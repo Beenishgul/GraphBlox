@@ -28,12 +28,39 @@ int main(int argc, char** argv){
 
 
  	//Open a Device (use "xbutil scan" to show the available devices)
-	xrtDeviceHandle device = xrtDeviceOpen(device_index);
-	if(device == NULL)
+	xrtDeviceHandle device_handle = xrtDeviceOpen(device_index);
+	if(device_handle == NULL)
 	{
 	printf("ERROR: %s --> xrtDeviceOpen(%i)\n",argv[0], device_index);
 	return -1;
 	}
+
+	//Load compiled kernel binary onto the device
+	xrtXclbinHandle xclbin_handle = xrtXclbinAllocFilename(xclbin_path);
+	if(xclbin_handle == NULL)
+	{
+	printf("ERROR: %s --> xrtXclbinAllocFilename(%s)\n",argv[0], xclbin_path);
+	return -1;
+	}
+
+
+	if(xrtDeviceLoadXclbinHandle(device_handle, xclbin_handle))
+	{
+	printf("ERROR: %s --> xrtDeviceLoadXclbinHandle()\n",argv[0]);
+	return -1;
+	}
+
+
+	xuid_t xclbin_uuid;
+ 
+    //Get UUID of xclbin handle
+    if(xrtXclbinGetUUID(xclbin_handle, xclbin_uuid))
+    {
+    	printf("ERROR: %s --> xrtXclbinGetUUID()\n",argv[0]);
+    	return -1;
+    }
+ 
+
 
 	return 0;
 }
