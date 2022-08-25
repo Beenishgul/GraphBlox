@@ -29,21 +29,92 @@ DEVICE 	:= xilinx_u280_xdma_201920_3
 XCLBIN 	:= ./xclbin
 XO 		:= ./xo
 
+EXECUTABLE := run-$(PROJECT)
+
+DSA := $(call device2sandsa, $(DEVICE))
+BUILD_DIR := ./_x.$(TARGET).$(DSA)
+BUILD_DIR_PROJECT := $(BUILD_DIR)/$(PROJECT)
+
+CXX := g++
+VPP := v++
+GCC := gcc
+
+RM := rm -f
+RMDIR := rm -rf
+ECHO:= @echo
+CP := cp -rf
+
+
+######################################################################
+# Executable Arguments
+######################################################################
+
+DEVICE_INDEX := 0
+XCLBIN_PATH := ./file.xclbin
+CMD_ARGS := $(DEVICE_INDEX) $(XCLBIN_PATH)
+
+######################################################################
+# G++ COMPILER FLAGS
+######################################################################
+host_CXXFLAGS += -g -g -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include -Wall -O0 
+# The below are linking flags for C++ Compiler
+xrt_LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
+CXXFLAGS += $(host_CXXFLAGS)
+CFLAGS += $(host_CXXFLAGS)
+
+
+HOST_SRCS += ./src/host/user-host.c
+
+# Host compiler global settings
+CXXFLAGS += -fmessage-length=0
+LDFLAGS += -lrt -lstdc++ $(xrt_LDFLAGS) 
+
+
+##########################################################################
+# Compile Executable
+##########################################################################
+
+$(EXECUTABLE): $(HOST_SRCS)
+	$(CXX) $(CXXFLAGS) $(HOST_SRCS) -o '$@' $(LDFLAGS)
+
+##########################################################################
+# RUN Executable
+##########################################################################
+
+
+run: $(EXECUTABLE)
+	./$(EXECUTABLE) $(CMD_ARGS)
+
+
+##########################################################################
+# Cleaning stuff
+##########################################################################
+clean:
+	#-$(RMDIR) $(EXECUTABLE) $(XCLBIN)/{*sw_emu*,*hw_emu*}
+	-$(RMDIR) $(EXECUTABLE) $(XCLBIN)
+	-$(RMDIR) *.log emconfig.json vadd.xclbin vivado.jou
+	#-$(RMDIR) TempConfig system_estimate.xtxt *.rpt
+	#-$(RMDIR) src/*.ll _v++_* .Xil emconfig.json dltmp* xmltmp* *.log *.jou
+
+cleanall: clean
+	-$(RMDIR) $(XCLBIN) $(XO)
+	-$(RMDIR) _x
+	-$(RMDIR) ./tmp_kernel_pack* ./packaged_kernel*
+###########################################################################
+#END OF Cleaning stuff
+##########################################################################
 
 
 ##########################################################################
 # The below commands generate a XO file from a pre-exsisitng RTL kernel.
 ###########################################################################
 VIVADO := $(XILINX_VIVADO)/bin/vivado
-$(XO)/vadd.xo: ./src/xml/kernel.xml ./scripts/package_kernel.tcl ./scripts/gen_xo.tcl ./src/IP/*.sv ./src/IP/*.v
+$(XO)/$(PROJECT).xo: ./src/xml/kernel.xml ./scripts/package_kernel.tcl ./scripts/gen_xo.tcl ./src/IP/*.sv ./src/IP/*.v
 	mkdir -p $(XO)
-	$(VIVADO) -mode batch -source scripts/gen_xo.tcl -tclargs $(XO)/vadd.xo vadd $(TARGET) $(DEVICE)
+	$(VIVADO) -mode batch -source scripts/gen_xo.tcl -tclargs $(XO)/$(PROJECT).xo $(PROJECT) $(TARGET) $(DEVICE)
 ###########################################################################
 #END OF GENERATION OF XO
 ##########################################################################
-
-
-
 
 
 
