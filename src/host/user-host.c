@@ -2,17 +2,9 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <time.h>
+
+
  #include "glayenv.h"
-
- #include "experimental/xrt_kernel.h"
- #include "experimental/xrt_aie.h"
-
-#define DATA_SIZE 4096
-#define IP_START 0x1
-#define IP_IDLE 0x4
-#define USER_OFFSET 0x0
-#define A_OFFSET 0x18
-#define B_OFFSET 0x24
 
 int main(int argc, char** argv){
 
