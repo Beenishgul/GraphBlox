@@ -22,6 +22,50 @@ help::
 	$(ECHO) ""
 
 
+#########################################################
+#                GENERAL DIRECTOIRES                    #
+#########################################################
+# global binary /bin/glay name doesn't need to match main/glay.c
+APP                 ?= glay
+
+# test name needs to match the file name tests/test_glay.c
+APP_TEST            ?= test_glay
+
+# dirs Root app
+APP_DIR             ?= .
+BENCHMARKS_DIR      ?= ../01_test_graphs
+
+#dir root/managed_folders
+
+SRC_DIR             ?= src
+OBJ_DIR             ?= obj
+INC_DIR             ?= include
+BIN_DIR             ?= bin
+RES_DIR             ?= results
+
+#if you want to compile from cmake you need this directory
+#cd build
+#cmake ..
+BUILD_DIR           ?= build
+
+# relative directories used for managing src/obj files
+STRUCT_DIR          ?= structures
+PREPRO_DIR          ?= preprocess
+ALGO_DIR            ?= algorithms
+ALGO_DIR_GLAY       ?= glay
+ALGO_DIR_OPENMP     ?= openmp
+UTIL_DIR            ?= utils
+CONFIG_DIR			?= config
+
+#contains the tests use make run-test to compile what in this directory
+TEST_DIR            ?= tests
+
+#contains the main for the graph processing framework
+MAIN_DIR            ?= main
+
+#########################################################
+#                GENERAL VARIABLES                      #
+#########################################################
 
 PROJECT := glay
 TARGET 	:= hw_emu
@@ -43,7 +87,6 @@ RM := rm -f
 RMDIR := rm -rf
 ECHO:= @echo
 CP := cp -rf
-
 
 ######################################################################
 # Executable Arguments
