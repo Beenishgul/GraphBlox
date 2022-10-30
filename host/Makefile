@@ -75,18 +75,71 @@ XO 		:= ./xo
 
 EXECUTABLE := run-$(PROJECT)
 
-DSA := $(call device2sandsa, $(DEVICE))
-BUILD_DIR := ./_x.$(TARGET).$(DSA)
+DSA 		:= $(call device2sandsa, $(DEVICE))
+BUILD_DIR 	:= ./_x.$(TARGET).$(DSA)
 BUILD_DIR_PROJECT := $(BUILD_DIR)/$(PROJECT)
 
-CXX := g++
-VPP := v++
-GCC := gcc
+CXX 	:= g++
+VPP 	:= v++
+GCC 	:= gcc
 
-RM := rm -f
-RMDIR := rm -rf
-ECHO:= @echo
-CP := cp -rf
+RM 		:= rm -f
+RMDIR 	:= rm -rf
+ECHO 	:= @echo
+CP 		:= cp -rf
+
+##############################################
+#     GLAY COMPILATION FOLDERS/FILES         #
+##############################################
+
+
+#each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
+SRC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/*.c)
+SRC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
+SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
+SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
+SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
+SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
+
+
+INC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/openmp/*.h)
+INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
+INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
+INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
+INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
+
+
+ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CONFIG)
+
+#create object file rules for the final binary target
+OBJ_FILES_ALGO_OPENMP = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
+
+OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
+OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
+OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
+OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
+OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
+
+CC                = gcc
+
+OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
+				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
+				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
+				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
+				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
+
+
+# flags
+CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
+LFLAGS = -lm -lJudy
+
+
+# TEST PASS OR FAIL
+PASS = \033[92mPASS\033[0m
+FAIL = \033[91mFAIL\033[0m
+
+##################################################
+##################################################
 
 ######################################################################
 # Executable Arguments
