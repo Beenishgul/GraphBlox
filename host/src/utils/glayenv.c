@@ -30,12 +30,12 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
 {
 
     int i;
-    glayHandle = malloc(sizeof(struct xrtGLAYHandle));
+    glayHandle = (struct xrtGLAYHandle *)malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
     glayHandle->deviceHandle = NULL;
     glayHandle->xclbinHandle = NULL;
-    glayHandle->xclbinUUID = 0;
+    // glayHandle->xclbinUUID
 
     //Open a Device (use "xbutil scan" to show the available devices)
     glayHandle->deviceHandle = xrtDeviceOpen(glayHandle->deviceIndex);
@@ -121,10 +121,10 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR)
+struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struct GLAYGraphCSR *graph)
 {
 
-    struct GLAYGraphCSR *glayGraphCSR = malloc(sizeof(struct GLAYGraphCSR));
+    glayGraphCSR = (struct GLAYGraphCSR *)malloc(sizeof(struct GLAYGraphCSR));
 
     glayGraphCSR->num_edges    = graph->num_edges;
     glayGraphCSR->num_vertices = graph->num_vertices;

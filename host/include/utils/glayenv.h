@@ -6,8 +6,6 @@
 #include "experimental/xrt_kernel.h"
 #include "experimental/xrt_aie.h"
 
-#include "graphCSR.h" 
-
 #define DATA_SIZE 4096
 #define IP_START 0x1
 #define IP_IDLE 0x4
@@ -49,6 +47,7 @@ void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphC
 void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
 void waitGLAY(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
-struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR);
+struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struct GLAYGraphCSR *graph);
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);
 
+#endif
