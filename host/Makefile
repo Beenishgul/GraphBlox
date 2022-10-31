@@ -38,10 +38,10 @@ BENCHMARKS_DIR      ?= ../01_test_graphs
 #dir root/managed_folders
 
 SRC_DIR             ?= src
-OBJ_DIR             ?= obj
+OBJ_DIR             ?= obj/$(INTEGRATION)
 INC_DIR             ?= include
-BIN_DIR             ?= bin
-RES_DIR             ?= results
+BIN_DIR             ?= bin/$(INTEGRATION)
+RES_DIR             ?= results/$(INTEGRATION)
 
 #if you want to compile from cmake you need this directory
 #cd build
@@ -79,22 +79,48 @@ DSA 		:= $(call device2sandsa, $(DEVICE))
 BUILD_DIR 	:= ./_x.$(TARGET).$(DSA)
 BUILD_DIR_PROJECT := $(BUILD_DIR)/$(PROJECT)
 
+##############################################
+#     CLI COMMANDS                           #
+##############################################
+
+RM 		:= @rm -f
+RMDIR 	:= @rm -rf
+ECHO 	:= @echo
+CP 		:= @cp -rf
+MKDIR   := @mkdir -p
+
+# TEST PASS OR FAIL
+PASS = \033[92mPASS\033[0m
+FAIL = \033[91mFAIL\033[0m
+
+##############################################
+#     COMPILER FLAGS                         #
+##############################################
+
 CXX 	:= g++
 VPP 	:= v++
 GCC 	:= gcc
+CC      := gcc
 
-RM 		:= rm -f
-RMDIR 	:= rm -rf
-ECHO 	:= @echo
-CP 		:= cp -rf
+# flags
+CFLAGS   	   =  -O3 -Wall -m64 -fopenmp -g
+LFLAGS         = -lm -lJudy
+HOST_CXXFLAGS += -g -g -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include -Wall -O0 
+# The below are linking flags for C++ Compiler
+XRT_LDFLAGS   += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
+CXXFLAGS      += $(HOST_CXXFLAGS)
+CFLAGS        += $(HOST_CXXFLAGS)
+
+# Host compiler global settings
+CXXFLAGS      += -fmessage-length=0
+LDFLAGS       += -lrt -lstdc++ $(XRT_LDFLAGS) 
 
 ##############################################
 #     GLAY COMPILATION FOLDERS/FILES         #
 ##############################################
 
-
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
-SRC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/*.c)
+SRC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.c)
 SRC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
 SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
 SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
@@ -102,17 +128,17 @@ SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
 SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
 
 
-INC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/openmp/*.h)
+INC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.h)
 INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
 INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
 INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
 INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
 
 
-ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CONFIG)
+ALL_HEADER_FILES    =   $(INC_FILES_ALGO) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CONFIG)
 
 #create object file rules for the final binary target
-OBJ_FILES_ALGO_OPENMP = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
+OBJ_FILES_ALGO      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO_OPENMP))
 
 OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
 OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
@@ -120,57 +146,93 @@ OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_D
 OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
 OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
 
-CC                = gcc
-
 OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
 				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
-
-# flags
-CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
-LFLAGS = -lm -lJudy
-
-
-# TEST PASS OR FAIL
-PASS = \033[92mPASS\033[0m
-FAIL = \033[91mFAIL\033[0m
-
-##################################################
-##################################################
-
 ######################################################################
-# Executable Arguments
+# GLAY COMMAND ARGUMENTS
 ######################################################################
 
 DEVICE_INDEX := 0
 XCLBIN_PATH := ./file.xclbin
 CMD_ARGS := $(DEVICE_INDEX) $(XCLBIN_PATH)
 
-######################################################################
-# G++ COMPILER FLAGS
-######################################################################
-host_CXXFLAGS += -g -g -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include -Wall -O0 
-# The below are linking flags for C++ Compiler
-xrt_LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
-CXXFLAGS += $(host_CXXFLAGS)
-CFLAGS += $(host_CXXFLAGS)
+#########################################################
+#                GLAY GENERATION                        #
+#########################################################
 
+.PHONY: app-$(INTEGRATION)
+app-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(APP)-$(INTEGRATION)
+	-$(ECHO) "\n ******************************************************************************  "
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> glay-$(INTEGRATION): ./$(word 3,$^)"
+	-$(ECHO) " ******************************************************************************  \n"
 
-HOST_SRCS += ./src/host/user-host.c
+.PHONY: test-$(INTEGRATION)
+test-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-$(INTEGRATION)
+	-$(ECHO) "\n ******************************************************************************  "
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> TEST: ./$(word 3,$^)"
+	-$(ECHO) " ****************************************************************************** \n"
 
-# Host compiler global settings
-CXXFLAGS += -fmessage-length=0
-LDFLAGS += -lrt -lstdc++ $(xrt_LDFLAGS) 
+.PHONY: directories
+directories :
+	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(APP_DIR)/$(RES_DIR)
 
+.PHONY: clean-all
+clean-all: clean clean-results
+
+.PHONY: clean
+clean:
+	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
+	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
+
+.PHONY: clean-results
+clean-results:
+	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
+
+#########################################################
+#                GLAY COMPILATION                       #
+#########################################################
+
+$(APP_DIR)/$(BIN_DIR)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
+
+$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
+
+$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) 
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 ##########################################################################
 # Compile Executable
 ##########################################################################
 
-$(EXECUTABLE): $(HOST_SRCS)s
+$(EXECUTABLE): $(HOST_SRCS)
 	$(CXX) $(CXXFLAGS) $(HOST_SRCS) -o '$@' $(LDFLAGS)
 
 ##########################################################################
@@ -179,25 +241,6 @@ $(EXECUTABLE): $(HOST_SRCS)s
 
 run: $(EXECUTABLE)
 	./$(EXECUTABLE) $(CMD_ARGS)
-
-##########################################################################
-# Cleaning stuff
-##########################################################################
-clean:
-	#-$(RMDIR) $(EXECUTABLE) $(XCLBIN)/{*sw_emu*,*hw_emu*}
-	-$(RMDIR) $(EXECUTABLE) $(XCLBIN)
-	-$(RMDIR) *.log emconfig.json glay.xclbin vivado.jou
-	#-$(RMDIR) TempConfig system_estimate.xtxt *.rpt
-	#-$(RMDIR) src/*.ll _v++_* .Xil emconfig.json dltmp* xmltmp* *.log *.jou
-
-cleanall: clean
-	-$(RMDIR) $(XCLBIN) $(XO)
-	-$(RMDIR) _x
-	-$(RMDIR) ./tmp_kernel_pack* ./packaged_kernel*
-###########################################################################
-#END OF Cleaning stuff
-##########################################################################
-
 
 ##########################################################################
 # The below commands generate a XO file from a pre-exsisitng RTL kernel.
