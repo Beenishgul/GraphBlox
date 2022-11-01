@@ -18,7 +18,12 @@
 #include <string.h>
 #include <math.h>
 #include <omp.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <Judy.h>
+}
 
 #include "mt19937.h"
 #include "timer.h"
@@ -31,10 +36,7 @@
 
 #include "graphCSR.h"
 
-
-
 #include "reorder.h"
-
 #include "connectedComponents.h"
 
 
@@ -105,13 +107,15 @@ void printCCStats(struct CCStats *stats)
 
 
     Index = 0;
-    JLF(PValue, JArray, Index);
+    // JLF(PValue, JArray, Index);
+    PValue = (Word_t *) JudyLFirst(JArray, &Index, PJE0);
     while (PValue != NULL)
     {
         // printf("--> %lu %lu\n", Index, *PValue);
         stats->counts[Index] = *PValue;
         * PValue = 0;
-        JLN(PValue, JArray, Index);
+        // JLN(PValue, JArray, Index);
+        PValue = (Word_t *) JudyLNext(JArray, &Index, PJE0);
 
     }
 
@@ -210,7 +214,8 @@ void addSample(uint32_t id)
 {
     Word_t *PValue;
 
-    JLI(PValue, JArray, id);
+    // JLI(PValue, JArray, id);
+    PValue = (Word_t *) JudyLIns(&JArray, id, PJE0);
     *PValue += 1;
 }
 
@@ -230,7 +235,8 @@ uint32_t sampleFrequentNode(mt19937state *mt19937var, uint32_t num_vertices, uin
     uint32_t maxCount = 0;
 
     Index = 0;
-    JLF(PValue, JArray, Index);
+    // JLF(PValue, JArray, Index);
+    PValue = (Word_t *) JudyLFirst(JArray, &Index, PJE0);
     while (PValue != NULL)
     {
         // printf("%lu %lu\n", Index, *PValue);
@@ -241,7 +247,8 @@ uint32_t sampleFrequentNode(mt19937state *mt19937var, uint32_t num_vertices, uin
 
         }
         *PValue = 0;
-        JLN(PValue, JArray, Index);
+        // JLN(PValue, JArray, Index);
+        PValue = (Word_t *) JudyLNext(JArray, &Index, PJE0);
 
     }
 

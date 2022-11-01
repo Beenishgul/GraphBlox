@@ -24,7 +24,7 @@ struct Arguments
     uint32_t iterations;
     uint32_t trials;
     double epsilon;
-    int source;
+    uint32_t source;
     uint32_t algorithm;
     uint32_t datastructure;
     uint32_t pushpull;
