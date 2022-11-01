@@ -243,7 +243,8 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
 {
 
     FILE *pText, *pBinary;
-    uint32_t size = 0, i;
+    uint32_t size = 0;
+    int32_t i = 0;
     uint32_t src = 0, dest = 0;
     float weight = 1.0;
 
@@ -364,7 +365,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     }
 
     /* fs.st_size could have been 0 actually */
-    buf_addr = mmap(0, fs.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
+    buf_addr = (char *)mmap(0, fs.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
 
     if (buf_addr == (void *) -1)
     {

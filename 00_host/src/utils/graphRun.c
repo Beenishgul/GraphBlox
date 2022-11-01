@@ -27,14 +27,12 @@
 #include "BFS.h"
 #include "DFS.h"
 #include "pageRank.h"
-
 #include "bellmanFord.h"
 #include "SSSP.h"
 #include "SPMV.h"
 #include "connectedComponents.h"
 #include "triangleCount.h"
 #include "betweennessCentrality.h"
-
 
 #include "reorder.h"
 #include "graphStats.h"
@@ -151,7 +149,7 @@ void writeSerializedGraphDataStructure(struct Arguments *arguments)  // for now 
 
         graphCSR = (struct GraphCSR *)graph;
         Start(timer);
-        writeToBinFileGraphCSR (arguments->fnameb, graph);
+        writeToBinFileGraphCSR (arguments->fnameb, graphCSR);
         Stop(timer);
         generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
 
