@@ -1,0 +1,9 @@
+00_host/obj
+00_host/bin
+00_host/build
+00_host/results
+nohup.out
+00_host/nohup.out
+.vscode
+glay.sublime-project
+glay.sublime-workspace
