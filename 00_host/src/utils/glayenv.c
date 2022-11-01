@@ -14,6 +14,7 @@
 // -----------------------------------------------------------------------------
 
 #include "glayenv.h"
+#include "myMalloc.h"
 
 // ********************************************************************************************
 // ***************                  XRT General                                  **************
@@ -22,8 +23,7 @@
 int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath)
 {
 
-    int i;
-    glayHandle = (struct xrtGLAYHandle *)malloc(sizeof(struct xrtGLAYHandle));
+    glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
     glayHandle->deviceHandle = NULL;
@@ -34,7 +34,7 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
     glayHandle->deviceHandle = xrtDeviceOpen(glayHandle->deviceIndex);
     if(glayHandle->deviceHandle == NULL)
     {
-        printf("ERROR: %i --> xrtDeviceOpen(%i)\n", glayHandle->deviceIndex, glayHandle->deviceIndex);
+        printf("ERROR:--> xrtDeviceOpen\n");
         return -1;
     }
 
@@ -42,21 +42,21 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
     glayHandle->xclbinHandle = xrtXclbinAllocFilename(glayHandle->xclbinPath);
     if(glayHandle->xclbinHandle == NULL)
     {
-        printf("ERROR: %i --> xrtXclbinAllocFilename(%s)\n", glayHandle->deviceIndex, glayHandle->xclbinPath);
+        printf("ERROR:--> xrtXclbinAllocFilename\n");
         return -1;
     }
 
 
     if(xrtDeviceLoadXclbinHandle(glayHandle->deviceHandle, glayHandle->xclbinHandle))
     {
-        printf("ERROR: %s --> xrtDeviceLoadXclbinHandle()\n",glayHandle->xclbinHandle);
+        printf("ERROR:--> xrtDeviceLoadXclbinHandle\n");
         return -1;
     }
 
     //Get UUID of xclbin handle
     if(xrtXclbinGetUUID(glayHandle->xclbinHandle, glayHandle->xclbinUUID))
     {
-        printf("ERROR: %s --> xrtXclbinGetUUID()\n", glayHandle->xclbinUUID);
+        printf("ERROR:--> xrtXclbinGetUUID");
         return -1;
     }
 
@@ -117,7 +117,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struct GLAYGraphCSR *graph)
 {
 
-    glayGraphCSR = (struct GLAYGraphCSR *)malloc(sizeof(struct GLAYGraphCSR));
+    glayGraphCSR = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
 
     glayGraphCSR->num_edges    = graph->num_edges;
     glayGraphCSR->num_vertices = graph->num_vertices;
@@ -128,10 +128,6 @@ struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struc
 
 void printGLAYDeviceInfo(struct xrtGLAYHandle *glayHandle){
 
-    printf("ERROR: %s --> xrtDeviceOpen(%i)\n", glayHandle->deviceIndex, glayHandle->deviceIndex);
-    printf("ERROR: %s --> xrtXclbinAllocFilename(%s)\n", glayHandle->deviceIndex, glayHandle->xclbinPath);
-    printf("ERROR: %s --> xrtDeviceLoadXclbinHandle()\n",glayHandle->deviceIndex);
-    printf("ERROR: %s --> xrtXclbinGetUUID()\n", glayHandle->deviceIndex);
 }
 
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR)

@@ -105,14 +105,14 @@ static edit **levenshtein_matrix_create(const uint32_t *array1, uint32_t len1, c
                                         uint32_t len2)
 {
     uint32_t i, j;
-    edit **mat = malloc((len1 + 1) * sizeof(edit *));
+    edit **mat = (edit **) my_malloc((len1 + 1) * sizeof(edit *));
     if (mat == NULL)
     {
         return NULL;
     }
     for (i = 0; i <= len1; i++)
     {
-        mat[i] = malloc((len2 + 1) * sizeof(edit));
+        mat[i] = (edit *) my_malloc((len2 + 1) * sizeof(edit));
         if (mat[i] == NULL)
         {
             for (j = 0; j < i; j++)
@@ -165,7 +165,7 @@ uint32_t levenshtein_distance(const uint32_t *array1, const uint32_t len1, const
     /* Main algorithm */
     distance = levenshtein_matrix_calculate(mat, array1, len1, array2, len2);
     /* Read back the edit script */
-    *script = malloc(distance * sizeof(edit));
+    *script = (edit *) my_malloc(distance * sizeof(edit));
     if (*script)
     {
         i = distance - 1;
@@ -538,7 +538,7 @@ double avg_error_ranks_real_topK(uint32_t *array1, uint32_t *array2, uint32_t *a
 
     for(v = size_k - topk; v < size_k; v++)
     {
-        error += abs(array2[array3[v]] - array1[array3[v]])/((double)array1[array3[v]]+1);
+        error += abs((double)array2[array3[v]] - (double)array1[array3[v]])/((double)array1[array3[v]]+1);
         // printf("rank%d v%d rv_ref%d rv_cmp%d diff%d err%lf \n", v, array/3[v], array1[array3[v]], array2[array3[v]], abs(array2[array3[v]] - array1[array3[v]]), error);
     }
 

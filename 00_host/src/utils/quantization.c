@@ -23,7 +23,7 @@
  it has an O(N) complexity*/
 void getMinMax(struct quant_params *x, float *ranks, uint32_t size)
 {
-    int i ;
+    uint32_t i ;
 
     if (size == 1)
     {
@@ -55,7 +55,7 @@ void getMinMax(struct quant_params *x, float *ranks, uint32_t size)
 
 void getMinMax_32(struct quant_params_32 *x, float *ranks, uint32_t size)
 {
-    int i ;
+    uint32_t i ;
 
     if (size == 1)
     {
@@ -93,7 +93,7 @@ void getMinMax_32(struct quant_params_32 *x, float *ranks, uint32_t size)
 
 void getMinMax_16(struct quant_params_16 *x, float *ranks, uint32_t size)
 {
-    int i ;
+    uint32_t i ;
 
     if (size == 1)
     {
@@ -125,7 +125,7 @@ void getMinMax_16(struct quant_params_16 *x, float *ranks, uint32_t size)
 
 void getMinMax_8(struct quant_params_8 *x, float *ranks, uint32_t size)
 {
-    int i ;
+    uint32_t i ;
 
     if (size == 1)
     {

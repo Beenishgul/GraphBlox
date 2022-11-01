@@ -1663,7 +1663,7 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
 {
 
     FILE *pText;
-    uint32_t i;
+    int32_t i;
     uint32_t v = 0;
     uint32_t dest = 0;
     uint32_t x = 0;
