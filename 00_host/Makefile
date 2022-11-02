@@ -103,9 +103,9 @@ GCC 	:= gcc
 CC      := gcc
 
 # flags
-CFLAGS   	   =  -O3 -Wall -m64 -fopenmp -g
+CFLAGS   	   = -Wall -m64 -fopenmp -g -Wall -O0 
 LFLAGS         = -lm -lJudy
-HOST_CXXFLAGS += -g -g -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include -Wall -O0 
+HOST_CXXFLAGS += -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
 # The below are linking flags for C++ Compiler
 XRT_LDFLAGS   += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS      += $(HOST_CXXFLAGS)
