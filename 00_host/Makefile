@@ -6,21 +6,11 @@ help::
 	$(ECHO) "      Command to generate the design for specified Target and Device."
 	$(ECHO) ""
 	$(ECHO) "  make clean "
-	$(ECHO) "      Command to remove the generated non-hardware files."
+	$(ECHO) "      Command to remove the generated files (obj, bin)."
 	$(ECHO) ""
-	$(ECHO) "  make cleanall"
-	$(ECHO) "      Command to remove all the generated files."
+	$(ECHO) "  make clean-all"
+	$(ECHO) "      Command to remove all the generated files (obj, bin, results)"
 	$(ECHO) ""
-	$(ECHO) "  make check TARGET=<sw_emu/hw_emu/hw> DEVICE=<FPGA platform>"
-	$(ECHO) "      Command to run application in emulation."
-	$(ECHO) ""
-	$(ECHO) "  make run_nimbix DEVICE=<FPGA platform>"
-	$(ECHO) "      Command to run application on Nimbix Cloud."
-	$(ECHO) ""
-	$(ECHO) "  make aws_build DEVICE=<FPGA platform>"
-	$(ECHO) "      Command to build AWS xclbin application on AWS Cloud."
-	$(ECHO) ""
-
 
 #########################################################
 #                GENERAL DIRECTOIRES                    #
@@ -272,4 +262,3 @@ endif
 ifndef XILINX_VITIS
 $(error XILINX_VITIS variable is not set, please set correctly and rerun)
 endif
-
