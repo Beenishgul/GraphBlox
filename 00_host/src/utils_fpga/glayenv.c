@@ -16,6 +16,7 @@
 #include "glayenv.h"
 #include "myMalloc.h"
 
+
 // ********************************************************************************************
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
@@ -104,40 +105,87 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 
 }
 
+void printGLAYDeviceInfo(struct xrtGLAYHandle *glayHandle){
 
-// ********************************************************************************************
-// ***************                   DataStructure                               **************
-// ********************************************************************************************
-
+}
 
 // ********************************************************************************************
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struct GLAYGraphCSR *graph)
+struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GraphCSR *graph)
 {
 
-    glayGraphCSR = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
+    struct GLAYGraphCSR *glayGraphCSR = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
 
     glayGraphCSR->num_edges    = graph->num_edges;
     glayGraphCSR->num_vertices = graph->num_vertices;
+#if WEIGHTED
+    glayGraphCSR->max_weight   = graph->max_weight;
+#else
+    glayGraphCSR->max_weight   = 0;
+#endif
 
+    glayGraphCSR->vertex_out_degree  = graph->vertices->out_degree;
+    glayGraphCSR->vertex_in_degree   = graph->vertices->in_degree;
+    glayGraphCSR->vertex_edges_idx   = graph->vertices->edges_idx;
+
+    glayGraphCSR->edges_array_src    = graph->sorted_edges_array->edges_array_src;
+    glayGraphCSR->edges_array_dest   = graph->sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    glayGraphCSR->edges_array_weight = graph->sorted_edges_array->edges_array_weight;
+#else
+    glayGraphCSR->edges_array_weight = 0;
+#endif
+
+#if DIRECTED
+    glayGraphCSR->inverse_vertex_out_degree  = graph->inverse_vertices->out_degree;
+    glayGraphCSR->inverse_vertex_in_degree   = graph->inverse_vertices->in_degree;
+    glayGraphCSR->inverse_vertex_edges_idx   = graph->inverse_vertices->edges_idx;
+
+    glayGraphCSR->inverse_edges_array_src    = graph->inverse_sorted_edges_array->edges_array_src;
+    glayGraphCSR->inverse_edges_array_dest   = graph->inverse_sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    glayGraphCSR->inverse_edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
+#else
+    glayGraphCSR->inverse_edges_array_weight = 0;
+#endif
+#endif
+
+
+    glayGraphCSR->auxiliary0 = 0;
     return glayGraphCSR;
 }
 
 
-void printGLAYDeviceInfo(struct xrtGLAYHandle *glayHandle){
-
-}
-
-void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR)
+void printGLAYGraphCSRPointers(struct GLAYGraphCSR *glayGraphCSR)
 {
 
     printf("*-----------------------------------------------------*\n");
-    printf("| %-12s %-24s %-12s | \n", " ", "GraphCSR structure", " ");
+    printf("| %-12s %-24s %-12s | \n", " ", "GLay GraphCSR structure", " ");
     printf(" -----------------------------------------------------\n");
-    printf("| %-25s | %-24p| \n", "wed",   glayGraphCSR);
+    printf("| %-25s | %-24p| \n", "glayGraphCSR",   glayGraphCSR);
     printf("| %-25s | %-24u| \n", "num_edges", glayGraphCSR->num_edges);
     printf("| %-25s | %-24u| \n", "num_vertices", glayGraphCSR->num_vertices);
+    printf("| %-25s | %-24f| \n", "max_weight", glayGraphCSR->max_weight);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-25s | %-24p| \n", "vertex_in_degree", glayGraphCSR->vertex_in_degree);
+    printf("| %-25s | %-24p| \n", "vertex_out_degree", glayGraphCSR->vertex_out_degree);
+    printf("| %-25s | %-24p| \n", "vertex_edges_idx", glayGraphCSR->vertex_edges_idx);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-25s | %-24p| \n", "edges_array_src", glayGraphCSR->edges_array_src);
+    printf("| %-25s | %-24p| \n", "edges_array_dest", glayGraphCSR->edges_array_dest);
+    printf("| %-25s | %-24p| \n", "edges_array_weight", glayGraphCSR->edges_array_weight);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-25s | %-24p| \n", "inverse_vertex_in_degree", glayGraphCSR->inverse_vertex_in_degree);
+    printf("| %-25s | %-24p| \n", "inverse_vertex_out_degree", glayGraphCSR->inverse_vertex_out_degree);
+    printf("| %-25s | %-24p| \n", "inverse_vertex_edges_idx", glayGraphCSR->inverse_vertex_edges_idx);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-25s | %-24p| \n", "inverse_edges_array_src", glayGraphCSR->inverse_edges_array_src);
+    printf("| %-25s | %-24p| \n", "inverse_edges_array_dest", glayGraphCSR->inverse_edges_array_dest);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-25s | %-24u| \n", "auxiliary0", glayGraphCSR->auxiliary0);
+    printf("| %-25s | %-24p| \n", "auxiliary1", glayGraphCSR->auxiliary1);
+    printf("| %-25s | %-24p| \n", "auxiliary2", glayGraphCSR->auxiliary2);
     printf(" -----------------------------------------------------\n");
 }
