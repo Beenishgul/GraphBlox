@@ -13,6 +13,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "graphCSR.h"
 
 #define DATA_SIZE 4096
 #define IP_START 0x1
@@ -27,10 +28,25 @@ extern "C" {
 
 struct __attribute__((__packed__)) GLAYGraphCSR
 {
-    uint32_t num_edges;                    // 4-Bytes
-    uint32_t num_vertices;                 // 4-Bytes
-    uint32_t avg_degree;
-
+    uint32_t num_edges;                 // 4-Bytes
+    uint32_t num_vertices;              // 4-Bytes
+    float max_weight;                   // 4-Bytes
+    uint32_t auxiliary0;                // 4-Bytes
+    void *vertex_out_degree;            // 8-Bytes
+    void *vertex_in_degree;             // 8-Bytes
+    void *vertex_edges_idx;             // 8-Bytes
+    void *edges_array_weight;           // 8-Bytes
+    void *edges_array_src;              // 8-Bytes
+    void *edges_array_dest;             // 8-Bytes
+    //---------------------------------------------------//--// 64bytes
+    void *inverse_vertex_out_degree;    // 8-Bytes
+    void *inverse_vertex_in_degree;     // 8-Bytes
+    void *inverse_vertex_edges_idx;     // 8-Bytes
+    void *inverse_edges_array_weight;   // 8-Bytes
+    void *inverse_edges_array_src;      // 8-Bytes
+    void *inverse_edges_array_dest;     // 8-Bytes
+    void *auxiliary1;                   // 8-Bytes
+    void *auxiliary2;                   // 8-Bytes
 };
 
 
@@ -55,7 +71,7 @@ void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphC
 void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
 void waitGLAY(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
-struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GLAYGraphCSR *glayGraphCSR, struct GLAYGraphCSR *graph);
+struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GraphCSR *graph);
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);
 
 #ifdef __cplusplus
