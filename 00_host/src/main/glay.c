@@ -7,11 +7,16 @@
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi
 // Email  : atmughra@virginia||atmughrabi@gmail.com
-// File   : open-graph.c
+// File   : glay.c
 // Create : 2022-06-21 17:15:17
 // Revise : 2022-09-28 15:37:28
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -327,7 +332,9 @@ main (int argc, char **argv)
     exit (0);
 }
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 

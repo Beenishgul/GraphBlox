@@ -1,9 +1,11 @@
-.PHONY: help
-
-help::
+.PHONY: mkhelp
+mkhelp::
 	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make all TARGET=<sw_emu/hw_emu/hw> DEVICE=<FPGA platform>"
-	$(ECHO) "      Command to generate the design for specified Target and Device."
+	$(ECHO) "  make glay INTEGRATION=(Default::openmp)"
+	$(ECHO) "      Command to generate glay in openmp"
+	$(ECHO) ""
+	$(ECHO) "  make glay INTEGRATION=fpga"
+	$(ECHO) "      Command to generate glay in FPGA"
 	$(ECHO) ""
 	$(ECHO) "  make clean "
 	$(ECHO) "      Command to remove the generated files (obj, bin)."
@@ -15,23 +17,20 @@ help::
 #########################################################
 #                GENERAL DIRECTOIRES                    #
 #########################################################
-# global binary /bin/glay name doesn't need to match main/glay.c
 APP                 ?= glay
-
-# test name needs to match the file name tests/test_glay.c
 APP_TEST            ?= test_glay
+INTEGRATION         ?= openmp
 
 # dirs Root app
 APP_DIR             ?= .
-BENCHMARKS_DIR      ?= ../01_test_graphs
 
 #dir root/managed_folders
 
 SRC_DIR             ?= src
-OBJ_DIR             ?= obj/$(INTEGRATION)
+OBJ_DIR             ?= obj
 INC_DIR             ?= include
-BIN_DIR             ?= bin/$(INTEGRATION)
-RES_DIR             ?= results/$(INTEGRATION)
+BIN_DIR             ?= bin
+RES_DIR             ?= results
 
 #if you want to compile from cmake you need this directory
 #cd build
@@ -128,13 +127,13 @@ INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
 ALL_HEADER_FILES    =   $(INC_FILES_ALGO) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CONFIG)
 
 #create object file rules for the final binary target
-OBJ_FILES_ALGO      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO))
+OBJ_FILES_ALGO      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO))
 
-OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
-OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
-OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
-OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
-OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
+OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
+OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
+OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
+OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
+OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
 
 OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
@@ -142,123 +141,182 @@ OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
 				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
-######################################################################
-# GLAY COMMAND ARGUMENTS
-######################################################################
-
-DEVICE_INDEX := 0
-XCLBIN_PATH := ./file.xclbin
-CMD_ARGS := $(DEVICE_INDEX) $(XCLBIN_PATH)
-
 #########################################################
 #                GLAY GENERATION                        #
 #########################################################
 
-.PHONY: app-$(INTEGRATION)
-app-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(APP)-$(INTEGRATION)
+.PHONY: help
+help: $(APP)-$(INTEGRATION)
+	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
+
+.PHONY: $(APP)-$(INTEGRATION)
+$(APP)-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> glay-$(INTEGRATION): ./$(word 3,$^)"
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP)-$(INTEGRATION): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)"
 	-$(ECHO) " ******************************************************************************  \n"
 
-.PHONY: test-$(INTEGRATION)
-test-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-$(INTEGRATION)
+.PHONY: $(APP_TEST)-$(INTEGRATION)
+$(APP_TEST)-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> TEST: ./$(word 3,$^)"
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP_TEST): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)"
 	-$(ECHO) " ****************************************************************************** \n"
 
 .PHONY: directories
 directories :
-	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(APP_DIR)/$(RES_DIR)
+	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
 
 .PHONY: clean-all
-clean-all: clean clean-results
+clean-all:
+	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
+	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
+	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
 
 .PHONY: clean
 clean:
-	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
-	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
+	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
+	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
 
 .PHONY: clean-results
 clean-results:
-	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
+	-$(RMDIR) $(APP_DIR)/$(RES_DIR)/$(INTEGRATION)
+
 
 #########################################################
 #                GLAY COMPILATION                       #
 #########################################################
 
-$(APP_DIR)/$(BIN_DIR)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
-$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
-$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) 
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) 
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 ##########################################################################
-# RUN Executable
+# RUN GLay
 ##########################################################################
 
-run: $(EXECUTABLE)
-	./$(EXECUTABLE) $(CMD_ARGS)
+.PHONY: run
+run: $(APP)
+
+.PHONY: $(APP)
+$(APP): $(APP)-$(INTEGRATION)
+	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
+
+.PHONY: debug-memory
+debug-memory: $(APP)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
 
 ##########################################################################
-# The below commands generate a XO file from a pre-exsisitng RTL kernel.
-###########################################################################
-VIVADO := $(XILINX_VIVADO)/bin/vivado
-$(XO)/$(PROJECT).xo: ./src/xml/kernel.xml ./scripts/package_kernel.tcl ./scripts/gen_xo.tcl ./src/IP/*.sv ./src/IP/*.v
-	mkdir -p $(XO)
-	$(VIVADO) -mode batch -source scripts/gen_xo.tcl -tclargs $(XO)/$(PROJECT).xo $(PROJECT) $(TARGET) $(DEVICE)
-###########################################################################
-#END OF GENERATION OF XO
+# RUN Tests
 ##########################################################################
 
+DEVICE_INDEX := 0
+XCLBIN_PATH := ./file.xclbin
+export TEST_ARGS ?= $(DEVICE_INDEX) $(XCLBIN_PATH)
+
+.PHONY: run-test
+run-test: $(APP_TEST)
+
+.PHONY: $(APP_TEST)
+$(APP_TEST): $(APP_TEST)-$(INTEGRATION)
+	$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) $(TEST_ARGS)
+
+#########################################################
+#       		    GRAPH ARGUMENTS         			#
+#########################################################
+
+export BENCHMARKS_DIR ?= ../03_test_graphs
+
+# TEST # small test graphs
+# export GRAPH_SUIT ?= TEST
+# export GRAPH_NAME ?= test
+# export GRAPH_NAME ?= v51_e1021
+# export GRAPH_NAME ?= v300_e2730
+# export GRAPH_NAME ?= graphbrew
+
+export GRAPH_SUIT ?= LAW
+export GRAPH_NAME ?= LAW-amazon-2008
+# export GRAPH_NAME ?= LAW-cnr-2000
+# export GRAPH_NAME ?= LAW-dblp-2010
+# export GRAPH_NAME ?= LAW-enron
 
 
-#######################################################################
-# RTL Kernel only supports Hardware and Hardware Emulation.
-# THis line is to check that
-#########################################################################
-ifneq ($(TARGET),$(findstring $(TARGET), hw hw_emu))
-$(warning WARNING:Application supports only hw hw_emu TARGET. Please use the target for running the application)
-endif
+# export FILE_BIN_TYPE ?= graph
+export FILE_BIN_TYPE ?= graph.bin
+# export FILE_BIN_TYPE ?= graph.wbin
 
-###################################################################
-#check the devices avaiable
-########################################################################
+# export FILE_LABEL_TYPE ?= graph_Gorder.labels
+export FILE_LABEL_TYPE ?= graph_Rabbit.labels
 
-check-devices:
-ifndef DEVICE
-	$(error DEVICE not set. Please set the DEVICE properly and rerun. Run "make help" for more details.)
-endif
+#GRAPH file
+export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
+export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
-############################################################################
-# check the VITIS environment
-#############################################################################
+#ALGORITHM
+export PULL_PUSH 		?= 0
+export ALGORITHMS 		?= 1
 
-ifndef XILINX_VITIS
-$(error XILINX_VITIS variable is not set, please set correctly and rerun)
-endif
+#GRAPH DATA_STRUCTURES
+export SORT_TYPE		?= 2
+export DATA_STRUCTURES  ?= 0
+export REORDER_LAYER1 	?= 0
+export REORDER_LAYER2   ?= 0
+export REORDER_LAYER3   ?= 0
+export CACHE_SIZE       ?= 32768
+
+#ALGORITHM SPECIFIC ARGS
+export ROOT 			?= 0
+export TOLERANCE 		?= 1e-8
+export DELTA			?= 800
+export NUM_ITERATIONS	?= 100
+
+#PERFORMANCE
+export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
+
+#EXPERIMENTS
+export NUM_TRIALS 		?= 1
+
+#GRAPH FROMAT EDGELIST
+export FILE_FORMAT		?= 1
+export CONVERT_FORMAT 	?= 1
+
+#STATS COLLECTION VARIABLES
+export BIN_SIZE 		?= 1000
+export INOUT_STATS 		?= 0
+export MASK_MODE 		?= 0
+
+##################################################
+
+export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+
+##############################################
+#      ACCEL GRAPH COMPILATION VARIABLES     #
+##############################################
