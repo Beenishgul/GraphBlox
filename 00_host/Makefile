@@ -43,7 +43,8 @@ PREPRO_DIR          ?= preprocess
 ALGO_DIR            ?= algorithms
 ALGO_DIR_GLAY       ?= glay
 ALGO_DIR_OPENMP     ?= openmp
-UTIL_DIR            ?= utils
+UTIL_DIR            ?= utils_graph
+UTIL_DIR_FPGA       ?= utils_fpga
 CONFIG_DIR			?= config
 
 #contains the tests use make run-test to compile what in this directory
@@ -111,6 +112,7 @@ LDFLAGS       += -lrt -lstdc++ $(XRT_LDFLAGS)
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
 SRC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.c)
 SRC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
+SRC_FILES_UTIL_FPGA =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/*.c)
 SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
 SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
 SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
@@ -119,6 +121,7 @@ SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
 
 INC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.h)
 INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
+INC_FILES_UTIL_FPGA =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)/*.h)
 INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
 INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
 INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
@@ -130,6 +133,7 @@ ALL_HEADER_FILES    =   $(INC_FILES_ALGO) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) 
 OBJ_FILES_ALGO      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO))
 
 OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
+OBJ_FILES_UTIL_FPGA = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o,$(SRC_FILES_UTIL_FPGA))
 OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
 OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
 OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
@@ -139,6 +143,7 @@ OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
+				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)   			\
 				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
 #########################################################
@@ -166,6 +171,7 @@ directories :
 	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
@@ -193,7 +199,7 @@ clean-results:
 #                GLAY COMPILATION                       #
 #########################################################
 
-$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
@@ -206,6 +212,9 @@ $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SR
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES)
@@ -230,7 +239,7 @@ $(APP): $(APP)-$(INTEGRATION)
 
 .PHONY: debug-memory
 debug-memory: $(APP)
-	valgrind --leak-check=full --show-leak-kinds=all ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
+	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
 
 ##########################################################################
 # RUN Tests
@@ -294,12 +303,12 @@ export CACHE_SIZE       ?= 32768
 export ROOT 			?= 0
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
-export NUM_ITERATIONS	?= 100
+export NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_PRE  ?= 1
+export NUM_THREADS_ALGO ?= 1
+export NUM_THREADS_KER  ?= 1
 
 #EXPERIMENTS
 export NUM_TRIALS 		?= 1
