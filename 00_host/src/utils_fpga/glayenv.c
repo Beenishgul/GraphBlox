@@ -99,9 +99,17 @@ void waitGLAY(struct xrtGLAYHandle *glayHandle)
 
 void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 {
-
     //Close an opened device
     xrtDeviceClose(glayHandle->deviceHandle);
+    // freeGlayHandle(glayHandle);
+}
+
+void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
+{
+
+    //Close an opened device
+    if(glayHandle)
+        free(glayHandle);
 
 }
 

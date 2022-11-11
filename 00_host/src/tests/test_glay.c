@@ -21,6 +21,7 @@ int main(int argc, char** argv){
  	setupGLAYDevice(glayHandle, device_index, xclbin_path);
 
     releaseGLAY(glayHandle);
+  
 
 	return 0;
 }
