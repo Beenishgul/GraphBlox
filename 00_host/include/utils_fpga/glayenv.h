@@ -14,6 +14,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include "graphCSR.h"
+#include <time.h>
 
 #define DATA_SIZE 4096
 #define IP_START 0x1
@@ -61,7 +62,6 @@ struct xrtGLAYHandle
     xrtDeviceHandle deviceHandle;
     xrtXclbinHandle xclbinHandle;
     xuid_t xclbinUUID;
-
 };
 
 

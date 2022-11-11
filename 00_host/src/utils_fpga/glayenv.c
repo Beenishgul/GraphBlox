@@ -57,7 +57,7 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
     //Get UUID of xclbin handle
     if(xrtXclbinGetUUID(glayHandle->xclbinHandle, glayHandle->xclbinUUID))
     {
-        printf("ERROR:--> xrtXclbinGetUUID");
+        printf("ERROR:--> xrtXclbinGetUUID(%p)", glayHandle->xclbinUUID);
         return -1;
     }
 
