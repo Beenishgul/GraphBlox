@@ -71,12 +71,9 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
 // ***************                  GLAY General                                 **************
 // ********************************************************************************************
 
-int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle)
+int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph)
 {
-
-
     return 0;
-
 }
 
 
@@ -101,7 +98,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 {
     //Close an opened device
     xrtDeviceClose(glayHandle->deviceHandle);
-    // freeGlayHandle(glayHandle);
+    freeGlayHandle(glayHandle);
 }
 
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
