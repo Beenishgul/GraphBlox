@@ -71,6 +71,7 @@ void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphC
 void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
 void waitGLAY(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
+void freeGlayHandle(struct xrtGLAYHandle *glayHandle);
 struct  GLAYGraphCSR *mapGraphCSRToGLAY(struct GraphCSR *graph);
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);
 
