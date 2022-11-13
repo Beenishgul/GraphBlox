@@ -187,12 +187,12 @@ clean-all:
 
 .PHONY: clean
 clean:
-	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
-	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
+	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
+	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
 
 .PHONY: clean-results
 clean-results:
-	-$(RMDIR) $(APP_DIR)/$(RES_DIR)/$(INTEGRATION)
+	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
 
 
 #########################################################
