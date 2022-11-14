@@ -53,7 +53,7 @@ package GLAY_GLOBALS_PKG;
     parameter CU_CONFIGURE_3     = 26'h 3FFFFC8 >> 2;
     parameter CU_CONFIGURE_4     = 26'h 3FFFFC0 >> 2;
 
-    parameter CU_RETURN          = 26'h 3FFFFB8 >> 2; // running counters that you can read continuosly
+    parameter CU_RETURN          = 26'h 3FFFFB8 >> 2; // running counters that you can read continuously
     parameter CU_RETURN_2        = 26'h 3FFFFB0 >> 2;
     parameter CU_RETURN_ACK      = 26'h 3FFFFA8 >> 2;
 
