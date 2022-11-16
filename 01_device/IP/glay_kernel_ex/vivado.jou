@@ -1,0 +1,15 @@
+#-----------------------------------------------------------
+# Vivado v2022.1.2 (64-bit)
+# SW Build 3605665 on Fri Aug  5 22:52:02 MDT 2022
+# IP Build 3603185 on Sat Aug  6 04:07:44 MDT 2022
+# Start of session at: Mon Nov 14 23:16:19 2022
+# Process ID: 18983
+# Current directory: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/IP/glay_kernel_ex
+# Command line: vivado -notrace -source /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/IP/glay_kernel/glay_kernel.gen/sources_1/ip/glay_kernel/glay_kernel_ex.tcl
+# Log file: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/IP/glay_kernel_ex/vivado.log
+# Journal file: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/IP/glay_kernel_ex/vivado.jou
+# Running On: jaguar, OS: Linux, CPU Frequency: 2592.538 MHz, CPU Physical cores: 16, Host memory: 269887 MB
+#-----------------------------------------------------------
+start_gui
+source /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/IP/glay_kernel/glay_kernel.gen/sources_1/ip/glay_kernel/glay_kernel_ex.tcl -notrace
+update_compile_order -fileset sources_1
