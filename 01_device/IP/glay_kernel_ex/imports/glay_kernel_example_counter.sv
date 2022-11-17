@@ -43,28 +43,28 @@ assign count = count_r;
 
 always @(posedge clk) begin
   if (rst) begin
-    count_r <= C_INIT;
+    count_r     <= C_INIT;
   end
   else if (clken) begin
     if (load) begin
-      count_r <= load_value;
+      count_r   <= load_value;
     end
     else if (incr & ~decr) begin
-      count_r <= count_r + 1'b1;
+      count_r   <= count_r + 1'b1;
     end
     else if (~incr & decr) begin
-      count_r <= count_r - 1'b1;
+      count_r   <= count_r - 1'b1;
     end
     else
-      count_r <= count_r;
+      count_r   <= count_r;
   end
 end
 
-assign is_zero = is_zero_r;
+assign is_zero  = is_zero_r;
 
 always @(posedge clk) begin
   if (rst) begin
-    is_zero_r <= (C_INIT == LP_ZERO);
+    is_zero_r   <= (C_INIT == LP_ZERO);
   end
   else if (clken) begin
     if (load) begin
@@ -75,7 +75,7 @@ always @(posedge clk) begin
     end
   end
   else begin
-    is_zero_r <= is_zero_r;
+    is_zero_r   <= is_zero_r;
   end
 end
 

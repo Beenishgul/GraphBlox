@@ -18,49 +18,84 @@ package GLAY_AXI4_PKG;
   
   import GLOBALS_AFU_PKG::*;
 
-  AXIMasterReadInput
-  AXIMasterWriteInput
-
-  AXIMasterReadOutput
-  AXIMasterWriteOutput
-
-  AXISlaveReadInput
-  AXISlaveWriteInput
-
-  AXISlaveReadOutput
-  AXISlaveWriteOutput
 
 typedef struct packed {
-    logic        running; // ha_jval,        // Job valid
-    logic        done   ; // ha_jcom,        // Job command
-    logic        cack   ; // ha_jcompar,     // Job command parity
-    logic [0:63] error  ; // ha_jea,         // Job address
-    logic        yield  ; // ha_jeapar,      // Job address parity
-  } AXI4MasterReadInput;
+    AXI4MasterReadInterfaceInput in;
+    AXI4MasterReadInterfaceOutput out;
+  } AXI4MasterReadInterface;
 
 typedef struct packed {
-    logic        running; // ha_jval,        // Job valid
-    logic        done   ; // ha_jcom,        // Job command
-    logic        cack   ; // ha_jcompar,     // Job command parity
-    logic [0:63] error  ; // ha_jea,         // Job address
-    logic        yield  ; // ha_jeapar,      // Job address parity
-  } AXI4MasterWriteInput;
+  logic                             arready      ; // Address read channel ready
+  logic                             rlast        ; // Read channel last word
+  logic                             rvalid       ; // Read channel valid
+  logic [C_M00_AXI_DATA_WIDTH-1:0]  rdata        ; // Read channel data
+  logic [IOB_AXI_ID_W-1:0]          rid          ; // Read channel ID
+  logic [2-1:0]                     rresp        ; // Read channel response
+  } AXI4MasterReadInterfaceInput;
+
+  typedef struct packed {
+  logic                           m_axi_arvalid;
+  logic [C_M_AXI_ADDR_WIDTH-1:0]  m_axi_araddr;
+  logic [8-1:0]                   m_axi_arlen;
+  logic                           m_axi_rready;
+  } AXI4MasterReadInterfaceOutput;
 
 typedef struct packed {
-    logic        running; // ha_jval,        // Job valid
-    logic        done   ; // ha_jcom,        // Job command
-    logic        cack   ; // ha_jcompar,     // Job command parity
-    logic [0:63] error  ; // ha_jea,         // Job address
-    logic        yield  ; // ha_jeapar,      // Job address parity
-  } AXI4MasterReadOutput;
+  
+ `IOB_OUTPUT(m_axi_awid, AXI_ID_W), //Address write channel ID
 
-typedef struct packed {
-    logic        running; // ha_jval,        // Job valid
-    logic        done   ; // ha_jcom,        // Job command
-    logic        cack   ; // ha_jcompar,     // Job command parity
-    logic [0:63] error  ; // ha_jea,         // Job address
-    logic        yield  ; // ha_jeapar,      // Job address parity
-  } AXI4MasterWriteOutput;
+ `IOB_OUTPUT(m_axi_awaddr, AXI_ADDR_W), //Address write channel address
+
+ `IOB_OUTPUT(m_axi_awlen, AXI_LEN_W), //Address write channel burst length
+
+ `IOB_OUTPUT(m_axi_awsize, 3), //Address write channel burst size. This signal indicates the size of each transfer in the burst
+
+ `IOB_OUTPUT(m_axi_awburst, 2), //Address write channel burst type
+
+ `IOB_OUTPUT(m_axi_awlock, 2), //Address write channel lock type
+
+ `IOB_OUTPUT(m_axi_awcache, 4), //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+
+ `IOB_OUTPUT(m_axi_awprot, 3), //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+
+ `IOB_OUTPUT(m_axi_awqos, 4), //Address write channel quality of service
+
+ `IOB_OUTPUT(m_axi_awvalid, 1), //Address write channel valid
+
+ `IOB_OUTPUT(m_axi_wdata, AXI_DATA_W), //Write channel data
+
+ `IOB_OUTPUT(m_axi_wstrb, (AXI_DATA_W/8)), //Write channel write strobe
+
+ `IOB_OUTPUT(m_axi_wlast, 1), //Write channel last word flag
+
+ `IOB_OUTPUT(m_axi_wvalid, 1), //Write channel valid
+
+ `IOB_OUTPUT(m_axi_bready, 1), //Write response channel ready
+
+ `IOB_OUTPUT(m_axi_arid, AXI_ID_W), //Address read channel ID
+
+ `IOB_OUTPUT(m_axi_araddr, AXI_ADDR_W), //Address read channel address
+
+ `IOB_OUTPUT(m_axi_arlen, AXI_LEN_W), //Address read channel burst length
+
+ `IOB_OUTPUT(m_axi_arsize, 3), //Address read channel burst size. This signal indicates the size of each transfer in the burst
+
+ `IOB_OUTPUT(m_axi_arburst, 2), //Address read channel burst type
+
+ `IOB_OUTPUT(m_axi_arlock, 2), //Address read channel lock type
+
+ `IOB_OUTPUT(m_axi_arcache, 4), //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+
+ `IOB_OUTPUT(m_axi_arprot, 3), //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+
+ `IOB_OUTPUT(m_axi_arqos, 4), //Address read channel quality of service
+
+ `IOB_OUTPUT(m_axi_arvalid, 1), //Address read channel valid
+
+ `IOB_OUTPUT(m_axi_rready, 1), //Read channel ready
+
+
+} AXI4MasterWriteInterface;
 
 typedef struct packed {
     logic        running; // ha_jval,        // Job valid
