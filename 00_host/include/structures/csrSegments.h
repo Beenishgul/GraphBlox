@@ -1,5 +1,5 @@
-#ifndef GRID_H
-#define GRID_H
+#ifndef CSRSEGMENTS_H
+#define CSRSEGMENTS_H
 
 
 #ifdef __cplusplus
