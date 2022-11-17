@@ -54,7 +54,7 @@ module glay_kernel #(
   output wire                                     m00_axi_bready       , // Write response channel ready
   input wire                                      m00_axi_arready      , // Address read channel ready
   input wire                                      m00_axi_rlast        , // Read channel last word
-  input wire                                      m00_axi_rvalid       ,
+  input wire                                      m00_axi_rvalid       , // Read channel valid
   input wire  [C_M00_AXI_DATA_WIDTH-1:0]          m00_axi_rdata        , // Read channel data
   output wire                                     m00_axi_arvalid      ,
   output wire                                     m00_axi_rready       ,
