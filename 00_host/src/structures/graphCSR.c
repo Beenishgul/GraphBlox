@@ -12,6 +12,7 @@
 // Revise : 2022-09-28 15:36:13
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,10 +34,6 @@
 //edgelist prerpcessing
 // #include "countsort.h"
 // #include "radixsort.h"
-
-
-
-
 
 
 void graphCSRFree (struct GraphCSR *graphCSR)
