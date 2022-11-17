@@ -41,44 +41,50 @@ module glay_kernel #(
   // RESP - Not useful in most acceleration platforms.
   // 
   // AXI4 master interface m00_axi
-  output wire                                    m00_axi_awvalid      ,
-  input  wire                                    m00_axi_awready      ,
-  output wire [C_M00_AXI_ADDR_WIDTH-1:0]         m00_axi_awaddr       ,
-  output wire [8-1:0]                            m00_axi_awlen        ,
-  output wire                                    m00_axi_wvalid       ,
-  input  wire                                    m00_axi_wready       ,
-  output wire [C_M00_AXI_DATA_WIDTH-1:0]         m00_axi_wdata        ,
-  output wire [C_M00_AXI_DATA_WIDTH/8-1:0]       m00_axi_wstrb        ,
-  output wire                                    m00_axi_wlast        ,
-  input  wire                                    m00_axi_bvalid       ,
-  output wire                                    m00_axi_bready       ,
-  output wire                                    m00_axi_arvalid      ,
-  input  wire                                    m00_axi_arready      ,
-  output wire [C_M00_AXI_ADDR_WIDTH-1:0]         m00_axi_araddr       ,
-  output wire [8-1:0]                            m00_axi_arlen        ,
-  input  wire                                    m00_axi_rvalid       ,
-  output wire                                    m00_axi_rready       ,
-  input  wire [C_M00_AXI_DATA_WIDTH-1:0]         m00_axi_rdata        ,
-  input  wire                                    m00_axi_rlast        ,
+  input wire                                      m00_axi_awready      , // Address write channel ready
+  input wire                                      m00_axi_wready       , // Write channel ready
+  output wire                                     m00_axi_awvalid      ,
+  output wire                                     m00_axi_wlast        ,
+  output wire                                     m00_axi_wvalid       ,
+  output wire [8-1:0]                             m00_axi_awlen        ,
+  output wire [C_M00_AXI_ADDR_WIDTH-1:0]          m00_axi_awaddr       ,
+  output wire [C_M00_AXI_DATA_WIDTH-1:0]          m00_axi_wdata        ,
+  output wire [C_M00_AXI_DATA_WIDTH/8-1:0]        m00_axi_wstrb        ,
+  input wire                                      m00_axi_bvalid       , // Write response channel valid
+  output wire                                     m00_axi_bready       , // Write response channel ready
+  input wire                                      m00_axi_arready      , // Address read channel ready
+  input wire                                      m00_axi_rlast        , // Read channel last word
+  input wire                                      m00_axi_rvalid       ,
+  input wire  [C_M00_AXI_DATA_WIDTH-1:0]          m00_axi_rdata        , // Read channel data
+  output wire                                     m00_axi_arvalid      ,
+  output wire                                     m00_axi_rready       ,
+  output wire [8-1:0]                             m00_axi_arlen        ,
+  output wire [C_M00_AXI_ADDR_WIDTH-1:0]          m00_axi_araddr       ,
+  // AXI4 master interface m00_axi missing ports
+  input wire [IOB_AXI_ID_W-1:0]                   m00_axi_bid          , // Write response channel ID
+  input wire [IOB_AXI_ID_W-1:0]                   m00_axi_rid          , // Read channel ID
+  input wire  [2-1:0]                             m00_axi_rresp        , // Read channel response
+  input wire  [2-1:0]                             m00_axi_bresp        , // Write channel response
+
   // AXI4-Lite slave interface
-  input  wire                                    s_axi_control_awvalid,
-  output wire                                    s_axi_control_awready,
-  input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_awaddr ,
-  input  wire                                    s_axi_control_wvalid ,
-  output wire                                    s_axi_control_wready ,
-  input  wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_wdata  ,
-  input  wire [C_S_AXI_CONTROL_DATA_WIDTH/8-1:0] s_axi_control_wstrb  ,
-  input  wire                                    s_axi_control_arvalid,
-  output wire                                    s_axi_control_arready,
-  input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_araddr ,
-  output wire                                    s_axi_control_rvalid ,
-  input  wire                                    s_axi_control_rready ,
-  output wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_rdata  ,
-  output wire [2-1:0]                            s_axi_control_rresp  ,
-  output wire                                    s_axi_control_bvalid ,
-  input  wire                                    s_axi_control_bready ,
-  output wire [2-1:0]                            s_axi_control_bresp  ,
-  output wire                                    interrupt            
+  input wire                                      s_axi_control_awvalid,
+  output wire                                     s_axi_control_awready,
+  input wire  [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]    s_axi_control_awaddr ,
+  input wire                                      s_axi_control_wvalid ,
+  output wire                                     s_axi_control_wready ,
+  input wire  [C_S_AXI_CONTROL_DATA_WIDTH-1:0]    s_axi_control_wdata  ,
+  input wire  [C_S_AXI_CONTROL_DATA_WIDTH/8-1:0]  s_axi_control_wstrb  ,
+  input wire                                      s_axi_control_arvalid,
+  output wire                                     s_axi_control_arready,
+  input wire  [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]    s_axi_control_araddr ,
+  output wire                                     s_axi_control_rvalid ,
+  input wire                                      s_axi_control_rready ,
+  output wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]    s_axi_control_rdata  ,
+  output wire [2-1:0]                             s_axi_control_rresp  ,
+  output wire                                     s_axi_control_bvalid ,
+  input wire                                      s_axi_control_bready ,
+  output wire [2-1:0]                             s_axi_control_bresp  ,
+  output wire                                     interrupt            
 );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,8 +94,8 @@ module glay_kernel #(
 ///////////////////////////////////////////////////////////////////////////////
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
-(* DONT_TOUCH = "yes" *)
-reg                                 areset                         = 1'b0;
+(* DONT_TOUCH                                  = "yes" *)
+reg                                 areset     = 1'b0;
 wire                                ap_start                      ;
 wire                                ap_idle                       ;
 wire                                ap_done                       ;
@@ -107,7 +113,7 @@ wire [64-1:0]                       auxiliary_2                   ;
 
 // Register and invert reset signal.
 always @(posedge ap_clk) begin
-  areset <= ~ap_rst_n;
+  areset                                       <= ~ap_rst_n;
 end
 
 ///////////////////////////////////////////////////////////////////////////////
