@@ -55,30 +55,28 @@ void csrSegmentsPrint(struct CSRSegments *csrSegments)
     printf("| %-51u | \n", csrSegments->num_segments);
     printf(" -----------------------------------------------------\n");
 
-    // _u32 i;
-    //  for ( i = 0; i < csrSegments->num_vertices; ++i)
-    //     {
+    // uint32_t i;
+    // for ( i = 0; i < csrSegments->num_vertices; ++i)
+    // {
 
-    //         uint32_t begin = getSegmentRangeBegin();
-    //         uint32_t end = getSegmentRangeEnd();
+    //     uint32_t begin = getSegmentRangeBegin();
+    //     uint32_t end = getSegmentRangeEnd();
 
+    // }
 
+    // uint32_t i;
+    // for ( i = 0; i < (csrSegments->num_segments * csrSegments->num_segments); ++i)
+    // {
 
-    //     }
-
-    //   uint32_t i;
-    //    for ( i = 0; i < (csrSegments->num_segments*csrSegments->num_segments); ++i)
-    //       {
-
-    //       uint32_t x = i % csrSegments->num_segments;    // % is the "modulo operator", the remainder of i / width;
-    // uint32_t y = i / csrSegments->num_segments;
+    //     uint32_t x = i % csrSegments->num_segments;    // % is the "modulo operator", the remainder of i / width;
+    //     uint32_t y = i / csrSegments->num_segments;
 
 
-    //       printf("| %-11s (%u,%u)   | \n", "Segment: ", y, x);
-    //          printf("| %-11s %-40u  | \n", "Edges: ", csrSegments->segments[i].num_edges);
-    //          printf("| %-11s %-40u  | \n", "Vertices: ", csrSegments->segments[i].num_vertices);
-    //          edgeListPrint(csrSegments->segments[i].edgeList);
-    //       }
+    //     printf("| %-11s (%u,%u)   | \n", "Segment: ", y, x);
+    //     printf("| %-11s %-40u  | \n", "Edges: ", csrSegments->segments[i].num_edges);
+    //     printf("| %-11s %-40u  | \n", "Vertices: ", csrSegments->segments[i].num_vertices);
+    //     edgeListPrint(csrSegments->segments[i].edgeList);
+    // }
 
 
 }
@@ -449,7 +447,8 @@ uint32_t csrSegmentsCalculateSegments(struct EdgeList *edgeList, uint32_t cache_
 
     // if(num_Segments > 512)
     //     num_Segments = 256;
-    if(num_Segments < 4){
+    if(num_Segments < 4)
+    {
         // cache_size = (32*1024);
         // num_Segments = (((num_vertices * 8) + (cache_size) - 1) / cache_size);
         num_Segments = 4;

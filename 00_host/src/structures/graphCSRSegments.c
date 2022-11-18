@@ -65,29 +65,25 @@ void  graphCSRSegmentsPrint(struct GraphCSRSegments *graphCSRSegments)
     printf("| %-51s | \n", "Number of Edges (E)");
     printf("| %-51u | \n", graphCSRSegments->csrSegments->num_edges);
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Number of Segments (P)");
+    printf("| %-51s | \n", "Number of Segments (S)");
     printf("| %-51u | \n", graphCSRSegments->csrSegments->num_segments);
     printf(" -----------------------------------------------------\n");
 
 
+    uint32_t i;
+    for ( i = 0; i < (graphCSRSegments->csrSegments->num_segments); ++i)
+    {
 
+        if(graphCSRSegments->csrSegments->segments[i].num_edges)
+        {
 
-    //   uint32_t i;
-    //    for ( i = 0; i < ( graphCSRSegments->csrSegments->num_segments*graphCSRSegments->csrSegments->num_segments); ++i)
-    //       {
+            printf("| %-11s (%u) \n", "Segment: ", i);
+            printf("| %-11s %-40u   \n", "Edges: ", graphCSRSegments->csrSegments->segments[i].num_edges);
+            printf("| %-11s %-40u   \n", "Vertices: ", graphCSRSegments->csrSegments->segments[i].num_vertices);
+            edgeListPrint(graphCSRSegments->csrSegments->segments[i].edgeList);
+        }
 
-    //       uint32_t x = i % graphCSRSegments->csrSegments->num_segments;    // % is the "modulo operator", the remainder of i / width;
-    // uint32_t y = i / graphCSRSegments->csrSegments->num_segments;
-
-    //      if(graphCSRSegments->csrSegments->segments[i].num_edges){
-
-    //       printf("| %-11s (%u,%u) \n", "Partition: ", y, x);
-    //      printf("| %-11s %-40u   \n", "Edges: ", graphCSRSegments->csrSegments->segments[i].num_edges);
-    //      printf("| %-11s %-40u   \n", "Vertices: ", graphCSRSegments->csrSegments->segments[i].num_vertices);
-    //      edgeListPrint(graphCSRSegments->csrSegments->segments[i].edgeList);
-    //       }
-
-    //       }
+    }
 
 
 }
