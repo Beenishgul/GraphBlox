@@ -235,11 +235,15 @@ run: $(APP)
 
 .PHONY: $(APP)
 $(APP): $(APP)-$(INTEGRATION)
-	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: debug-memory
 debug-memory: $(APP)
-	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)  -f $(FILE_BIN) $(ARGS)
+	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+
+.PHONY: debug
+debug: $(APP)
+	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 ##########################################################################
 # RUN Tests
