@@ -297,7 +297,7 @@ export DATA_STRUCTURES  ?= 1
 export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
-export CACHE_SIZE       ?= 32768
+export CACHE_SIZE       ?= 23068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
 export ROOT 			?= 0
