@@ -651,7 +651,7 @@ struct TCStats *runTriangleCountAlgorithm(struct Arguments *arguments, void *gra
         generateGraphPrintMessageWithtime("TriangleCount NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("TriangleCount NOT YET IMPLEMENTED", 0);
         break;
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
@@ -688,7 +688,7 @@ struct SPMVStats *runSPMVAlgorithm(struct Arguments *arguments, void *graph)
         generateGraphPrintMessageWithtime("SPMV NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("SPMV NOT YET IMPLEMENTED", 0);
         break;
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
@@ -762,7 +762,7 @@ struct PageRankStats *runPageRankAlgorithm(struct Arguments *arguments, void *gr
         generateGraphPrintMessageWithtime("PageRank NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("PageRank NOT YET IMPLEMENTED", 0);
         break;
 
     default:// CSR

@@ -62,7 +62,7 @@ static struct argp_option options[] =
     },
     {
         "data-structure",     'd', "[DEFAULT:[0]-CSR]",      0,
-        "[0]-CSR"
+        "[0]-CSR, [1]-CSR Segmented (use cache-size parameter)"
     },
     {
         "root",               'r', "[DEFAULT:0]",      0,
@@ -138,7 +138,7 @@ static struct argp_option options[] =
     },
     {
         "bin-size",          'g', "[SIZE:512]",      0,
-        "You bin vertices's histogram according to this parameter, if you have a large graph you want to illustrate."
+        "You bin vertices histogram according to this parameter, if you have a large graph you want to illustrate."
     },
     {
         "verbosity",         'j', "[DEFAULT:[0:no stats output]",      0,
@@ -158,7 +158,7 @@ static struct argp_option options[] =
     },
     {
         "cache-size",        'C', "<LLC=32768/32KB>",      0,
-        "LLC cache size for MASK vertex reodering"
+        "LLC cache size for MASK vertex reordering"
     },
     { 0 }
 };
