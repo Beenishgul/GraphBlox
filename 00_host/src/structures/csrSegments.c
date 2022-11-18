@@ -51,7 +51,7 @@ void csrSegmentsPrint(struct CSRSegments *csrSegments)
     printf("| %-51s | \n", "Number of Edges (E)");
     printf("| %-51u | \n", csrSegments->num_edges);
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Number of Segments (P)");
+    printf("| %-51s | \n", "Number of Segments (S)");
     printf("| %-51u | \n", csrSegments->num_segments);
     printf(" -----------------------------------------------------\n");
 
@@ -87,7 +87,7 @@ void   graphCSRSegmentsResetActiveSegments(struct CSRSegments *csrSegments)
 {
 
     uint32_t totalSegments = 0;
-    totalSegments = csrSegments->num_segments * csrSegments->num_segments;
+    totalSegments = csrSegments->num_segments;
     uint32_t i;
 
     #pragma omp parallel for default(none) shared(csrSegments,totalSegments) private(i)
@@ -110,7 +110,7 @@ void   graphCSRSegmentsResetActiveSegmentsMap(struct CSRSegments *csrSegments)
 void   graphCSRSegmentsSetActiveSegmentsMap(struct CSRSegments *csrSegments, uint32_t vertex)
 {
 
-    uint32_t row = getSegmentID(csrSegments->num_vertices, csrSegments->num_segments, vertex);
+    // uint32_t row = getSegmentID(csrSegments->num_vertices, csrSegments->num_segments, vertex);
     uint32_t Segment_idx = 0;
     uint32_t i;
     uint32_t totalSegments = 0;
@@ -121,7 +121,7 @@ void   graphCSRSegmentsSetActiveSegmentsMap(struct CSRSegments *csrSegments, uin
     for ( i = 0; i < totalSegments; ++i)
     {
 
-        Segment_idx = (row * totalSegments) + i;
+        Segment_idx = i;
 
         if(csrSegments->segments[Segment_idx].edgeList->num_edges)
         {
@@ -136,7 +136,7 @@ void   graphCSRSegmentsSetActiveSegmentsMap(struct CSRSegments *csrSegments, uin
 void   graphCSRSegmentsSetActiveSegments(struct CSRSegments *csrSegments, uint32_t vertex)
 {
 
-    uint32_t row = getSegmentID(csrSegments->num_vertices, csrSegments->num_segments, vertex);
+    // uint32_t row = getSegmentID(csrSegments->num_vertices, csrSegments->num_segments, vertex);
     uint32_t Segment_idx = 0;
     uint32_t i;
     uint32_t totalSegments = 0;
@@ -146,7 +146,7 @@ void   graphCSRSegmentsSetActiveSegments(struct CSRSegments *csrSegments, uint32
     for ( i = 0; i < totalSegments; ++i)
     {
 
-        Segment_idx = (row * totalSegments) + i;
+        Segment_idx =  i;
         if(csrSegments->segments[Segment_idx].edgeList->num_edges)
         {
             csrSegments->activeSegments[Segment_idx] = 1;
@@ -171,7 +171,7 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_siz
     csrSegments->num_edges = edgeList->num_edges;
     csrSegments->num_vertices = edgeList->num_vertices;
     csrSegments->num_segments = csrSegmentsCalculateSegments(edgeList, cache_size);
-    totalSegments = csrSegments->num_segments * csrSegments->num_segments;
+    totalSegments = csrSegments->num_segments;
 
     csrSegments->segments = (struct Segment *) my_malloc(totalSegments * sizeof(struct Segment));
     csrSegments->activeSegments = (uint32_t *) my_malloc(totalSegments * sizeof(uint32_t));
@@ -241,7 +241,7 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
 
     if(csrSegments)
     {
-        uint32_t totalSegments = csrSegments->num_segments * csrSegments->num_segments;
+        uint32_t totalSegments = csrSegments->num_segments;
         uint32_t i;
 
         for (i = 0; i < totalSegments; ++i)
@@ -304,7 +304,7 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
     uint32_t src;
     uint32_t dest;
     uint32_t num_vertices = 0;
-    uint32_t totalSegments = csrSegments->num_segments * csrSegments->num_segments;
+    uint32_t totalSegments = csrSegments->num_segments;
 
     // #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     #pragma omp parallel for default(none) private(i,src,dest,num_vertices) shared(totalSegments,csrSegments) schedule(dynamic,1024)
@@ -335,7 +335,7 @@ struct CSRSegments *csrSegmentsSegmentEdgeListSizePreprocessing(struct CSRSegmen
 {
 
     uint32_t i;
-    uint32_t src;
+    // uint32_t src;
     uint32_t dest;
     uint32_t Segment_idx;
 
@@ -343,22 +343,23 @@ struct CSRSegments *csrSegmentsSegmentEdgeListSizePreprocessing(struct CSRSegmen
     uint32_t num_vertices = csrSegments->num_vertices;
 
 
-    uint32_t row;
+    // uint32_t row;
     uint32_t col;
 
-    #pragma omp parallel for default(none) private(i,row,col,src,dest,Segment_idx) shared(num_vertices, num_segments,edgeList,csrSegments)
+    #pragma omp parallel for default(none) private(i,col,dest,Segment_idx) shared(num_vertices, num_segments,edgeList,csrSegments)
     for(i = 0; i < edgeList->num_edges; i++)
     {
 
-        src  = edgeList->edges_array_src[i];
+        // src  = edgeList->edges_array_src[i];
         dest = edgeList->edges_array_dest[i];
 
         // __sync_fetch_and_add(&csrSegments->out_degree[src],1);
         // __sync_fetch_and_add(&csrSegments->in_degree[dest],1);
 
-        row = getSegmentID(num_vertices, num_segments, src);
+        // row = getSegmentID(num_vertices, num_segments, src);
         col = getSegmentID(num_vertices, num_segments, dest);
-        Segment_idx = (row * num_segments) + col;
+        // Segment_idx = (row * num_segments) + col;
+        Segment_idx = col;
 
         // __sync_fetch_and_add(&csrSegments->segments[Segment_idx].num_edges,1);
 
@@ -376,7 +377,7 @@ struct CSRSegments *csrSegmentsSegmentEdgePopulation(struct CSRSegments *csrSegm
 {
 
     uint32_t i;
-    uint32_t src;
+    // uint32_t src;
     uint32_t dest;
     uint32_t Segment_idx;
     uint32_t Edge_idx;
@@ -384,23 +385,24 @@ struct CSRSegments *csrSegmentsSegmentEdgePopulation(struct CSRSegments *csrSegm
     uint32_t num_segments = csrSegments->num_segments;
     uint32_t num_vertices = csrSegments->num_vertices;
 
-    uint32_t row;
+    // uint32_t row;
     uint32_t col;
 
 
 
 
-    #pragma omp parallel for default(none) private(Edge_idx,i,row,col,src,dest,Segment_idx) shared(num_vertices, num_segments,edgeList,csrSegments)
+    #pragma omp parallel for default(none) private(Edge_idx,i,col,dest,Segment_idx) shared(num_vertices, num_segments,edgeList,csrSegments)
     for(i = 0; i < edgeList->num_edges; i++)
     {
 
 
-        src  = edgeList->edges_array_src[i];
+        // src  = edgeList->edges_array_src[i];
         dest = edgeList->edges_array_dest[i];
 
-        row = getSegmentID(num_vertices, num_segments, src);
+        // row = getSegmentID(num_vertices, num_segments, src);
         col = getSegmentID(num_vertices, num_segments, dest);
-        Segment_idx = (row * num_segments) + col;
+        // Segment_idx = (row * num_segments) + col;
+        Segment_idx = col;
 
         Edge_idx = __sync_fetch_and_add(&csrSegments->segments[Segment_idx].num_edges, 1);
 
@@ -422,7 +424,7 @@ struct CSRSegments *csrSegmentsSegmentsMemoryAllocations(struct CSRSegments *csr
 {
 
     uint32_t i;
-    uint32_t totalSegments = csrSegments->num_segments * csrSegments->num_segments;
+    uint32_t totalSegments = csrSegments->num_segments;
 
     #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     for ( i = 0; i < totalSegments; ++i)
@@ -443,11 +445,15 @@ uint32_t csrSegmentsCalculateSegments(struct EdgeList *edgeList, uint32_t cache_
 {
     //epfl everything graph
     uint32_t num_vertices  = edgeList->num_vertices;
-    uint32_t num_Segments = (num_vertices * 8 / 1024) / cache_size;
-    if(num_Segments > 512)
-        num_Segments = 256;
-    if(num_Segments == 0 )
+    uint32_t num_Segments = (((num_vertices * 8) + cache_size - 1) / cache_size);
+
+    // if(num_Segments > 512)
+    //     num_Segments = 256;
+    if(num_Segments < 4){
+        // cache_size = (32*1024);
+        // num_Segments = (((num_vertices * 8) + (cache_size) - 1) / cache_size);
         num_Segments = 4;
+    }
 
     return num_Segments;
 
