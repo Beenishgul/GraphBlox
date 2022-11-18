@@ -293,7 +293,7 @@ export ALGORITHMS 		?= 1
 
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		?= 2
-export DATA_STRUCTURES  ?= 0
+export DATA_STRUCTURES  ?= 1
 export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0

@@ -248,7 +248,7 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
         {
 
             freeEdgeList(csrSegments->segments[i].edgeList);
-            graphCSRFree(csrSegments->segments[i].graphCSR);
+            // graphCSRFree(csrSegments->segments[i].graphCSR);
         }
 
         freeBitmap(csrSegments->activeSegmentsMap);
