@@ -18,13 +18,12 @@ extern "C" {
 // A structure to represent an adjacency list
 struct  Segment
 {
-
     // uint32_t vertex_start;
     // uint32_t vertex_end;
     uint32_t num_edges;
     uint32_t num_vertices;
     struct EdgeList *edgeList;
-
+    struct GraphCSR *graphCSR;
 };
 
 

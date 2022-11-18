@@ -185,12 +185,9 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_siz
     #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     for (i = 0; i < totalSegments; ++i)
     {
-
         csrSegments->segments[i].num_edges = 0;
         csrSegments->segments[i].num_vertices = 0;   /* code */
         csrSegments->activeSegments[i] = 0;
-
-
     }
 
 
@@ -240,7 +237,7 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_siz
 
 void  csrSegmentsFree(struct CSRSegments *csrSegments)
 {
-    
+
 
     if(csrSegments)
     {
@@ -251,6 +248,7 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
         {
 
             freeEdgeList(csrSegments->segments[i].edgeList);
+            graphCSRFree(csrSegments->segments[i].graphCSR);
         }
 
         freeBitmap(csrSegments->activeSegmentsMap);

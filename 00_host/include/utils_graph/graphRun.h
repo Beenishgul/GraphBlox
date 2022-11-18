@@ -11,7 +11,9 @@ extern "C" {
 
 #include "graphConfig.h"
 #include "timer.h"
+
 #include "graphCSR.h"
+#include "graphCSRSegments.h"
 
 
 #include "BFS.h"
@@ -26,6 +28,8 @@ extern "C" {
 
 // Random root helper functions
 uint32_t generateRandomRootGraphCSR(mt19937state *mt19937var, struct GraphCSR *graph);
+uint32_t generateRandomRootGraphGrid(mt19937state *mt19937var, struct GraphGrid *graph);
+
 uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph);
 
 void freeGraphDataStructure(void *graph, uint32_t datastructure);
