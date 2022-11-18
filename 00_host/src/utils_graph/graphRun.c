@@ -23,6 +23,7 @@
 #include "timer.h"
 
 #include "graphCSR.h"
+#include "graphCSRSegments.h"
 
 #include "BFS.h"
 #include "DFS.h"
@@ -267,6 +268,13 @@ void *generateGraphDataStructure(struct Arguments *arguments)
             Stop(timer);
             generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
             break;
+        case 1: // CSR Segments
+        case 5:
+            Start(timer);
+            graph = (void *)graphCSRSegmentsPreProcessingStep (arguments);
+            Stop(timer);
+            generateGraphPrintMessageWithtime("GraphCSRSegments Preprocessing Step Time (Seconds)", Seconds(timer));
+            break;
         default:// CSR
             Start(timer);
             graph = (void *)graphCSRPreProcessingStep (arguments);
@@ -411,7 +419,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
             }
         }
         break;
-       
+
 
         default: // BFS
         {
@@ -465,10 +473,30 @@ uint32_t generateRandomRootGraphCSR(mt19937state *mt19937var, struct GraphCSR *g
 }
 
 
+uint32_t generateRandomRootGraphCSRSegments(mt19937state *mt19937var, struct GraphCSRSegments *graph)
+{
+
+    uint32_t source = 0;
+
+    while(1)
+    {
+        source = generateRandInt(mt19937var);
+        if(source < graph->num_vertices)
+        {
+            if(graph->csrSegments->out_degree[source] > graph->avg_degree)
+                break;
+        }
+    }
+
+    return source;
+
+}
+
 uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
 {
 
     struct GraphCSR *graphCSR = NULL;
+    struct GraphCSRSegments *graphCSRSegments = NULL;
 
     switch (arguments->datastructure)
     {
@@ -477,6 +505,12 @@ uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
     case 6:
         graphCSR = (struct GraphCSR *)graph;
         arguments->source = generateRandomRootGraphCSR(&(arguments->mt19937var), graphCSR);
+        break;
+
+    case 1: // Segments
+    case 5:
+        graphCSRSegments = (struct GraphCSRSegments *)graph;
+        arguments->source = generateRandomRootGraphCSRSegments(&(arguments->mt19937var), graphCSRSegments);
         break;
 
     default:// CSR
@@ -494,6 +528,7 @@ struct BFSStats *runBreadthFirstSearchAlgorithm(struct Arguments *arguments, voi
 
 
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct BFSStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -501,9 +536,15 @@ struct BFSStats *runBreadthFirstSearchAlgorithm(struct Arguments *arguments, voi
     case 0: // CSR
     case 4:
         graphCSR = (struct GraphCSR *)graph;
-
         stats = breadthFirstSearchGraphCSR(arguments, graphCSR);
         break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = breadthFirstSearchGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("BreadthFirstSearch NOT YET IMPLEMENTED", 0);
+        break;
+
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
 
@@ -520,7 +561,7 @@ struct DFSStats *runDepthFirstSearchAlgorithm(struct Arguments *arguments, void 
 
 
     struct GraphCSR *graphCSR = NULL;
-
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct DFSStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -531,8 +572,14 @@ struct DFSStats *runDepthFirstSearchAlgorithm(struct Arguments *arguments, void 
         stats = depthFirstSearchGraphCSR(arguments, graphCSR);
         break;
 
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        generateGraphPrintMessageWithtime("DepthFirstSearch NOT YET IMPLEMENTED", 0);
+        break;
+
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("DepthFirstSearch NOT YET IMPLEMENTED", 0);
 
         break;
 
@@ -552,6 +599,7 @@ struct CCStats *runConnectedComponentsAlgorithm(struct Arguments *arguments, voi
 
 
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct CCStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -561,8 +609,14 @@ struct CCStats *runConnectedComponentsAlgorithm(struct Arguments *arguments, voi
         graphCSR = (struct GraphCSR *)graph;
         stats = connectedComponentsGraphCSR(arguments, graphCSR);
         break;
+    case 1: // Segments
+    case 5: // Segments
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = connectedComponentsGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("ConnectedComponents NOT YET IMPLEMENTED", 0);
+        break;
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("ConnectedComponents NOT YET IMPLEMENTED", 0);
         break;
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
@@ -580,6 +634,7 @@ struct TCStats *runTriangleCountAlgorithm(struct Arguments *arguments, void *gra
 
 
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct TCStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -588,6 +643,12 @@ struct TCStats *runTriangleCountAlgorithm(struct Arguments *arguments, void *gra
     case 4:
         graphCSR = (struct GraphCSR *)graph;
         stats = triangleCountGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = triangleCountGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("TriangleCount NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
@@ -610,6 +671,7 @@ struct SPMVStats *runSPMVAlgorithm(struct Arguments *arguments, void *graph)
 
 
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct SPMVStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -618,6 +680,12 @@ struct SPMVStats *runSPMVAlgorithm(struct Arguments *arguments, void *graph)
     case 4:
         graphCSR = (struct GraphCSR *)graph;
         stats = SPMVGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = SPMVGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("SPMV NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
@@ -637,6 +705,7 @@ struct SPMVStats *runSPMVAlgorithm(struct Arguments *arguments, void *graph)
 struct BetweennessCentralityStats *runBetweennessCentralityAlgorithm(struct Arguments *arguments, void *graph)
 {
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct BetweennessCentralityStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -645,6 +714,11 @@ struct BetweennessCentralityStats *runBetweennessCentralityAlgorithm(struct Argu
     case 4:
         graphCSR = (struct GraphCSR *)graph;
         stats = betweennessCentralityGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
@@ -671,6 +745,7 @@ struct PageRankStats *runPageRankAlgorithm(struct Arguments *arguments, void *gr
 
 
     struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct PageRankStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -679,6 +754,12 @@ struct PageRankStats *runPageRankAlgorithm(struct Arguments *arguments, void *gr
     case 4:
         graphCSR = (struct GraphCSR *)graph;
         stats = pageRankGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = pageRankGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("PageRank NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
@@ -707,7 +788,7 @@ struct BellmanFordStats *runBellmanFordAlgorithm(struct Arguments *arguments, vo
 {
 
     struct GraphCSR *graphCSR = NULL;
-
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct BellmanFordStats *stats = NULL;
 
     switch (arguments->datastructure)
@@ -717,6 +798,12 @@ struct BellmanFordStats *runBellmanFordAlgorithm(struct Arguments *arguments, vo
         graphCSR = (struct GraphCSR *)graph;
 
         stats = bellmanFordGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = bellmanFordGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("BellmanFord NOT YET IMPLEMENTED", 0);
         break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
@@ -738,7 +825,7 @@ struct SSSPStats *runSSSPAlgorithm(struct Arguments *arguments, void *graph)
 {
 
     struct GraphCSR *graphCSR = NULL;
-
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
     struct SSSPStats *stats = NULL;
     switch (arguments->datastructure)
     {
@@ -747,7 +834,11 @@ struct SSSPStats *runSSSPAlgorithm(struct Arguments *arguments, void *graph)
         graphCSR = (struct GraphCSR *)graph;
         stats = SSSPGraphCSR(arguments, graphCSR);
         break;
-
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
+        break;
     case 6: // CSR
         generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
         break;
@@ -769,6 +860,7 @@ void freeGraphDataStructure(void *graph, uint32_t datastructure)
 {
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct GraphCSR *graphCSR = NULL;
+    struct GraphCSRSegments *graphCSRSegments = NULL;
 
     switch (datastructure)
     {
@@ -779,6 +871,15 @@ void freeGraphDataStructure(void *graph, uint32_t datastructure)
         graphCSRFree(graphCSR);
         Stop(timer);
         generateGraphPrintMessageWithtime("Free Graph CSR (Seconds)", Seconds(timer));
+        break;
+
+    case 1: // Segments
+    case 5:
+        graphCSRSegments = (struct GraphCSRSegments *)graph;
+        Start(timer);
+        graphCSRSegmentsFree(graphCSRSegments);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("Free Graph Segments (Seconds)", Seconds(timer));
         break;
 
     case 6: // CSR
