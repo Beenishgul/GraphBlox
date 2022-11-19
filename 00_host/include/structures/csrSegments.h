@@ -50,6 +50,7 @@ void csrSegmentsPrintMessageWithtime(const char *msg, double time);
 
 struct CSRSegments *csrSegmentsSegmentEdgeListSizePreprocessing(struct CSRSegments *csrSegments, struct EdgeList *edgeList);
 struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments *csrSegments);
+struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegments, struct Arguments *arguments);
 uint32_t csrSegmentsCalculateSegments(struct EdgeList *edgeList, uint32_t cache_size);
 struct CSRSegments *csrSegmentsSegmentsMemoryAllocations(struct CSRSegments *csrSegments);
 struct CSRSegments *csrSegmentsSegmentEdgePopulation(struct CSRSegments *csrSegments, struct EdgeList *edgeList);

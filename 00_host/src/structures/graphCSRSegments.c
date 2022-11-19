@@ -107,14 +107,17 @@ struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList, struct A
 
 }
 
-void   graphCSRSegmentsFree(struct GraphCSRSegments *graphCSRSegments)
+void graphCSRSegmentsFree(struct GraphCSRSegments *graphCSRSegments)
 {
 
-    if(graphCSRSegments->csrSegments)
-        csrSegmentsFree(graphCSRSegments->csrSegments);
-
     if(graphCSRSegments)
+    {
+
+        if(graphCSRSegments->csrSegments)
+            csrSegmentsFree(graphCSRSegments->csrSegments);
+
         free(graphCSRSegments);
+    }
 
 }
 
