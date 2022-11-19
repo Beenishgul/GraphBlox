@@ -157,6 +157,86 @@ struct GraphCSR *graphCSRAssignEdgeList (struct GraphCSR *graphCSR, struct EdgeL
 
 }
 
+struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *arguments, struct EdgeList *edgeList)
+{
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+
+    edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+
+    if(arguments->dflag)
+    {
+        Start(timer);
+        edgeList = removeDulpicatesSelfLoopEdges(edgeList);
+        Stop(timer);
+        graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
+    }
+
+    if(arguments->lmode)
+    {
+        edgeList = reorderGraphProcess(edgeList, arguments);
+        edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+    }
+
+    // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
+    arguments->lmode = arguments->lmode_l2;
+    if(arguments->lmode)
+    {
+        edgeList = reorderGraphProcess(edgeList, arguments);
+        edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+    }
+
+    arguments->lmode = arguments->lmode_l3;
+    if(arguments->lmode)
+    {
+        edgeList = reorderGraphProcess(edgeList, arguments);
+        edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+    }
+
+    if(arguments->mmode)
+        edgeList = maskGraphProcess(edgeList, arguments);
+
+#if DIRECTED
+    struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 1);
+#else
+    struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 0);
+#endif
+
+    // edgeListPrint(edgeList);
+    Start(timer);
+    graphCSR = graphCSRAssignEdgeList (graphCSR, edgeList, 0);
+    Stop(timer);
+
+    graphCSRPrintMessageWithtime("Mappign Vertices to CSR (Seconds)", Seconds(timer));
+
+#if DIRECTED
+
+    Start(timer);
+    struct EdgeList *inverse_edgeList = readEdgeListsMem(edgeList, 1, 0, 0); // read edglist from memory since we pre loaded it
+    Stop(timer);
+
+    graphCSRPrintMessageWithtime("Read Inverse Edge List From Memory (Seconds)", Seconds(timer));
+
+    inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
+
+    Start(timer);
+    graphCSR = graphCSRAssignEdgeList (graphCSR, inverse_edgeList, 1);
+    Stop(timer);
+    graphCSRPrintMessageWithtime("Process In/Out degrees of Inverse Nodes (Seconds)", Seconds(timer));
+
+#endif
+
+
+    graphCSRPrint(graphCSR);
+
+
+    free(timer);
+
+    return graphCSR;
+
+
+}
+
 
 struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
 {

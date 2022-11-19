@@ -44,7 +44,7 @@ struct  CSRSegments
 
 
 void csrSegmentsPrint(struct CSRSegments *csrSegments);
-struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_size);
+struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *arguments);
 void  csrSegmentsFree(struct CSRSegments *csrSegments);
 void csrSegmentsPrintMessageWithtime(const char *msg, double time);
 

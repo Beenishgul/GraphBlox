@@ -87,9 +87,8 @@ void  graphCSRSegmentsPrint(struct GraphCSRSegments *graphCSRSegments)
 }
 
 
-struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList, uint32_t cache_size)
+struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList, struct Arguments *arguments)
 {
-
 
     struct GraphCSRSegments *graphCSRSegments = (struct GraphCSRSegments *) my_malloc( sizeof(struct GraphCSRSegments));
 
@@ -101,7 +100,7 @@ struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList, uint32_t
     graphCSRSegments->num_vertices = edgeList->num_vertices;
     graphCSRSegments->avg_degree = edgeList->num_edges / edgeList->num_vertices;
 
-    graphCSRSegments->csrSegments = csrSegmentsNew(edgeList, cache_size);
+    graphCSRSegments->csrSegments = csrSegmentsNew(edgeList, arguments);
 
 
     return graphCSRSegments;
@@ -178,7 +177,7 @@ struct GraphCSRSegments *graphCSRSegmentsPreProcessingStep (struct Arguments *ar
     // graphCSRSegmentsPrintMessageWithtime("Radix Sort Edges By Source (Seconds)",Seconds(timer));
 
     Start(timer);
-    struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeList, arguments->cache_size);
+    struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeList, arguments);
     Stop(timer);
     graphCSRSegmentsPrintMessageWithtime("Create Graph Grid (Seconds)", Seconds(timer));
 
