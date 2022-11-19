@@ -204,29 +204,30 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
     Stop(timer);
     csrSegmentsPrintMessageWithtime("CSRSegments Process In Out Degrees (Seconds)", Seconds(timer));
 
-
     Start(timer);
     csrSegments = csrSegmentsSegmentEdgeListSizePreprocessing(csrSegments, edgeList);
     Stop(timer);
     csrSegmentsPrintMessageWithtime("Segment EdgeList Size (Seconds)", Seconds(timer));
-
 
     Start(timer);
     csrSegments = csrSegmentsSegmentsMemoryAllocations(csrSegments);
     Stop(timer);
     csrSegmentsPrintMessageWithtime("Segments Memory Allocations (Seconds)", Seconds(timer));
 
-
     Start(timer);
     csrSegments = csrSegmentsSegmentEdgePopulation(csrSegments, edgeList);
     Stop(timer);
     csrSegmentsPrintMessageWithtime("Segment Edge Population (Seconds)", Seconds(timer));
 
-
     Start(timer);
     csrSegments = csrSegmentsSegmentVertexSizePreprocessing(csrSegments);
     Stop(timer);
     csrSegmentsPrintMessageWithtime("Segment Vertex Size (Seconds)", Seconds(timer));
+
+    Start(timer);
+    csrSegments = csrSegmentsCreationPreprocessing(csrSegments, arguments);
+    Stop(timer);
+    csrSegmentsPrintMessageWithtime("CSR Segments Creation Total (Seconds)", Seconds(timer));
 
     return csrSegments;
 }
@@ -246,7 +247,7 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
         {
 
             freeEdgeList(csrSegments->segments[i].edgeList);
-            // graphCSRFree(csrSegments->segments[i].graphCSR);
+            graphCSRFree(csrSegments->segments[i].graphCSR);
         }
 
         freeBitmap(csrSegments->activeSegmentsMap);
@@ -341,6 +342,24 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
 
 
 
+    return csrSegments;
+}
+
+struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegments, struct Arguments *arguments)
+{
+
+    uint32_t j;
+    uint32_t totalSegments = csrSegments->num_segments;
+
+    #pragma omp parallel for default(none) shared(arguments, totalSegments,csrSegments) schedule(dynamic,1024)
+    for ( j = 0; j < totalSegments; ++j)
+    {
+        printf(" ----------------------------------------------------- %u \n", j);
+        printf(" -----------------------------------------------------\n");
+        csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments, csrSegments->segments[j].edgeList);
+        printf(" -----------------------------------------------------\n");
+        printf(" -----------------------------------------------------\n");
+    }
     return csrSegments;
 
 
