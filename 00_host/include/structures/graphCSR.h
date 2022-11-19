@@ -37,6 +37,7 @@ void graphCSRPrint (struct GraphCSR *graphCSR);
 struct GraphCSR *graphCSRAssignEdgeList (struct GraphCSR *graphCSR, struct EdgeList *edgeList, uint8_t inverse);
 struct GraphCSR *graphCSRNew(uint32_t V, uint32_t E,  uint8_t inverse);
 struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments);
+struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *arguments, struct EdgeList *edgeList);
 struct GraphCSR *graphCSRPreProcessingStepDualOrder (struct Arguments *arguments);
 void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR);
 void graphCSRPrintMessageWithtime(const char *msg, double time);

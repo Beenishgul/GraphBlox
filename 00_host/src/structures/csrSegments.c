@@ -154,7 +154,7 @@ void   graphCSRSegmentsSetActiveSegments(struct CSRSegments *csrSegments, uint32
 
 
 
-struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_size)
+struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *arguments)
 {
 
 
@@ -168,7 +168,7 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, uint32_t cache_siz
 
     csrSegments->num_edges = edgeList->num_edges;
     csrSegments->num_vertices = edgeList->num_vertices;
-    csrSegments->num_segments = csrSegmentsCalculateSegments(edgeList, cache_size);
+    csrSegments->num_segments = csrSegmentsCalculateSegments(edgeList, arguments->cache_size);
     totalSegments = csrSegments->num_segments;
 
     csrSegments->segments = (struct Segment *) my_malloc(totalSegments * sizeof(struct Segment));

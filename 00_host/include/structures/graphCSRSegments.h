@@ -31,7 +31,7 @@ struct  GraphCSRSegments
 
 void  graphCSRSegmentsReset(struct GraphCSRSegments *graphCSRSegments);
 void  graphCSRSegmentsPrint(struct GraphCSRSegments *graphCSRSegments);
-struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList, uint32_t cache_size);
+struct GraphCSRSegments *graphCSRSegmentsNew(struct EdgeList *edgeList,struct Arguments *arguments);
 void   graphCSRSegmentsFree(struct GraphCSRSegments *graphCSRSegments);
 void   graphCSRSegmentsPrintMessageWithtime(const char *msg, double time);
 struct GraphCSRSegments *graphCSRSegmentsPreProcessingStep (struct Arguments *arguments);
