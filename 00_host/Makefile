@@ -232,11 +232,11 @@ $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$
 
 .PHONY: run
 run: $(APP)
+	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: $(APP)
 $(APP): $(APP)-$(INTEGRATION)
-	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
-
+	
 .PHONY: debug-memory
 debug-memory: $(APP)
 	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
@@ -310,7 +310,7 @@ export DELTA			?= 800
 export NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= 4
+export NUM_THREADS_PRE  ?= 1
 export NUM_THREADS_ALGO ?= 1
 export NUM_THREADS_KER  ?= 1
 
