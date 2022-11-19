@@ -310,7 +310,7 @@ export DELTA			?= 800
 export NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= 1
+export NUM_THREADS_PRE  ?= 4
 export NUM_THREADS_ALGO ?= 1
 export NUM_THREADS_KER  ?= 1
 

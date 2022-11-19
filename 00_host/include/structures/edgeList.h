@@ -32,6 +32,7 @@ float maxTwoFloats(float num1, float num2);
 
 
 void edgeListPrint(struct EdgeList *edgeList);
+void edgeListPrintBasic(struct EdgeList *edgeList);
 void freeEdgeList( struct EdgeList *edgeList);
 char *readEdgeListstxt(const char *fname, uint32_t weighted);
 struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t symmetric, uint32_t weighted);

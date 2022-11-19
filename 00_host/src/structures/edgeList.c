@@ -326,7 +326,7 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
 
     fclose(pText);
     fclose(pBinary);
-    
+
 #if WEIGHTED
     free(mt19937var);
 #endif
@@ -743,6 +743,15 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 #endif
 
     return edgeList;
+}
+
+void edgeListPrintBasic(struct EdgeList *edgeList)
+{
+
+    printf("number of vertices (V) : %u \n", edgeList->num_vertices);
+    printf("number of edges    (E) : %u \n", edgeList->num_edges);
+    printf("average degree     (D) : %u \n", edgeList->avg_degree);
+
 }
 
 void edgeListPrint(struct EdgeList *edgeList)

@@ -70,20 +70,18 @@ void  graphCSRSegmentsPrint(struct GraphCSRSegments *graphCSRSegments)
     printf(" -----------------------------------------------------\n");
 
 
-    uint32_t i;
-    for ( i = 0; i < (graphCSRSegments->csrSegments->num_segments); ++i)
-    {
+    // uint32_t i;
+    // for ( i = 0; i < (graphCSRSegments->csrSegments->num_segments); ++i)
+    // {
 
-        if(graphCSRSegments->csrSegments->segments[i].num_edges)
-        {
+    //     if(graphCSRSegments->csrSegments->segments[i].num_edges)
+    //     {
 
-            printf("| %-11s (%u) \n", "Segment: ", i);
-            printf("| %-11s %-40u   \n", "Edges: ", graphCSRSegments->csrSegments->segments[i].num_edges);
-            printf("| %-11s %-40u   \n", "Vertices: ", graphCSRSegments->csrSegments->segments[i].num_vertices);
-            edgeListPrint(graphCSRSegments->csrSegments->segments[i].edgeList);
-        }
+    //         printf("| %-11s (%u) \n", "Segment: ", i);
+    //         edgeListPrintBasic(graphCSRSegments->csrSegments->segments[i].edgeList);
+    //     }
 
-    }
+    // }
 
 
 }

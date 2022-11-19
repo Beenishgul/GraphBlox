@@ -312,17 +312,34 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
         // #pragma omp parallel for default(none) private(i,src,dest) shared(j,csrSegments) schedule(dynamic,1024) reduction(max:num_vertices)
         for(i = 0; i <  csrSegments->segments[j].edgeList->num_edges; i++)
         {
-
             src  =  csrSegments->segments[j].edgeList->edges_array_src[i];
             dest =  csrSegments->segments[j].edgeList->edges_array_dest[i];
-
             num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(src, dest));
-
         }
-
         csrSegments->segments[j].num_vertices = num_vertices;
         csrSegments->segments[j].edgeList->num_vertices = num_vertices;
     }
+
+    #pragma omp parallel for default(none) private(i,num_vertices) shared(totalSegments,csrSegments) schedule(dynamic,1024)
+    for ( j = 0; j < totalSegments; ++j)
+    {
+        csrSegments->segments[j].edgeList->mask_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
+        csrSegments->segments[j].edgeList->label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
+        csrSegments->segments[j].edgeList->inverse_label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
+
+        #pragma omp parallel for
+        for (i = 0; i < csrSegments->segments[j].edgeList->num_vertices; ++i)
+        {
+            csrSegments->segments[j].edgeList->mask_array[i] = 0;
+            csrSegments->segments[j].edgeList->label_array[i] = i;
+            csrSegments->segments[j].edgeList->inverse_label_array[i] = i;
+        }
+
+        if(csrSegments->segments[j].edgeList->num_vertices)
+            csrSegments->segments[j].edgeList->avg_degree = csrSegments->segments[j].edgeList->num_edges / csrSegments->segments[j].edgeList->num_vertices;
+    }
+
+
 
     return csrSegments;
 
