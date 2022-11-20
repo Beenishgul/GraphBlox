@@ -272,7 +272,7 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int
 main (int argc, char **argv)
 {
-    struct Arguments *arguments = (struct Arguments *)my_malloc(sizeof(struct Arguments));
+    struct Arguments *arguments = argumentsNew();
     /* Default values. */
 
     arguments->wflag = 0;
@@ -328,7 +328,7 @@ main (int argc, char **argv)
         freeGraphDataStructure(graph, arguments->datastructure);
     }
 
-    free(arguments);
+    argumentsFree(arguments);
     exit (0);
 }
 

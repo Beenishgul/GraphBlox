@@ -748,18 +748,18 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 void edgeListPrintBasic(struct EdgeList *edgeList)
 {
 
-    printf("number of vertices (V) : %u \n", edgeList->num_vertices);
-    printf("number of edges    (E) : %u \n", edgeList->num_edges);
-    printf("average degree     (D) : %u \n", edgeList->avg_degree);
+    printf("Number of vertices (V) : %u \n", edgeList->num_vertices);
+    printf("Number of edges    (E) : %u \n", edgeList->num_edges);
+    printf("Average degree     (D) : %u \n", edgeList->avg_degree);
 
 }
 
 void edgeListPrint(struct EdgeList *edgeList)
 {
 
-    printf("number of vertices (V) : %u \n", edgeList->num_vertices);
-    printf("number of edges    (E) : %u \n", edgeList->num_edges);
-    printf("average degree     (D) : %u \n", edgeList->avg_degree);
+    printf("Number of vertices (V) : %u \n", edgeList->num_vertices);
+    printf("Number of edges    (E) : %u \n", edgeList->num_edges);
+    printf("Average degree     (D) : %u \n", edgeList->avg_degree);
 
     uint32_t i;
 
