@@ -47,6 +47,12 @@ struct Arguments
     uint32_t cache_size;
 };
 
+
+void argumentsFree (struct Arguments *arguments);
+void argumentsPrint (struct Arguments *arguments);
+struct Arguments *argumentsNew();
+void argumentsCopy (struct Arguments *argFrom, struct Arguments *argTo);
+
 #ifdef __cplusplus
 }
 #endif

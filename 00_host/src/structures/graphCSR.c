@@ -38,23 +38,19 @@
 
 void graphCSRFree (struct GraphCSR *graphCSR)
 {
-
     if(graphCSR)
     {
         if(graphCSR->vertices)
             freeVertexArray(graphCSR->vertices);
         if(graphCSR->sorted_edges_array)
             freeEdgeList(graphCSR->sorted_edges_array);
-
 #if DIRECTED
         if(graphCSR->inverse_vertices)
             freeVertexArray(graphCSR->inverse_vertices);
         if(graphCSR->inverse_sorted_edges_array)
             freeEdgeList(graphCSR->inverse_sorted_edges_array);
 #endif
-
         free(graphCSR);
-
     }
 
 }
@@ -152,8 +148,6 @@ struct GraphCSR *graphCSRAssignEdgeList (struct GraphCSR *graphCSR, struct EdgeL
 #endif
 
     return mapVerticesWithInOutDegree (graphCSR, inverse);
-
-
 }
 
 struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *arguments, struct EdgeList *edgeList)
@@ -164,8 +158,8 @@ struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *argume
     Start(timer);
     struct EdgeList *edgeList_internal = edgeList; // read edglist from memory
     Stop(timer);
-    // edgeListPrint(edgeList_internal);
-    graphCSRPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
+    edgeListPrintBasic(edgeList_internal);
+    graphCSRPrintMessageWithtime("Read Edge List From Memory (Seconds)", Seconds(timer));
 
     edgeList_internal = sortRunAlgorithms(edgeList_internal, arguments->sort);
 

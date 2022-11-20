@@ -11,8 +11,6 @@ extern "C" {
 #include "edgeList.h"
 #include "vertex.h"
 
-
-
 struct GraphCSR
 {
 

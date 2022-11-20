@@ -184,7 +184,9 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
     for (i = 0; i < totalSegments; ++i)
     {
         csrSegments->segments[i].num_edges = 0;
-        csrSegments->segments[i].num_vertices = 0;   /* code */
+        csrSegments->segments[i].num_vertices = 0;   
+        csrSegments->segments[i].edgeList = NULL;   
+        csrSegments->segments[i].graphCSR = NULL;   
         csrSegments->activeSegments[i] = 0;
     }
 
@@ -229,6 +231,7 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
     Stop(timer);
     csrSegmentsPrintMessageWithtime("CSR Segments Creation Total (Seconds)", Seconds(timer));
 
+    free(timer);
     return csrSegments;
 }
 
@@ -245,9 +248,11 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
 
         for (i = 0; i < totalSegments; ++i)
         {
+            // if(csrSegments->segments[i].edgeList)
+            //     freeEdgeList(csrSegments->segments[i].edgeList);
 
-            freeEdgeList(csrSegments->segments[i].edgeList);
-            graphCSRFree(csrSegments->segments[i].graphCSR);
+            if(csrSegments->segments[i].graphCSR)
+                graphCSRFree(csrSegments->segments[i].graphCSR);
         }
 
         freeBitmap(csrSegments->activeSegmentsMap);
@@ -351,15 +356,28 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
     uint32_t j;
     uint32_t totalSegments = csrSegments->num_segments;
 
-    #pragma omp parallel for default(none) shared(arguments, totalSegments,csrSegments) schedule(dynamic,1024)
+    struct Arguments *arguments_local = argumentsNew();
+    argumentsCopy(arguments,arguments_local);
+
+    arguments_local->sflag = 0;
+    arguments_local->datastructure = 0;
+    arguments_local->sort = 1;
+    arguments_local->lmode = 1;
+    arguments_local->lmode_l2 = 0;
+    arguments_local->lmode_l3 = 0;
+
+
+    #pragma omp parallel for default(none) shared(arguments_local, totalSegments,csrSegments)
     for ( j = 0; j < totalSegments; ++j)
     {
-        printf(" ----------------------------------------------------- %u \n", j);
-        printf(" -----------------------------------------------------\n");
-        csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments, csrSegments->segments[j].edgeList);
-        printf(" -----------------------------------------------------\n");
-        printf(" -----------------------------------------------------\n");
+        printf(" ----------------------SEGMENT %u -------------------- \n", j);
+        csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
+        printf(" ***************************************************** \n");
     }
+
+
+    argumentsFree(arguments_local);
+
     return csrSegments;
 
 
@@ -442,9 +460,13 @@ struct CSRSegments *csrSegmentsSegmentEdgePopulation(struct CSRSegments *csrSegm
 
         csrSegments->segments[Segment_idx].edgeList->edges_array_src[Edge_idx] = edgeList->edges_array_src[i];
         csrSegments->segments[Segment_idx].edgeList->edges_array_dest[Edge_idx] = edgeList->edges_array_dest[i];
+
 #if WEIGHTED
         csrSegments->segments[Segment_idx].edgeList->edges_array_weight[Edge_idx] = edgeList->edges_array_weight[i];
+        csrSegments->segments[Segment_idx].edgeList->max_weight = maxTwoFloats( csrSegments->segments[Segment_idx].edgeList->max_weight, edgeList->edges_array_weight[i]);
 #endif
+
+
     }
 
 

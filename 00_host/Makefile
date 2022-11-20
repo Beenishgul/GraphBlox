@@ -117,6 +117,7 @@ SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
 SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
 SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
 SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
+SRC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/*.c)
 
 
 INC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.h)
@@ -138,6 +139,7 @@ OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_D
 OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
 OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
 OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
+OBJ_FILES_CONFIG    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o,$(SRC_FILES_CONFIG))
 
 OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
@@ -176,6 +178,7 @@ directories :
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)
+	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
 	-$(MKDIR) $(APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
 
@@ -199,7 +202,7 @@ clean-results:
 #                GLAY COMPILATION                       #
 #########################################################
 
-$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
+$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
@@ -224,6 +227,9 @@ $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
+	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG)
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 ##########################################################################
@@ -274,10 +280,10 @@ export BENCHMARKS_DIR ?= ../03_test_graphs
 # export GRAPH_NAME ?= graphbrew
 
 export GRAPH_SUIT ?= LAW
-export GRAPH_NAME ?= LAW-amazon-2008
+# export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-# export GRAPH_NAME ?= LAW-enron
+export GRAPH_NAME ?= LAW-enron
 
 
 # export FILE_BIN_TYPE ?= graph
