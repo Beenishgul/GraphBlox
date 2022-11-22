@@ -38,6 +38,7 @@ struct  CSRSegments
     uint32_t *activeSegments;
     uint32_t *out_degree;
     uint32_t *in_degree;
+    uint32_t *vertex_segment_index;
     struct Bitmap *activeSegmentsMap;
     // struct Bitmap* activeVertices;
 };
