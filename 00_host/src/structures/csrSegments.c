@@ -184,9 +184,9 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
     for (i = 0; i < totalSegments; ++i)
     {
         csrSegments->segments[i].num_edges = 0;
-        csrSegments->segments[i].num_vertices = 0;   
-        csrSegments->segments[i].edgeList = NULL;   
-        csrSegments->segments[i].graphCSR = NULL;   
+        csrSegments->segments[i].num_vertices = 0;
+        csrSegments->segments[i].edgeList = NULL;
+        csrSegments->segments[i].graphCSR = NULL;
         csrSegments->activeSegments[i] = 0;
     }
 
@@ -248,14 +248,18 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
 
         for (i = 0; i < totalSegments; ++i)
         {
-            // if(csrSegments->segments[i].edgeList)
-            //     freeEdgeList(csrSegments->segments[i].edgeList);
-
+            if(csrSegments->segments[i].edgeList)
+            {
+                freeEdgeList(csrSegments->segments[i].edgeList);
+            }
             if(csrSegments->segments[i].graphCSR)
+            {
                 graphCSRFree(csrSegments->segments[i].graphCSR);
+            }
         }
 
-        freeBitmap(csrSegments->activeSegmentsMap);
+        if(csrSegments->activeSegmentsMap)
+            freeBitmap(csrSegments->activeSegmentsMap);
 
         if(csrSegments->activeSegments)
             free(csrSegments->activeSegments);
@@ -326,14 +330,14 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
         csrSegments->segments[j].edgeList->num_vertices = num_vertices;
     }
 
-    #pragma omp parallel for default(none) private(i,num_vertices) shared(totalSegments,csrSegments) schedule(dynamic,1024)
+    #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     for ( j = 0; j < totalSegments; ++j)
     {
         csrSegments->segments[j].edgeList->mask_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
         csrSegments->segments[j].edgeList->label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
         csrSegments->segments[j].edgeList->inverse_label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
 
-        #pragma omp parallel for
+        // #pragma omp parallel for
         for (i = 0; i < csrSegments->segments[j].edgeList->num_vertices; ++i)
         {
             csrSegments->segments[j].edgeList->mask_array[i] = 0;
@@ -345,8 +349,6 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
             csrSegments->segments[j].edgeList->avg_degree = csrSegments->segments[j].edgeList->num_edges / csrSegments->segments[j].edgeList->num_vertices;
     }
 
-
-
     return csrSegments;
 }
 
@@ -357,27 +359,25 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
     uint32_t totalSegments = csrSegments->num_segments;
 
     struct Arguments *arguments_local = argumentsNew();
-    argumentsCopy(arguments,arguments_local);
+    // argumentsCopy(arguments, arguments_local);
 
-    arguments_local->sflag = 0;
+    arguments_local->sflag         = 0;
     arguments_local->datastructure = 0;
-    arguments_local->sort = 1;
-    arguments_local->lmode = 1;
-    arguments_local->lmode_l2 = 0;
-    arguments_local->lmode_l3 = 0;
+    arguments_local->sort          = 0;
+    arguments_local->lmode         = 0;
+    arguments_local->lmode_l2      = 0;
+    arguments_local->lmode_l3      = 0;
 
-
-    #pragma omp parallel for default(none) shared(arguments_local, totalSegments,csrSegments)
+    // #pragma omp parallel for default(none) shared(arguments_local, totalSegments, csrSegments)
     for ( j = 0; j < totalSegments; ++j)
     {
         printf(" ----------------------SEGMENT %u -------------------- \n", j);
+        edgeListPrint(csrSegments->segments[j].edgeList);
         csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
         printf(" ***************************************************** \n");
     }
 
-
     argumentsFree(arguments_local);
-
     return csrSegments;
 
 

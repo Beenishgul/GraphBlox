@@ -20,6 +20,7 @@ extern "C" {
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <argp.h>
 #include <stdbool.h>
@@ -176,10 +177,12 @@ parse_opt (int key, char *arg, struct argp_state *state)
     switch (key)
     {
     case 'f':
-        arguments->fnameb = arg;
+        arguments->fnameb = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->fnameb  = strcpy (arguments->fnameb, arg);
         break;
     case 'F':
-        arguments->fnamel = arg;
+        arguments->fnamel = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->fnamel  = strcpy (arguments->fnamel, arg);
         break;
     case 'z':
         arguments->fnameb_format = atoi(arg);
@@ -292,7 +295,7 @@ main (int argc, char **argv)
     arguments->sort = 0;
     arguments->mmode = 0;
     arguments->cache_size = 32768; // 32KB for DBG reordering or GRID based structures
-    
+
     arguments->lmode = 0;
     arguments->lmode_l2 = 0;
     arguments->lmode_l3 = 0;

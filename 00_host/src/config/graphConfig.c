@@ -1,4 +1,17 @@
-
+// -----------------------------------------------------------------------------
+//
+//      "00_GLay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2014-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi
+// Email  : atmughra@virginia||atmughrabi@gmail.com
+// File   : graphConfig.c
+// Create : 2022-06-29 12:31:24
+// Revise : 2022-09-28 15:36:13
+// Editor : Abdullah Mughrabi
+// -----------------------------------------------------------------------------
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,9 +22,14 @@
 
 void argumentsFree (struct Arguments *arguments)
 {
-
-    free(arguments);
-
+    if(arguments)
+    {
+        if(arguments->fnameb)
+            free(arguments->fnameb);
+        if(arguments->fnamel)
+            free(arguments->fnamel);
+        free(arguments);
+    }
 }
 
 void argumentsPrint (struct Arguments *arguments)
@@ -19,6 +37,7 @@ void argumentsPrint (struct Arguments *arguments)
 
 
 }
+
 struct Arguments *argumentsNew()
 {
 
