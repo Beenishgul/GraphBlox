@@ -280,12 +280,10 @@ export BENCHMARKS_DIR ?= ../03_test_graphs
 # export GRAPH_NAME ?= graphbrew
 
 export GRAPH_SUIT ?= LAW
-# export GRAPH_NAME ?= LAW-amazon-2008
+export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
 # export GRAPH_NAME ?= LAW-enron
-export GRAPH_NAME ?= LAW-orkut
-
 
 # export FILE_BIN_TYPE ?= graph.txt
 export FILE_BIN_TYPE ?= graph.bin
