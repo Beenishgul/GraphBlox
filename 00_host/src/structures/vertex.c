@@ -30,9 +30,9 @@ struct Vertex *newVertexArray(uint32_t num_vertices)
     ;
     struct Vertex *vertex_array = (struct Vertex *) my_malloc(sizeof(struct Vertex));
 
-    vertex_array->out_degree = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
-    vertex_array->in_degree = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
-    vertex_array->edges_idx = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
+    vertex_array->out_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
+    vertex_array->in_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
+    vertex_array->edges_idx = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
     vertex_array->num_vertices =  num_vertices;
 
     #pragma omp parallel for
@@ -315,11 +315,14 @@ struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_
     free(offset_start_arr);
     free(offset_end_arr);
 
-    // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++){
+    // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++)
+    // {
 
-    //     printf("<--v %u out_degree %u\n",vertex_id, graph->vertices->out_degree[vertex_id] );
+    //     if(vertices->out_degree[vertex_id])
+    //         printf("<--v %u out_degree %u\n", vertex_id, graph->vertices->out_degree[vertex_id] );
 
     // }
+
 
     return graph;
 
@@ -335,7 +338,6 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
     uint32_t key = 0;
     uint32_t pos = 0;
     uint32_t i = 0;
-    uint32_t j = 0;
     uint32_t P = 1;
     uint32_t t_id = 0;
     uint32_t offset_start = 0;
@@ -361,10 +363,17 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
 #endif
 
 
-    #pragma omp parallel default(none) shared(P,sorted_edges_array,vertices,graph) firstprivate(t_id, offset_end,offset_start,base,i,j,key,pos)
+    #pragma omp parallel default(none) shared(P,sorted_edges_array,vertices,graph) firstprivate(t_id, offset_end,offset_start,base,i,key,pos)
     {
 
         t_id = omp_get_thread_num();
+
+        if(t_id == 0)
+        {
+            P = omp_get_num_threads();
+        }
+
+        #pragma omp barrier
 
         offset_start = t_id * (graph->num_edges / P);
 
@@ -377,18 +386,22 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
             offset_end = offset_start + (graph->num_edges / P);
         }
 
-        //HISTOGRAM-KEYS
+        #pragma omp for
         for(i = 0; i < graph->num_vertices; i++)
         {
-            vertices->edges_idx[(t_id * graph->num_vertices) + i] = 0;
+            vertices->edges_idx[i] = 0;
         }
 
         // count occurrence of key: id of the source vertex
         for(i = offset_start; i < offset_end; i++)
         {
             key = VERTEX_CACHE_MASK_U32 & sorted_edges_array->edges_array_src[i];
-            vertices->edges_idx[(t_id * graph->num_vertices) + key]++;
-            vertices->out_degree[(t_id * graph->num_vertices) + key]++;
+
+            #pragma omp atomic update
+            vertices->edges_idx[key]++;
+
+            #pragma omp atomic update
+            vertices->out_degree[key]++;
         }
 
         #pragma omp barrier
@@ -398,12 +411,9 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
         {
             for(i = 0; i < graph->num_vertices; i++)
             {
-                for(j = 0 ; j < P; j++)
-                {
-                    pos = vertices->edges_idx[(j * graph->num_vertices) + i];
-                    vertices->edges_idx[(j * graph->num_vertices) + i] = base;
-                    base += pos;
-                }
+                pos = vertices->edges_idx[i];
+                vertices->edges_idx[i] = base;
+                base += pos;
             }
         }
     }
@@ -430,9 +440,11 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
     }
 #endif
 
-    // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++){
+    // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++)
+    // {
 
-    //     printf("<--v %u out_degree %u\n",vertex_id, graph->vertices->out_degree[vertex_id] );
+    //     if(vertices->out_degree[vertex_id])
+    //         printf("<--v %u out_degree %u\n", vertex_id, graph->vertices->out_degree[vertex_id] );
 
     // }
 

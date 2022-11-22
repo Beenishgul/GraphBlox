@@ -273,14 +273,14 @@ $(APP_TEST): $(APP_TEST)-$(INTEGRATION)
 export BENCHMARKS_DIR ?= ../03_test_graphs
 
 # TEST # small test graphs
-export GRAPH_SUIT ?= TEST
+# export GRAPH_SUIT ?= TEST
 # export GRAPH_NAME ?= test
-export GRAPH_NAME ?= v51_e1021
+# export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= graphbrew
 
-# export GRAPH_SUIT ?= LAW
-# export GRAPH_NAME ?= LAW-amazon-2008
+export GRAPH_SUIT ?= LAW
+export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
 # export GRAPH_NAME ?= LAW-enron
@@ -316,7 +316,7 @@ export DELTA			?= 800
 export NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= 1
+export NUM_THREADS_PRE  ?= 8
 export NUM_THREADS_ALGO ?= 1
 export NUM_THREADS_KER  ?= 1
 

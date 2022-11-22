@@ -149,7 +149,8 @@ struct GraphCSR *graphCSRAssignEdgeList (struct GraphCSR *graphCSR, struct EdgeL
     graphCSR->max_weight =  edgeList->max_weight;
 #endif
 
-    return mapVerticesWithInOutDegree (graphCSR, inverse);
+    // return mapVerticesWithInOutDegree (graphCSR, inverse);
+    return mapVerticesWithInOutDegree_base (graphCSR, inverse);
 }
 
 struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *arguments, struct EdgeList *edgeList)

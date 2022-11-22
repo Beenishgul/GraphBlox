@@ -372,7 +372,7 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
     for ( j = 0; j < totalSegments; ++j)
     {
         printf(" ----------------------SEGMENT %u -------------------- \n", j);
-        edgeListPrint(csrSegments->segments[j].edgeList);
+        // edgeListPrint(csrSegments->segments[j].edgeList);
         csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
         printf(" ***************************************************** \n");
     }
