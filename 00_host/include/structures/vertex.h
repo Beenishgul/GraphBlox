@@ -25,6 +25,7 @@ struct  Vertex
 
 struct GraphCSR *mapVertices (struct GraphCSR *graph, uint8_t inverse);
 struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inverse);
+struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_t inverse);
 
 struct Vertex *newVertexArray(uint32_t num_vertices);
 void freeVertexArray(struct Vertex *vertices);
