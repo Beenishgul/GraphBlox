@@ -173,8 +173,9 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
 
     csrSegments->segments = (struct Segment *) my_malloc(totalSegments * sizeof(struct Segment));
     csrSegments->activeSegments = (uint32_t *) my_malloc(totalSegments * sizeof(uint32_t));
-    csrSegments->out_degree = (uint32_t *) my_malloc(csrSegments->num_vertices * sizeof(uint32_t));
-    csrSegments->in_degree = (uint32_t *) my_malloc(csrSegments->num_vertices * sizeof(uint32_t));
+    csrSegments->out_degree = (uint32_t *) my_malloc((csrSegments->num_vertices) * sizeof(uint32_t));
+    csrSegments->in_degree = (uint32_t *) my_malloc((csrSegments->num_vertices) * sizeof(uint32_t));
+    csrSegments->vertex_segment_index = (uint32_t *) my_malloc((csrSegments->num_vertices) * sizeof(uint32_t));
 
     // csrSegments->activeVertices = newBitmap(csrSegments->num_vertices);
     csrSegments->activeSegmentsMap = newBitmap(totalSegments);
@@ -194,10 +195,9 @@ struct CSRSegments *csrSegmentsNew(struct EdgeList *edgeList, struct Arguments *
     #pragma omp parallel for default(none) private(i) shared(csrSegments)
     for (i = 0; i < csrSegments->num_vertices ; ++i)
     {
-
         csrSegments->out_degree[i] = 0;
         csrSegments->in_degree[i] = 0;
-
+        csrSegments->vertex_segment_index[i] = 0;
     }
 
 
@@ -266,6 +266,9 @@ void  csrSegmentsFree(struct CSRSegments *csrSegments)
 
         if(csrSegments->out_degree)
             free(csrSegments->out_degree);
+
+        if(csrSegments->vertex_segment_index)
+            free(csrSegments->vertex_segment_index);
 
         if(csrSegments->in_degree)
             free(csrSegments->in_degree);
@@ -417,6 +420,9 @@ struct CSRSegments *csrSegmentsSegmentEdgeListSizePreprocessing(struct CSRSegmen
 
         #pragma omp atomic update
         csrSegments->segments[Segment_idx].num_edges++;
+
+        // #pragma omp atomic write
+        csrSegments->vertex_segment_index[dest] = Segment_idx;
 
     }
 

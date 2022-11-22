@@ -33,16 +33,15 @@ struct Vertex *newVertexArray(uint32_t num_vertices)
     vertex_array->out_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
     vertex_array->in_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
     vertex_array->edges_idx = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
+ 
     vertex_array->num_vertices =  num_vertices;
 
     #pragma omp parallel for
     for(i = 0; i < num_vertices; i++)
     {
-
         vertex_array->edges_idx[i]  = 0;
         vertex_array->out_degree[i] = 0;
         vertex_array->in_degree[i] = 0;
-
     }
 
     return vertex_array;
