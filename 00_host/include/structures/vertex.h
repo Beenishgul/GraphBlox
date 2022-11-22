@@ -16,6 +16,7 @@ extern "C" {
 
 struct  Vertex
 {
+    uint32_t num_vertices;
     uint32_t *out_degree;
     uint32_t *in_degree;
     uint32_t *edges_idx;

@@ -104,8 +104,10 @@ struct GraphCSR *graphCSRNew(uint32_t V, uint32_t E, uint8_t inverse)
     graphCSR->num_edges = E;
     graphCSR->avg_degree = E / V;
     graphCSR->sorted_edges_array = NULL; // sorted edge array
+    graphCSR->vertices = NULL;
 
 #if DIRECTED
+    graphCSR->inverse_vertices = NULL;
     graphCSR->inverse_sorted_edges_array = NULL; // sorted edge array
 #endif
 
@@ -156,9 +158,8 @@ struct GraphCSR *graphCSRPreProcessingStepFromEdgelist (struct Arguments *argume
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
-    struct EdgeList *edgeList_internal = edgeList; // read edglist from memory
+    struct EdgeList *edgeList_internal = readEdgeListsMem(edgeList, 0, 0, arguments->weighted); // read edglist from memory
     Stop(timer);
-    edgeListPrintBasic(edgeList_internal);
     graphCSRPrintMessageWithtime("Read Edge List From Memory (Seconds)", Seconds(timer));
 
     edgeList_internal = sortRunAlgorithms(edgeList_internal, arguments->sort);

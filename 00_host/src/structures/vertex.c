@@ -26,15 +26,16 @@
 struct Vertex *newVertexArray(uint32_t num_vertices)
 {
 
-
+    uint32_t i
+    ;
     struct Vertex *vertex_array = (struct Vertex *) my_malloc(sizeof(struct Vertex));
 
-    vertex_array->out_degree = (uint32_t *) my_malloc( num_vertices * sizeof(uint32_t));
-    vertex_array->in_degree = (uint32_t *) my_malloc( num_vertices * sizeof(uint32_t));
-    vertex_array->edges_idx = (uint32_t *) my_malloc( num_vertices * sizeof(uint32_t));
+    vertex_array->out_degree = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
+    vertex_array->in_degree = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
+    vertex_array->edges_idx = (uint32_t *) my_malloc( (num_vertices+1) * sizeof(uint32_t));
+    vertex_array->num_vertices =  num_vertices;
 
-    uint32_t i;
-
+    #pragma omp parallel for
     for(i = 0; i < num_vertices; i++)
     {
 
@@ -201,7 +202,7 @@ void partitionEdgeListOffsetStartEnd(struct GraphCSR *graph, struct EdgeList *so
 
 }
 
-struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inverse)
+struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_t inverse)
 {
 
     uint32_t i;
@@ -214,18 +215,18 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
     uint32_t *offset_start_arr = NULL;
     uint32_t *offset_end_arr = NULL;
 
-    #pragma omp parallel default(none) shared(P,offset_start_arr,offset_end_arr)
+    #pragma omp parallel default(none) shared(P)
     {
         uint32_t t_id = omp_get_thread_num();
 
         if(t_id == 0)
         {
             P = omp_get_num_threads();
-            offset_start_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
-            offset_end_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
         }
     }
 
+    offset_start_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
+    offset_end_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
     // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++){
 
     //     printf("-->v %u out_degree %u\n",vertex_id, graph->vertices->out_degree[vertex_id] );
@@ -324,6 +325,121 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
 
 }
 
+struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inverse)
+{
+
+    uint32_t vertex_id;
+    // uint32_t vertex_id_dest;
+    struct Vertex *vertices;
+    struct EdgeList *sorted_edges_array;
+    uint32_t key = 0;
+    uint32_t pos = 0;
+    uint32_t i = 0;
+    uint32_t j = 0;
+    uint32_t P = 1;
+    uint32_t t_id = 0;
+    uint32_t offset_start = 0;
+    uint32_t offset_end = 0;
+    uint32_t base = 0;
+
+#if DIRECTED
+
+    if(inverse)
+    {
+        sorted_edges_array = graph->inverse_sorted_edges_array;
+        vertices = graph->inverse_vertices; // sorted edge array
+    }
+    else
+    {
+        sorted_edges_array = graph->sorted_edges_array;
+        vertices = graph->vertices;
+    }
+
+#else
+    sorted_edges_array = graph->sorted_edges_array;
+    vertices = graph->vertices;
+#endif
+
+
+    #pragma omp parallel default(none) shared(P,sorted_edges_array,vertices,graph) firstprivate(t_id, offset_end,offset_start,base,i,j,key,pos)
+    {
+
+        t_id = omp_get_thread_num();
+
+        offset_start = t_id * (graph->num_edges / P);
+
+        if(t_id == (P - 1))
+        {
+            offset_end = offset_start + (graph->num_edges / P) + (graph->num_edges % P) ;
+        }
+        else
+        {
+            offset_end = offset_start + (graph->num_edges / P);
+        }
+
+        //HISTOGRAM-KEYS
+        for(i = 0; i < graph->num_vertices; i++)
+        {
+            vertices->edges_idx[(t_id * graph->num_vertices) + i] = 0;
+        }
+
+        // count occurrence of key: id of the source vertex
+        for(i = offset_start; i < offset_end; i++)
+        {
+            key = VERTEX_CACHE_MASK_U32 & sorted_edges_array->edges_array_src[i];
+            vertices->edges_idx[(t_id * graph->num_vertices) + key]++;
+            vertices->out_degree[(t_id * graph->num_vertices) + key]++;
+        }
+
+        #pragma omp barrier
+
+        //SCAN BUCKETS
+        if(t_id == 0)
+        {
+            for(i = 0; i < graph->num_vertices; i++)
+            {
+                for(j = 0 ; j < P; j++)
+                {
+                    pos = vertices->edges_idx[(j * graph->num_vertices) + i];
+                    vertices->edges_idx[(j * graph->num_vertices) + i] = base;
+                    base += pos;
+                }
+            }
+        }
+    }
+
+#if DIRECTED
+    if(!inverse)
+    {
+
+        #pragma omp parallel for default(none) private(vertex_id) shared(vertices,graph)
+        for(vertex_id = 0; vertex_id < graph->num_vertices ; vertex_id++)
+        {
+            graph->inverse_vertices->in_degree[vertex_id] = vertices->out_degree[vertex_id];
+        }
+
+    }
+    else
+    {
+        #pragma omp parallel for default(none) private(vertex_id) shared(vertices,graph)
+        for(vertex_id = 0; vertex_id < graph->num_vertices ; vertex_id++)
+        {
+            graph->vertices->in_degree[vertex_id] = vertices->out_degree[vertex_id];
+        }
+
+    }
+#endif
+
+    // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++){
+
+    //     printf("<--v %u out_degree %u\n",vertex_id, graph->vertices->out_degree[vertex_id] );
+
+    // }
+
+    return graph;
+
+}
+
 void vertexArrayMaxOutdegree(struct Vertex *vertex_array, uint32_t num_vertices)
 {
 
@@ -405,6 +521,8 @@ void printVertexArray(struct Vertex *vertex_array, uint32_t num_vertices)
 
 void freeVertexArray(struct Vertex *vertices)
 {
+    // printVertexArray(vertices, vertices->num_vertices);
+
     if(vertices)
     {
         if(vertices->edges_idx)
