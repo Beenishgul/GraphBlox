@@ -33,7 +33,7 @@ struct Vertex *newVertexArray(uint32_t num_vertices)
     vertex_array->out_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
     vertex_array->in_degree = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
     vertex_array->edges_idx = (uint32_t *) my_malloc( (num_vertices + 1) * sizeof(uint32_t));
- 
+
     vertex_array->num_vertices =  num_vertices;
 
     #pragma omp parallel for
@@ -204,8 +204,8 @@ void partitionEdgeListOffsetStartEnd(struct GraphCSR *graph, struct EdgeList *so
 struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_t inverse)
 {
 
-    uint32_t i;
-    uint32_t vertex_id;
+    uint32_t i = 0;
+    uint32_t vertex_id = 0;
     // uint32_t vertex_id_dest;
     uint32_t P = 1;
     struct Vertex *vertices;
@@ -259,7 +259,7 @@ struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_
 
 
 
-    #pragma omp parallel default(none) private(i,vertex_id) shared(inverse,graph,vertices,sorted_edges_array,offset_start_arr,offset_end_arr) firstprivate( offset_end,offset_start)
+    #pragma omp parallel default(none) shared(inverse,graph,vertices,sorted_edges_array,offset_start_arr,offset_end_arr) firstprivate(i, vertex_id, offset_end,offset_start)
     {
 
         uint32_t t_id = omp_get_thread_num();

@@ -84,6 +84,14 @@ void  graphCSRSegmentsPrint(struct GraphCSRSegments *graphCSRSegments)
     // }
 
 
+    // uint32_t i;
+    // for ( i = 0; i < (graphCSRSegments->csrSegments->num_vertices); ++i)
+    // {
+    //         printf("v:%u --> s:%u \n",i, graphCSRSegments->csrSegments->vertex_segment_index[i]);
+    //         // edgeListPrintBasic(graphCSRSegments->csrSegments->segments[i].edgeList);
+    // }
+
+
 }
 
 
