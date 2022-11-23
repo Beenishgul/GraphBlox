@@ -35,6 +35,8 @@
 #include "triangleCount.h"
 #include "betweennessCentrality.h"
 
+#include "edgeListDynamic.h"
+
 #include "reorder.h"
 #include "graphStats.h"
 #include "graphRun.h"

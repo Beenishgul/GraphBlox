@@ -485,7 +485,7 @@ struct EdgeListDynamic *readEdgeListsDynamicbin(const char *fname, uint8_t inver
         dest = buf_pointer[((offset) * i) + 1];
         time =  buf_pointer[((offset) * i) + 2];
         operation =  buf_pointer[((offset) * i) + 3];
-        // printf(" %u %lu -> %lu \n",i,src,dest);
+        // printf(" %u %lu -> %lu %lu %lu  \n",i,src,dest,time,operation);
 #if DIRECTED
         if(!inverse)
         {

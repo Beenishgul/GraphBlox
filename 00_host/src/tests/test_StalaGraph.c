@@ -33,6 +33,11 @@ extern "C" {
 #include "graphConfig.h"
 #include "graphRun.h"
 #include "graphStats.h"
+#include "edgeList.h"
+#include "sortRun.h"
+#include "reorder.h"
+
+#include "graphCSRSegments.h"
 #include "edgeListDynamic.h"
 
 const char *argp_program_version =
@@ -313,16 +318,12 @@ main (int argc, char **argv)
     initializeMersenneState (&(arguments->mt19937var), 27491095);
     omp_set_nested(1);
 
-     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
-    void *graph = NULL;
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
     if(arguments->dflag)
         arguments->sort = 1;
-
-
-    void *graph = NULL;
 
     if(arguments->algorithm == 8)  // Triangle counting depends on order
     {
@@ -341,9 +342,9 @@ main (int argc, char **argv)
     if(arguments->fnameb_format == 0)  // for now it edge list is text only convert to binary
     {
         Start(timer);
-        arguments->fnameb = readEdgeListDynamicsDynamictxt(arguments->fnameb, arguments->weighted);
-        arguments->fnamel = readEdgeListDynamicsDynamictxt(arguments->fnamel, arguments->weighted);
-        arguments->fnamel_format = 1; // now you have a bin file
+        arguments->fnameb = readEdgeListsDynamictxt(arguments->fnameb, arguments->weighted);
+        arguments->fnamel = readEdgeListsDynamictxt(arguments->fnamel, arguments->weighted);
+        arguments->fnameb_format = 1; // now you have a bin file
 #if WEIGHTED
         arguments->weighted = 1; // no need to generate weights again this affects readedgelistDynamicbin
 #else
@@ -358,64 +359,38 @@ main (int argc, char **argv)
     Start(timer);
     struct EdgeListDynamic *edgeListDynamic = readEdgeListsDynamicbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);
     struct EdgeList *edgeList = newEdgeList(edgeListDynamic->num_edges);
-    struct EdgeListDynamic *edgeListDynamic_actions = readEdgeListsDynamicbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);
+
+    // struct EdgeListDynamic *edgeListDynamic_actions = readEdgeListsDynamicbin(arguments->fnamel, 0, arguments->symmetric, arguments->weighted);
     Stop(timer);
     // edgeListDynamicPrint(edgeListDynamic);
     graphCSRSegmentsPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
 
     // Start(timer);
-    edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
+    edgeList = sortRunAlgorithms(edgeList, arguments->sort);
 
     if(arguments->dflag)
     {
         Start(timer);
-        edgeListDynamic = removeDulpicatesSelfLoopEdgesDynamic(edgeListDynamic);
+        edgeList = removeDulpicatesSelfLoopEdges(edgeList);
         Stop(timer);
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
 
-    if(arguments->lmode)
-    {
-        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
-        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
-    }
-
-    // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
-    arguments->lmode = arguments->lmode_l2;
-    if(arguments->lmode)
-    {
-        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
-        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
-    }
-
-    arguments->lmode = arguments->lmode_l3;
-    if(arguments->lmode)
-    {
-        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
-        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
-    }
-
-    if(arguments->mmode)
-        edgeListDynamic = maskGraphProcess(edgeListDynamic, arguments);
-
-    // if(arguments->mmode)
-    //     edgeListDynamic = maskGraphProcess(edgeListDynamic, arguments);
-    // Stop(timer);
-    // graphCSRSegmentsPrintMessageWithtime("Radix Sort Edges By Source (Seconds)",Seconds(timer));
 
     Start(timer);
-    struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeListDynamic, arguments);
+    // struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeListDynamic, arguments);
     Stop(timer);
     graphCSRSegmentsPrintMessageWithtime("Create Graph Grid (Seconds)", Seconds(timer));
 
 
-    graphCSRSegmentsPrint(graphCSRSegments);
+    // graphCSRSegmentsPrint(graphCSRSegments);
 
 
-    freeEdgeListDynamic(edgeListDynamic);
+    // freeEdgeListDynamic(edgeListDynamic);
+    // freeEdgeListDynamic(edgeListDynamic_actions);
+    freeEdgeList(edgeList);
     free(timer);
     
-
     argumentsFree(arguments);
     exit (0);
 }

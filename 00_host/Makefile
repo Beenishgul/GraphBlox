@@ -19,7 +19,8 @@ mkhelp::
 #########################################################
 APP                 ?= glay
 # APP_TEST            ?= test_glay
-APP_TEST            ?= test_match
+# APP_TEST            ?= test_match
+APP_TEST            ?= test_StalaGraph
 INTEGRATION         ?= openmp
 
 # dirs Root app
@@ -262,18 +263,18 @@ export TEST_ARGS ?= $(DEVICE_INDEX) $(XCLBIN_PATH)
 
 .PHONY: run-test
 run-test: $(APP_TEST)
-	$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) $(TEST_ARGS)
+	$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: $(APP_TEST)
 $(APP_TEST): $(APP_TEST)-$(INTEGRATION)
 
 .PHONY: debug-test
 debug-test: $(APP_TEST)
-	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
+	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: debug-test-memory
 debug-test-memory: $(APP_TEST)
-	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) 
+	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 # test files
 .PHONY: test
@@ -295,18 +296,29 @@ export BENCHMARKS_DIR ?= ../03_test_graphs
 # export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= graphbrew
 
-export GRAPH_SUIT ?= LAW
-export GRAPH_NAME ?= LAW-amazon-2008
+# export GRAPH_SUIT ?= LAW
+# export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
 # export GRAPH_NAME ?= LAW-enron
 
+export GRAPH_SUIT ?= KRON
+export GRAPH_NAME ?= RMAT
+
+# export FILE_BIN_TYPE ?= g.20.16.text
+# export FILE_LABEL_TYPE ?= a.20.16.1000000.text
+
+export FILE_BIN_TYPE ?= g.20.16.text.dbin
+export FILE_LABEL_TYPE ?= a.20.16.1000000.text.dbin
+# export FILE_BIN_TYPE ?= g.24.16.text
+# export FILE_LABEL_TYPE ?= a.24.16.10000000.text
+
 # export FILE_BIN_TYPE ?= graph.txt
-export FILE_BIN_TYPE ?= graph.bin
+# export FILE_BIN_TYPE ?= graph.bin
 # export FILE_BIN_TYPE ?= graph.wbin
 
 # export FILE_LABEL_TYPE ?= graph_Gorder.labels
-export FILE_LABEL_TYPE ?= graph_Rabbit.labels
+# export FILE_LABEL_TYPE ?= graph_Rabbit.labels
 
 #GRAPH file
 export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
@@ -319,7 +331,7 @@ export ALGORITHMS 		?= 1
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		?= 2
 export DATA_STRUCTURES  ?= 1
-export REORDER_LAYER1 	?= 1
+export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 # export CACHE_SIZE       ?= 32768 #(32KB)
@@ -351,6 +363,6 @@ export MASK_MODE 		?= 0
 
 ##################################################
 
-export ARGS ?= -x -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 
 ##############################################
