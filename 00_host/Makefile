@@ -303,12 +303,12 @@ export ALGORITHMS 		?= 1
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		?= 2
 export DATA_STRUCTURES  ?= 1
-export REORDER_LAYER1 	?= 0
+export REORDER_LAYER1 	?= 1
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 # export CACHE_SIZE       ?= 32768 #(32KB)
-export CACHE_SIZE       ?= 262144 #(256KB)
-# export CACHE_SIZE       ?= 23068672 #(22MB)
+# export CACHE_SIZE       ?= 262144 #(256KB)
+export CACHE_SIZE       ?= 23068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
 export ROOT 			?= 0
@@ -317,7 +317,7 @@ export DELTA			?= 800
 export NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= 16
+export NUM_THREADS_PRE  ?= 1
 export NUM_THREADS_ALGO ?= 1
 export NUM_THREADS_KER  ?= 1
 

@@ -194,12 +194,12 @@ struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
 #endif
     tempEdgeList->avg_degree = tempEdgeList->num_edges / tempEdgeList->num_vertices;
 
-    tempEdgeList->mask_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
-    tempEdgeList->label_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
-    tempEdgeList->inverse_label_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
+    tempEdgeList->mask_array = (uint32_t *) my_malloc((tempEdgeList->num_vertices + 1) * sizeof(uint32_t));
+    tempEdgeList->label_array = (uint32_t *) my_malloc((tempEdgeList->num_vertices + 1) * sizeof(uint32_t));
+    tempEdgeList->inverse_label_array = (uint32_t *) my_malloc((tempEdgeList->num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel for
-    for (i = 0; i < edgeList->num_vertices; ++i)
+    for (i = 0; i < (edgeList->num_vertices); ++i)
     {
         tempEdgeList->mask_array[i] = edgeList->mask_array[i] ;
         tempEdgeList->label_array[i] =  edgeList->label_array[i];
@@ -576,12 +576,12 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     // printf("DONE Reading EdgeList from file %s \n", fname);
     // edgeListPrint(edgeList);
 
-    edgeList->mask_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
-    edgeList->label_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
-    edgeList->inverse_label_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    edgeList->mask_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->inverse_label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel for
-    for (i = 0; i < edgeList->num_vertices; ++i)
+    for (i = 0; i < (edgeList->num_vertices); ++i)
     {
         edgeList->mask_array[i] = 0;
         edgeList->label_array[i] = i;
@@ -610,10 +610,10 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 
     if(edgeListmem->mask_array)
     {
-        edgeList->mask_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+        edgeList->mask_array = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
 
         #pragma omp parallel for
-        for ( i = 0; i < num_vertices; ++i)
+        for ( i = 0; i < (num_vertices); ++i)
         {
             edgeList->mask_array[i] = edgeListmem->mask_array[i];
         }
@@ -622,10 +622,10 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 
     if(edgeListmem->label_array)
     {
-        edgeList->label_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+        edgeList->label_array = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
 
         #pragma omp parallel for
-        for ( i = 0; i < num_vertices; ++i)
+        for ( i = 0; i < (num_vertices); ++i)
         {
             edgeList->label_array[i] = edgeListmem->label_array[i];
         }
@@ -633,10 +633,10 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 
     if(edgeListmem->inverse_label_array)
     {
-        edgeList->inverse_label_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+        edgeList->inverse_label_array = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
 
         #pragma omp parallel for
-        for ( i = 0; i < num_vertices; ++i)
+        for ( i = 0; i < (num_vertices); ++i)
         {
             edgeList->inverse_label_array[i] = edgeListmem->inverse_label_array[i];
         }

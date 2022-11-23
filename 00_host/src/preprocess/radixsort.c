@@ -256,13 +256,21 @@ struct EdgeList *radixSortEdgesBySource (struct EdgeList *edgeList)
     #pragma omp parallel default(none) shared(P,buckets,buckets_count)
     {
         uint32_t t_id = omp_get_thread_num();
+        uint32_t i = 0;
 
         if(t_id == 0)
         {
             P = omp_get_num_threads();
             buckets_count = (uint32_t *) my_malloc(P * buckets * sizeof(uint32_t));
         }
+
+        for(i = 0; i < buckets; i++)
+        {
+            buckets_count[(t_id * buckets) + i] = 0;
+        }
     }
+
+
 
 
     for(j = 0 ; j < radix ; j++)
@@ -309,11 +317,17 @@ struct EdgeList *radixSortEdgesBySourceAndDestination (struct EdgeList *edgeList
     #pragma omp parallel default(none) shared(P,buckets,buckets_count)
     {
         uint32_t t_id = omp_get_thread_num();
+        uint32_t i = 0;
 
         if(t_id == 0)
         {
             P = omp_get_num_threads();
             buckets_count = (uint32_t *) my_malloc(P * buckets * sizeof(uint32_t));
+        }
+
+        for(i = 0; i < buckets; i++)
+        {
+            buckets_count[(t_id * buckets) + i] = 0;
         }
     }
 
