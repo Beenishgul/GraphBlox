@@ -1045,6 +1045,10 @@ void collectStats(struct Arguments *arguments)
     printf(" -----------------------------------------------------\n");
     Start(timer);
 
+    graph_file : g.24.16.text,
+    actions_file : a.24.16.10000000.text,
+
+ 
     struct GraphCSR *graphStats = graphCSRPreProcessingStep (arguments);
 
 

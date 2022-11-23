@@ -322,8 +322,8 @@ main (int argc, char **argv)
 
     if(arguments->xflag) // if stats flag is on collect stats or serialize your graph
     {
-        // writeSerializedGraphDataStructure(arguments);
-        collectStats(arguments);
+        writeSerializedGraphDataStructure(arguments);
+        // collectStats(arguments);
     }
     else
     {

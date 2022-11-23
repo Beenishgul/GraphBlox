@@ -303,6 +303,93 @@ void *generateGraphDataStructure(struct Arguments *arguments)
 
 }
 
+void *generateGraphDataStructureDynamic(struct Arguments *arguments)
+{
+
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-35s %-15d | \n", "Number of Threads Preprocessing:", arguments->pre_numThreads);
+    printf(" -----------------------------------------------------\n");
+
+    omp_set_num_threads(arguments->pre_numThreads);
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    void *graph = NULL;
+
+    if(arguments->algorithm == 8)  // Triangle counting depends on order
+    {
+
+        arguments->sort = 1;
+        // arguments->lmode = 2;
+    }
+
+    if(arguments->algorithm == 9)  // Incremental aggregation order
+    {
+
+        arguments->sort = 1;
+        // arguments->lmode = 2;
+    }
+
+    if(arguments->fnameb_format == 0)  // for now it edge list is text only convert to binary
+    {
+        Start(timer);
+        arguments->fnameb = readEdgeListsDynamictxt(arguments->fnameb, arguments->weighted);
+        arguments->fnameb_format = 1; // now you have a bin file
+#if WEIGHTED
+        arguments->weighted = 1; // no need to generate weights again this affects readedgelistbin
+#else
+        arguments->weighted = 0;
+#endif
+        Stop(timer);
+        generateGraphPrintMessageWithtime("Serialize EdgeList text to binary (Seconds)", Seconds(timer));
+    }
+
+    if(arguments->fnameb_format == 1 ) // if it is a graphCSR binary file
+    {
+
+        switch (arguments->datastructure)
+        {
+        case 0: // CSR
+        case 4:
+            Start(timer);
+            graph = (void *)graphCSRPreProcessingStep (arguments);
+            Stop(timer);
+            generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
+            break;
+        case 1: // CSR Segments
+        case 5:
+            Start(timer);
+            graph = (void *)graphCSRSegmentsPreProcessingStep (arguments);
+            Stop(timer);
+            generateGraphPrintMessageWithtime("GraphCSRSegments Preprocessing Step Time (Seconds)", Seconds(timer));
+            break;
+        default:// CSR
+            Start(timer);
+            graph = (void *)graphCSRPreProcessingStep (arguments);
+            Stop(timer);
+            generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
+
+            break;
+        }
+    }
+    else if(arguments->fnameb_format == 2)
+    {
+        Start(timer);
+        graph = (void *)readFromBinFileGraphCSR (arguments->fnameb);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
+    }
+    else
+    {
+        Start(timer);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("UNKOWN Graph format Preprocessing Step Time (Seconds)", Seconds(timer));
+    }
+
+    free(timer);
+    return graph;
+
+}
+
 void runGraphAlgorithms(struct Arguments *arguments, void *graph)
 {
     printf("*-----------------------------------------------------*\n");

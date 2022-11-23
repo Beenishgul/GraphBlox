@@ -40,6 +40,7 @@ void readSerializeGraphDataStructure(struct Arguments *arguments);
 
 void generateGraphPrintMessageWithtime(const char *msg, double time);
 void *generateGraphDataStructure(struct Arguments *arguments);
+void *generateGraphDataStructureDynamic(struct Arguments *arguments)
 
 void runGraphAlgorithms(struct Arguments *arguments, void *graph);
 

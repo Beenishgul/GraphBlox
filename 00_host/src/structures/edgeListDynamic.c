@@ -842,7 +842,6 @@ void edgeListDynamicPrint(struct EdgeListDynamic *edgeListDynamic)
 
     uint32_t i;
 
-
     for(i = 0; i < edgeListDynamic->num_vertices; i++)
     {
         printf("label %-2u->%-2u - %-2u->%-2u \n",  i, edgeListDynamic->label_array[i], i, edgeListDynamic->inverse_label_array[i] );
