@@ -33,7 +33,7 @@ extern "C" {
 #include "graphConfig.h"
 #include "graphRun.h"
 #include "graphStats.h"
-#include "edgeList.h"
+#include "edgeListDynamic.h"
 
 const char *argp_program_version =
     "GLay v1.0";
@@ -54,8 +54,8 @@ static struct argp_option options[] =
         "Edge list represents the graph binary format to run the algorithm textual format change graph-file-format."
     },
     {
-        "graph-file-format",   'z', "[DEFAULT:[1]-binary-edgeList]",      0,
-        "Specify file format to be read, is it textual edge list, or a binary file edge list. This is specifically useful if you have Graph CSR/Grid structure already saved in a binary file format to skip the preprocessing step. [0]-text edgeList [1]-binary edgeList [2]-graphCSR binary."
+        "graph-file-format",   'z', "[DEFAULT:[1]-binary-edgeListDynamic]",      0,
+        "Specify file format to be read, is it textual edge list, or a binary file edge list. This is specifically useful if you have Graph CSR/Grid structure already saved in a binary file format to skip the preprocessing step. [0]-text edgeListDynamic [1]-binary edgeListDynamic [2]-graphCSR binary."
     },
     {
         "algorithm",          'a', "[DEFAULT:[0]-BFS]",      0,
@@ -118,8 +118,8 @@ static struct argp_option options[] =
         "Relabels the graph for better cache performance (third layer). [0]-no-reordering, [1]-out-degree, [2]-in-degree, [3]-(in+out)-degree, [4]-DBG-out, [5]-DBG-in, [6]-HUBSort-out, [7]-HUBSort-in, [8]-HUBCluster-out, [9]-HUBCluster-in, [10]-(random)-degree,  [11]-LoadFromFile (used for Rabbit order)."
     },
     {
-        "convert-format",     'c', "[DEFAULT:[1]-binary-edgeList]",      0,
-        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary."
+        "convert-format",     'c', "[DEFAULT:[1]-binary-edgeListDynamic]",      0,
+        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeListDynamic [1]-binary-edgeListDynamic [2]-graphCSR-binary."
     },
     {
         "generate-weights",   'w', 0,      0,
@@ -151,7 +151,7 @@ static struct argp_option options[] =
     },
     {
         "mask-mode",         'M', "[DEFAULT:[0:disabled]]",      0,
-        "Encodes [0:disabled] the last two bits of [1:out-degree]-Edgelist-labels [2:in-degree]-Edgelist-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work."
+        "Encodes [0:disabled] the last two bits of [1:out-degree]-EdgelistDynamic-labels [2:in-degree]-EdgelistDynamic-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work."
     },
     {
         "labels-file",       'F', "<FILE>",      0,
@@ -313,6 +313,7 @@ main (int argc, char **argv)
     initializeMersenneState (&(arguments->mt19937var), 27491095);
     omp_set_nested(1);
 
+     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     void *graph = NULL;
     argp_parse (&argp, argc, argv, 0, 0, arguments);
@@ -320,17 +321,100 @@ main (int argc, char **argv)
     if(arguments->dflag)
         arguments->sort = 1;
 
-    // if(arguments->xflag) // if stats flag is on collect stats or serialize your graph
-    // {
-        // writeSerializedGraphDataStructure(arguments);
-        collectStats(arguments);
-    // }
-    // else
-    // {
-    //     graph = generateGraphDataStructure(arguments);
-    //     runGraphAlgorithms(arguments, graph);
-    //     freeGraphDataStructure(graph, arguments->datastructure);
-    // }
+
+    void *graph = NULL;
+
+    if(arguments->algorithm == 8)  // Triangle counting depends on order
+    {
+
+        arguments->sort = 1;
+        // arguments->lmode = 2;
+    }
+
+    if(arguments->algorithm == 9)  // Incremental aggregation order
+    {
+
+        arguments->sort = 1;
+        // arguments->lmode = 2;
+    }
+
+    if(arguments->fnameb_format == 0)  // for now it edge list is text only convert to binary
+    {
+        Start(timer);
+        arguments->fnameb = readEdgeListDynamicsDynamictxt(arguments->fnameb, arguments->weighted);
+        arguments->fnamel = readEdgeListDynamicsDynamictxt(arguments->fnamel, arguments->weighted);
+        arguments->fnamel_format = 1; // now you have a bin file
+#if WEIGHTED
+        arguments->weighted = 1; // no need to generate weights again this affects readedgelistDynamicbin
+#else
+        arguments->weighted = 0;
+#endif
+        Stop(timer);
+        generateGraphPrintMessageWithtime("Serialize EdgeListDynamic text to binary (Seconds)", Seconds(timer));
+    }
+
+    printf("Filename : %s \n", arguments->fnameb);
+
+    Start(timer);
+    struct EdgeListDynamic *edgeListDynamic = readEdgeListsDynamicbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);
+    struct EdgeList *edgeList = newEdgeList(edgeListDynamic->num_edges);
+    struct EdgeListDynamic *edgeListDynamic_actions = readEdgeListsDynamicbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);
+    Stop(timer);
+    // edgeListDynamicPrint(edgeListDynamic);
+    graphCSRSegmentsPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
+
+    // Start(timer);
+    edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
+
+    if(arguments->dflag)
+    {
+        Start(timer);
+        edgeListDynamic = removeDulpicatesSelfLoopEdgesDynamic(edgeListDynamic);
+        Stop(timer);
+        graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
+    }
+
+    if(arguments->lmode)
+    {
+        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
+        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
+    }
+
+    // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
+    arguments->lmode = arguments->lmode_l2;
+    if(arguments->lmode)
+    {
+        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
+        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
+    }
+
+    arguments->lmode = arguments->lmode_l3;
+    if(arguments->lmode)
+    {
+        edgeListDynamic = reorderGraphProcess(edgeListDynamic, arguments);
+        edgeListDynamic = sortRunAlgorithms(edgeListDynamic, arguments->sort);
+    }
+
+    if(arguments->mmode)
+        edgeListDynamic = maskGraphProcess(edgeListDynamic, arguments);
+
+    // if(arguments->mmode)
+    //     edgeListDynamic = maskGraphProcess(edgeListDynamic, arguments);
+    // Stop(timer);
+    // graphCSRSegmentsPrintMessageWithtime("Radix Sort Edges By Source (Seconds)",Seconds(timer));
+
+    Start(timer);
+    struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeListDynamic, arguments);
+    Stop(timer);
+    graphCSRSegmentsPrintMessageWithtime("Create Graph Grid (Seconds)", Seconds(timer));
+
+
+    graphCSRSegmentsPrint(graphCSRSegments);
+
+
+    freeEdgeListDynamic(edgeListDynamic);
+    free(timer);
+    
 
     argumentsFree(arguments);
     exit (0);
