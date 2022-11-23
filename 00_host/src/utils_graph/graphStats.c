@@ -1033,171 +1033,171 @@ void collectStatsPageRank( struct Arguments *arguments,   struct PageRankStats *
     free(ref_rankedVertices_inverse);
 }
 
-// void collectStats(struct Arguments *arguments)
-// {
+void collectStats(struct Arguments *arguments)
+{
 
-//     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
-//     // printf("Filename : %s \n",fnameb);
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    // printf("Filename : %s \n",fnameb);
 
-//     printf(" *****************************************************\n");
-//     printf(" -----------------------------------------------------\n");
-//     printf("| %-51s | \n", "Collect Stats Process");
-//     printf(" -----------------------------------------------------\n");
-//     Start(timer);
+    printf(" *****************************************************\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Collect Stats Process");
+    printf(" -----------------------------------------------------\n");
+    Start(timer);
 
-//     struct GraphCSR *graphStats = graphCSRPreProcessingStep (arguments);
-
-
-//     uint32_t *histogram_in = (uint32_t *) my_malloc(sizeof(uint32_t) * arguments->binSize);
-//     uint32_t *histogram_out = (uint32_t *) my_malloc(sizeof(uint32_t) * arguments->binSize);
+    struct GraphCSR *graphStats = graphCSRPreProcessingStep (arguments);
 
 
-//     uint32_t i = 0;
-//     #pragma omp parallel for
-//     for(i = 0 ; i < arguments->binSize; i++)
-//     {
-//         histogram_in[i] = 0;
-//         histogram_out[i] = 0;
-//     }
-
-//     char *fname_txt = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
-//     char *fname_stats_out = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
-//     char *fname_stats_in = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
-//     char *fname_adjMat = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
+    uint32_t *histogram_in = (uint32_t *) my_malloc(sizeof(uint32_t) * arguments->binSize);
+    uint32_t *histogram_out = (uint32_t *) my_malloc(sizeof(uint32_t) * arguments->binSize);
 
 
-//     fname_txt = strcpy (fname_txt, arguments->fnameb);
-//     fname_adjMat = strcpy (fname_adjMat, arguments->fnameb);
+    uint32_t i = 0;
+    #pragma omp parallel for
+    for(i = 0 ; i < arguments->binSize; i++)
+    {
+        histogram_in[i] = 0;
+        histogram_out[i] = 0;
+    }
+
+    char *fname_txt = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
+    char *fname_stats_out = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
+    char *fname_stats_in = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
+    char *fname_adjMat = (char *) malloc((strlen(arguments->fnameb) + 20) * sizeof(char));
 
 
-//     fname_adjMat  = strcat (fname_adjMat, ".bin-adj-SM.dat");// out-degree
-
-//     if(arguments->lmode == 1)
-//     {
-//         fname_stats_in = strcat (fname_txt, ".in-degree.dat");// in-degree
-//         countHistogram(graphStats, histogram_in, arguments->binSize, arguments->inout_degree);
-//         printHistogram(fname_stats_in, histogram_in, arguments->binSize);
-//     }
-//     else if(arguments->lmode == 2)
-//     {
-//         fname_stats_out = strcat (fname_txt, ".out-degree.dat");// out-degree
-//         countHistogram(graphStats, histogram_out, arguments->binSize, arguments->inout_degree);
-//         printHistogram(fname_stats_out, histogram_out, arguments->binSize);
-//     }
+    fname_txt = strcpy (fname_txt, arguments->fnameb);
+    fname_adjMat = strcpy (fname_adjMat, arguments->fnameb);
 
 
-//     printSparseMatrixList(fname_adjMat,  graphStats, arguments->binSize);
+    fname_adjMat  = strcat (fname_adjMat, ".bin-adj-SM.dat");// out-degree
+
+    if(arguments->lmode == 1)
+    {
+        fname_stats_in = strcat (fname_txt, ".in-degree.dat");// in-degree
+        countHistogram(graphStats, histogram_in, arguments->binSize, arguments->lmode_l2);
+        printHistogram(fname_stats_in, histogram_in, arguments->binSize);
+    }
+    else if(arguments->lmode == 2)
+    {
+        fname_stats_out = strcat (fname_txt, ".out-degree.dat");// out-degree
+        countHistogram(graphStats, histogram_out, arguments->binSize, arguments->lmode_l2);
+        printHistogram(fname_stats_out, histogram_out, arguments->binSize);
+    }
 
 
-//     Stop(timer);
+    printSparseMatrixList(fname_adjMat,  graphStats, arguments->binSize);
 
 
-//     printf(" -----------------------------------------------------\n");
-//     printf("| %-51s | \n", "Collect Stats Complete");
-//     printf(" -----------------------------------------------------\n");
-//     printf("| %-51f | \n", Seconds(timer));
-//     printf(" -----------------------------------------------------\n");
-//     printf(" *****************************************************\n");
-
-//     free(timer);
-//     graphCSRFree(graphStats);
-//     free(histogram_in);
-//     free(histogram_out);
-//     free(fname_txt);
-//     free(fname_stats_out);
-//     free(fname_stats_in);
-//     free(fname_adjMat);
-
-// }
+    Stop(timer);
 
 
-// void countHistogram(struct GraphCSR *graphStats, uint32_t *histogram, uint32_t binSize, uint32_t inout_degree)
-// {
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Collect Stats Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+    printf(" *****************************************************\n");
 
-//     uint32_t v;
-//     uint32_t index;
+    free(timer);
+    graphCSRFree(graphStats);
+    free(histogram_in);
+    free(histogram_out);
+    free(fname_txt);
+    free(fname_stats_out);
+    free(fname_stats_in);
+    free(fname_adjMat);
 
-//     #pragma omp parallel for
-//     for(v = 0; v < graphStats->num_vertices; v++)
-//     {
-
-//         index = v / ((graphStats->num_vertices / binSize) + 1);
-
-//         if(inout_degree == 1)
-//         {
-//             #pragma omp atomic update
-//             histogram[index] += graphStats->vertices->in_degree[v];
-//         }
-//         else if(inout_degree == 2)
-//         {
-//             #pragma omp atomic update
-//             histogram[index] += graphStats->vertices->out_degree[v];
-//         }
-//     }
-
-// }
+}
 
 
-// void printHistogram(const char *fname_stats, uint32_t *histogram, uint32_t binSize)
-// {
+void countHistogram(struct GraphCSR *graphStats, uint32_t *histogram, uint32_t binSize, uint32_t inout_degree)
+{
 
-//     uint32_t index;
-//     FILE *fptr;
-//     fptr = fopen(fname_stats, "w");
-//     for(index = 0; index < binSize; index++)
-//     {
-//         fprintf(fptr, "%u %u \n", index, histogram[index]);
-//     }
-//     fclose(fptr);
-// }
+    uint32_t v;
+    uint32_t index;
 
+    #pragma omp parallel for
+    for(v = 0; v < graphStats->num_vertices; v++)
+    {
 
-// void printSparseMatrixList(const char *fname_stats, struct GraphCSR *graphStats, uint32_t binSize)
-// {
+        index = v / ((graphStats->num_vertices / binSize) + 1);
 
+        if(inout_degree == 1)
+        {
+            #pragma omp atomic update
+            histogram[index] += graphStats->vertices->in_degree[v];
+        }
+        else if(inout_degree == 2)
+        {
+            #pragma omp atomic update
+            histogram[index] += graphStats->vertices->out_degree[v];
+        }
+    }
 
-//     uint32_t *SparseMatrix = (uint32_t *) my_malloc(sizeof(uint32_t) * binSize * binSize);
-
-
-//     uint32_t x;
-//     uint32_t y;
-//     #pragma omp parallel for private(y) shared(SparseMatrix)
-//     for(x = 0; x < binSize; x++)
-//     {
-//         for(y = 0; y < binSize; y++)
-//         {
-//             SparseMatrix[(binSize * y) + x] = 0;
-//         }
-//     }
+}
 
 
-//     uint32_t i;
+void printHistogram(const char *fname_stats, uint32_t *histogram, uint32_t binSize)
+{
 
-//     #pragma omp parallel for
-//     for(i = 0; i < graphStats->num_edges; i++)
-//     {
-//         uint32_t src;
-//         uint32_t dest;
-//         src = graphStats->sorted_edges_array->edges_array_src[i] / ((graphStats->num_vertices / binSize) + 1);
-//         dest = graphStats->sorted_edges_array->edges_array_dest[i] / ((graphStats->num_vertices / binSize) + 1);
+    uint32_t index;
+    FILE *fptr;
+    fptr = fopen(fname_stats, "w");
+    for(index = 0; index < binSize; index++)
+    {
+        fprintf(fptr, "%u %u \n", index, histogram[index]);
+    }
+    fclose(fptr);
+}
 
-//         #pragma omp atomic update
-//         SparseMatrix[(binSize * dest) + src]++;
 
-//     }
+void printSparseMatrixList(const char *fname_stats, struct GraphCSR *graphStats, uint32_t binSize)
+{
 
-//     FILE *fptr;
-//     fptr = fopen(fname_stats, "w");
-//     for(x = 0; x < binSize; x++)
-//     {
-//         for(y = 0; y < binSize; y++)
-//         {
-//             fprintf(fptr, "%u %u %u\n", x, y, SparseMatrix[(binSize * y) + x]);
-//         }
-//     }
 
-//     fclose(fptr);
-//     free(SparseMatrix);
+    uint32_t *SparseMatrix = (uint32_t *) my_malloc(sizeof(uint32_t) * binSize * binSize);
 
-// }
+
+    uint32_t x;
+    uint32_t y;
+    #pragma omp parallel for private(y) shared(SparseMatrix)
+    for(x = 0; x < binSize; x++)
+    {
+        for(y = 0; y < binSize; y++)
+        {
+            SparseMatrix[(binSize * y) + x] = 0;
+        }
+    }
+
+
+    uint32_t i;
+
+    #pragma omp parallel for
+    for(i = 0; i < graphStats->num_edges; i++)
+    {
+        uint32_t src;
+        uint32_t dest;
+        src = graphStats->sorted_edges_array->edges_array_src[i] / ((graphStats->num_vertices / binSize) + 1);
+        dest = graphStats->sorted_edges_array->edges_array_dest[i] / ((graphStats->num_vertices / binSize) + 1);
+
+        #pragma omp atomic update
+        SparseMatrix[(binSize * dest) + src]++;
+
+    }
+
+    FILE *fptr;
+    fptr = fopen(fname_stats, "w");
+    for(x = 0; x < binSize; x++)
+    {
+        for(y = 0; y < binSize; y++)
+        {
+            fprintf(fptr, "%u %u %u\n", x, y, SparseMatrix[(binSize * y) + x]);
+        }
+    }
+
+    fclose(fptr);
+    free(SparseMatrix);
+
+}
 
