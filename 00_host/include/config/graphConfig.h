@@ -10,6 +10,7 @@ extern "C" {
 
 #define WEIGHTED 0
 #define DIRECTED 1
+#define DYNAMIC  0
 
 /* Used by main to communicate with parse_opt. */
 struct Arguments

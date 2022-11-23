@@ -21,8 +21,10 @@ struct  EdgeListDynamic
 #endif
     uint32_t *edges_array_src;
     uint32_t *edges_array_dest;
+
     uint32_t *edges_array_time;
     uint8_t *edges_array_operation;
+
     uint32_t *mask_array;
     uint32_t *label_array;
     uint32_t *inverse_label_array;
