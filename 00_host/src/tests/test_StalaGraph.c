@@ -320,17 +320,17 @@ main (int argc, char **argv)
     if(arguments->dflag)
         arguments->sort = 1;
 
-    if(arguments->xflag) // if stats flag is on collect stats or serialize your graph
-    {
+    // if(arguments->xflag) // if stats flag is on collect stats or serialize your graph
+    // {
         // writeSerializedGraphDataStructure(arguments);
         collectStats(arguments);
-    }
-    else
-    {
-        graph = generateGraphDataStructure(arguments);
-        runGraphAlgorithms(arguments, graph);
-        freeGraphDataStructure(graph, arguments->datastructure);
-    }
+    // }
+    // else
+    // {
+    //     graph = generateGraphDataStructure(arguments);
+    //     runGraphAlgorithms(arguments, graph);
+    //     freeGraphDataStructure(graph, arguments->datastructure);
+    // }
 
     argumentsFree(arguments);
     exit (0);

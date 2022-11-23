@@ -188,9 +188,9 @@ uint32_t *radixSortEdgesByPageRank (float *pageRanks, uint32_t *labels, uint32_t
     uint32_t *labelsTemp = NULL;
 
     buckets_count   = (uint32_t *) my_malloc(P * buckets * sizeof(uint32_t));
-    pageRanksFP     = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
-    pageRanksFPTemp = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
-    labelsTemp      = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+    pageRanksFP     = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
+    pageRanksFPTemp = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
+    labelsTemp      = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel for
     for(v = 0; v < num_vertices; v++)
@@ -243,11 +243,11 @@ uint32_t *radixSortEdgesByDegree (uint32_t *degrees, uint32_t *labels, uint32_t 
     uint32_t *labelsTemp = NULL;
 
     buckets_count = (uint32_t *) my_malloc(P * buckets * sizeof(uint32_t));
-    degreesTemp = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
-    labelsTemp = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+    degreesTemp = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
+    labelsTemp = (uint32_t *) my_malloc((num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel
-    for (j = 0; j < num_vertices; ++j)
+    for (j = 0; j < (num_vertices + 1); ++j)
     {
         labelsTemp[j] = 0;
         degreesTemp[j] = 0;
@@ -261,8 +261,8 @@ uint32_t *radixSortEdgesByDegree (uint32_t *degrees, uint32_t *labels, uint32_t 
 
 
     free(buckets_count);
-    free(degreesTemp);
-    free(labelsTemp);
+    // free(degreesTemp);
+    // free(labelsTemp);
 
     return labels;
 

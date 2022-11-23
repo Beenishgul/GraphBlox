@@ -59,9 +59,9 @@ struct CCStats *newCCStatsGraphCSR(struct GraphCSR *graph)
     stats->neighbor_rounds = 2;
     stats->num_vertices = graph->num_vertices;
     stats->time_total = 0.0f;
-    stats->components = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
-    stats->counts = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
-    stats->labels = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
+    stats->components = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
+    stats->counts = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
+    stats->labels = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel for default(none) private(v) shared(stats)
     for(v = 0; v < stats->num_vertices; v++)
@@ -83,10 +83,10 @@ void freeCCStats(struct CCStats *stats)
     {
         if(stats->components)
             free(stats->components);
-        if(stats->counts)
-            free(stats->counts);
-        if(stats->labels)
-            free(stats->labels);
+        // if(stats->counts)
+        //     free(stats->counts);
+        // if(stats->labels)
+        //     free(stats->labels);
         free(stats);
     }
 }
