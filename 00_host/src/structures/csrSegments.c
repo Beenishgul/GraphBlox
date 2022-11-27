@@ -381,21 +381,24 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
     // #pragma omp parallel for default(none) firstprivate(arguments_local, totalSegments) shared(csrSegments)
     for ( j = 0; j < totalSegments; ++j)
     {
-        printf(" ----------------------SEGMENT %u -------------------- \n", j);
+
         // edgeListPrint(csrSegments->segments[j].edgeList);
         arguments_local->sflag         = 0;
         arguments_local->datastructure = 0;
         arguments_local->sort          = 0;
-        arguments_local->lmode         = 0;
+        arguments_local->lmode         = 1;
         arguments_local->lmode_l2      = 0;
         arguments_local->lmode_l3      = 0;
 
         if(csrSegments->segments[j].num_edges)
         {
+            printf(" ***************************************************** \n");
+            printf(" ------------------ SEGMENT ID: %u -------------------- \n", j);
             csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
             // freeEdgeList(csrSegments->segments[j].edgeList);
+            printf(" ***************************************************** \n");
         }
-        printf(" ***************************************************** \n");
+
     }
 
     argumentsFree(arguments_local);
