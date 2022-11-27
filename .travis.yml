@@ -9,10 +9,9 @@ env: OMP_NUM_THREADS=4
 
 language: c
 compiler:
-  - gcc
+  - g++
 
 script:
-  - make -j
   - make test
 
 notifications:
