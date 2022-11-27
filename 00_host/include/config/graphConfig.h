@@ -1,6 +1,8 @@
 #ifndef GRAPHCONFIG_H
 #define GRAPHCONFIG_H
 
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,11 @@ struct Arguments
     uint32_t convert_format;
     mt19937state mt19937var;
     uint32_t cache_size;
+    // GLay Xilinx Parameters
+
+    int device_index;
+    char *xclbin_path;
+    struct xrtGLAYHandle *glayHandle;
 };
 
 

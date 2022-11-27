@@ -20,7 +20,8 @@ mkhelp::
 APP                 ?= glay
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_match
-APP_TEST            ?= test_StalaGraph
+# APP_TEST            ?= test_StalaGraph
+APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
 
 # dirs Root app
@@ -56,7 +57,7 @@ TEST_DIR            ?= tests
 MAIN_DIR            ?= main
 
 #########################################################
-#                GENERAL VARIABLES                      #
+#                GENERAL XILINX VARIABLES               #
 #########################################################
 
 PROJECT := glay
@@ -257,9 +258,7 @@ debug: $(APP)
 # RUN Tests
 ##########################################################################
 
-DEVICE_INDEX := 0
-XCLBIN_PATH := ./file.xclbin
-export TEST_ARGS ?= $(DEVICE_INDEX) $(XCLBIN_PATH)
+
 
 .PHONY: run-test
 run-test: $(APP_TEST)
@@ -368,8 +367,16 @@ export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
 export MASK_MODE 		?= 0
 
+#########################################################
+#                GENERAL XILINX ARGS                    #
+#########################################################
+
+DEVICE_INDEX ?= 0
+XCLBIN_PATH ?= ./file.xclbin
+export GLAY_FPGA_ARGS ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+
 ##################################################
 
-export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+export ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 
 ##############################################
