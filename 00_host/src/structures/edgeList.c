@@ -215,22 +215,25 @@ void freeEdgeList( struct EdgeList *edgeList)
 
     if(edgeList)
     {
-        // freeEdgeArray(edgeList->edges_array);
-        if(edgeList->edges_array_src)
-            free(edgeList->edges_array_src);
-        if(edgeList->edges_array_dest)
-            free(edgeList->edges_array_dest);
-        if(edgeList->mask_array)
-            free(edgeList->mask_array);
-        if(edgeList->label_array)
-            free(edgeList->label_array);
-        if(edgeList->inverse_label_array)
-            free(edgeList->inverse_label_array);
+        if(edgeList->num_edges)
+        {
+            // freeEdgeArray(edgeList->edges_array);
+            if(edgeList->edges_array_src)
+                free(edgeList->edges_array_src);
+            if(edgeList->edges_array_dest)
+                free(edgeList->edges_array_dest);
+            if(edgeList->mask_array)
+                free(edgeList->mask_array);
+            if(edgeList->label_array)
+                free(edgeList->label_array);
+            if(edgeList->inverse_label_array)
+                free(edgeList->inverse_label_array);
 
 #if WEIGHTED
-        if(edgeList->edges_array_weight)
-            free(edgeList->edges_array_weight);
+            if(edgeList->edges_array_weight)
+                free(edgeList->edges_array_weight);
 #endif
+        }
 
         free(edgeList);
     }

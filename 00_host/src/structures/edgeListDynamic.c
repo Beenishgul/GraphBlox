@@ -104,7 +104,7 @@ struct EdgeListDynamic *newEdgeListDynamic( uint32_t num_edges)
     newEdgeListDynamic->edges_array_dest = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
 
     newEdgeListDynamic->edges_array_time = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
-    newEdgeListDynamic->edges_array_operation = (uint8_t *) my_malloc(num_edges * sizeof(uint8_t));
+    newEdgeListDynamic->edges_array_operation = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
 
 #if WEIGHTED
     newEdgeListDynamic->edges_array_weight = (float *) my_malloc(num_edges * sizeof(float));
@@ -153,7 +153,7 @@ struct EdgeListDynamic *removeDulpicatesSelfLoopEdgesDynamic( struct EdgeListDyn
 #endif
 
     uint32_t tempTime = 0;
-    uint8_t tempOperation = 0;
+    uint32_t tempOperation = 0;
 
     uint32_t j = 0;
     uint32_t i = 0;
@@ -281,7 +281,7 @@ char *readEdgeListsDynamictxt(const char *fname, uint32_t weighted)
     int32_t i = 0;
     uint32_t src = 0, dest = 0;
     uint32_t time = 0;
-    uint8_t operation = 0;
+    uint32_t operation = 0;
     float weight = 1.0;
 
     char *fname_txt = (char *) malloc((strlen(fname) + 10) * sizeof(char));
@@ -326,21 +326,21 @@ char *readEdgeListsDynamictxt(const char *fname, uint32_t weighted)
 #if WEIGHTED
         if(weighted)
         {
-            i = fscanf(pText, "%u\t%u\t%f%u\t%c\n", &src, &dest, &weight, &time, &operation);
+            i = fscanf(pText, "%u %u %f %u %u\n", &src, &dest, &weight, &time, &operation);
         }
         else
         {
-            i = fscanf(pText, "%u\t%u%u\t%c\n", &src, &dest, &time, &operation);
+            i = fscanf(pText, "%u %u %u %u\n", &src, &dest, &time, &operation);
             weight = generateRandFloat(mt19937var);
         }
 #else
         if(weighted)
         {
-            i = fscanf(pText, "%u\t%u\t%f%u\t%c\n", &src, &dest, &weight, &time, &operation);
+            i = fscanf(pText, "%u %u %f %u %u\n", &src, &dest, &weight, &time, &operation);
         }
         else
         {
-            i = fscanf(pText, "%u\t%u%u\t%c\n", &src, &dest, &time, &operation);
+            i = fscanf(pText, "%u %u %u %u\n", &src, &dest, &time, &operation);
         }
 #endif
 
@@ -389,7 +389,7 @@ struct EdgeListDynamic *readEdgeListsDynamicbin(const char *fname, uint8_t inver
 #endif
     uint32_t  src = 0, dest = 0;
     uint32_t time = 0;
-    uint8_t operation = 0;
+    uint32_t operation = 0;
     uint32_t offset = 0;
     uint32_t offset_size;
 
@@ -427,23 +427,23 @@ struct EdgeListDynamic *readEdgeListsDynamicbin(const char *fname, uint8_t inver
     if(weighted)
     {
         offset = 5;
-        offset_size = (3 * sizeof(uint32_t)) + sizeof(float) + sizeof(uint8_t);
+        offset_size = (4 * sizeof(uint32_t)) + sizeof(float);
     }
     else
     {
         offset = 5;
-        offset_size = (3 * sizeof(uint32_t)) + sizeof(float) + sizeof(uint8_t);
+        offset_size = (4 * sizeof(uint32_t)) + sizeof(float);
     }
 #else
     if(weighted) // you will skip the weights
     {
         offset = 5;
-        offset_size = (3 * sizeof(uint32_t)) + sizeof(float) + sizeof(uint8_t);
+        offset_size = (4 * sizeof(uint32_t)) + sizeof(float);
     }
     else
     {
         offset = 4;
-        offset_size = (3 * sizeof(uint32_t)) + sizeof(uint8_t);
+        offset_size = (4 * sizeof(uint32_t));
     }
 #endif
 
@@ -485,7 +485,7 @@ struct EdgeListDynamic *readEdgeListsDynamicbin(const char *fname, uint8_t inver
         dest = buf_pointer[((offset) * i) + 1];
         time =  buf_pointer[((offset) * i) + 2];
         operation =  buf_pointer[((offset) * i) + 3];
-        // printf(" %u %lu -> %lu %lu %lu  \n",i,src,dest,time,operation);
+        // printf(" %u - %lu %lu %lu %d  \n", i, src, dest, time, operation);
 #if DIRECTED
         if(!inverse)
         {
@@ -668,7 +668,7 @@ struct EdgeListDynamic *readEdgeListsDynamicMem( struct EdgeListDynamic *edgeLis
     uint32_t i;
     uint32_t  src = 0, dest = 0;
     uint32_t time = 0;
-    uint8_t operation = 0;
+    uint32_t operation = 0;
 
     struct EdgeListDynamic *edgeListDynamic;
 
@@ -855,5 +855,56 @@ void edgeListDynamicPrint(struct EdgeListDynamic *edgeListDynamic)
         printf("%u -> %u \n", edgeListDynamic->edges_array_src[i], edgeListDynamic->edges_array_dest[i]);
 #endif
     }
+
+}
+
+
+struct EdgeList *newEdgeListFromDynamic( struct EdgeListDynamic *edgeListDynamic)
+{
+
+
+    struct EdgeList *newEdgeList = (struct EdgeList *) my_malloc(sizeof(struct EdgeList));
+    newEdgeList->edges_array_src = (uint32_t *) my_malloc(edgeListDynamic->num_edges * sizeof(uint32_t));
+    newEdgeList->edges_array_dest = (uint32_t *) my_malloc(edgeListDynamic->num_edges * sizeof(uint32_t));
+
+#if WEIGHTED
+    newEdgeList->edges_array_weight = (float *) my_malloc(edgeListDynamic->num_edges * sizeof(float));
+#endif
+
+    uint32_t i;
+    #pragma omp parallel for
+    for(i = 0; i < edgeListDynamic->num_edges; i++)
+    {
+        newEdgeList->edges_array_dest[i] = edgeListDynamic->edges_array_dest[i];
+        newEdgeList->edges_array_src[i] = edgeListDynamic->edges_array_src[i];
+#if WEIGHTED
+        newEdgeList->edges_array_weight[i] = edgeListDynamic->edges_array_weight[i];
+#endif
+    }
+
+
+    newEdgeList->mask_array = (uint32_t *) my_malloc((edgeListDynamic->num_vertices + 1) * sizeof(uint32_t));
+    newEdgeList->label_array = (uint32_t *) my_malloc((edgeListDynamic->num_vertices + 1) * sizeof(uint32_t));
+    newEdgeList->inverse_label_array = (uint32_t *) my_malloc((edgeListDynamic->num_vertices + 1) * sizeof(uint32_t));
+
+    newEdgeList->num_edges = edgeListDynamic->num_edges;
+    newEdgeList->num_vertices = edgeListDynamic->num_vertices;
+    newEdgeList->avg_degree = edgeListDynamic->avg_degree;
+
+    #pragma omp parallel for
+    for (i = 0; i < (edgeListDynamic->num_vertices); ++i)
+    {
+        newEdgeList->mask_array[i] = edgeListDynamic->mask_array[i] ;
+        newEdgeList->label_array[i] =  edgeListDynamic->label_array[i];
+        newEdgeList->inverse_label_array[i] =  edgeListDynamic->inverse_label_array[i];
+    }
+
+    // newEdgeList->edges_array = newEdgeList(num_edges);
+
+#if WEIGHTED
+    newEdgeList->max_weight = edgeListDynamic->max_weight;
+#endif
+
+    return newEdgeList;
 
 }

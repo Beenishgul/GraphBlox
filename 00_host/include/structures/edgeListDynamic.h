@@ -8,6 +8,7 @@ extern "C" {
 #include <stdint.h>
 #include "graphConfig.h"
 #include "edgeListDynamic.h"
+#include "edgeList.h"
 
 struct  EdgeListDynamic
 {
@@ -23,7 +24,7 @@ struct  EdgeListDynamic
     uint32_t *edges_array_dest;
 
     uint32_t *edges_array_time;
-    uint8_t *edges_array_operation;
+    uint32_t *edges_array_operation;
 
     uint32_t *mask_array;
     uint32_t *label_array;
@@ -44,6 +45,7 @@ struct EdgeListDynamic *readEdgeListsDynamicMem( struct EdgeListDynamic *edgeLis
 struct EdgeListDynamic *newEdgeListDynamic(uint32_t num_edges);
 void writeEdgeListDynamicToTXTFile(struct EdgeListDynamic *edgeListDynamic, const char *fname);
 struct EdgeListDynamic *removeDulpicatesSelfLoopEdgesDynamic( struct EdgeListDynamic *edgeListDynamic);
+struct EdgeList *newEdgeListFromDynamic( struct EdgeListDynamic *edgeListDynamic);
 
 #ifdef __cplusplus
 }

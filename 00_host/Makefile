@@ -296,25 +296,32 @@ export BENCHMARKS_DIR ?= ../03_test_graphs
 # export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= graphbrew
 
-# export GRAPH_SUIT ?= LAW
+export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-# export GRAPH_NAME ?= LAW-enron
+export GRAPH_NAME ?= LAW-enron
 
-export GRAPH_SUIT ?= KRON
-export GRAPH_NAME ?= RMAT
+# export GRAPH_SUIT ?= KRON
+# export GRAPH_NAME ?= RMAT
 
 # export FILE_BIN_TYPE ?= g.20.16.text
 # export FILE_LABEL_TYPE ?= a.20.16.1000000.text
 
-export FILE_BIN_TYPE ?= g.20.16.text.dbin
-export FILE_LABEL_TYPE ?= a.20.16.1000000.text.dbin
+# export FILE_BIN_TYPE   ?= g.20.16.text.dbin
+# export FILE_LABEL_TYPE ?= a.20.16.1000000.text.dbin
+
+# export FILE_BIN_TYPE   ?=  g.5.16.text.dbin
+# export FILE_LABEL_TYPE ?= a.5.16.100.text.dbin
+
+# export FILE_BIN_TYPE ?= g.24.16.text.dbin
+# export FILE_LABEL_TYPE ?= a.24.16.10000000.text.dbin
+
 # export FILE_BIN_TYPE ?= g.24.16.text
 # export FILE_LABEL_TYPE ?= a.24.16.10000000.text
 
 # export FILE_BIN_TYPE ?= graph.txt
-# export FILE_BIN_TYPE ?= graph.bin
+export FILE_BIN_TYPE ?= graph.bin
 # export FILE_BIN_TYPE ?= graph.wbin
 
 # export FILE_LABEL_TYPE ?= graph_Gorder.labels
@@ -336,7 +343,7 @@ export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 # export CACHE_SIZE       ?= 32768 #(32KB)
 # export CACHE_SIZE       ?= 262144 #(256KB)
-export CACHE_SIZE       ?= 23068672 #(22MB)
+export CACHE_SIZE       ?= 5068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
 export ROOT 			?= 0

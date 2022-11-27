@@ -358,42 +358,150 @@ main (int argc, char **argv)
 
     Start(timer);
     struct EdgeListDynamic *edgeListDynamic = readEdgeListsDynamicbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);
-    struct EdgeList *edgeList = newEdgeList(edgeListDynamic->num_edges);
+    struct EdgeList *edgeList = newEdgeListFromDynamic(edgeListDynamic);
+    freeEdgeListDynamic(edgeListDynamic);
+    edgeListPrintBasic(edgeList);
 
-    // struct EdgeListDynamic *edgeListDynamic_actions = readEdgeListsDynamicbin(arguments->fnamel, 0, arguments->symmetric, arguments->weighted);
+    struct EdgeListDynamic *edgeListDynamic_actions = readEdgeListsDynamicbin(arguments->fnamel, 0, arguments->symmetric, arguments->weighted);
     Stop(timer);
-    // edgeListDynamicPrint(edgeListDynamic);
-    graphCSRSegmentsPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
+    // // edgeListDynamicPrint(edgeListDynamic);
+    // graphCSRSegmentsPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
 
     // Start(timer);
     edgeList = sortRunAlgorithms(edgeList, arguments->sort);
-
+    // edgeListPrint(edgeList);
     if(arguments->dflag)
     {
         Start(timer);
-        edgeList = removeDulpicatesSelfLoopEdges(edgeList);
+        // edgeList = removeDulpicatesSelfLoopEdges(edgeList);
         Stop(timer);
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
 
 
     Start(timer);
-    // struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeListDynamic, arguments);
+    struct GraphCSRSegments *graphCSRSegments = graphCSRSegmentsNew(edgeList, arguments);
     Stop(timer);
     graphCSRSegmentsPrintMessageWithtime("Create Graph Grid (Seconds)", Seconds(timer));
 
 
-    // graphCSRSegmentsPrint(graphCSRSegments);
+    uint32_t i;
+
+    for ( i = 0; i < (graphCSRSegments->csrSegments->num_vertices); ++i)
+    {
+        // printf("v:%u --> s:%u \n", i, graphCSRSegments->csrSegments->vertex_segment_index[i]);
+        // edgeListPrintBasic(graphCSRSegments->csrSegments->segments[i].edgeList);
+    }
+
+
+    uint32_t *activeSegments = (uint32_t *) my_malloc( graphCSRSegments->csrSegments->num_segments * sizeof(uint32_t));
+    uint32_t *activeSegments2 = (uint32_t *) my_malloc( graphCSRSegments->csrSegments->num_segments * sizeof(uint32_t));
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        activeSegments[i] = 0;
+        activeSegments2[i] = 0;
+    }
+
+    for(i = 0; i < edgeListDynamic_actions->num_edges; i++)
+    {
+
+        // src  = edgeList->edges_array_src[i];
+        uint32_t dest = edgeListDynamic_actions->edges_array_dest[i];
+        uint32_t operation = edgeListDynamic_actions->edges_array_operation[i];
+        uint32_t col = getSegmentID(graphCSRSegments->csrSegments->num_vertices, graphCSRSegments->csrSegments->num_segments, dest);
+        uint32_t Segment_idx = graphCSRSegments->csrSegments->vertex_segment_index[dest];
+
+
+        if(!operation)
+        {
+            activeSegments[col]++;
+            activeSegments2[Segment_idx]++;
+        }
+    }
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        printf("%u - %u\n", activeSegments[i],  activeSegments2[i]);
+    }
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        activeSegments[i] = 0;
+        activeSegments2[i] = 0;
+    }
+
+
+    printf("First 100K \n");
+
+    for(i = 0; i < 100000; i++)
+    {
+
+        // src  = edgeList->edges_array_src[i];
+        uint32_t dest = edgeListDynamic_actions->edges_array_dest[i];
+        uint32_t operation = edgeListDynamic_actions->edges_array_operation[i];
+        uint32_t col = getSegmentID(graphCSRSegments->csrSegments->num_vertices, graphCSRSegments->csrSegments->num_segments, dest);
+        uint32_t Segment_idx = graphCSRSegments->csrSegments->vertex_segment_index[dest];
+
+
+        if(!operation)
+        {
+            activeSegments[col]++;
+            activeSegments2[Segment_idx]++;
+        }
+    }
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        printf("%u - %u\n", activeSegments[i],  activeSegments2[i]);
+    }
+
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        activeSegments[i] = 0;
+        activeSegments2[i] = 0;
+    }
+
+
+    printf("Last 100K \n");
+
+    for(i = edgeListDynamic_actions->num_edges - 100000; i < edgeListDynamic_actions->num_edges; i++)
+    {
+
+        // src  = edgeList->edges_array_src[i];
+        uint32_t dest = edgeListDynamic_actions->edges_array_dest[i];
+        uint32_t operation = edgeListDynamic_actions->edges_array_operation[i];
+        uint32_t col = getSegmentID(graphCSRSegments->csrSegments->num_vertices, graphCSRSegments->csrSegments->num_segments, dest);
+        uint32_t Segment_idx = graphCSRSegments->csrSegments->vertex_segment_index[dest];
+
+
+        if(!operation)
+        {
+            activeSegments[col]++;
+            activeSegments2[Segment_idx]++;
+        }
+    }
+
+    for (i = 0; i < graphCSRSegments->csrSegments->num_segments ; ++i)
+    {
+        printf("%u - %u\n", activeSegments[i],  activeSegments2[i]);
+    }
+
+
+
+    graphCSRSegmentsPrint(graphCSRSegments);
 
 
     // freeEdgeListDynamic(edgeListDynamic);
-    // freeEdgeListDynamic(edgeListDynamic_actions);
+    freeEdgeListDynamic(edgeListDynamic_actions);
     freeEdgeList(edgeList);
     free(timer);
-    
+
     argumentsFree(arguments);
     exit (0);
 }
+
 
 #ifdef __cplusplus
 }

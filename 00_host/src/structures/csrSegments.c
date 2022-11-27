@@ -321,35 +321,42 @@ struct CSRSegments *csrSegmentsSegmentVertexSizePreprocessing(struct CSRSegments
     #pragma omp parallel for default(none) private(i,src,dest,num_vertices) shared(totalSegments,csrSegments) schedule(dynamic,1024)
     for ( j = 0; j < totalSegments; ++j)
     {
-        num_vertices = 0;
-        // #pragma omp parallel for default(none) private(i,src,dest) shared(j,csrSegments) schedule(dynamic,1024) reduction(max:num_vertices)
-        for(i = 0; i <  csrSegments->segments[j].edgeList->num_edges; i++)
+
+        if(csrSegments->segments[j].num_edges)
         {
-            src  =  csrSegments->segments[j].edgeList->edges_array_src[i];
-            dest =  csrSegments->segments[j].edgeList->edges_array_dest[i];
-            num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(src, dest));
+            num_vertices = 0;
+            // #pragma omp parallel for default(none) private(i,src,dest) shared(j,csrSegments) schedule(dynamic,1024) reduction(max:num_vertices)
+            for(i = 0; i <  csrSegments->segments[j].edgeList->num_edges; i++)
+            {
+                src  =  csrSegments->segments[j].edgeList->edges_array_src[i];
+                dest =  csrSegments->segments[j].edgeList->edges_array_dest[i];
+                num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(src, dest));
+            }
+            csrSegments->segments[j].num_vertices = num_vertices;
+            csrSegments->segments[j].edgeList->num_vertices = num_vertices;
         }
-        csrSegments->segments[j].num_vertices = num_vertices;
-        csrSegments->segments[j].edgeList->num_vertices = num_vertices;
     }
 
     #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     for ( j = 0; j < totalSegments; ++j)
     {
-        csrSegments->segments[j].edgeList->mask_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
-        csrSegments->segments[j].edgeList->label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
-        csrSegments->segments[j].edgeList->inverse_label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
-
-        // #pragma omp parallel for
-        for (i = 0; i < csrSegments->segments[j].edgeList->num_vertices; ++i)
+        if(csrSegments->segments[j].num_edges)
         {
-            csrSegments->segments[j].edgeList->mask_array[i] = 0;
-            csrSegments->segments[j].edgeList->label_array[i] = i;
-            csrSegments->segments[j].edgeList->inverse_label_array[i] = i;
-        }
+            csrSegments->segments[j].edgeList->mask_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
+            csrSegments->segments[j].edgeList->label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
+            csrSegments->segments[j].edgeList->inverse_label_array = (uint32_t *) my_malloc(csrSegments->segments[j].edgeList->num_vertices * sizeof(uint32_t));
 
-        if(csrSegments->segments[j].edgeList->num_vertices)
-            csrSegments->segments[j].edgeList->avg_degree = csrSegments->segments[j].edgeList->num_edges / csrSegments->segments[j].edgeList->num_vertices;
+            // #pragma omp parallel for
+            for (i = 0; i < csrSegments->segments[j].edgeList->num_vertices; ++i)
+            {
+                csrSegments->segments[j].edgeList->mask_array[i] = 0;
+                csrSegments->segments[j].edgeList->label_array[i] = i;
+                csrSegments->segments[j].edgeList->inverse_label_array[i] = i;
+            }
+
+            if(csrSegments->segments[j].edgeList->num_vertices)
+                csrSegments->segments[j].edgeList->avg_degree = csrSegments->segments[j].edgeList->num_edges / csrSegments->segments[j].edgeList->num_vertices;
+        }
     }
 
     return csrSegments;
@@ -367,7 +374,7 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
     arguments_local->sflag         = 0;
     arguments_local->datastructure = 0;
     arguments_local->sort          = 0;
-    arguments_local->lmode         = 1;
+    arguments_local->lmode         = 0;
     arguments_local->lmode_l2      = 0;
     arguments_local->lmode_l3      = 0;
 
@@ -379,10 +386,15 @@ struct CSRSegments *csrSegmentsCreationPreprocessing(struct CSRSegments *csrSegm
         arguments_local->sflag         = 0;
         arguments_local->datastructure = 0;
         arguments_local->sort          = 0;
-        arguments_local->lmode         = 1;
+        arguments_local->lmode         = 0;
         arguments_local->lmode_l2      = 0;
         arguments_local->lmode_l3      = 0;
-        csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
+
+        if(csrSegments->segments[j].num_edges)
+        {
+            csrSegments->segments[j].graphCSR = graphCSRPreProcessingStepFromEdgelist(arguments_local, csrSegments->segments[j].edgeList);
+            // freeEdgeList(csrSegments->segments[j].edgeList);
+        }
         printf(" ***************************************************** \n");
     }
 
@@ -491,16 +503,19 @@ struct CSRSegments *csrSegmentsSegmentEdgePopulation(struct CSRSegments *csrSegm
 struct CSRSegments *csrSegmentsSegmentsMemoryAllocations(struct CSRSegments *csrSegments)
 {
 
-    uint32_t i;
+    uint32_t i = 0;
     uint32_t totalSegments = csrSegments->num_segments;
 
     #pragma omp parallel for default(none) private(i) shared(totalSegments,csrSegments)
     for ( i = 0; i < totalSegments; ++i)
     {
 
-        csrSegments->segments[i].edgeList = newEdgeList(csrSegments->segments[i].num_edges);
-        csrSegments->segments[i].edgeList->num_vertices = csrSegments->segments[i].num_vertices;
-        csrSegments->segments[i].num_edges = 0;
+        if(csrSegments->segments[i].num_edges)
+        {
+            csrSegments->segments[i].edgeList = newEdgeList(csrSegments->segments[i].num_edges);
+            csrSegments->segments[i].edgeList->num_vertices = csrSegments->segments[i].num_vertices;
+            csrSegments->segments[i].num_edges = 0;
+        }
 
     }
 
