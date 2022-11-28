@@ -12,7 +12,6 @@ compiler:
   - g++
 
 script:
-  - cd 00_host
   - make test
 
 notifications:
