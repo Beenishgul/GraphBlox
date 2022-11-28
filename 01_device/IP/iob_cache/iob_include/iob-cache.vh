@@ -14,7 +14,7 @@
 
 //Write Policy
 `define WRITE_THROUGH 0 //write-through not allocate: implements a write-through buffer
-`define WRITE_BACK 1    //write-back allocate: implementes a dirty-memory
+`define WRITE_BACK 1    //write-back allocate: implemented a dirty-memory
 
 //Cache-Control
 `define CTRL_ADDR_W 4

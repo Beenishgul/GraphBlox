@@ -21,7 +21,8 @@ package GLAY_GLOBALS_PKG;
 ////////////////////////////////////////////////////////////////////////////
 //  GLay COMMON GLOBALS
 ////////////////////////////////////////////////////////////////////////////
-    parameter PAGE_SIZE                     = 4096                  ;// Page size default is 4KB
+
+    parameter PAGE_SIZE                     = 4096                   ;// Page size default is 4KB
     parameter PAGE_SIZE_BITS                = (PAGE_SIZE * 8)        ;
     parameter CACHELINE_SIZE                = 64                     ; // cacheline is 64bytes
     parameter CACHELINE_SIZE_BITS           = (CACHELINE_SIZE * 8)   ;
@@ -50,7 +51,7 @@ package GLAY_GLOBALS_PKG;
 ////////////////////////////////////////////////////////////////////////////
 
     parameter IOB_FE_ADDR_W                     = 64;    //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-    parameter IOB_FE_DATA_W                     = 64;   //Data width - word size used for the cache
+    parameter IOB_FE_DATA_W                     = 64;    //Data width - word size used for the cache
     parameter IOB_N_WAYS                        = 4;     //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
     parameter IOB_LINE_OFF_W                    = 7;     //Line-Offset Width - 2**NLINE_W total cache lines
     parameter IOB_WORD_OFF_W                    = 3;     //Word-Offset Width - 2**OFFSET_W total FE_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
@@ -100,7 +101,6 @@ package GLAY_GLOBALS_PKG;
     parameter EDGES_ARRAY_DEST_OFFSET       = 7'h58;
     parameter AUXILIARY_1_OFFSET            = 7'h64;
     parameter AUXILIARY_2_OFFSET            = 7'h70;
-
 
 // ********************************************************************************************
 // ***************                  GLOBAL MEMORY(DDR4/HBM)                      **************
