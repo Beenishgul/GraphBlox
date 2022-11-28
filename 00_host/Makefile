@@ -160,19 +160,19 @@ help: $(APP)-$(INTEGRATION)
 	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
 
 .PHONY: $(APP)-$(INTEGRATION)
-$(APP)-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
+$(APP)-$(INTEGRATION) : $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
 	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP)-$(INTEGRATION): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)"
 	-$(ECHO) " ******************************************************************************  \n"
 
 .PHONY: $(APP_TEST)-$(INTEGRATION)
-$(APP_TEST)-$(INTEGRATION) : directories $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
+$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
 	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP_TEST): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)"
 	-$(ECHO) " ****************************************************************************** \n"
 
-.PHONY: directories
-directories :
+.PHONY: directories-obj
+directories-obj :
 	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
 	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
@@ -211,28 +211,28 @@ $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DI
 $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) 
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG)
+$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 ##########################################################################

@@ -13,6 +13,8 @@
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
 
+#include "glayenv.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,6 +35,11 @@ extern "C" {
 #include "graphConfig.h"
 #include "graphRun.h"
 #include "graphStats.h"
+#include "edgeList.h"
+#include "sortRun.h"
+#include "reorder.h"
+
+#include "graphCSRSegments.h"
 #include "edgeList.h"
 
 const char *argp_program_version =
@@ -161,6 +168,14 @@ static struct argp_option options[] =
         "cache-size",        'C', "<LLC=32768/32KB>",      0,
         "LLC cache size for MASK vertex reordering"
     },
+    {
+        "xclbin-path",            'm', "[DEFAULT:NULL]\n",      0,
+        "\nPending Implementation.\n"
+    },
+    {
+        "device-index",             'q', "[DEFAULT:0]\n",      0,
+        "\nPending Implementation.\n"
+    },
     { 0 }
 };
 
@@ -262,7 +277,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'M':
         arguments->mmode = atoi(arg);
         break;
-
+    case 'm':
+        arguments->device_index = atoi(arg);
+        break;
+    case 'q':
+        arguments->xclbin_path = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->xclbin_path  = strcpy (arguments->xclbin_path, arg);
+        break;
     default:
         return ARGP_ERR_UNKNOWN;
     }
