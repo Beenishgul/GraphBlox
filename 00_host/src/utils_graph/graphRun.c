@@ -900,7 +900,6 @@ struct BellmanFordStats *runBellmanFordAlgorithm(struct Arguments *arguments, vo
 
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
-
         stats = bellmanFordGraphCSR(arguments, graphCSR);
         break;
     }
