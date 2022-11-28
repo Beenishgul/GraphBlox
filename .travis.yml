@@ -24,4 +24,4 @@ email:
 
 branches:
   only:
-    - master
+    - main
