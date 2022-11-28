@@ -1,18 +1,6 @@
 .PHONY: mkhelp
-mkhelp::
-	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make glay INTEGRATION=(Default::openmp)"
-	$(ECHO) "      Command to generate glay in openmp"
-	$(ECHO) ""
-	$(ECHO) "  make glay INTEGRATION=ggdl"
-	$(ECHO) "      Command to generate glay graph description language ggdl and run on FPGA"
-	$(ECHO) ""
-	$(ECHO) "  make clean "
-	$(ECHO) "      Command to remove the generated files (obj, bin)."
-	$(ECHO) ""
-	$(ECHO) "  make clean-all"
-	$(ECHO) "      Command to remove all the generated files (obj, bin, results)"
-	$(ECHO) ""
+mkhelp:
+	$(MAKE) mkhelp $(MAKE_ARGS)
 
 #########################################################
 #                GENERAL DIRECTOIRES                    #
@@ -48,7 +36,7 @@ export ALGO_DIR_GLAY       = glay
 export ALGO_DIR_OPENMP     = openmp
 export UTIL_DIR            = utils_graph
 export UTIL_DIR_FPGA       = utils_fpga
-export CONFIG_DIR			= config
+export CONFIG_DIR		   = config
 
 #contains the tests use make run-test to compile what in this directory
 export TEST_DIR            = tests
@@ -208,8 +196,8 @@ export MASK_MODE 		= 0
 #                GENERAL XILINX ARGS                    #
 #########################################################
 
-export DEVICE_INDEX = 0
-export XCLBIN_PATH = ./file.xclbin
+export DEVICE_INDEX   = 0
+export XCLBIN_PATH    = ./file.xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################
