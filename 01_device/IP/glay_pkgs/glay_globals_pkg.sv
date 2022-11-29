@@ -50,29 +50,29 @@ package GLAY_GLOBALS_PKG;
 // AXI4 IOB-CACHE PARAMETERS
 ////////////////////////////////////////////////////////////////////////////
 
-    parameter IOB_FE_ADDR_W                     = 64;    //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-    parameter IOB_FE_DATA_W                     = 64;    //Data width - word size used for the cache
-    parameter IOB_N_WAYS                        = 4;     //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-    parameter IOB_LINE_OFF_W                    = 7;     //Line-Offset Width - 2**NLINE_W total cache lines
-    parameter IOB_WORD_OFF_W                    = 3;     //Word-Offset Width - 2**OFFSET_W total FE_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-    parameter IOB_WTBUF_DEPTH_W                 = 5;     //Depth Width of Write-Through Buffer
+    parameter IOB_FE_ADDR_W                 = 64;    //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+    parameter IOB_FE_DATA_W                 = 64;    //Data width - word size used for the cache
+    parameter IOB_N_WAYS                    = 4;     //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+    parameter IOB_LINE_OFF_W                = 7;     //Line-Offset Width - 2**NLINE_W total cache lines
+    parameter IOB_WORD_OFF_W                = 3;     //Word-Offset Width - 2**OFFSET_W total FE_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
+    parameter IOB_WTBUF_DEPTH_W             = 5;     //Depth Width of Write-Through Buffer
     //Replacement policy (N_WAYS > 1)
-    parameter IOB_REP_POLICY                    = `PLRU_tree;            //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU 
+    parameter IOB_REP_POLICY                = `PLRU_tree;            //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU 
     //Do NOT change - memory cache's parameters - dependency
-    parameter IOB_NWAY_W                        = $clog2(IOB_N_WAYS);    //Cache Ways Width
-    parameter IOB_FE_NBYTES                     = IOB_FE_DATA_W/8;       //Number of Bytes per Word
-    parameter IOB_FE_BYTE_W                     = $clog2(IOB_FE_NBYTES); //Byte Offset
+    parameter IOB_NWAY_W                    = $clog2(IOB_N_WAYS);    //Cache Ways Width
+    parameter IOB_FE_NBYTES                 = IOB_FE_DATA_W/8;       //Number of Bytes per Word
+    parameter IOB_FE_BYTE_W                 = $clog2(IOB_FE_NBYTES); //Byte Offset
     /*---------------------------------------------------*/
     //Higher hierarchy memory (slave) interface parameters 
-    parameter IOB_BE_ADDR_W                     = IOB_FE_ADDR_W;         //Address width of the higher hierarchy memory
-    parameter IOB_BE_DATA_W                     = IOB_FE_DATA_W;         //Data width of the memory 
-    parameter IOB_BE_NBYTES                     = IOB_BE_DATA_W/8;       //Number of bytes
-    parameter IOB_BE_BYTE_W                     = $clog2(IOB_BE_NBYTES); //Offset of Number of Bytes
+    parameter IOB_BE_ADDR_W                 = IOB_FE_ADDR_W;         //Address width of the higher hierarchy memory
+    parameter IOB_BE_DATA_W                 = IOB_FE_DATA_W;         //Data width of the memory 
+    parameter IOB_BE_NBYTES                 = IOB_BE_DATA_W/8;       //Number of bytes
+    parameter IOB_BE_BYTE_W                 = $clog2(IOB_BE_NBYTES); //Offset of Number of Bytes
     //Cache-Memory base Offset
-    parameter IOB_LINE2MEM_W                    = IOB_WORD_OFF_W-$clog2(IOB_BE_DATA_W/IOB_FE_DATA_W); //Logarithm Ratio between the size of the cache-line and the BE's data width 
+    parameter IOB_LINE2MEM_W                = IOB_WORD_OFF_W-$clog2(IOB_BE_DATA_W/IOB_FE_DATA_W); //Logarithm Ratio between the size of the cache-line and the BE's data width 
     /*---------------------------------------------------*/
     //Write Policy 
-    parameter IOB_WRITE_POL                     = `WRITE_BACK; //write policy: write-through (0), write-back (1)
+    parameter IOB_WRITE_POL                 = `WRITE_BACK; //write policy: write-through (0), write-back (1)
     /*---------------------------------------------------*/
     //AXI specific parameters
     parameter IOB_AXI_ADDR_W                = IOB_BE_ADDR_W;
