@@ -81,14 +81,14 @@ package GLAY_GLOBALS_PKG;
     parameter CACHE_WRITE_POL = `WRITE_BACK; //write policy: write-through (0), write-back (1)
     /*---------------------------------------------------*/
     //AXI specific parameters
-    parameter CACHE_AXI_ADDR_W = CACHE_BACKEND_ADDR_W;
-    parameter CACHE_AXI_DATA_W = CACHE_BACKEND_ADDR_W;
-    parameter CACHE_AXI_ID_W                    = 1, //AXI ID (identification) width
-        parameter CACHE_AXI_LEN_W                   = 8, //AXI ID burst length (log2)
-        parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0, //AXI ID value
-        //Controller's options
-        parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-    parameter CACHE_CTRL_CNT = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
+    parameter                      CACHE_AXI_ADDR_W = CACHE_BACKEND_ADDR_W;
+    parameter                      CACHE_AXI_DATA_W = CACHE_BACKEND_ADDR_W;
+    parameter                      CACHE_AXI_ID_W   = 1                   ; //AXI ID (identification) width
+    parameter                      CACHE_AXI_LEN_W  = 8                   ; //AXI ID burst length (log2)
+    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID     = 0                   ; //AXI ID value
+    //Controller's options
+    parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
+    parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
 ////////////////////////////////////////////////////////////////////////////
 // GLay ADDRESS Mappings on AFU and HOST

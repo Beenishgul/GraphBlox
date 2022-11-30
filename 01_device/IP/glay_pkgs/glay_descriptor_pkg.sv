@@ -26,27 +26,26 @@ package GLAY_DESCRIPTOR_PKG;
     } glay_descriptor_state;
 
     typedef struct packed{
-        logic   [64-1:0]    graph_csr_struct  ,
-        logic   [64-1:0]    vertex_out_degree ,
-        logic   [64-1:0]    vertex_in_degree  ,
-        logic   [64-1:0]    vertex_edges_idx  ,
-        logic   [64-1:0]    edges_array_weight,
-        logic   [64-1:0]    edges_array_src   ,
-        logic   [64-1:0]    edges_array_dest  ,
-        logic   [64-1:0]    auxiliary_1       ,
-        logic   [64-1:0]    auxiliary_2
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    graph_csr_struct  ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_out_degree ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_in_degree  ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_edges_idx  ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_weight,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_src   ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_dest  ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    auxiliary_1       ,
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    auxiliary_2
     } glay_descriptor_request;
 
 
     typedef struct packed{
-        logic [0:63]            address        ;
         glay_descriptor_request glay_descriptor;
     } GLAYDescriptorInterfacePayload;
 
 
     typedef struct packed{
-        logic                          valid  ;
-        GLAYDescriptorInterfacePayload payload;
+        logic                   valid  ;
+        glay_descriptor_request payload;
     } GLAYDescriptorInterface;
 
 endpackage
