@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////// 
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
-module glay_kernel_example #(
+module glay_kernel_cu #(
   parameter integer C_M00_AXI_ADDR_WIDTH = 64 ,
   parameter integer C_M00_AXI_DATA_WIDTH = 512
 )
