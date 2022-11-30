@@ -23,62 +23,62 @@ module glay_kernel_afu #(
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  wire                              ap_clk            ,
-  input  wire                              ap_rst_n          ,
+  input  logic                              ap_clk            ,
+  input  logic                              ap_rst_n          ,
   // AXI4 master interface m00_axi
-  output wire                              m00_axi_awvalid   ,
-  input  wire                              m00_axi_awready   ,
-  output wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr    ,
-  output wire [                     8-1:0] m00_axi_awlen     ,
-  output wire                              m00_axi_wvalid    ,
-  input  wire                              m00_axi_wready    ,
-  output wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata     ,
-  output wire [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb     ,
-  output wire                              m00_axi_wlast     ,
-  input  wire                              m00_axi_bvalid    ,
-  output wire                              m00_axi_bready    ,
-  output wire                              m00_axi_arvalid   ,
-  input  wire                              m00_axi_arready   ,
-  output wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr    ,
-  output wire [                     8-1:0] m00_axi_arlen     ,
-  input  wire                              m00_axi_rvalid    ,
-  output wire                              m00_axi_rready    ,
-  input  wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata     ,
-  input  wire                              m00_axi_rlast     ,
+  output logic                              m00_axi_awvalid   ,
+  input  logic                              m00_axi_awready   ,
+  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr    ,
+  output logic [                     8-1:0] m00_axi_awlen     ,
+  output logic                              m00_axi_wvalid    ,
+  input  logic                              m00_axi_wready    ,
+  output logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata     ,
+  output logic [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb     ,
+  output logic                              m00_axi_wlast     ,
+  input  logic                              m00_axi_bvalid    ,
+  output logic                              m00_axi_bready    ,
+  output logic                              m00_axi_arvalid   ,
+  input  logic                              m00_axi_arready   ,
+  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr    ,
+  output logic [                     8-1:0] m00_axi_arlen     ,
+  input  logic                              m00_axi_rvalid    ,
+  output logic                              m00_axi_rready    ,
+  input  logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata     ,
+  input  logic                              m00_axi_rlast     ,
   // Control Signals
   // AXI4 master interface m00_axi missing ports
-  input  wire [          IOB_AXI_ID_W-1:0] m00_axi_bid       ,
-  input  wire [          IOB_AXI_ID_W-1:0] m00_axi_rid       ,
-  input  wire [                     2-1:0] m00_axi_rresp     ,
-  input  wire [                     2-1:0] m00_axi_bresp     ,
-  output wire [          IOB_AXI_ID_W-1:0] m00_axi_awid      ,
-  output wire [                     3-1:0] m00_axi_awsize    ,
-  output wire [                     2-1:0] m00_axi_awburst   ,
-  output wire [                     2-1:0] m00_axi_awlock    ,
-  output wire [                     4-1:0] m00_axi_awcache   ,
-  output wire [                     3-1:0] m00_axi_awprot    ,
-  output wire [                     4-1:0] m00_axi_awqos     ,
-  output wire [          IOB_AXI_ID_W-1:0] m00_axi_arid      ,
-  output wire [                     3-1:0] m00_axi_arsize    ,
-  output wire [                     2-1:0] m00_axi_arburst   ,
-  output wire [                     2-1:0] m00_axi_arlock    ,
-  output wire [                     4-1:0] m00_axi_arcache   ,
-  output wire [                     3-1:0] m00_axi_arprot    ,
-  output wire [                     4-1:0] m00_axi_arqos     ,
-  input  wire                              ap_start          ,
-  output wire                              ap_idle           ,
-  output wire                              ap_done           ,
-  output wire                              ap_ready          ,
-  input  wire                              ap_continue       ,
-  input  wire [                    64-1:0] graph_csr_struct  ,
-  input  wire [                    64-1:0] vertex_out_degree ,
-  input  wire [                    64-1:0] vertex_in_degree  ,
-  input  wire [                    64-1:0] vertex_edges_idx  ,
-  input  wire [                    64-1:0] edges_array_weight,
-  input  wire [                    64-1:0] edges_array_src   ,
-  input  wire [                    64-1:0] edges_array_dest  ,
-  input  wire [                    64-1:0] auxiliary_1       ,
-  input  wire [                    64-1:0] auxiliary_2
+  input  logic [          IOB_AXI_ID_W-1:0] m00_axi_bid       ,
+  input  logic [          IOB_AXI_ID_W-1:0] m00_axi_rid       ,
+  input  logic [                     2-1:0] m00_axi_rresp     ,
+  input  logic [                     2-1:0] m00_axi_bresp     ,
+  output logic [          IOB_AXI_ID_W-1:0] m00_axi_awid      ,
+  output logic [                     3-1:0] m00_axi_awsize    ,
+  output logic [                     2-1:0] m00_axi_awburst   ,
+  output logic [                     2-1:0] m00_axi_awlock    ,
+  output logic [                     4-1:0] m00_axi_awcache   ,
+  output logic [                     3-1:0] m00_axi_awprot    ,
+  output logic [                     4-1:0] m00_axi_awqos     ,
+  output logic [          IOB_AXI_ID_W-1:0] m00_axi_arid      ,
+  output logic [                     3-1:0] m00_axi_arsize    ,
+  output logic [                     2-1:0] m00_axi_arburst   ,
+  output logic [                     2-1:0] m00_axi_arlock    ,
+  output logic [                     4-1:0] m00_axi_arcache   ,
+  output logic [                     3-1:0] m00_axi_arprot    ,
+  output logic [                     4-1:0] m00_axi_arqos     ,
+  input  logic                              ap_start          ,
+  output logic                              ap_idle           ,
+  output logic                              ap_done           ,
+  output logic                              ap_ready          ,
+  input  logic                              ap_continue       ,
+  input  logic [                    64-1:0] graph_csr_struct  ,
+  input  logic [                    64-1:0] vertex_out_degree ,
+  input  logic [                    64-1:0] vertex_in_degree  ,
+  input  logic [                    64-1:0] vertex_edges_idx  ,
+  input  logic [                    64-1:0] edges_array_weight,
+  input  logic [                    64-1:0] edges_array_src   ,
+  input  logic [                    64-1:0] edges_array_dest  ,
+  input  logic [                    64-1:0] auxiliary_1       ,
+  input  logic [                    64-1:0] auxiliary_2
 );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +91,7 @@ module glay_kernel_afu #(
 ///////////////////////////////////////////////////////////////////////////////
   (* KEEP = "yes" *)
   logic                          areset         = 1'b0                      ;
+  logic                          m_axi_areset   = 1'b0                      ;
   logic                          ap_start_r     = 1'b0                      ;
   logic                          ap_idle_r      = 1'b1                      ;
   logic                          ap_start_pulse                             ;
@@ -109,7 +110,8 @@ module glay_kernel_afu #(
 
 // Register and invert reset signal.
   always @(posedge ap_clk) begin
-    areset <= ~ap_rst_n;
+    areset       <= ~ap_rst_n;
+    m_axi_areset <= ~ap_rst_n;
   end
 
 // create pulse when ap_start transitions to 1
@@ -162,7 +164,7 @@ module glay_kernel_afu #(
 ///////////////////////////////////////////////////////////////////////////////
 
   always @(posedge ap_clk) begin
-    if (areset) begin
+    if (m_axi_areset) begin
       m_axi_read_in <= 0;
     end
     else begin
@@ -180,7 +182,7 @@ module glay_kernel_afu #(
 ///////////////////////////////////////////////////////////////////////////////
 
   always @(posedge ap_clk) begin
-    if (areset) begin
+    if (m_axi_areset) begin
       m00_axi_arvalid <= 0; // Address read channel valid
       m00_axi_araddr  <= 0; // Address read channel address
       m00_axi_arlen   <= 0; // Address write channel burst length
@@ -213,7 +215,7 @@ module glay_kernel_afu #(
 ///////////////////////////////////////////////////////////////////////////////
 
   always @(posedge ap_clk) begin
-    if (areset) begin
+    if (m_axi_areset) begin
       m_axi_write_in <= 0;
     end
     else begin
@@ -230,7 +232,7 @@ module glay_kernel_afu #(
 ///////////////////////////////////////////////////////////////////////////////
 
   always @(posedge ap_clk) begin
-    if (areset) begin
+    if (m_axi_areset) begin
       m00_axi_awvalid <= 0;// Address write channel valid
       m00_axi_awid    <= 0;// Address write channel ID
       m00_axi_awaddr  <= 0;// Address write channel address
@@ -270,6 +272,31 @@ module glay_kernel_afu #(
 // DRIVE GLAY DESCRIPTOR
 ///////////////////////////////////////////////////////////////////////////////
 
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      glay_descriptor.valid <= 0;
+    end
+    else begin
+      glay_descriptor.valid <= ap_start;
+    end
+  end
+
+  always @(posedge ap_clk) begin
+    glay_descriptor.payload.graph_csr_struct   <= graph_csr_struct  ;
+    glay_descriptor.payload.vertex_out_degree  <= vertex_out_degree ;
+    glay_descriptor.payload.vertex_in_degree   <= vertex_in_degree  ;
+    glay_descriptor.payload.vertex_edges_idx   <= vertex_edges_idx  ;
+    glay_descriptor.payload.edges_array_weight <= edges_array_weight;
+    glay_descriptor.payload.edges_array_src    <= edges_array_src   ;
+    glay_descriptor.payload.edges_array_dest   <= edges_array_dest  ;
+    glay_descriptor.payload.auxiliary_1        <= auxiliary_1       ;
+    glay_descriptor.payload.auxiliary_2        <= auxiliary_2       ;
+  end
+
+
+///////////////////////////////////////////////////////////////////////////////
+// GLay CU -> Caches/PEs and Logic here.
+///////////////////////////////////////////////////////////////////////////////
 
   glay_kernel_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
