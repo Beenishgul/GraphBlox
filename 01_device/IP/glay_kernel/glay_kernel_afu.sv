@@ -90,19 +90,18 @@ module glay_kernel_afu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
   (* KEEP = "yes" *)
-  logic                          areset         = 1'b0                      ;
-  logic                          m_axi_areset   = 1'b0                      ;
-  logic                          ap_start_r     = 1'b0                      ;
-  logic                          ap_idle_r      = 1'b1                      ;
-  logic                          ap_start_pulse                             ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i                                  ;
+  logic                          areset         = 1'b0;
+  logic                          m_axi_areset   = 1'b0;
+  logic                          glay_areset    = 1'b0;
+  logic                          ap_start_r     = 1'b0;
+  logic                          ap_idle_r      = 1'b1;
+  logic                          ap_start_pulse       ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i            ;
   logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
 
-  GLAYDescriptorInterface        glay_descriptor;
-  AXI4MasterReadInterfaceInput   m_axi_read_in  ;
-  AXI4MasterReadInterfaceOutput  m_axi_read_out ;
-  AXI4MasterWriteInterfaceInput  m_axi_write_in ;
-  AXI4MasterWriteInterfaceOutput m_axi_write_out;
+  GLAYDescriptorInterface  glay_descriptor;
+  AXI4MasterReadInterface  m_axi_read     ;
+  AXI4MasterWriteInterface m_axi_write    ;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Begin RTL
@@ -112,6 +111,7 @@ module glay_kernel_afu #(
   always @(posedge ap_clk) begin
     areset       <= ~ap_rst_n;
     m_axi_areset <= ~ap_rst_n;
+    glay_areset  <= ~ap_rst_n;
   end
 
 // create pulse when ap_start transitions to 1
@@ -165,15 +165,15 @@ module glay_kernel_afu #(
 
   always @(posedge ap_clk) begin
     if (m_axi_areset) begin
-      m_axi_read_in <= 0;
+      m_axi_read.in <= 0;
     end
     else begin
-      m_axi_read_in.rvalid  <= m00_axi_rvalid ; // Read channel valid
-      m_axi_read_in.arready <= m00_axi_arready; // Address read channel ready
-      m_axi_read_in.rlast   <= m00_axi_rlast  ; // Read channel last word
-      m_axi_read_in.rdata   <= m00_axi_rdata  ; // Read channel data
-      m_axi_read_in.rid     <= m00_axi_rid    ; // Read channel ID
-      m_axi_read_in.rresp   <= m00_axi_rresp  ; // Read channel response
+      m_axi_read.in.rvalid  <= m00_axi_rvalid ; // Read channel valid
+      m_axi_read.in.arready <= m00_axi_arready; // Address read channel ready
+      m_axi_read.in.rlast   <= m00_axi_rlast  ; // Read channel last word
+      m_axi_read.in.rdata   <= m00_axi_rdata  ; // Read channel data
+      m_axi_read.in.rid     <= m00_axi_rid    ; // Read channel ID
+      m_axi_read.in.rresp   <= m00_axi_rresp  ; // Read channel response
     end
   end
 
@@ -196,17 +196,17 @@ module glay_kernel_afu #(
       m00_axi_arqos   <= 0; // Address write channel quality of service
     end
     else begin
-      m00_axi_arvalid <= m_axi_read_out.arvalid; // Address read channel valid
-      m00_axi_araddr  <= m_axi_read_out.araddr;  // Address read channel address
-      m00_axi_arlen   <= m_axi_read_out.arlen;   // Address write channel burst length
-      m00_axi_rready  <= m_axi_read_out.rready;  // Read channel ready
-      m00_axi_arid    <= m_axi_read_out.arid;    // Address read channel ID
-      m00_axi_arsize  <= m_axi_read_out.arsize;  // Address read channel burst size. This signal indicates the size of each transfer in the burst
-      m00_axi_arburst <= m_axi_read_out.arburst; // Address read channel burst type
-      m00_axi_arlock  <= m_axi_read_out.arlock;  // Address read channel lock type
-      m00_axi_arcache <= m_axi_read_out.arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      m00_axi_arprot  <= m_axi_read_out.arprot;  // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-      m00_axi_arqos   <= m_axi_read_out.arqos;   // Address write channel quality of service
+      m00_axi_arvalid <= m_axi_read.out.arvalid; // Address read channel valid
+      m00_axi_araddr  <= m_axi_read.out.araddr ; // Address read channel address
+      m00_axi_arlen   <= m_axi_read.out.arlen  ; // Address write channel burst length
+      m00_axi_rready  <= m_axi_read.out.rready ; // Read channel ready
+      m00_axi_arid    <= m_axi_read.out.arid   ; // Address read channel ID
+      m00_axi_arsize  <= m_axi_read.out.arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
+      m00_axi_arburst <= m_axi_read.out.arburst; // Address read channel burst type
+      m00_axi_arlock  <= m_axi_read.out.arlock ; // Address read channel lock type
+      m00_axi_arcache <= m_axi_read.out.arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+      m00_axi_arprot  <= m_axi_read.out.arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      m00_axi_arqos   <= m_axi_read.out.arqos  ; // Address write channel quality of service
     end
   end
 
@@ -216,14 +216,14 @@ module glay_kernel_afu #(
 
   always @(posedge ap_clk) begin
     if (m_axi_areset) begin
-      m_axi_write_in <= 0;
+      m_axi_write.in <= 0;
     end
     else begin
-      m_axi_write_in.awready <= m00_axi_awready; // Address write channel ready
-      m_axi_write_in.wready  <= m00_axi_wready;  // Write channel ready
-      m_axi_write_in.bid     <= m00_axi_bid;     // Write response channel ID
-      m_axi_write_in.bresp   <= m00_axi_bresp;   // Write channel response
-      m_axi_write_in.bvalid  <= m00_axi_bvalid;  // Write response channel valid
+      m_axi_write.in.awready <= m00_axi_awready; // Address write channel ready
+      m_axi_write.in.wready  <= m00_axi_wready ; // Write channel ready
+      m_axi_write.in.bid     <= m00_axi_bid    ; // Write response channel ID
+      m_axi_write.in.bresp   <= m00_axi_bresp  ; // Write channel response
+      m_axi_write.in.bvalid  <= m00_axi_bvalid ; // Write response channel valid
     end
   end
 
@@ -250,21 +250,21 @@ module glay_kernel_afu #(
       m00_axi_bready  <= 0;// Write response channel ready
     end
     else begin
-      m00_axi_awvalid <= m_axi_write_out.awvalid; // Address write channel valid
-      m00_axi_awid    <= m_axi_write_out.awid   ; // Address write channel ID
-      m00_axi_awaddr  <= m_axi_write_out.awaddr ; // Address write channel address
-      m00_axi_awlen   <= m_axi_write_out.awlen  ; // Address write channel burst length
-      m00_axi_awsize  <= m_axi_write_out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
-      m00_axi_awburst <= m_axi_write_out.awburst; // Address write channel burst type
-      m00_axi_awlock  <= m_axi_write_out.awlock ; // Address write channel lock type
-      m00_axi_awcache <= m_axi_write_out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      m00_axi_awprot  <= m_axi_write_out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-      m00_axi_awqos   <= m_axi_write_out.awqos  ; // Address write channel quality of service
-      m00_axi_wdata   <= m_axi_write_out.wdata  ; // Write channel data
-      m00_axi_wstrb   <= m_axi_write_out.wstrb  ; // Write channel write strobe
-      m00_axi_wlast   <= m_axi_write_out.wlast  ; // Write channel last word flag
-      m00_axi_wvalid  <= m_axi_write_out.wvalid ; // Write channel valid
-      m00_axi_bready  <= m_axi_write_out.bready ; // Write response channel ready
+      m00_axi_awvalid <= m_axi_write.out.awvalid; // Address write channel valid
+      m00_axi_awid    <= m_axi_write.out.awid   ; // Address write channel ID
+      m00_axi_awaddr  <= m_axi_write.out.awaddr ; // Address write channel address
+      m00_axi_awlen   <= m_axi_write.out.awlen  ; // Address write channel burst length
+      m00_axi_awsize  <= m_axi_write.out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
+      m00_axi_awburst <= m_axi_write.out.awburst; // Address write channel burst type
+      m00_axi_awlock  <= m_axi_write.out.awlock ; // Address write channel lock type
+      m00_axi_awcache <= m_axi_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+      m00_axi_awprot  <= m_axi_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      m00_axi_awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
+      m00_axi_wdata   <= m_axi_write.out.wdata  ; // Write channel data
+      m00_axi_wstrb   <= m_axi_write.out.wstrb  ; // Write channel write strobe
+      m00_axi_wlast   <= m_axi_write.out.wlast  ; // Write channel last word flag
+      m00_axi_wvalid  <= m_axi_write.out.wvalid ; // Write channel valid
+      m00_axi_bready  <= m_axi_write.out.bready ; // Write response channel ready
     end
   end
 
@@ -302,15 +302,15 @@ module glay_kernel_afu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_glay_kernel_cu (
-    .aclk           (aclk           ),
-    .areset         (areset         ),
+    .aclk           (ap_clk         ),
+    .areset         (glay_areset    ),
     .ap_start       (ap_start       ),
     .ap_done        (ap_done        ),
     .glay_descriptor(glay_descriptor),
-    .m_axi_read_in  (m_axi_read_in  ),
-    .m_axi_read_out (m_axi_read_out ),
-    .m_axi_write_in (m_axi_write_in ),
-    .m_axi_write_out(m_axi_write_out)
+    .m_axi_read.in  (m_axi_read.in  ),
+    .m_axi_read.out (m_axi_read.out ),
+    .m_axi_write.in (m_axi_write.in ),
+    .m_axi_write.out(m_axi_write.out)
   );
 
 endmodule : glay_kernel_afu

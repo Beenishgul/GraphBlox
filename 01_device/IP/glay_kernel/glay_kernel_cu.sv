@@ -21,7 +21,7 @@ module glay_kernel_cu #(
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                          aclk           ,
+  input  logic                          ap_clk           ,
   input  logic                          areset         ,
   input  logic                          ap_start       ,
   output logic                          ap_done        ,
