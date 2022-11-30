@@ -21,7 +21,7 @@ module glay_kernel_cu #(
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                          ap_clk           ,
+  input  logic                          ap_clk         ,
   input  logic                          areset         ,
   input  logic                          ap_start       ,
   output logic                          ap_done        ,
@@ -36,22 +36,81 @@ module glay_kernel_cu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
 // AXI write master stage
-  logic write_done;
+  logic glay_done;
 
+  GLAYDescriptorInterface  glay_descriptor;
+  AXI4MasterReadInterface  m_axi_read     ;
+  AXI4MasterWriteInterface m_axi_write    ;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Begin RTL
+// Done Logic
 ///////////////////////////////////////////////////////////////////////////////
+
   always @(posedge ap_clk) begin
     if (areset) begin
-      write_done <= 0;
+      glay_done <= 0;
     end
     else begin
-      write_done <= 1;
+      glay_done <= 1;
     end
   end
 
-  assign ap_done = write_done;
+  assign ap_done = glay_done;
+
+///////////////////////////////////////////////////////////////////////////////
+// WRITE AXI4 SIGNALS INPUT
+///////////////////////////////////////////////////////////////////////////////
+
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      m_axi_write.in <= 0;
+    end
+    else begin
+      m_axi_write.in <= m_axi_write_in;
+    end
+  end
+
+///////////////////////////////////////////////////////////////////////////////
+// READ AXI4 SIGNALS INPUT
+///////////////////////////////////////////////////////////////////////////////
+
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      m_axi_read.in <= 0;
+    end
+    else begin
+      m_axi_read.in <= m_axi_read_in;
+    end
+  end
+
+
+///////////////////////////////////////////////////////////////////////////////
+// WRITE AXI4 SIGNALS OUTPUT
+///////////////////////////////////////////////////////////////////////////////
+
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      m_axi_write_out <= 0;
+    end
+    else begin
+      m_axi_write_out <= m_axi_write.out;
+    end
+  end
+
+///////////////////////////////////////////////////////////////////////////////
+// READ AXI4 SIGNALS OUTPUT
+///////////////////////////////////////////////////////////////////////////////
+
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      m_axi_read_out <= 0;
+    end
+    else begin
+      m_axi_read_out <= m_axi_write.out;
+    end
+  end
+
+
 
 endmodule : glay_kernel_cu

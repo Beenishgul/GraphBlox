@@ -307,10 +307,10 @@ module glay_kernel_afu #(
     .ap_start       (ap_start       ),
     .ap_done        (ap_done        ),
     .glay_descriptor(glay_descriptor),
-    .m_axi_read.in  (m_axi_read.in  ),
-    .m_axi_read.out (m_axi_read.out ),
-    .m_axi_write.in (m_axi_write.in ),
-    .m_axi_write.out(m_axi_write.out)
+    .m_axi_read_in  (m_axi_read.in  ),
+    .m_axi_read_out (m_axi_read.out ),
+    .m_axi_write_in (m_axi_write.in ),
+    .m_axi_write_out(m_axi_write.out)
   );
 
 endmodule : glay_kernel_afu
