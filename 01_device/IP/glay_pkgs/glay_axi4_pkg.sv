@@ -74,7 +74,6 @@ package GLAY_AXI4_PKG;
     logic                            wlast  ; // Write channel last word flag
     logic                            wvalid ; // Write channel valid
     logic                            bready ; // Write response channel ready
-
   } AXI4MasterWriteInterfaceOutput;
 
 endpackage
