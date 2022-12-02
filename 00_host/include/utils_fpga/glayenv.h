@@ -28,16 +28,16 @@ struct __attribute__((__packed__)) GLAYGraphCSR
     void *vertex_out_degree;            // 8-Bytes
     void *vertex_in_degree;             // 8-Bytes
     void *vertex_edges_idx;             // 8-Bytes
-    void *edges_array_weight;           // 8-Bytes
     void *edges_array_src;              // 8-Bytes
     void *edges_array_dest;             // 8-Bytes
+    void *edges_array_weight;           // 8-Bytes
     //---------------------------------------------------//--// 64bytes
     void *auxiliary1;                   // 8-Bytes
     void *auxiliary2;                   // 8-Bytes
 };
 
 
-struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandle
+struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
 {
     size_t Edges_buffer_size_in_bytes;
     size_t Vertex_buffer_size_in_bytes;
@@ -52,6 +52,7 @@ struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandle
     xrtBufferHandle edges_array_dest_buffer;
     xrtBufferHandle auxiliary_1_buffer;
     xrtBufferHandle auxiliary_2_buffer;
+    xrtMemoryGroup bank_grp_idx;
 };
 
 
@@ -71,14 +72,14 @@ struct xrtGLAYHandle
 
 
 int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
-int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle);
+int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
 void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
 void waitGLAY(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle);
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);
-struct GLAYGraphCSRxrtBufferHandle *allocateGLAYGraphCSRDeviceBuffers(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph);
+struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 
 #ifdef __cplusplus
 }
