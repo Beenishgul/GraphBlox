@@ -6,10 +6,10 @@ mkhelp:
 #                GENERAL DIRECTOIRES                    #
 #########################################################
 export APP                 = glay
-export APP_TEST            = test_match
+# export APP_TEST            = test_match
 # export APP_TEST            = test_glay
 # export APP_TEST            = test_StalaGraph
-# export APP_TEST            = test_glayGraph
+export APP_TEST            = test_glayGraph
 export INTEGRATION         = openmp
 
 # dirs Root app
@@ -161,7 +161,7 @@ export ALGORITHMS 		= 1
 
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		= 2
-export DATA_STRUCTURES  = 1
+export DATA_STRUCTURES  = 0
 export REORDER_LAYER1 	= 0
 export REORDER_LAYER2   = 0
 export REORDER_LAYER3   = 0
@@ -197,7 +197,7 @@ export MASK_MODE 		= 0
 #########################################################
 
 export DEVICE_INDEX   = 0
-export XCLBIN_PATH    = ./file.xclbin
+export XCLBIN_PATH    = ./$(APP).xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################

@@ -301,16 +301,19 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
+    int bank_grp_idx = 0;
+    struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
+    struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
 
     setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path);
 
+    setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
     // //Create segmented graph assign to GLay
 
-
     releaseGLAY(arguments->glayHandle);
-
     free(timer);
+    free(glayGraph);
     argumentsFree(arguments);
     exit (0);
 }
