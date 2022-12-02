@@ -18,10 +18,10 @@ mkhelp::
 #                GENERAL DIRECTOIRES                    #
 #########################################################
 APP                 ?= glay
-APP_TEST            ?= test_match
+# APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
-# APP_TEST            ?= test_glayGraph
+APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
 
 # dirs Root app
