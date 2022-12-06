@@ -1,19 +1,3 @@
-.PHONY: mkhelp
-mkhelp::
-	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make glay INTEGRATION=(Default::openmp)"
-	$(ECHO) "      Command to generate glay in openmp"
-	$(ECHO) ""
-	$(ECHO) "  make glay INTEGRATION=ggdl"
-	$(ECHO) "      Command to generate glay graph description language ggdl and run on FPGA"
-	$(ECHO) ""
-	$(ECHO) "  make clean "
-	$(ECHO) "      Command to remove the generated files (obj, bin)."
-	$(ECHO) ""
-	$(ECHO) "  make clean-all"
-	$(ECHO) "      Command to remove all the generated files (obj, bin, results)"
-	$(ECHO) ""
-
 #########################################################
 #                GENERAL DIRECTOIRES                    #
 #########################################################
