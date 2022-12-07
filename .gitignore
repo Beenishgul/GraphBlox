@@ -7,4 +7,7 @@ nohup.out
 .vscode
 glay.sublime-project
 glay.sublime-workspace
-00_GLay/01_device/IP/glay_kernel_ex
+01_device/IP/glay_kernel_ex
+01_device/IP/vivado.jou  
+01_device/IP/vivado.log  
+01_device/IP/xilinx
