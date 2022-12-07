@@ -614,19 +614,19 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
 
 
     free(fname_txt_out_degree);
-    free(fname_bin_out_degree);
+    // free(fname_bin_out_degree);
     free(fname_txt_in_degree);
-    free(fname_bin_in_degree);
+//     free(fname_bin_in_degree);
     free(fname_txt_edges_idx);
-    free(fname_bin_edges_idx);
+//     free(fname_bin_edges_idx);
     free(fname_txt_edges_array_src);
-    free(fname_bin_edges_array_src);
+//     free(fname_bin_edges_array_src);
     free(fname_txt_edges_array_dest);
-    free(fname_bin_edges_array_dest);
+//     free(fname_bin_edges_array_dest);
 
 #if WEIGHTED
     free(fname_txt_edges_array_weight);
-    free(fname_bin_edges_array_weight);
+//     free(fname_bin_edges_array_weight);
 #endif
 
 
