@@ -183,22 +183,19 @@ int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, 
     return 0;
 }
 
-
-void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR)
+void startGLAYRun(struct xrtGLAYHandle *glayHandle)
 {
-
+    glayHandle->kernelHandleRun = xrtKernelRun(glayHandle->kernelHandle);
 }
 
-
-void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR)
+void waitGLAYRun(struct xrtGLAYHandle *glayHandle)
 {
-
+ xrtRunWait(glayHandle->kernelHandleRun);
 }
 
-void waitGLAY(struct xrtGLAYHandle *glayHandle)
+void closeGLAYRun(struct xrtGLAYHandle *glayHandle)
 {
-
-
+ xrtRunClose(glayHandle->kernelHandleRun);
 }
 
 void releaseGLAY(struct xrtGLAYHandle *glayHandle)
