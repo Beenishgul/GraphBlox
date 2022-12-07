@@ -61,6 +61,7 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.HAS_LOCK {1} \
                          CONFIG.HAS_CACHE {1} \
                          CONFIG.HAS_REGION {0} \
+                         CONFIG.HAS_PROT {1}] \
                          CONFIG.HAS_BURST {1} \
                          CONFIG.HAS_QOS {1} \
                          CONFIG.HAS_PROT {1} \
