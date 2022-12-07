@@ -1,9 +1,5 @@
-.PHONY: mkhelp
-mkhelp:
-	$(MAKE) mkhelp $(MAKE_ARGS)
-
 #########################################################
-#                GENERAL DIRECTOIRES                    #
+#                GENERAL DIRECTOIRES HOST               #
 #########################################################
 export APP                 = glay
 # export APP_TEST            = test_match
@@ -12,103 +8,72 @@ export APP                 = glay
 export APP_TEST            = test_glayGraph
 export INTEGRATION         = openmp
 
-# dirs Root app
-export APP_DIR             = .
-
-#dir root/managed_folders
-
-export SRC_DIR             = src
-export OBJ_DIR             = obj
-export INC_DIR             = include
-export BIN_DIR             = bin
-export RES_DIR             = results
-
-#if you want to compile from cmake you need this directory
-#cd build
-#cmake ..
-export BUILD_DIR           = build
-
-# relative directories used for managing src/obj files
-export STRUCT_DIR          = structures
-export PREPRO_DIR          = preprocess
-export ALGO_DIR            = algorithms
-export ALGO_DIR_GLAY       = glay
-export ALGO_DIR_OPENMP     = openmp
-export UTIL_DIR            = utils_graph
-export UTIL_DIR_FPGA       = utils_fpga
-export CONFIG_DIR		   = config
-
-#contains the tests use make run-test to compile what in this directory
-export TEST_DIR            = tests
-
-#contains the main for the graph processing framework
-export MAIN_DIR            = main
-
 ##################################################
 
 export APP_DIR                 = .
-export MAKE_DIR                = 00_host
+export MAKE_DIR_HOST           = 00_host
+export MAKE_DIR_DEVICE         = 01_device
 
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
-export MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
+export MAKE_ARGS_HOST          = -w -C $(APP_DIR)/$(MAKE_DIR_HOST) -j$(MAKE_NUM_THREADS)
 
 #########################################################
 
 .PHONY: help
 help: 
-	$(MAKE) help $(MAKE_ARGS)
+	$(MAKE) help $(MAKE_ARGS_HOST)
 
 .PHONY: clean-all
 clean-all:
-	$(MAKE) clean-all $(MAKE_ARGS)
+	$(MAKE) clean-all $(MAKE_ARGS_HOST)
 
 .PHONY: clean
 clean:
-	$(MAKE) clean $(MAKE_ARGS)
+	$(MAKE) clean $(MAKE_ARGS_HOST)
 
 .PHONY: clean-results
 clean-results:
-	$(MAKE) clean-results $(MAKE_ARGS)
+	$(MAKE) clean-results $(MAKE_ARGS_HOST)
 
 ##########################################################################
-# RUN GLay
+# RUN GLay HOST
 ##########################################################################
 
 .PHONY: run
 run:
-	$(MAKE) run $(MAKE_ARGS) 
+	$(MAKE) run $(MAKE_ARGS_HOST) 
 	
 .PHONY: debug-memory
 debug-memory:
-	$(MAKE) debug-memory $(MAKE_ARGS) 
+	$(MAKE) debug-memory $(MAKE_ARGS_HOST) 
 
 .PHONY: debug
 debug:
-	$(MAKE) debug $(MAKE_ARGS) 
+	$(MAKE) debug $(MAKE_ARGS_HOST) 
 
 ##########################################################################
-# RUN Tests
+# RUN Tests HOST
 ##########################################################################
 
 .PHONY: run-test
 run-test:
-	$(MAKE) run-test $(MAKE_ARGS) 
+	$(MAKE) run-test $(MAKE_ARGS_HOST) 
 
 .PHONY: debug-test
 debug-test:
-	$(MAKE) debug-test $(MAKE_ARGS) 
+	$(MAKE) debug-test $(MAKE_ARGS_HOST) 
 
 .PHONY: debug-test-memory
 debug-test-memory:
-	$(MAKE) debug-test-memory $(MAKE_ARGS)
+	$(MAKE) debug-test-memory $(MAKE_ARGS_HOST)
 
 # test files
 .PHONY: test
 test:
-	$(MAKE) test $(MAKE_ARGS)
+	$(MAKE) test $(MAKE_ARGS_HOST)
 
 #########################################################
-#       		    GRAPH ARGUMENTS         			#
+#       		    GRAPH ARGUMENTS HOST       			#
 #########################################################
 
 export BENCHMARKS_DIR = ../03_test_graphs
@@ -192,16 +157,18 @@ export BIN_SIZE 		= 1000
 export INOUT_STATS 		= 0
 export MASK_MODE 		= 0
 
+##################################################
+
+export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+
+##############################################
+
 #########################################################
-#                GENERAL XILINX ARGS                    #
+#                        XILINX ARGS                    #
 #########################################################
 
 export DEVICE_INDEX   = 0
 export XCLBIN_PATH    = ./$(APP).xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
-##################################################
 
-export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
-
-##############################################

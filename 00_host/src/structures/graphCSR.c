@@ -526,6 +526,112 @@ void writeToBinFileGraphCSR (const char *fname, struct GraphCSR *graphCSR)
 
 }
 
+void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
+{
+
+    uint32_t vertex_id;
+
+    FILE *fptr_out_degree;
+    FILE *fptr_in_degree;
+    FILE *fptr_edges_idx;
+    FILE *fptr_edges_array_src;
+    FILE *fptr_edges_array_dest;
+#if WEIGHTED
+    FILE *fptr_edges_array_weight;
+#endif
+
+    char *fname_txt_out_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_out_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_out_degree = strcpy (fname_txt_out_degree, fname);
+    fname_bin_out_degree = strcat (fname_txt_out_degree, ".out_degree");
+
+    char *fname_txt_in_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_in_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_in_degree = strcpy (fname_txt_in_degree, fname);
+    fname_bin_in_degree = strcat (fname_txt_in_degree, ".in_degree");
+
+    char *fname_txt_edges_idx = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_edges_idx = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_edges_idx = strcpy (fname_txt_edges_idx, fname);
+    fname_bin_edges_idx = strcat (fname_txt_edges_idx, ".edges_idx");
+
+    char *fname_txt_edges_array_src = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_edges_array_src = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_edges_array_src = strcpy (fname_txt_edges_array_src, fname);
+    fname_bin_edges_array_src = strcat (fname_txt_edges_array_src, ".edges_array_src");
+
+    char *fname_txt_edges_array_dest = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_edges_array_dest = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_edges_array_dest = strcpy (fname_txt_edges_array_dest, fname);
+    fname_bin_edges_array_dest = strcat (fname_txt_edges_array_dest, ".edges_array_dest");
+
+#if WEIGHTED
+    char *fname_txt_edges_array_weight = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_bin_edges_array_weight = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+
+    fname_txt_edges_array_weight = strcpy (fname_txt_edges_array_weight, fname);
+    fname_bin_edges_array_weight = strcat (fname_txt_edges_array_weight, ".edges_array_weight");
+#endif
+
+    fptr_out_degree = fopen(fname_bin_out_degree, "w");
+    fptr_in_degree = fopen(fname_bin_in_degree, "w");
+    fptr_edges_idx = fopen(fname_bin_edges_idx, "w");
+    fptr_edges_array_src = fopen(fname_bin_edges_array_src, "w");
+    fptr_edges_array_dest = fopen(fname_bin_edges_array_dest, "w");
+#if WEIGHTED
+    fptr_edges_array_weight = fopen(fname_bin_edges_array_weight, "w");
+#endif
+
+    for(vertex_id = 0; vertex_id < graphCSR->num_vertices ; vertex_id++)
+    {
+        fprintf(fptr_out_degree, "%u\n", graphCSR->vertices->out_degree[vertex_id]);
+        fprintf(fptr_in_degree, "%u\n", graphCSR->vertices->in_degree[vertex_id]);
+        fprintf(fptr_edges_idx, "%u\n", graphCSR->vertices->edges_idx[vertex_id]);
+    }
+
+    for(vertex_id = 0; vertex_id < graphCSR->num_edges ; vertex_id++)
+    {
+        fprintf(fptr_edges_array_src, "%u\n", graphCSR->sorted_edges_array->edges_array_src[vertex_id]);
+        fprintf(fptr_edges_array_dest, "%u\n", graphCSR->sorted_edges_array->edges_array_dest[vertex_id]);
+#if WEIGHTED
+        fprintf(fptr_edges_array_weight, "%u\n", graphCSR->sorted_edges_array->edges_array_weight[vertex_id]);
+#endif
+    }
+
+    fclose(fptr_out_degree);
+    fclose(fptr_in_degree);
+    fclose(fptr_edges_idx);
+    fclose(fptr_edges_array_src);
+    fclose(fptr_edges_array_dest);
+#if WEIGHTED
+    fclose(fptr_edges_array_weight);
+#endif
+
+
+    free(fname_txt_out_degree);
+    free(fname_bin_out_degree);
+    free(fname_txt_in_degree);
+    free(fname_bin_in_degree);
+    free(fname_txt_edges_idx);
+    free(fname_bin_edges_idx);
+    free(fname_txt_edges_array_src);
+    free(fname_bin_edges_array_src);
+    free(fname_txt_edges_array_dest);
+    free(fname_bin_edges_array_dest);
+
+#if WEIGHTED
+    free(fname_txt_edges_array_weight);
+    free(fname_bin_edges_array_weight);
+#endif
+
+
+}
+
 
 struct GraphCSR *readFromBinFileGraphCSR (const char *fname)
 {

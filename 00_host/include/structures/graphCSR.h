@@ -41,6 +41,7 @@ void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR);
 void graphCSRPrintMessageWithtime(const char *msg, double time);
 struct GraphCSR *readFromBinFileGraphCSR (const char *fname);
 void writeToBinFileGraphCSR (const char *fname, struct GraphCSR *graph);
+void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR);
 
 #ifdef __cplusplus
 }

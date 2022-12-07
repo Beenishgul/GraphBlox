@@ -126,7 +126,7 @@ static struct argp_option options[] =
     },
     {
         "convert-format",     'c', "[DEFAULT:[1]-binary-edgeList]",      0,
-        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary."
+        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary [3]-graphCSR-test(5 files)."
     },
     {
         "generate-weights",   'w', 0,      0,
