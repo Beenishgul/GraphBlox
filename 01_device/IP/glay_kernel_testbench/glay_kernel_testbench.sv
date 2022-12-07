@@ -19,6 +19,10 @@
 import axi_vip_pkg::*;
 import axi_vip_mst_pkg::*;
 import axi_vip_slv_pkg::*;
+import GLAY_GLOBALS_PKG::*;
+import GLAY_AXI4_PKG::*;
+import GLAY_DESCRIPTOR_PKG::*;
+
 
 module glay_kernel_testbench ();
 
