@@ -67,15 +67,16 @@ struct xrtGLAYHandle
     xrtDeviceHandle deviceHandle;
     xrtXclbinHandle xclbinHandle;
     xrtKernelHandle kernelHandle;
+    xrtRunHandle kernelHandleRun;
     xuid_t xclbinUUID;
 };
 
 
 int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
 int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
-void startGLAY(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
-void startGLAYCU(struct xrtGLAYHandle *glayHandle, struct GLAYGraphCSR *glayGraphCSR);
-void waitGLAY(struct xrtGLAYHandle *glayHandle);
+void startGLAYRun(struct xrtGLAYHandle *glayHandle);
+void waitGLAYRun(struct xrtGLAYHandle *glayHandle);
+void closeGLAYRun(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle);
 void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);

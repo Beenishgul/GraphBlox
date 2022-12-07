@@ -309,7 +309,11 @@ main (int argc, char **argv)
 
     setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
-    // //Create segmented graph assign to GLay
+    startGLAYRun(arguments->glayHandle);
+
+    waitGLAYRun(arguments->glayHandle);
+
+    closeGLAYRun(arguments->glayHandle);
 
     releaseGLAY(arguments->glayHandle);
     free(timer);
