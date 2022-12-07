@@ -21,19 +21,15 @@
 task automatic init_vips();
   axi_ready_gen     rgen;
 
-  $display("Starting AXI Control Master: krnl_aes_ctrl and glay_ctrl");
+  $display("Starting AXI Control Master: glay_ctrl_mst");
 
-  glay_ctrl = new("glay_ctrl", glay_kernel_testbench.axi_vip_mst_glay.inst.IF);
-  glay_ctrl.start_master();
+  glay_ctrl_mst = new("glay_ctrl_mst", glay_kernel_testbench.axi_vip_mst_glay.inst.IF);
+  glay_ctrl_mst.start_master();
 
-  $display("Starting Memory slave: input buffer and output_buffer");
+  $display("Starting Memory slave: glay_mem_slv");
 
-  input_buffer = new("input_buffer", glay_kernel_testbench.axi_vip_slv_in_buf.inst.IF);
-  input_buffer.start_slave();
-
-  output_buffer = new("output_buffer", glay_kernel_testbench.axi_vip_slv_out_buf.inst.IF);
-  output_buffer.start_slave();
-
+  glay_mem_slv_buf = new("glay_mem_slv_buf", glay_kernel_testbench.axi_vip_slv_in_out_buf.inst.IF);
+  glay_mem_slv_buf.start_slave();
 
 // Applying slv_random_backpressure_wready
   rgen = new("axi_random_backpressure_wready");
@@ -41,14 +37,10 @@ task automatic init_vips();
   rgen.set_low_time_range(0,20);
   rgen.set_high_time_range(1,20);
   rgen.set_event_count_range(3,5);
-  input_buffer.wr_driver.set_wready_gen(rgen);
-  output_buffer.wr_driver.set_wready_gen(rgen);
+  glay_mem_slv_buf.wr_driver.set_wready_gen(rgen);
 // Applying slv_random_delay_rvalid
-  input_buffer.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
-  input_buffer.mem_model.set_inter_beat_gap_range(0,20);
-  output_buffer.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
-  output_buffer.mem_model.set_inter_beat_gap_range(0,20);
-
+  glay_mem_slv_buf.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
+  glay_mem_slv_buf.mem_model.set_inter_beat_gap_range(0,20);
 
 endtask
 
