@@ -18,17 +18,22 @@
 ##################################### Step 1: create vivado project and add design sources
 
 # create ip project with part name in command line argvs
-create_project glay_kernel ./glay_kernel -part [lindex $argv 0]
+
+
+
+create_project -force glay_kernel ./glay_kernel -part [lindex $argv 0]
 
 # add design sources into project
 add_files \
-              ../IP/iob_cache/iob_include        \
-              ../IP/glay_pkgs                    \
-              ../IP/glay_kernel                  \
-              ../IP/glay_top                     \
+        {                                           \
+              ../../IP/iob_cache/iob_include        \
+              ../../IP/glay_pkgs                    \
+              ../../IP/glay_kernel                  \
+              ../../IP/glay_top                     \
        }
 
 update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
 
 # create IP packaging project
 ipx::package_project -root_dir ./glay_kernel_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true
@@ -196,6 +201,8 @@ set_property value          {32} [ipx::get_bus_parameters DATA_WIDTH -of_objects
 # Set required property for Vitis kernel
 set_property sdx_kernel true [ipx::current_core]
 set_property sdx_kernel_type rtl [ipx::current_core]
+set_property ipi_drc {ignore_freq_hz true} [ipx::current_core]
+set_property vitis_drc {ctrl_protocol ap_ctrl_chain} [ipx::current_core]
 
 # Packaging Vivado IP
 ipx::update_source_project_archive -component [ipx::current_core]
