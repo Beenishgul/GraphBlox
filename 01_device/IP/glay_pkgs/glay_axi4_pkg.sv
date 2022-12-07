@@ -17,65 +17,118 @@ package GLAY_AXI4_PKG;
 
   import GLAY_GLOBALS_PKG::*;
 
+  parameter M_AXI4_ADDR_W   = M_AXI_MEMORY_ADDR_WIDTH     ;
+  parameter M_AXI4_DATA_W   = M_AXI_MEMORY_DATA_WIDTH_BITS;
+  parameter M_AXI4_STRB_W   = M_AXI4_DATA_W / 8           ;
+  parameter M_AXI4_BURST_W  = 2                           ;
+  parameter M_AXI4_CACHE_W  = 4                           ;
+  parameter M_AXI4_PROT_W   = 3                           ;
+  parameter M_AXI4_REGION_W = 4                           ;
+  parameter M_AXI4_USER_W   = 4                           ;
+  parameter M_AXI4_LOCK_W   = 2                           ;
+  parameter M_AXI4_QOS_W    = 4                           ;
+  parameter M_AXI4_LEN_W    = 8                           ;
+  parameter M_AXI4_SIZE_W   = 3                           ;
+  parameter M_AXI4_RESP_W   = 2                           ;
+  parameter M_AXI4_ID_W     = CACHE_AXI_ID_W              ;
+
+  typedef logic                       m_axi4_valid_t;
+  typedef logic                       m_axi4_ready_t;
+  typedef logic                       m_axi4_last_t;
+  typedef logic [M_AXI4_ADDR_W-1:0]   m_axi4_addr_t;
+  typedef logic [M_AXI4_DATA_W-1:0]   m_axi4_data_t;
+  typedef logic [M_AXI4_STRB_W-1:0]   m_axi4_strb_t;
+  typedef logic [M_AXI4_LEN_W-1:0]    m_axi4_len_t;
+  typedef logic [M_AXI4_LOCK_W-1:0]    m_axi4_lock_t;
+  typedef logic [M_AXI4_CACHE_W-1:0]  m_axi4_cache_t;
+  typedef logic [M_AXI4_PROT_W-1:0]   m_axi4_prot_t;
+  typedef logic [M_AXI4_REGION_W-1:0] m_axi4_region_t;
+  typedef logic [M_AXI4_QOS_W-1:0]    m_axi4_qos_t;
+  typedef logic [M_AXI4_ID_W-1:0]     m_axi4_id_t;
+
+  typedef enum logic [M_AXI4_BURST_W-1:0] {
+    M_AXI4_BURST_FIXED = 2'b00,
+    M_AXI4_BURST_INCR  = 2'b01,
+    M_AXI4_BURST_WRAP  = 2'b10,
+    M_AXI4_BURST_RSVD  = 2'b11
+  } m_axi4_burst_t;
+
+  typedef enum logic [M_AXI4_RESP_W-1:0] {
+    M_AXI4_RESP_OKAY   = 2'b00,
+    M_AXI4_RESP_EXOKAY = 2'b01,
+    M_AXI4_RESP_SLVERR = 2'b10,
+    M_AXI4_RESP_DECERR = 2'b11
+  } m_axi4_resp_t;
+
+  typedef enum logic [M_AXI4_SIZE_W-1:0] {
+    M_AXI4_SIZE_1B   = 3'b000,
+    M_AXI4_SIZE_2B   = 3'b001,
+    M_AXI4_SIZE_4B   = 3'b010,
+    M_AXI4_SIZE_8B   = 3'b011,
+    M_AXI4_SIZE_16B  = 3'b100,
+    M_AXI4_SIZE_32B  = 3'b101,
+    M_AXI4_SIZE_64B  = 3'b110,
+    M_AXI4_SIZE_128B = 3'b111
+  } m_axi4_size_t;
+
   typedef struct packed {
-    logic                                     rvalid ; // Read channel valid
-    logic                                     arready; // Address read channel ready
-    logic                                     rlast  ; // Read channel last word
-    logic [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0]  rdata  ; // Read channel data
-    logic [      CACHE_AXI_ID_W-1:0]          rid    ; // Read channel ID
-    logic [                   2-1:0]          rresp  ; // Read channel response
+    m_axi4_valid_t rvalid ; // Read channel valid
+    m_axi4_last_t  arready; // Address read channel ready
+    m_axi4_last_t  rlast  ; // Read channel last word
+    m_axi4_data_t  rdata  ; // Read channel data
+    m_axi4_id_t    rid    ; // Read channel ID
+    m_axi4_resp_t  rresp  ; // Read channel response
   } AXI4MasterReadInterfaceInput;
 
   typedef struct packed {
-    logic                               arvalid; // Address read channel valid
-    logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] araddr ; // Address read channel address
-    logic [                 8-1:0]      arlen  ; // Address write channel burst length
-    logic                               rready ; // Read channel ready
-    logic [    CACHE_AXI_ID_W-1:0]      arid   ; // Address read channel ID
-    logic [                 3-1:0]      arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
-    logic [                 2-1:0]      arburst; // Address read channel burst type
-    logic [                 2-1:0]      arlock ; // Address read channel lock type
-    logic [                 4-1:0]      arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-    logic [                 3-1:0]      arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-    logic [                 4-1:0]      arqos  ; // Address write channel quality of service
+    m_axi4_valid_t arvalid; // Address read channel valid
+    m_axi4_addr_t  araddr ; // Address read channel address
+    m_axi4_len_t   arlen  ; // Address write channel burst length
+    m_axi4_ready_t rready ; // Read channel ready
+    m_axi4_id_t    arid   ; // Address read channel ID
+    m_axi4_size_t  arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
+    m_axi4_burst_t arburst; // Address read channel burst type
+    m_axi4_lock_t  arlock ; // Address read channel lock type
+    m_axi4_cache_t arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+    m_axi4_prot_t  arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+    m_axi4_qos_t   arqos  ; // Address write channel quality of service
   } AXI4MasterReadInterfaceOutput;
 
-   typedef struct packed {
+  typedef struct packed {
     AXI4MasterReadInterfaceInput  in ;
     AXI4MasterReadInterfaceOutput out;
   } AXI4MasterReadInterface;
 
 
   typedef struct packed {
-    logic                      awready; // Address write channel ready
-    logic                      wready ; // Write channel ready
-    logic [CACHE_AXI_ID_W-1:0] bid    ; // Write response channel ID
-    logic [             2-1:0] bresp  ; // Write channel response
-    logic                      bvalid ; // Write response channel valid
+    m_axi4_ready_t awready; // Address write channel ready
+    m_axi4_ready_t wready ; // Write channel ready
+    m_axi4_id_t    bid    ; // Write response channel ID
+    m_axi4_resp_t  bresp  ; // Write channel response
+    m_axi4_valid_t bvalid ; // Write response channel valid
   } AXI4MasterWriteInterfaceInput;
 
   typedef struct packed {
-    logic                                     awvalid; // Address write channel valid
-    logic [      CACHE_AXI_ID_W-1:0]          awid   ; // Address write channel ID
-    logic [M_AXI_MEMORY_ADDR_WIDTH-1:0]       awaddr ; // Address write channel address
-    logic [                   8-1:0]          awlen  ; // Address write channel burst length
-    logic [                   3-1:0]          awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
-    logic [                   2-1:0]          awburst; // Address write channel burst type
-    logic [                   2-1:0]          awlock ; // Address write channel lock type
-    logic [                   4-1:0]          awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-    logic [                   3-1:0]          awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-    logic [                   4-1:0]          awqos  ; // Address write channel quality of service
-    logic [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0]  wdata  ; // Write channel data
-    logic                                     wstrb  ; // Write channel write strobe
-    logic                                     wlast  ; // Write channel last word flag
-    logic                                     wvalid ; // Write channel valid
-    logic                                     bready ; // Write response channel ready
+    m_axi4_valid_t awvalid; // Address write channel valid
+    m_axi4_id_t    awid   ; // Address write channel ID
+    m_axi4_addr_t  awaddr ; // Address write channel address
+    m_axi4_len_t   awlen  ; // Address write channel burst length
+    m_axi4_size_t  awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
+    m_axi4_burst_t awburst; // Address write channel burst type
+    m_axi4_lock_t  awlock ; // Address write channel lock type
+    m_axi4_cache_t awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+    m_axi4_prot_t  awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+    m_axi4_qos_t   awqos  ; // Address write channel quality of service
+    m_axi4_data_t  wdata  ; // Write channel data
+    m_axi4_strb_t  wstrb  ; // Write channel write strobe
+    m_axi4_last_t  wlast  ; // Write channel last word flag
+    m_axi4_valid_t wvalid ; // Write channel valid
+    m_axi4_ready_t bready ; // Write response channel ready
   } AXI4MasterWriteInterfaceOutput;
 
   typedef struct packed {
     AXI4MasterWriteInterfaceInput  in ;
     AXI4MasterWriteInterfaceOutput out;
   } AXI4MasterWriteInterface;
-
 
 endpackage

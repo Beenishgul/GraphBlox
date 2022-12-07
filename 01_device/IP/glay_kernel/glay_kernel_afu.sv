@@ -47,18 +47,18 @@ module glay_kernel_afu #(
   input  logic                              m00_axi_rlast     ,
   // Control Signals
   // AXI4 master interface m00_axi missing ports
-  input  logic [          CACHE_AXI_ID_W-1:0] m00_axi_bid       ,
-  input  logic [          CACHE_AXI_ID_W-1:0] m00_axi_rid       ,
+  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_bid       ,
+  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_rid       ,
   input  logic [                     2-1:0] m00_axi_rresp     ,
   input  logic [                     2-1:0] m00_axi_bresp     ,
-  output logic [          CACHE_AXI_ID_W-1:0] m00_axi_awid      ,
+  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_awid      ,
   output logic [                     3-1:0] m00_axi_awsize    ,
   output logic [                     2-1:0] m00_axi_awburst   ,
   output logic [                     2-1:0] m00_axi_awlock    ,
   output logic [                     4-1:0] m00_axi_awcache   ,
   output logic [                     3-1:0] m00_axi_awprot    ,
   output logic [                     4-1:0] m00_axi_awqos     ,
-  output logic [          CACHE_AXI_ID_W-1:0] m00_axi_arid      ,
+  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_arid      ,
   output logic [                     3-1:0] m00_axi_arsize    ,
   output logic [                     2-1:0] m00_axi_arburst   ,
   output logic [                     2-1:0] m00_axi_arlock    ,
@@ -90,13 +90,13 @@ module glay_kernel_afu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
   (* KEEP = "yes" *)
-  logic                          areset         = 1'b0;
-  logic                          m_axi_areset   = 1'b0;
-  logic                          glay_areset    = 1'b0;
-  logic                          ap_start_r     = 1'b0;
-  logic                          ap_idle_r      = 1'b1;
-  logic                          ap_start_pulse       ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i            ;
+  logic                          areset         = 1'b0                      ;
+  logic                          m_axi_areset   = 1'b0                      ;
+  logic                          glay_areset    = 1'b0                      ;
+  logic                          ap_start_r     = 1'b0                      ;
+  logic                          ap_idle_r      = 1'b1                      ;
+  logic                          ap_start_pulse                             ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i                                  ;
   logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
 
   GLAYDescriptorInterface  glay_descriptor;
@@ -173,7 +173,7 @@ module glay_kernel_afu #(
       m_axi_read.in.rlast   <= m00_axi_rlast  ; // Read channel last word
       m_axi_read.in.rdata   <= m00_axi_rdata  ; // Read channel data
       m_axi_read.in.rid     <= m00_axi_rid    ; // Read channel ID
-      m_axi_read.in.rresp   <= m00_axi_rresp  ; // Read channel response
+      m_axi_read.in.rresp   <= m_axi4_resp_t'(m00_axi_rresp) ; // Read channel response
     end
   end
 
@@ -222,7 +222,7 @@ module glay_kernel_afu #(
       m_axi_write.in.awready <= m00_axi_awready; // Address write channel ready
       m_axi_write.in.wready  <= m00_axi_wready ; // Write channel ready
       m_axi_write.in.bid     <= m00_axi_bid    ; // Write response channel ID
-      m_axi_write.in.bresp   <= m00_axi_bresp  ; // Write channel response
+      m_axi_write.in.bresp   <= m_axi4_resp_t'(m00_axi_bresp)  ; // Write channel response
       m_axi_write.in.bvalid  <= m00_axi_bvalid ; // Write response channel valid
     end
   end
