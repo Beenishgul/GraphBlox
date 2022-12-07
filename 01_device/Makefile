@@ -38,6 +38,13 @@ help::
 	$(ECHO) "  make clean"
 	$(ECHO) "      Command to remove all the generated files."
 
+APP_DIR := .
+SCRIPTS_DIR := scripts
+IP_DIR := IP
+XML_DIR := xml
+SCRIPTS_DIR := scripts
+XILINX_DIR := xilinx
+
 KERNEL := glay_kernel
 
 # PART setting: uncomment the line matching your Alveo card
@@ -62,14 +69,14 @@ TARGET := hw_emu
 
 ################## resource generation and simulation 
 gen_ip:
-	rm -rf $(KERNEL)_ip_generation; mkdir $(KERNEL)_ip_generation; vivado -mode batch -source ./$(KERNEL)_gen_ip.tcl -tclargs $(PART)
+	rm -rf $(XILINX_DIR)/$(KERNEL)_ip_generation; mkdir -p $(XILINX_DIR)/$(KERNEL)_ip_generation; vivado -mode batch -source ./$(SCRIPTS_DIR)/$(KERNEL)_gen_ip.tcl -tclargs $(PART)
 
 
 pack_kernel:
-	rm -rf $(KERNEL)_vivado_pack_krnl_project; mkdir $(KERNEL)_vivado_pack_krnl_project; cd $(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../$(KERNEL)_package.tcl -tclargs $(PART)
+	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
 
 runsim:
-	./$(KERNEL)_runsim_xsim.sh
+	./$(SCRIPTS_DIR)/$(KERNEL)_runsim_xsim.sh
 
 
 ################## hardware build 
@@ -79,7 +86,7 @@ XOCCLFLAGS := --link --optimize 3
 #DEBUG_OPT := -debug.chipscope $(KERNEL)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
 build_hw:
-	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin $(KERNEL).xo
+	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ./$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin $(KERNEL).xo
 
 all: gen_ip pack_kernel build_hw
 
@@ -91,6 +98,6 @@ LDFLAGS += $(LDFLAGS) -lxrt_coreutil -lssl -lcrypto -lpthread
 
 ################## clean up
 clean:
-	$(RM) -rf ip_generation vivado_pack_krnl_project
+	$(RM) -rf $(XILINX_DIR)
 	$(RM) -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
-	$(RM) -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg host_krnl_cbc_test
+	$(RM) -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg

@@ -28,4 +28,12 @@
 ./IP/glay_top/glay_top_control_s_axi.v
 ./IP/glay_top/glay_top.v
 
+./xilinx/glay_kernel_ip_generation/axi_vip_mst/sim/axi_vip_mst_pkg.sv
+./xilinx/glay_kernel_ip_generation/axi_vip_mst/sim/axi_vip_mst.sv
+./xilinx/glay_kernel_ip_generation/axi_vip_mst/hdl/axi_vip_v1_1_vl_rfs.sv
+./xilinx/glay_kernel_ip_generation/axi_vip_mst/hdl/axi_infrastructure_v1_1_vl_rfs.v
+./xilinx/glay_kernel_ip_generation/axi_vip_slv/sim/axi_vip_slv_pkg.sv
+./xilinx/glay_kernel_ip_generation/axi_vip_slv/sim/axi_vip_slv.sv
+
+
 $XILINX_VIVADO/data/verilog/src/glbl.v
