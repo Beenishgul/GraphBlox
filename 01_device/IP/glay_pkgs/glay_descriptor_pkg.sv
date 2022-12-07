@@ -14,7 +14,7 @@
 
 package GLAY_DESCRIPTOR_PKG;
 
-    import GLOBALS_AFU_PKG::*;
+    import GLAY_GLOBALS_PKG::*;
 
     typedef enum int unsigned {
         GLAY_RESET,
@@ -26,21 +26,16 @@ package GLAY_DESCRIPTOR_PKG;
     } glay_descriptor_state;
 
     typedef struct packed{
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    graph_csr_struct  ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_out_degree ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_in_degree  ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    vertex_edges_idx  ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_weight,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_src   ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    edges_array_dest  ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    auxiliary_1       ,
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]    auxiliary_2
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   graph_csr_struct  ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_out_degree ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_in_degree  ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_edges_idx  ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_weight;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_src   ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_dest  ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   auxiliary_1       ;
+        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   auxiliary_2       ;
     } glay_descriptor_request;
-
-
-    typedef struct packed{
-        glay_descriptor_request glay_descriptor;
-    } GLAYDescriptorInterfacePayload;
 
 
     typedef struct packed{

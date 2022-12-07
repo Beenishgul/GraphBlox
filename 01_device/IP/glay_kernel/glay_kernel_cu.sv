@@ -14,7 +14,7 @@
 
 import GLAY_GLOBALS_PKG::*;
 import GLAY_AXI4_PKG::*;
-import GLOBALS_AFU_PKG::*;
+import GLAY_DESCRIPTOR_PKG::*;
 
 module glay_kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
@@ -36,11 +36,17 @@ module glay_kernel_cu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
 // AXI write master stage
-  logic glay_done;
+  logic   glay_done;
+  logic  m_axi_areset;
 
-  GLAYDescriptorInterface  glay_descriptor;
+  GLAYDescriptorInterface  glay_descriptor_reg0;
   AXI4MasterReadInterface  m_axi_read     ;
   AXI4MasterWriteInterface m_axi_write    ;
+
+// Register reset signal.
+  always @(posedge ap_clk) begin
+    m_axi_areset <= areset;
+  end
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,6 +115,24 @@ module glay_kernel_cu #(
     else begin
       m_axi_read_out <= m_axi_write.out;
     end
+  end
+
+
+///////////////////////////////////////////////////////////////////////////////
+// READ GLAY Descriptor
+///////////////////////////////////////////////////////////////////////////////
+
+  always @(posedge ap_clk) begin
+    if (m_axi_areset) begin
+      glay_descriptor_reg0.valid <= 0;
+    end
+    else begin
+      glay_descriptor_reg0.valid <= glay_descriptor.valid;
+    end
+  end
+
+  always @(posedge ap_clk) begin
+      glay_descriptor_reg0.payload <= glay_descriptor.payload;
   end
 
 

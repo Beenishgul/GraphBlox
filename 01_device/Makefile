@@ -76,7 +76,7 @@ pack_kernel:
 	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../../$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
 
 runsim:
-	./$(SCRIPTS_DIR)/$(KERNEL)_runsim_xsim.sh
+	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; sh ../../$(SCRIPTS_DIR)/$(KERNEL)_runsim_xsim.sh
 
 
 ################## hardware build 
