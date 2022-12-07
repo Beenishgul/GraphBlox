@@ -8,6 +8,6 @@ nohup.out
 glay.sublime-project
 glay.sublime-workspace
 01_device/IP/glay_kernel_ex
-01_device/IP/vivado.jou  
-01_device/IP/vivado.log  
-01_device/IP/xilinx
+01_device/vivado.jou  
+01_device/vivado.log  
+01_device/xilinx
