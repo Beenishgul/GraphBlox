@@ -1,5 +1,7 @@
 
-xvlog -f ./glay_kernel_filelist.f         \
+pwd
+
+xvlog -f ../../scripts/glay_kernel_filelist.f   -i ../../IP/iob_cache/iob_include \
       -L xilinx_vip                       \
       --sv # -d DUMP_WAVEFORM
       

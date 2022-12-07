@@ -14,7 +14,7 @@
 
 import GLAY_GLOBALS_PKG::*;
 import GLAY_AXI4_PKG::*;
-import GLOBALS_AFU_PKG::*;
+import GLAY_DESCRIPTOR_PKG::*;
 
 module glay_kernel_afu #(
   parameter C_M00_AXI_ADDR_WIDTH = 64             ,
@@ -47,18 +47,18 @@ module glay_kernel_afu #(
   input  logic                              m00_axi_rlast     ,
   // Control Signals
   // AXI4 master interface m00_axi missing ports
-  input  logic [          IOB_AXI_ID_W-1:0] m00_axi_bid       ,
-  input  logic [          IOB_AXI_ID_W-1:0] m00_axi_rid       ,
+  input  logic [          CACHE_AXI_ID_W-1:0] m00_axi_bid       ,
+  input  logic [          CACHE_AXI_ID_W-1:0] m00_axi_rid       ,
   input  logic [                     2-1:0] m00_axi_rresp     ,
   input  logic [                     2-1:0] m00_axi_bresp     ,
-  output logic [          IOB_AXI_ID_W-1:0] m00_axi_awid      ,
+  output logic [          CACHE_AXI_ID_W-1:0] m00_axi_awid      ,
   output logic [                     3-1:0] m00_axi_awsize    ,
   output logic [                     2-1:0] m00_axi_awburst   ,
   output logic [                     2-1:0] m00_axi_awlock    ,
   output logic [                     4-1:0] m00_axi_awcache   ,
   output logic [                     3-1:0] m00_axi_awprot    ,
   output logic [                     4-1:0] m00_axi_awqos     ,
-  output logic [          IOB_AXI_ID_W-1:0] m00_axi_arid      ,
+  output logic [          CACHE_AXI_ID_W-1:0] m00_axi_arid      ,
   output logic [                     3-1:0] m00_axi_arsize    ,
   output logic [                     2-1:0] m00_axi_arburst   ,
   output logic [                     2-1:0] m00_axi_arlock    ,
