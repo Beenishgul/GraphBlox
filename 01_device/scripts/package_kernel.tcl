@@ -21,10 +21,11 @@
 create_project glay_kernel ./glay_kernel -part [lindex $argv 0]
 
 # add design sources into project
-add_files -norecurse \
-
-              ../IP/glay_top/glay_top.v               \
-              ../IP/glay_top/glay_top_ctrl_slave.v    \
+add_files \
+              ../IP/iob_cache/iob_include        \
+              ../IP/glay_pkgs                    \
+              ../IP/glay_kernel                  \
+              ../IP/glay_top                     \
        }
 
 update_compile_order -fileset sources_1
@@ -41,16 +42,7 @@ ipx::infer_bus_interface ap_rst_n xilinx.com:signal:reset_rtl:1.0 [ipx::current_
 
 # associate AXI/AXIS interface with clock
 ipx::associate_bus_interfaces -busif s_axi_control  -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axi_rmst       -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axi_wmst       -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_mst0      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_mst1      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_mst2      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_mst3      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_slv0      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_slv1      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_slv2      -clock ap_clk [ipx::current_core]
-ipx::associate_bus_interfaces -busif axis_slv3      -clock ap_clk [ipx::current_core]
+ipx::associate_bus_interfaces -busif m00_axi       -clock ap_clk [ipx::current_core]
 
 # associate reset signal with clock
 ipx::associate_bus_interfaces -clock ap_clk -reset ap_rst_n [ipx::current_core]
@@ -59,81 +51,145 @@ ipx::associate_bus_interfaces -clock ap_clk -reset ap_rst_n [ipx::current_core]
 ##################################### Step 3: Set the definition of AXI control slave registers, including CTRL and user kernel arguments
 
 # Add RTL kernel registers
-ipx::add_register CTRL         [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register MODE         [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register CBC_MODE     [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register IV_W3        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register IV_W2        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register IV_W1        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register IV_W0        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register WORDS_NUM    [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register SRC_ADDR     [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-ipx::add_register DEST_ADDR    [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register CTRL                    [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register GRAPH_CSR_STRUCT        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register VERTEX_OUT_DEGREE       [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register VERTEX_IN_DEGREE        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register VERTEX_EDGES_IDX        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register EDGES_ARRAY_WEIGHT      [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register EDGES_ARRAY_SRC         [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register EDGES_ARRAY_DEST        [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register AUXILIARY_1             [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+ipx::add_register AUXILIARY_2             [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
+
 
 # Set RTL kernel registers property
-set_property description    {Control Signals}   [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x000}             [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {Control Signals}           [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x000}                     [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {32}                        [ipx::get_registers CTRL    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {working mode}      [ipx::get_registers MODE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x010}             [ipx::get_registers MODE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers MODE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {Graph CSR struct}          [ipx::get_registers GRAPH_CSR_STRUCT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x010}                     [ipx::get_registers GRAPH_CSR_STRUCT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers GRAPH_CSR_STRUCT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {intial vector w3}  [ipx::get_registers IV_W3 -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x018}             [ipx::get_registers IV_W3 -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers IV_W3 -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {vertex_out_degree}         [ipx::get_registers VERTEX_OUT_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x01c}                     [ipx::get_registers VERTEX_OUT_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers VERTEX_OUT_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {initial vector w2} [ipx::get_registers IV_W2  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x020}             [ipx::get_registers IV_W2  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers IV_W2  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {vertex_in_degree}          [ipx::get_registers VERTEX_IN_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x028}                     [ipx::get_registers VERTEX_IN_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers VERTEX_IN_DEGREE    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {initial vector w1} [ipx::get_registers IV_W1  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x028}             [ipx::get_registers IV_W1  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers IV_W1  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {vertex_edges_idx}          [ipx::get_registers VERTEX_EDGES_IDX    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x034}                     [ipx::get_registers VERTEX_EDGES_IDX    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers VERTEX_EDGES_IDX    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {initial vector w0} [ipx::get_registers IV_W0  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x030}             [ipx::get_registers IV_W0  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers IV_W0  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {edges_array_weight}        [ipx::get_registers EDGES_ARRAY_WEIGHT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x040}                     [ipx::get_registers EDGES_ARRAY_WEIGHT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers EDGES_ARRAY_WEIGHT    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {number of words}   [ipx::get_registers WORDS_NUM  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x038}             [ipx::get_registers WORDS_NUM  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers WORDS_NUM  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {edges_array_src}           [ipx::get_registers EDGES_ARRAY_SRC    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x04c}                     [ipx::get_registers EDGES_ARRAY_SRC    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers EDGES_ARRAY_SRC    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {read addr     }    [ipx::get_registers SRC_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x040}             [ipx::get_registers SRC_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {64}                [ipx::get_registers SRC_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {edges_array_dest}          [ipx::get_registers EDGES_ARRAY_DEST    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x058}                     [ipx::get_registers EDGES_ARRAY_DEST    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers EDGES_ARRAY_DEST    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {write addr    }    [ipx::get_registers DEST_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x048}             [ipx::get_registers DEST_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {64}                [ipx::get_registers DEST_ADDR  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {auxiliary_1}               [ipx::get_registers AUXILIARY_1    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x064}                     [ipx::get_registers AUXILIARY_1    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers AUXILIARY_1    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
 
-set_property description    {cbc mode}          [ipx::get_registers CBC_MODE  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property address_offset {0x050}             [ipx::get_registers CBC_MODE  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property size           {32}                [ipx::get_registers CBC_MODE  -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property description    {auxiliary_2}               [ipx::get_registers AUXILIARY_2    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property address_offset {0x070}                     [ipx::get_registers AUXILIARY_2    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property size           {64}                        [ipx::get_registers AUXILIARY_2    -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+
 
 
 ##################################### Step 4: associate AXI master port to pointer argument and set data width
 
-# define association between pointer arguments (SRC_ADDR, DEST_ADDR) and axi masters (axi_rmst, axi_wmst)
-ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers SRC_ADDR -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property value          {axi_rmst}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
-                                    -of_objects [ipx::get_registers SRC_ADDR                      \
-                                    -of_objects [ipx::get_address_blocks reg0                      \
-                                    -of_objects [ipx::get_memory_maps s_axi_control                 \
+# define association between pointer arguments  and axi masters (m00_axi)
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers GRAPH_CSR_STRUCT -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers GRAPH_CSR_STRUCT              \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
                                     -of_objects [ipx::current_core]]]]]
 
-ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers DEST_ADDR -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
-set_property value          {axi_wmst}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
-                                    -of_objects [ipx::get_registers DEST_ADDR                      \
-                                    -of_objects [ipx::get_address_blocks reg0                      \
-                                    -of_objects [ipx::get_memory_maps s_axi_control                 \
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers VERTEX_OUT_DEGREE -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers VERTEX_OUT_DEGREE             \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
                                     -of_objects [ipx::current_core]]]]]
 
-ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces axi_wmst -of_objects [ipx::current_core]]
-set_property value          {128} [ipx::get_bus_parameters DATA_WIDTH -of_objects [ipx::get_bus_interfaces axi_wmst -of_objects [ipx::current_core]]]
 
-ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces axi_rmst -of_objects [ipx::current_core]]
-set_property value          {128} [ipx::get_bus_parameters DATA_WIDTH -of_objects [ipx::get_bus_interfaces axi_rmst -of_objects [ipx::current_core]]]
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers VERTEX_IN_DEGREE -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers VERTEX_IN_DEGREE              \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers VERTEX_EDGES_IDX -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers VERTEX_EDGES_IDX              \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers EDGES_ARRAY_WEIGHT -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers EDGES_ARRAY_WEIGHT            \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers EDGES_ARRAY_SRC -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers EDGES_ARRAY_SRC               \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers EDGES_ARRAY_DEST -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers EDGES_ARRAY_DEST              \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers AUXILIARY_1 -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers AUXILIARY_1                   \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers AUXILIARY_2 -of_objects [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]]
+set_property value          {m00_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF     \
+                                    -of_objects [ipx::get_registers AUXILIARY_2                   \
+                                    -of_objects [ipx::get_address_blocks reg0                     \
+                                    -of_objects [ipx::get_memory_maps s_axi_control               \
+                                    -of_objects [ipx::current_core]]]]]
+
+
+ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]
+set_property value          {512} [ipx::get_bus_parameters DATA_WIDTH -of_objects [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]]
+
+ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]
+set_property value          {64}  [ipx::get_bus_parameters ADDR_WIDTH -of_objects [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]]
+
+ipx::add_bus_parameter ID_WIDTH   [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]
+set_property value          {1} [ipx::get_bus_parameters ID_WIDTH -of_objects [ipx::get_bus_interfaces m00_axi -of_objects [ipx::current_core]]]
+
+ipx::add_bus_parameter ADDR_WIDTH   [ipx::get_bus_interfaces s_axi_control -of_objects [ipx::current_core]]
+set_property value          {12} [ipx::get_bus_parameters ADDR_WIDTH -of_objects [ipx::get_bus_interfaces s_axi_control -of_objects [ipx::current_core]]]
+
+ipx::add_bus_parameter DATA_WIDTH   [ipx::get_bus_interfaces s_axi_control -of_objects [ipx::current_core]]
+set_property value          {32} [ipx::get_bus_parameters DATA_WIDTH -of_objects [ipx::get_bus_interfaces s_axi_control -of_objects [ipx::current_core]]]
+
+
 
 #### Step 5: Package Vivado IP and generate Vitis kernel file
 
