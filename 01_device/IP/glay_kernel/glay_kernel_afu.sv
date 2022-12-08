@@ -302,7 +302,7 @@ module glay_kernel_afu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_glay_kernel_cu (
-    .aclk           (ap_clk         ),
+    .ap_clk         (ap_clk         ),
     .areset         (glay_areset    ),
     .ap_start       (ap_start       ),
     .ap_done        (ap_done        ),

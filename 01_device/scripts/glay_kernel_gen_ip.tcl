@@ -24,7 +24,7 @@ create_ip -name axi_vip \
           -vendor xilinx.com \
           -library ip \
           -version 1.1 \
-          -module_name axi_vip_mst \
+          -module_name control_glay_kernel_vip \
           -dir ./xilinx/glay_kernel_ip_generation
           
 set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
@@ -39,9 +39,9 @@ set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.HAS_QOS {0} \
                          CONFIG.HAS_PROT {0} \
                          CONFIG.HAS_WSTRB {0}] \
-             [get_ips axi_vip_mst]
+             [get_ips control_glay_kernel_vip]
              
-generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/axi_vip_mst/axi_vip_mst.xci]
+generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/control_glay_kernel_vip/control_glay_kernel_vip.xci]
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -50,7 +50,7 @@ create_ip -name axi_vip \
           -vendor xilinx.com \
           -library ip \
           -version 1.1 \
-          -module_name axi_vip_slv \
+          -module_name slv_m00_axi_vip \
           -dir ./xilinx/glay_kernel_ip_generation
           
 set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
@@ -65,6 +65,6 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.HAS_QOS {1} \
                          CONFIG.HAS_PROT {1} \
                          CONFIG.HAS_WSTRB {1}] \
-             [get_ips axi_vip_slv]
+             [get_ips slv_m00_axi_vip]
              
-generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/axi_vip_slv/axi_vip_slv.xci]
+generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/slv_m00_axi_vip/slv_m00_axi_vip.xci]
