@@ -11,4 +11,4 @@ xelab glay_kernel_testbench glbl                 \
       -L xpm                \
       -L xilinx_vip
 
-xsim -t xsim.tcl --wdb work.glay_kernel_testbench.wdb work.glay_kernel_testbench#work.glbl
+xsim -t ../../scripts/glay_kernel_xsim.tcl --wdb work.glay_kernel_testbench.wdb work.glay_kernel_testbench#work.glbl

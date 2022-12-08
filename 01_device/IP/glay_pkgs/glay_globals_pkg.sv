@@ -12,7 +12,7 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-
+`timescale 1 ns / 1 ps
 `include "iob_lib.vh"
 `include "iob-cache.vh"
 

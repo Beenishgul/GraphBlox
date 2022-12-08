@@ -38,7 +38,7 @@ set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.HAS_REGION {0} \
                          CONFIG.HAS_QOS {0} \
                          CONFIG.HAS_PROT {0} \
-                         CONFIG.HAS_WSTRB {0}] \
+                         CONFIG.HAS_WSTRB {1}] \
              [get_ips control_glay_kernel_vip]
              
 generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/control_glay_kernel_vip/control_glay_kernel_vip.xci]
@@ -64,7 +64,9 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.HAS_BURST {1} \
                          CONFIG.HAS_QOS {1} \
                          CONFIG.HAS_PROT {1} \
-                         CONFIG.HAS_WSTRB {1}] \
+                         CONFIG.HAS_WSTRB {1} \
+                         CONFIG.HAS_SIZE {1} \
+                         CONFIG.ID_WIDTH   {1}] \
              [get_ips slv_m00_axi_vip]
              
 generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/slv_m00_axi_vip/slv_m00_axi_vip.xci]
