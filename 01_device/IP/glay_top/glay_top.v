@@ -82,14 +82,14 @@ module glay_top #(
   output wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_awid         , // Address write channel ID
   output wire [                           3-1:0] m00_axi_awsize       , // Address write channel burst size. This signal indicates the size of each transfer in the burst
   output wire [                           2-1:0] m00_axi_awburst      , // Address write channel burst type
-  output wire [                           2-1:0] m00_axi_awlock       , // Address write channel lock type
+  output wire [                           1-1:0] m00_axi_awlock       , // Address write channel lock type
   output wire [                           4-1:0] m00_axi_awcache      , // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
   output wire [                           3-1:0] m00_axi_awprot       , // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
   output wire [                           4-1:0] m00_axi_awqos        , // Address write channel quality of service
   output wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_arid         , // Address read channel ID
   output wire [                           3-1:0] m00_axi_arsize       , // Address read channel burst size. This signal indicates the size of each transfer in the burst
   output wire [                           2-1:0] m00_axi_arburst      , // Address read channel burst type
-  output wire [                           2-1:0] m00_axi_arlock       , // Address read channel lock type
+  output wire [                           1-1:0] m00_axi_arlock       , // Address read channel lock type
   output wire [                           4-1:0] m00_axi_arcache      , // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
   output wire [                           3-1:0] m00_axi_arprot       , // Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
   output wire [                           4-1:0] m00_axi_arqos        , // Address read channel quality of service
