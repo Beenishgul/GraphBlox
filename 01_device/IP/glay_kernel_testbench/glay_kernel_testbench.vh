@@ -16,6 +16,19 @@
 
 // Tasks for glay_kernel_testbench
 
+class GraphCSR;
+
+     bit [VERTEX_DATA_BITS-1:0] vertex_count = 0;
+     bit [VERTEX_DATA_BITS-1:0] edge_count   = 0;
+
+     function new ();
+      this.vertex_count = 0;
+      this.edge_count = 0;
+
+     endfunction
+
+endclass
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Initial VIPs
 task automatic init_vips();
