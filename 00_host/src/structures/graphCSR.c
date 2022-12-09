@@ -587,6 +587,7 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
     fptr_edges_array_weight = fopen(fname_bin_edges_array_weight, "w");
 #endif
 
+    fprintf(fptr_out_degree, "%u\n", graphCSR->num_vertices);
     for(vertex_id = 0; vertex_id < graphCSR->num_vertices ; vertex_id++)
     {
         fprintf(fptr_out_degree, "%u\n", graphCSR->vertices->out_degree[vertex_id]);
@@ -594,6 +595,7 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
         fprintf(fptr_edges_idx, "%u\n", graphCSR->vertices->edges_idx[vertex_id]);
     }
 
+    fprintf(fptr_edges_array_src, "%u\n", graphCSR->num_edges);
     for(vertex_id = 0; vertex_id < graphCSR->num_edges ; vertex_id++)
     {
         fprintf(fptr_edges_array_src, "%u\n", graphCSR->sorted_edges_array->edges_array_src[vertex_id]);
