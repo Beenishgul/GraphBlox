@@ -96,9 +96,8 @@ module glay_kernel_afu #(
   logic                          ap_start_r     = 1'b0                      ;
   logic                          ap_idle_r      = 1'b1                      ;
   logic                          ap_start_pulse                             ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i                                  ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i      = {NUM_GRAPH_CLUSTERS{1'b0}};
   logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_o      = {NUM_GRAPH_CLUSTERS{1'b0}};
 
   GLAYDescriptorInterface  glay_descriptor;
   AXI4MasterReadInterface  m_axi_read     ;
@@ -306,7 +305,7 @@ module glay_kernel_afu #(
     .ap_clk         (ap_clk         ),
     .areset         (glay_areset    ),
     .ap_start       (ap_start       ),
-    .ap_done        (ap_done_o      ),
+    .ap_done        (ap_done_i      ),
     .glay_descriptor(glay_descriptor),
     .m_axi_read_in  (m_axi_read.in  ),
     .m_axi_read_out (m_axi_read.out ),
