@@ -16,16 +16,18 @@ export MAKE_DIR_DEVICE         = 01_device
 
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
 export MAKE_ARGS_HOST          = -w -C $(APP_DIR)/$(MAKE_DIR_HOST) -j$(MAKE_NUM_THREADS)
-
+export MAKE_ARGS_DEVICE        = -w -C $(APP_DIR)/$(MAKE_DIR_DEVICE) -j$(MAKE_NUM_THREADS)
 #########################################################
 
 .PHONY: help
 help: 
 	$(MAKE) help $(MAKE_ARGS_HOST)
+	$(MAKE) help $(MAKE_ARGS_DEVICE)
 
 .PHONY: clean-all
 clean-all:
 	$(MAKE) clean-all $(MAKE_ARGS_HOST)
+	$(MAKE) clean $(MAKE_ARGS_DEVICE)
 
 .PHONY: clean
 clean:
@@ -171,4 +173,21 @@ export DEVICE_INDEX   = 0
 export XCLBIN_PATH    = ./$(APP).xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
+##################################################
 
+################## resource generation and simulation
+.PHONY: generate-vip
+generate-vip:
+	$(MAKE) gen_ip $(MAKE_ARGS_DEVICE)
+
+.PHONY: package-kernel
+package-kernel:
+	$(MAKE) package_kernel $(MAKE_ARGS_DEVICE)
+
+.PHONY: run-sim
+run-sim:
+	$(MAKE) runsim $(MAKE_ARGS_DEVICE)
+
+.PHONY: build-hw
+build-hw:
+	$(MAKE) build_hw $(MAKE_ARGS_DEVICE)
