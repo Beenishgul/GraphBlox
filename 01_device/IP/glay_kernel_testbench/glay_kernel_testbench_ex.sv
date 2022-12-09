@@ -752,7 +752,13 @@ module glay_kernel_testbench ();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // Backdoor fill the memory with the content.
-    m00_axi_fill_memory(graph_csr_struct_ptr, LP_MAX_LENGTH);
+    m00_axi_fill_memory(graph_csr_struct_ptr,   LP_MAX_LENGTH);
+    m00_axi_fill_memory(vertex_out_degree_ptr,  LP_MAX_LENGTH);
+    m00_axi_fill_memory(vertex_in_degree_ptr,   LP_MAX_LENGTH);
+    m00_axi_fill_memory(vertex_edges_idx_ptr,   LP_MAX_LENGTH);
+    m00_axi_fill_memory(edges_array_src_ptr,    LP_MAX_LENGTH);
+    m00_axi_fill_memory(edges_array_dest_ptr,   LP_MAX_LENGTH);
+    m00_axi_fill_memory(edges_array_weight_ptr, LP_MAX_LENGTH);
 
   endtask
 
@@ -844,6 +850,75 @@ module glay_kernel_testbench ();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
   initial begin : STIMULUS
+
+    static int vertex_count = 0;
+    static int edge_count   = 0;
+    static int file_error   = 0;
+    int file_ptr_edges_idx       ;
+    int file_ptr_in_degree       ;
+    int file_ptr_out_degree      ;
+    int file_ptr_edges_array_src ;
+    int file_ptr_edges_array_dest;
+
+    bit [VERTEX_DATA_BITS-1:0] out_degree[];
+    bit [VERTEX_DATA_BITS-1:0] in_degree[];
+    bit [VERTEX_DATA_BITS-1:0] edges_idx[];
+
+    bit [EDGE_DATA_BITS-1:0] edges_array_src[];
+    bit [EDGE_DATA_BITS-1:0] edges_array_dest[];
+
+    static string graph_name = "LAW-amazon-2008";
+
+    file_ptr_edges_array_dest = $fopen("/home/cmv6ru/Documents/00_github_repos/00_GLay/03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_dest", "r");
+    if(file_ptr_edges_array_dest) $display("File was opened successfully : %0d",file_ptr_edges_array_dest);
+    else                          $display("File was NOT opened successfully : %0d",file_ptr_edges_array_dest);
+
+    file_ptr_edges_array_src = $fopen("/home/cmv6ru/Documents/00_github_repos/00_GLay/03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_src", "r");
+    if(file_ptr_edges_array_src) $display("File was opened successfully : %0d",file_ptr_edges_array_src);
+    else                         $display("File was NOT opened successfully : %0d",file_ptr_edges_array_src);
+
+    file_ptr_edges_idx = $fopen("/home/cmv6ru/Documents/00_github_repos/00_GLay/03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_idx", "r");
+    if(file_ptr_edges_idx) $display("File was opened successfully : %0d",file_ptr_edges_idx);
+    else                   $display("File was NOT opened successfully : %0d",file_ptr_edges_idx);
+
+
+    file_ptr_in_degree = $fopen("/home/cmv6ru/Documents/00_github_repos/00_GLay/03_test_graphs/LAW/LAW-amazon-2008/graph.bin.in_degree", "r");
+    if(file_ptr_in_degree) $display("File was opened successfully : %0d",file_ptr_in_degree);
+    else                   $display("File was NOT opened successfully : %0d",file_ptr_in_degree);
+
+
+    file_ptr_out_degree = $fopen("/home/cmv6ru/Documents/00_github_repos/00_GLay/03_test_graphs/LAW/LAW-amazon-2008/graph.bin.out_degree", "r");
+    if(file_ptr_out_degree) $display("File was opened successfully : %0d",file_ptr_out_degree);
+    else                    $display("File was NOT opened successfully : %0d",file_ptr_out_degree);
+
+    file_error =      $fscanf(file_ptr_out_degree, "%d\n",vertex_count);
+    file_error =      $fscanf(file_ptr_edges_array_src, "%d\n",edge_count);
+
+    $display("---------------------------------------------------------------------------");
+    $display("  READING --> GRAPH CSR : %s", graph_name);
+    $display("  VERTEX COUNT : %d", vertex_count);
+    $display("  EDGE COUNT   : %d", edge_count);
+    $display("---------------------------------------------------------------------------");
+
+
+    out_degree = new [vertex_count];
+    in_degree = new [vertex_count];
+    edges_idx = new [vertex_count];
+
+    edges_array_src = new [vertex_count];
+    edges_array_dest= new [edge_count];
+
+    for (int i = 0; i < 5; i++) begin
+      $fscanf(file_ptr_edges_array_src, "%d\n",vertex_count);
+      $display("%0d",vertex_count);
+    end
+
+    $fclose(file_ptr_edges_array_dest);
+    $fclose(file_ptr_edges_array_src);
+    $fclose(file_ptr_edges_idx);
+    $fclose(file_ptr_in_degree);
+    $fclose(file_ptr_out_degree);
+
     #200000;
     start_vips();
     check_scalar_registers(error_found);
@@ -874,8 +949,18 @@ module glay_kernel_testbench ();
     end else begin
       $display( "Test completed successfully");
     end
-    $finish;
+
+    #1000  $finish;
+
   end
+
+// Waveform dump
+  `ifdef DUMP_WAVEFORM
+    initial begin
+      $dumpfile("glay_kernel_testbench.vcd");
+      $dumpvars(0,glay_kernel_testbench);
+    end
+  `endif
 
 endmodule
 `default_nettype wire
