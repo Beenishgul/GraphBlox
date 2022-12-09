@@ -43,7 +43,6 @@ module glay_kernel_cu #(
   AXI4MasterReadInterface  m_axi_read     ;
   AXI4MasterWriteInterface m_axi_write    ;
 
-
   assign m_axi_write.out = 0;
   assign m_axi_read.out = 0;
 

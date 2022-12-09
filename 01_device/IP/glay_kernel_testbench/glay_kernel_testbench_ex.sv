@@ -890,8 +890,8 @@ module glay_kernel_testbench ();
 
       set_scalar_registers();
       set_memory_pointers();
-      // backdoor_fill_memories();
-      backdoor_buffer_fill_memories(graph);
+      backdoor_fill_memories();
+      // backdoor_buffer_fill_memories(graph);
       // Check that Kernel is IDLE before starting.
       poll_idle_register();
       ///////////////////////////////////////////////////////////////////////////
@@ -901,15 +901,15 @@ module glay_kernel_testbench ();
       ctrl.wait_drivers_idle();
       ///////////////////////////////////////////////////////////////////////////
       //Wait for interrupt being asserted or poll done register
-      @(posedge interrupt);
-
+      // @(posedge interrupt);
+      poll_done_register();
       ///////////////////////////////////////////////////////////////////////////
       // Service the interrupt
-      service_interrupts();
-      wait(interrupt == 0);
+      // service_interrupts();
+      // wait(interrupt == 0);
 
       ///////////////////////////////////////////////////////////////////////////
-      error_found |= check_kernel_result()   ;
+      // error_found |= check_kernel_result()   ;
 
       $display("Finished iteration: %d / %d", iter+1, num_iterations);
     end
@@ -1018,6 +1018,7 @@ module glay_kernel_testbench ();
       $finish();
     end
 
+     #1000
     check_pointer_registers(error_found);
     if (error_found == 1) begin
       $display( "Test Failed!");
@@ -1026,12 +1027,14 @@ module glay_kernel_testbench ();
 
     enable_interrupts();
 
+     #1000
     multiple_iteration(1, error_found, graph);
     if (error_found == 1) begin
       $display( "Test Failed!");
       $finish();
     end
 
+     #1000
     multiple_iteration(5, error_found, graph);
 
     if (error_found == 1) begin

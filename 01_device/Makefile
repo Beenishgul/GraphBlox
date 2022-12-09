@@ -92,6 +92,6 @@ all: gen_ip pack_kernel build_hw
 
 ################## clean up
 clean:
-	$(RM) -rf $(XILINX_DIR)
+	$(RM) -rf $(XILINX_DIR) .Xil
 	$(RM) -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	$(RM) -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
