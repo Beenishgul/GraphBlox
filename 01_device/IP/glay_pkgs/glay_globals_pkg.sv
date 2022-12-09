@@ -41,6 +41,12 @@ parameter WORD_BITS        = WORD * 8       ;
 parameter WORD_DOUBLE      = WORD * 2       ;
 parameter WORD_DOUBLE_BITS = WORD_DOUBLE * 8;
 
+
+parameter VERTEX_ADDRESS_BITS = 64;
+parameter EDGE_ADDRESS_BITS = 64;
+parameter VERTEX_DATA_BITS = 32;
+parameter EDGE_DATA_BITS = 32;
+
 ////////////////////////////////////////////////////////////////////////////
 // AXI4 PARAMETERS
 ////////////////////////////////////////////////////////////////////////////
