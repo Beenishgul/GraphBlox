@@ -17,7 +17,6 @@
 ECHO=@echo
 
 .PHONY: help
-
 help::
 	$(ECHO) "Makefile Usage:"
 	$(ECHO) "  make gen_ip"
@@ -68,14 +67,16 @@ TARGET := hw_emu
 .phony: clean traces
 
 ################## resource generation and simulation 
-gen_ip:
+.PHONY: generate-vip
+generate-vip:
 	rm -rf $(XILINX_DIR)/$(KERNEL)_ip_generation; mkdir -p $(XILINX_DIR)/$(KERNEL)_ip_generation; vivado -mode batch -source ./$(SCRIPTS_DIR)/$(KERNEL)_gen_ip.tcl -tclargs $(PART)
 
-
-pack_kernel:
+.PHONY: package-kernel
+package-kernel:
 	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../../$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
 
-runsim:
+.PHONY: run-sim
+run-sim:
 	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; sh ../../$(SCRIPTS_DIR)/$(KERNEL)_runsim_xsim.sh
 
 
@@ -85,12 +86,15 @@ XOCCLFLAGS := --link --optimize 3
 # You could uncomment following line and modify the options for hardware debug/profiling
 #DEBUG_OPT := -debug.chipscope $(KERNEL)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
-build_hw:
+.PHONY: build-hw
+build-hw:
 	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ./$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin $(KERNEL).xo
 
-all: gen_ip pack_kernel build_hw
+.PHONY: all
+all: generate-vip package-kernel build-hw
 
 ################## clean up
+.PHONY: clean
 clean:
 	$(RM) -rf $(XILINX_DIR) .Xil
 	$(RM) -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
