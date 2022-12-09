@@ -178,16 +178,16 @@ export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 ################## resource generation and simulation
 .PHONY: generate-vip
 generate-vip:
-	$(MAKE) gen_ip $(MAKE_ARGS_DEVICE)
+	$(MAKE) generate-vip $(MAKE_ARGS_DEVICE)
 
 .PHONY: package-kernel
 package-kernel:
-	$(MAKE) package_kernel $(MAKE_ARGS_DEVICE)
+	$(MAKE) package-kernel $(MAKE_ARGS_DEVICE)
 
 .PHONY: run-sim
 run-sim:
-	$(MAKE) runsim $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim $(MAKE_ARGS_DEVICE)
 
 .PHONY: build-hw
 build-hw:
-	$(MAKE) build_hw $(MAKE_ARGS_DEVICE)
+	$(MAKE) build-hw $(MAKE_ARGS_DEVICE)

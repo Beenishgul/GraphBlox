@@ -62,7 +62,7 @@ PLATFORM := xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # TARGET: set the build target, can be hw or hw_emu
 TARGET := hw_emu
-
+# TARGET := hw
 
 .phony: clean traces
 
@@ -88,7 +88,7 @@ XOCCLFLAGS := --link --optimize 3
 
 .PHONY: build-hw
 build-hw:
-	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ./$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin $(KERNEL).xo
+	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ../../$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin ../$(KERNEL).xo
 
 .PHONY: all
 all: generate-vip package-kernel build-hw
