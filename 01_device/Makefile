@@ -88,7 +88,7 @@ XOCCLFLAGS := --link --optimize 3
 
 .PHONY: build-hw
 build-hw:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_hw_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ../../$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin ../$(KERNEL).xo
+	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ../../$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin ../$(KERNEL).xo
 
 .PHONY: all
 all: generate-vip package-kernel build-hw
