@@ -75,9 +75,27 @@ generate-vip:
 package-kernel:
 	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../../$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
 
+
+################## simulation 
+.PHONY: run-sim-clean
+run-sim-clean:
+	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
+
 .PHONY: run-sim
 run-sim:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; sh ../../$(SCRIPTS_DIR)/$(KERNEL)_runsim_xsim.sh
+	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
+
+.PHONY: run-sim-reset
+run-sim-reset:
+	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -reset_run
+
+.PHONY: run-sim-wave
+run-sim-wave:
+	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -wave_run
+
+.PHONY: run-sim-help
+run-sim-help:
+	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -help
 
 
 ################## hardware build 

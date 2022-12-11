@@ -36,15 +36,22 @@ module glay_kernel_cu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
 // AXI write master stage
-  logic   glay_done;
-  logic  m_axi_areset;
+  logic glay_done   ;
+  logic m_axi_areset;
 
   GLAYDescriptorInterface  glay_descriptor_reg0;
-  AXI4MasterReadInterface  m_axi_read     ;
-  AXI4MasterWriteInterface m_axi_write    ;
+  AXI4MasterReadInterface  m_axi_read          ;
+  AXI4MasterWriteInterface m_axi_write         ;
 
   assign m_axi_write.out = 0;
-  assign m_axi_read.out = 0;
+  assign m_axi_read.out  = 0;
+
+  assign m_axi_write.out.awburst = M_AXI4_BURST_INCR;
+  assign m_axi_read.out.arburst  = M_AXI4_BURST_INCR;
+  assign m_axi_write.out.awsize  = M_AXI4_SIZE_64B;
+  assign m_axi_read.out.arsize   = M_AXI4_SIZE_64B;
+  assign m_axi_write.out.awcache = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
+  assign m_axi_read.out.arcache  = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
 
 // Register reset signal.
   always @(posedge ap_clk) begin
@@ -135,7 +142,7 @@ module glay_kernel_cu #(
   end
 
   always @(posedge ap_clk) begin
-      glay_descriptor_reg0.payload <= glay_descriptor.payload;
+    glay_descriptor_reg0.payload <= glay_descriptor.payload;
   end
 
 
