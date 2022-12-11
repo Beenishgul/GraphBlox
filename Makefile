@@ -10,7 +10,7 @@ export INTEGRATION         = openmp
 
 ##################################################
 
-export ROOT_DIR                = /home/cmv6ru/Documents/00_github_repos
+export ROOT_DIR                = $(shell cd .. ; pwd)
 export APP_DIR                 = 00_GLay
 export MAKE_DIR_HOST           = 00_host
 export MAKE_DIR_DEVICE         = 01_device

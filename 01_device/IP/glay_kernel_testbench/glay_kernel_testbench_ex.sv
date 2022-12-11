@@ -354,18 +354,22 @@ module glay_kernel_testbench ();
   function void  m00_axi_buffer_fill_memory(
       input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
       input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-      input bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] words_data[],      // data source to fill memory
+      input bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] words_data[$],      // data source to fill memory
       input integer offset,                 // start index of data source
       input integer words                   // number of words to fill
     );
     int index;
+    // bit [(32/8)-1:0] wr_strb = 4'hf;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] temp;
     int i;
     for (index = 0; index < words; index++) begin
-      for (i = 0; i < 16; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-        temp[i*8+7-:8] = words_data[offset+index][(15-i)*8+7-:8];
+      // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
+      for (i = 0; i < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+        temp[i*8+7-:8] = words_data[offset+index][((M_AXI_MEMORY_DATA_WIDTH_BITS/8)-1-i)*8+7-:8];
+        // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
       end
-      mem.mem_model.backdoor_memory_write(ptr + index * 16, temp);
+      // $display("After: %0d ->%0d ->%0h",index, i, temp);
+      mem.mem_model.backdoor_memory_write(ptr + index * (M_AXI_MEMORY_DATA_WIDTH_BITS/8), temp);
     end
   endfunction
 
@@ -890,8 +894,8 @@ module glay_kernel_testbench ();
 
       set_scalar_registers();
       set_memory_pointers();
-      backdoor_fill_memories();
-      // backdoor_buffer_fill_memories(graph);
+      // backdoor_fill_memories();
+      backdoor_buffer_fill_memories(graph);
       // Check that Kernel is IDLE before starting.
       poll_idle_register();
       ///////////////////////////////////////////////////////////////////////////
