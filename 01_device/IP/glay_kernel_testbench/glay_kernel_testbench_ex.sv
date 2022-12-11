@@ -939,24 +939,24 @@ module glay_kernel_testbench ();
     realcount = 0;
 
     for (int i = 0; i < graph.mem512_vertex_count; i++) begin
-      for (int j = 0; j < 16; j++) begin
+      for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
         file_error =  $fscanf(file_ptr_out_degree, "%0d\n",temp_out_degree);
-        graph.out_degree[i][j+:32] = temp_out_degree;
+        graph.out_degree[i][j+:VERTEX_DATA_BITS] = temp_out_degree;
         file_error =  $fscanf(file_ptr_in_degree, "%0d\n",temp_in_degree);
-        graph.in_degree[i][j+:32] = temp_in_degree;
+        graph.in_degree[i][j+:VERTEX_DATA_BITS] = temp_in_degree;
         file_error =  $fscanf(file_ptr_edges_idx, "%0d\n",temp_edges_idx);
-        graph.edges_idx[i][j+:32] = temp_edges_idx;
+        graph.edges_idx[i][j+:VERTEX_DATA_BITS] = temp_edges_idx;
       end
     end
 
     realcount = 0;
 
     for (int i = 0; i < graph.mem512_vertex_count; i++) begin
-      for (int j = 0;j < 16; j++) begin
+      for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
         file_error =  $fscanf(file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
-        graph.edges_array_src[i][j+:32] = temp_edges_array_src;
+        graph.edges_array_src[i][j+:VERTEX_DATA_BITS] = temp_edges_array_src;
         file_error =  $fscanf(file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
-        graph.edges_array_dest[i][j+:32] = temp_edges_array_dest;
+        graph.edges_array_dest[i][j+:VERTEX_DATA_BITS] = temp_edges_array_dest;
       end
     end
 
@@ -994,8 +994,8 @@ module glay_kernel_testbench ();
     file_error =      $fscanf(file_ptr_out_degree, "%d\n",graph.vertex_count);
     file_error =      $fscanf(file_ptr_edges_array_src, "%d\n",graph.edge_count);
 
-    graph.mem512_vertex_count = (graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-    graph.mem512_edge_count = (graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
+    graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
+    graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
 
     graph.out_degree = new[graph.mem512_vertex_count];
     graph.in_degree = new [graph.mem512_vertex_count];
