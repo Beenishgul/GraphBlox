@@ -57,7 +57,7 @@ simulate()
 # RUN_STEP: <GUI wave>
 wave_run()
 {
-  xsim --gui work.glay_kernel_testbench.wd
+  xsim --gui work.glay_kernel_testbench#work.glbl
 }
 
 # STEP: setup
@@ -116,7 +116,7 @@ reset_run()
 # Check command line arguments
 check_args()
 {
-  if [[ ($1 == 1 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-help" && $2 != "-h") ]]; then
+  if [[ ($1 == 1 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
     echo -e "ERROR: Unknown option specified '$2' (type \"./glay_kernel_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi

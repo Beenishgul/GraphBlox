@@ -890,8 +890,8 @@ module glay_kernel_testbench ();
 
       set_scalar_registers();
       set_memory_pointers();
-      // backdoor_fill_memories();
-      backdoor_buffer_fill_memories(graph);
+      backdoor_fill_memories();
+      // backdoor_buffer_fill_memories(graph);
       // Check that Kernel is IDLE before starting.
       poll_idle_register();
       ///////////////////////////////////////////////////////////////////////////
