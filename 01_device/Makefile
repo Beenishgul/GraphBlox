@@ -41,7 +41,7 @@ help::
 SCRIPTS_DIR := scripts
 IP_DIR := IP
 
-ROOT_DIR            ?= /home/cmv6ru/Documents/00_github_repos
+ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
 SUB_APP_DIR         := 01_device
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)

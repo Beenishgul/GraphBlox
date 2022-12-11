@@ -9,7 +9,7 @@ APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
 
 # Directories for host app
-ROOT_DIR            ?= /home/cmv6ru/Documents/00_github_repos
+ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
 SUB_APP_DIR         := 00_host
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)
@@ -144,7 +144,7 @@ OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 
 .PHONY: help
 help: $(APP)-$(INTEGRATION)
-	./$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
+	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
 
 .PHONY: $(APP)-$(INTEGRATION)
 $(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
