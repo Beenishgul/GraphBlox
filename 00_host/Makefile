@@ -8,9 +8,12 @@ APP                 ?= glay
 APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
 
-# dirs Root app
-APP_DIR             ?= .
-
+# Directories for host app
+ROOT_DIR            ?= /home/cmv6ru/Documents/00_github_repos
+APP_DIR             ?= 00_GLay
+SUB_APP_DIR         := 00_host
+ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)
+BENCH_DIR           ?= 03_test_graphs
 #dir root/managed_folders
 
 SRC_DIR             ?= src
@@ -97,43 +100,43 @@ LDFLAGS       += -lrt -lstdc++ $(XRT_LDFLAGS)
 ##############################################
 
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
-SRC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.c)
-SRC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
-SRC_FILES_UTIL_FPGA =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/*.c)
-SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
-SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
-SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
-SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
-SRC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/*.c)
+SRC_FILES_ALGO      =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.c)
+SRC_FILES_UTIL      =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
+SRC_FILES_UTIL_FPGA =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/*.c)
+SRC_FILES_PREPRO    =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
+SRC_FILES_STRUCT    =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
+SRC_FILES_MAIN      =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
+SRC_FILES_TEST      =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
+SRC_FILES_CONFIG    =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/*.c)
 
 
-INC_FILES_ALGO      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.h)
-INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
-INC_FILES_UTIL_FPGA =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)/*.h)
-INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
-INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
-INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
+INC_FILES_ALGO      =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.h)
+INC_FILES_UTIL      =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
+INC_FILES_UTIL_FPGA =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)/*.h)
+INC_FILES_PREPRO    =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
+INC_FILES_STRUCT    =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
+INC_FILES_CONFIG    =   $(wildcard $(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
 
 
 ALL_HEADER_FILES    =   $(INC_FILES_ALGO) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CONFIG)
 
 #create object file rules for the final binary target
-OBJ_FILES_ALGO      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO))
+OBJ_FILES_ALGO      = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o,$(SRC_FILES_ALGO))
 
-OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
-OBJ_FILES_UTIL_FPGA = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o,$(SRC_FILES_UTIL_FPGA))
-OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
-OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
-OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
-OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
-OBJ_FILES_CONFIG    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o,$(SRC_FILES_CONFIG))
+OBJ_FILES_UTIL      = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
+OBJ_FILES_UTIL_FPGA = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o,$(SRC_FILES_UTIL_FPGA))
+OBJ_FILES_PREPRO    = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
+OBJ_FILES_STRUCT    = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
+OBJ_FILES_MAIN      = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
+OBJ_FILES_TEST      = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
+OBJ_FILES_CONFIG    = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c,$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o,$(SRC_FILES_CONFIG))
 
-OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
-				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
-				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
-				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
-				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)   			\
-				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
+OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)   			\
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
 #########################################################
 #                GLAY GENERATION                        #
@@ -141,82 +144,82 @@ OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 
 .PHONY: help
 help: $(APP)-$(INTEGRATION)
-	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
+	./$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
 
 .PHONY: $(APP)-$(INTEGRATION)
-$(APP)-$(INTEGRATION) : $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
+$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP)-$(INTEGRATION): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)"
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP)-$(INTEGRATION): $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)"
 	-$(ECHO) " ******************************************************************************  \n"
 
 .PHONY: $(APP_TEST)-$(INTEGRATION)
-$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
+$(APP_TEST)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)
 	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP_TEST): $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)"
+	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP_TEST): $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)"
 	-$(ECHO) " ****************************************************************************** \n"
 
 .PHONY: directories-obj
 directories-obj :
-	-$(MKDIR) $(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
-	-$(MKDIR) $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
+	-$(MKDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
 
 .PHONY: clean-all
 clean-all:
-	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
-	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
-	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)
 
 .PHONY: clean
 clean:
-	-$(RMDIR) $(APP_DIR)/$(BIN_DIR)
-	-$(RMDIR) $(APP_DIR)/$(OBJ_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)
 
 .PHONY: clean-results
 clean-results:
-	-$(RMDIR) $(APP_DIR)/$(RES_DIR)
+	-$(RMDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)
 
 
 #########################################################
 #                GLAY COMPILATION                       #
 #########################################################
 
-$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
+$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
-$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
+$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) directories-obj
 	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 ##########################################################################
@@ -225,18 +228,18 @@ $(APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$
 
 .PHONY: run
 run: $(APP)
-	./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS) 
+	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS) 
 
 .PHONY: $(APP)
 $(APP): $(APP)-$(INTEGRATION)
 	
 .PHONY: debug-memory
 debug-memory: $(APP)
-	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	valgrind --leak-check=full --show-leak-kinds=all -v $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: debug
 debug: $(APP)
-	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 ##########################################################################
 # RUN Tests
@@ -246,23 +249,23 @@ debug: $(APP)
 
 .PHONY: run-test
 run-test: $(APP_TEST)
-	$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: $(APP_TEST)
 $(APP_TEST): $(APP_TEST)-$(INTEGRATION)
 
 .PHONY: debug-test
 debug-test: $(APP_TEST)
-	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: debug-test-memory
 debug-test-memory: $(APP_TEST)
-	valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	valgrind --leak-check=full --show-leak-kinds=all -v $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 # test files
 .PHONY: test
 test:
-	@if $(MAKE) run-test -C $(APP_DIR) | grep FAIL > /dev/null; \
+	@if $(MAKE) run-test -C $(ACTIVE_APP_DIR) | grep FAIL > /dev/null; \
 		then exit 1; \
 	fi
 	
@@ -270,7 +273,7 @@ test:
 #       		    GRAPH ARGUMENTS         			#
 #########################################################
 
-export BENCHMARKS_DIR ?= ../03_test_graphs
+export GRAPH_DIR ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 
 # TEST # small test graphs
 # export GRAPH_SUIT ?= TEST
@@ -311,8 +314,8 @@ export FILE_BIN_TYPE ?= graph.bin
 # export FILE_LABEL_TYPE ?= graph_Rabbit.labels
 
 #GRAPH file
-export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
-export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
+export FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
+export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
 export PULL_PUSH 		?= 0

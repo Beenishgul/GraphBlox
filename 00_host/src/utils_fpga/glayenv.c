@@ -61,13 +61,19 @@ int setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xcl
         return -1;
     }
 
-
     glayHandle->kernelHandle = xrtPLKernelOpenExclusive(glayHandle->deviceHandle, glayHandle->xclbinUUID, "glay_kernel");
     if(glayHandle->kernelHandle == NULL)
     {
         printf("ERROR:--> xrtPLKernelOpen\n");
         return -1;
     }
+
+    printf("UUID : %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x \n",
+           glayHandle->xclbinUUID[0],  glayHandle->xclbinUUID[1],  glayHandle->xclbinUUID[2],  glayHandle->xclbinUUID[3],
+           glayHandle->xclbinUUID[4],  glayHandle->xclbinUUID[5],
+           glayHandle->xclbinUUID[6],  glayHandle->xclbinUUID[7],
+           glayHandle->xclbinUUID[8],  glayHandle->xclbinUUID[9],
+           glayHandle->xclbinUUID[10],  glayHandle->xclbinUUID[11],  glayHandle->xclbinUUID[12],  glayHandle->xclbinUUID[13],  glayHandle->xclbinUUID[14],  glayHandle->xclbinUUID[15]);
 
 
     return 0;
@@ -90,6 +96,7 @@ struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerB
     glayGraphCSRxrtBufferHandlePerBank->graph_buffer_size_in_bytes = sizeof(struct GLAYGraphCSR);
 
     glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx = xrtKernelArgGroupId(glayHandle->kernelHandle, bank_grp_idx);
+    // glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx = 1;
 
     // Each Memory bank contains a Graph CSR segment
     glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer     = xrtBOAllocUserPtr(glayHandle->deviceHandle, (void *)glayGraph, glayGraphCSRxrtBufferHandlePerBank->graph_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
@@ -159,7 +166,7 @@ int freeGLAYGraphCSRHostToDeviceBuffersPerBank(struct GLAYGraphCSRxrtBufferHandl
 #endif
     // xrtBOFree(glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer);
     // xrtBOFree(glayGraphCSRxrtBufferHandlePerBank->auxiliary_2_buffer);
-  
+
     return 0;
 }
 
@@ -190,12 +197,12 @@ void startGLAYRun(struct xrtGLAYHandle *glayHandle)
 
 void waitGLAYRun(struct xrtGLAYHandle *glayHandle)
 {
- xrtRunWait(glayHandle->kernelHandleRun);
+    xrtRunWait(glayHandle->kernelHandleRun);
 }
 
 void closeGLAYRun(struct xrtGLAYHandle *glayHandle)
 {
- xrtRunClose(glayHandle->kernelHandleRun);
+    xrtRunClose(glayHandle->kernelHandleRun);
 }
 
 void releaseGLAY(struct xrtGLAYHandle *glayHandle)

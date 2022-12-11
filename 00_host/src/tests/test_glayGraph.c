@@ -301,11 +301,14 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
-    int bank_grp_idx = 0;
+    int bank_grp_idx = 1;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
 
-    setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path);
+    if(setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path) == -1)
+    {
+        printf("ERROR:--> setupGLAYDevice\n");
+    }
 
     setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 

@@ -37,14 +37,16 @@ help::
 	$(ECHO) "  make clean"
 	$(ECHO) "      Command to remove all the generated files."
 
-APP_DIR := .
+
 SCRIPTS_DIR := scripts
 IP_DIR := IP
-XML_DIR := xml
-SCRIPTS_DIR := scripts
+
+ROOT_DIR            ?= /home/cmv6ru/Documents/00_github_repos
+APP_DIR             ?= 00_GLay
+SUB_APP_DIR         := 01_device
+ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)
 
 XILINX_DIR ?= xilinx
-
 KERNEL ?= glay_kernel
 
 # PART setting: uncomment the line matching your Alveo card
@@ -70,33 +72,33 @@ TARGET ?= hw_emu
 ################## resource generation and simulation 
 .PHONY: generate-vip
 generate-vip:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_ip_generation; mkdir -p $(XILINX_DIR)/$(KERNEL)_ip_generation; vivado -mode batch -source ./$(SCRIPTS_DIR)/$(KERNEL)_gen_ip.tcl -tclargs $(PART)
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_ip_generation; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_ip_generation; vivado -mode batch -source ./$(SCRIPTS_DIR)/$(KERNEL)_gen_ip.tcl -tclargs $(PART)
 
 .PHONY: package-kernel
 package-kernel:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source ../../$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
 
 
 ################## simulation 
-.PHONY: run-sim-clean
-run-sim-clean:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
-
 .PHONY: run-sim
 run-sim:
-	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
+
+.PHONY: run-sim-clean
+run-sim-clean:
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -reset_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -reset_run
 
 .PHONY: run-sim-wave
 run-sim-wave:
-	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -wave_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -wave_run
 
 .PHONY: run-sim-help
 run-sim-help:
-	mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash ../../$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -help
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_testbench_xsim.sh -help
 
 
 ################## hardware build 
@@ -107,7 +109,7 @@ XOCCLFLAGS := --link --optimize 3
 
 .PHONY: build-hw
 build-hw:
-	rm -rf $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; mkdir -p $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; cd $(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config ../../$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(KERNEL)_test_$(TARGET).xclbin ../$(KERNEL).xo
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_test.cfg -o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL).xo
 
 .PHONY: all
 all: generate-vip package-kernel build-hw
@@ -115,6 +117,6 @@ all: generate-vip package-kernel build-hw
 ################## clean up
 .PHONY: clean
 clean:
-	$(RM) -rf $(XILINX_DIR) .Xil
+	$(RM) -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR) $(ACTIVE_APP_DIR)/.Xil
 	$(RM) -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	$(RM) -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
