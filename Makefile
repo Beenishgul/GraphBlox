@@ -10,13 +10,14 @@ export INTEGRATION         = openmp
 
 ##################################################
 
-export APP_DIR                 = .
+export ROOT_DIR                = /home/cmv6ru/Documents/00_github_repos
+export APP_DIR                 = 00_GLay
 export MAKE_DIR_HOST           = 00_host
 export MAKE_DIR_DEVICE         = 01_device
 
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
-export MAKE_ARGS_HOST          = -w -C $(APP_DIR)/$(MAKE_DIR_HOST) -j$(MAKE_NUM_THREADS)
-export MAKE_ARGS_DEVICE        = -w -C $(APP_DIR)/$(MAKE_DIR_DEVICE) -j$(MAKE_NUM_THREADS)
+export MAKE_ARGS_HOST          = -w -C $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_HOST) -j$(MAKE_NUM_THREADS)
+export MAKE_ARGS_DEVICE        = -w -C $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_DEVICE) -j$(MAKE_NUM_THREADS)
 #########################################################
 
 .PHONY: help
@@ -168,10 +169,30 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 #########################################################
 #                        XILINX ARGS                    #
 #########################################################
-
+export XILINX_DIR     = xilinx
 export DEVICE_INDEX   = 0
-export XCLBIN_PATH    = ./$(APP).xclbin
+export XCLBIN_PATH    = $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_DEVICE)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+
+export KERNEL = glay_kernel
+
+# PART setting: uncomment the line matching your Alveo card
+# export PART =  xcu200-fsgd2104-2-e
+export PART = xcu250-figd2104-2L-e
+# export PART =  xcu50-fsvh2104-2-e
+# export PART =  xcu55c-fsvh2892-2L-e
+# export PART =  xcu280-fsvh2892-2L-e
+
+# PLATFORM setting: uncomment the lin matching your Alveo card
+# export PLATFORM =  xilinx_u200_gen3x16_xdma_2_202110_1
+export PLATFORM = xilinx_u250_gen3x16_xdma_4_1_202210_1
+# export PLATFORM =  xilinx_u50_gen3x16_xdma_5_202210_1
+# export PLATFORM =  xilinx_u55c_gen3x16_xdma_3_202210_1
+# export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
+
+# TARGET: set the build target, can be hw or hw_emu
+# export TARGET = hw_emu
+export TARGET = hw
 
 ##################################################
 
@@ -184,10 +205,29 @@ generate-vip:
 package-kernel:
 	$(MAKE) package-kernel $(MAKE_ARGS_DEVICE)
 
+################## simulation
+
 .PHONY: run-sim
 run-sim:
 	$(MAKE) run-sim $(MAKE_ARGS_DEVICE)
 
+.PHONY: run-sim-clean
+run-sim-clean:
+	$(MAKE) run-sim-clean $(MAKE_ARGS_DEVICE)
+
+.PHONY: run-sim-reset
+run-sim-reset:
+	$(MAKE) run-sim-reset $(MAKE_ARGS_DEVICE)
+
+.PHONY: run-sim-wave
+run-sim-wave:
+	$(MAKE) run-sim-wave $(MAKE_ARGS_DEVICE)
+
+.PHONY: run-sim-help
+run-sim-help:
+	$(MAKE) run-sim-help $(MAKE_ARGS_DEVICE)
+
+################## build HW
 .PHONY: build-hw
 build-hw:
 	$(MAKE) build-hw $(MAKE_ARGS_DEVICE)
