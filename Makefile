@@ -12,11 +12,11 @@ export INTEGRATION         = openmp
 
 export ROOT_DIR                = $(shell cd .. ; pwd)
 export APP_DIR                 = 00_GLay
-export MAKE_DIR_HOST           = 00_host
+export HOST_DIR                = 00_host
 export MAKE_DIR_DEVICE         = 01_device
-
+export BENCH_DIR           	   = 03_test_graphs
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
-export MAKE_ARGS_HOST          = -w -C $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_HOST) -j$(MAKE_NUM_THREADS)
+export MAKE_ARGS_HOST          = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 export MAKE_ARGS_DEVICE        = -w -C $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_DEVICE) -j$(MAKE_NUM_THREADS)
 #########################################################
 
@@ -79,7 +79,7 @@ test:
 #       		    GRAPH ARGUMENTS HOST       			#
 #########################################################
 
-export BENCHMARKS_DIR = ../03_test_graphs
+export GRAPH_DIR = $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 
 # TEST # small test graphs
 # export GRAPH_SUIT = TEST
@@ -120,8 +120,8 @@ export FILE_BIN_TYPE = graph.bin
 # export FILE_LABEL_TYPE = graph_Rabbit.labels
 
 #GRAPH file
-export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
-export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
+export FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
+export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
 export PULL_PUSH 		= 0

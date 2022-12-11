@@ -43,8 +43,9 @@ IP_DIR := IP
 
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
-SUB_APP_DIR         := 01_device
-ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)
+HOST_DIR            ?= 00_host
+DEVICE_DIR          ?= 01_device
+ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 
 XILINX_DIR ?= xilinx
 KERNEL ?= glay_kernel
