@@ -11,8 +11,9 @@ INTEGRATION         ?= openmp
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
-SUB_APP_DIR         := 00_host
-ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(SUB_APP_DIR)
+HOST_DIR            ?= 00_host
+DEVICE_DIR          ?= 01_device
+ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
 BENCH_DIR           ?= 03_test_graphs
 #dir root/managed_folders
 
@@ -273,97 +274,97 @@ test:
 #       		    GRAPH ARGUMENTS         			#
 #########################################################
 
-export GRAPH_DIR ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
+GRAPH_DIR ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 
 # TEST # small test graphs
-# export GRAPH_SUIT ?= TEST
-# export GRAPH_NAME ?= test
-# export GRAPH_NAME ?= v51_e1021
-# export GRAPH_NAME ?= v300_e2730
-# export GRAPH_NAME ?= graphbrew
+# GRAPH_SUIT ?= TEST
+# GRAPH_NAME ?= test
+# GRAPH_NAME ?= v51_e1021
+# GRAPH_NAME ?= v300_e2730
+# GRAPH_NAME ?= graphbrew
 
-export GRAPH_SUIT ?= LAW
-export GRAPH_NAME ?= LAW-amazon-2008
-# export GRAPH_NAME ?= LAW-cnr-2000
-# export GRAPH_NAME ?= LAW-dblp-2010
-# export GRAPH_NAME ?= LAW-enron
+GRAPH_SUIT ?= LAW
+GRAPH_NAME ?= LAW-amazon-2008
+# GRAPH_NAME ?= LAW-cnr-2000
+# GRAPH_NAME ?= LAW-dblp-2010
+# GRAPH_NAME ?= LAW-enron
 
-# export GRAPH_SUIT ?= KRON
-# export GRAPH_NAME ?= RMAT
+# GRAPH_SUIT ?= KRON
+# GRAPH_NAME ?= RMAT
 
-# export FILE_BIN_TYPE ?= g.20.16.text
-# export FILE_LABEL_TYPE ?= a.20.16.1000000.text
+# FILE_BIN_TYPE ?= g.20.16.text
+# FILE_LABEL_TYPE ?= a.20.16.1000000.text
 
-# export FILE_BIN_TYPE   ?= g.20.16.text.dbin
-# export FILE_LABEL_TYPE ?= a.20.16.1000000.text.dbin
+# FILE_BIN_TYPE   ?= g.20.16.text.dbin
+# FILE_LABEL_TYPE ?= a.20.16.1000000.text.dbin
 
-# export FILE_BIN_TYPE   ?=  g.5.16.text.dbin
-# export FILE_LABEL_TYPE ?= a.5.16.100.text.dbin
+# FILE_BIN_TYPE   ?=  g.5.16.text.dbin
+# FILE_LABEL_TYPE ?= a.5.16.100.text.dbin
 
-# export FILE_BIN_TYPE ?= g.24.16.text.dbin
-# export FILE_LABEL_TYPE ?= a.24.16.10000000.text.dbin
+# FILE_BIN_TYPE ?= g.24.16.text.dbin
+# FILE_LABEL_TYPE ?= a.24.16.10000000.text.dbin
 
-# export FILE_BIN_TYPE ?= g.24.16.text
-# export FILE_LABEL_TYPE ?= a.24.16.10000000.text
+# FILE_BIN_TYPE ?= g.24.16.text
+# FILE_LABEL_TYPE ?= a.24.16.10000000.text
 
-# export FILE_BIN_TYPE ?= graph.txt
-export FILE_BIN_TYPE ?= graph.bin
-# export FILE_BIN_TYPE ?= graph.wbin
+# FILE_BIN_TYPE ?= graph.txt
+FILE_BIN_TYPE ?= graph.bin
+# FILE_BIN_TYPE ?= graph.wbin
 
-# export FILE_LABEL_TYPE ?= graph_Gorder.labels
-# export FILE_LABEL_TYPE ?= graph_Rabbit.labels
+# FILE_LABEL_TYPE ?= graph_Gorder.labels
+# FILE_LABEL_TYPE ?= graph_Rabbit.labels
 
 #GRAPH file
-export FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
-export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
+FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
+FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		?= 0
-export ALGORITHMS 		?= 1
+PULL_PUSH 		?= 0
+ALGORITHMS 		?= 1
 
 #GRAPH DATA_STRUCTURES
-export SORT_TYPE		?= 2
-export DATA_STRUCTURES  ?= 1
-export REORDER_LAYER1 	?= 0
-export REORDER_LAYER2   ?= 0
-export REORDER_LAYER3   ?= 0
-# export CACHE_SIZE       ?= 32768 #(32KB)
-# export CACHE_SIZE       ?= 262144 #(256KB)
-export CACHE_SIZE       ?= 5068672 #(22MB)
+SORT_TYPE		 ?= 2
+DATA_STRUCTURES  ?= 1
+REORDER_LAYER1 	 ?= 0
+REORDER_LAYER2   ?= 0
+REORDER_LAYER3   ?= 0
+# CACHE_SIZE       ?= 32768 #(32KB)
+# CACHE_SIZE       ?= 262144 #(256KB)
+CACHE_SIZE       ?= 5068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
-export ROOT 			?= 0
-export TOLERANCE 		?= 1e-8
-export DELTA			?= 800
-export NUM_ITERATIONS	?= 1
+ROOT 			?= 0
+TOLERANCE 		?= 1e-8
+DELTA			?= 800
+NUM_ITERATIONS	?= 1
 
 #PERFORMANCE
-export NUM_THREADS_PRE  ?= 1
-export NUM_THREADS_ALGO ?= 1
-export NUM_THREADS_KER  ?= 1
+NUM_THREADS_PRE  ?= 1
+NUM_THREADS_ALGO ?= 1
+NUM_THREADS_KER  ?= 1
 
 #EXPERIMENTS
-export NUM_TRIALS 		?= 1
+NUM_TRIALS 		?= 1
 
 #GRAPH FROMAT EDGELIST
-export FILE_FORMAT		?= 1
-export CONVERT_FORMAT 	?= 1
+FILE_FORMAT		?= 1
+CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
-export BIN_SIZE 		?= 1000
-export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 0
+BIN_SIZE 		?= 1000
+INOUT_STATS 	?= 0
+MASK_MODE 		?= 0
 
 #########################################################
 #                GENERAL XILINX ARGS                    #
 #########################################################
 
-DEVICE_INDEX ?= 0
-XCLBIN_PATH ?= ./file.xclbin
-export GLAY_FPGA_ARGS ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+DEVICE_INDEX   ?= 0
+XCLBIN_PATH    ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
+GLAY_FPGA_ARGS ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################
 
-export ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 
 ##############################################
