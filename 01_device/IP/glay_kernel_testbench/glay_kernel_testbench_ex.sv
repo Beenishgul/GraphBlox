@@ -820,13 +820,13 @@ module glay_kernel_testbench ();
   task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // Backdoor fill the memory with the content.
-    m00_axi_buffer_fill_memory(m00_axi, vertex_out_degree_ptr, graph.out_degree, 0, graph.vertex_count);
-    m00_axi_buffer_fill_memory(m00_axi, vertex_in_degree_ptr, graph.in_degree, 0, graph.vertex_count);
-    m00_axi_buffer_fill_memory(m00_axi, vertex_edges_idx_ptr, graph.edges_idx, 0, graph.vertex_count);
+    m00_axi_buffer_fill_memory(m00_axi, vertex_out_degree_ptr, graph.out_degree, 0, graph.mem512_vertex_count);
+    m00_axi_buffer_fill_memory(m00_axi, vertex_in_degree_ptr, graph.in_degree, 0, graph.mem512_vertex_count);
+    m00_axi_buffer_fill_memory(m00_axi, vertex_edges_idx_ptr, graph.edges_idx, 0, graph.mem512_vertex_count);
 
-    m00_axi_buffer_fill_memory(m00_axi, edges_array_dest_ptr, graph.edges_array_dest, 0, graph.edge_count);
-    m00_axi_buffer_fill_memory(m00_axi, edges_array_src_ptr, graph.edges_array_src, 0, graph.edge_count);
-    m00_axi_buffer_fill_memory(m00_axi, edges_array_weight_ptr, graph.edges_array_weight, 0, graph.edge_count);
+    m00_axi_buffer_fill_memory(m00_axi, edges_array_dest_ptr, graph.edges_array_dest, 0, graph.mem512_vertex_count);
+    m00_axi_buffer_fill_memory(m00_axi, edges_array_src_ptr, graph.edges_array_src, 0, graph.mem512_vertex_count);
+    m00_axi_buffer_fill_memory(m00_axi, edges_array_weight_ptr, graph.edges_array_weight, 0, graph.mem512_vertex_count);
   endtask
 
   function automatic bit check_kernel_result();
@@ -890,8 +890,8 @@ module glay_kernel_testbench ();
 
       set_scalar_registers();
       set_memory_pointers();
-      backdoor_fill_memories();
-      // backdoor_buffer_fill_memories(graph);
+      // backdoor_fill_memories();
+      backdoor_buffer_fill_memories(graph);
       // Check that Kernel is IDLE before starting.
       poll_idle_register();
       ///////////////////////////////////////////////////////////////////////////

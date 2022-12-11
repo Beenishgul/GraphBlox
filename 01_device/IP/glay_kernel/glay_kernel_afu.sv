@@ -189,9 +189,9 @@ module glay_kernel_afu #(
       m00_axi_rready  <= 0; // Read channel ready
       m00_axi_arid    <= 0; // Address read channel ID
       m00_axi_arsize  <= 0; // Address read channel burst size. This signal indicates the size of each transfer in the burst
-      m00_axi_arburst <= 0; // Address read channel burst type
+      m00_axi_arburst <= M_AXI4_BURST_INCR; // Address read channel burst type
       m00_axi_arlock  <= 0; // Address read channel lock type
-      m00_axi_arcache <= 0; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+      m00_axi_arcache <= M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
       m00_axi_arprot  <= 0; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       m00_axi_arqos   <= 0; // Address write channel quality of service
     end
@@ -238,9 +238,9 @@ module glay_kernel_afu #(
       m00_axi_awaddr  <= 0;// Address write channel address
       m00_axi_awlen   <= 0;// Address write channel burst length
       m00_axi_awsize  <= 0;// Address write channel burst size. This signal indicates the size of each transfer in the burst
-      m00_axi_awburst <= 0;// Address write channel burst type
+      m00_axi_awburst <= M_AXI4_BURST_INCR;// Address write channel burst type
       m00_axi_awlock  <= 0;// Address write channel lock type
-      m00_axi_awcache <= 0;// Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+      m00_axi_awcache <= M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;// Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
       m00_axi_awprot  <= 0;// Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       m00_axi_awqos   <= 0;// Address write channel quality of service
       m00_axi_wdata   <= 0;// Write channel data

@@ -39,8 +39,7 @@ package GLAY_AXI4_PKG;
   typedef logic [M_AXI4_DATA_W-1:0]   m_axi4_data_t;
   typedef logic [M_AXI4_STRB_W-1:0]   m_axi4_strb_t;
   typedef logic [M_AXI4_LEN_W-1:0]    m_axi4_len_t;
-  typedef logic [M_AXI4_LOCK_W-1:0]    m_axi4_lock_t;
-  typedef logic [M_AXI4_CACHE_W-1:0]  m_axi4_cache_t;
+  typedef logic [M_AXI4_LOCK_W-1:0]   m_axi4_lock_t;
   typedef logic [M_AXI4_PROT_W-1:0]   m_axi4_prot_t;
   typedef logic [M_AXI4_REGION_W-1:0] m_axi4_region_t;
   typedef logic [M_AXI4_QOS_W-1:0]    m_axi4_qos_t;
@@ -70,6 +69,25 @@ package GLAY_AXI4_PKG;
     M_AXI4_SIZE_64B  = 3'b110,
     M_AXI4_SIZE_128B = 3'b111
   } m_axi4_size_t;
+
+  typedef enum logic [M_AXI4_CACHE_W-1:0] {
+    M_AXI4_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000,
+    M_AXI4_CACHE_BUFFERABLE_ONLY                        = 4'B0001,
+    M_AXI4_CACHE_NO_ALLOCATE                            = 4'B0010,
+    M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011,
+    M_AXI4_CACHE_RESERVED_1                             = 4'B0100,
+    M_AXI4_CACHE_RESERVED_2                             = 4'B0101,
+    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110,
+    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111,
+    M_AXI4_CACHE_RESERVED_3                             = 4'B1000,
+    M_AXI4_CACHE_RESERVED_4                             = 4'B1001,
+    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010,
+    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011,
+    M_AXI4_CACHE_RESERVED_5                             = 4'B1100,
+    M_AXI4_CACHE_RESERVED_6                             = 4'B1101,
+    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110,
+    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111
+  } m_axi4_cache_t;
 
   typedef struct packed {
     m_axi4_valid_t rvalid ; // Read channel valid
