@@ -22,7 +22,7 @@
 #*********************************************************************************************************
 
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ../../scripts/glay_kernel_filelist.f  -i ../../IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
+xvlog_opts="--incr --relax -L uvm -f ../../scripts/glay_kernel_filelist_xsim.f  -i ../../IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --debug typical --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
 xsim_opts="-tclbatch ../../scripts/glay_kernel_cmd_xsim.tcl --wdb work.glay_kernel_testbench.wdb work.glay_kernel_testbench#work.glbl"
 # Script info

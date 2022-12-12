@@ -16,27 +16,29 @@
 
 
 ##################################### Step 1: create vivado project and add design sources
-
 # create ip project with part name in command line argvs
+set part_id          [lindex $argv 0]
+set kernel_name      [lindex $argv 1]
+set device_directory [lindex $argv 2]
+set xilinx_directory [lindex $argv 3]
+set active_directory [lindex $argv 4]
+set ip_directory     [lindex $argv 5]
 
+puts $part_id
+puts $kernel_name
+puts $device_directory
+puts $xilinx_directory
+puts $active_directory
+puts $ip_directory
 
-
-create_project -force glay_kernel ./glay_kernel -part [lindex $argv 0]
+create_project -force $kernel_name ./$kernel_name -part $part_id
 
 # add design sources into project
-add_files \
-        {                                           \
-              ../../IP/iob_cache/iob_include        \
-              ../../IP/glay_pkgs                    \
-              ../../IP/glay_kernel                  \
-              ../../IP/glay_top                     \
-       }
+add_files -fileset sources_1 [read [open ../../scripts/glay_kernel_filelist_package.f]]
 
-update_compile_order -fileset sources_1
-update_compile_order -fileset sim_1
-
+update_compile_order -fileset sources_1 
 # create IP packaging project
-ipx::package_project -root_dir ./glay_kernel_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true
+ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true
 
 set core       [ipx::current_core]
 
@@ -232,4 +234,4 @@ set_property vitis_drc {ctrl_protocol ap_ctrl_chain} [ipx::current_core]
 ::ipx::save_core $core
 ::ipx::unload_core $core
 # Generate Vitis Kernel from Vivado IP
-package_xo -force -xo_path ../glay_kernel.xo -kernel_name glay_kernel -ctrl_protocol ap_ctrl_chain -ip_directory ./glay_kernel_ip -output_kernel_xml ../glay_kernel.xml
+package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml

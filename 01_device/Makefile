@@ -19,20 +19,17 @@ ECHO=@echo
 .PHONY: help
 help::
 	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make gen_ip"
+	$(ECHO) "  make gen-ip"
 	$(ECHO) "      Command to generate the IPs used in this design"
 	$(ECHO) ""
-	$(ECHO) "  make pack_kernel"
+	$(ECHO) "  make package-kernel"
 	$(ECHO) "      Command to pack the module glay_kernel to Vitis kernel"
 	$(ECHO) ""
-	$(ECHO) "  make runsim"
+	$(ECHO) "  make run-sim"
 	$(ECHO) "      Command to run the simulation"
 	$(ECHO) ""
-	$(ECHO) "  make build_hw"
+	$(ECHO) "  make build-hw"
 	$(ECHO) "      Command to build xclbin files for Alveo platform, including glay_kernel"
-	$(ECHO) ""
-	$(ECHO) "  make build_sw"
-	$(ECHO) "      Command to build host software for xclbin test"
 	$(ECHO) ""
 	$(ECHO) "  make clean"
 	$(ECHO) "      Command to remove all the generated files."
@@ -73,12 +70,11 @@ TARGET ?= hw_emu
 ################## resource generation and simulation 
 .PHONY: generate-vip
 generate-vip:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_ip_generation; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_ip_generation; vivado -mode batch -source ./$(SCRIPTS_DIR)/$(KERNEL)_gen_ip.tcl -tclargs $(PART)
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vip_generation; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vip_generation; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vip_generation; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_gen_vip.tcl -tclargs $(PART) $(KERNEL) $(ACTIVE_APP_DIR) $(XILINX_DIR) $(KERNEL)_vip_generation
 
 .PHONY: package-kernel
 package-kernel:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART)
-
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL)_vivado_pack_krnl_project; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL)_package.tcl -tclargs $(PART) $(KERNEL) $(ACTIVE_APP_DIR) $(KERNEL)_vivado_pack_krnl_project $(IP_DIR)
 
 ################## simulation 
 .PHONY: run-sim
