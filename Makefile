@@ -173,7 +173,6 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 #########################################################
 export XILINX_DIR         = xilinx
 export SCRIPTS_DIR        = scripts
-export XRT_INI_PATH       = $(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini
 export KERNEL_NAME        = glay_kernel
 export DEVICE_INDEX   = 0
 export XCLBIN_PATH    = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin

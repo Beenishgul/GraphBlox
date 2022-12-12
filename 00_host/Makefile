@@ -365,7 +365,6 @@ TARGET ?= hw_emu
 
 SCRIPTS_DIR 		?= scripts
 IP_DIR      		?= IP
-XRT_INI_PATH       	?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini
 
 DEVICE_INDEX   		?= 0
 XCLBIN_PATH    		?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
