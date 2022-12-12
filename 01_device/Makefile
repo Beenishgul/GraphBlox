@@ -45,7 +45,6 @@ KERNEL_NAME         ?= glay_kernel
 SCRIPTS_DIR 		?= scripts
 IP_DIR      		?= IP
 
-XRT_INI_PATH       	?= $(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 
 DEVICE_INDEX        ?= 0
@@ -112,26 +111,27 @@ XOCCLFLAGS := --link --optimize 3
 
 .PHONY: build-hw
 build-hw:
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_test.cfg -o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME).xo
 
 .PHONY: run-emu
 run-emu:
+	export XCL_EMULATION_MODE=hw_emu ;\
+    export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project; \
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project; \
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project;  \
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).."; \
-    export XCL_EMULATION_MODE=hw_emu ;\
     emconfigutil --platform $(PLATFORM) ;\
     echo "Enter Hardware Emulation Mode";\
     cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
 	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS);\
-	xsim --gui xilinx_u250_gen3x16_xdma_4_1_202210_1-0-glay_kernel_test_hw_emu.wdb
 
 .PHONY: run-emu-wave
 run-emu-wave:
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project;  \
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
 	xsim --gui xilinx_u250_gen3x16_xdma_4_1_202210_1-0-glay_kernel_test_hw_emu.wdb
 
 
