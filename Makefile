@@ -13,30 +13,32 @@ export INTEGRATION         = openmp
 export ROOT_DIR                = $(shell cd .. ; pwd)
 export APP_DIR                 = 00_GLay
 export HOST_DIR                = 00_host
-export MAKE_DIR_DEVICE         = 01_device
+export DEVICE_DIR              = 01_device
+
 export BENCH_DIR           	   = 03_test_graphs
+
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
-export MAKE_ARGS_HOST          = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
-export MAKE_ARGS_DEVICE        = -w -C $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_DEVICE) -j$(MAKE_NUM_THREADS)
+export MAKE_HOST               = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
+export MAKE_DEVICE             = -w -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 
 .PHONY: help
 help: 
-	$(MAKE) help $(MAKE_ARGS_HOST)
-	$(MAKE) help $(MAKE_ARGS_DEVICE)
+	$(MAKE) help $(MAKE_HOST)
+	$(MAKE) help $(MAKE_DEVICE)
 
 .PHONY: clean-all
 clean-all:
-	$(MAKE) clean-all $(MAKE_ARGS_HOST)
-	$(MAKE) clean $(MAKE_ARGS_DEVICE)
+	$(MAKE) clean-all $(MAKE_HOST)
+	$(MAKE) clean $(MAKE_DEVICE)
 
 .PHONY: clean
 clean:
-	$(MAKE) clean $(MAKE_ARGS_HOST)
+	$(MAKE) clean $(MAKE_HOST)
 
 .PHONY: clean-results
 clean-results:
-	$(MAKE) clean-results $(MAKE_ARGS_HOST)
+	$(MAKE) clean-results $(MAKE_HOST)
 
 ##########################################################################
 # RUN GLay HOST
@@ -44,15 +46,15 @@ clean-results:
 
 .PHONY: run
 run:
-	$(MAKE) run $(MAKE_ARGS_HOST) 
+	$(MAKE) run $(MAKE_HOST) 
 	
 .PHONY: debug-memory
 debug-memory:
-	$(MAKE) debug-memory $(MAKE_ARGS_HOST) 
+	$(MAKE) debug-memory $(MAKE_HOST) 
 
 .PHONY: debug
 debug:
-	$(MAKE) debug $(MAKE_ARGS_HOST) 
+	$(MAKE) debug $(MAKE_HOST) 
 
 ##########################################################################
 # RUN Tests HOST
@@ -60,20 +62,20 @@ debug:
 
 .PHONY: run-test
 run-test:
-	$(MAKE) run-test $(MAKE_ARGS_HOST) 
+	$(MAKE) run-test $(MAKE_HOST) 
 
 .PHONY: debug-test
 debug-test:
-	$(MAKE) debug-test $(MAKE_ARGS_HOST) 
+	$(MAKE) debug-test $(MAKE_HOST) 
 
 .PHONY: debug-test-memory
 debug-test-memory:
-	$(MAKE) debug-test-memory $(MAKE_ARGS_HOST)
+	$(MAKE) debug-test-memory $(MAKE_HOST)
 
 # test files
 .PHONY: test
 test:
-	$(MAKE) test $(MAKE_ARGS_HOST)
+	$(MAKE) test $(MAKE_HOST)
 
 #########################################################
 #       		    GRAPH ARGUMENTS HOST       			#
@@ -169,12 +171,15 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 #########################################################
 #                        XILINX ARGS                    #
 #########################################################
-export XILINX_DIR     = xilinx
+export XILINX_DIR         = xilinx
+export SCRIPTS_DIR        = scripts
+export XRT_INI_PATH       = $(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini
+export KERNEL_NAME        = glay_kernel
 export DEVICE_INDEX   = 0
-export XCLBIN_PATH    = $(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR_DEVICE)/$(XILINX_DIR)/$(KERNEL)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
+export XCLBIN_PATH    = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
 export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
-export KERNEL = glay_kernel
+
 
 # PART setting: uncomment the line matching your Alveo card
 # export PART =  xcu200-fsgd2104-2-e
@@ -191,43 +196,43 @@ export PLATFORM = xilinx_u250_gen3x16_xdma_4_1_202210_1
 # export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 
 # TARGET: set the build target, can be hw or hw_emu
-export TARGET = hw_emu
-# export TARGET = hw
+# export TARGET = hw_emu
+export TARGET = hw
 
 ##################################################
 
 ################## resource generation and simulation
 .PHONY: generate-vip
 generate-vip:
-	$(MAKE) generate-vip $(MAKE_ARGS_DEVICE)
+	$(MAKE) generate-vip $(MAKE_DEVICE)
 
 .PHONY: package-kernel
 package-kernel:
-	$(MAKE) package-kernel $(MAKE_ARGS_DEVICE)
+	$(MAKE) package-kernel $(MAKE_DEVICE)
 
 ################## simulation
 
 .PHONY: run-sim
 run-sim:
-	$(MAKE) run-sim $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim $(MAKE_DEVICE)
 
 .PHONY: run-sim-clean
 run-sim-clean:
-	$(MAKE) run-sim-clean $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim-clean $(MAKE_DEVICE)
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	$(MAKE) run-sim-reset $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim-reset $(MAKE_DEVICE)
 
 .PHONY: run-sim-wave
 run-sim-wave:
-	$(MAKE) run-sim-wave $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim-wave $(MAKE_DEVICE)
 
 .PHONY: run-sim-help
 run-sim-help:
-	$(MAKE) run-sim-help $(MAKE_ARGS_DEVICE)
+	$(MAKE) run-sim-help $(MAKE_DEVICE)
 
 ################## build HW
 .PHONY: build-hw
 build-hw:
-	$(MAKE) build-hw $(MAKE_ARGS_DEVICE)
+	$(MAKE) build-hw $(MAKE_DEVICE)
