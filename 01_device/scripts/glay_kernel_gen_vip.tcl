@@ -13,10 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 # set the device part from command line argvs
-set_part [lindex $argv 0]
+set part_id          [lindex $argv 0]
+set kernel_name      [lindex $argv 1]
+set device_directory [lindex $argv 2]
+set xilinx_directory [lindex $argv 3]
+set active_directory [lindex $argv 4]
 
+puts $part_id
+puts $kernel_name
+puts $device_directory
+puts $xilinx_directory
+puts $active_directory
+
+set_part ${part_id}
 # ----------------------------------------------------------------------------
 # generate axi master vip
 # ----------------------------------------------------------------------------
@@ -24,8 +34,8 @@ create_ip -name axi_vip \
           -vendor xilinx.com \
           -library ip \
           -version 1.1 \
-          -module_name control_glay_kernel_vip \
-          -dir ./xilinx/glay_kernel_ip_generation
+          -module_name control_${kernel_name}_vip \
+          -dir ${device_directory}/${xilinx_directory}/${active_directory}
           
 set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.PROTOCOL {AXI4LITE} \
@@ -39,9 +49,9 @@ set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.HAS_QOS {0} \
                          CONFIG.HAS_PROT {0} \
                          CONFIG.HAS_WSTRB {1}] \
-             [get_ips control_glay_kernel_vip]
+             [get_ips control_${kernel_name}_vip]
              
-generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/control_glay_kernel_vip/control_glay_kernel_vip.xci]
+generate_target all [get_files  ${device_directory}/${xilinx_directory}/${active_directory}/control_${kernel_name}_vip/control_${kernel_name}_vip.xci]
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -51,7 +61,7 @@ create_ip -name axi_vip \
           -library ip \
           -version 1.1 \
           -module_name slv_m00_axi_vip \
-          -dir ./xilinx/glay_kernel_ip_generation
+          -dir ${device_directory}/${xilinx_directory}/${active_directory}
           
 set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.PROTOCOL {AXI4} \
@@ -69,4 +79,4 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.ID_WIDTH   {1}] \
              [get_ips slv_m00_axi_vip]
              
-generate_target all [get_files  ./xilinx/glay_kernel_ip_generation/slv_m00_axi_vip/slv_m00_axi_vip.xci]
+generate_target all [get_files  ${device_directory}/${xilinx_directory}/${active_directory}/slv_m00_axi_vip/slv_m00_axi_vip.xci]
