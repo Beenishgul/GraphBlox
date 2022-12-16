@@ -34,14 +34,20 @@ help::
 	$(ECHO) "  make clean"
 	$(ECHO) "      Command to remove all the generated files."
 
+APP                 ?= glay
+KERNEL_NAME         ?= glay_kernel
+# APP_TEST            ?= test_match
+# APP_TEST            ?= test_glay
+# APP_TEST            ?= test_StalaGraph
+APP_TEST            ?= test_glayGraph
+INTEGRATION         ?= openmp
+
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
 
 XILINX_DIR          ?= xilinx
-KERNEL_NAME         ?= glay_kernel
-
 SCRIPTS_DIR 		?= scripts
 IP_DIR      		?= IP
 
@@ -75,32 +81,51 @@ EMU_MODE ?= on
 ################## resource generation and simulation 
 .PHONY: generate-vip
 generate-vip:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_gen_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR) $(KERNEL_NAME)_vip_generation
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_gen_vip.tcl\ 
+	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR) $(KERNEL_NAME)_vip_generation
 
 .PHONY: package-kernel
 package-kernel:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project; vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_package.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vivado_pack_krnl_project $(IP_DIR)
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_package.tcl \
+	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vivado_pack_krnl_project $(IP_DIR)
 
 ################## simulation 
 .PHONY: run-sim
 run-sim:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
 
 .PHONY: run-sim-clean
 run-sim-clean:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -reset_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -reset_run
 
 .PHONY: run-sim-wave
 run-sim-wave:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -wave_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -wave_run
 
 .PHONY: run-sim-help
 run-sim-help:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project; bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -help
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -help
 
 
 ################## hardware build 
@@ -112,27 +137,38 @@ XOCCLFLAGS := --link --optimize 3
 .PHONY: build-hw
 build-hw:
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project; v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_test.cfg -o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME).xo
+	export XCL_EMULATION_MODE=hw_emu ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_test.cfg \
+	-o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin \ 
+	$(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME).xo
 
 .PHONY: run-emu
-run-emu:
+run-emu: gen-host-bin
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=hw_emu ;\
-    export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project; \
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project; \
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project;  \
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
-	echo "Generating emulation config file for platform $(PLATFORM).."; \
+	echo "Generating emulation config file for platform $(PLATFORM).." ;\
     emconfigutil --platform $(PLATFORM) ;\
-    echo "Enter Hardware Emulation Mode";\
+    echo "Enter Hardware Emulation Mode" ;\
     cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
-	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS);\
+	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS) ;\
 
 .PHONY: run-emu-wave
 run-emu-wave:
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
+	export XCL_EMULATION_MODE=hw_emu ;\
 	xsim --gui xilinx_u250_gen3x16_xdma_4_1_202210_1-0-glay_kernel_test_hw_emu.wdb
+
+.PHONY: gen-host-bin
+gen-host-bin: 
+	make $(APP_TEST)-$(INTEGRATION) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
 
 
 .PHONY: all
