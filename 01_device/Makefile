@@ -49,9 +49,10 @@ DEVICE_DIR          ?= 01_device
 
 XILINX_DIR          ?= xilinx
 SCRIPTS_DIR         ?= scripts
+IP_DIR      		?= IP
+
 SCRIPTS_DIR_ACTIVE  ?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
 XILINX_DIR_ACTIVE   ?= $(KERNEL_NAME)_$(XILINX_DIR)
-IP_DIR      		?= IP
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 
@@ -102,7 +103,7 @@ CC      := gcc
 
 ################## resource generation and simulation 
 .PHONY: gen-vip
-gen-vip:
+gen-vip: gen-scripts-dir
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
@@ -176,7 +177,9 @@ $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
 	for file in $$(ls $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)) ; do cp -v -- $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_$$file; done ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) ;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR) ;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR)
 
 
 .PHONY: run-emu
