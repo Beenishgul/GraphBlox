@@ -164,7 +164,8 @@ run-emu: gen-host-bin
 run-emu-wave:
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=hw_emu ;\
-	xsim --gui xilinx_u250_gen3x16_xdma_4_1_202210_1-0-glay_kernel_test_hw_emu.wdb
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_test_hw_emu.wdb
 
 .PHONY: gen-host-bin
 gen-host-bin: 
