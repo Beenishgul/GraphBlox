@@ -5,8 +5,8 @@ print_usage () {
   echo "Usage: "
   echo "  generate_xrt_ini.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME"
   echo ""
-  echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/"
-  echo "  SCRIPTS_DIR: 00_GLay"
+  echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+  echo "  SCRIPTS_DIR: scripts"
   echo "  KERNEL_NAME: glay_kernel"
   echo "" 
 }
