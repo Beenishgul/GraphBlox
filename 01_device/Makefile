@@ -35,7 +35,7 @@ help::
 	$(ECHO) "      Command to remove all the generated files."
 
 APP                 ?= glay
-KERNEL_NAME         ?= glay_kernel_A
+KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
