@@ -84,8 +84,15 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/glay_kernel_testbench_ex.sv"
-echo $newtext >> ${CFG_FILE_NAME}
+newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench.sv"
+newtext_cp="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/${KERNEL_NAME}_testbench.sv"
+cp ${newtext} ${newtext_cp}
+search="glay_kernel"
+replace=${KERNEL_NAME}
+if [[ $search != "" && $replace != "" ]]; then
+sed -i "s/$search/$replace/" $newtext_cp
+fi
+echo $newtext_cp >> ${CFG_FILE_NAME}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
