@@ -244,3 +244,7 @@ run-emu:
 .PHONY: run-emu-wave
 run-emu-wave:
 	$(MAKE) run-emu-wave $(MAKE_DEVICE)
+
+.PHONY: gen-host-bin
+gen-host-bin: 
+	$(MAKE) gen-host-bin $(MAKE_DEVICE)
