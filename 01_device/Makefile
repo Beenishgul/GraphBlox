@@ -35,7 +35,7 @@ help::
 	$(ECHO) "      Command to remove all the generated files."
 
 APP                 ?= glay
-KERNEL_NAME         ?= glay_kernel_A
+KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
@@ -163,11 +163,6 @@ build-hw:
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	$(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg -o $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME).xo
-
-.PHONY: gen-ini-cfg
-gen-ini-cfg: gen-scripts-dir
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME)
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME)
 
 .PHONY: gen-scripts-dir
 gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
