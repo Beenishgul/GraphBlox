@@ -230,8 +230,6 @@ debug: $(APP)
 # RUN Tests
 ##########################################################################
 
-
-
 .PHONY: run-test
 run-test: $(APP_TEST)
 	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
