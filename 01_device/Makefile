@@ -141,9 +141,14 @@ build-hw:
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_test.cfg \
+	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_build_hw.cfg \
 	-o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin \ 
 	$(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME).xo
+
+.PHONY: gen-ini-cfg
+gen-ini-cfg:
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR) $(KERNEL_NAME)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR) $(KERNEL_NAME)
 
 .PHONY: run-emu
 run-emu: gen-host-bin
