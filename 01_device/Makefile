@@ -76,7 +76,7 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 # TARGET: set the build target, can be hw or hw_emu
 TARGET   ?= hw_emu
 # TARGET ?= hw
-EMU_MODE ?= on
+EMU_MODE ?= off
 
 ##############################################
 #     CLI COMMANDS                           #
@@ -106,16 +106,14 @@ gen-vip:
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_gen_vip.tcl\ 
-	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR_ACTIVE) $(KERNEL_NAME)_vip_generation
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_gen_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR_ACTIVE) $(KERNEL_NAME)_vip_generation
 
 .PHONY: package-kernel
 package-kernel:
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package.tcl \
-	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vivado_pack_krnl_project $(IP_DIR)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vivado_pack_krnl_project $(IP_DIR)
 
 ################## simulation 
 .PHONY: run-sim
@@ -163,9 +161,7 @@ build-hw:
 	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	$(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
-	-o $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin \ 
-	$(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME).xo
+	$(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg -o $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME).xo
 
 .PHONY: gen-ini-cfg
 gen-ini-cfg: gen-scripts-dir
