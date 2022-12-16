@@ -19,7 +19,7 @@ ACTIVE_APP_DIR=$1
 SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 
-CFG_FILE_NAME="${KERNEL_NAME}_build_hw.cfg"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
 
 param="compiler.skipTimingCheckAndFrequencyScaling=1"
 slr="${KERNEL_NAME}_1:SLR0"
