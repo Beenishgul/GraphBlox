@@ -48,13 +48,15 @@ HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
 
 XILINX_DIR          ?= xilinx
-SCRIPTS_DIR 		?= scripts
+SCRIPTS_DIR         ?= scripts
+SCRIPTS_DIR_ACTIVE  ?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
+XILINX_DIR_ACTIVE   ?= $(KERNEL_NAME)_$(XILINX_DIR)
 IP_DIR      		?= IP
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 
 DEVICE_INDEX        ?= 0
-XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
+XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 # PART setting: uncomment the line matching your Alveo card
@@ -81,51 +83,51 @@ EMU_MODE ?= on
 ################## resource generation and simulation 
 .PHONY: generate-vip
 generate-vip:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vip_generation;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_gen_vip.tcl\ 
-	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR) $(KERNEL_NAME)_vip_generation
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vip_generation;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_gen_vip.tcl\ 
+	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(XILINX_DIR_ACTIVE) $(KERNEL_NAME)_vip_generation
 
 .PHONY: package-kernel
 package-kernel:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_package.tcl \
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package.tcl \
 	-tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vivado_pack_krnl_project $(IP_DIR)
 
 ################## simulation 
 .PHONY: run-sim
 run-sim:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh $(KERNEL_NAME)
 
 .PHONY: run-sim-clean
 run-sim-clean:
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh $(KERNEL_NAME)
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -reset_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh -reset_run $(KERNEL_NAME)
 
 .PHONY: run-sim-wave
 run-sim-wave:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -wave_run
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh -wave_run $(KERNEL_NAME)
 
 .PHONY: run-sim-help
 run-sim-help:
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_testbench_xsim.sh -help
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_sim_krnl_project;\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh -help $(KERNEL_NAME)
 
 
 ################## hardware build 
@@ -136,29 +138,35 @@ XOCCLFLAGS := --link --optimize 3
 
 .PHONY: build-hw
 build-hw:
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=hw_emu ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_build_hw.cfg \
-	-o $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin \ 
-	$(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME).xo
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
+	v++ $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
+	-o $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin \ 
+	$(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME).xo
 
 .PHONY: gen-ini-cfg
-gen-ini-cfg:
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR) $(KERNEL_NAME)
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR) $(KERNEL_NAME)
+gen-ini-cfg: gen-scripts-dir
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME)
+
+.PHONY: gen-scripts-dir
+gen-scripts-dir:
+	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
+	for file in $$(ls $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)) ; do cp -v -- $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_$$file; done
+
 
 .PHONY: run-emu
 run-emu: gen-host-bin
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=hw_emu ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
     emconfigutil --platform $(PLATFORM) ;\
     echo "Enter Hardware Emulation Mode" ;\
@@ -167,9 +175,9 @@ run-emu: gen-host-bin
 
 .PHONY: run-emu-wave
 run-emu-wave:
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR)/$(KERNEL_NAME)_xrt.ini ;\
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=hw_emu ;\
-	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cd $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
 	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_test_hw_emu.wdb
 
 .PHONY: gen-host-bin
@@ -183,6 +191,7 @@ all: generate-vip package-kernel build-hw
 ################## clean up
 .PHONY: clean
 clean:
-	$(RM) -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR) $(ACTIVE_APP_DIR)/.Xil
+	$(RM) -rf $(ACTIVE_APP_DIR)/$(XILINX_DIR_ACTIVE) $(ACTIVE_APP_DIR)/.Xil
+	$(RM) -rf $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
 	$(RM) -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	$(RM) -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
