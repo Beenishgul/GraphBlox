@@ -24,9 +24,9 @@
 
 kernel_name=$1
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ../../scripts/${kernel_name}_filelist_xsim.f  -i ../../IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
+xvlog_opts="--incr --relax -L uvm -f ../../${kernel_name}_scripts/${kernel_name}_filelist_xsim.f  -i ../../IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --debug typical --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
-xsim_opts="-tclbatch ../../scripts/${kernel_name}_cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
+xsim_opts="-tclbatch ../../${kernel_name}_scripts/${kernel_name}_cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 
@@ -68,7 +68,7 @@ setup()
   case $2 in
     "-lib_map_path" )
       if [[ ($3 == "") ]]; then
-        echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench.sh -help\" for more information)\n"
+        echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
         exit 1
       fi
     ;;
