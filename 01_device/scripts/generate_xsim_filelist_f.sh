@@ -87,6 +87,7 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench.sv"
 newtext_cp="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/${KERNEL_NAME}_testbench.sv"
 cp ${newtext} ${newtext_cp}
+cp ${newtext} ${newtext_cp}.bkp
 search="glay_kernel"
 replace=${KERNEL_NAME}
 if [[ $search != "" && $replace != "" ]]; then

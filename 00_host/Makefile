@@ -36,7 +36,7 @@ ALGO_DIR_GLAY       ?= glay
 ALGO_DIR_OPENMP     ?= openmp
 UTIL_DIR            ?= utils_graph
 UTIL_DIR_FPGA       ?= utils_fpga
-CONFIG_DIR			?= config
+CONFIG_DIR          ?= config
 
 #contains the tests use make run-test to compile what in this directory
 TEST_DIR            ?= tests
@@ -48,10 +48,10 @@ MAIN_DIR            ?= main
 #     CLI COMMANDS                           #
 ##############################################
 
-RM 		:= @rm -f
-RMDIR 	:= @rm -rf
-ECHO 	:= @echo
-CP 		:= @cp -rf
+RM      := @rm -f
+RMDIR   := @rm -rf
+ECHO    := @echo
+CP      := @cp -rf
 MKDIR   := @mkdir -p
 
 # TEST PASS OR FAIL
@@ -62,13 +62,13 @@ FAIL = \033[91mFAIL\033[0m
 #     COMPILER FLAGS                         #
 ##############################################
 
-CXX 	:= g++
-VPP 	:= v++
-GCC 	:= gcc
+CXX     := g++
+VPP     := v++
+GCC     := gcc
 CC      := gcc
 
 # flags
-CFLAGS   	   = -Wall -m64 -fopenmp -g -Wall -O0 
+CFLAGS         = -Wall -m64 -fopenmp -g -Wall -O0 
 LFLAGS         = -lm -lJudy
 HOST_CXXFLAGS += -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
 # The below are linking flags for C++ Compiler
@@ -119,8 +119,8 @@ OBJ_FILES_CONFIG    = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c,
 OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
-				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)   				\
-				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)   			\
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                  \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)             \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
 #########################################################
@@ -253,7 +253,7 @@ test:
 	fi
 	
 #########################################################
-#       		    GRAPH ARGUMENTS         			#
+#                   GRAPH ARGUMENTS                     #
 #########################################################
 
 GRAPH_DIR ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
@@ -301,13 +301,13 @@ FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-PULL_PUSH 		?= 0
-ALGORITHMS 		?= 1
+PULL_PUSH       ?= 0
+ALGORITHMS      ?= 1
 
 #GRAPH DATA_STRUCTURES
-SORT_TYPE		 ?= 2
+SORT_TYPE        ?= 2
 DATA_STRUCTURES  ?= 1
-REORDER_LAYER1 	 ?= 0
+REORDER_LAYER1   ?= 0
 REORDER_LAYER2   ?= 0
 REORDER_LAYER3   ?= 0
 # CACHE_SIZE       ?= 32768 #(32KB)
@@ -315,10 +315,10 @@ REORDER_LAYER3   ?= 0
 CACHE_SIZE       ?= 5068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
-ROOT 			?= 0
-TOLERANCE 		?= 1e-8
-DELTA			?= 800
-NUM_ITERATIONS	?= 1
+ROOT            ?= 0
+TOLERANCE       ?= 1e-8
+DELTA           ?= 800
+NUM_ITERATIONS  ?= 1
 
 #PERFORMANCE
 NUM_THREADS_PRE  ?= 1
@@ -326,16 +326,16 @@ NUM_THREADS_ALGO ?= 1
 NUM_THREADS_KER  ?= 1
 
 #EXPERIMENTS
-NUM_TRIALS 		?= 1
+NUM_TRIALS      ?= 1
 
 #GRAPH FROMAT EDGELIST
-FILE_FORMAT		?= 1
-CONVERT_FORMAT 	?= 1
+FILE_FORMAT     ?= 1
+CONVERT_FORMAT  ?= 1
 
 #STATS COLLECTION VARIABLES
-BIN_SIZE 		?= 1000
-INOUT_STATS 	?= 0
-MASK_MODE 		?= 0
+BIN_SIZE        ?= 1000
+INOUT_STATS     ?= 0
+MASK_MODE       ?= 0
 
 #########################################################
 #                GENERAL XILINX ARGS                    #
@@ -361,12 +361,12 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 TARGET ?= hw_emu
 # TARGET ?= hw
 
-SCRIPTS_DIR 		?= scripts
-IP_DIR      		?= IP
+SCRIPTS_DIR         ?= scripts
+IP_DIR              ?= IP
 
-DEVICE_INDEX   		?= 0
-XCLBIN_PATH    		?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
-GLAY_FPGA_ARGS 		?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+DEVICE_INDEX        ?= 0
+XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
+GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################
 
