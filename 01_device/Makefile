@@ -49,7 +49,7 @@ DEVICE_DIR          ?= 01_device
 
 XILINX_DIR          ?= xilinx
 SCRIPTS_DIR         ?= scripts
-IP_DIR      		?= IP
+IP_DIR              ?= IP
 
 SCRIPTS_DIR_ACTIVE  ?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
 XILINX_DIR_ACTIVE   ?= $(KERNEL_NAME)_$(XILINX_DIR)
@@ -83,22 +83,22 @@ EMU_MODE ?= off
 #     CLI COMMANDS                           #
 ##############################################
 
-RM 		:=rm -f
-RMDIR 	:=rm -rf
-CP 		:=@cp -rf
+RM      :=rm -f
+RMDIR   :=rm -rf
+CP      :=@cp -rf
 MKDIR   :=mkdir -p
 EXPORTE :=@export
-CD 		:=@cd
-ECHO	:=@echo
+CD      :=@cd
+ECHO    :=@echo
 EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
 
 ##############################################
 #     COMPILER FLAGS                         #
 ##############################################
 
-CXX 	:= g++
-VPP 	:= v++
-GCC 	:= gcc
+CXX     := g++
+VPP     := v++
+GCC     := gcc
 CC      := gcc
 
 ################## resource generation and simulation 
@@ -187,9 +187,9 @@ run-emu: gen-host-bin
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
-    emconfigutil --platform $(PLATFORM)  ;\
-    echo "Enter Hardware Emulation Mode" ;\
-    cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
+	emconfigutil --platform $(PLATFORM)  ;\
+	echo "Enter Hardware Emulation Mode" ;\
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
 	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-wave
