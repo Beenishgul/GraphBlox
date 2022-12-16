@@ -174,9 +174,11 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 export XILINX_DIR         = xilinx
 export SCRIPTS_DIR        = scripts
 export KERNEL_NAME        = glay_kernel
-export DEVICE_INDEX   = 0
-export XCLBIN_PATH    = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
-export GLAY_FPGA_ARGS = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+export SCRIPTS_DIR_ACTIVE = $(KERNEL_NAME)_$(SCRIPTS_DIR)
+export XILINX_DIR_ACTIVE  = $(KERNEL_NAME)_$(XILINX_DIR)
+export DEVICE_INDEX       = 0
+export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
+export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 
 
@@ -202,9 +204,9 @@ export EMU_MODE = off
 ##################################################
 
 ################## resource generation and simulation
-.PHONY: generate-vip
-generate-vip:
-	$(MAKE) generate-vip $(MAKE_DEVICE)
+.PHONY: gen-vip
+gen-vip:
+	$(MAKE) gen-vip $(MAKE_DEVICE)
 
 .PHONY: package-kernel
 package-kernel:
@@ -248,3 +250,12 @@ run-emu-wave:
 .PHONY: gen-host-bin
 gen-host-bin: 
 	$(MAKE) gen-host-bin $(MAKE_DEVICE)
+
+
+.PHONY: gen-host-bin
+gen-host-bin: 
+	$(MAKE) gen-host-bin $(MAKE_DEVICE)
+
+.PHONY: gen-scripts-dir
+gen-scripts-dir: 
+	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
