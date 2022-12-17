@@ -22,7 +22,7 @@ KERNEL_NAME=$3
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
 
 param="compiler.skipTimingCheckAndFrequencyScaling=1"
-slr="${KERNEL_NAME}_1:SLR0"
+slr="${KERNEL_NAME}_1:SLR1"
 
 newtext="[advanced]"
 echo $newtext > ${CFG_FILE_NAME}
