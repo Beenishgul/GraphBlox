@@ -173,7 +173,7 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 #########################################################
 export XILINX_DIR         = xilinx
 export SCRIPTS_DIR        = scripts
-export KERNEL_NAME        = glay_kernel
+export KERNEL_NAME        = glay_kernel_C
 export IP_DIR             = IP
 export SCRIPTS_DIR_ACTIVE = $(KERNEL_NAME)_$(SCRIPTS_DIR)
 export XILINX_DIR_ACTIVE  = $(KERNEL_NAME)_$(XILINX_DIR)
@@ -211,9 +211,9 @@ export EMU_MODE = off
 gen-vip:
 	$(MAKE) gen-vip $(MAKE_DEVICE)
 
-.PHONY: package-kernel
-package-kernel:
-	$(MAKE) package-kernel $(MAKE_DEVICE)
+.PHONY: pack-kernel
+pack-kernel:
+	$(MAKE) pack-kernel $(MAKE_DEVICE)
 
 ################## simulation
 
