@@ -63,22 +63,22 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_xilinx/${KERNEL_NAME}_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""

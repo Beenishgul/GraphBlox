@@ -174,8 +174,11 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 export XILINX_DIR         = xilinx
 export SCRIPTS_DIR        = scripts
 export KERNEL_NAME        = glay_kernel
+export IP_DIR             = IP
 export SCRIPTS_DIR_ACTIVE = $(KERNEL_NAME)_$(SCRIPTS_DIR)
 export XILINX_DIR_ACTIVE  = $(KERNEL_NAME)_$(XILINX_DIR)
+export IP_DIR_ACTIVE      = $(KERNEL_NAME)_$(IP_DIR)
+
 export DEVICE_INDEX       = 0
 export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
 export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)

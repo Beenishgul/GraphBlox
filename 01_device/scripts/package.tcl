@@ -19,14 +19,14 @@
 # create ip project with part name in command line argvs
 set part_id          [lindex $argv 0]
 set kernel_name      [lindex $argv 1]
-set device_directory [lindex $argv 2]
+set app_directory    [lindex $argv 2]
 set xilinx_directory [lindex $argv 3]
 set active_directory [lindex $argv 4]
 set ip_directory     [lindex $argv 5]
 
 puts $part_id
 puts $kernel_name
-puts $device_directory
+puts $app_directory
 puts $xilinx_directory
 puts $active_directory
 puts $ip_directory
@@ -34,7 +34,7 @@ puts $ip_directory
 create_project -force $kernel_name ./$kernel_name -part $part_id
 
 # add design sources into project
-add_files -fileset sources_1 [read [open ../../${kernel_name}_scripts/${kernel_name}_filelist_package.f]]
+add_files -fileset sources_1 [read [open ${app_directory}/${kernel_name}_scripts/${kernel_name}_filelist_package.f]]
 
 update_compile_order -fileset sources_1 
 # create IP packaging project
