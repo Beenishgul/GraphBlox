@@ -23,18 +23,20 @@
 
 
 kernel_name=$1
+app_directory=$2
+
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ../../${kernel_name}_scripts/${kernel_name}_filelist_xsim.f  -i ../../IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
+xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${kernel_name}_scripts/${kernel_name}_filelist_xsim.f  -i ${app_directory}/${kernel_name}_IP/iob_cache/iob_include -L xilinx_vip --sv -d DUMP_WAVEFORM"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --debug typical --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
-xsim_opts="-tclbatch ../../${kernel_name}_scripts/${kernel_name}_cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
+xsim_opts="-tclbatch ${app_directory}/${kernel_name}_scripts/${kernel_name}_cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 
 # Main steps
 run()
 {
-  check_args $# $2
-  setup $2 $3
+  check_args $# $3
+  setup $3 $4
 }
 
 # RUN_STEP: <compile>
@@ -65,9 +67,9 @@ wave_run()
 # STEP: setup
 setup()
 {
-  case $2 in
+  case $3 in
     "-lib_map_path" )
-      if [[ ($3 == "") ]]; then
+      if [[ ($4 == "") ]]; then
         echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
         exit 1
       fi
@@ -93,6 +95,7 @@ setup()
       compile
       elaborate
       simulate
+      wave_run
       exit 0
     ;;
   esac
@@ -118,12 +121,12 @@ reset_run()
 # Check command line arguments
 check_args()
 {
-  if [[ ($2 == 2 ) && ($3 != "-lib_map_path" && $3 != "-noclean_files" && $3 != "-reset_run" && $3 != "-wave_run" && $3 != "-help" && $3 != "-h") ]]; then
-    echo -e "ERROR: Unknown option specified '$3' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
+  if [[ ($3 == 3 ) && ($4 != "-lib_map_path" && $4 != "-noclean_files" && $4 != "-reset_run" && $4 != "-wave_run" && $4 != "-help" && $4 != "-h") ]]; then
+    echo -e "ERROR: Unknown option specified '$4' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
 
-  if [[ ($3 == "-help" || $3 == "-h") ]]; then
+  if [[ ($4 == "-help" || $4 == "-h") ]]; then
     usage
   fi
 }
@@ -148,4 +151,4 @@ from the previous run will be removed. If you don't want to remove the simulator
 }
 
 # Launch script
-run $2 $3
+run $3 $4

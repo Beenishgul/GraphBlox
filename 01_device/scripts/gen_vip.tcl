@@ -17,13 +17,11 @@
 set part_id          [lindex $argv 0]
 set kernel_name      [lindex $argv 1]
 set device_directory [lindex $argv 2]
-set xilinx_directory [lindex $argv 3]
-set active_directory [lindex $argv 4]
+set active_directory [lindex $argv 3]
 
 puts $part_id
 puts $kernel_name
 puts $device_directory
-puts $xilinx_directory
 puts $active_directory
 
 set_part ${part_id}
@@ -35,7 +33,7 @@ create_ip -name axi_vip \
           -library ip \
           -version 1.1 \
           -module_name control_${kernel_name}_vip \
-          -dir ${device_directory}/${xilinx_directory}/${active_directory}
+          -dir ${device_directory}/${active_directory}
           
 set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.PROTOCOL {AXI4LITE} \
@@ -51,7 +49,7 @@ set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.HAS_WSTRB {1}] \
              [get_ips control_${kernel_name}_vip]
              
-generate_target all [get_files  ${device_directory}/${xilinx_directory}/${active_directory}/control_${kernel_name}_vip/control_${kernel_name}_vip.xci]
+generate_target all [get_files  ${device_directory}/${active_directory}/control_${kernel_name}_vip/control_${kernel_name}_vip.xci]
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -61,7 +59,7 @@ create_ip -name axi_vip \
           -library ip \
           -version 1.1 \
           -module_name slv_m00_axi_vip \
-          -dir ${device_directory}/${xilinx_directory}/${active_directory}
+          -dir ${device_directory}/${active_directory}
           
 set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.PROTOCOL {AXI4} \
@@ -79,4 +77,4 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.ID_WIDTH   {1}] \
              [get_ips slv_m00_axi_vip]
              
-generate_target all [get_files  ${device_directory}/${xilinx_directory}/${active_directory}/slv_m00_axi_vip/slv_m00_axi_vip.xci]
+generate_target all [get_files  ${device_directory}/${active_directory}/slv_m00_axi_vip/slv_m00_axi_vip.xci]
