@@ -15,7 +15,7 @@ export APP_DIR                 = 00_GLay
 export HOST_DIR                = 00_host
 export DEVICE_DIR              = 01_device
 
-export BENCH_DIR           	   = 03_test_graphs
+export BENCH_DIR               = 03_test_graphs
 
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
 export MAKE_HOST               = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
@@ -78,7 +78,7 @@ test:
 	$(MAKE) test $(MAKE_HOST)
 
 #########################################################
-#       		    GRAPH ARGUMENTS HOST       			#
+#                   GRAPH ARGUMENTS HOST                #
 #########################################################
 
 export GRAPH_DIR = $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
@@ -126,13 +126,13 @@ export FILE_BIN = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		= 0
-export ALGORITHMS 		= 1
+export PULL_PUSH        = 0
+export ALGORITHMS       = 1
 
 #GRAPH DATA_STRUCTURES
-export SORT_TYPE		= 2
+export SORT_TYPE        = 2
 export DATA_STRUCTURES  = 0
-export REORDER_LAYER1 	= 0
+export REORDER_LAYER1   = 0
 export REORDER_LAYER2   = 0
 export REORDER_LAYER3   = 0
 # export CACHE_SIZE       = 32768 #(32KB)
@@ -140,10 +140,10 @@ export REORDER_LAYER3   = 0
 export CACHE_SIZE       = 5068672 #(22MB)
 
 #ALGORITHM SPECIFIC ARGS
-export ROOT 			= 0
-export TOLERANCE 		= 1e-8
-export DELTA			= 800
-export NUM_ITERATIONS	= 1
+export ROOT             = 0
+export TOLERANCE        = 1e-8
+export DELTA            = 800
+export NUM_ITERATIONS   = 1
 
 #PERFORMANCE
 export NUM_THREADS_PRE  = 1
@@ -151,16 +151,16 @@ export NUM_THREADS_ALGO = 1
 export NUM_THREADS_KER  = 1
 
 #EXPERIMENTS
-export NUM_TRIALS 		= 1
+export NUM_TRIALS       = 1
 
 #GRAPH FROMAT EDGELIST
-export FILE_FORMAT		= 1
-export CONVERT_FORMAT 	= 1
+export FILE_FORMAT      = 1
+export CONVERT_FORMAT   = 1
 
 #STATS COLLECTION VARIABLES
-export BIN_SIZE 		= 1000
-export INOUT_STATS 		= 0
-export MASK_MODE 		= 0
+export BIN_SIZE         = 1000
+export INOUT_STATS      = 0
+export MASK_MODE        = 0
 
 ##################################################
 

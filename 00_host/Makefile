@@ -119,8 +119,8 @@ OBJ_FILES_CONFIG    = $(patsubst $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c,
 OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
-				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                  \
-				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)             \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)            \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
 
 #########################################################

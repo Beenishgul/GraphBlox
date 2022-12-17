@@ -1,21 +1,3 @@
-#
-# Copyright 2021 Xilinx, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-
-
 .PHONY: help
 help::
 	$(ECHO) "Makefile Usage:"
@@ -51,9 +33,9 @@ XILINX_DIR          ?= xilinx
 SCRIPTS_DIR         ?= scripts
 IP_DIR              ?= IP
 
-SCRIPTS_DIR_ACTIVE  ?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
-XILINX_DIR_ACTIVE   ?= $(KERNEL_NAME)_$(XILINX_DIR)
-IP_DIR _ACTIVE      ?= $(KERNEL_NAME)_$(XILINX_DIR)
+SCRIPTS_DIR_ACTIVE 	?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
+XILINX_DIR_ACTIVE  	?= $(KERNEL_NAME)_$(XILINX_DIR)
+IP_DIR_ACTIVE       ?= $(KERNEL_NAME)_$(XILINX_DIR)
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 
@@ -150,7 +132,7 @@ run-sim-help:
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh -help $(KERNEL_NAME)
 
 
-################## hardware build 
+################## hardware build
 XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET)  -s -g
 XOCCLFLAGS := --link --optimize 3
 # You could uncomment following line and modify the options for hardware debug/profiling
@@ -167,9 +149,9 @@ build-hw:
 
 .PHONY: gen-scripts-dir
 gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
-	
+
 .PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
-$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE): 
+$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
 	for file in $$(ls $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)) ; do cp -v -- $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_$$file; done ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) ;\
@@ -201,7 +183,7 @@ run-emu-wave:
 	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_test_hw_emu.wdb
 
 .PHONY: gen-host-bin
-gen-host-bin: 
+gen-host-bin:
 	make $(APP_TEST)-$(INTEGRATION) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
 
 
