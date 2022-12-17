@@ -66,7 +66,7 @@ set_property value_source constant     $bifparam
 set clkbif      [::ipx::get_bus_interfaces -of [ipx::current_core] "ap_clk"]
 set clkbifparam [::ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # Set desired frequency                   
-set_property value 250000000 $clkbifparam
+set_property value 300000000 $clkbifparam
 # set value_resolve_type 'user' if the frequency can vary. 
 set_property value_resolve_type user $clkbifparam
 
