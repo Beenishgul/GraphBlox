@@ -173,7 +173,7 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 #########################################################
 export XILINX_DIR         = xilinx
 export SCRIPTS_DIR        = scripts
-export KERNEL_NAME        = glay_kernel_C
+export KERNEL_NAME        = glay_kernel
 export IP_DIR             = IP
 export SCRIPTS_DIR_ACTIVE = $(KERNEL_NAME)_$(SCRIPTS_DIR)
 export XILINX_DIR_ACTIVE  = $(KERNEL_NAME)_$(XILINX_DIR)
