@@ -56,16 +56,22 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_globals_pkg.sv"
+echo $newtext >> ${CFG_FILE_NAME}
+
 newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_axi4_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_descriptor_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_globals_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_control_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""
+
+echo $newtext >> ${CFG_FILE_NAME}
+newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/glay_kernel_control.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/glay_kernel_afu.sv"
