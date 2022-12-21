@@ -130,8 +130,7 @@ module glay_kernel_afu #(
       ap_idle_r <= 1'b1;
     end
     else begin
-      ap_idle_r <= ap_done ? 1'b1 :
-        ap_start_pulse ? 1'b0 : ap_idle;
+      ap_idle_r <= ap_done ? 1'b1 : ap_start_pulse ? 1'b0 : ap_idle;
     end
   end
 
