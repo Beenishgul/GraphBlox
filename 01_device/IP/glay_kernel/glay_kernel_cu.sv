@@ -38,12 +38,13 @@ module glay_kernel_cu #(
 ///////////////////////////////////////////////////////////////////////////////
 // AXI write master stage
   logic                          m_axi_areset    ;
+  logic                          control_areset  ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done    ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
 
   assign glay_cu_done = {NUM_GRAPH_CLUSTERS{1'b1}};
 
-    AXI4MasterReadInterface m_axi_read;
+  AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
 
   GlayControlChainIterfaceInput  glay_control_in_reg    ;
@@ -63,7 +64,8 @@ module glay_kernel_cu #(
 
 // Register reset signal.
   always @(posedge ap_clk) begin
-    m_axi_areset <= areset;
+    m_axi_areset   <= areset;
+    control_areset <= areset;
   end
 
 ///////////////////////////////////////////////////////////////////////////////

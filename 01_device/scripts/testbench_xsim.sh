@@ -35,6 +35,10 @@ echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 # Main steps
 run()
 {
+  echo "run $#"
+  echo "run $kernel_name   $1"
+  echo "run $app_directory $2"
+  echo "run $3"
   check_args $# $3
   setup $3 $4
 }
@@ -67,9 +71,11 @@ wave_run()
 # STEP: setup
 setup()
 {
-  case $3 in
+  echo "Setup $1"
+  echo "Setup $2"
+  case $1 in
     "-lib_map_path" )
-      if [[ ($4 == "") ]]; then
+      if [[ ($2 == "") ]]; then
         echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
         exit 1
       fi
@@ -120,12 +126,14 @@ reset_run()
 # Check command line arguments
 check_args()
 {
-  if [[ ($3 == 3 ) && ($4 != "-lib_map_path" && $4 != "-noclean_files" && $4 != "-reset_run" && $4 != "-wave_run" && $4 != "-help" && $4 != "-h") ]]; then
-    echo -e "ERROR: Unknown option specified '$4' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
+  echo "check_args $1"
+  echo "check_args $2"
+  if [[ ($1 == 3 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
+    echo -e "ERROR: Unknown option specified '$2' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
 
-  if [[ ($4 == "-help" || $4 == "-h") ]]; then
+  if [[ ($2 == "-help" || $2 == "-h") ]]; then
     usage
   fi
 }
@@ -150,4 +158,4 @@ from the previous run will be removed. If you don't want to remove the simulator
 }
 
 # Launch script
-run $3 $4
+run $1 $2 $3 
