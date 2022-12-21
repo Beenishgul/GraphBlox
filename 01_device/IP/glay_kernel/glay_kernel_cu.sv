@@ -25,7 +25,7 @@ module glay_kernel_cu #(
   input  logic                          ap_clk          ,
   input  logic                          areset          ,
   input  GlayControlChainIterfaceInput  glay_control_in ,
-  output GlayControlChainIterfaceInput  glay_control_out,
+  output GlayControlChainIterfaceOutput glay_control_out,
   input  GLAYDescriptorInterface        glay_descriptor ,
   input  AXI4MasterReadInterfaceInput   m_axi_read_in   ,
   output AXI4MasterReadInterfaceOutput  m_axi_read_out  ,
@@ -44,10 +44,10 @@ module glay_kernel_cu #(
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
 
-  GlayControlChainIterfaceInput glay_control_in_reg    ;
-  GlayControlChainIterfaceInput glay_control_out_reg   ;
-  GLAYDescriptorInterface       glay_descriptor_in_reg ;
-  GLAYDescriptorInterface       glay_descriptor_out_reg;
+  GlayControlChainIterfaceInput  glay_control_in_reg    ;
+  GlayControlChainIterfaceOutput glay_control_out_reg   ;
+  GLAYDescriptorInterface        glay_descriptor_in_reg ;
+  GLAYDescriptorInterface        glay_descriptor_out_reg;
 
   assign m_axi_write.out = 0;
   assign m_axi_read.out  = 0;
@@ -86,25 +86,25 @@ module glay_kernel_cu #(
 
   always @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_control_in_reg.start    <= 1'b0;
-      glay_control_in_reg.continue <= 1'b0;
+      glay_control_in_reg.glay_start    <= 1'b0;
+      glay_control_in_reg.glay_continue <= 1'b0;
     end
     else begin
-      glay_control_in_reg.start    <= glay_control_in.start ;
-      glay_control_in_reg.continue <= glay_control_in.continue;
+      glay_control_in_reg.glay_start    <= glay_control_in.glay_start ;
+      glay_control_in_reg.glay_continue <= glay_control_in.glay_continue;
     end
   end
 
   always @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_control_out.idle  <= 1'b1;
-      glay_control_out.done  <= 1'b0;
-      glay_control_out.ready <= 1'b0;
+      glay_control_out.glay_idle  <= 1'b1;
+      glay_control_out.glay_done  <= 1'b0;
+      glay_control_out.glay_ready <= 1'b0;
     end
     else begin
-      glay_control_out.idle  <= glay_control_out_reg.idle;
-      glay_control_out.done  <= glay_control_out_reg.done;
-      glay_control_out.ready <= glay_control_out_reg.ready;
+      glay_control_out.glay_idle  <= glay_control_out_reg.glay_idle;
+      glay_control_out.glay_done  <= glay_control_out_reg.glay_done;
+      glay_control_out.glay_ready <= glay_control_out_reg.glay_ready;
     end
   end
 
