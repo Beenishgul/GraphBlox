@@ -11,6 +11,7 @@
 // Revise : 2022-11-29 16:14:59
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
+
 `timescale 1 ns / 1 ps
 package GLAY_DESCRIPTOR_PKG;
 

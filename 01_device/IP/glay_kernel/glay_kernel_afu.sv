@@ -15,6 +15,7 @@
 import GLAY_GLOBALS_PKG::*;
 import GLAY_AXI4_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
+import GLAY_CONTROL_PKG::*;
 
 module glay_kernel_afu #(
   parameter C_M00_AXI_ADDR_WIDTH = 64             ,
@@ -90,14 +91,13 @@ module glay_kernel_afu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
   (* KEEP = "yes" *)
-  logic                          areset         = 1'b0                      ;
-  logic                          m_axi_areset   = 1'b0                      ;
-  logic                          glay_areset    = 1'b0                      ;
-  logic                          ap_start_r     = 1'b0                      ;
-  logic                          ap_idle_r      = 1'b1                      ;
-  logic                          ap_start_pulse                             ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i      = {NUM_GRAPH_CLUSTERS{1'b0}};
-  logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
+  logic areset         = 1'b0;
+  logic m_axi_areset   = 1'b0;
+  logic glay_areset    = 1'b0;
+  logic control_areset = 1'b0;
+
+  GlayControlChainIterfaceInput glay_control_in ;
+  GlayControlChainIterfaceInput glay_control_out;
 
   GLAYDescriptorInterface  glay_descriptor;
   AXI4MasterReadInterface  m_axi_read     ;
@@ -109,54 +109,43 @@ module glay_kernel_afu #(
 
 // Register and invert reset signal.
   always @(posedge ap_clk) begin
-    areset       <= ~ap_rst_n;
-    m_axi_areset <= ~ap_rst_n;
-    glay_areset  <= ~ap_rst_n;
+    areset         <= ~ap_rst_n;
+    m_axi_areset   <= ~ap_rst_n;
+    glay_areset    <= ~ap_rst_n;
+    control_areset <= ~ap_rst_n;
   end
 
-// create pulse when ap_start transitions to 1
-  always @(posedge ap_clk) begin
-    begin
-      ap_start_r <= ap_start;
-    end
-  end
+///////////////////////////////////////////////////////////////////////////////
+// GLay control chain signals
+///////////////////////////////////////////////////////////////////////////////
 
-  assign ap_start_pulse = ap_start & ~ap_start_r;
-
-// ap_idle is asserted when done is asserted, it is de-asserted when ap_start_pulse
-// is asserted
   always @(posedge ap_clk) begin
-    if (areset) begin
-      ap_idle_r <= 1'b1;
+    if (control_areset) begin
+      glay_control_in.start    <= 1'b0;
+      glay_control_in.continue <= 1'b0;
     end
     else begin
-      ap_idle_r <= ap_done ? 1'b1 : ap_start_pulse ? 1'b0 : ap_idle;
+      glay_control_in.start    <= ap_start;
+      glay_control_in.continue <= ap_continue;
     end
   end
 
-  assign ap_idle = ap_idle_r;
-
-// Done logic
   always @(posedge ap_clk) begin
-    if (areset) begin
-      ap_done_r <= '0;
+    if (control_areset) begin
+      ap_idle  <= 1'b1;
+      ap_done  <= 1'b0;
+      ap_ready <= 1'b0;
     end
     else begin
-      ap_done_r <= (ap_continue & ap_done) ? '0 : ap_done_r | ap_done_i;
+      ap_idle  <= glay_control_out.idle;
+      ap_done  <= glay_control_out.done;
+      ap_ready <= glay_control_out.ready;
     end
   end
-
-  assign ap_done = &ap_done_r;
-
-// Ready Logic (non-pipelined case)
-  assign ap_ready = ap_done;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // DRIVE GLAY AXI4 SIGNALS
 ///////////////////////////////////////////////////////////////////////////////
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // READ AXI4 SIGNALS INPUT
@@ -301,16 +290,17 @@ module glay_kernel_afu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_glay_kernel_cu (
-    .ap_clk         (ap_clk         ),
-    .areset         (glay_areset    ),
-    .ap_start       (ap_start       ),
-    .ap_done        (ap_done_i      ),
-    .glay_descriptor(glay_descriptor),
-    .m_axi_read_in  (m_axi_read.in  ),
-    .m_axi_read_out (m_axi_read.out ),
-    .m_axi_write_in (m_axi_write.in ),
-    .m_axi_write_out(m_axi_write.out)
+    .ap_clk          (ap_clk          ),
+    .areset          (areset          ),
+    .glay_control_in (glay_control_in ),
+    .glay_control_out(glay_control_out),
+    .glay_descriptor (glay_descriptor ),
+    .m_axi_read_in   (m_axi_read_in   ),
+    .m_axi_read_out  (m_axi_read_out  ),
+    .m_axi_write_in  (m_axi_write_in  ),
+    .m_axi_write_out (m_axi_write_out )
   );
+
 
 endmodule : glay_kernel_afu
 
