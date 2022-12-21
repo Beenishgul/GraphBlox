@@ -95,7 +95,6 @@ setup()
       compile
       elaborate
       simulate
-      wave_run
       exit 0
     ;;
   esac

@@ -15,12 +15,12 @@ import GLAY_DESCRIPTOR_PKG::*;
 
 class GraphCSR;
 
-    string                     graph_name             ;
-    bit [VERTEX_DATA_BITS-1:0] mem512_vertex_count    ;
-    bit [VERTEX_DATA_BITS-1:0] mem512_edge_count      ;
-    bit [VERTEX_DATA_BITS-1:0] mem512_csr_struct_count;
-    bit [VERTEX_DATA_BITS-1:0] vertex_count           ;
-    bit [VERTEX_DATA_BITS-1:0] edge_count             ;
+    string  graph_name             ;
+    integer mem512_vertex_count    ;
+    integer mem512_edge_count      ;
+    integer mem512_csr_struct_count;
+    integer vertex_count           ;
+    integer edge_count             ;
 
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] csr_struct[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] out_degree[];

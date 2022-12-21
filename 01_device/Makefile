@@ -93,7 +93,7 @@ gen-vip: gen-scripts-dir
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_gen_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(KERNEL_NAME)_vip_generation
 
 .PHONY: pack-kernel
-pack-kernel:
+pack-kernel: gen-scripts-dir
 	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_pack_krnl_project;\
