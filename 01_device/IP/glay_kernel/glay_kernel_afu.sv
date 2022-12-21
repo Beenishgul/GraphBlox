@@ -96,8 +96,8 @@ module glay_kernel_afu #(
   logic glay_areset    = 1'b0;
   logic control_areset = 1'b0;
 
-  GlayControlChainIterfaceInput glay_control_in ;
-  GlayControlChainIterfaceInput glay_control_out;
+  GlayControlChainIterfaceInput  glay_control_in ;
+  GlayControlChainIterfaceOutput glay_control_out;
 
   GLAYDescriptorInterface  glay_descriptor;
   AXI4MasterReadInterface  m_axi_read     ;
@@ -121,12 +121,12 @@ module glay_kernel_afu #(
 
   always @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_control_in.start    <= 1'b0;
-      glay_control_in.continue <= 1'b0;
+      glay_control_in.glay_start    <= 1'b0;
+      glay_control_in.glay_continue <= 1'b0;
     end
     else begin
-      glay_control_in.start    <= ap_start;
-      glay_control_in.continue <= ap_continue;
+      glay_control_in.glay_start    <= ap_start;
+      glay_control_in.glay_continue <= ap_continue;
     end
   end
 
@@ -137,9 +137,9 @@ module glay_kernel_afu #(
       ap_ready <= 1'b0;
     end
     else begin
-      ap_idle  <= glay_control_out.idle;
-      ap_done  <= glay_control_out.done;
-      ap_ready <= glay_control_out.ready;
+      ap_idle  <= glay_control_out.glay_idle;
+      ap_done  <= glay_control_out.glay_done;
+      ap_ready <= glay_control_out.glay_ready;
     end
   end
 
