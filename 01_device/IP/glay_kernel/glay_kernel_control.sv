@@ -25,6 +25,7 @@ module glay_kernel_control #(
     // System Signals
     input  logic                          ap_clk             ,
     input  logic                          areset             ,
+    input  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_in    ,
     input  GlayControlChainIterfaceInput  glay_control_in    ,
     output GlayControlChainIterfaceOutput glay_control_out   ,
     input  GLAYDescriptorInterface        glay_descriptor_in ,
@@ -37,6 +38,15 @@ module glay_kernel_control #(
     logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i      = {NUM_GRAPH_CLUSTERS{1'b0}};
     logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
 
+
+    always @(posedge ap_clk) begin
+        if (areset) begin
+            ap_done_i <= {NUM_GRAPH_CLUSTERS{1'b0}};
+        end
+        else begin
+            ap_done_i <= glay_cu_done_in;
+        end
+    end
 
 // create pulse when ap_start transitions to 1
     always @(posedge ap_clk) begin

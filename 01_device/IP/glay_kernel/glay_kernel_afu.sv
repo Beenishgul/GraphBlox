@@ -133,7 +133,7 @@ module glay_kernel_afu #(
   always @(posedge ap_clk) begin
     if (control_areset) begin
       ap_idle  <= 1'b1;
-      ap_done  <= 1'b0;
+      ap_done  <= 1'b1;
       ap_ready <= 1'b0;
     end
     else begin
@@ -295,10 +295,10 @@ module glay_kernel_afu #(
     .glay_control_in (glay_control_in ),
     .glay_control_out(glay_control_out),
     .glay_descriptor (glay_descriptor ),
-    .m_axi_read_in   (m_axi_read_in   ),
-    .m_axi_read_out  (m_axi_read_out  ),
-    .m_axi_write_in  (m_axi_write_in  ),
-    .m_axi_write_out (m_axi_write_out )
+    .m_axi_read_in   (m_axi_read.in   ),
+    .m_axi_read_out  (m_axi_read.out  ),
+    .m_axi_write_in  (m_axi_write.in  ),
+    .m_axi_write_out (m_axi_write.out )
   );
 
 

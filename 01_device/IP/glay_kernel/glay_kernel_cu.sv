@@ -37,11 +37,13 @@ module glay_kernel_cu #(
 // Wires and Variables
 ///////////////////////////////////////////////////////////////////////////////
 // AXI write master stage
-  logic glay_done   ;
-  logic m_axi_areset;
+  logic                          m_axi_areset    ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done    ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
 
+  assign glay_cu_done = {NUM_GRAPH_CLUSTERS{1'b1}};
 
-  AXI4MasterReadInterface  m_axi_read ;
+    AXI4MasterReadInterface m_axi_read;
   AXI4MasterWriteInterface m_axi_write;
 
   GlayControlChainIterfaceInput  glay_control_in_reg    ;
@@ -64,21 +66,18 @@ module glay_kernel_cu #(
     m_axi_areset <= areset;
   end
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Done Logic
 ///////////////////////////////////////////////////////////////////////////////
 
   always @(posedge ap_clk) begin
     if (areset) begin
-      glay_done <= 0;
+      glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
-      glay_done <= 1;
+      glay_cu_done_reg <= glay_cu_done;
     end
   end
-
-  assign ap_done = glay_done;
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLay control chain signals
@@ -114,8 +113,9 @@ module glay_kernel_cu #(
   ) inst_glay_kernel_control (
     .ap_clk             (ap_clk                 ),
     .areset             (control_areset         ),
+    .glay_cu_done_in    (glay_cu_done_reg       ),
     .glay_control_in    (glay_control_in_reg    ),
-    .glay_control_out   (glay_control_out       ),
+    .glay_control_out   (glay_control_out_reg   ),
     .glay_descriptor_in (glay_descriptor_in_reg ),
     .glay_descriptor_out(glay_descriptor_out_reg)
   );
