@@ -24,16 +24,16 @@ struct __attribute__((__packed__)) GLAYGraphCSR
 {
     uint32_t num_edges;                 // 4-Bytes
     uint32_t num_vertices;              // 4-Bytes
-    float max_weight;                   // 4-Bytes
     void *vertex_out_degree;            // 8-Bytes
     void *vertex_in_degree;             // 8-Bytes
     void *vertex_edges_idx;             // 8-Bytes
     void *edges_array_src;              // 8-Bytes
     void *edges_array_dest;             // 8-Bytes
     void *edges_array_weight;           // 8-Bytes
-    //---------------------------------------------------//--// 64bytes
     void *auxiliary1;                   // 8-Bytes
+    //---------------------------------------------------//--// 64bytes
     void *auxiliary2;                   // 8-Bytes
+    float max_weight;                   // 4-Bytes
 };
 
 
