@@ -33,24 +33,35 @@ module glay_kernel_control #(
 );
 
 
-    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
-
     logic glay_start_reg   ;
     logic glay_continue_reg;
     logic glay_idle_reg    ;
     logic glay_ready_reg   ;
     logic glay_done_reg    ;
 
+    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
+
     GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_reg;
     GlayControlChainInputSyncInterfaceOutput  glay_kernel_control_input_reg ;
-    GlayControlChainInterfaceInput            glay_control_reg              ;
+    GlayControlChainInterfaceInput            glay_control_in_reg           ;
+    GlayControlChainInterfaceOutput           glay_control_out_reg          ;
+
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        control_areset        <= areset;
+        control_input_areset  <= areset;
+        control_output_areset <= areset;
+    end
 
 // --------------------------------------------------------------------------------------
 //   Reset internal registers
 // --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
-        if (areset) begin
+        if (control_areset) begin
             glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
         end
         else begin
@@ -58,35 +69,54 @@ module glay_kernel_control #(
         end
     end
 
-
-    always_ff @(posedge ap_clk) begin
-        if (areset) begin
-            glay_control_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-        end
-        else begin
-            glay_control_reg <= glay_cu_done_in;
-        end
-    end
-
 // --------------------------------------------------------------------------------------
 //   Reset output registers
 // --------------------------------------------------------------------------------------
 
+    always_ff @(posedge ap_clk) begin
+        if (control_areset) begin
+            glay_control_out.glay_ready <= 1'b0;
+            glay_control_out.glay_done  <= 1'b1;
+            glay_control_out.glay_idle  <= 1'b1;
+        end
+        else begin
+            glay_control_out <= glay_control_out_reg;
+        end
+    end
 
+    always_ff @(posedge ap_clk) begin
+        if (control_areset) begin
+            glay_control_out_reg.glay_ready <= 1'b0;
+            glay_control_out_reg.glay_done  <= 1'b1;
+            glay_control_out_reg.glay_idle  <= 1'b1;
+        end
+        else begin
+            glay_control_out_reg.glay_ready <= glay_kernel_control_input_reg.glay_ready;
+            glay_control_out_reg.glay_done  <= glay_kernel_control_output_reg.glay_done;
+            glay_control_out_reg.glay_idle  <= glay_kernel_control_output_reg.glay_idle;
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 //   Reset input registers
 // --------------------------------------------------------------------------------------
 
-
+    always_ff @(posedge ap_clk) begin
+        if (control_areset) begin
+            glay_control_in_reg <= 0;
+        end
+        else begin
+            glay_control_in_reg <= glay_control_in;
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 //   Glay_descriptor LOGIC
 // --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
-        if (areset) begin
-            glay_descriptor_out.valid <= 0;
+        if (control_areset) begin
+            glay_descriptor_out.valid <= 1'b0;
         end
         else begin
             glay_descriptor_out.valid <= glay_descriptor_in.valid;
@@ -106,9 +136,9 @@ module glay_kernel_control #(
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
     ) inst_glay_kernel_control_input (
         .ap_clk                       (ap_clk                       ),
-        .areset                       (areset                       ),
+        .areset                       (control_input_areset         ),
         .glay_cu_done_in              (glay_cu_done_reg             ),
-        .glay_control_in              (glay_control_reg             ),
+        .glay_control_in              (glay_control_in_reg          ),
         .glay_kernel_control_input_out(glay_kernel_control_input_reg)
     );
 
@@ -121,9 +151,9 @@ module glay_kernel_control #(
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
     ) inst_glay_kernel_control_output (
         .ap_clk                        (ap_clk                        ),
-        .areset                        (areset                        ),
+        .areset                        (control_output_areset         ),
         .glay_cu_done_in               (glay_cu_done_reg              ),
-        .glay_control_in               (glay_control_reg              ),
+        .glay_control_in               (glay_control_in_reg           ),
         .glay_kernel_control_output_out(glay_kernel_control_output_reg)
     );
 

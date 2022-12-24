@@ -103,11 +103,11 @@ module glay_kernel_afu #(
   AXI4MasterReadInterface  m_axi_read     ;
   AXI4MasterWriteInterface m_axi_write    ;
 
+
 // --------------------------------------------------------------------------------------
-// Begin RTL
+//   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
 
-// Register and invert reset signal.
   always_ff @(posedge ap_clk) begin
     areset         <= ~ap_rst_n;
     m_axi_areset   <= ~ap_rst_n;
@@ -133,8 +133,8 @@ module glay_kernel_afu #(
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       ap_idle  <= 1'b1;
-      ap_done  <= 1'b1;
       ap_ready <= 1'b0;
+      ap_done  <= 1'b1;
     end
     else begin
       ap_idle  <= glay_control_out.glay_idle;
