@@ -30,68 +30,102 @@ module glay_kernel_control_output #(
     output GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_out
 );
 
+    logic glay_continue_reg;
+    logic glay_done_reg    ;
+    logic glay_idle_reg    ;
+
+    control_output_state current_state;
+    control_output_state next_state   ;
+
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        control_ouput_areset <= areset;
+    end
+
+// --------------------------------------------------------------------------------------
+//   Reset input registers
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        if (control_ouput_areset) begin
+            glay_continue_reg <= 0;
+        end
+        else begin
+            glay_continue_reg <= glay_control_in.glay_continue;
+        end
+    end
+
+// --------------------------------------------------------------------------------------
+//   Reset output registers
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        if (control_ouput_areset) begin
+            glay_kernel_control_output_out.glay_done <= 1;
+            glay_kernel_control_output_out.glay_idle <= 1;
+        end
+        else begin
+            glay_kernel_control_output_out.glay_done <= glay_done_reg;
+            glay_kernel_control_output_out.glay_idle <= glay_idle_reg;
+        end
+    end
+
 // --------------------------------------------------------------------------------------
 //   State Machine AP_CTRL_CHAIN output sync
 // --------------------------------------------------------------------------------------
 
-    always_ff @(posedge clock or negedge rstn) begin
-        if(~rstn)
-            current_state <= SEND_MATRIX_C_RESET;
+    always_ff @(posedge clock) begin
+        if(control_ouput_areset)
+            current_state <= CTRL_OUT_RESET;
         else begin
-            if(enabled) begin
-                current_state <= next_state;
-            end
+            current_state <= next_state;
         end
     end // always_ff @(posedge clock)
 
     always_comb begin
         next_state = current_state;
         case (current_state)
-            SEND_MATRIX_C_RESET : begin
-                if(wed_request_in_latched.valid && enabled_cmd)
-                    next_state = SEND_MATRIX_C_INIT;
-                else
-                    next_state = SEND_MATRIX_C_RESET;
+            CTRL_OUT_RESET : begin
+                next_state = CTRL_OUT_IDLE;
             end
-            SEND_MATRIX_C_INIT : begin
-                next_state = SEND_MATRIX_C_IDLE;
+            CTRL_OUT_IDLE : begin
+                next_state = CTRL_OUT_DONE;
             end
-            SEND_MATRIX_C_IDLE : begin
-                if(send_request_ready)
-                    next_state = START_MATRIX_C_REQ;
-                else
-                    next_state = SEND_MATRIX_C_IDLE;
+            CTRL_OUT_DONE : begin
+                next_state = CTRL_OUT_CONTINUE;
+            end
+            CTRL_OUT_CONTINUE : begin
+                next_state = CTRL_OUT_BUSY;
+            end
+            CTRL_OUT_BUSY : begin
+                next_state = CTRL_OUT_BUSY;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge clock) begin
         case (current_state)
-            SEND_MATRIX_C_RESET : begin
-                read_command_matrix_C_job_latched.valid <= 0;
-                generate_read_command                   <= 0;
-                setup_read_command                      <= 0;
-                clear_data_ready                        <= 1;
-                shift_limit_clear                       <= 1;
-                start_shift_hf_0                        <= 0;
-                start_shift_hf_1                        <= 0;
-                switch_shift_hf                         <= 0;
-                shift_counter                           <= 0;
+            CTRL_OUT_RESET : begin
+
             end
-            SEND_MATRIX_C_INIT : begin
-                read_command_matrix_C_job_latched.valid <= 0;
-                clear_data_ready                        <= 0;
-                shift_limit_clear                       <= 0;
-                setup_read_command                      <= 1;
+            CTRL_OUT_IDLE : begin
+
             end
-            SEND_MATRIX_C_IDLE : begin
-                read_command_matrix_C_job_latched.valid <= 0;
-                setup_read_command                      <= 0;
-                shift_limit_clear                       <= 0;
-                shift_counter                           <= 0;
+            CTRL_OUT_DONE : begin
+
+            end
+            CTRL_OUT_CONTINUE : begin
+
+            end
+            CTRL_OUT_BUSY : begin
+
             end
         endcase
     end // always_ff @(posedge clock)
+
 
 
 endmodule : glay_kernel_control_output
