@@ -102,8 +102,8 @@ module glay_kernel_cu #(
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       glay_control_out.glay_ready <= 1'b0;
-      glay_control_out.glay_done  <= 1'b1;
-      glay_control_out.glay_idle  <= 1'b1;
+      glay_control_out.glay_done  <= 1'b0;
+      glay_control_out.glay_idle  <= 1'b0;
     end
     else begin
       glay_control_out.glay_ready <= glay_control_out_reg.glay_ready;

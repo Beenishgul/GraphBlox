@@ -51,8 +51,8 @@ package GLAY_CONTROL_PKG;
 // --------------------------------------------------------------------------------------
 
     typedef struct packed{
-        logic glay_done    ;
-        logic glay_idle    ;
+        logic glay_done;
+        logic glay_idle;
     } GlayControlChainOutputSyncInterfaceOutput;
 
     typedef enum int unsigned {
