@@ -30,10 +30,12 @@ module glay_kernel_control_output #(
     output GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_out
 );
 
-    logic control_ouput_areset;
-    logic glay_continue_reg   ;
-    logic glay_done_reg       ;
-    logic glay_idle_reg       ;
+    logic                          control_ouput_areset;
+    logic                          glay_start_reg      ;
+    logic                          glay_continue_reg   ;
+    logic                          glay_done_reg       ;
+    logic                          glay_idle_reg       ;
+    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg    ;
 
     control_output_state current_state;
     control_output_state next_state   ;
@@ -52,10 +54,21 @@ module glay_kernel_control_output #(
 
     always_ff @(posedge ap_clk) begin
         if (control_ouput_areset) begin
+            glay_start_reg    <= 0;
             glay_continue_reg <= 0;
         end
         else begin
+            glay_start_reg    <= glay_control_in.glay_start;
             glay_continue_reg <= glay_control_in.glay_continue;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if (control_ouput_areset) begin
+            glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+        end
+        else begin
+            glay_cu_done_reg <= glay_cu_done_in;
         end
     end
 
@@ -65,8 +78,8 @@ module glay_kernel_control_output #(
 
     always_ff @(posedge ap_clk) begin
         if (control_ouput_areset) begin
-            glay_kernel_control_output_out.glay_done <= 1;
-            glay_kernel_control_output_out.glay_idle <= 1;
+            glay_kernel_control_output_out.glay_done <= 0;
+            glay_kernel_control_output_out.glay_idle <= 0;
         end
         else begin
             glay_kernel_control_output_out.glay_done <= glay_done_reg;
@@ -92,17 +105,20 @@ module glay_kernel_control_output #(
             CTRL_OUT_RESET : begin
                 next_state = CTRL_OUT_IDLE;
             end
-            CTRL_OUT_IDLE : begin
-                next_state = CTRL_OUT_DONE;
+            CTRL_OUT_BUSY : begin
+                if(glay_done_reg & glay_continue_reg)
+                    next_state = CTRL_OUT_BUSY;
+                else
+                    next_state = CTRL_OUT_DONE;
             end
             CTRL_OUT_DONE : begin
                 next_state = CTRL_OUT_CONTINUE;
             end
             CTRL_OUT_CONTINUE : begin
-                next_state = CTRL_OUT_BUSY;
-            end
-            CTRL_OUT_BUSY : begin
-                next_state = CTRL_OUT_BUSY;
+                if(glay_continue_reg)
+                    next_state = CTRL_OUT_BUSY;
+                else
+                    next_state = CTRL_OUT_CONTINUE;
             end
         endcase
     end // always_comb
@@ -110,19 +126,20 @@ module glay_kernel_control_output #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             CTRL_OUT_RESET : begin
-
-            end
-            CTRL_OUT_IDLE : begin
-
-            end
-            CTRL_OUT_DONE : begin
-
-            end
-            CTRL_OUT_CONTINUE : begin
-
+                glay_idle_reg <= 1'b0;
+                glay_done_reg <= 1'b0;
             end
             CTRL_OUT_BUSY : begin
-
+                glay_idle_reg <= 1'b0;
+                glay_done_reg <= &glay_cu_done_reg;
+            end
+            CTRL_OUT_DONE : begin
+                glay_idle_reg <= 1'b1;
+                glay_done_reg <= 1'b0;
+            end
+            CTRL_OUT_CONTINUE : begin
+                glay_idle_reg <= 1'b0;
+                glay_done_reg <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)

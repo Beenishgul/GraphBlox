@@ -32,10 +32,11 @@ module glay_kernel_control #(
     output GLAYDescriptorInterface         glay_descriptor_out
 );
 
-    logic                          control_areset       ;
-    logic                          control_input_areset ;
-    logic                          control_output_areset;
-    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg     ;
+    logic                          glay_descriptor_valid_reg;
+    logic                          control_areset           ;
+    logic                          control_input_areset     ;
+    logic                          control_output_areset    ;
+    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg         ;
 
     GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_reg;
     GlayControlChainInputSyncInterfaceOutput  glay_kernel_control_input_reg ;
@@ -72,8 +73,8 @@ module glay_kernel_control #(
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
             glay_control_out.glay_ready <= 1'b0;
-            glay_control_out.glay_done  <= 1'b1;
-            glay_control_out.glay_idle  <= 1'b1;
+            glay_control_out.glay_done  <= 1'b0;
+            glay_control_out.glay_idle  <= 1'b0;
         end
         else begin
             glay_control_out <= glay_control_out_reg;
@@ -83,8 +84,8 @@ module glay_kernel_control #(
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
             glay_control_out_reg.glay_ready <= 1'b0;
-            glay_control_out_reg.glay_done  <= 1'b1;
-            glay_control_out_reg.glay_idle  <= 1'b1;
+            glay_control_out_reg.glay_done  <= 1'b0;
+            glay_control_out_reg.glay_idle  <= 1'b0;
         end
         else begin
             glay_control_out_reg.glay_ready <= glay_kernel_control_input_reg.glay_ready;
@@ -115,7 +116,7 @@ module glay_kernel_control #(
             glay_descriptor_out.valid <= 1'b0;
         end
         else begin
-            glay_descriptor_out.valid <= glay_descriptor_in.valid;
+            glay_descriptor_out.valid <= glay_descriptor_valid_reg;
         end
     end
 
@@ -135,7 +136,8 @@ module glay_kernel_control #(
         .areset                       (control_input_areset         ),
         .glay_cu_done_in              (glay_cu_done_reg             ),
         .glay_control_in              (glay_control_in_reg          ),
-        .glay_kernel_control_input_out(glay_kernel_control_input_reg)
+        .glay_kernel_control_input_out(glay_kernel_control_input_reg),
+        .glay_descriptor_valid_out    (glay_descriptor_valid_reg    )
     );
 
 // --------------------------------------------------------------------------------------
