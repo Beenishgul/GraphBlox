@@ -80,7 +80,23 @@ module glay_kernel_cu #(
       glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
-      glay_cu_done_reg <= glay_cu_done;
+
+      if(counter > 32000)
+        glay_cu_done_reg <= glay_cu_done;
+      else
+        glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+
+    end
+  end
+
+  logic [VERTEX_DATA_BITS-1:0] counter;
+
+  always_ff @(posedge ap_clk) begin
+    if (areset) begin
+      counter <= 0;
+    end
+    else begin
+      counter <= counter + 1;
     end
   end
 
