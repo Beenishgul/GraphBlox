@@ -22,20 +22,20 @@ module glay_kernel_cu #(
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                          ap_clk          ,
-  input  logic                          areset          ,
-  input  GlayControlChainIterfaceInput  glay_control_in ,
-  output GlayControlChainIterfaceOutput glay_control_out,
-  input  GLAYDescriptorInterface        glay_descriptor ,
-  input  AXI4MasterReadInterfaceInput   m_axi_read_in   ,
-  output AXI4MasterReadInterfaceOutput  m_axi_read_out  ,
-  input  AXI4MasterWriteInterfaceInput  m_axi_write_in  ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out
+  input  logic                           ap_clk          ,
+  input  logic                           areset          ,
+  input  GlayControlChainInterfaceInput  glay_control_in ,
+  output GlayControlChainInterfaceOutput glay_control_out,
+  input  GLAYDescriptorInterface         glay_descriptor ,
+  input  AXI4MasterReadInterfaceInput    m_axi_read_in   ,
+  output AXI4MasterReadInterfaceOutput   m_axi_read_out  ,
+  input  AXI4MasterWriteInterfaceInput   m_axi_write_in  ,
+  output AXI4MasterWriteInterfaceOutput  m_axi_write_out
 );
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // Wires and Variables
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // AXI write master stage
   logic                          m_axi_areset    ;
   logic                          control_areset  ;
@@ -47,10 +47,10 @@ module glay_kernel_cu #(
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
 
-  GlayControlChainIterfaceInput  glay_control_in_reg    ;
-  GlayControlChainIterfaceOutput glay_control_out_reg   ;
-  GLAYDescriptorInterface        glay_descriptor_in_reg ;
-  GLAYDescriptorInterface        glay_descriptor_out_reg;
+  GlayControlChainInterfaceInput  glay_control_in_reg    ;
+  GlayControlChainInterfaceOutput glay_control_out_reg   ;
+  GLAYDescriptorInterface         glay_descriptor_in_reg ;
+  GLAYDescriptorInterface         glay_descriptor_out_reg;
 
   assign m_axi_write.out = 0;
   assign m_axi_read.out  = 0;
@@ -63,16 +63,16 @@ module glay_kernel_cu #(
   assign m_axi_read.out.arcache  = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
 
 // Register reset signal.
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     m_axi_areset   <= areset;
     control_areset <= areset;
   end
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // Done Logic
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (areset) begin
       glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
@@ -81,11 +81,11 @@ module glay_kernel_cu #(
     end
   end
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // GLay control chain signals
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       glay_control_in_reg.glay_start    <= 1'b0;
       glay_control_in_reg.glay_continue <= 1'b0;
@@ -96,7 +96,7 @@ module glay_kernel_cu #(
     end
   end
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       glay_control_out.glay_idle  <= 1'b1;
       glay_control_out.glay_done  <= 1'b0;
@@ -122,11 +122,11 @@ module glay_kernel_cu #(
     .glay_descriptor_out(glay_descriptor_out_reg)
   );
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_write.in <= 0;
     end
@@ -135,11 +135,11 @@ module glay_kernel_cu #(
     end
   end
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_read.in <= 0;
     end
@@ -149,11 +149,11 @@ module glay_kernel_cu #(
   end
 
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_write_out <= 0;
     end
@@ -162,11 +162,11 @@ module glay_kernel_cu #(
     end
   end
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_read_out <= 0;
     end
@@ -176,11 +176,11 @@ module glay_kernel_cu #(
   end
 
 
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // READ GLAY Descriptor
-///////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       glay_descriptor_in_reg.valid <= 0;
     end
@@ -189,7 +189,7 @@ module glay_kernel_cu #(
     end
   end
 
-  always @(posedge ap_clk) begin
+  always_ff @(posedge ap_clk) begin
     glay_descriptor_in_reg.payload <= glay_descriptor.payload;
   end
 

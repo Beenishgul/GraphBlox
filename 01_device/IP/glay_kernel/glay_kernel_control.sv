@@ -23,70 +23,68 @@ module glay_kernel_control #(
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
     // System Signals
-    input  logic                          ap_clk             ,
-    input  logic                          areset             ,
-    input  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_in    ,
-    input  GlayControlChainIterfaceInput  glay_control_in    ,
-    output GlayControlChainIterfaceOutput glay_control_out   ,
-    input  GLAYDescriptorInterface        glay_descriptor_in ,
-    output GLAYDescriptorInterface        glay_descriptor_out
+    input  logic                           ap_clk             ,
+    input  logic                           areset             ,
+    input  logic [NUM_GRAPH_CLUSTERS-1:0]  glay_cu_done_in    ,
+    input  GlayControlChainInterfaceInput  glay_control_in    ,
+    output GlayControlChainInterfaceOutput glay_control_out   ,
+    input  GLAYDescriptorInterface         glay_descriptor_in ,
+    output GLAYDescriptorInterface         glay_descriptor_out
 );
 
-    logic                          ap_start_r     = 1'b0                      ;
-    logic                          ap_idle_r      = 1'b1                      ;
-    logic                          ap_start_pulse                             ;
-    logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_i      = {NUM_GRAPH_CLUSTERS{1'b0}};
-    logic [NUM_GRAPH_CLUSTERS-1:0] ap_done_r      = {NUM_GRAPH_CLUSTERS{1'b0}};
 
+    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
 
-    always @(posedge ap_clk) begin
+    logic glay_start_reg   ;
+    logic glay_continue_reg;
+    logic glay_idle_reg    ;
+    logic glay_ready_reg   ;
+    logic glay_done_reg    ;
+
+    GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_reg;
+    GlayControlChainInputSyncInterfaceOutput  glay_kernel_control_input_reg ;
+    GlayControlChainInterfaceInput            glay_control_reg              ;
+
+// --------------------------------------------------------------------------------------
+//   Reset internal registers
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
         if (areset) begin
-            ap_done_i <= {NUM_GRAPH_CLUSTERS{1'b0}};
+            glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
         end
         else begin
-            ap_done_i <= glay_cu_done_in;
+            glay_cu_done_reg <= glay_cu_done_in;
         end
     end
 
-// create pulse when ap_start transitions to 1
-    always @(posedge ap_clk) begin
-        begin
-            ap_start_r <= glay_control_in.glay_start;
-        end
-    end
 
-    assign ap_start_pulse = glay_control_in.glay_start & ~ap_start_r;
-
-// glay_control_out.glay_idle is asserted when done is asserted, it is de-asserted when ap_start_pulse
-// is asserted
-    always @(posedge ap_clk) begin
+    always_ff @(posedge ap_clk) begin
         if (areset) begin
-            ap_idle_r <= 1'b1;
+            glay_control_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
         end
         else begin
-            ap_idle_r <= glay_control_out.glay_done ? 1'b1 : ap_start_pulse ? 1'b0 : glay_control_out.glay_idle;
+            glay_control_reg <= glay_cu_done_in;
         end
     end
 
-    assign glay_control_out.glay_idle = ap_idle_r;
-
-// Done logic
-    always @(posedge ap_clk) begin
-        if (areset) begin
-            ap_done_r <= '0;
-        end
-        else begin
-            ap_done_r <= (glay_control_in.glay_continue & glay_control_out.glay_done) ? '0 : ap_done_r | ap_done_i;
-        end
-    end
-
-    assign glay_control_out.glay_done = &ap_done_r;
-
-// Ready Logic (non-pipelined case)
-    assign glay_control_out.glay_ready = glay_control_out.glay_done;
+// --------------------------------------------------------------------------------------
+//   Reset output registers
+// --------------------------------------------------------------------------------------
 
 
-    always @(posedge ap_clk) begin
+
+// --------------------------------------------------------------------------------------
+//   Reset input registers
+// --------------------------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------------------------------
+//   Glay_descriptor LOGIC
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
         if (areset) begin
             glay_descriptor_out.valid <= 0;
         end
@@ -95,7 +93,7 @@ module glay_kernel_control #(
         end
     end
 
-    always @(posedge ap_clk) begin
+    always_ff @(posedge ap_clk) begin
         glay_descriptor_out.payload <= glay_descriptor_in.payload;
     end
 
@@ -107,11 +105,11 @@ module glay_kernel_control #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
     ) inst_glay_kernel_control_input (
-        .ap_clk          (ap_clk              ),
-        .areset          (areset              ),
-        .glay_cu_done_in (glay_cu_done_in_reg ),
-        .glay_control_in (glay_control_in_reg ),
-        .glay_control_out(glay_control_out_reg)
+        .ap_clk                       (ap_clk                       ),
+        .areset                       (areset                       ),
+        .glay_cu_done_in              (glay_cu_done_reg             ),
+        .glay_control_in              (glay_control_reg             ),
+        .glay_kernel_control_input_out(glay_kernel_control_input_reg)
     );
 
 // --------------------------------------------------------------------------------------
@@ -122,11 +120,11 @@ module glay_kernel_control #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
     ) inst_glay_kernel_control_output (
-        .ap_clk          (ap_clk             ),
-        .areset          (areset             ),
-        .glay_cu_done_in (glay_cu_done_in_reg),
-        .glay_control_in (glay_control_in_reg),
-        .glay_control_out(glay_control_out   )
+        .ap_clk                        (ap_clk                        ),
+        .areset                        (areset                        ),
+        .glay_cu_done_in               (glay_cu_done_reg              ),
+        .glay_control_in               (glay_control_reg              ),
+        .glay_kernel_control_output_out(glay_kernel_control_output_reg)
     );
 
 
