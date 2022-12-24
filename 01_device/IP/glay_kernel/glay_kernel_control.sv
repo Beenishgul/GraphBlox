@@ -32,13 +32,6 @@ module glay_kernel_control #(
     output GLAYDescriptorInterface         glay_descriptor_out
 );
 
-
-    logic glay_start_reg   ;
-    logic glay_continue_reg;
-    logic glay_idle_reg    ;
-    logic glay_ready_reg   ;
-    logic glay_done_reg    ;
-
     logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
 
     GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_reg;
