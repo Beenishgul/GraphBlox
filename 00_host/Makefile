@@ -7,7 +7,7 @@ APP                 ?= glay
 # APP_TEST            ?= test_StalaGraph
 APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
-
+# INTEGRATION         ?= ggdl
 
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
@@ -69,7 +69,7 @@ GCC     := gcc
 CC      := gcc
 
 # flags
-CXXFLAGS         = -Wall -m64 -fopenmp -g -O3
+CXXFLAGS       = -Wall -m64 -fopenmp -g -O3
 LDFLAGS        = -lm -lJudy
 
 HOST_CXXFLAGS += -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include

@@ -23,12 +23,18 @@ module glay_kernel_control_input #(
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
     // System Signals
-    input  logic                                    ap_clk          ,
-    input  logic                                    areset          ,
-    input  logic [NUM_GRAPH_CLUSTERS-1:0]           glay_cu_done_in ,
-    input  GlayControlChainIterfaceInput            glay_control_in ,
-    output GlayControlChainInputSyncInterfaceOutput glay_control_out
+    input  logic                                    ap_clk                       ,
+    input  logic                                    areset                       ,
+    input  logic [NUM_GRAPH_CLUSTERS-1:0]           glay_cu_done_in              ,
+    input  GlayControlChainIterfaceInput            glay_control_in              ,
+    output GlayControlChainInputSyncInterfaceOutput glay_kernel_control_input_out
 );
+
+    logic glay_start   ;
+    logic glay_continue;
+    logic glay_idle    ;
+    logic glay_ready   ;
+    logic glay_done    ;
 
 // --------------------------------------------------------------------------------------
 //   State Machine AP_CTRL_CHAIN output sync

@@ -7,7 +7,7 @@ export APP                 = glay
 # export APP_TEST            = test_StalaGraph
 export APP_TEST            = test_glayGraph
 export INTEGRATION         = openmp
-
+# export INTEGRATION         = ggdl
 ##################################################
 
 export ROOT_DIR                = $(shell cd .. ; pwd)
