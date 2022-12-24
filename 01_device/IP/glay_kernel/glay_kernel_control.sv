@@ -32,7 +32,10 @@ module glay_kernel_control #(
     output GLAYDescriptorInterface         glay_descriptor_out
 );
 
-    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
+    logic                          control_areset       ;
+    logic                          control_input_areset ;
+    logic                          control_output_areset;
+    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg     ;
 
     GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_reg;
     GlayControlChainInputSyncInterfaceOutput  glay_kernel_control_input_reg ;

@@ -26,13 +26,14 @@ module glay_kernel_control_output #(
     input  logic                                     ap_clk                        ,
     input  logic                                     areset                        ,
     input  logic [NUM_GRAPH_CLUSTERS-1:0]            glay_cu_done_in               ,
-    input  GlayControlChainIterfaceInput             glay_control_in               ,
+    input  GlayControlChainInterfaceInput            glay_control_in               ,
     output GlayControlChainOutputSyncInterfaceOutput glay_kernel_control_output_out
 );
 
-    logic glay_continue_reg;
-    logic glay_done_reg    ;
-    logic glay_idle_reg    ;
+    logic control_ouput_areset;
+    logic glay_continue_reg   ;
+    logic glay_done_reg       ;
+    logic glay_idle_reg       ;
 
     control_output_state current_state;
     control_output_state next_state   ;
@@ -77,13 +78,13 @@ module glay_kernel_control_output #(
 //   State Machine AP_CTRL_CHAIN output sync
 // --------------------------------------------------------------------------------------
 
-    always_ff @(posedge clock) begin
+    always_ff @(posedge ap_clk) begin
         if(control_ouput_areset)
             current_state <= CTRL_OUT_RESET;
         else begin
             current_state <= next_state;
         end
-    end // always_ff @(posedge clock)
+    end // always_ff @(posedge ap_clk)
 
     always_comb begin
         next_state = current_state;
@@ -106,7 +107,7 @@ module glay_kernel_control_output #(
         endcase
     end // always_comb
 
-    always_ff @(posedge clock) begin
+    always_ff @(posedge ap_clk) begin
         case (current_state)
             CTRL_OUT_RESET : begin
 
@@ -124,7 +125,7 @@ module glay_kernel_control_output #(
 
             end
         endcase
-    end // always_ff @(posedge clock)
+    end // always_ff @(posedge ap_clk)
 
 
 
