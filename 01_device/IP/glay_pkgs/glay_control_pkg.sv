@@ -24,9 +24,9 @@ package GLAY_CONTROL_PKG;
     } GlayControlChainInterfaceInput;
 
     typedef struct packed{
-        logic glay_idle ;
         logic glay_ready;
         logic glay_done ;
+        logic glay_idle ;
     } GlayControlChainInterfaceOutput;
 
 // --------------------------------------------------------------------------------------
