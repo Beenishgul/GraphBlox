@@ -86,8 +86,6 @@ module glay_kernel_control #(
     assign glay_control_out.glay_ready = glay_control_out.glay_done;
 
 
-
-
     always @(posedge ap_clk) begin
         if (areset) begin
             glay_descriptor_out.valid <= 0;
@@ -101,17 +99,35 @@ module glay_kernel_control #(
         glay_descriptor_out.payload <= glay_descriptor_in.payload;
     end
 
-
 // --------------------------------------------------------------------------------------
 //   State Machine AP_CTRL_CHAIN input sync
 // --------------------------------------------------------------------------------------
 
-
+    glay_kernel_control_input #(
+        .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
+        .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
+    ) inst_glay_kernel_control_input (
+        .ap_clk          (ap_clk              ),
+        .areset          (areset              ),
+        .glay_cu_done_in (glay_cu_done_in_reg ),
+        .glay_control_in (glay_control_in_reg ),
+        .glay_control_out(glay_control_out_reg)
+    );
 
 // --------------------------------------------------------------------------------------
 //   State Machine AP_CTRL_CHAIN output sync
 // --------------------------------------------------------------------------------------
 
+    glay_kernel_control_output #(
+        .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
+        .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
+    ) inst_glay_kernel_control_output (
+        .ap_clk          (ap_clk             ),
+        .areset          (areset             ),
+        .glay_cu_done_in (glay_cu_done_in_reg),
+        .glay_control_in (glay_control_in_reg),
+        .glay_control_out(glay_control_out   )
+    );
 
 
 endmodule : glay_kernel_control

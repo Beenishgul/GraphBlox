@@ -8,6 +8,7 @@ APP                 ?= glay
 APP_TEST            ?= test_glayGraph
 INTEGRATION         ?= openmp
 
+
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 APP_DIR             ?= 00_GLay
@@ -68,13 +69,13 @@ GCC     := gcc
 CC      := gcc
 
 # flags
-CFLAGS         = -Wall -m64 -fopenmp -g -Wall -O0 
-LFLAGS         = -lm -lJudy
+CXXFLAGS         = -Wall -m64 -fopenmp -g -O3
+LDFLAGS        = -lm -lJudy
+
 HOST_CXXFLAGS += -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
 # The below are linking flags for C++ Compiler
 XRT_LDFLAGS   += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS      += $(HOST_CXXFLAGS)
-CFLAGS        += $(HOST_CXXFLAGS)
 
 # Host compiler global settings
 CXXFLAGS      += -fmessage-length=0
@@ -121,7 +122,7 @@ OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA)            \
-				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)              
+				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)
 
 #########################################################
 #                GLAY GENERATION                        #
@@ -178,34 +179,34 @@ clean-results:
 #########################################################
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
-	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
-	@$(CXX) $(CFLAGS) -o $@ $^  $(LFLAGS) $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA)/%.c $(INC_FILES_UTIL) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) directories-obj
-	$(CXX) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 ##########################################################################
 # RUN GLay

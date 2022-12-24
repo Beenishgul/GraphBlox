@@ -16,33 +16,51 @@
 `timescale 1 ns / 1 ps
 package GLAY_CONTROL_PKG;
 
-import GLAY_GLOBALS_PKG::*;
+    import GLAY_GLOBALS_PKG::*;
 
     typedef struct packed{
-        logic   glay_start;
-        logic   glay_continue;
-    } GlayControlChainIterfaceInput;
+        logic glay_start   ;
+        logic glay_continue;
+    } GlayControlChainInterfaceInput;
 
     typedef struct packed{
         logic glay_idle ;
         logic glay_ready;
         logic glay_done ;
-    } GlayControlChainIterfaceOutput;
+    } GlayControlChainInterfaceOutput;
+
+// --------------------------------------------------------------------------------------
+//   State Machine AP_CTRL_CHAIN input sync
+// --------------------------------------------------------------------------------------
 
     typedef struct packed{
-        logic   glay_start;
-        logic   glay_ready;
-    } glay_control_chain_input_sync;
+        logic glay_ready;
+    } GlayControlChainInputSyncInterfaceOutput;
+
+    typedef enum int unsigned {
+        CTRL_IN_RESET,
+        CTRL_IN_IDLE,
+        CTRL_IN_START_S1,
+        CTRL_IN_READY,
+        CTRL_IN_START_S2,
+        CTRL_IN_BUSY
+    } control_input_state;
+
+// --------------------------------------------------------------------------------------
+//   State Machine AP_CTRL_CHAIN output sync
+// --------------------------------------------------------------------------------------
 
     typedef struct packed{
-        logic   glay_continue;
-        logic   glay_done;
-    } glay_control_chain_output_sync;
+        logic glay_done    ;
+        logic glay_idle    ;
+    } GlayControlChainOutputSyncInterfaceOutput;
 
-    typedef struct packed{
-        logic glay_idle;  
-        glay_control_chain_input_sync input_sync;
-        glay_control_chain_output_sync output_sync;
-    } glay_control_chain;
+    typedef enum int unsigned {
+        CTRL_OUT_RESET,
+        CTRL_OUT_IDLE,
+        CTRL_OUT_DONE,
+        CTRL_OUT_CONTINUE,
+        CTRL_OUT_BUSY
+    } control_output_state;
 
 endpackage
