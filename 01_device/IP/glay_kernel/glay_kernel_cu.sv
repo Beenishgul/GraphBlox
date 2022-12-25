@@ -39,10 +39,7 @@ module glay_kernel_cu #(
 // AXI write master stage
   logic                          m_axi_areset    ;
   logic                          control_areset  ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done    ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
-
-  assign glay_cu_done = {NUM_GRAPH_CLUSTERS{1'b1}};
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -62,6 +59,7 @@ module glay_kernel_cu #(
   assign m_axi_write.out.awcache = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
   assign m_axi_read.out.arcache  = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
 
+  logic [VERTEX_DATA_BITS-1:0] counter;
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
@@ -77,26 +75,18 @@ module glay_kernel_cu #(
 
   always_ff @(posedge ap_clk) begin
     if (areset) begin
+      counter          <= 0;
       glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
-
-      if(counter > 32000)
-        glay_cu_done_reg <= glay_cu_done;
-      else
+      if(counter > 2000) begin
+        glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+        counter          <= 0;
+      end
+      else begin
         glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-
-    end
-  end
-
-  logic [VERTEX_DATA_BITS-1:0] counter;
-
-  always_ff @(posedge ap_clk) begin
-    if (areset) begin
-      counter <= 0;
-    end
-    else begin
-      counter <= counter + 1;
+        counter          <= counter + 1;
+      end
     end
   end
 
@@ -119,7 +109,7 @@ module glay_kernel_cu #(
     if (control_areset) begin
       glay_control_out.glay_ready <= 1'b0;
       glay_control_out.glay_done  <= 1'b0;
-      glay_control_out.glay_idle  <= 1'b0;
+      glay_control_out.glay_idle  <= 1'b1;
     end
     else begin
       glay_control_out.glay_ready <= glay_control_out_reg.glay_ready;
