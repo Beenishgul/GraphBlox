@@ -908,12 +908,12 @@ module glay_kernel_testbench ();
             ctrl.wait_drivers_idle();
             ///////////////////////////////////////////////////////////////////////////
             //Wait for interrupt being asserted or poll done register
-            // @(posedge interrupt);
-            poll_done_register();
+            @(posedge interrupt);
+            // poll_done_register();
             ///////////////////////////////////////////////////////////////////////////
             // Service the interrupt
-            // service_interrupts();
-            // wait(interrupt == 0);
+            service_interrupts();
+            wait(interrupt == 0);
 
             ///////////////////////////////////////////////////////////////////////////
             // error_found |= check_kernel_result()   ;

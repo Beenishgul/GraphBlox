@@ -132,14 +132,14 @@ module glay_kernel_afu #(
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      ap_idle  <= 1'b0;
       ap_ready <= 1'b0;
       ap_done  <= 1'b0;
+      ap_idle  <= 1'b1;
     end
     else begin
-      ap_idle  <= glay_control_out.glay_idle;
       ap_done  <= glay_control_out.glay_done;
       ap_ready <= glay_control_out.glay_ready;
+      ap_idle  <= glay_control_out.glay_idle;
     end
   end
 

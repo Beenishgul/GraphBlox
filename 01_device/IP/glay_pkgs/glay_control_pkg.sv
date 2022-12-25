@@ -33,34 +33,14 @@ package GLAY_CONTROL_PKG;
 //   State Machine AP_CTRL_CHAIN input sync
 // --------------------------------------------------------------------------------------
 
-    typedef struct packed{
-        logic glay_ready;
-    } GlayControlChainInputSyncInterfaceOutput;
-
     typedef enum int unsigned {
-        CTRL_IN_RESET,
-        CTRL_IN_IDLE,
-        CTRL_IN_START_S1,
-        CTRL_IN_READY,
-        CTRL_IN_START_S2,
-        CTRL_IN_BUSY
-    } control_input_state;
-
-// --------------------------------------------------------------------------------------
-//   State Machine AP_CTRL_CHAIN output sync
-// --------------------------------------------------------------------------------------
-
-    typedef struct packed{
-        logic glay_done;
-        logic glay_idle;
-    } GlayControlChainOutputSyncInterfaceOutput;
-
-    typedef enum int unsigned {
-        CTRL_OUT_RESET,
-        CTRL_OUT_IDLE,
-        CTRL_OUT_DONE,
-        CTRL_OUT_CONTINUE,
-        CTRL_OUT_BUSY
-    } control_output_state;
+        CTRL_SYNC_RESET,
+        CTRL_SYNC_IDLE,
+        CTRL_SYNC_READY,
+        CTRL_SYNC_START,
+        CTRL_SYNC_BUSY,
+        CTRL_SYNC_PAUSE,
+        CTRL_SYNC_DONE
+    } control_sync_state;
 
 endpackage
