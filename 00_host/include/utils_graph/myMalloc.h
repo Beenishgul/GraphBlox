@@ -7,7 +7,8 @@ extern "C" {
 #endif
 
 #define ALIGNED 1
-#define CACHELINE_BYTES 64
+// #define CACHELINE_BYTES 64
+#define CACHELINE_BYTES 4096
 
 char *strerror(int errnum);
 void *aligned_malloc( size_t size );

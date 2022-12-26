@@ -98,19 +98,19 @@ struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerB
     glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx = xrtKernelArgGroupId(glayHandle->kernelHandle, bank_grp_idx);
 
     // Each Memory bank contains a Graph CSR segment
-    glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->graph_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 0));
-    glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer    = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 1));
-    glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 2));
-    glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 3));
-    glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer      = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 4));
-    glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 5));
+    glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->graph_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer    = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer      = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer     = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, glayGraphCSRxrtBufferHandlePerBank->bank_grp_idx);
 
 #if WEIGHTED
-    glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer   = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 6));
+    glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer   = xrtBOAlloc(glayHandle->deviceHandle, glayGraphCSRxrtBufferHandlePerBank->Edges_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, bank_grp_idx + 6));
 #endif
 
-    // glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer          = xrtBOAlloc(glayHandle->deviceHandle, glayGraph->auxiliary1, Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 7));
-    // glayGraphCSRxrtBufferHandlePerBank->auxiliary_2_buffer          = xrtBOAlloc(glayHandle->deviceHandle, glayGraph->auxiliary2, Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, 8));
+    // glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer          = xrtBOAlloc(glayHandle->deviceHandle, glayGraph->auxiliary1, Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle, bank_grp_idx +7));
+    // glayGraphCSRxrtBufferHandlePerBank->auxiliary_2_buffer          = xrtBOAlloc(glayHandle->deviceHandle, glayGraph->auxiliary2, Vertex_buffer_size_in_bytes, XRT_BO_FLAGS_NONE, (xrtMemoryGroup) xrtKernelArgGroupId(glayHandle->kernelHandle,bank_grp_idx + 8));
 
     return glayGraphCSRxrtBufferHandlePerBank;
 }
@@ -154,28 +154,29 @@ int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle
 int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, GRAPH_CSR_STRUCT_OFFSET, glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (GRAPH_CSR_STRUCT_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer >> 32);
+  
+    xrtKernelWriteRegister(glayHandle->kernelHandle, GRAPH_CSR_STRUCT_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (GRAPH_CSR_STRUCT_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer) >> 32);
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_OUT_DEGREE_OFFSET, glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_OUT_DEGREE_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_OUT_DEGREE_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_OUT_DEGREE_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer) >> 32);
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_IN_DEGREE_OFFSET, glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_IN_DEGREE_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_IN_DEGREE_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_IN_DEGREE_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer) >> 32);
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_EDGES_IDX_OFFSET, glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_EDGES_IDX_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, VERTEX_EDGES_IDX_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (VERTEX_EDGES_IDX_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer) >> 32);
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_DEST_OFFSET, glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_DEST_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_DEST_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_DEST_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer) >> 32);
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_SRC_OFFSET, glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_SRC_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_SRC_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_SRC_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer) >> 32);
 
-   
+
 #if WEIGHTED
-    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_WEIGHT_OFFSET, glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer);
-    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_WEIGHT_OFFSET + 4), glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer >> 32);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, EDGES_ARRAY_WEIGHT_OFFSET, xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer));
+    xrtKernelWriteRegister(glayHandle->kernelHandle, (EDGES_ARRAY_WEIGHT_OFFSET + 4), xrtBOAddress(glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer) >> 32);
 #endif
 
     // xrtKernelWriteRegister(glayHandle->kernelHandle, AUXILIARY_1_OFFSET, glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer);
@@ -221,6 +222,7 @@ int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, 
 
     struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = allocateGLAYGraphCSRDeviceBuffersPerBank(glayHandle, graph, glayGraph, bank_grp_idx);
     writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
+    writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
 
     return 0;
 }
@@ -232,29 +234,33 @@ void startGLAYRun(struct xrtGLAYHandle *glayHandle)
 
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 {
-    uint32_t glay_control_write = 0
-    uint32_t glay_control_read  = 0
-    glay_control = CONTROL_START;
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, CONTROL_OFFSET, glay_control);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, CONTROL_OFFSET, glay_control_write);
 
-    do{
+    do
+    {
         xrtKernelReadRegister(glayHandle->kernelHandle, CONTROL_OFFSET, &glay_control_read);
-    }while(!(glay_control_read & CONTROL_READY));
+    }
+    while(!(glay_control_read & CONTROL_READY));
 
 }
 
 void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 {
-    uint32_t glay_control_write = 0
-    uint32_t glay_control_read  = 0
-    glay_control = CONTROL_START;
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
 
-    xrtKernelWriteRegister(glayHandle->kernelHandle, CONTROL_OFFSET, glay_control);
+    xrtKernelWriteRegister(glayHandle->kernelHandle, CONTROL_OFFSET, glay_control_write);
 
-    do{
+    do
+    {
         xrtKernelReadRegister(glayHandle->kernelHandle, CONTROL_OFFSET, &glay_control_read);
-    }while(!(glay_control_read & CONTROL_IDLE));
+    }
+    while(!(glay_control_read & CONTROL_IDLE));
 }
 
 void waitGLAYRun(struct xrtGLAYHandle *glayHandle)
