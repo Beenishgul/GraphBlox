@@ -79,13 +79,17 @@ module glay_kernel_cu #(
       glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
-      if(counter > 2000) begin
-        glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
-        counter          <= 0;
-      end
-      else begin
+      if (glay_descriptor_out_reg.valid) begin
+        if(counter > 2000) begin
+          glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+          counter          <= 0;
+        end
+        else begin
+          counter <= counter + 1;
+        end
+      end else begin
         glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-        counter          <= counter + 1;
+        counter          <= 0;
       end
     end
   end

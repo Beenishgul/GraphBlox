@@ -476,6 +476,15 @@ module glay_kernel_testbench ();
         end while ((rd_value & CTRL_IDLE_MASK) == 0);
     endtask
 
+// This will poll until the IDLE flag in the status register is asserted.
+    task automatic poll_ready_register ();
+        bit [31:0] rd_value;
+        do begin
+            read_register(KRNL_CTRL_REG_ADDR, rd_value);
+        end while ((rd_value & CTRL_READY_MASK) == 0);
+    endtask
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Write to the control registers to enable the triggering of interrupts for the kernel
     task automatic enable_interrupts();
@@ -906,14 +915,18 @@ module glay_kernel_testbench ();
             blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
 
             ctrl.wait_drivers_idle();
+            
+            poll_ready_register();
+
+            poll_done_register();
             ///////////////////////////////////////////////////////////////////////////
             //Wait for interrupt being asserted or poll done register
-            @(posedge interrupt);
+            // @(posedge interrupt);
             // poll_done_register();
             ///////////////////////////////////////////////////////////////////////////
             // Service the interrupt
-            service_interrupts();
-            wait(interrupt == 0);
+            // service_interrupts();
+            // wait(interrupt == 0);
 
             ///////////////////////////////////////////////////////////////////////////
             // error_found |= check_kernel_result()   ;
@@ -1046,7 +1059,8 @@ module glay_kernel_testbench ();
             $finish();
         end
 
-        enable_interrupts();
+        // enable_interrupts();
+        disable_interrupts();
 
         #1000
             multiple_iteration(1, error_found, graph);

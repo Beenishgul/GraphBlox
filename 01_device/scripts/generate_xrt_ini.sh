@@ -27,9 +27,19 @@ user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_cmd_xsim.tc
 profile="true"
 timeline_trace="true"
 device_trace="coarse"
+exclusive_cu_context="true"
+
+newtext="[Runtime]"
+echo $newtext > ${CFG_FILE_NAME}
+
+newtext="exclusive_cu_context=${exclusive_cu_context}"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="[Emulation]"
-echo $newtext > ${CFG_FILE_NAME}
+echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="debug_mode=${debug_mode}"
 echo $newtext >> ${CFG_FILE_NAME}

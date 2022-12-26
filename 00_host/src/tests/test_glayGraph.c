@@ -304,19 +304,20 @@ main (int argc, char **argv)
     int bank_grp_idx = 1;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-
-    if(setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path) == -1)
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path);
+   
+    if(arguments->glayHandle == NULL)
     {
         printf("ERROR:--> setupGLAYDevice\n");
     }
 
     setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
-    startGLAYRun(arguments->glayHandle);
+    startGLAYUserManaged(arguments->glayHandle);
 
-    waitGLAYRun(arguments->glayHandle);
+    waitGLAYUserManaged(arguments->glayHandle);
 
-    closeGLAYRun(arguments->glayHandle);
+    closeGLAYUserManaged(arguments->glayHandle);
 
     releaseGLAY(arguments->glayHandle);
     free(timer);
