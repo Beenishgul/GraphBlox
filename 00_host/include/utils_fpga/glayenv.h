@@ -3,7 +3,7 @@
 
 #include "experimental/xrt_kernel.h"
 #include "experimental/xrt_aie.h"
-
+#include <experimental/xrt_ip.h>
 
 #ifdef __cplusplus
 extern "C" {
