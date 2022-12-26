@@ -246,6 +246,10 @@ build-hw:
 run-emu:
 	$(MAKE) run-emu $(MAKE_DEVICE)
 
+.PHONY: run-emu-debug
+run-emu-debug:
+	$(MAKE) run-emu-debug $(MAKE_DEVICE)
+
 .PHONY: run-emu-wave
 run-emu-wave:
 	$(MAKE) run-emu-wave $(MAKE_DEVICE)

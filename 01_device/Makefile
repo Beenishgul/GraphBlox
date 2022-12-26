@@ -136,7 +136,7 @@ run-sim-help: gen-scripts-dir
 XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET)  -s -g
 XOCCLFLAGS := --link --optimize 3
 # You could uncomment following line and modify the options for hardware debug/profiling
-#DEBUG_OPT := -debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
+# DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
 .PHONY: build-hw
 build-hw:
@@ -177,6 +177,21 @@ run-emu: gen-host-bin
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
 	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
+.PHONY: run-emu-debug
+run-emu-debug: gen-host-bin
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
+	export XCL_EMULATION_MODE=$(TARGET) ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
+	echo "Generating emulation config file for platform $(PLATFORM).." ;\
+	emconfigutil --platform $(PLATFORM)  ;\
+	echo "Enter Hardware Emulation Mode" ;\
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
+	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+
 .PHONY: run-emu-wave
 run-emu-wave:
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
@@ -186,7 +201,7 @@ run-emu-wave:
 
 .PHONY: gen-host-bin
 gen-host-bin:
-	make $(APP_TEST)-$(INTEGRATION) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
+	make $(APP_TEST)-$(INTEGRATION) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 
 .PHONY: all

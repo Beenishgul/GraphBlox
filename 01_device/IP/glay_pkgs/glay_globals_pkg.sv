@@ -18,16 +18,16 @@
 
 package GLAY_GLOBALS_PKG;
 
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 //  COMPUTE UNITS COUNT GLOBALS
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
 parameter CU_COUNT_GLOBAL = 1;
 parameter CU_COUNT_LOCAL  = 1;
 
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 //  GLay COMMON GLOBALS
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
 parameter PAGE_SIZE              = 4096                   ; // Page size default is 4KB
 parameter PAGE_SIZE_BITS         = (PAGE_SIZE * 8)        ;
@@ -43,13 +43,13 @@ parameter WORD_DOUBLE_BITS = WORD_DOUBLE * 8;
 
 
 parameter VERTEX_ADDRESS_BITS = 64;
-parameter EDGE_ADDRESS_BITS = 64;
-parameter VERTEX_DATA_BITS = 32;
-parameter EDGE_DATA_BITS = 32;
+parameter EDGE_ADDRESS_BITS   = 64;
+parameter VERTEX_DATA_BITS    = 32;
+parameter EDGE_DATA_BITS      = 32;
 
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // AXI4 PARAMETERS
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
 parameter S_AXI_CONTROL_ADDR_WIDTH_BITS = 12 ;
 parameter S_AXI_CONTROL_DATA_WIDTH      = 32 ;
@@ -59,9 +59,9 @@ parameter M_AXI_MEMORY_ID_WIDTH         = 1  ;
 parameter M_AXI_MEMORY_ID_VALUE         = 0  ;
 parameter M_AXI_MEMORY_BURST_LEN        = 8  ;
 
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // AXI4 IOB-CACHE PARAMETERS
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
 parameter CACHE_FRONTEND_ADDR_W = 64; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 parameter CACHE_FRONTEND_DATA_W = 64; //Data width - word size used for the cache
@@ -97,9 +97,9 @@ parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID     = 0                   ; //AXI ID
 parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
 parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 // GLay ADDRESS Mappings on AFU and HOST
-////////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
 
 // ********************************************************************************************
 // ***************                  MMIO/Scalar General                          **************

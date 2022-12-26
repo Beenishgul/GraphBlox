@@ -39,7 +39,6 @@ package GLAY_CONTROL_PKG;
         CTRL_SYNC_READY,
         CTRL_SYNC_START,
         CTRL_SYNC_BUSY,
-        CTRL_SYNC_PAUSE,
         CTRL_SYNC_DONE
     } control_sync_state;
 
