@@ -17,9 +17,7 @@ extern "C" {
 #include "graphCSR.h"
 #include <time.h>
 
-#ifdef __cplusplus
-}
-#endif
+
 
 
 // User Managed Kernel masks
@@ -165,6 +163,8 @@ int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHa
 int readGLAYGraphCSRDeviceToHostBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
 int freeGLAYGraphCSRHostToDeviceBuffersPerBank(struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif

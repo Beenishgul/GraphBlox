@@ -6,6 +6,7 @@ export APP                 = glay
 # export APP_TEST            = test_glay
 # export APP_TEST            = test_StalaGraph
 export APP_TEST            = test_glayGraph
+export APP_LANG            = cpp
 export INTEGRATION         = openmp
 # export INTEGRATION         = ggdl
 ##################################################
