@@ -301,7 +301,7 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
-    int bank_grp_idx = 0;
+    int bank_grp_idx = 1;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
     arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path);
@@ -311,7 +311,7 @@ main (int argc, char **argv)
         printf("ERROR:--> setupGLAYDevice\n");
     }
 
-    // setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    arguments->glayHandle = setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
     // startGLAYUserManaged(arguments->glayHandle);
 
@@ -321,7 +321,7 @@ main (int argc, char **argv)
 
     // releaseGLAY(arguments->glayHandle);
     free(timer);
-    free(glayGraph);
+    // free(glayGraph);
     argumentsFree(arguments);
     exit (0);
 }

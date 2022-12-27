@@ -23,6 +23,7 @@ set app_directory    [lindex $argv 2]
 set xilinx_directory [lindex $argv 3]
 set active_directory [lindex $argv 4]
 set ip_directory     [lindex $argv 5]
+set ctrl_mode     "user_managed"
 
 puts $part_id
 puts $kernel_name
@@ -30,6 +31,7 @@ puts $app_directory
 puts $xilinx_directory
 puts $active_directory
 puts $ip_directory
+puts $ctrl_mode
 
 create_project -force $kernel_name ./$kernel_name -part $part_id
 
@@ -225,7 +227,7 @@ set field [ipx::add_field AP_START $reg]
 set_property sdx_kernel true [ipx::current_core]
 set_property sdx_kernel_type rtl [ipx::current_core]
 set_property ipi_drc {ignore_freq_hz true} [ipx::current_core]
-set_property vitis_drc {ctrl_protocol ap_ctrl_chain} [ipx::current_core]
+set_property vitis_drc {ctrl_protocol user_managed} [ipx::current_core]
 
 # Packaging Vivado IP
 ::ipx::update_checksums $core
@@ -234,4 +236,4 @@ set_property vitis_drc {ctrl_protocol ap_ctrl_chain} [ipx::current_core]
 ::ipx::save_core $core
 ::ipx::unload_core $core
 # Generate Vitis Kernel from Vivado IP
-package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml
+package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml
