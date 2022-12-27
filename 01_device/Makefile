@@ -22,6 +22,7 @@ KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
 APP_TEST            ?= test_glayGraph
+APP_LANG            ?= cpp
 INTEGRATION         ?= openmp
 
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
@@ -174,8 +175,8 @@ run-emu: gen-host-bin
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
-	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
-	./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
+	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-debug
 run-emu-debug: gen-host-bin
@@ -189,8 +190,8 @@ run-emu-debug: gen-host-bin
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
-	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) ./$(APP_TEST)-$(INTEGRATION) ;\
-	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
+	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-wave
 run-emu-wave:
@@ -201,7 +202,7 @@ run-emu-wave:
 
 .PHONY: gen-host-bin
 gen-host-bin:
-	make $(APP_TEST)-$(INTEGRATION) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
+	make $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 
 .PHONY: all
