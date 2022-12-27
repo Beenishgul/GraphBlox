@@ -117,24 +117,6 @@ struct __attribute__((__packed__)) GLAYGraphCSR
     float max_weight;                   // 4-Bytes
 };
 
-struct GLAYGraphCSRxrtBufferHandlePerBank
-{
-    size_t Edges_buffer_size_in_bytes;
-    size_t Vertex_buffer_size_in_bytes;
-    size_t graph_buffer_size_in_bytes;
-    // Each Memory bank contains a Graph CSR segment
-    xrt::bo graph_csr_struct_buffer;
-    xrt::bo vertex_out_degree_buffer;
-    xrt::bo vertex_in_degree_buffer;
-    xrt::bo vertex_edges_idx_buffer;
-    xrt::bo edges_array_weight_buffer;
-    xrt::bo edges_array_src_buffer;
-    xrt::bo edges_array_dest_buffer;
-    xrt::bo auxiliary_1_buffer;
-    xrt::bo auxiliary_2_buffer;
-    uint64_t buf_addr[9];
-};
-
 // ********************************************************************************************
 // ***************                      XRT Device Management                    **************
 // ********************************************************************************************
@@ -151,11 +133,39 @@ struct xrtGLAYHandle
     std::vector<xrt::xclbin::ip> cuHandles;
 };
 
-
 struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
-struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bank_grp_idx);
-int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
-int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
+
+// ********************************************************************************************
+// ***************                      XRT Buffer Management                    **************
+// ********************************************************************************************
+
+class GLAYGraphCSRxrtBufferHandlePerBank
+{
+public:
+    size_t Edges_buffer_size_in_bytes;
+    size_t Vertex_buffer_size_in_bytes;
+    size_t graph_buffer_size_in_bytes;
+    // Each Memory bank contains a Graph CSR segment
+    xrt::bo graph_csr_struct_buffer;
+    xrt::bo vertex_out_degree_buffer;
+    xrt::bo vertex_in_degree_buffer;
+    xrt::bo vertex_edges_idx_buffer;
+    xrt::bo edges_array_weight_buffer;
+    xrt::bo edges_array_src_buffer;
+    xrt::bo edges_array_dest_buffer;
+    xrt::bo auxiliary_1_buffer;
+    xrt::bo auxiliary_2_buffer;
+    uint64_t buf_addr[9];
+
+
+    GLAYGraphCSRxrtBufferHandlePerBank()=default;
+    GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bank_grp_idx);
+    int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
+    int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
+    
+};
+
 struct xrtGLAYHandle *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
+
 
 #endif
