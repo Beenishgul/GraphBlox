@@ -1,10 +1,14 @@
 #ifndef GLAYENV_H
 #define GLAYENV_H
 
+#include <iostream>
+#include <cstring>
+
+#include "experimental/xrt_bo.h"
+#include "experimental/xrt_ip.h"
+#include "experimental/xrt_device.h"
 #include "experimental/xrt_kernel.h"
-#include "experimental/xrt_aie.h"
-#include <experimental/xrt_ip.h>
-#include <xrt/xrt_device.h>
+#include "experimental/xrt_xclbin.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +22,9 @@ extern "C" {
 #include <time.h>
 
 
+#ifdef __cplusplus
+}
+#endif
 
 
 // User Managed Kernel masks
@@ -110,25 +117,23 @@ struct __attribute__((__packed__)) GLAYGraphCSR
     float max_weight;                   // 4-Bytes
 };
 
-
-struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
+struct GLAYGraphCSRxrtBufferHandlePerBank
 {
     size_t Edges_buffer_size_in_bytes;
     size_t Vertex_buffer_size_in_bytes;
     size_t graph_buffer_size_in_bytes;
     // Each Memory bank contains a Graph CSR segment
-    xrtBufferHandle graph_csr_struct_buffer;
-    xrtBufferHandle vertex_out_degree_buffer;
-    xrtBufferHandle vertex_in_degree_buffer;
-    xrtBufferHandle vertex_edges_idx_buffer;
-    xrtBufferHandle edges_array_weight_buffer;
-    xrtBufferHandle edges_array_src_buffer;
-    xrtBufferHandle edges_array_dest_buffer;
-    xrtBufferHandle auxiliary_1_buffer;
-    xrtBufferHandle auxiliary_2_buffer;
-    xrtMemoryGroup bank_grp_idx;
+    xrt::bo graph_csr_struct_buffer;
+    xrt::bo vertex_out_degree_buffer;
+    xrt::bo vertex_in_degree_buffer;
+    xrt::bo vertex_edges_idx_buffer;
+    xrt::bo edges_array_weight_buffer;
+    xrt::bo edges_array_src_buffer;
+    xrt::bo edges_array_dest_buffer;
+    xrt::bo auxiliary_1_buffer;
+    xrt::bo auxiliary_2_buffer;
+    uint64_t buf_addr[9];
 };
-
 
 // ********************************************************************************************
 // ***************                      XRT Device Management                    **************
@@ -137,34 +142,18 @@ struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
 struct xrtGLAYHandle
 {
     char *xclbinPath;
-    int deviceIndex;
-    xrtDeviceHandle deviceHandle;
-    xrtXclbinHandle xclbinHandle;
-    xrtKernelHandle kernelHandle;
-    xrtRunHandle kernelHandleRun;
-    xuid_t xclbinUUID;
+    unsigned int deviceIndex;
+    xrt::device deviceHandle;
+    xrt::xclbin xclbinHandle;
+    xrt::ip ipHandle;
+    xrt::uuid xclbinUUID;
+    xrt::xclbin::mem mem_used;
 };
 
 
 struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
-int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
-void startGLAYRun(struct xrtGLAYHandle *glayHandle);
-void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
-void waitGLAYRun(struct xrtGLAYHandle *glayHandle);
-void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
-void closeGLAYRun(struct xrtGLAYHandle *glayHandle);
-void closeGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
-void releaseGLAY(struct xrtGLAYHandle *glayHandle);
-void freeGlayHandle(struct xrtGLAYHandle *glayHandle);
-void printGLAYGraphCSRPointers(struct  GLAYGraphCSR *glayGraphCSR);
-struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
+struct GLAYGraphCSRxrtBufferHandlePerBank *allocateGLAYGraphCSRDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bank_grp_idx);
 int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
 int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
-int readGLAYGraphCSRDeviceToHostBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
-int freeGLAYGraphCSRHostToDeviceBuffersPerBank(struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
