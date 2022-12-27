@@ -58,6 +58,9 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
         }
     }
 
+    // glayHandle->interruptHandle = glayHandle->ipHandle.create_interrupt_notify();
+    // glayHandle->interruptHandle.disable();
+
     std::cout << "device name                   :     " << glayHandle->deviceHandle.get_info<xrt::info::device::name>() << "\n";
     std::cout << "device bdf                    :     " << glayHandle->deviceHandle.get_info<xrt::info::device::bdf>() << "\n";
     std::cout << "device max_clock_frequency_mhz:     " << glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() << "\n";
@@ -66,6 +69,8 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     std::cout << "Kernel Arguments Offsets:" << "\n"; 
     for (auto i: glayHandle->cuHandles[0].get_args())
         std::cout << std::hex << std::uppercase << i.get_offset() << "\n";
+
+
 
     return glayHandle;
 
@@ -182,12 +187,73 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
     return 0;
 }
 
-struct xrtGLAYHandle *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
+GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
 {
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
     glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
     glayGraphCSRxrtBufferHandlePerBank->writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
 
-    return glayHandle;
+    return glayGraphCSRxrtBufferHandlePerBank;
+}
+
+
+
+// ********************************************************************************************
+// ***************                  GLAY Control                                 **************
+// ********************************************************************************************
+
+void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
+{    
+
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
+
+    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+
+    do
+    {
+        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
+        printf("start %x \n", glay_control_read);
+    }
+    while(!(glay_control_read & CONTROL_READY));
+
+    printf("wait %x \n", glay_control_read);
+
+}
+
+void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
+{
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
+
+    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+
+    do
+    {
+        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
+        printf("wait %x \n", glay_control_read);
+    }
+    while(!(glay_control_read & CONTROL_IDLE));
+
+    printf("wait %x \n", glay_control_read);
+}
+
+// void releaseGLAY(struct xrtGLAYHandle *glayHandle)
+// {
+//     //Close an opened device
+//     // xrtKernelClose(glayHandle->kernelHandle);
+//     xrtDeviceClose(glayHandle->deviceHandle);
+//     freeGlayHandle(glayHandle);
+// }
+
+void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
+{
+
+    //Close an opened device
+    if(glayHandle)
+        free(glayHandle);
+
 }

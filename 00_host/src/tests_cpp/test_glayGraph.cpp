@@ -311,17 +311,18 @@ main (int argc, char **argv)
         printf("ERROR:--> setupGLAYDevice\n");
     }
 
-    arguments->glayHandle = setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
+    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
-    // startGLAYUserManaged(arguments->glayHandle);
+    startGLAYUserManaged(arguments->glayHandle);
 
-    // waitGLAYUserManaged(arguments->glayHandle);
+    waitGLAYUserManaged(arguments->glayHandle);
 
     // closeGLAYUserManaged(arguments->glayHandle);
 
     // releaseGLAY(arguments->glayHandle);
     free(timer);
-    // free(glayGraph);
+    free(glayGraph);
     argumentsFree(arguments);
     exit (0);
 }
