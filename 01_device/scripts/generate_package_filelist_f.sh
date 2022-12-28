@@ -29,62 +29,32 @@ iob_cache="iob_cache"
 iob_include="iob_include"
 portmaps="portmaps"
 
-
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.f"
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/iob-cache.vh"
+generate_package_filelist_f () {
+
+  local ip_directory=$1
+  local cfg_filelist_name=$2
+  local verilog_type=$3
+
+  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" )" ; do  
+    newtext="${filepath}"
+    echo "$newtext" >> ${cfg_filelist_name}
+  done 
+
+  newtext=""
+  echo $newtext >> ${CFG_FILE_NAME}
+}
+
+newtext=""
 echo $newtext > ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/iob_lib.vh"
-echo $newtext >> ${CFG_FILE_NAME}
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/${portmaps}/m_axi_m_read_port.vh"
-echo $newtext >> ${CFG_FILE_NAME}
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/${portmaps}/m_axi_m_write_port.vh"
-echo $newtext >> ${CFG_FILE_NAME}
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/ ${CFG_FILE_NAME} "v"  
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/${portmaps}/m_axi_portmap.vh"
-echo $newtext >> ${CFG_FILE_NAME}
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/${portmaps}/m_axi_read_portmap.vh"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/${portmaps}/m_axi_write_portmap.vh"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_globals_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_axi4_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_descriptor_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/glay_control_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/glay_kernel_control.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/glay_kernel_afu.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/glay_kernel_cu.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/glay_top_control_s_axi.v"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/glay_top.v"
-echo $newtext >> ${CFG_FILE_NAME}
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
