@@ -39,7 +39,7 @@ generate_xsim_filelist_f () {
   local cfg_filelist_name=$2
   local verilog_type=$3
 
-  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" )" ; do  
+  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do  
     newtext="${filepath}"
     echo "$newtext" >> ${cfg_filelist_name}
   done 
