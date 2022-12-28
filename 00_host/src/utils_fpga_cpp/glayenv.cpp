@@ -241,13 +241,13 @@ void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
     printf("wait %x \n", glay_control_read);
 }
 
-// void releaseGLAY(struct xrtGLAYHandle *glayHandle)
-// {
-//     //Close an opened device
-//     // xrtKernelClose(glayHandle->kernelHandle);
-//     xrtDeviceClose(glayHandle->deviceHandle);
-//     freeGlayHandle(glayHandle);
-// }
+void releaseGLAY(struct xrtGLAYHandle *glayHandle)
+{
+    //Close an opened device
+    // xrtKernelClose(glayHandle->kernelHandle);
+    // xrtDeviceClose(glayHandle->deviceHandle);
+    freeGlayHandle(glayHandle);
+}
 
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
 {
