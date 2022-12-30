@@ -107,7 +107,7 @@ package GLAY_GLOBALS_PKG;
 /*---------------------------------------------------*/
 //AXI specific parameters
 	parameter CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W ;
-	parameter CACHE_AXI_DATA_W  = CACHE_BACKEND_ADDR_W ;
+	parameter CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W ;
 	parameter CACHE_AXI_ID_W    = M_AXI_MEMORY_ID_WIDTH; //AXI ID (identification) width
 	parameter CACHE_AXI_LEN_W   = M_AXI_MEMORY_LEN_W   ; //AXI ID burst length (log2)
 	parameter CACHE_AXI_LOCK_W  = M_AXI_MEMORY_LOCK_W  ;
