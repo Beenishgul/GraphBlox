@@ -12,8 +12,9 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import GLAY_GLOBALS_PKG::*;
+
 import GLAY_AXI4_PKG::*;
+import GLAY_GLOBALS_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 import GLAY_REQ_PKG::*;
