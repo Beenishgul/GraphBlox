@@ -49,9 +49,9 @@ generate_package_filelist_f () {
 newtext=""
 echo $newtext > ${CFG_FILE_NAME}
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
-
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
+
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
 
