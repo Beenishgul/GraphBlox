@@ -63,12 +63,12 @@ parameter M_AXI_MEMORY_BURST_LEN        = 8  ;
 // AXI4 IOB-CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 
-parameter CACHE_FRONTEND_ADDR_W = 64; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-parameter CACHE_FRONTEND_DATA_W = 64; //Data width - word size used for the cache
+parameter CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+parameter CACHE_FRONTEND_DATA_W = M_AXI_MEMORY_DATA_WIDTH_BITS; //Data width - word size used for the cache
 parameter CACHE_N_WAYS          = 4 ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
 parameter CACHE_LINE_OFF_W      = 7 ; //Line-Offset Width - 2**NLINE_W total cache lines
 parameter CACHE_WORD_OFF_W      = 3 ; //Word-Offset Width - 2**OFFSET_W total FE_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-parameter CACHE_WTBUF_DEPTH_W   = 5 ; //Depth Width of Write-Through Buffer
+parameter CACHE_WTBUF_DEPTH_W   = 8 ; //Depth Width of Write-Through Buffer
 //Replacement policy (N_WAYS > 1)
 parameter CACHE_REP_POLICY = `PLRU_tree; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency

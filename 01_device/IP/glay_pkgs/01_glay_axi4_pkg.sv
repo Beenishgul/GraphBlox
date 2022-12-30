@@ -45,49 +45,49 @@ package GLAY_AXI4_PKG;
   typedef logic [M_AXI4_QOS_W-1:0]    m_axi4_qos_t;
   typedef logic [M_AXI4_ID_W-1:0]     m_axi4_id_t;
 
-  typedef enum logic [M_AXI4_BURST_W-1:0] {
-    M_AXI4_BURST_FIXED = 2'b00,
-    M_AXI4_BURST_INCR  = 2'b01,
-    M_AXI4_BURST_WRAP  = 2'b10,
-    M_AXI4_BURST_RSVD  = 2'b11
-  } m_axi4_burst_t;
+  parameter M_AXI4_BURST_FIXED = 2'b00;
+  parameter M_AXI4_BURST_INCR  = 2'b01;
+  parameter M_AXI4_BURST_WRAP  = 2'b10;
+  parameter M_AXI4_BURST_RSVD  = 2'b11;
 
-  typedef enum logic [M_AXI4_RESP_W-1:0] {
-    M_AXI4_RESP_OKAY   = 2'b00,
-    M_AXI4_RESP_EXOKAY = 2'b01,
-    M_AXI4_RESP_SLVERR = 2'b10,
-    M_AXI4_RESP_DECERR = 2'b11
-  } m_axi4_resp_t;
+  typedef logic [M_AXI4_BURST_W-1:0] m_axi4_burst_t;
 
-  typedef enum logic [M_AXI4_SIZE_W-1:0] {
-    M_AXI4_SIZE_1B   = 3'b000,
-    M_AXI4_SIZE_2B   = 3'b001,
-    M_AXI4_SIZE_4B   = 3'b010,
-    M_AXI4_SIZE_8B   = 3'b011,
-    M_AXI4_SIZE_16B  = 3'b100,
-    M_AXI4_SIZE_32B  = 3'b101,
-    M_AXI4_SIZE_64B  = 3'b110,
-    M_AXI4_SIZE_128B = 3'b111
-  } m_axi4_size_t;
+  parameter M_AXI4_RESP_OKAY   = 2'b00;
+  parameter M_AXI4_RESP_EXOKAY = 2'b01;
+  parameter M_AXI4_RESP_SLVERR = 2'b10;
+  parameter M_AXI4_RESP_DECERR = 2'b11;
 
-  typedef enum logic [M_AXI4_CACHE_W-1:0] {
-    M_AXI4_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000,
-    M_AXI4_CACHE_BUFFERABLE_ONLY                        = 4'B0001,
-    M_AXI4_CACHE_NO_ALLOCATE                            = 4'B0010,
-    M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011,
-    M_AXI4_CACHE_RESERVED_1                             = 4'B0100,
-    M_AXI4_CACHE_RESERVED_2                             = 4'B0101,
-    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110,
-    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111,
-    M_AXI4_CACHE_RESERVED_3                             = 4'B1000,
-    M_AXI4_CACHE_RESERVED_4                             = 4'B1001,
-    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010,
-    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011,
-    M_AXI4_CACHE_RESERVED_5                             = 4'B1100,
-    M_AXI4_CACHE_RESERVED_6                             = 4'B1101,
-    M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110,
-    M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111
-  } m_axi4_cache_t;
+  typedef logic [M_AXI4_RESP_W-1:0] m_axi4_resp_t;
+
+  parameter M_AXI4_SIZE_1B   = 3'b000;
+  parameter M_AXI4_SIZE_2B   = 3'b001;
+  parameter M_AXI4_SIZE_4B   = 3'b010;
+  parameter M_AXI4_SIZE_8B   = 3'b011;
+  parameter M_AXI4_SIZE_16B  = 3'b100;
+  parameter M_AXI4_SIZE_32B  = 3'b101;
+  parameter M_AXI4_SIZE_64B  = 3'b110;
+  parameter M_AXI4_SIZE_128B = 3'b111;
+
+  typedef logic [M_AXI4_SIZE_W-1:0] m_axi4_size_t;
+
+  parameter M_AXI4_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000;
+  parameter M_AXI4_CACHE_BUFFERABLE_ONLY                        = 4'B0001;
+  parameter M_AXI4_CACHE_NO_ALLOCATE                            = 4'B0010;
+  parameter M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011;
+  parameter M_AXI4_CACHE_RESERVED_1                             = 4'B0100;
+  parameter M_AXI4_CACHE_RESERVED_2                             = 4'B0101;
+  parameter M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110;
+  parameter M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111;
+  parameter M_AXI4_CACHE_RESERVED_3                             = 4'B1000;
+  parameter M_AXI4_CACHE_RESERVED_4                             = 4'B1001;
+  parameter M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010;
+  parameter M_AXI4_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011;
+  parameter M_AXI4_CACHE_RESERVED_5                             = 4'B1100;
+  parameter M_AXI4_CACHE_RESERVED_6                             = 4'B1101;
+  parameter M_AXI4_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110;
+  parameter M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111;
+
+  typedef logic [M_AXI4_CACHE_W-1:0] m_axi4_cache_t;
 
   typedef struct packed {
     m_axi4_valid_t rvalid ; // Read channel valid

@@ -2,6 +2,14 @@
 `include "iob_lib.vh"
 `include "iob-cache.vh"
 
+
+import GLAY_GLOBALS_PKG::*;
+import GLAY_AXI4_PKG::*;
+import GLAY_DESCRIPTOR_PKG::*;
+import GLAY_CONTROL_PKG::*;
+import GLAY_REQ_PKG::*;
+
+
 ///////////////
 // IOb-cache //
 ///////////////
