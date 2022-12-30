@@ -255,7 +255,7 @@ module iob_cache_axi #(
             )
       cache_control
         (
-         .ap_clk         (ap_clk),
+         .ap_clk      (ap_clk),
          .reset       (reset),
          //control's signals
          .valid       (ctrl_valid),
