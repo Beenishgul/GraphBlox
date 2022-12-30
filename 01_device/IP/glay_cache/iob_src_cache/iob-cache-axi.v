@@ -43,7 +43,8 @@ module iob_cache_axi
       parameter CACHE_AXI_PROT_W            = 3,
       parameter CACHE_AXI_QOS_W             = 4,
       parameter CACHE_AXI_BURST_W           = 2,
-      parameter CACHE_AXI_RESP_W            = 1
+      parameter CACHE_AXI_RESP_W            = 1,
+      parameter CACHE_AXI_SIZE_W            = 3
     ) 
    (
     //IOb slave frontend interface 
@@ -65,7 +66,7 @@ module iob_cache_axi
     output                                      wtb_empty_out, 
 `endif 
     //AXI master backend interface
-`include "m_axi_m_port.vh"
+    `include "m_axi_m_port.vh"
     input                                       clk,
     input                                       reset
     );
@@ -213,39 +214,43 @@ module iob_cache_axi
 
 
    
-   back_end_axi
-     #(
-       .CACHE_FRONTEND_ADDR_W  (CACHE_FRONTEND_ADDR_W),
-       .CACHE_FRONTEND_DATA_W  (CACHE_FRONTEND_DATA_W),  
-       .CACHE_BACKEND_ADDR_W  (CACHE_BACKEND_ADDR_W),
-       .CACHE_BACKEND_DATA_W  (CACHE_BACKEND_DATA_W),
-       .CACHE_WORD_OFF_W (CACHE_WORD_OFF_W),
-       .CACHE_WRITE_POL  (CACHE_WRITE_POL),
-       .CACHE_AXI_ADDR_W (CACHE_AXI_ADDR_W),
-       .CACHE_AXI_DATA_W (CACHE_AXI_DATA_W),
-       .CACHE_AXI_ID_W   (CACHE_AXI_ID_W),
-       .CACHE_AXI_LEN_W  (CACHE_AXI_LEN_W),
-       .CACHE_AXI_ID     (CACHE_AXI_ID)
-       )
-   back_end
-     (
-       //write-through-buffer (write-channel)
-      .write_valid   (write_valid),
-      .write_addr    (write_addr),
-      .write_wdata   (write_wdata),
-      .write_wstrb   (write_wstrb),
-      .write_ready   (write_ready),
-      //cache-line replacement (read-channel)
-      .replace_valid (replace_valid),
-      .replace_addr  (replace_addr),
-      .replace       (replace),
-      .read_valid    (read_valid),
-      .read_addr     (read_addr),
-      .read_rdata    (read_rdata),
-`include "m_axi_portmap.vh"
-      .clk   (clk),
-      .reset (reset)
-      );
+  back_end_axi #(
+    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
+    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
+    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
+    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W ),
+    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
+    .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W     ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W     ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W       ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W      ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID         ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W     ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W    ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W     ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     ),
+    .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     )
+  ) back_end (
+    //write-through-buffer (write-channel)
+    .write_valid  (write_valid  ),
+    .write_addr   (write_addr   ),
+    .write_wdata  (write_wdata  ),
+    .write_wstrb  (write_wstrb  ),
+    .write_ready  (write_ready  ),
+    //cache-line replacement (read-channel)
+    .replace_valid(replace_valid),
+    .replace_addr (replace_addr ),
+    .replace      (replace      ),
+    .read_valid   (read_valid   ),
+    .read_addr    (read_addr    ),
+    .read_rdata   (read_rdata   ),
+    `include "m_axi_portmap.vh"
+    .clk          (clk          ),
+    .reset        (reset        )
+  );
    
    
    generate

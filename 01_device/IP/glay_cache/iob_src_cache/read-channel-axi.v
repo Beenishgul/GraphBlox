@@ -19,7 +19,15 @@ module read_channel_axi
     parameter CACHE_AXI_DATA_W            = CACHE_BACKEND_DATA_W,
     parameter CACHE_AXI_LEN_W             = 8, //AXI ID burst length (log2)
     parameter CACHE_AXI_ID_W              = 1, //AXI ID (identification) width
-    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0  //AXI ID value
+    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0,  //AXI ID value
+    parameter CACHE_AXI_LOCK_W            = 1,
+    parameter CACHE_AXI_CACHE_W           = 4,
+    parameter CACHE_AXI_PROT_W            = 3,
+    parameter CACHE_AXI_QOS_W             = 4,
+    parameter CACHE_AXI_BURST_W           = 2,
+    parameter CACHE_AXI_RESP_W            = 1,
+    parameter CACHE_AXI_SIZE_W            = 3
+
     )
    (
     //IOb slave frontend interface 

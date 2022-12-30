@@ -19,7 +19,14 @@ module write_channel_axi
     // Write-Policy
     parameter CACHE_WRITE_POL = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
     parameter CACHE_WORD_OFF_W = 3, //required for write-back
-    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)  //burst offset based on the cache and memory word size
+    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W),  //burst offset based on the cache and memory word size
+    parameter CACHE_AXI_LOCK_W            = 1,
+    parameter CACHE_AXI_CACHE_W           = 4,
+    parameter CACHE_AXI_PROT_W            = 3,
+    parameter CACHE_AXI_QOS_W             = 4,
+    parameter CACHE_AXI_BURST_W           = 2,
+    parameter CACHE_AXI_RESP_W            = 1,
+    parameter CACHE_AXI_SIZE_W            = 3
   )
   (
     //IOb slave frontend interface

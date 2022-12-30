@@ -116,7 +116,7 @@ package GLAY_GLOBALS_PKG;
 	parameter CACHE_AXI_QOS_W   = M_AXI_MEMORY_QOS_W   ;
 	parameter CACHE_AXI_BURST_W = M_AXI_MEMORY_BURST_W ;
 	parameter CACHE_AXI_RESP_W  = M_AXI_MEMORY_RESP_W  ;
-
+	parameter CACHE_AXI_SIZE_W  = M_AXI_MEMORY_SIZE_W  ;
 	parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0; //AXI ID value
 //Controller's options
 	parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
