@@ -1,45 +1,43 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
-module write_channel_axi
-  #(
-    parameter CACHE_FRONTEND_ADDR_W = 32,
-    parameter CACHE_FRONTEND_DATA_W = 32,
-    parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8,
-    parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES),
-    parameter CACHE_BACKEND_ADDR_W = CACHE_FRONTEND_ADDR_W,
-    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W,
-    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8,
-    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES),
-    parameter CACHE_AXI_ADDR_W = CACHE_BACKEND_ADDR_W,
-    parameter CACHE_AXI_DATA_W = CACHE_BACKEND_DATA_W,
-    parameter CACHE_AXI_LEN_W             = 8, //AXI ID burst length (log2)
-    parameter CACHE_AXI_ID_W  = 1,
-    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0,
-    // Write-Policy
-    parameter CACHE_WRITE_POL = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
-    parameter CACHE_WORD_OFF_W = 3, //required for write-back
-    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W),  //burst offset based on the cache and memory word size
-    parameter CACHE_AXI_LOCK_W            = 1,
-    parameter CACHE_AXI_CACHE_W           = 4,
-    parameter CACHE_AXI_PROT_W            = 3,
-    parameter CACHE_AXI_QOS_W             = 4,
-    parameter CACHE_AXI_BURST_W           = 2,
-    parameter CACHE_AXI_RESP_W            = 1,
-    parameter CACHE_AXI_SIZE_W            = 3
-  )
-  (
-    //IOb slave frontend interface
-    input                                                                    valid,
-    input [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W + CACHE_WRITE_POL*CACHE_WORD_OFF_W]                     addr,
-    input [CACHE_FRONTEND_DATA_W + CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1 :0] wdata,
-    input [CACHE_FRONTEND_NBYTES-1:0]                                                    wstrb,
-    output reg                                                               ready,
-    //AXI master backend interface
-    `include "m_axi_m_write_port.vh"
-    input                                                                    clk,
-    input                                                                    reset
-  );
+module write_channel_axi #(
+  parameter                      CACHE_FRONTEND_ADDR_W = 32                                                                 ,
+  parameter                      CACHE_FRONTEND_DATA_W = 32                                                                 ,
+  parameter                      CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8                                            ,
+  parameter                      CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES)                                      ,
+  parameter                      CACHE_BACKEND_ADDR_W  = CACHE_FRONTEND_ADDR_W                                              ,
+  parameter                      CACHE_BACKEND_DATA_W  = CACHE_FRONTEND_DATA_W                                              ,
+  parameter                      CACHE_BACKEND_NBYTES  = CACHE_BACKEND_DATA_W/8                                             ,
+  parameter                      CACHE_BACKEND_BYTE_W  = $clog2(CACHE_BACKEND_NBYTES)                                       ,
+  parameter                      CACHE_AXI_ADDR_W      = CACHE_BACKEND_ADDR_W                                               ,
+  parameter                      CACHE_AXI_DATA_W      = CACHE_BACKEND_DATA_W                                               ,
+  parameter                      CACHE_AXI_LEN_W       = 8                                                                  , //AXI ID burst length (log2)
+  parameter                      CACHE_AXI_ID_W        = 1                                                                  ,
+  parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID          = 0                                                                  ,
+  // Write-Policy
+  parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH                                                     , //write policy: write-through (0), write-back (1)
+  parameter                      CACHE_WORD_OFF_W      = 3                                                                  , //required for write-back
+  parameter                      CACHE_LINE2MEM_W      = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W), //burst offset based on the cache and memory word size
+  parameter                      CACHE_AXI_LOCK_W      = 1                                                                  ,
+  parameter                      CACHE_AXI_CACHE_W     = 4                                                                  ,
+  parameter                      CACHE_AXI_PROT_W      = 3                                                                  ,
+  parameter                      CACHE_AXI_QOS_W       = 4                                                                  ,
+  parameter                      CACHE_AXI_BURST_W     = 2                                                                  ,
+  parameter                      CACHE_AXI_RESP_W      = 1                                                                  ,
+  parameter                      CACHE_AXI_SIZE_W      = 3
+) (
+  //IOb slave frontend interface
+  input                                                                                                                      valid,
+  input      [                               CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W+CACHE_WRITE_POL*CACHE_WORD_OFF_W] addr ,
+  input      [CACHE_FRONTEND_DATA_W+CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1:0] wdata,
+  input      [                                                                                    CACHE_FRONTEND_NBYTES-1:0] wstrb,
+  output reg                                                                                                                 ready,
+  //AXI master backend interface
+  `include "m_axi_m_write_port.vh"
+  input                                                                                                                      clk  ,
+  input                                                                                                                      reset
+);
 
 reg m_axi_awvalid_int;
 reg m_axi_wvalid_int ;

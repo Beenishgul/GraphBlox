@@ -17,10 +17,11 @@ import GLAY_AXI4_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 
+
 module glay_kernel_afu #(
-  parameter C_M00_AXI_ADDR_WIDTH = 64             ,
-  parameter C_M00_AXI_DATA_WIDTH = 512            ,
-  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
+  parameter C_M00_AXI_ADDR_WIDTH = M_AXI_MEMORY_ADDR_WIDTH     ,
+  parameter C_M00_AXI_DATA_WIDTH = M_AXI_MEMORY_DATA_WIDTH_BITS,
+  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL             ,
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
   // System Signals
