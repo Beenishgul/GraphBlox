@@ -12,7 +12,7 @@ module replacement_policy #(
   parameter CACHE_NWAY_W     = $clog2(CACHE_N_WAYS),
   parameter CACHE_REP_POLICY = `PLRU_tree            //LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 ) (
-  input                         clk           ,
+  input                         ap_clk           ,
   input                         reset         ,
   input                         write_en      ,
   input  [    CACHE_N_WAYS-1:0] way_hit       ,
@@ -73,7 +73,7 @@ module replacement_policy #(
                )
            mru_memory //simply uses the same format as valid memory
              (
-              .clk    (clk      ),
+              .ap_clk    (ap_clk      ),
               .rst    (reset    ),
 
               .we     (write_en ),
@@ -115,7 +115,7 @@ module replacement_policy #(
                )
            mru_memory //simply uses the same format as valid memory
              (
-              .clk    (clk      ),
+              .ap_clk    (ap_clk      ),
               .rst    (reset    ),
 
               .we     (write_en ),
@@ -190,7 +190,7 @@ module replacement_policy #(
                )
            mru_memory //simply uses the same format as valid memory
              (
-              .clk    (clk          ),
+              .ap_clk    (ap_clk          ),
               .rst    (reset        ),
 
               .we     (write_en     ),

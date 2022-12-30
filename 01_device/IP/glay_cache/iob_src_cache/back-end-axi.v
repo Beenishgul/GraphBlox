@@ -48,7 +48,7 @@ module back_end_axi #(
   output [                                                                                     CACHE_BACKEND_DATA_W-1:0] read_rdata   ,
   //AXI master backend interface
   `include "m_axi_m_port.vh"
-  input                                                                                                                  clk          ,
+  input                                                                                                                  ap_clk          ,
   input                                                                                                                  reset
 );
 
@@ -80,7 +80,7 @@ read_channel_axi #(
   .read_addr    (read_addr    ),
   .read_rdata   (read_rdata   ),
   `include "m_axi_read_portmap.vh"
-  .clk          (clk          ),
+  .ap_clk          (ap_clk          ),
   .reset        (reset        )
 );
 
@@ -111,7 +111,7 @@ write_channel_axi #(
   .wdata(write_wdata),
   .ready(write_ready),
   `include "m_axi_write_portmap.vh"
-  .clk  (clk        ),
+  .ap_clk  (ap_clk        ),
   .reset(reset      )
 );
 

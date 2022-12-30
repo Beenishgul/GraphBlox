@@ -65,7 +65,7 @@ module iob_cache_axi #(
   `endif
   //AXI master backend interface
   `include "m_axi_m_port.vh"
-  input                                                                   clk          ,
+  input                                                                   ap_clk          ,
   input                                                                   reset
 );
 
@@ -119,7 +119,7 @@ module iob_cache_axi #(
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
     .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     )
   ) front_end (
-    .clk           (clk           ),
+    .ap_clk           (ap_clk           ),
     .reset         (reset         ),
     //front-end port
     .valid         (valid         ),
@@ -161,7 +161,7 @@ module iob_cache_axi #(
     .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
     .CACHE_WRITE_POL      (CACHE_WRITE_POL      )
   ) cache_memory (
-    .clk          (clk                                                                       ),
+    .ap_clk          (ap_clk                                                                       ),
     .reset        (reset                                                                     ),
     //front-end
     //internal data signals
@@ -240,7 +240,7 @@ module iob_cache_axi #(
     .read_addr    (read_addr    ),
     .read_rdata   (read_rdata   ),
     `include "m_axi_portmap.vh"
-    .clk          (clk          ),
+    .ap_clk          (ap_clk          ),
     .reset        (reset        )
   );
    
@@ -255,7 +255,7 @@ module iob_cache_axi #(
             )
       cache_control
         (
-         .clk         (clk),
+         .ap_clk         (ap_clk),
          .reset       (reset),
          //control's signals
          .valid       (ctrl_valid),

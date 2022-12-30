@@ -16,7 +16,7 @@ module read_channel_native
     parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W) //burst offset based on the cache word's and memory word size
     )
    (
-    input                                        clk,
+    input                                        ap_clk,
     input                                        reset,
     input                                        replace_valid,
     input [CACHE_FRONTEND_ADDR_W -1: CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W] replace_addr,
@@ -48,12 +48,12 @@ module read_channel_native
              handshake        = 2'd1, //the process was divided in 2 handshake steps to cause a delay in the
              end_handshake    = 2'd2; //(always 1 or a delayed valid signal), otherwise it will fail
 
-           always @ (posedge clk)
+           always @ (posedge ap_clk)
              read_addr <= word_counter;
            
            reg [1:0]            state;
 
-           always @(posedge clk, posedge reset)
+           always @(posedge ap_clk, posedge reset)
              begin
                 if(reset)
                   begin
@@ -141,7 +141,7 @@ module read_channel_native
            
            reg [1:0]                                  state;
 
-           always @(posedge clk, posedge reset)
+           always @(posedge ap_clk, posedge reset)
              begin
                 if(reset)
                   state <= idle;

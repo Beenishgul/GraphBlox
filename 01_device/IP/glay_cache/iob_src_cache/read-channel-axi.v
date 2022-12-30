@@ -36,7 +36,7 @@ module read_channel_axi #(
   output     [                                     CACHE_BACKEND_DATA_W-1:0] read_rdata   ,
   //AXI master backend interface
   `include "m_axi_m_read_port.vh"
-  input                                                                      clk          ,
+  input                                                                      ap_clk          ,
   input                                                                      reset
 );
 
@@ -79,7 +79,7 @@ module read_channel_axi #(
            reg                                 slave_error;//axi slave_error during reply (m_axi_rresp[1] == 1) - burst can't be interrupted, so a flag needs to be active
            
            
-           always @(posedge clk, posedge reset)
+           always @(posedge ap_clk, posedge reset)
              begin
                 if(reset)
                   begin
@@ -197,7 +197,7 @@ module read_channel_axi #(
            reg [1:0]                           state;
 
            
-           always @(posedge clk, posedge reset)
+           always @(posedge ap_clk, posedge reset)
              begin
                 if(reset)
                    

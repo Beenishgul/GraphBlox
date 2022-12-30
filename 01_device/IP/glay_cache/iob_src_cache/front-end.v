@@ -15,7 +15,7 @@ module front_end
     )
    (
     //front-end port
-    input                                       clk,
+    input                                       ap_clk,
     input                                       reset,
 `ifdef WORD_ADDR   
     input [CACHE_CTRL_CACHE + CACHE_FRONTEND_ADDR_W -1:CACHE_FRONTEND_BYTE_W] addr, //MSB is used for Controller selection
@@ -95,7 +95,7 @@ module front_end
    // Input Data stored signals
    /////////////////////////////////////////////////////////////////////////////////
 
-   always @(posedge clk, posedge reset)
+   always @(posedge ap_clk, posedge reset)
      begin
         if(reset)
           begin
@@ -112,7 +112,7 @@ module front_end
              wdata_reg <= wdata;
              wstrb_reg <= wstrb;
           end
-     end // always @ (posedge clk, posedge reset)  
+     end // always @ (posedge ap_clk, posedge reset)  
 
    
    //////////////////////////////////////////////////////////////////////////////////

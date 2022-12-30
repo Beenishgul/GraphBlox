@@ -1,3 +1,5 @@
+ `include "iob_lib.vh"
+ 
   //START_IO_TABLE m_axi_m_write_port
  `IOB_OUTPUT(m_axi_awid, CACHE_AXI_ID_W), //Address write channel ID
  `IOB_OUTPUT(m_axi_awaddr, CACHE_AXI_ADDR_W), //Address write channel address

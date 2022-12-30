@@ -7,7 +7,7 @@ module iob_ram_sp
     parameter ADDR_W=14
     )
    (
-    input                     clk,
+    input                     ap_clk,
     input                     en, 
     input                     we, 
     input [(ADDR_W-1):0]      addr,
@@ -27,7 +27,7 @@ module iob_ram_sp
        $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
    // Operate the RAM
-   always @ (posedge clk)
+   always @ (posedge ap_clk)
      if(en)
        if (we)
          ram[addr] <= din;

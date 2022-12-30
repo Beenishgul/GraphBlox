@@ -9,7 +9,7 @@ module cache_control #(
   parameter CACHE_FRONTEND_DATA_W = 32,
   parameter CACHE_CTRL_CNT  = 1
 ) (
-  input                         clk        ,
+  input                         ap_clk        ,
   input                         reset      ,
   input                         valid      ,
   input      [`CTRL_ADDR_W-1:0] addr       ,
@@ -35,7 +35,7 @@ module cache_control #(
         assign hit_cnt  = read_hit_cnt  + write_hit_cnt;
         assign miss_cnt = read_miss_cnt + write_miss_cnt;
 
-        always @ (posedge clk, posedge reset)
+        always @ (posedge ap_clk, posedge reset)
           begin
             if (reset)
               begin
@@ -79,9 +79,9 @@ module cache_control #(
                     write_miss_cnt <= write_miss_cnt;
                   end
               end // else: !if(ctrl_arst)
-          end // always @ (posedge clk, posedge ctrl_arst)
+          end // always @ (posedge ap_clk, posedge ctrl_arst)
 
-          always @ (posedge clk)
+          always @ (posedge ap_clk)
           begin
             rdata <= {CACHE_FRONTEND_DATA_W{1'b0}};
             invalidate <= 1'b0;
@@ -108,12 +108,12 @@ module cache_control #(
               rdata <= wtbuf_empty;
             else if (addr == `ADDR_BUFFER_FULL)
               rdata <= wtbuf_full;
-          end // always @ (posedge clk)
+          end // always @ (posedge ap_clk)
         end // if (CACHE_CTRL_CNT)
       else
         begin
 
-          always @ (posedge clk)
+          always @ (posedge ap_clk)
           begin
             rdata <= {CACHE_FRONTEND_DATA_W{1'b0}};
             invalidate <= 1'b0;
@@ -125,7 +125,7 @@ module cache_control #(
               rdata <= wtbuf_empty;
             else if (addr == `ADDR_BUFFER_FULL)
               rdata <= wtbuf_full;
-          end // always @ (posedge clk)
+          end // always @ (posedge ap_clk)
         end // else: !if(CACHE_CTRL_CNT)
     endgenerate
 

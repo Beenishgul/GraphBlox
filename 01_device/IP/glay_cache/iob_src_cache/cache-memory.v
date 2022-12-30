@@ -30,7 +30,7 @@ module cache_memory
     parameter CACHE_WRITE_POL = `WRITE_THROUGH //write policy: write-through (0), write-back (1)
   )
   (
-    input                                                                     clk,
+    input                                                                     ap_clk,
     input                                                                     reset,
     //front-end
     input                                                                     valid,
@@ -120,7 +120,7 @@ generate
       .DATA_W(FIFO_DATA_W),
       .ADDR_W(FIFO_ADDR_W)
     ) iob_ram_2p0 (
-      .clk   (clk       ),
+      .ap_clk   (ap_clk       ),
       
       .w_en  (mem_w_en  ),
       .w_addr(mem_w_addr),
@@ -136,7 +136,7 @@ generate
       .W_DATA_W(FIFO_DATA_W),
       .ADDR_W  (FIFO_ADDR_W)
     ) write_throught_buffer (
-      .clk           (clk                           ),
+      .ap_clk           (ap_clk                           ),
       .rst           (reset                         ),
       .arst          (reset                         ),
       
@@ -208,7 +208,7 @@ reg  [    CACHE_N_WAYS-1:0] way_hit_prev  ;
 
 generate
   if (CACHE_WRITE_POL == `WRITE_THROUGH) begin
-    always @(posedge clk) begin
+    always @(posedge ap_clk) begin
       write_hit_prev <= write_access & (|way_hit);
       //previous write position
       offset_prev    <= offset;
@@ -217,7 +217,7 @@ generate
     assign raw = write_hit_prev & (way_hit_prev == way_hit) & (offset_prev == offset);
   end
   else begin //// if (CACHE_WRITE_POL == WRITE_BACK)
-    always @(posedge clk) begin
+    always @(posedge ap_clk) begin
       write_hit_prev <= write_access; //all writes will have the data in cache in the end
       //previous write position
       offset_prev    <= offset;
@@ -279,7 +279,7 @@ generate
             .DATA_W(CACHE_FRONTEND_DATA_W),
             .ADDR_W(CACHE_LINE_OFF_W)
           ) cache_memory (
-            .clk (clk),
+            .ap_clk (ap_clk),
             .en  (valid),
             .we ({CACHE_FRONTEND_NBYTES{way_hit[k]}} & line_wstrb[(j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_NBYTES +: CACHE_FRONTEND_NBYTES]),
             .addr((write_access & way_hit[k] & ((j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i) == offset))? index_reg : index),
@@ -315,7 +315,7 @@ generate
 
         wire [CACHE_NWAY_W-1:0] way_hit_bin, way_select_bin; //reason for the 2 generates for single vs multiple ways
         //valid-memory
-        always @ (posedge clk, posedge reset) begin
+        always @ (posedge ap_clk, posedge reset) begin
           if (reset)
             v_reg <= 0;
           else if (invalidate)
@@ -328,7 +328,7 @@ generate
 
         for(k = 0; k < CACHE_N_WAYS; k = k+1) begin : tag_mem_block
           //valid-memory output stage register - 1 c.c. read-latency (cleaner simulation during rep.)
-          always @(posedge clk)
+          always @(posedge ap_clk)
           if(invalidate)
             v[k] <= 0;
           else
@@ -342,7 +342,7 @@ generate
             )
             tag_memory
               (
-                .clk (clk                           ),
+                .ap_clk (ap_clk                           ),
                 .en  (valid                         ),
                 .we  (way_select[k] & replace_valid),
                 .addr(index                        ),
@@ -366,7 +366,7 @@ generate
         )
         replacement_policy_algorithm
           (
-            .clk       (clk             ),
+            .ap_clk       (ap_clk             ),
             .reset     (reset|invalidate),
             .write_en  (ready           ),
             .way_hit   (way_hit         ),
@@ -388,7 +388,7 @@ generate
         //dirty-memory
         if(CACHE_WRITE_POL == `WRITE_BACK)
           begin
-            always @ (posedge clk, posedge reset) begin
+            always @ (posedge ap_clk, posedge reset) begin
               if (reset)
                 dirty_reg <= 0;
               else if(write_valid)
@@ -401,7 +401,7 @@ generate
 
             for(k = 0; k < CACHE_N_WAYS; k = k+1) begin : dirty_block
               //valid-memory output stage register - 1 c.c. read-latency (cleaner simulation during rep.)
-              always @(posedge clk)
+              always @(posedge ap_clk)
               dirty[k] <= dirty_reg [(2**CACHE_LINE_OFF_W)*k + index];
             end
 
@@ -420,7 +420,7 @@ generate
     else // (CACHE_N_WAYS = 1)
       begin
         //valid-memory
-        always @ (posedge clk, posedge reset)
+        always @ (posedge ap_clk, posedge reset)
         begin
           if (reset)
             v_reg <= 0;
@@ -433,7 +433,7 @@ generate
         end
 
         //valid-memory output stage register - 1 c.c. read-latency (cleaner simulation during rep.)
-        always @(posedge clk)
+        always @(posedge ap_clk)
         if(invalidate)
           v <= 0;
         else
@@ -447,7 +447,7 @@ generate
           )
           tag_memory
             (
-              .clk (clk),
+              .ap_clk (ap_clk),
               .en  (valid),
               .we  (replace_valid),
               .addr(index),
@@ -466,7 +466,7 @@ generate
         if(CACHE_WRITE_POL == `WRITE_BACK)
           begin
             //dirty-memory
-            always @ (posedge clk, posedge reset) begin
+            always @ (posedge ap_clk, posedge reset) begin
               if (reset)
                 dirty_reg <= 0;
               else if(write_valid)
@@ -477,7 +477,7 @@ generate
                 dirty_reg <= dirty_reg;
             end
 
-            always @(posedge clk)
+            always @(posedge ap_clk)
             dirty <= dirty_reg [index];
 
             //flush line
@@ -503,7 +503,7 @@ module iob_gen_sp_ram #(
   parameter DATA_W = 32,
   parameter ADDR_W = 10
 ) (
-  input                 clk     ,
+  input                 ap_clk     ,
   input                 en      ,
   input  [DATA_W/8-1:0] we      ,
   input  [  ADDR_W-1:0] addr    ,
@@ -522,7 +522,7 @@ module iob_gen_sp_ram #(
               )
               iob_cache_mem
                 (
-                  .clk (clk),
+                  .ap_clk (ap_clk),
                   .en  (en),
                   .we  (we[i]),
                   .addr(addr),
