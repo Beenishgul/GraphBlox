@@ -1,60 +1,52 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
-
-import GLAY_GLOBALS_PKG::*;
-import GLAY_AXI4_PKG::*;
-import GLAY_DESCRIPTOR_PKG::*;
-import GLAY_CONTROL_PKG::*;
-import GLAY_REQ_PKG::*;
-
-
 module write_channel_native
   #(
-    parameter FE_ADDR_W = 32,
-    parameter FE_DATA_W = 32,
-    parameter FE_NBYTES = FE_DATA_W/8,
-    parameter FE_BYTE_W = $clog2(FE_NBYTES),
-    parameter BE_ADDR_W = FE_ADDR_W,
-    parameter BE_DATA_W = FE_DATA_W,
-    parameter BE_NBYTES = BE_DATA_W/8,
-    parameter BE_BYTE_W = $clog2(BE_NBYTES),
+    parameter CACHE_FRONTEND_ADDR_W = 32,
+    parameter CACHE_FRONTEND_DATA_W = 32,
+    parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8,
+    parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES),
+    parameter CACHE_BACKEND_ADDR_W = CACHE_FRONTEND_ADDR_W,
+    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W,
+    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8,
+    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES),
     // Write-Policy
-    parameter WRITE_POL  = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
-    parameter WORD_OFF_W = 3, //required for write-back
-    parameter LINE2MEM_W = WORD_OFF_W-$clog2(BE_DATA_W/FE_DATA_W) //burst offset based on the cache and memory word size
+    parameter CACHE_WRITE_POL  = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
+    parameter CACHE_WORD_OFF_W = 3, //required for write-back
+    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W) //burst offset based on the cache and memory word size
   )
   (
     input                                                                   clk,
     input                                                                   reset,
 
     input                                                                   valid,
-    input [FE_ADDR_W-1:FE_BYTE_W + WRITE_POL*WORD_OFF_W]                    addr,
-    input [FE_NBYTES-1:0]                                                   wstrb,
-    input [FE_DATA_W + WRITE_POL*(FE_DATA_W*(2**WORD_OFF_W)-FE_DATA_W)-1:0] wdata, //try [FE_DATA_W*((2**WORD_OFF_W)**WRITE_POL)-1:0] (f(x)=a*b^x)
+    input [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W + CACHE_WRITE_POL*CACHE_WORD_OFF_W]                    addr,
+    input [CACHE_FRONTEND_NBYTES-1:0]                                                   wstrb,
+    input [CACHE_FRONTEND_DATA_W + CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1:0] wdata, //try [CACHE_FRONTEND_DATA_W*((2**CACHE_WORD_OFF_W)**CACHE_WRITE_POL)-1:0] (f(x)=a*b^x)
     output reg                                                              ready,
     //Native Memory interface
-    output [BE_ADDR_W -1:0]                                                 mem_addr,
+    output [CACHE_BACKEND_ADDR_W -1:0]                                                 mem_addr,
     output reg                                                              mem_valid,
     input                                                                   mem_ready,
-    output [BE_DATA_W-1:0]                                                  mem_wdata,
-    output reg [BE_NBYTES-1:0]                                              mem_wstrb
+    output [CACHE_BACKEND_DATA_W-1:0]                                                  mem_wdata,
+    output reg [CACHE_BACKEND_NBYTES-1:0]                                              mem_wstrb
 
   );
 
 genvar i;
 
 generate
-  if(WRITE_POL == `WRITE_THROUGH) begin
+  if(CACHE_WRITE_POL == `WRITE_THROUGH) begin
 
-    assign mem_addr = {BE_ADDR_W{1'b0}} + {addr[FE_ADDR_W-1:BE_BYTE_W], {BE_BYTE_W{1'b0}}};
+    assign mem_addr = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W], {CACHE_BACKEND_BYTE_W{1'b0}}};
 
     localparam
       idle  = 1'd0,
       write = 1'd1;
 
     reg [0:0] state;
-    if(BE_DATA_W == FE_DATA_W) begin
+    if(CACHE_BACKEND_DATA_W == CACHE_FRONTEND_DATA_W) begin
       assign mem_wdata = wdata;
       always @* begin
         mem_wstrb = 0;
@@ -65,16 +57,16 @@ generate
       end // always @ *
     end
     else begin
-      wire [BE_BYTE_W-FE_BYTE_W -1 :0] word_align = addr[FE_BYTE_W +: (BE_BYTE_W - FE_BYTE_W)];
+      wire [CACHE_BACKEND_BYTE_W-CACHE_FRONTEND_BYTE_W -1 :0] word_align = addr[CACHE_FRONTEND_BYTE_W +: (CACHE_BACKEND_BYTE_W - CACHE_FRONTEND_BYTE_W)];
 
-      for (i = 0; i < BE_DATA_W/FE_DATA_W; i = i +1) begin : wdata_block
-        assign mem_wdata[(i+1)*FE_DATA_W-1:i*FE_DATA_W] = wdata;
+      for (i = 0; i < CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W; i = i +1) begin : wdata_block
+        assign mem_wdata[(i+1)*CACHE_FRONTEND_DATA_W-1:i*CACHE_FRONTEND_DATA_W] = wdata;
       end
 
       always @* begin
         mem_wstrb = 0;
         case(state)
-          write: mem_wstrb = wstrb << word_align * FE_NBYTES;
+          write: mem_wstrb = wstrb << word_align * CACHE_FRONTEND_NBYTES;
           default:;
         endcase // case (state)
       end // always @ *
@@ -119,19 +111,19 @@ generate
             end
         endcase // case (state)
       end
-    end // if (WRITE_POL == WRITE_THROUGH)
+    end // if (CACHE_WRITE_POL == WRITE_THROUGH)
     //////////////////////////////////////////////////////////////////////////////////////////////
-    else begin // if (WRITE_POL == WRITE_BACK)
+    else begin // if (CACHE_WRITE_POL == WRITE_BACK)
 
-      if (LINE2MEM_W > 0) begin
+      if (CACHE_LINE2MEM_W > 0) begin
 
-        reg [LINE2MEM_W-1:0] word_counter, word_counter_reg;
+        reg [CACHE_LINE2MEM_W-1:0] word_counter, word_counter_reg;
         always @(posedge clk) word_counter_reg <= word_counter;
 
         // memory address
-        assign mem_addr  = {BE_ADDR_W{1'b0}} + {addr[FE_ADDR_W-1: BE_BYTE_W + LINE2MEM_W], word_counter, {BE_BYTE_W{1'b0}}};
+        assign mem_addr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1: CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W], word_counter, {CACHE_BACKEND_BYTE_W{1'b0}}};
         // memory write-data
-        assign mem_wdata = wdata>>(BE_DATA_W*word_counter);
+        assign mem_wdata = wdata>>(CACHE_BACKEND_DATA_W*word_counter);
 
         localparam
           idle  = 1'd0,
@@ -176,7 +168,7 @@ generate
             idle:
               begin
                 ready = ~valid;
-                if(valid) mem_wstrb = {BE_NBYTES{1'b1}};
+                if(valid) mem_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
                 else mem_wstrb =0;
               end
 
@@ -185,17 +177,17 @@ generate
               begin
                 ready = mem_ready & (&word_counter); //last word transfered
                 mem_valid = ~(mem_ready & (&word_counter));
-                mem_wstrb = {BE_NBYTES{1'b1}};
+                mem_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
                 word_counter = word_counter_reg + mem_ready;
               end
           endcase // case (state)
         end
 
-      end // if (LINE2MEM_W > 0)
-      else begin // if (LINE2MEM_W == 0)
+      end // if (CACHE_LINE2MEM_W > 0)
+      else begin // if (CACHE_LINE2MEM_W == 0)
 
         // memory address
-        assign mem_addr  = {BE_ADDR_W{1'b0}} + {addr[FE_ADDR_W-1: BE_BYTE_W], {BE_BYTE_W{1'b0}}};
+        assign mem_addr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1: CACHE_BACKEND_BYTE_W], {CACHE_BACKEND_BYTE_W{1'b0}}};
         // memory write-data
         assign mem_wdata = wdata;
 
@@ -241,7 +233,7 @@ generate
             idle:
               begin
                 ready = ~valid;
-                if(valid) mem_wstrb = {BE_NBYTES{1'b1}};
+                if(valid) mem_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
                 else mem_wstrb = 0;
               end
 
@@ -250,13 +242,13 @@ generate
               begin
                 ready = mem_ready;
                 mem_valid = ~mem_ready;
-                mem_wstrb = {BE_NBYTES{1'b1}};
+                mem_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
               end
           endcase // case (state)
         end // always @ *
 
-      end // else: !if(LINE2MEM_W > 0)
-    end // else: !if(WRITE_POL == WRITE_THROUGH)
+      end // else: !if(CACHE_LINE2MEM_W > 0)
+    end // else: !if(CACHE_WRITE_POL == WRITE_THROUGH)
   endgenerate
 
   endmodule

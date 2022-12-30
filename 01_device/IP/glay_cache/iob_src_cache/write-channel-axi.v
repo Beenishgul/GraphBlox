@@ -1,40 +1,32 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
-
-import GLAY_GLOBALS_PKG::*;
-import GLAY_AXI4_PKG::*;
-import GLAY_DESCRIPTOR_PKG::*;
-import GLAY_CONTROL_PKG::*;
-import GLAY_REQ_PKG::*;
-
-
 module write_channel_axi
   #(
-    parameter FE_ADDR_W = 32,
-    parameter FE_DATA_W = 32,
-    parameter FE_NBYTES = FE_DATA_W/8,
-    parameter FE_BYTE_W = $clog2(FE_NBYTES),
-    parameter BE_ADDR_W = FE_ADDR_W,
-    parameter BE_DATA_W = FE_DATA_W,
-    parameter BE_NBYTES = BE_DATA_W/8,
-    parameter BE_BYTE_W = $clog2(BE_NBYTES),
-    parameter AXI_ADDR_W = BE_ADDR_W,
-    parameter AXI_DATA_W = BE_DATA_W,
-    parameter AXI_LEN_W             = 8, //AXI ID burst length (log2)
-    parameter AXI_ID_W  = 1,
-    parameter [AXI_ID_W-1:0] AXI_ID = 0,
+    parameter CACHE_FRONTEND_ADDR_W = 32,
+    parameter CACHE_FRONTEND_DATA_W = 32,
+    parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8,
+    parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES),
+    parameter CACHE_BACKEND_ADDR_W = CACHE_FRONTEND_ADDR_W,
+    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W,
+    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8,
+    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES),
+    parameter CACHE_AXI_ADDR_W = CACHE_BACKEND_ADDR_W,
+    parameter CACHE_AXI_DATA_W = CACHE_BACKEND_DATA_W,
+    parameter CACHE_AXI_LEN_W             = 8, //AXI ID burst length (log2)
+    parameter CACHE_AXI_ID_W  = 1,
+    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0,
     // Write-Policy
-    parameter WRITE_POL = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
-    parameter WORD_OFF_W = 3, //required for write-back
-    parameter LINE2MEM_W = WORD_OFF_W-$clog2(BE_DATA_W/FE_DATA_W)  //burst offset based on the cache and memory word size
+    parameter CACHE_WRITE_POL = `WRITE_THROUGH, //write policy: write-through (0), write-back (1)
+    parameter CACHE_WORD_OFF_W = 3, //required for write-back
+    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)  //burst offset based on the cache and memory word size
   )
   (
     //IOb slave frontend interface
     input                                                                    valid,
-    input [FE_ADDR_W-1:FE_BYTE_W + WRITE_POL*WORD_OFF_W]                     addr,
-    input [FE_DATA_W + WRITE_POL*(FE_DATA_W*(2**WORD_OFF_W)-FE_DATA_W)-1 :0] wdata,
-    input [FE_NBYTES-1:0]                                                    wstrb,
+    input [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W + CACHE_WRITE_POL*CACHE_WORD_OFF_W]                     addr,
+    input [CACHE_FRONTEND_DATA_W + CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1 :0] wdata,
+    input [CACHE_FRONTEND_NBYTES-1:0]                                                    wstrb,
     output reg                                                               ready,
     //AXI master backend interface
     `include "m_axi_m_write_port.vh"
@@ -55,12 +47,12 @@ assign m_axi_bready  = m_axi_bready_int;
 
 genvar                                                                       i;
 generate
-  if(WRITE_POL == `WRITE_THROUGH) begin
+  if(CACHE_WRITE_POL == `WRITE_THROUGH) begin
 
     //Constant AXI signals
-    assign m_axi_awid    = AXI_ID;
+    assign m_axi_awid    = CACHE_AXI_ID;
     assign m_axi_awlen   = 8'd0;
-    assign m_axi_awsize  = BE_BYTE_W; // verify - Writes data of the size of BE_DATA_W
+    assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; // verify - Writes data of the size of CACHE_BACKEND_DATA_W
     assign m_axi_awburst = 2'd0;
     assign m_axi_awlock  = 1'b0; // 00 - Normal Access
     assign m_axi_awcache = 4'b0011;
@@ -68,10 +60,10 @@ generate
     assign m_axi_wlast   = m_axi_wvalid_int;
 
     //AXI Buffer Output signals
-    assign m_axi_awaddr = {BE_ADDR_W{1'b0}} + {addr[FE_ADDR_W-1:BE_BYTE_W], {BE_BYTE_W{1'b0}}};
+    assign m_axi_awaddr = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W], {CACHE_BACKEND_BYTE_W{1'b0}}};
 
 
-    if(BE_DATA_W == FE_DATA_W)
+    if(CACHE_BACKEND_DATA_W == CACHE_FRONTEND_DATA_W)
       begin
         assign m_axi_wstrb = wstrb;
         assign m_axi_wdata = wdata;
@@ -79,11 +71,11 @@ generate
       end
     else
       begin
-        wire [BE_BYTE_W-FE_BYTE_W-1:0] word_align = addr[FE_BYTE_W +: (BE_BYTE_W - FE_BYTE_W)];
-        assign m_axi_wstrb = wstrb << (word_align * FE_NBYTES);
+        wire [CACHE_BACKEND_BYTE_W-CACHE_FRONTEND_BYTE_W-1:0] word_align = addr[CACHE_FRONTEND_BYTE_W +: (CACHE_BACKEND_BYTE_W - CACHE_FRONTEND_BYTE_W)];
+        assign m_axi_wstrb = wstrb << (word_align * CACHE_FRONTEND_NBYTES);
 
-        for (i = 0; i < BE_DATA_W/FE_DATA_W; i = i +1) begin : wdata_block
-          assign m_axi_wdata[(i+1)*FE_DATA_W-1:i*FE_DATA_W] = wdata;
+        for (i = 0; i < CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W; i = i +1) begin : wdata_block
+          assign m_axi_wdata[(i+1)*CACHE_FRONTEND_DATA_W-1:i*CACHE_FRONTEND_DATA_W] = wdata;
         end
       end
 
@@ -166,28 +158,28 @@ generate
 
 
     end
-    else begin // if (WRITE_POL == `WRITE_BACK)
+    else begin // if (CACHE_WRITE_POL == `WRITE_BACK)
 
-      if(LINE2MEM_W > 0) begin
+      if(CACHE_LINE2MEM_W > 0) begin
 
         //Constant AXI signals
-        assign m_axi_awid    = AXI_ID;
+        assign m_axi_awid    = CACHE_AXI_ID;
         assign m_axi_awlock  = 1'b0;
         assign m_axi_awcache = 4'b0011;
         assign m_axi_awprot  = 3'd0;
 
         //Burst parameters
-        assign m_axi_awlen   = 2**LINE2MEM_W -1; //will choose the burst lenght depending on the cache's and slave's data width
-        assign m_axi_awsize  = BE_BYTE_W; //each word will be the width of the memory for maximum bandwidth
+        assign m_axi_awlen   = 2**CACHE_LINE2MEM_W -1; //will choose the burst lenght depending on the cache's and slave's data width
+        assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
         assign m_axi_awburst = 2'b01; //incremental burst
 
         //memory address
-        assign m_axi_awaddr  = {BE_ADDR_W{1'b0}} + {addr, {(FE_BYTE_W+WORD_OFF_W){1'b0}}}; //base address for the burst, with width extension
+        assign m_axi_awaddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr, {(CACHE_FRONTEND_BYTE_W+CACHE_WORD_OFF_W){1'b0}}}; //base address for the burst, with width extension
 
         // memory write-data
-        reg [LINE2MEM_W-1:0] word_counter;
-        assign m_axi_wdata = wdata >> (word_counter*BE_DATA_W);
-        assign m_axi_wstrb = {BE_NBYTES{1'b1}};
+        reg [CACHE_LINE2MEM_W-1:0] word_counter;
+        assign m_axi_wdata = wdata >> (word_counter*CACHE_BACKEND_DATA_W);
+        assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
         assign m_axi_wlast = &word_counter;
 
 
@@ -274,26 +266,26 @@ generate
           endcase
         end // always @ *
 
-      end // if (LINE2MEM_W > 0)
-      else  begin // if (LINE2MEM_W == 0)
+      end // if (CACHE_LINE2MEM_W > 0)
+      else  begin // if (CACHE_LINE2MEM_W == 0)
 
         //Constant AXI signals
-        assign m_axi_awid    = AXI_ID;
+        assign m_axi_awid    = CACHE_AXI_ID;
         assign m_axi_awlock  = 1'b0;
         assign m_axi_awcache = 4'b0011;
         assign m_axi_awprot  = 3'd0;
 
         //Burst parameters - single
         assign m_axi_awlen   = 8'd0; //A single burst of Memory data width word
-        assign m_axi_awsize  = BE_BYTE_W; //each word will be the width of the memory for maximum bandwidth
+        assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
         assign m_axi_awburst = 2'b00;
 
         //memory address
-        assign m_axi_awaddr  = {BE_ADDR_W{1'b0}} + {addr, {BE_BYTE_W{1'b0}}}; //base address for the burst, with width extension
+        assign m_axi_awaddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr, {CACHE_BACKEND_BYTE_W{1'b0}}}; //base address for the burst, with width extension
 
         //memory write-data
         assign m_axi_wdata = wdata;
-        assign m_axi_wstrb = {BE_NBYTES{1'b1}}; //uses entire bandwidth
+        assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}}; //uses entire bandwidth
         assign m_axi_wlast = m_axi_wvalid;
 
         localparam
@@ -368,8 +360,8 @@ generate
           endcase
         end // always @ *
 
-      end // else: !if(LINE2MEM_W > 0)
-    end // else: !if(WRITE_POL == `WRITE_THROUGH)
+      end // else: !if(CACHE_LINE2MEM_W > 0)
+    end // else: !if(CACHE_WRITE_POL == `WRITE_THROUGH)
   endgenerate
 
   endmodule

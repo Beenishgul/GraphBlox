@@ -2,14 +2,6 @@
 `include "iob_lib.vh"
 `include "iob-cache.vh"
 
-
-import GLAY_GLOBALS_PKG::*;
-import GLAY_AXI4_PKG::*;
-import GLAY_DESCRIPTOR_PKG::*;
-import GLAY_CONTROL_PKG::*;
-import GLAY_REQ_PKG::*;
-
-
 ///////////////
 // IOb-cache //
 ///////////////
@@ -17,33 +9,33 @@ import GLAY_REQ_PKG::*;
 module iob_cache 
   #(
     //memory cache's parameters
-    parameter FE_ADDR_W = 32,  //PARAM & ? & ? & Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-    parameter FE_DATA_W = 32,   //PARAM & ? & ? & Data width - word size used for the cache
-    parameter N_WAYS = 2,      //PARAM & ? & ? & Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-    parameter LINE_OFF_W = 7,    //PARAM & ? & ? & Line-Offset Width - 2**NLINE_W total cache lines
-    parameter WORD_OFF_W = 3,    //PARAM & ? & ? & Word-Offset Width - 2**OFFSET_W total FE_DATA_W words per line - WARNING about LINE2MEM_W (can cause word_counter [-1:0]
-    parameter WTBUF_DEPTH_W = 5,   //PARAM & ? & ? & Depth Width of Write-Through Buffer
-    //Replacement policy (N_WAYS > 1)
-    parameter REP_POLICY = `PLRU_mru, //MACRO & ? & ? & LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU 
+    parameter CACHE_FRONTEND_ADDR_W = 32,  //PARAM & ? & ? & Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+    parameter CACHE_FRONTEND_DATA_W = 32,   //PARAM & ? & ? & Data width - word size used for the cache
+    parameter CACHE_N_WAYS = 2,      //PARAM & ? & ? & Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+    parameter CACHE_LINE_OFF_W = 7,    //PARAM & ? & ? & Line-Offset Width - 2**NLINE_W total cache lines
+    parameter CACHE_WORD_OFF_W = 3,    //PARAM & ? & ? & Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about CACHE_LINE2MEM_W (can cause word_counter [-1:0]
+    parameter CACHE_WTBUF_DEPTH_W = 5,   //PARAM & ? & ? & Depth Width of Write-Through Buffer
+    //Replacement policy (CACHE_N_WAYS > 1)
+    parameter CACHE_REP_POLICY = `PLRU_mru, //MACRO & ? & ? & LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU 
     //Do NOT change - memory cache's parameters - dependency
-    parameter NWAY_W = $clog2(N_WAYS),  //PARAM & ? & ? & Cache Ways Width
-    parameter FE_NBYTES = FE_DATA_W/8,       //PARAM & ? & ? & Number of Bytes per Word
-    parameter FE_BYTE_W = $clog2(FE_NBYTES), //PARAM & ? & ? & Byte Offset
+    parameter CACHE_NWAY_W = $clog2(CACHE_N_WAYS),  //PARAM & ? & ? & Cache Ways Width
+    parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8,       //PARAM & ? & ? & Number of Bytes per Word
+    parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES), //PARAM & ? & ? & Byte Offset
     /*---------------------------------------------------*/
     //Higher hierarchy memory (slave) interface parameters 
-    parameter BE_ADDR_W = FE_ADDR_W, //PARAM & ? & ? & Address width of the higher hierarchy memory
-    parameter BE_DATA_W = FE_DATA_W, //PARAM & ? & ? & Data width of the memory 
-    parameter BE_NBYTES = BE_DATA_W/8, //PARAM & ? & ? & Number of bytes
-    parameter BE_BYTE_W = $clog2(BE_NBYTES), //PARAM & ? & ? & Offset of Number of Bytes
+    parameter CACHE_BACKEND_ADDR_W = CACHE_FRONTEND_ADDR_W, //PARAM & ? & ? & Address width of the higher hierarchy memory
+    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W, //PARAM & ? & ? & Data width of the memory 
+    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8, //PARAM & ? & ? & Number of bytes
+    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES), //PARAM & ? & ? & Offset of Number of Bytes
     //Cache-Memory base Offset
-    parameter LINE2MEM_W = WORD_OFF_W-$clog2(BE_DATA_W/FE_DATA_W),  //PARAM & ? & ? & Logarithm Ratio between the size of the cache-line and the BE's data width 
+    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W),  //PARAM & ? & ? & Logarithm Ratio between the size of the cache-line and the BE's data width 
     /*---------------------------------------------------*/
     //Write Policy 
-    parameter WRITE_POL = `WRITE_THROUGH, //MACRO & ? & ? & write policy: write-through (0), write-back (1)
+    parameter CACHE_WRITE_POL = `WRITE_THROUGH, //MACRO & ? & ? & write policy: write-through (0), write-back (1)
     /*---------------------------------------------------*/
     //Controller's options
-    parameter CTRL_CACHE = 0, //PARAM & ? & ? & Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-    parameter CTRL_CNT = 0    //PARAM & ? & ? & Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
+    parameter CACHE_CTRL_CACHE = 0, //PARAM & ? & ? & Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
+    parameter CACHE_CTRL_CNT = 0    //PARAM & ? & ? & Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
     ) 
    (
     //START_IO_TABLE gen
@@ -54,13 +46,13 @@ module iob_cache
     //START_IO_TABLE iob_m
     `IOB_INPUT(valid, 1),          //Native CPU interface valid signal
 `ifdef WORD_ADDR   
-    `IOB_INPUT(addr,CTRL_CACHE + FE_ADDR_W - FE_BYTE_W), //Native CPU interface address signal
+    `IOB_INPUT(addr,CACHE_CTRL_CACHE + CACHE_FRONTEND_ADDR_W - CACHE_FRONTEND_BYTE_W), //Native CPU interface address signal
 `else
-    `IOB_INPUT(addr,CTRL_CACHE + FE_ADDR_W), //Native CPU interface address signal
+    `IOB_INPUT(addr,CACHE_CTRL_CACHE + CACHE_FRONTEND_ADDR_W), //Native CPU interface address signal
 `endif
-    `IOB_INPUT(wdata,FE_DATA_W),   //Native CPU interface data write signal
-    `IOB_INPUT(wstrb,FE_NBYTES),   //Native CPU interface write strobe signal
-    `IOB_OUTPUT(rdata, FE_DATA_W), //Native CPU interface read data signal
+    `IOB_INPUT(wdata,CACHE_FRONTEND_DATA_W),   //Native CPU interface data write signal
+    `IOB_INPUT(wstrb,CACHE_FRONTEND_NBYTES),   //Native CPU interface write strobe signal
+    `IOB_OUTPUT(rdata, CACHE_FRONTEND_DATA_W), //Native CPU interface read data signal
     `IOB_OUTPUT(ready,1),          //Native CPU interface ready signal
 `ifdef CTRL_IO
     //control-status io
@@ -73,52 +65,52 @@ module iob_cache
     //Slave i/f - Native
     //START_IO_TABLE iob_s
     `IOB_OUTPUT(mem_valid,1),         //Native CPU interface valid signal
-    `IOB_OUTPUT(mem_addr,BE_ADDR_W),  //Native CPU interface address signal
-    `IOB_OUTPUT(mem_wdata,BE_DATA_W), //Native CPU interface data write signal
-    `IOB_OUTPUT(mem_wstrb,BE_NBYTES), //Native CPU interface write strobe signal
-    `IOB_INPUT(mem_rdata,BE_DATA_W),  //Native CPU interface read data signal
+    `IOB_OUTPUT(mem_addr,CACHE_BACKEND_ADDR_W),  //Native CPU interface address signal
+    `IOB_OUTPUT(mem_wdata,CACHE_BACKEND_DATA_W), //Native CPU interface data write signal
+    `IOB_OUTPUT(mem_wstrb,CACHE_BACKEND_NBYTES), //Native CPU interface write strobe signal
+    `IOB_INPUT(mem_rdata,CACHE_BACKEND_DATA_W),  //Native CPU interface read data signal
     `IOB_INPUT(mem_ready,1)           //Native CPU interface ready signal
     );
 
    
    //internal signals (front-end inputs)
    wire                                         data_valid, data_ready;
-   wire [FE_ADDR_W -1:FE_BYTE_W]                data_addr; 
-   wire [FE_DATA_W-1 : 0]                       data_wdata, data_rdata;
-   wire [FE_NBYTES-1: 0]                        data_wstrb;
+   wire [CACHE_FRONTEND_ADDR_W -1:CACHE_FRONTEND_BYTE_W]                data_addr; 
+   wire [CACHE_FRONTEND_DATA_W-1 : 0]                       data_wdata, data_rdata;
+   wire [CACHE_FRONTEND_NBYTES-1: 0]                        data_wstrb;
    
    //stored signals
-   wire [FE_ADDR_W -1:FE_BYTE_W]                data_addr_reg; 
-   wire [FE_DATA_W-1 : 0]                       data_wdata_reg;
-   wire [FE_NBYTES-1: 0]                        data_wstrb_reg;
+   wire [CACHE_FRONTEND_ADDR_W -1:CACHE_FRONTEND_BYTE_W]                data_addr_reg; 
+   wire [CACHE_FRONTEND_DATA_W-1 : 0]                       data_wdata_reg;
+   wire [CACHE_FRONTEND_NBYTES-1: 0]                        data_wstrb_reg;
    wire                                         data_valid_reg;
 
    //back-end write-channel
    wire                                         write_valid, write_ready;
-   wire [FE_ADDR_W-1:FE_BYTE_W + WRITE_POL*WORD_OFF_W] write_addr;
-   wire [FE_DATA_W + WRITE_POL*(FE_DATA_W*(2**WORD_OFF_W)-FE_DATA_W)-1 :0] write_wdata;
-   wire [FE_NBYTES-1:0]                                write_wstrb;
+   wire [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W + CACHE_WRITE_POL*CACHE_WORD_OFF_W] write_addr;
+   wire [CACHE_FRONTEND_DATA_W + CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1 :0] write_wdata;
+   wire [CACHE_FRONTEND_NBYTES-1:0]                                write_wstrb;
    
    //back-end read-channel
    wire                                                replace_valid, replace;
-   wire [FE_ADDR_W -1:BE_BYTE_W+LINE2MEM_W]            replace_addr; 
+   wire [CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W]            replace_addr; 
    wire                                                read_valid;
-   wire [LINE2MEM_W-1:0]                               read_addr;
-   wire [BE_DATA_W-1:0]                                read_rdata;
+   wire [CACHE_LINE2MEM_W-1:0]                               read_addr;
+   wire [CACHE_BACKEND_DATA_W-1:0]                                read_rdata;
    
    //cache-control
    wire                                                ctrl_valid, ctrl_ready;   
    wire [`CTRL_ADDR_W-1:0]                             ctrl_addr;
    wire                                                wtbuf_full, wtbuf_empty;
    wire                                                write_hit, write_miss, read_hit, read_miss;
-   wire [CTRL_CACHE*(FE_DATA_W-1):0]            ctrl_rdata;
+   wire [CACHE_CTRL_CACHE*(CACHE_FRONTEND_DATA_W-1):0]            ctrl_rdata;
    wire                                         invalidate;
    
 `ifdef CTRL_IO
    assign force_inv_out = invalidate;
 
    generate
-      if (CTRL_CACHE)
+      if (CACHE_CTRL_CACHE)
         assign wtb_empty_out = wtbuf_empty;
       else
         assign wtb_empty_out = wtbuf_empty & wtb_empty_in;//to remove unconnected port warning. If unused wtb_empty_in = 1'b1
@@ -128,9 +120,9 @@ module iob_cache
    //BLOCK Front-end & Front-end block.
    front_end
      #(
-       .FE_ADDR_W (FE_ADDR_W),
-       .FE_DATA_W (FE_DATA_W),
-       .CTRL_CACHE(CTRL_CACHE)
+       .CACHE_FRONTEND_ADDR_W (CACHE_FRONTEND_ADDR_W),
+       .CACHE_FRONTEND_DATA_W (CACHE_FRONTEND_DATA_W),
+       .CACHE_CTRL_CACHE(CACHE_CTRL_CACHE)
        )
    front_end
      (
@@ -165,17 +157,17 @@ module iob_cache
    //BLOCK Cache memory & Cache memory block.
    cache_memory
      #(
-       .FE_ADDR_W (FE_ADDR_W),
-       .FE_DATA_W (FE_DATA_W),
-       .BE_DATA_W (BE_DATA_W),
-       .N_WAYS     (N_WAYS),
-       .LINE_OFF_W (LINE_OFF_W),
-       .WORD_OFF_W (WORD_OFF_W),
-       .REP_POLICY (REP_POLICY),    
-       .WTBUF_DEPTH_W (WTBUF_DEPTH_W),
-       .CTRL_CACHE(CTRL_CACHE),
-       .CTRL_CNT  (CTRL_CNT),
-       .WRITE_POL (WRITE_POL)
+       .CACHE_FRONTEND_ADDR_W (CACHE_FRONTEND_ADDR_W),
+       .CACHE_FRONTEND_DATA_W (CACHE_FRONTEND_DATA_W),
+       .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W),
+       .CACHE_N_WAYS     (CACHE_N_WAYS),
+       .CACHE_LINE_OFF_W (CACHE_LINE_OFF_W),
+       .CACHE_WORD_OFF_W (CACHE_WORD_OFF_W),
+       .CACHE_REP_POLICY (CACHE_REP_POLICY),    
+       .CACHE_WTBUF_DEPTH_W (CACHE_WTBUF_DEPTH_W),
+       .CACHE_CTRL_CACHE(CACHE_CTRL_CACHE),
+       .CACHE_CTRL_CNT  (CACHE_CTRL_CNT),
+       .CACHE_WRITE_POL (CACHE_WRITE_POL)
        )
    cache_memory
      (
@@ -184,7 +176,7 @@ module iob_cache
       //front-end
       //internal data signals
       .valid (data_valid),
-      .addr  (data_addr[FE_ADDR_W-1:BE_BYTE_W + LINE2MEM_W]),
+      .addr  (data_addr[CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W]),
       //.wdata (data_wdata),
       // .wstrb (data_wstrb),
       .rdata (data_rdata),
@@ -225,12 +217,12 @@ module iob_cache
    //BLOCK Back-end & Back-end block.
    back_end_native
      #(
-       .FE_ADDR_W (FE_ADDR_W),
-       .FE_DATA_W (FE_DATA_W),  
-       .BE_ADDR_W (BE_ADDR_W),
-       .BE_DATA_W (BE_DATA_W),
-       .WORD_OFF_W (WORD_OFF_W),
-       .WRITE_POL (WRITE_POL)
+       .CACHE_FRONTEND_ADDR_W (CACHE_FRONTEND_ADDR_W),
+       .CACHE_FRONTEND_DATA_W (CACHE_FRONTEND_DATA_W),  
+       .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W),
+       .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W),
+       .CACHE_WORD_OFF_W (CACHE_WORD_OFF_W),
+       .CACHE_WRITE_POL (CACHE_WRITE_POL)
        )
    back_end
      (
@@ -261,12 +253,12 @@ module iob_cache
    
    //BLOCK Cache control & Cache control block.
    generate
-      if (CTRL_CACHE)
+      if (CACHE_CTRL_CACHE)
          
         cache_control
           #(
-            .FE_DATA_W  (FE_DATA_W),
-            .CTRL_CNT   (CTRL_CNT)
+            .CACHE_FRONTEND_DATA_W  (CACHE_FRONTEND_DATA_W),
+            .CACHE_CTRL_CNT   (CACHE_CTRL_CNT)
             )
       cache_control
         (
@@ -296,7 +288,7 @@ module iob_cache
            assign ctrl_rdata = 1'bx;
            assign ctrl_ready = 1'bx;
            assign invalidate = 1'b0;
-        end // else: !if(CTRL_CACHE)
+        end // else: !if(CACHE_CTRL_CACHE)
       
    endgenerate
 

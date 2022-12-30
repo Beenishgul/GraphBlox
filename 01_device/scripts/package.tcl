@@ -38,9 +38,12 @@ create_project -force $kernel_name ./$kernel_name -part $part_id
 # add design sources into project
 add_files -fileset sources_1 [read [open ${app_directory}/${kernel_name}_scripts/${kernel_name}_filelist_package.f]]
 
+set_property source_mgmt_mode DisplayOnly [current_project]
+
 update_compile_order -fileset sources_1 
 # create IP packaging project
 ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true
+
 
 set core       [ipx::current_core]
 
@@ -228,6 +231,7 @@ set_property sdx_kernel true [ipx::current_core]
 set_property sdx_kernel_type rtl [ipx::current_core]
 set_property ipi_drc {ignore_freq_hz true} [ipx::current_core]
 set_property vitis_drc {ctrl_protocol user_managed} [ipx::current_core]
+
 
 # Packaging Vivado IP
 ::ipx::update_checksums $core
