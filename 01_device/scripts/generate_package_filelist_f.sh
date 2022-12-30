@@ -24,8 +24,8 @@ IP_DIR=$4
 glay_pkgs="glay_pkgs"
 glay_kernel="glay_kernel"
 glay_top="glay_top"
+glay_cache="glay_cache"
 
-iob_cache="iob_cache"
 iob_include="iob_include"
 portmaps="portmaps"
 
@@ -49,11 +49,11 @@ generate_package_filelist_f () {
 newtext=""
 echo $newtext > ${CFG_FILE_NAME}
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${iob_cache}/ ${CFG_FILE_NAME} "v"  
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
