@@ -15,22 +15,23 @@
 `timescale 1 ns / 1 ps
 package GLAY_AXI4_PKG;
 
-  import GLAY_GLOBALS_PKG::*;
+  parameter S_AXI_ADDR_WIDTH_BITS = 12;
+  parameter S_AXI_DATA_WIDTH      = 32;
 
-  parameter M_AXI4_ADDR_W   = M_AXI_MEMORY_ADDR_WIDTH     ;
-  parameter M_AXI4_DATA_W   = M_AXI_MEMORY_DATA_WIDTH_BITS;
-  parameter M_AXI4_STRB_W   = M_AXI4_DATA_W / 8           ;
-  parameter M_AXI4_BURST_W  = 2                           ;
-  parameter M_AXI4_CACHE_W  = 4                           ;
-  parameter M_AXI4_PROT_W   = 3                           ;
-  parameter M_AXI4_REGION_W = 4                           ;
-  parameter M_AXI4_USER_W   = 4                           ;
-  parameter M_AXI4_LOCK_W   = 1                           ;
-  parameter M_AXI4_QOS_W    = 4                           ;
-  parameter M_AXI4_LEN_W    = 8                           ;
-  parameter M_AXI4_SIZE_W   = 3                           ;
-  parameter M_AXI4_RESP_W   = 2                           ;
-  parameter M_AXI4_ID_W     = CACHE_AXI_ID_W              ;
+  parameter M_AXI4_ADDR_W   = 64               ;
+  parameter M_AXI4_DATA_W   = 512              ;
+  parameter M_AXI4_STRB_W   = M_AXI4_DATA_W / 8;
+  parameter M_AXI4_BURST_W  = 2                ;
+  parameter M_AXI4_CACHE_W  = 4                ;
+  parameter M_AXI4_PROT_W   = 3                ;
+  parameter M_AXI4_REGION_W = 4                ;
+  parameter M_AXI4_USER_W   = 4                ;
+  parameter M_AXI4_LOCK_W   = 1                ;
+  parameter M_AXI4_QOS_W    = 4                ;
+  parameter M_AXI4_LEN_W    = 8                ;
+  parameter M_AXI4_SIZE_W   = 3                ;
+  parameter M_AXI4_RESP_W   = 2                ;
+  parameter M_AXI4_ID_W     = 1                ;
 
   typedef logic                       m_axi4_valid_t;
   typedef logic                       m_axi4_ready_t;

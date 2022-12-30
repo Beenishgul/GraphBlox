@@ -68,8 +68,8 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 
 
-  GlayCacheRequestInterfaceInput  iob_cache_req_in ;
-  GlayCacheRequestInterfaceOutput iob_cache_req_out;
+  GlayCacheRequestInterfaceInput  glay_cache_req_in ;
+  GlayCacheRequestInterfaceOutput glay_cache_req_out;
 
   logic force_inv_in ;
   logic force_inv_out;
@@ -79,7 +79,7 @@ module glay_kernel_cu #(
   assign force_inv_in = 1'b0;
   assign wtb_empty_in = 1'b1;
 
-  assign iob_cache_req_in.valid = 1'b0;
+  assign glay_cache_req_in.valid = 1'b0;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -206,7 +206,7 @@ module glay_kernel_cu #(
       m_axi_read_out <= 0;
     end
     else begin
-      m_axi_read_out <=  m_axi_read.out;
+      m_axi_read_out <= m_axi_read.out;
     end
   end
 
@@ -229,48 +229,51 @@ module glay_kernel_cu #(
   end
 
   iob_cache_axi #(
-    .FE_ADDR_W    (CACHE_FRONTEND_ADDR_W),
-    .FE_DATA_W    (CACHE_FRONTEND_DATA_W),
-    .N_WAYS       (CACHE_N_WAYS         ),
-    .LINE_OFF_W   (CACHE_LINE_OFF_W     ),
-    .WORD_OFF_W   (CACHE_WORD_OFF_W     ),
-    .WTBUF_DEPTH_W(CACHE_WTBUF_DEPTH_W  ),
-    .REP_POLICY   (CACHE_REP_POLICY     ),
-    .NWAY_W       (CACHE_NWAY_W         ),
-    .FE_NBYTES    (CACHE_FRONTEND_NBYTES),
-    .FE_BYTE_W    (CACHE_FRONTEND_BYTE_W),
-    .BE_ADDR_W    (CACHE_BACKEND_ADDR_W ),
-    .BE_DATA_W    (CACHE_BACKEND_DATA_W ),
-    .BE_NBYTES    (CACHE_BACKEND_NBYTES ),
-    .BE_BYTE_W    (CACHE_BACKEND_BYTE_W ),
-    .LINE2MEM_W   (CACHE_LINE2MEM_W     ),
-    .WRITE_POL    (CACHE_WRITE_POL      ),
-    .AXI_ADDR_W   (CACHE_AXI_ADDR_W     ),
-    .AXI_DATA_W   (CACHE_AXI_DATA_W     ),
-    .AXI_ID_W     (CACHE_AXI_ID_W       ),
-    .AXI_LEN_W    (CACHE_AXI_LEN_W      ),
-    .AXI_ID       (CACHE_AXI_ID         ),
-    .CTRL_CACHE   (CACHE_CTRL_CACHE     ),
-    .CTRL_CNT     (CACHE_CTRL_CNT       )
-  ) inst_iob_cache_axi (
-    .valid        (iob_cache_req_in.payload.valid ),
-    .addr         (iob_cache_req_in.payload.addr  ),
-    .wdata        (iob_cache_req_in.payload.wdata ),
-    .wstrb        (iob_cache_req_in.payload.wstrb ),
-    .rdata        (iob_cache_req_out.payload.rdata),
-    .ready        (iob_cache_req_out.payload.ready),
-    .force_inv_in (force_inv_in                   ),
-    .force_inv_out(force_inv_out                  ),
-    .wtb_empty_in (wtb_empty_in                   ),
-    .wtb_empty_out(wtb_empty_out                  ),
+    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
+    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
+    .CACHE_N_WAYS         (CACHE_N_WAYS         ),
+    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W     ),
+    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
+    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W  ),
+    .CACHE_REP_POLICY     (CACHE_REP_POLICY     ),
+    .CACHE_NWAY_W         (CACHE_NWAY_W         ),
+    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES),
+    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W),
+    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
+    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W ),
+    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES ),
+    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W ),
+    .CACHE_LINE2MEM_W     (CACHE_LINE2MEM_W     ),
+    .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W     ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W     ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W       ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W      ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID         ),
+    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     ),
+    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W     ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W    ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W     ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
+  ) inst_glay_cache_axi (
+    .valid        (glay_cache_req_in.payload.valid ),
+    .addr         (glay_cache_req_in.payload.addr  ),
+    .wdata        (glay_cache_req_in.payload.wdata ),
+    .wstrb        (glay_cache_req_in.payload.wstrb ),
+    .rdata        (glay_cache_req_out.payload.rdata),
+    .ready        (glay_cache_req_out.payload.ready),
+    .force_inv_in (force_inv_in                    ),
+    .force_inv_out(force_inv_out                   ),
+    .wtb_empty_in (wtb_empty_in                    ),
+    .wtb_empty_out(wtb_empty_out                   ),
     `include "m_axi_portmap_glay.vh"
-    .clk          (ap_clk                         ),
-    .reset        (cache_areset                   )
+    .clk          (ap_clk                          ),
+    .reset        (cache_areset                    )
   );
 
 
 
 endmodule : glay_kernel_cu
-
-
-

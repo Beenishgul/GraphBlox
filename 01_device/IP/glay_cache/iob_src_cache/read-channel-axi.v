@@ -1,42 +1,34 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
-
-import GLAY_GLOBALS_PKG::*;
-import GLAY_AXI4_PKG::*;
-import GLAY_DESCRIPTOR_PKG::*;
-import GLAY_CONTROL_PKG::*;
-import GLAY_REQ_PKG::*;
-
-
 module read_channel_axi
   #(
-    parameter FE_ADDR_W   = 32,
-    parameter FE_DATA_W   = 32,
-    parameter FE_NBYTES  = FE_DATA_W/8,
-    parameter WORD_OFF_W = 3,
+    parameter CACHE_FRONTEND_ADDR_W   = 32,
+    parameter CACHE_FRONTEND_DATA_W   = 32,
+    parameter CACHE_FRONTEND_NBYTES  = CACHE_FRONTEND_DATA_W/8,
+    parameter CACHE_WORD_OFF_W = 3,
     //Higher hierarchy memory (slave) interface parameters 
-    parameter BE_ADDR_W = FE_ADDR_W, //Address width of the higher hierarchy memory
-    parameter BE_DATA_W = FE_DATA_W, //Data width of the memory 
-    parameter BE_NBYTES = BE_DATA_W/8, //Number of bytes
-    parameter BE_BYTE_W = $clog2(BE_NBYTES), //Offset of the Number of Bytes
+    parameter CACHE_BACKEND_ADDR_W = CACHE_FRONTEND_ADDR_W, //Address width of the higher hierarchy memory
+    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W, //Data width of the memory 
+    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8, //Number of bytes
+    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES), //Offset of the Number of Bytes
     //Cache-Memory base Offset
-    parameter LINE2MEM_W = WORD_OFF_W-$clog2(BE_DATA_W/FE_DATA_W), //burst offset based on the cache word's and memory word size
+    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W), //burst offset based on the cache word's and memory word size
     // //AXI specific parameters
-    parameter AXI_ADDR_W            = BE_ADDR_W,
-    parameter AXI_DATA_W            = BE_DATA_W,
-    parameter AXI_LEN_W             = 8, //AXI ID burst length (log2)
-    parameter AXI_ID_W              = 1, //AXI ID (identification) width
-    parameter [AXI_ID_W-1:0] AXI_ID = 0  //AXI ID value
+    parameter CACHE_AXI_ADDR_W            = CACHE_BACKEND_ADDR_W,
+    parameter CACHE_AXI_DATA_W            = CACHE_BACKEND_DATA_W,
+    parameter CACHE_AXI_LEN_W             = 8, //AXI ID burst length (log2)
+    parameter CACHE_AXI_ID_W              = 1, //AXI ID (identification) width
+    parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0  //AXI ID value
     )
    (
     //IOb slave frontend interface 
     input                                        replace_valid,
-    input [FE_ADDR_W -1: BE_BYTE_W + LINE2MEM_W] replace_addr,
+    input [CACHE_FRONTEND_ADDR_W -1: CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W] replace_addr,
     output reg                                   replace,
     output                                       read_valid,
-    output reg [LINE2MEM_W-1:0]                  read_addr,
-    output [BE_DATA_W-1:0]                       read_rdata,
+    output reg [CACHE_LINE2MEM_W-1:0]                  read_addr,
+    output [CACHE_BACKEND_DATA_W-1:0]                       read_rdata,
     //AXI master backend interface 
 `include "m_axi_m_read_port.vh"
     input                                        clk,
@@ -51,19 +43,19 @@ module read_channel_axi
    assign m_axi_rready = m_axi_rready_int;
            
    generate
-      if(LINE2MEM_W > 0)
+      if(CACHE_LINE2MEM_W > 0)
         begin
            
            //Constant AXI signals
-           assign m_axi_arid    = AXI_ID;
+           assign m_axi_arid    = CACHE_AXI_ID;
            assign m_axi_arlock  = 1'b0;
            assign m_axi_arcache = 4'b0011;
            assign m_axi_arprot  = 3'd0;
            //Burst parameters
-           assign m_axi_arlen   = 2**LINE2MEM_W -1; //will choose the burst lenght depending on the cache's and slave's data width
-           assign m_axi_arsize  = BE_BYTE_W; //each word will be the width of the memory for maximum bandwidth
+           assign m_axi_arlen   = 2**CACHE_LINE2MEM_W -1; //will choose the burst lenght depending on the cache's and slave's data width
+           assign m_axi_arsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
            assign m_axi_arburst = 2'b01; //incremental burst
-           assign m_axi_araddr  = {BE_ADDR_W{1'b0}} + {replace_addr, {(LINE2MEM_W+BE_BYTE_W){1'b0}}}; //base address for the burst, with width extension 
+           assign m_axi_araddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {replace_addr, {(CACHE_LINE2MEM_W+CACHE_BACKEND_BYTE_W){1'b0}}}; //base address for the burst, with width extension 
 
            
            // Read Line values
@@ -168,22 +160,22 @@ module read_channel_axi
                   
                 endcase
              end // always @ *
-        end // if (LINE2MEM_W > 0)
+        end // if (CACHE_LINE2MEM_W > 0)
 
       
       else
          
         begin
            //Constant AXI signals
-           assign m_axi_arid    = AXI_ID;
+           assign m_axi_arid    = CACHE_AXI_ID;
            assign m_axi_arlock  = 1'b0;
            assign m_axi_arcache = 4'b0011;
            assign m_axi_arprot  = 3'd0;
            //Burst parameters - single 
            assign m_axi_arlen   = 8'd0; //A single burst of Memory data width word
-           assign m_axi_arsize  = BE_BYTE_W; //each word will be the width of the memory for maximum bandwidth
+           assign m_axi_arsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
            assign m_axi_arburst = 2'b00; 
-           assign m_axi_araddr  = {BE_ADDR_W{1'b0}} + {replace_addr, {BE_BYTE_W{1'b0}}}; //base address for the burst, with width extension 
+           assign m_axi_araddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {replace_addr, {CACHE_BACKEND_BYTE_W{1'b0}}}; //base address for the burst, with width extension 
 
            // Read Line values
            assign read_valid = m_axi_rvalid;

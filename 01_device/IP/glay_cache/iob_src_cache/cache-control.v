@@ -6,8 +6,8 @@
 //Module responsible for performance measuring, information about the current cache state, and other cache functions
 
 module cache_control #(
-  parameter FE_DATA_W = 32,
-  parameter CTRL_CNT  = 1
+  parameter CACHE_FRONTEND_DATA_W = 32,
+  parameter CACHE_CTRL_CNT  = 1
 ) (
   input                         clk        ,
   input                         reset      ,
@@ -19,17 +19,17 @@ module cache_control #(
   input                         write_miss ,
   input                         read_hit   ,
   input                         read_miss  ,
-  output reg [   FE_DATA_W-1:0] rdata      ,
+  output reg [   CACHE_FRONTEND_DATA_W-1:0] rdata      ,
   output reg                    ready      ,
   output reg                    invalidate
 );
 
   generate
-    if(CTRL_CNT)
+    if(CACHE_CTRL_CNT)
       begin
 
-        reg  [FE_DATA_W-1:0] read_hit_cnt, read_miss_cnt, write_hit_cnt, write_miss_cnt;
-        wire [FE_DATA_W-1:0] hit_cnt, miss_cnt;
+        reg  [CACHE_FRONTEND_DATA_W-1:0] read_hit_cnt, read_miss_cnt, write_hit_cnt, write_miss_cnt;
+        wire [CACHE_FRONTEND_DATA_W-1:0] hit_cnt, miss_cnt;
         reg                  counter_reset;
 
         assign hit_cnt  = read_hit_cnt  + write_hit_cnt;
@@ -39,19 +39,19 @@ module cache_control #(
           begin
             if (reset)
               begin
-                read_hit_cnt  <= {FE_DATA_W{1'b0}};
-                read_miss_cnt <= {FE_DATA_W{1'b0}};
-                write_hit_cnt  <= {FE_DATA_W{1'b0}};
-                write_miss_cnt <= {FE_DATA_W{1'b0}};
+                read_hit_cnt  <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                read_miss_cnt <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                write_hit_cnt  <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                write_miss_cnt <= {CACHE_FRONTEND_DATA_W{1'b0}};
               end
             else
               begin
                 if (counter_reset)
                   begin
-                    read_hit_cnt  <= {FE_DATA_W{1'b0}};
-                    read_miss_cnt <= {FE_DATA_W{1'b0}};
-                    write_hit_cnt  <= {FE_DATA_W{1'b0}};
-                    write_miss_cnt <= {FE_DATA_W{1'b0}};
+                    read_hit_cnt  <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                    read_miss_cnt <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                    write_hit_cnt  <= {CACHE_FRONTEND_DATA_W{1'b0}};
+                    write_miss_cnt <= {CACHE_FRONTEND_DATA_W{1'b0}};
                   end
                 else
                   if (read_hit)
@@ -83,7 +83,7 @@ module cache_control #(
 
           always @ (posedge clk)
           begin
-            rdata <= {FE_DATA_W{1'b0}};
+            rdata <= {CACHE_FRONTEND_DATA_W{1'b0}};
             invalidate <= 1'b0;
             counter_reset <= 1'b0;
             ready <= valid; // Sends acknowlege the next clock cycle after request (handshake)
@@ -109,13 +109,13 @@ module cache_control #(
             else if (addr == `ADDR_BUFFER_FULL)
               rdata <= wtbuf_full;
           end // always @ (posedge clk)
-        end // if (CTRL_CNT)
+        end // if (CACHE_CTRL_CNT)
       else
         begin
 
           always @ (posedge clk)
           begin
-            rdata <= {FE_DATA_W{1'b0}};
+            rdata <= {CACHE_FRONTEND_DATA_W{1'b0}};
             invalidate <= 1'b0;
             ready <= valid; // Sends acknowlege the next clock cycle after request (handshake)
             if(valid)
@@ -126,7 +126,7 @@ module cache_control #(
             else if (addr == `ADDR_BUFFER_FULL)
               rdata <= wtbuf_full;
           end // always @ (posedge clk)
-        end // else: !if(CTRL_CNT)
+        end // else: !if(CACHE_CTRL_CNT)
     endgenerate
 
   endmodule // cache_controller

@@ -6,8 +6,6 @@
 package GLAY_REQ_PKG;
 
 import GLAY_GLOBALS_PKG::*;
-import GLAY_AXI4_PKG::*;
-
 
 typedef struct packed {
   logic valid;
