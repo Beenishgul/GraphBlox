@@ -41,7 +41,6 @@ module glay_kernel_control #(
     logic glay_idle_reg ;
     logic glay_done_reg ;
 
-    logic glay_start_reg   ;
     logic glay_continue_reg;
 
     control_sync_state current_state;

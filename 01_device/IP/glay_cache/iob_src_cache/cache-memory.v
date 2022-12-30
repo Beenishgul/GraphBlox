@@ -1,6 +1,14 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
+
+import GLAY_GLOBALS_PKG::*;
+import GLAY_AXI4_PKG::*;
+import GLAY_DESCRIPTOR_PKG::*;
+import GLAY_CONTROL_PKG::*;
+import GLAY_REQ_PKG::*;
+
+
 module cache_memory
   #(
     //memory cache's parameters
