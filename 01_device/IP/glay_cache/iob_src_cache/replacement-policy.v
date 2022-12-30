@@ -6,22 +6,20 @@
 /*--------------------*/
 // Module that contains all iob-cache's replacement policies
 
-module replacement_policy
-  #(
-    parameter CACHE_N_WAYS     = 8,
-    parameter CACHE_LINE_OFF_W = 0,
-    parameter CACHE_NWAY_W = $clog2(CACHE_N_WAYS),
-    parameter CACHE_REP_POLICY = `PLRU_tree //LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
-    )
-   (
-    input                  clk,
-    input                  reset,
-    input                  write_en,
-    input [CACHE_N_WAYS-1:0]     way_hit,
-    input [CACHE_LINE_OFF_W-1:0] line_addr,
-    output [CACHE_N_WAYS-1:0]    way_select,
-    output [CACHE_NWAY_W-1:0]    way_select_bin
-    );
+module replacement_policy #(
+  parameter CACHE_N_WAYS     = 8                   ,
+  parameter CACHE_LINE_OFF_W = 0                   ,
+  parameter CACHE_NWAY_W     = $clog2(CACHE_N_WAYS),
+  parameter CACHE_REP_POLICY = `PLRU_tree            //LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
+) (
+  input                         clk           ,
+  input                         reset         ,
+  input                         write_en      ,
+  input  [    CACHE_N_WAYS-1:0] way_hit       ,
+  input  [CACHE_LINE_OFF_W-1:0] line_addr     ,
+  output [    CACHE_N_WAYS-1:0] way_select    ,
+  output [    CACHE_NWAY_W-1:0] way_select_bin
+);
 
 
    genvar                  i, j, k;
