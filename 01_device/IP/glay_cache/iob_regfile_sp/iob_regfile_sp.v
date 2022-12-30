@@ -6,7 +6,7 @@ module iob_regfile_sp
     parameter DATA_W = 32
     )
    (
-    input               clk,
+    input               ap_clk,
     input               rst,
 
     input               we,
@@ -24,7 +24,7 @@ module iob_regfile_sp
    genvar               i;
    generate
       for (i=0; i < 2**ADDR_W; i=i+1) begin: register_file
-         always @(posedge clk)
+         always @(posedge ap_clk)
            if (rst)
              reg_file[i] <= {DATA_W{1'b0}};
            else if (we)

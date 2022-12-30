@@ -1,3 +1,5 @@
+`include "iob_lib.vh"
+
   //START_IO_TABLE m_axi_m_read_port
  `IOB_OUTPUT(m_axi_arid, CACHE_AXI_ID_W), //Address read channel ID
  `IOB_OUTPUT(m_axi_araddr, CACHE_AXI_ADDR_W), //Address read channel address

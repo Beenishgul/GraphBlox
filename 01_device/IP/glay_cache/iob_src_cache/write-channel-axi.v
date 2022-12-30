@@ -35,7 +35,7 @@ module write_channel_axi #(
   output reg                                                                                                                 ready,
   //AXI master backend interface
   `include "m_axi_m_write_port.vh"
-  input                                                                                                                      clk  ,
+  input                                                                                                                      ap_clk  ,
   input                                                                                                                      reset
 );
 
@@ -94,7 +94,7 @@ generate
     reg [1:0] state;
 
 
-    always @(posedge clk, posedge reset)
+    always @(posedge ap_clk, posedge reset)
       begin
         if(reset)
           state <= idle;
@@ -136,7 +136,7 @@ generate
                 state <= verif;
             end
           endcase
-      end // always @ (posedge clk, posedge reset)
+      end // always @ (posedge ap_clk, posedge reset)
 
 
       always @*
@@ -196,7 +196,7 @@ generate
 
         reg [1:0]            state;
 
-        always @(posedge clk, posedge reset)
+        always @(posedge ap_clk, posedge reset)
         begin
           if(reset) begin
             state <= idle;
@@ -243,7 +243,7 @@ generate
               default:;
             endcase
           end // else: !if(reset)
-        end // always @ (posedge clk, posedge reset)
+        end // always @ (posedge ap_clk, posedge reset)
 
         always @*
         begin
@@ -301,7 +301,7 @@ generate
 
         reg [1:0]                           state;
 
-        always @(posedge clk, posedge reset)
+        always @(posedge ap_clk, posedge reset)
         begin
           if(reset)
             state <= idle;

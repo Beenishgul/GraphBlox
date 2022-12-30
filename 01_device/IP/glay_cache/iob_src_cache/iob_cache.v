@@ -39,7 +39,7 @@ module iob_cache
     ) 
    (
     //START_IO_TABLE gen
-    `IOB_INPUT(clk,1),   //System clock input
+    `IOB_INPUT(ap_clk,1),   //System clock input
     `IOB_INPUT(reset,1), //System reset, asynchronous and active high
 
     //Master i/f
@@ -126,7 +126,7 @@ module iob_cache
        )
    front_end
      (
-      .clk   (clk),
+      .ap_clk   (ap_clk),
       .reset (reset),
       //front-end port
       .valid (valid),
@@ -171,7 +171,7 @@ module iob_cache
        )
    cache_memory
      (
-      .clk   (clk),
+      .ap_clk   (ap_clk),
       .reset (reset),
       //front-end
       //internal data signals
@@ -226,7 +226,7 @@ module iob_cache
        )
    back_end
      (
-      .clk(clk),
+      .ap_clk(ap_clk),
       .reset(reset),
       //write-through-buffer (write-channel)
       .write_valid (write_valid),
@@ -262,7 +262,7 @@ module iob_cache
             )
       cache_control
         (
-         .clk   (clk),
+         .ap_clk   (ap_clk),
          .reset (reset),
          //control's signals
          .valid (ctrl_valid),

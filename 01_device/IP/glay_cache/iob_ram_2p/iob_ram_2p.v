@@ -7,7 +7,7 @@ module iob_ram_2p
      parameter ADDR_W = 0
      ) 
    (
-    input                   clk,
+    input                   ap_clk,
 
     //write port
     input                   w_en,
@@ -32,12 +32,12 @@ module iob_ram_2p
        $readmemh(mem_init_file_int, mem, 0, (2**ADDR_W) - 1);
 
    //read port
-   always @(posedge clk)
+   always @(posedge ap_clk)
       if(r_en)
         r_data <= mem[r_addr];
 
    //write port
-   always @(posedge clk)
+   always @(posedge ap_clk)
      if(w_en)
        mem[w_addr] <= w_data;
 

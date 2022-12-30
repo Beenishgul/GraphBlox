@@ -17,7 +17,7 @@ module iob_ram_2p_asym
     N = MAXDATA_W/MINDATA_W
     )
    (
-    input                     clk,
+    input                     ap_clk,
 
     //write port
     output [N-1:0]            ext_mem_w_en,
@@ -74,7 +74,7 @@ module iob_ram_2p_asym
 
          //read address register
          reg [(R_ADDR_W-W_ADDR_W)-1:0] r_addr_lsbs_reg;
-         always @(posedge clk)
+         always @(posedge ap_clk)
            if (r_en)
              r_addr_lsbs_reg <= r_addr[(R_ADDR_W-W_ADDR_W)-1:0];
 

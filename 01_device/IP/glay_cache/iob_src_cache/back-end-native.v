@@ -25,7 +25,7 @@ module back_end_native
 
   )
   (
-    input                                                                    clk,
+    input                                                                    ap_clk,
     input                                                                    reset,
     //write-through-buffer
     input                                                                    write_valid,
@@ -63,7 +63,7 @@ read_channel_native #(
   .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
   .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W )
 ) read_fsm (
-  .clk          (clk           ),
+  .ap_clk          (ap_clk           ),
   .reset        (reset         ),
   .replace_valid(replace_valid ),
   .replace_addr (replace_addr  ),
@@ -85,7 +85,7 @@ write_channel_native #(
   .CACHE_WRITE_POL (CACHE_WRITE_POL ),
   .CACHE_WORD_OFF_W(CACHE_WORD_OFF_W)
 ) write_fsm (
-  .clk      (clk            ),
+  .ap_clk      (ap_clk            ),
   .reset    (reset          ),
   .valid    (write_valid    ),
   .addr     (write_addr     ),
