@@ -388,7 +388,7 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # TARGET: set the build target, can be hw or hw_emu
 TARGET ?= hw_emu
-# TARGET ?= hw_fpga
+# TARGET ?= hw
 
 
 DEVICE_INDEX        ?= 0

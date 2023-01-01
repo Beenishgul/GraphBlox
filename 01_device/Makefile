@@ -66,7 +66,7 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # TARGET: set the build target, can be hw or hw_emu
 TARGET   ?= hw_emu
-# TARGET ?= hw_fpga
+# TARGET ?= hw
 EMU_MODE ?= off
 
 ##############################################
@@ -139,7 +139,7 @@ run-sim-help: gen-scripts-dir
 
 
 ################## hardware build
-XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET)  -s -g
+XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET) -s -g
 XOCCLFLAGS := --link --optimize 3
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
