@@ -265,11 +265,6 @@ run-emu-wave:
 gen-host-bin: 
 	$(MAKE) gen-host-bin $(MAKE_DEVICE)
 
-
-.PHONY: gen-host-bin
-gen-host-bin: 
-	$(MAKE) gen-host-bin $(MAKE_DEVICE)
-
 .PHONY: gen-scripts-dir
 gen-scripts-dir: 
 	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
