@@ -204,7 +204,7 @@ export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # TARGET: set the build target, can be hw_fpga or hw_emu
 export TARGET = hw_emu
-# export TARGET = hw_fpga
+# export TARGET = hw
 
 export EMU_MODE = off
 ##################################################
