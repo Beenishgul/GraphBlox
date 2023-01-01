@@ -28,7 +28,7 @@ app_directory=$2
 # Set xvlog options
 xvlog_opts="--incr --relax -L uvm -f ${app_directory}/scripts/${kernel_name}_filelist_xsim.f  -i ${app_directory}/glay_ip/cache/iob_include -i ${app_directory}/glay_ip/cache/iob_include/portmaps -L xilinx_vip --sv"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
-xsim_opts="-tclbatch ${app_directory}/scripts/${kernel_name}_cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
+xsim_opts="-tclbatch ${app_directory}/scripts/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 

@@ -208,7 +208,7 @@ run-emu: gen-host-bin
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
@@ -223,7 +223,7 @@ run-emu-debug: gen-host-bin
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
@@ -231,7 +231,7 @@ run-emu-debug: gen-host-bin
 	gdb -ex=r --args $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-wave
-run-emu-wave: $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-0-$(KERNEL_NAME)_$(TARGET).wdb
+run-emu-wave: $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
