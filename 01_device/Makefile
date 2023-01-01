@@ -41,7 +41,7 @@ IP_DIR_ACTIVE       ?= $(KERNEL_NAME)_$(IP_DIR)
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
 DEVICE_INDEX        ?= 0
-XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin
+XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 # PART setting: uncomment the line matching your Alveo card
@@ -146,7 +146,8 @@ build-hw:
 	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project ;\
-	$(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg -o $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_test_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg -o $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
+	tail -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/nohup.out
 
 .PHONY: gen-scripts-dir
 gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
@@ -164,14 +165,22 @@ $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE)
 
+.PHONY: run-fpga
+run-fpga: gen-host-bin
+	unset XCL_EMULATION_MODE ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
+	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu
 run-emu: gen-host-bin
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
@@ -184,9 +193,9 @@ run-emu: gen-host-bin
 run-emu-debug: gen-host-bin
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
@@ -199,8 +208,8 @@ run-emu-debug: gen-host-bin
 run-emu-wave:
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_emu_project ;\
-	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_test_hw_emu.wdb
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_run_project ;\
+	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_$(TARGET).wdb
 
 .PHONY: gen-host-bin
 gen-host-bin:
