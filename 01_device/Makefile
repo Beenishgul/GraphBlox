@@ -28,6 +28,7 @@ APP_TEST            ?= test_glayGraph
 APP_LANG            ?= cpp
 INTEGRATION         ?= openmp
 
+MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%H")
 
@@ -38,8 +39,6 @@ DEVICE_DIR          ?= 01_device
 XILINX_DIR          ?= xilinx_project
 SCRIPTS_DIR         ?= scripts
 IP_DIR              ?= IP
-
-
 
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 SCRIPTS_DIR_ACTIVE 	?= $(KERNEL_NAME)_$(SCRIPTS_DIR)
@@ -181,6 +180,16 @@ run-fpga: gen-host-bin
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
+.PHONY: run-fpga-debug
+run-fpga-debug: gen-host-bin
+	unset XCL_EMULATION_MODE ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run ;\
+	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run ;\
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
+	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
+
+
 .PHONY: run-emu
 run-emu: gen-host-bin
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
@@ -219,7 +228,7 @@ run-emu-wave:
 	xsim --gui $(PLATFORM)-0-$(KERNEL_NAME)_$(TARGET).wdb
 
 .PHONY: gen-host-bin
-gen-host-bin:
+gen-host-bin: gen-scripts-dir
 	make $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 

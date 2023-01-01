@@ -12,6 +12,7 @@ INTEGRATION         ?= openmp
 
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
+GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%H")
 APP_DIR             ?= 00_GLay
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
@@ -202,34 +203,34 @@ $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-c : $(ACT
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-cpp : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA_CPP) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_C)/$(APP_TEST).c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_C)/$(APP_TEST).c $(ALL_HEADER_FILES) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_CPP)/$(APP_TEST).cpp $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_CPP)/$(APP_TEST).cpp $(ALL_HEADER_FILES) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_C)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_C)/%.c $(INC_FILES_UTIL) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_C)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_C)/%.c $(INC_FILES_UTIL) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_CPP)/%.cpp $(INC_FILES_UTIL) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_CPP)/%.cpp $(INC_FILES_UTIL) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) directories-obj
+$(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 ##########################################################################
@@ -365,8 +366,11 @@ MASK_MODE       ?= 0
 #########################################################
 #                GENERAL XILINX ARGS                    #
 #########################################################
-XILINX_DIR  ?= xilinx
+XILINX_DIR  ?= xilinx_project
 KERNEL_NAME ?= glay_kernel
+
+XILINX_DIR          ?= xilinx_project
+XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 
 # PART setting: uncomment the line matching your Alveo card
 # PART ?= xcu200-fsgd2104-2-e
@@ -384,13 +388,11 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # TARGET: set the build target, can be hw or hw_emu
 TARGET ?= hw_emu
-# TARGET ?= hw
+# TARGET ?= hw_fpga
 
-SCRIPTS_DIR         ?= scripts
-IP_DIR              ?= IP
 
 DEVICE_INDEX        ?= 0
-XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)/$(KERNEL_NAME)_vivado_$(TARGET)_krnl_project/$(KERNEL)_test_$(TARGET).xclbin
+XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################

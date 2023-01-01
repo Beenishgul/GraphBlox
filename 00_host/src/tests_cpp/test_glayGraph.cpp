@@ -43,7 +43,7 @@ extern "C" {
 #include "edgeList.h"
 
 const char *argp_program_version =
-    "GLay v1.0";
+    "GLay test v1.0";
 const char *argp_program_bug_address =
     "<atmughrabi@gmail.com>|<atmughra@virginia.edu>|<atmughra@alumni.ncsu.edu>";
 /* Program documentation. */
