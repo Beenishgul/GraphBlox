@@ -173,7 +173,11 @@ build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
 	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build ;\
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg -o $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
+	--temp_dir $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_temp \
+	--log_dir $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_log \
+	--report_dir $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_report \
+	-o $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
 	tail -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_build/nohup.out
 
 
