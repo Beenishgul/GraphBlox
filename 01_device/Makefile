@@ -168,9 +168,9 @@ package-kernel: gen-scripts-dir gen-ip-dir
 
 .PHONY: build-hw
 build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
+	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_build_$(TARGET) ;\
+	rm -rf $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
