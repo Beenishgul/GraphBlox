@@ -366,10 +366,8 @@ MASK_MODE       ?= 0
 #########################################################
 #                GENERAL XILINX ARGS                    #
 #########################################################
-XILINX_DIR  ?= xilinx_project
 KERNEL_NAME ?= glay_kernel
-
-XILINX_DIR          ?= xilinx_project
+XILINX_DIR  ?= xilinx_project
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 
 # PART setting: uncomment the line matching your Alveo card
@@ -392,7 +390,7 @@ TARGET ?= hw_emu
 
 
 DEVICE_INDEX        ?= 0
-XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET)_vivado_build/$(KERNEL_NAME)_$(TARGET).xclbin
+XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
 ##################################################

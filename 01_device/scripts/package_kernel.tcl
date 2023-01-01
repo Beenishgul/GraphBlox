@@ -36,7 +36,7 @@ puts $ctrl_mode
 create_project -force $kernel_name ./$kernel_name -part $part_id
 
 # add design sources into project
-add_files -fileset sources_1 [read [open ${app_directory}/${kernel_name}_scripts/${kernel_name}_filelist_package.f]]
+add_files -fileset sources_1 [read [open ${app_directory}/scripts/${kernel_name}_filelist_package.f]]
 
 # set_property source_mgmt_mode None [current_project]
 

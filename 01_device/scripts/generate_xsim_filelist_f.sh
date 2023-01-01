@@ -21,11 +21,11 @@ SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 IP_DIR=$4
 
-glay_pkgs="glay_pkgs"
-glay_kernel="glay_kernel"
-glay_top="glay_top"
-glay_kernel_testbench="glay_kernel_testbench"
-glay_cache="glay_cache"
+glay_pkgs="pkgs"
+glay_kernel="kernel"
+glay_top="top"
+glay_kernel_testbench="kernel_testbench"
+glay_cache="cache"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -59,22 +59,22 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_vip_generation/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
+newtext="${ACTIVE_APP_DIR}/${KERNEL_NAME}_vivado_generated_vip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""
