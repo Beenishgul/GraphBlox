@@ -142,7 +142,7 @@ run-sim-reset:
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -reset_run 
 
 .PHONY: run-sim-wave
-run-sim-wave:
+run-sim-wave: $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_simulate_kernel/work.$(KERNEL_NAME)_testbench.wdb
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -wave_run 
 
@@ -227,7 +227,7 @@ run-emu-debug: gen-host-bin
 	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-wave
-run-emu-wave: $(PLATFORM)-0-$(KERNEL_NAME)_$(TARGET).wdb
+run-emu-wave: $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run/$(PLATFORM)-0-$(KERNEL_NAME)_$(TARGET).wdb
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_$(TARGET)_vivado_run ;\
@@ -239,7 +239,7 @@ gen-host-bin:
 
 
 .PHONY: all
-all: gen-vip pack-kernel build-hw
+all: gen-vip package-kernel build-hw
 
 ################## clean up
 .PHONY: clean
