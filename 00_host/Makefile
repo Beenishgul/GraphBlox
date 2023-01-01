@@ -12,7 +12,7 @@ INTEGRATION         ?= openmp
 
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
-GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%H")
+GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%h")
 APP_DIR             ?= 00_GLay
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
