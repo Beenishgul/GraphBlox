@@ -1,69 +1,67 @@
 `timescale 1ns / 1ps
 `include "iob-cache.vh"
 
-module cache_memory
-  #(
-    //memory cache's parameters
-    parameter CACHE_FRONTEND_ADDR_W   = 32,       //Address width - width that will used for the cache
-    parameter CACHE_FRONTEND_DATA_W   = 32,       //Data width - word size used for the cache
-    parameter CACHE_N_WAYS   = 2,        //Number of Cache Ways
-    parameter CACHE_LINE_OFF_W  = 10,      //Line-Offset Width - 2**NLINE_W total cache lines
-    parameter CACHE_WORD_OFF_W = 3,       //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line
-    //Do NOT change - memory cache's parameters - dependency
-    parameter CACHE_NWAY_W   = $clog2(CACHE_N_WAYS), //Cache Ways Width
-    parameter CACHE_FRONTEND_NBYTES  = CACHE_FRONTEND_DATA_W/8,      //Number of Bytes per Word
-    parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES), //Offset of the Number of Bytes per Word
-    /*---------------------------------------------------*/
-    //Higher hierarchy memory (slave) interface parameters
-    parameter CACHE_BACKEND_DATA_W = CACHE_FRONTEND_DATA_W, //Data width of the memory
-    parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8, //Number of bytes
-    parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES), //Offset of the Number of Bytes per Word
-    //Do NOT change - slave parameters - dependency
-    parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W), //burst offset based on the cache and memory word size
-    parameter CACHE_WTBUF_DEPTH_W = 3,
-    //Replacement policy (CACHE_N_WAYS > 1)
-    parameter CACHE_REP_POLICY = `PLRU_tree, //LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
-    // //Controller's options
-    parameter CACHE_CTRL_CACHE = 0, //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-    parameter CACHE_CTRL_CNT = 0,  //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
-    // Write-Policy
-    parameter CACHE_WRITE_POL = `WRITE_THROUGH //write policy: write-through (0), write-back (1)
-  )
-  (
-    input                                                                     ap_clk,
-    input                                                                     reset,
-    //front-end
-    input                                                                     valid,
-    input [CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W]                                addr,
-    output [CACHE_FRONTEND_DATA_W-1:0]                                                    rdata,
-    output                                                                    ready,
-    //stored input value
-    input                                                                     valid_reg,
-    input [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W]                                             addr_reg,
-    input [CACHE_FRONTEND_DATA_W-1:0]                                                     wdata_reg,
-    input [CACHE_FRONTEND_NBYTES-1:0]                                                     wstrb_reg,
-    //back-end write-channel
-    output                                                                    write_valid,
-    output [CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W + CACHE_WRITE_POL*CACHE_WORD_OFF_W]                     write_addr,
-    output [CACHE_FRONTEND_DATA_W + CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1 :0] write_wdata,//write-through[CACHE_FRONTEND_DATA_W]; write-back[CACHE_FRONTEND_DATA_W*2**CACHE_WORD_OFF_W]
-    output [CACHE_FRONTEND_NBYTES-1:0]                                                    write_wstrb,
-    input                                                                     write_ready,
-    //back-end read-channel
-    output                                                                    replace_valid,
-    output [CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W]                                replace_addr,
-    input                                                                     replace,
-    input                                                                     read_valid,
-    input [CACHE_LINE2MEM_W-1:0]                                                    read_addr,
-    input [CACHE_BACKEND_DATA_W-1:0]                                                     read_rdata,
-    //cache-control
-    input                                                                     invalidate,
-    output                                                                    wtbuf_full,
-    output                                                                    wtbuf_empty,
-    output                                                                    write_hit,
-    output                                                                    write_miss,
-    output                                                                    read_hit,
-    output                                                                    read_miss
-  );
+module cache_memory #(
+  //memory cache's parameters
+  parameter CACHE_FRONTEND_ADDR_W = 32                                                                 , //Address width - width that will used for the cache
+  parameter CACHE_FRONTEND_DATA_W = 32                                                                 , //Data width - word size used for the cache
+  parameter CACHE_N_WAYS          = 2                                                                  , //Number of Cache Ways
+  parameter CACHE_LINE_OFF_W      = 10                                                                 , //Line-Offset Width - 2**NLINE_W total cache lines
+  parameter CACHE_WORD_OFF_W      = 3                                                                  , //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line
+  //Do NOT change - memory cache's parameters - dependency
+  parameter CACHE_NWAY_W          = $clog2(CACHE_N_WAYS)                                               , //Cache Ways Width
+  parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8                                            , //Number of Bytes per Word
+  parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES)                                      , //Offset of the Number of Bytes per Word
+  /*---------------------------------------------------*/
+  //Higher hierarchy memory (slave) interface parameters
+  parameter CACHE_BACKEND_DATA_W  = CACHE_FRONTEND_DATA_W                                              , //Data width of the memory
+  parameter CACHE_BACKEND_NBYTES  = CACHE_BACKEND_DATA_W/8                                             , //Number of bytes
+  parameter CACHE_BACKEND_BYTE_W  = $clog2(CACHE_BACKEND_NBYTES)                                       , //Offset of the Number of Bytes per Word
+  //Do NOT change - slave parameters - dependency
+  parameter CACHE_LINE2MEM_W      = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W), //burst offset based on the cache and memory word size
+  parameter CACHE_WTBUF_DEPTH_W   = 3                                                                  ,
+  //Replacement policy (CACHE_N_WAYS > 1)
+  parameter CACHE_REP_POLICY      = `PLRU_tree                                                         , //LRU - Least Recently Used; PLRU_mru (1) - mru-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
+  // //Controller's options
+  parameter CACHE_CTRL_CACHE      = 0                                                                  , //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
+  parameter CACHE_CTRL_CNT        = 0                                                                  , //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
+  // Write-Policy
+  parameter CACHE_WRITE_POL       = `WRITE_THROUGH                                                       //write policy: write-through (0), write-back (1)
+) (
+  input                                                                                                                  ap_clk       ,
+  input                                                                                                                  reset        ,
+  //front-end
+  input                                                                                                                  valid        ,
+  input  [                                                CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W] addr         ,
+  output [                                                                                    CACHE_FRONTEND_DATA_W-1:0] rdata        ,
+  output                                                                                                                 ready        ,
+  //stored input value
+  input                                                                                                                  valid_reg    ,
+  input  [                                                                CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr_reg     ,
+  input  [                                                                                    CACHE_FRONTEND_DATA_W-1:0] wdata_reg    ,
+  input  [                                                                                    CACHE_FRONTEND_NBYTES-1:0] wstrb_reg    ,
+  //back-end write-channel
+  output                                                                                                                 write_valid  ,
+  output [                               CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W+CACHE_WRITE_POL*CACHE_WORD_OFF_W] write_addr   ,
+  output [CACHE_FRONTEND_DATA_W+CACHE_WRITE_POL*(CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W)-CACHE_FRONTEND_DATA_W)-1:0] write_wdata  , //write-through[CACHE_FRONTEND_DATA_W]; write-back[CACHE_FRONTEND_DATA_W*2**CACHE_WORD_OFF_W]
+  output [                                                                                    CACHE_FRONTEND_NBYTES-1:0] write_wstrb  ,
+  input                                                                                                                  write_ready  ,
+  //back-end read-channel
+  output                                                                                                                 replace_valid,
+  output [                                                CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W] replace_addr ,
+  input                                                                                                                  replace      ,
+  input                                                                                                                  read_valid   ,
+  input  [                                                                                         CACHE_LINE2MEM_W-1:0] read_addr    ,
+  input  [                                                                                     CACHE_BACKEND_DATA_W-1:0] read_rdata   ,
+  //cache-control
+  input                                                                                                                  invalidate   ,
+  output                                                                                                                 wtbuf_full   ,
+  output                                                                                                                 wtbuf_empty  ,
+  output                                                                                                                 write_hit    ,
+  output                                                                                                                 write_miss   ,
+  output                                                                                                                 read_hit     ,
+  output                                                                                                                 read_miss
+);
 
 
 localparam TAG_W = CACHE_FRONTEND_ADDR_W - (CACHE_FRONTEND_BYTE_W + CACHE_WORD_OFF_W + CACHE_LINE_OFF_W);
@@ -73,16 +71,16 @@ wire hit;
 //cache-memory internal signals
 wire [CACHE_N_WAYS-1:0] way_hit, way_select;
 
-wire [     TAG_W-1:0] tag       = addr_reg[CACHE_FRONTEND_ADDR_W-1       -:TAG_W     ]; //so the tag doesnt update during ready on a read-access, losing the current hit status (can take the 1 clock-cycle delay)
+wire [           TAG_W-1:0] tag       = addr_reg[CACHE_FRONTEND_ADDR_W-1       -:TAG_W     ]      ; //so the tag doesnt update during ready on a read-access, losing the current hit status (can take the 1 clock-cycle delay)
 wire [CACHE_LINE_OFF_W-1:0] index     = addr    [CACHE_FRONTEND_ADDR_W-TAG_W-1 -:CACHE_LINE_OFF_W]; //cant wait, doesnt update during a write-access
 wire [CACHE_LINE_OFF_W-1:0] index_reg = addr_reg[CACHE_FRONTEND_ADDR_W-TAG_W-1 -:CACHE_LINE_OFF_W]; //cant wait, doesnt update during a write-access
 wire [CACHE_WORD_OFF_W-1:0] offset    = addr_reg[CACHE_FRONTEND_BYTE_W         +:CACHE_WORD_OFF_W]; //so the offset doesnt update during ready on a read-access (can take the 1 clock-cycle delay)
 
 
 wire [CACHE_N_WAYS*(2**CACHE_WORD_OFF_W)*CACHE_FRONTEND_DATA_W-1:0] line_rdata;
-wire [                    CACHE_N_WAYS*TAG_W-1:0] line_tag  ;
-reg  [          CACHE_N_WAYS*(2**CACHE_LINE_OFF_W)-1:0] v_reg     ;
-reg  [                          CACHE_N_WAYS-1:0] v         ;
+wire [                                      CACHE_N_WAYS*TAG_W-1:0] line_tag  ;
+reg  [                      CACHE_N_WAYS*(2**CACHE_LINE_OFF_W)-1:0] v_reg     ;
+reg  [                                            CACHE_N_WAYS-1:0] v         ;
 
 
 
@@ -93,11 +91,11 @@ wire read_access  = ~|wstrb_reg & valid_reg; //signal mantains the access 1 addi
 
 
 //back-end write channel
-wire                                                   buffer_empty, buffer_full;
+wire                                                                                                   buffer_empty, buffer_full;
 wire [CACHE_FRONTEND_NBYTES+(CACHE_FRONTEND_ADDR_W-CACHE_FRONTEND_BYTE_W)+(CACHE_FRONTEND_DATA_W)-1:0] buffer_dout ;
 
 //for write-back write-allocate only
-reg [                CACHE_N_WAYS-1:0] dirty    ;
+reg [                      CACHE_N_WAYS-1:0] dirty    ;
 reg [CACHE_N_WAYS*(2**CACHE_LINE_OFF_W)-1:0] dirty_reg;
 
 

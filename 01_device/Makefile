@@ -128,7 +128,6 @@ run-sim-reset: gen-scripts-dir
 
 .PHONY: run-sim-wave
 run-sim-wave: gen-scripts-dir
-	mkdir -p $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_simulate_kernel;\
 	cd $(ACTIVE_APP_DIR)/$(KERNEL_NAME)_vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -wave_run 
 

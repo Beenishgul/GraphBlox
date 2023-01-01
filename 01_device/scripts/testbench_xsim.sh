@@ -65,7 +65,7 @@ simulate()
 # RUN_STEP: <GUI wave>
 wave_run()
 {
-  xsim --gui work.${kernel_name}_testbench#work.glbl
+  xsim --gui work.${kernel_name}_testbench.wdb
 }
 
 # STEP: setup
