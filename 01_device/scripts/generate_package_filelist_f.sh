@@ -21,10 +21,10 @@ SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 IP_DIR=$4
 
-glay_pkgs="glay_pkgs"
-glay_kernel="glay_kernel"
-glay_top="glay_top"
-glay_cache="glay_cache"
+glay_pkgs="pkgs"
+glay_kernel="kernel"
+glay_top="top"
+glay_cache="cache"
 
 iob_include="iob_include"
 portmaps="portmaps"
