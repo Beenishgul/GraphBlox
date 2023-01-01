@@ -19,25 +19,13 @@ package GLAY_GLOBALS_PKG;
 //  COMPUTE UNITS COUNT GLOBALS
 // --------------------------------------------------------------------------------------
 
-	parameter CU_COUNT_GLOBAL = 1;
-	parameter CU_COUNT_LOCAL  = 1;
+	parameter CU_COUNT_GLOBAL     = 1    ;
+	parameter CU_COUNT_LOCAL      = 1    ;
+	parameter CU_CACHE_SIZE_BYTES = 32768; // size in Bytes 32KB
 
 // --------------------------------------------------------------------------------------
-//  GLay COMMON GLOBALS
+//  GLay COMMON graph GLOBALS
 // --------------------------------------------------------------------------------------
-
-	parameter PAGE_SIZE              = 4096                   ; // Page size default is 4KB
-	parameter PAGE_SIZE_BITS         = (PAGE_SIZE * 8)        ;
-	parameter CACHELINE_SIZE         = 64                     ; // cacheline is 64bytes
-	parameter CACHELINE_SIZE_BITS    = (CACHELINE_SIZE * 8)   ;
-	parameter CACHELINE_SIZE_HF      = (CACHELINE_SIZE >> 1)  ; // cacheline is 32bytes
-	parameter CACHELINE_SIZE_BITS_HF = (CACHELINE_SIZE_HF * 8);
-
-	parameter WORD             = 4              ;
-	parameter WORD_BITS        = WORD * 8       ;
-	parameter WORD_DOUBLE      = WORD * 2       ;
-	parameter WORD_DOUBLE_BITS = WORD_DOUBLE * 8;
-
 
 	parameter VERTEX_ADDRESS_BITS = 64;
 	parameter EDGE_ADDRESS_BITS   = 64;
@@ -83,9 +71,9 @@ package GLAY_GLOBALS_PKG;
 
 	parameter CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH     ; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter CACHE_FRONTEND_DATA_W = M_AXI_MEMORY_DATA_WIDTH_BITS; //Data width - word size used for the cache
-	parameter CACHE_N_WAYS          = 4                           ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 7                           ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter CACHE_WORD_OFF_W      = 3                           ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
+	parameter CACHE_N_WAYS          = 8                           ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter CACHE_LINE_OFF_W      = 9                           ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_WORD_OFF_W      = 1                           ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
 	parameter CACHE_WTBUF_DEPTH_W   = 8                           ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU

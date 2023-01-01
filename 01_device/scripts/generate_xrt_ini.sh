@@ -24,6 +24,7 @@ CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
 debug_mode="batch"
 # debug_mode="gui"
 user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_cmd_xsim.tcl"
+runtime_log="console"
 
 profile="true"
 timeline_trace="true"
@@ -35,6 +36,8 @@ echo $newtext > ${CFG_FILE_NAME}
 
 newtext="exclusive_cu_context=${exclusive_cu_context}"
 echo $newtext >> ${CFG_FILE_NAME}
+# newtext="runtime_log=${runtime_log}"
+# echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
