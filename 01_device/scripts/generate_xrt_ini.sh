@@ -23,7 +23,7 @@ CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
 
 debug_mode="batch"
 # debug_mode="gui"
-user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_cmd_xsim.tcl"
+user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/cmd_xsim.tcl"
 runtime_log="console"
 
 profile="true"
