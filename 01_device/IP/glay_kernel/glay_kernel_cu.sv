@@ -271,7 +271,7 @@ module glay_kernel_cu #(
     .wtb_empty_in (wtb_empty_in                    ),
     .wtb_empty_out(wtb_empty_out                   ),
     `include "m_axi_portmap_glay.vh"
-    .ap_clk          (ap_clk                          ),
+    .ap_clk       (ap_clk                          ),
     .reset        (cache_areset                    )
   );
 
