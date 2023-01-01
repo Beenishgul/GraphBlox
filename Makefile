@@ -214,10 +214,6 @@ export EMU_MODE = off
 gen-vip:
 	$(MAKE) gen-vip $(MAKE_DEVICE)
 
-.PHONY: pack-kernel
-pack-kernel:
-	$(MAKE) pack-kernel $(MAKE_DEVICE)
-
 ################## simulation
 
 .PHONY: run-sim
@@ -241,6 +237,10 @@ run-sim-help:
 	$(MAKE) run-sim-help $(MAKE_DEVICE)
 
 ################## build HW
+.PHONY: package-kernel
+package-kernel:
+	$(MAKE) package-kernel $(MAKE_DEVICE)
+
 .PHONY: build-hw
 build-hw:
 	$(MAKE) build-hw $(MAKE_DEVICE)
@@ -273,3 +273,7 @@ gen-host-bin:
 .PHONY: gen-scripts-dir
 gen-scripts-dir: 
 	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
+
+.PHONY: gen-ip-dir
+gen-ip-dir: 
+	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
