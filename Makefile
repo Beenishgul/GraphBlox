@@ -213,8 +213,8 @@ export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
 # export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 
 # TARGET: set the build target, can be hw_fpga or hw_emu
-export TARGET = hw_emu
-# export TARGET = hw
+# export TARGET = hw_emu
+export TARGET = hw
 
 # Enabling Multiple Strategies For Closing Timing
 export XILINX_IMPL_STRATEGY = 2
@@ -243,9 +243,9 @@ gen-ip-dir:
 run-sim:
 	$(MAKE) run-sim $(MAKE_DEVICE)
 
-.PHONY: run-sim-clean
-run-sim-clean:
-	$(MAKE) run-sim-clean $(MAKE_DEVICE)
+.PHONY: run-sim-noclean
+run-sim-noclean:
+	$(MAKE) run-sim-noclean $(MAKE_DEVICE)
 
 .PHONY: run-sim-reset
 run-sim-reset:
