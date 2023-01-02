@@ -29,8 +29,12 @@ KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
 APP_TEST            ?= test_glayGraph_user_managed
+# APP_TEST            ?= test_glayGraph_ctrl_chain
+# APP_TEST            ?= test_glayGraph_ctrl_hs
 APP_LANG            ?= cpp
+# APP_LANG            ?= c
 INTEGRATION         ?= openmp
+# INTEGRATION         ?= ggdl
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
@@ -197,7 +201,7 @@ VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_b
 				--report_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_report
 
 # You could uncomment following line and modify the options for hardware debug/profiling
-# DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
+# DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
 # =========================================================
 # Package Generation .XO
@@ -251,31 +255,34 @@ else
 	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)
 endif
+
+.PHONY: run-fpga-cmd
+run-fpga-cmd: gen-host-bin vivado_run_$(TARGET)
+	unset XCL_EMULATION_MODE ;\
+	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
+	if [ $(DEBUG_CMD) -eq 1 ]; then \
+		gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+	else \
+		./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+	fi
 	
 .PHONY: run-fpga
-run-fpga: gen-host-bin vivado_run_$(TARGET)
-	unset XCL_EMULATION_MODE ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
-	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
-
+run-fpga: DEBUG_CMD=0
+run-fpga: run-fpga-cmd
+	
 .PHONY: run-fpga-debug
-run-fpga-debug: gen-host-bin vivado_run_$(TARGET)
-	unset XCL_EMULATION_MODE ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
-	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
-
+run-fpga-debug: DEBUG_CMD=1
+run-fpga-debug: run-fpga-cmd
+	
 # =========================================================
 # Run Hardware Emulation  
 # =========================================================
 
-.PHONY: run-emu
-run-emu: gen-host-bin vivado_run_$(TARGET)
+.PHONY: run-emu-cmd
+run-emu-cmd: gen-host-bin vivado_run_$(TARGET)
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
@@ -283,23 +290,22 @@ run-emu: gen-host-bin vivado_run_$(TARGET)
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
-	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
+	if [ $(DEBUG_CMD) -eq 1 ]; then \
+		gdb -ex=r --args $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+	else \
+		$(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+	fi
 
+.PHONY: run-emu
+run-emu: DEBUG_CMD=0
+run-emu: run-emu-cmd
+	
 .PHONY: run-emu-debug
-run-emu-debug: gen-host-bin vivado_run_$(TARGET)
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
-	export XCL_EMULATION_MODE=$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	echo "Generating emulation config file for platform $(PLATFORM).." ;\
-	emconfigutil --platform $(PLATFORM)  ;\
-	echo "Enter Hardware Emulation Mode" ;\
-	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
-	gdb -ex=r --args $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
-
+run-emu-debug: DEBUG_CMD=1
+run-emu-debug: run-emu-cmd
+	
 .PHONY: run-emu-wave
 run-emu-wave: $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
-	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
-	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 
@@ -350,10 +356,8 @@ clean:
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
 
-
 .PHONY: clean-all
 clean-all:
 	rm -rf $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)_*
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
-

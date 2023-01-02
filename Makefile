@@ -1,11 +1,14 @@
 # =========================================================
 #                GENERAL DIRECTOIRES HOST               
 # =========================================================
+
 export APP                 = glay
 # export APP_TEST            = test_match
 # export APP_TEST            = test_glay
 # export APP_TEST            = test_StalaGraph
 export APP_TEST            = test_glayGraph_user_managed
+# export APP_TEST            = test_glayGraph_ctrl_chain
+# export APP_TEST            = test_glayGraph_ctrl_hs
 export APP_LANG            = cpp
 export INTEGRATION         = openmp
 # export INTEGRATION         = ggdl
@@ -177,6 +180,7 @@ export MASK_MODE        = 0
 # =========================================================
 # GLay HOST Argument list               
 # =========================================================
+
 export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 # =========================================================
 
@@ -184,6 +188,7 @@ export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SI
 # =========================================================
 #                        XILINX ARGS                    
 # =========================================================
+
 export KERNEL_NAME        = glay_kernel
 export XILINX_DIR         = xilinx_project
 export SCRIPTS_DIR        = scripts
@@ -240,6 +245,7 @@ gen-ip-dir:
 # =========================================================
 #  Run Hardware Simulation  
 # =========================================================
+
 .PHONY: run-sim
 run-sim:
 	$(MAKE) run-sim $(MAKE_DEVICE)
@@ -263,6 +269,7 @@ run-sim-help:
 # =========================================================
 # Package Generation  
 # =========================================================
+
 .PHONY: package-kernel
 package-kernel:
 	$(MAKE) package-kernel $(MAKE_DEVICE)
@@ -270,6 +277,7 @@ package-kernel:
 # =========================================================
 # XCLBIN File Generation
 # =========================================================
+
 .PHONY: build-hw
 build-hw:
 	$(MAKE) build-hw $(MAKE_DEVICE)
@@ -277,6 +285,7 @@ build-hw:
 # =========================================================
 # Run Hardware FPGA
 # =========================================================
+
 .PHONY: run-fpga
 run-fpga:
 	$(MAKE) run-fpga $(MAKE_DEVICE)
@@ -288,6 +297,7 @@ run-fpga-debug:
 # =========================================================
 # Run Hardware Emulation  
 # =========================================================
+
 .PHONY: run-emu
 run-emu:
 	$(MAKE) run-emu $(MAKE_DEVICE)
@@ -303,6 +313,7 @@ run-emu-wave:
 # =========================================================
 # Application Executable File Generation
 # =========================================================
+
 .PHONY: gen-host-bin
 gen-host-bin: 
 	$(MAKE) gen-host-bin $(MAKE_DEVICE)
@@ -310,6 +321,7 @@ gen-host-bin:
 # =========================================================
 # Open Project in Vivado GUI
 # =========================================================
+
 .PHONY: open-vivado-project
 open-vivado-project: 
 	$(MAKE) open-vivado-project $(MAKE_DEVICE)
@@ -319,6 +331,7 @@ open-vivado-project:
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
+
 .PHONY: report_metrics
 report_metrics: 
 	$(MAKE) report_metrics $(MAKE_DEVICE)
