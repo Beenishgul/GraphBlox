@@ -217,8 +217,8 @@ export TARGET = hw_emu
 # export TARGET = hw
 
 # Enabling Multiple Strategies For Closing Timing
-export XILINX_IMPL_STRATEGY = 0
-export XILINX_JOBS_STRATEGY = 2
+export XILINX_IMPL_STRATEGY = 2
+export XILINX_JOBS_STRATEGY = 4
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 
