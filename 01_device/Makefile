@@ -17,7 +17,7 @@ help::
 	$(ECHO) "      Command to remove all the generated files."
 	$(ECHO) ""
 	$(ECHO) "  github commit version:"
-	$(ECHO) "     $(GIT_VER)"
+	$(ECHO) "  $(GIT_VER)"
 
 # =========================================================
 # Directory/Project Configurations                           
@@ -43,16 +43,19 @@ DEVICE_DIR          ?= 01_device
 XILINX_DIR          ?= xilinx_project
 SCRIPTS_DIR         ?= scripts
 IP_DIR              ?= glay_ip
+REPORTS_DIR         ?= reports
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 ALL_SYSTEM_VERILOG_SOURCES  := $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.sv)
 ALL_VERILOG_SOURCES 		:= $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.v)
 ALL_VERILOG_HEADERS 		:= $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.vh)
 ALL_SCRIPTS_SOURCES 		:= $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/,*)
+ALL_DESIGN_SOURCES 		    := $(ALL_SYSTEM_VERILOG_SOURCES) $(ALL_VERILOG_SOURCES) $(ALL_VERILOG_HEADERS)
 
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 SCRIPTS_DIR_ACTIVE 	?= $(SCRIPTS_DIR)
 IP_DIR_ACTIVE       ?= $(IP_DIR)
+REPORTS_DIR_ACTIVE  ?= $(REPORTS_DIR)
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
@@ -289,6 +292,28 @@ gen-host-bin:
 open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET); \
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+
+# =========================================================
+#  Report Utilization Metrics
+# =========================================================
+# If the target is HW, this generates the power and resource
+# utilization metrics.
+report_metrics: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
+
+$(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE): $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl
+ifeq ($(TARGET),hw_emu)
+	@echo "This build target (report-metrics) not valid when design target is hw_emu"
+
+else
+	rm -rf $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
+	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
+	cd $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE); \
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	@echo ""
+	@echo "Vivado Utilization/Power Report Generation Complete..."
+	@echo "####################################"
+	@echo ""
+endif
 
 # =========================================================
 # Clean Projects
