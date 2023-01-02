@@ -1,6 +1,6 @@
-#########################################################
-#                GENERAL DIRECTOIRES                    #
-#########################################################
+# =========================================================
+#                GENERAL DIRECTOIRES HOST               
+# =========================================================
 APP                 ?= glay
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
@@ -49,9 +49,9 @@ TEST_DIR_CPP        ?= tests_cpp
 #contains the main for the graph processing framework
 MAIN_DIR            ?= main
 
-##############################################
-#     CLI COMMANDS                           #
-##############################################
+# =========================================================
+#     CLI COMMANDS                           
+# =========================================================
 
 RM      := @rm -f
 RMDIR   := @rm -rf
@@ -63,9 +63,9 @@ MKDIR   := @mkdir -p
 PASS = \033[92mPASS\033[0m
 FAIL = \033[91mFAIL\033[0m
 
-##############################################
-#     COMPILER FLAGS                         #
-##############################################
+# =========================================================
+# COMPILER FLAGS                         
+# =========================================================
 
 CXX     := g++
 VPP     := v++
@@ -85,9 +85,9 @@ CXXFLAGS      += $(HOST_CXXFLAGS)
 CXXFLAGS      += -fmessage-length=0
 LDFLAGS       += -lrt -lstdc++ $(XRT_LDFLAGS) 
 
-##############################################
-#     GLAY COMPILATION FOLDERS/FILES         #
-##############################################
+# =========================================================
+# GLAY COMPILATION FOLDERS/FILES     
+# =========================================================
 
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
 SRC_FILES_ALGO      =   $(wildcard $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/*.c)
@@ -138,13 +138,16 @@ OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA_CPP)        \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)
 
-#########################################################
-#                GLAY GENERATION                        #
-#########################################################
+# =========================================================
+# GLAY GENERATION                        
+# =========================================================
 
 .PHONY: help
 help: $(APP)-$(INTEGRATION)
 	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) --help
+
+.PHONY: all
+all: $(APP)-$(INTEGRATION)
 
 .PHONY: $(APP)-$(INTEGRATION)
 $(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
@@ -190,9 +193,9 @@ clean-results:
 	-$(RMDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)
 
 
-#########################################################
-#                GLAY COMPILATION                       #
-#########################################################
+# =========================================================
+# GLAY COMPILATION                       
+# =========================================================
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
@@ -233,9 +236,9 @@ $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) | directories-obj
 	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-##########################################################################
+# =========================================================
 # RUN GLay
-##########################################################################
+# =========================================================
 
 .PHONY: run
 run: $(APP)
@@ -252,9 +255,9 @@ debug-memory: $(APP)
 debug: $(APP)
 	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
 
-##########################################################################
+# =========================================================
 # RUN Tests
-##########################################################################
+# =========================================================
 
 .PHONY: run-test
 run-test: $(APP_TEST)
@@ -278,9 +281,9 @@ test:
 		then exit 1; \
 	fi
 	
-#########################################################
-#                   GRAPH ARGUMENTS                     #
-#########################################################
+# =========================================================
+# GRAPH ARGUMENTS                     
+# =========================================================
 
 GRAPH_DIR ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 
@@ -363,9 +366,9 @@ BIN_SIZE        ?= 1000
 INOUT_STATS     ?= 0
 MASK_MODE       ?= 0
 
-#########################################################
-#                GENERAL XILINX ARGS                    #
-#########################################################
+# =========================================================
+# GENERAL XILINX ARGS                    
+# =========================================================
 KERNEL_NAME ?= glay_kernel
 XILINX_DIR  ?= xilinx_project
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
@@ -393,8 +396,8 @@ DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
-##################################################
-
+# =========================================================
+# GLay HOST Argument list               
+# =========================================================
 ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
-
-##############################################
+# =========================================================

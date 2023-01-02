@@ -1,6 +1,6 @@
-#########################################################
-#                GENERAL DIRECTOIRES HOST               #
-#########################################################
+# =========================================================
+#                GENERAL DIRECTOIRES HOST               
+# =========================================================
 export APP                 = glay
 # export APP_TEST            = test_match
 # export APP_TEST            = test_glay
@@ -9,7 +9,7 @@ export APP_TEST            = test_glayGraph_user_managed
 export APP_LANG            = cpp
 export INTEGRATION         = openmp
 # export INTEGRATION         = ggdl
-##################################################
+# =========================================================
 
 export ROOT_DIR                = $(shell cd .. ; pwd)
 export GIT_VER                 = $(shell cd . && git log -1 --pretty=format:"%h")
@@ -22,12 +22,21 @@ export BENCH_DIR               = 03_test_graphs
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
 export MAKE_HOST               = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 export MAKE_DEVICE             = -w -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
-#########################################################
+# =========================================================
 
 .PHONY: help
 help: 
 	$(MAKE) help $(MAKE_HOST)
 	$(MAKE) help $(MAKE_DEVICE)
+
+# =========================================================
+#  Compile all steps
+# =========================================================
+
+.PHONY: all
+all:
+	$(MAKE) all $(MAKE_HOST)
+	$(MAKE) all $(MAKE_DEVICE)
 
 .PHONY: clean-all
 clean-all:
@@ -42,9 +51,9 @@ clean:
 clean-results:
 	$(MAKE) clean-results $(MAKE_HOST)
 
-##########################################################################
+# =========================================================
 # RUN GLay HOST
-##########################################################################
+# =========================================================
 
 .PHONY: run
 run:
@@ -58,9 +67,9 @@ debug-memory:
 debug:
 	$(MAKE) debug $(MAKE_HOST) 
 
-##########################################################################
+# =========================================================
 # RUN Tests HOST
-##########################################################################
+# =========================================================
 
 .PHONY: run-test
 run-test:
@@ -79,9 +88,9 @@ debug-test-memory:
 test:
 	$(MAKE) test $(MAKE_HOST)
 
-#########################################################
-#                   GRAPH ARGUMENTS HOST                #
-#########################################################
+# =========================================================
+#                   GRAPH ARGUMENTS HOST                
+# =========================================================
 
 export GRAPH_DIR = $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 
@@ -164,15 +173,16 @@ export BIN_SIZE         = 1000
 export INOUT_STATS      = 0
 export MASK_MODE        = 0
 
-##################################################
-
+# =========================================================
+# GLay HOST Argument list               
+# =========================================================
 export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+# =========================================================
 
-##############################################
 
-#########################################################
-#                        XILINX ARGS                    #
-#########################################################
+# =========================================================
+#                        XILINX ARGS                    
+# =========================================================
 export KERNEL_NAME        = glay_kernel
 export XILINX_DIR         = xilinx_project
 export SCRIPTS_DIR        = scripts
@@ -207,15 +217,26 @@ export TARGET = hw_emu
 # export TARGET = hw
 
 export EMU_MODE = off
-##################################################
 
-################## resource generation and simulation
+# =========================================================
+#  Scripts/VIPs/Directories generation 
+# =========================================================
+
 .PHONY: gen-vip
 gen-vip:
 	$(MAKE) gen-vip $(MAKE_DEVICE)
 
-################## simulation
+.PHONY: gen-scripts-dir
+gen-scripts-dir: 
+	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
 
+.PHONY: gen-ip-dir
+gen-ip-dir: 
+	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
+
+# =========================================================
+#  Run Hardware Simulation  
+# =========================================================
 .PHONY: run-sim
 run-sim:
 	$(MAKE) run-sim $(MAKE_DEVICE)
@@ -236,19 +257,34 @@ run-sim-wave:
 run-sim-help:
 	$(MAKE) run-sim-help $(MAKE_DEVICE)
 
-################## build HW
+# =========================================================
+# Package Generation  
+# =========================================================
 .PHONY: package-kernel
 package-kernel:
 	$(MAKE) package-kernel $(MAKE_DEVICE)
 
+# =========================================================
+# XCLBIN File Generation
+# =========================================================
 .PHONY: build-hw
 build-hw:
 	$(MAKE) build-hw $(MAKE_DEVICE)
 
+# =========================================================
+# Run Hardware FPGA
+# =========================================================
 .PHONY: run-fpga
 run-fpga:
 	$(MAKE) run-fpga $(MAKE_DEVICE)
 
+.PHONY: run-fpga-debug
+run-fpga-debug:
+	$(MAKE) run-fpga-debug $(MAKE_DEVICE)
+
+# =========================================================
+# Run Hardware Emulation  
+# =========================================================
 .PHONY: run-emu
 run-emu:
 	$(MAKE) run-emu $(MAKE_DEVICE)
@@ -261,19 +297,25 @@ run-emu-debug:
 run-emu-wave:
 	$(MAKE) run-emu-wave $(MAKE_DEVICE)
 
+# =========================================================
+# Application Executable File Generation
+# =========================================================
 .PHONY: gen-host-bin
 gen-host-bin: 
 	$(MAKE) gen-host-bin $(MAKE_DEVICE)
 
-.PHONY: gen-scripts-dir
-gen-scripts-dir: 
-	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
-
-.PHONY: gen-ip-dir
-gen-ip-dir: 
-	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
-
-################## vivado project
+# =========================================================
+# Open Project in Vivado GUI
+# =========================================================
 .PHONY: open-vivado-project
 open-vivado-project: 
 	$(MAKE) open-vivado-project $(MAKE_DEVICE)
+
+# =========================================================
+#  Report Utilization Metrics
+# =========================================================
+# If the target is HW, this generates the power and resource
+# utilization metrics.
+.PHONY: report_metrics
+report_metrics: 
+	$(MAKE) report_metrics $(MAKE_DEVICE)
