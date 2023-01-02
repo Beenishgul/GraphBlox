@@ -216,7 +216,9 @@ export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
 export TARGET = hw_emu
 # export TARGET = hw
 
-export EMU_MODE = off
+# Enabling Multiple Strategies For Closing Timing
+export XILINX_IMPL_STRATEGY = 0
+export XILINX_JOBS_STRATEGY = 2
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 

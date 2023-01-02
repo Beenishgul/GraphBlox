@@ -373,6 +373,7 @@ KERNEL_NAME ?= glay_kernel
 XILINX_DIR  ?= xilinx_project
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 
+
 # PART setting: uncomment the line matching your Alveo card
 # PART ?= xcu200-fsgd2104-2-e
 PART ?= xcu250-figd2104-2L-e
