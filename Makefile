@@ -41,11 +41,12 @@ all:
 .PHONY: clean-all
 clean-all:
 	$(MAKE) clean-all $(MAKE_HOST)
-	$(MAKE) clean $(MAKE_DEVICE)
+	$(MAKE) clean-all $(MAKE_DEVICE)
 
 .PHONY: clean
 clean:
 	$(MAKE) clean $(MAKE_HOST)
+	$(MAKE) clean $(MAKE_DEVICE)
 
 .PHONY: clean-results
 clean-results:
