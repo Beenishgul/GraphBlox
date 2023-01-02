@@ -189,8 +189,13 @@ run-sim-help:
 # XCLBIN V++ Flags
 # =========================================================
 
-XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET) -s -g
-XOCCLFLAGS := --link --optimize 3
+XOCCFLAGS   = 	--platform $(PLATFORM) -t $(TARGET) -s -g
+XOCCLFLAGS  = 	--link --optimize 3
+VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
+				--temp_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp \
+				--log_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_log \
+				--report_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_report
+
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
@@ -220,19 +225,16 @@ vivado_build_$(TARGET):
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)
 
 .PHONY: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
-$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado_build_$(TARGET) $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo vivado_build_$(TARGET) 
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
-	--temp_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp \
-	--log_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_log \
-	--report_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_report \
-	-o $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
-	tail -f $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
+	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out ;\
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $< &
 
 .PHONY: build-hw
 build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
+	tail -f $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
 	
 # =========================================================
 # Run Hardware FPGA
