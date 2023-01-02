@@ -28,7 +28,7 @@ KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
-APP_TEST            ?= test_glayGraph
+APP_TEST            ?= test_glayGraph_user_managed
 APP_LANG            ?= cpp
 INTEGRATION         ?= openmp
 
