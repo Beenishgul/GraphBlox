@@ -272,3 +272,8 @@ gen-scripts-dir:
 .PHONY: gen-ip-dir
 gen-ip-dir: 
 	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
+
+################## vivado project
+.PHONY: open-vivado-project
+open-vivado-project: 
+	$(MAKE) open-vivado-project $(MAKE_DEVICE)

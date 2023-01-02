@@ -19,6 +19,10 @@ help::
 	$(ECHO) "  github commit version:"
 	$(ECHO) "     $(GIT_VER)"
 
+# =========================================================
+# Directory/Project Configurations                           
+# =========================================================
+
 APP                 ?= glay
 KERNEL_NAME         ?= glay_kernel
 # APP_TEST            ?= test_match
@@ -75,9 +79,9 @@ TARGET   ?= hw_emu
 # TARGET ?= hw
 EMU_MODE ?= off
 
-##############################################
-#     CLI COMMANDS                           #
-##############################################
+# =========================================================
+# CLI COMMANDS                           
+# =========================================================
 
 RM      :=rm -f
 RMDIR   :=rm -rf
@@ -88,16 +92,27 @@ CD      :=@cd
 ECHO    :=@echo
 EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
 
-##############################################
-#     COMPILER FLAGS                         #
-##############################################
+# =========================================================
+# COMPILER FLAGS                         
+# =========================================================
 
 CXX     := g++
 VPP     := v++
 GCC     := gcc
 CC      := gcc
 
-################## resource generation 
+
+# =========================================================
+#  Compile all steps
+# =========================================================
+
+.PHONY: all
+all: gen-vip package-kernel build-hw
+
+# =========================================================
+#  Scripts/VIPs/Directories generation 
+# =========================================================
+
 .PHONY: gen-ip-dir
 gen-ip-dir:
 	rm -rf $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
@@ -121,7 +136,10 @@ gen-vip: gen-scripts-dir gen-ip-dir
 	cd $(ACTIVE_APP_DIR)/vivado_generated_vip;\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
 
-################## simulation 
+# =========================================================
+#  Run Hardware Simulation  
+# =========================================================
+
 .PHONY: run-sim
 run-sim:
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
@@ -153,11 +171,18 @@ run-sim-help:
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -help 
 
 
-################## hardware build
+# =========================================================
+# XCLBIN V++ Flags
+# =========================================================
+
 XOCCFLAGS := --platform $(PLATFORM) -t $(TARGET) -s -g
 XOCCLFLAGS := --link --optimize 3
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
+
+# =========================================================
+# Package Generation  
+# =========================================================
 
 .PHONY: package-kernel
 package-kernel: gen-scripts-dir gen-ip-dir
@@ -165,6 +190,10 @@ package-kernel: gen-scripts-dir gen-ip-dir
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel;\
 	cd $(ACTIVE_APP_DIR)/vivado_package_kernel;\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE)
+
+# =========================================================
+# XCLBIN File Generation
+# =========================================================
 
 .PHONY: build-hw
 build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
@@ -181,7 +210,10 @@ build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
 	tail -f $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
 
 
-################## hardware run
+# =========================================================
+# Run Hardware FPGA
+# =========================================================
+
 .PHONY: run-fpga
 run-fpga: gen-host-bin
 	unset XCL_EMULATION_MODE ;\
@@ -199,6 +231,10 @@ run-fpga-debug: gen-host-bin
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
+
+# =========================================================
+# Run Hardware Emulation  
+# =========================================================
 
 .PHONY: run-emu
 run-emu: gen-host-bin
@@ -237,17 +273,30 @@ run-emu-wave: $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 
+# =========================================================
+# Application Executable File Generation
+# =========================================================
+
 .PHONY: gen-host-bin
 gen-host-bin:
 	make $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
+# =========================================================
+# Open Project in Vivado GUI
+# =========================================================
 
-.PHONY: all
-all: gen-vip package-kernel build-hw
+.PHONY: open-vivado-project
+open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET); \
+	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 
-################## clean up
+# =========================================================
+# Clean Projects
+# =========================================================
+
 .PHONY: clean
 clean:
 	rm -rf $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)_*
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg
+
