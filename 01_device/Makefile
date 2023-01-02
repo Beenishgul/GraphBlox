@@ -118,26 +118,35 @@ all: gen-vip package-kernel build-hw
 #  Scripts/VIPs/Directories generation 
 # =========================================================
 
-.PHONY: gen-ip-dir
-gen-ip-dir:
+.PHONY: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
+$(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE):
 	rm -rf $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
 	cp -r $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/* $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)/
 
-.PHONY: gen-scripts-dir
-gen-scripts-dir:
+.PHONY: gen-ip-dir
+gen-ip-dir: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
+
+.PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
+$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 	rm -rf $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
-	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)) ; do cp -v -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$$file; done ;\
+	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)) ; do cp -v -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$$file; done 
+	
+.PHONY: gen-scripts-dir
+gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE)
 
-.PHONY: gen-vip
-gen-vip: gen-scripts-dir gen-ip-dir
+.PHONY: $(ACTIVE_APP_DIR)/vivado_generated_vip
+$(ACTIVE_APP_DIR)/vivado_generated_vip:
 	rm -rf $(ACTIVE_APP_DIR)/vivado_generated_vip;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_generated_vip;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_generated_vip
+
+.PHONY: gen-vip
+gen-vip:  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
 	cd $(ACTIVE_APP_DIR)/vivado_generated_vip;\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
 
@@ -145,22 +154,23 @@ gen-vip: gen-scripts-dir gen-ip-dir
 #  Run Hardware Simulation  
 # =========================================================
 
+.PHONY: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
+$(ACTIVE_APP_DIR)/vivado_simulate_kernel:
+	rm -rf $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel
+
 .PHONY: run-sim
-run-sim:
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+run-sim: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 	cd $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)
 
-.PHONY: run-sim-clean
-run-sim-clean:
-	rm -rf $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+.PHONY: run-sim-noclean
+run-sim-noclean:
 	cd $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -noclean_files
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	cd $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -reset_run 
 
@@ -171,7 +181,6 @@ run-sim-wave: $(ACTIVE_APP_DIR)/vivado_simulate_kernel/work.$(KERNEL_NAME)_testb
 
 .PHONY: run-sim-help
 run-sim-help:
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	cd $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -help 
 
@@ -186,26 +195,34 @@ XOCCLFLAGS := --link --optimize 3
 # DEBUG_OPT := --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
 # =========================================================
-# Package Generation  
+# Package Generation .XO
 # =========================================================
 
-.PHONY: package-kernel
-package-kernel: gen-scripts-dir gen-ip-dir
+.PHONY: $(ACTIVE_APP_DIR)/vivado_package_kernel
+$(ACTIVE_APP_DIR)/vivado_package_kernel:
 	rm -rf $(ACTIVE_APP_DIR)/vivado_package_kernel;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel
+
+$(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
 	cd $(ACTIVE_APP_DIR)/vivado_package_kernel;\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE)
 
+.PHONY: package-kernel
+package-kernel: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+	
 # =========================================================
 # XCLBIN File Generation
 # =========================================================
 
-.PHONY: build-hw
-build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+.PHONY: vivado_build_$(TARGET)
+vivado_build_$(TARGET):
+	rm -rf $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)
+
+.PHONY: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
+$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado_build_$(TARGET) $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
 	--temp_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp \
@@ -214,13 +231,28 @@ build-hw: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
 	-o $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
 	tail -f $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
 
-
+.PHONY: build-hw
+build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
+	
 # =========================================================
 # Run Hardware FPGA
 # =========================================================
 
+.PHONY: vivado_run_$(TARGET)
+vivado_run_$(TARGET):
+ifeq ($(TARGET),hw_emu)
+	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/xrt.ini ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/xsim.tcl
+else
+	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)
+endif
+	
+
 .PHONY: run-fpga
-run-fpga: gen-host-bin
+run-fpga: gen-host-bin vivado_run_$(TARGET)
 	unset XCL_EMULATION_MODE ;\
 	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
@@ -229,7 +261,7 @@ run-fpga: gen-host-bin
 	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-fpga-debug
-run-fpga-debug: gen-host-bin
+run-fpga-debug: gen-host-bin vivado_run_$(TARGET)
 	unset XCL_EMULATION_MODE ;\
 	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
@@ -242,14 +274,10 @@ run-fpga-debug: gen-host-bin
 # =========================================================
 
 .PHONY: run-emu
-run-emu: gen-host-bin
+run-emu: gen-host-bin vivado_run_$(TARGET)
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
@@ -257,14 +285,10 @@ run-emu: gen-host-bin
 	./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-emu-debug
-run-emu-debug: gen-host-bin
+run-emu-debug: gen-host-bin vivado_run_$(TARGET)
 	export XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ./xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl ./xsim.tcl ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
@@ -300,9 +324,8 @@ open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_tem
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
-report_metrics: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
 
-$(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE): $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl
+report_metrics: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
 ifeq ($(TARGET),hw_emu)
 	@echo "This build target (report-metrics) not valid when design target is hw_emu"
 

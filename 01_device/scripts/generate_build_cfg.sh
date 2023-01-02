@@ -54,7 +54,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
@@ -72,7 +71,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
@@ -101,7 +99,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
@@ -128,7 +125,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
@@ -154,7 +150,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
@@ -180,7 +175,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config="[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-   config+="param=compiler.enableMultiStrategies=1\n"
 
    config+="\n[connectivity]\n"
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
