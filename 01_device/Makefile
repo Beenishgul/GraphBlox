@@ -185,7 +185,6 @@ run-sim-help:
 	cd $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -help 
 
-
 # =========================================================
 # XCLBIN V++ Flags
 # =========================================================
@@ -251,7 +250,6 @@ else
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)
 endif
 	
-
 .PHONY: run-fpga
 run-fpga: gen-host-bin vivado_run_$(TARGET)
 	unset XCL_EMULATION_MODE ;\
@@ -329,7 +327,6 @@ open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_tem
 report_metrics: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
 ifeq ($(TARGET),hw_emu)
 	@echo "This build target (report-metrics) not valid when design target is hw_emu"
-
 else
 	rm -rf $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
 	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
@@ -344,6 +341,7 @@ endif
 # =========================================================
 # Clean Projects
 # =========================================================
+
 .PHONY: clean
 clean:
 	rm -rf $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)*$(GIT_VER)
