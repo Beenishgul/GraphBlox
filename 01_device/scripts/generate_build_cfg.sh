@@ -21,13 +21,16 @@ KERNEL_NAME=$3
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
 
-param="compiler.skipTimingCheckAndFrequencyScaling=1"
+param1="compiler.skipTimingCheckAndFrequencyScaling=0"
+param2="compiler.multiStrategiesWaitOnAllRuns=1"
 slr="${KERNEL_NAME}_1:SLR1"
 
 newtext="[advanced]"
 echo $newtext > ${CFG_FILE_NAME}
 
-newtext="param=${param}"
+newtext="param=${param1}"
+echo $newtext >> ${CFG_FILE_NAME}
+newtext="param=${param2}"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""
@@ -39,3 +42,11 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="slr=${slr}"
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="[vivado]"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="impl.strategies=Performance_Explore,Area_Explore"
+echo $newtext >> ${CFG_FILE_NAME}
