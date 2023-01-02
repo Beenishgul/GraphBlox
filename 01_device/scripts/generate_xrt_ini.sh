@@ -31,38 +31,16 @@ timeline_trace="true"
 device_trace="coarse"
 exclusive_cu_context="true"
 
-newtext="[Runtime]"
-echo $newtext > ${CFG_FILE_NAME}
+config="[Runtime]\n"
+config+="exclusive_cu_context=${exclusive_cu_context}\n"
 
-newtext="exclusive_cu_context=${exclusive_cu_context}"
-echo $newtext >> ${CFG_FILE_NAME}
-# newtext="runtime_log=${runtime_log}"
-# echo $newtext >> ${CFG_FILE_NAME}
+config+="\n[Emulation]\n"
+config+="debug_mode=${debug_mode}\n"
+config+="user_pre_sim_script=${user_pre_sim_script}\n"
 
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
+config+="\n[Debug]\n"
+config+="profile=${profile}\n"
+config+="timeline_trace=${timeline_trace}\n"
+config+="device_trace=${device_trace}\n"
 
-newtext="[Emulation]"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="debug_mode=${debug_mode}"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="user_pre_sim_script=${user_pre_sim_script}"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="[Debug]"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="profile=${profile}"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="timeline_trace=${timeline_trace}"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="device_trace=${device_trace}"
-echo $newtext >> ${CFG_FILE_NAME}
-
+echo -e "${config}" >> ${CFG_FILE_NAME}

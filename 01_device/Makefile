@@ -1,7 +1,7 @@
 .PHONY: help
 help::
 	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make gen-ip"
+	$(ECHO) "  make gen-vip"
 	$(ECHO) "      Command to generate the IPs used in this design"
 	$(ECHO) ""
 	$(ECHO) "  make package-kernel"
@@ -89,10 +89,11 @@ XILINX_JOBS_STRATEGY ?= 2
 # CLI COMMANDS                           
 # =========================================================
 
-RM      :=rm -f
-RMDIR   :=rm -rf
+RM      :=@rm -f
+RMDIR   :=@rm -rf
 CP      :=@cp -rf
-MKDIR   :=mkdir -p
+MKDIR   :=@mkdir
+MKDIR_P :=@mkdir -p
 EXPORTE :=@export
 CD      :=@cd
 ECHO    :=@echo
