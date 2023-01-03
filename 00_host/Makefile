@@ -395,6 +395,11 @@ PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 TARGET ?= hw_emu
 # TARGET ?= hw
 
+XILINX_CTRL_MODE     ?= user_managed
+# XILINX_CTRL_MODE     ?= ap_ctrl_hs
+# XILINX_CTRL_MODE     ?= ap_ctrl_chain
+# XILINX_CTRL_MODE     ?= ap_ctrl_none
+
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)

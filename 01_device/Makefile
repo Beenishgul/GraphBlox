@@ -89,6 +89,7 @@ XILINX_JOBS_STRATEGY ?= 2
 XILINX_CTRL_MODE     ?= user_managed
 # export XILINX_CTRL_MODE     ?= ap_ctrl_hs
 # export XILINX_CTRL_MODE     ?= ap_ctrl_chain
+# export XILINX_CTRL_MODE     ?= ap_ctrl_none
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
