@@ -90,6 +90,7 @@ XILINX_CTRL_MODE     ?= user_managed
 # XILINX_CTRL_MODE     ?= ap_ctrl_hs
 # XILINX_CTRL_MODE     ?= ap_ctrl_chain
 # XILINX_CTRL_MODE     ?= ap_ctrl_none
+
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
