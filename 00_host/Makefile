@@ -264,18 +264,18 @@ debug: $(APP)
 
 .PHONY: run-test
 run-test: $(APP_TEST)
-	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: $(APP_TEST)
-$(APP_TEST): $(APP_TEST)-$(INTEGRATION)
+$(APP_TEST): $(APP_TEST)-$(INTEGRATION)-$(APP_LANG)
 
 .PHONY: debug-test
 debug-test: $(APP_TEST)
-	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	gdb -ex=r --args $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 .PHONY: debug-test-memory
 debug-test-memory: $(APP_TEST)
-	valgrind --leak-check=full --show-leak-kinds=all -v $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION) -f $(FILE_BIN) $(ARGS)
+	valgrind --leak-check=full --show-leak-kinds=all -v $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS)
 
 # test files
 .PHONY: test
