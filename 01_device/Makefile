@@ -88,7 +88,9 @@ TARGET   ?= hw_emu
 # Enabling Multiple Strategies For Closing Timing
 XILINX_IMPL_STRATEGY ?= 0
 XILINX_JOBS_STRATEGY ?= 2
-
+XILINX_CTRL_MODE     ?= user_managed
+# export XILINX_CTRL_MODE     ?= ap_ctrl_hs
+# export XILINX_CTRL_MODE     ?= ap_ctrl_chain
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
@@ -213,11 +215,13 @@ VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_b
 .PHONY: $(ACTIVE_APP_DIR)/vivado_package_kernel
 $(ACTIVE_APP_DIR)/vivado_package_kernel:
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
+	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo ;\
+	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xml ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel
 
 $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
 	$(CD) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
 
 .PHONY: package-kernel
 package-kernel: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo

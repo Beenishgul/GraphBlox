@@ -1,3 +1,4 @@
+#!/usr/bin/tclsh
 #
 # Copyright 2021 Xilinx, Inc.
 #
@@ -23,7 +24,7 @@ set app_directory    [lindex $argv 2]
 set xilinx_directory [lindex $argv 3]
 set active_directory [lindex $argv 4]
 set ip_directory     [lindex $argv 5]
-set ctrl_mode     "user_managed"
+set ctrl_mode        [lindex $argv 6]
 
 puts $part_id
 puts $kernel_name
@@ -44,8 +45,7 @@ update_compile_order -fileset sources_1
 # create IP packaging project
 ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true
 
-
-set core       [ipx::current_core]
+set core [ipx::current_core]
 
 foreach user_parameter [list C_S_AXI_CONTROL_ADDR_WIDTH C_S_AXI_CONTROL_DATA_WIDTH C_M00_AXI_ADDR_WIDTH C_M00_AXI_DATA_WIDTH] {
     ::ipx::remove_user_parameter $user_parameter $core
@@ -68,7 +68,7 @@ set_property value_source constant     $bifparam
 ::ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core
 
 # Specify the freq_hz parameter 
-set clkbif      [::ipx::get_bus_interfaces -of [ipx::current_core] "ap_clk"]
+set clkbif      [::ipx::get_bus_interfaces -of $core "ap_clk"]
 set clkbifparam [::ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # Set desired frequency                   
 set_property value 300000000 $clkbifparam
@@ -76,18 +76,16 @@ set_property value 300000000 $clkbifparam
 set_property value_resolve_type user $clkbifparam
 
 # associate AXI/AXIS interface with clock
-ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" [ipx::current_core]
-ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" [ipx::current_core]
+ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core
+ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core
 
 # associate reset signal with clock
-ipx::associate_bus_interfaces -clock ap_clk -reset ap_rst_n [ipx::current_core]
-
+ipx::associate_bus_interfaces -clock ap_clk -reset ap_rst_n $core
 
 ##################################### Step 3: Set the definition of AXI control slave registers, including CTRL and user kernel arguments
 
 # Add RTL kernel registers
-ipx::add_register CTRL                    [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
-
+ipx::add_register CTRL [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects $core]]
 
 set mem_map    [::ipx::add_memory_map -quiet "s_axi_control" $core]
 set addr_block [::ipx::add_address_block -quiet "reg0" $mem_map]
@@ -227,11 +225,10 @@ set field [ipx::add_field AP_START $reg]
 #### Step 5: Package Vivado IP and generate Vitis kernel file
 
 # Set required property for Vitis kernel
-set_property sdx_kernel true [ipx::current_core]
-set_property sdx_kernel_type rtl [ipx::current_core]
-set_property ipi_drc {ignore_freq_hz true} [ipx::current_core]
-set_property vitis_drc {ctrl_protocol user_managed} [ipx::current_core]
-
+set_property sdx_kernel true $core
+set_property sdx_kernel_type rtl $core
+set_property ipi_drc {ignore_freq_hz true} $core
+set_property vitis_drc {ctrl_protocol user_managed} $core
 
 # Packaging Vivado IP
 ::ipx::update_checksums $core
@@ -241,3 +238,4 @@ set_property vitis_drc {ctrl_protocol user_managed} [ipx::current_core]
 ::ipx::unload_core $core
 # Generate Vitis Kernel from Vivado IP
 package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml
+
