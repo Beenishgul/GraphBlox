@@ -159,7 +159,7 @@ $(ACTIVE_APP_DIR)/vivado_generated_vip:
 .PHONY: gen-vip
 gen-vip:  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
 	$(CD) $(ACTIVE_APP_DIR)/vivado_generated_vip;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
 
 # =========================================================
 #  Run Hardware Simulation  
@@ -222,7 +222,7 @@ $(ACTIVE_APP_DIR)/vivado_package_kernel:
 
 $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
 	$(CD) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package_kernel.tcl -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
 
 .PHONY: package-kernel
 package-kernel: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
@@ -332,7 +332,7 @@ gen-host-bin:
 .PHONY: open-vivado-project
 open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET); \
-	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
 # =========================================================
 #  Report Utilization Metrics
@@ -347,7 +347,7 @@ else
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(CD) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE); \
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl -notrace $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(ECHO) ""
 	$(ECHO) "Vivado Utilization/Power Report Generation Complete..."
 	$(ECHO) "####################################"
