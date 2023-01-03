@@ -1,3 +1,4 @@
+#!/usr/bin/tclsh
 #
 # Copyright 2021 Xilinx, Inc.
 #
