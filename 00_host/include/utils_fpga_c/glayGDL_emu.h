@@ -1,5 +1,5 @@
-#ifndef GLAYGDL_H
-#define GLAYGDL_H
+#ifndef GLAYGDL_EMU_H
+#define GLAYGDL_EMU_H
 
 #ifdef __cplusplus
 extern "C" {

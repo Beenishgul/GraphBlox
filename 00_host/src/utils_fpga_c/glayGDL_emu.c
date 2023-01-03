@@ -18,6 +18,8 @@
 #include "graphConfig.h"
 #include "edgeList.h"
 
+#include "glayGDL_emu.h"
+
 // GGDL is a description language that helps compile and port any graph
 // algorithm to GLay graph processing overlay. This chapter describes some
 // of the features of GLay architecture combined with a description
