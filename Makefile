@@ -201,7 +201,7 @@ export DEVICE_INDEX       = 0
 export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
 
-# export GIT_VER            = 6dec0d8
+
 
 # PART setting: uncomment the line matching your Alveo card
 # export PART =  xcu200-fsgd2104-2-e
@@ -228,6 +228,7 @@ export XILINX_CTRL_MODE     = user_managed
 # export XILINX_CTRL_MODE     = ap_ctrl_hs
 # export XILINX_CTRL_MODE     = ap_ctrl_chain
 # export XILINX_CTRL_MODE     = ap_ctrl_none
+# export GIT_VER              = ece92cc
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 
