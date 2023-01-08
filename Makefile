@@ -222,7 +222,7 @@ export TARGET = hw_emu
 # export TARGET = hw
 
 # Enabling Multiple Strategies For Closing Timing
-export XILINX_IMPL_STRATEGY = 1
+export XILINX_IMPL_STRATEGY = 2
 export XILINX_JOBS_STRATEGY = 4
 export XILINX_CTRL_MODE     = user_managed
 # export XILINX_CTRL_MODE     = ap_ctrl_hs
