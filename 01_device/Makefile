@@ -108,6 +108,9 @@ TAIL_F  :=@tail -f
 UNSET   :=@unset
 EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
 
+RED     =\033[0;31m
+NC      =\033[0m # No Color
+
 # =========================================================
 # COMPILER FLAGS                         
 # =========================================================
@@ -266,6 +269,7 @@ endif
 
 .PHONY: run-fpga-cmd
 run-fpga-cmd: gen-host-bin vivado_run_$(TARGET)
+ifeq ($(TARGET),hw)
 	$(UNSET) XCL_EMULATION_MODE ;\
 	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
@@ -276,6 +280,9 @@ run-fpga-cmd: gen-host-bin vivado_run_$(TARGET)
 	else \
 		./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	fi
+else
+	$(ECHO) "${RED}This build target <TARGET=hw> not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
+endif
 	
 .PHONY: run-fpga
 run-fpga: DEBUG_CMD=0
@@ -291,6 +298,7 @@ run-fpga-debug: run-fpga-cmd
 
 .PHONY: run-emu-cmd
 run-emu-cmd: gen-host-bin vivado_run_$(TARGET)
+ifeq ($(TARGET),hw_emu)
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
@@ -303,6 +311,9 @@ run-emu-cmd: gen-host-bin vivado_run_$(TARGET)
 	else \
 		$(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	fi
+else
+	$(ECHO) "${RED}This build target <TARGET=hw_emu> not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
+endif
 
 .PHONY: run-emu
 run-emu: DEBUG_CMD=0
@@ -342,7 +353,7 @@ open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_tem
 
 report_metrics: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
 ifeq ($(TARGET),hw_emu)
-	$(ECHO) "This build target (report-metrics) not valid when design target is hw_emu"
+	$(ECHO) "${RED}This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
 else
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
