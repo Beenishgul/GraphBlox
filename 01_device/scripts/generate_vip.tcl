@@ -117,7 +117,7 @@ set_property -dict [list                                                        
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width{0}                                                   \
+                    CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {638}                                                     \
                     CONFIG.Input_Depth {128}                                                          \
                     CONFIG.Output_Data_Width {638}                                                    \
@@ -130,6 +130,7 @@ set_property -dict [list                                                        
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \
                    ] [get_ips ${module_name}]
+
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
@@ -156,7 +157,7 @@ set_property -dict [list                                                        
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width{0}                                                   \
+                    CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {516}                                                     \
                     CONFIG.Input_Depth {128}                                                          \
                     CONFIG.Output_Data_Width {516}                                                    \
@@ -169,6 +170,7 @@ set_property -dict [list                                                        
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \
                    ] [get_ips ${module_name}]
+
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
