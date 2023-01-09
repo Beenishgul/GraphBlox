@@ -15,7 +15,6 @@
 # Tool Version Limit: 2022.04 
 #
 # usage: ${kernel_name}_testbench_xsim.sh [-help]
-
 # usage: ${kernel_name}_testbench_xsim.sh [-lib_map_path]
 # usage: ${kernel_name}_testbench_xsim.sh [-noclean_files]
 # usage: ${kernel_name}_testbench_xsim.sh [-reset_run]
