@@ -19,22 +19,29 @@ set part_id          [lindex $argv 0]
 set kernel_name      [lindex $argv 1]
 set device_directory [lindex $argv 2]
 set active_directory [lindex $argv 3]
+set log_file         ${device_directory}/${active_directory}/generate_${kernel_name}_ip.log
 
-puts $part_id
-puts $kernel_name
-puts $device_directory
-puts $active_directory
+## Create a new Vivado IP Project
+puts "\[Generate GLay IPs.....\] START! [clock format [clock seconds] -format {%T %a %b %d %Y}]"
+puts "\[Part ID: ${part_id}\]" 
+puts "\[Kernel: ${kernel_name}\]" 
 
-set_part ${part_id}
+# Project IP Settings
+# General
+set_part ${part_id} >> $log_file
+set_property target_language  Verilog [current_project] >> $log_file
+set_property target_simulator XSim    [current_project] >> $log_file
+
 # ----------------------------------------------------------------------------
 # generate axi master vip
 # ----------------------------------------------------------------------------
+puts "                        generate axi master vip"
 create_ip -name axi_vip \
           -vendor xilinx.com \
           -library ip \
-          -version 1.1 \
+          -version 1.* \
           -module_name control_${kernel_name}_vip \
-          -dir ${device_directory}/${active_directory}
+          -dir ${device_directory}/${active_directory} >> $log_file
           
 set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.PROTOCOL {AXI4LITE} \
@@ -50,17 +57,18 @@ set_property -dict [list CONFIG.INTERFACE_MODE {MASTER} \
                          CONFIG.HAS_WSTRB {1}] \
              [get_ips control_${kernel_name}_vip]
              
-generate_target all [get_files  ${device_directory}/${active_directory}/control_${kernel_name}_vip/control_${kernel_name}_vip.xci]
+generate_target all [get_files  ${device_directory}/${active_directory}/control_${kernel_name}_vip/control_${kernel_name}_vip.xci] >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
+puts "                        generate axi slave vip"
 create_ip -name axi_vip \
           -vendor xilinx.com \
           -library ip \
-          -version 1.1 \
+          -version 1.* \
           -module_name slv_m00_axi_vip \
-          -dir ${device_directory}/${active_directory}
+          -dir ${device_directory}/${active_directory} >> $log_file
           
 set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.PROTOCOL {AXI4} \
@@ -78,4 +86,21 @@ set_property -dict [list CONFIG.INTERFACE_MODE {SLAVE} \
                          CONFIG.ID_WIDTH   {1}] \
              [get_ips slv_m00_axi_vip]
              
-generate_target all [get_files  ${device_directory}/${active_directory}/slv_m00_axi_vip/slv_m00_axi_vip.xci]
+generate_target all [get_files  ${device_directory}/${active_directory}/slv_m00_axi_vip/slv_m00_axi_vip.xci] >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate fifo_516x128_GlayCacheRequestInterfaceOutput
+# ----------------------------------------------------------------------------
+puts "                        generate fifo_516x128_GlayCacheRequestInterfaceOutput"
+
+
+# ----------------------------------------------------------------------------
+# generate fifo_638x128_GlayCacheRequestInterfaceInput
+# ----------------------------------------------------------------------------
+puts "                        generate create fifo_638x128_GlayCacheRequestInterfaceInput"
+
+
+puts "\[Check directory:\]"
+puts "\[${device_directory}/${active_directory}\]"
+puts "\[Generate GLay IPs.....\] DONE!  [clock format [clock seconds] -format {%T %a %b %d %Y}]"
+close_project >> $log_file

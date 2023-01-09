@@ -276,5 +276,8 @@ module glay_kernel_cu #(
   );
 
 
+// FIFO cache requests in
+
+// FIFO cache requests out 
 
 endmodule : glay_kernel_cu

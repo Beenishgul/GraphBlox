@@ -7,6 +7,7 @@ package GLAY_REQ_PKG;
 
 import GLAY_GLOBALS_PKG::*;
 
+
 typedef struct packed {
   logic valid;
   `ifdef WORD_ADDR
@@ -24,6 +25,7 @@ typedef struct packed {
   `endif
 } GlayCacheRequestInterfaceInputPayload;
 
+// SIZE = 644 - 6(CACHE_FRONTEND_BYTE_W) = 638 bits
 typedef struct packed {
   logic                                 valid  ;
   GlayCacheRequestInterfaceInputPayload payload;
@@ -40,6 +42,8 @@ typedef struct packed {
   `endif
 } GlayCacheRequestInterfaceOutputPayload;
 
+
+// SIZE = 516 bits
 typedef struct packed {
   logic                                  valid  ;
   GlayCacheRequestInterfaceOutputPayload payload;
