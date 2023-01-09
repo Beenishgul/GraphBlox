@@ -58,3 +58,9 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FIL
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
+
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/fifo_638x128.xci"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_516x128/fifo_516x128.xci"
+echo $newtext >> ${CFG_FILE_NAME}
