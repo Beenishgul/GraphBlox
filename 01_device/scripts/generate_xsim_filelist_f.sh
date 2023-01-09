@@ -80,6 +80,21 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/simulation/fifo_generator_vlog_beh.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/hdl/fifo_generator_v13_2_rfs.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/sim/fifo_638x128.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_516x128/sim/fifo_516x128.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
+
 newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench.sv"
 newtext_cp="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/${KERNEL_NAME}_testbench.sv"
 cp ${newtext} ${newtext_cp}
