@@ -111,19 +111,24 @@ create_ip -name fifo_generator \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
-                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
-                    CONFIG.Input_Data_Width {513}                                                     \
-                    CONFIG.Input_Depth {512}                                                          \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
+                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {true}                                                           \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width{false}                                               \
+                    CONFIG.Input_Data_Width {638}                                                     \
+                    CONFIG.Input_Depth {128}                                                          \
+                    CONFIG.Output_Data_Width {638}                                                    \
+                    CONFIG.Output_Depth {128}                                                         \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {490}                                          \
-                    CONFIG.Output_Data_Width {513}                                                    \
-                    CONFIG.Output_Depth {512}                                                         \
-                    CONFIG.Data_Count_Width {9}                                                       \
-                    CONFIG.Write_Data_Count_Width {9}                                                 \
-                    CONFIG.Read_Data_Count_Width {9}                                                  \
-                    CONFIG.Full_Threshold_Negate_Value {489}                                          \
-                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
-                    CONFIG.Empty_Threshold_Negate_Value {5}                                           \
+                    CONFIG.Full_Threshold_Assert_Value {96}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {32}                                          \
+                    CONFIG.Valid_Flag {true}                                                          \
+                    CONFIG.Almost_Empty_Flag {true}                                                   \
+                    CONFIG.Almost_Full_Flag {true}                                                    
                    ] [get_ips ${module_name}]
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
@@ -136,6 +141,39 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 puts "                        generate fifo_516x128_GlayCacheRequestInterfaceOutput"
 
+set module_name fifo_516x128_GlayCacheRequestInterfaceOutput
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
+                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {true}                                                           \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width{false}                                               \
+                    CONFIG.Input_Data_Width {516}                                                     \
+                    CONFIG.Input_Depth {128}                                                          \
+                    CONFIG.Output_Data_Width {516}                                                    \
+                    CONFIG.Output_Depth {128}                                                         \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {96}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {32}                                          \
+                    CONFIG.Valid_Flag {true}                                                          \
+                    CONFIG.Almost_Empty_Flag {true}                                                   \
+                    CONFIG.Almost_Full_Flag {true}                                                    
+                   ] [get_ips ${module_name}]
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 
 # ----------------------------------------------------------------------------
