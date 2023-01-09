@@ -37,7 +37,7 @@ set_property target_simulator XSim    [current_project]
 # ----------------------------------------------------------------------------
 # generate axi master vip
 # ----------------------------------------------------------------------------
-puts "                        generate axi master vip"
+puts "                        Generate AXI Master VIP"
 
 set module_name control_${kernel_name}_vip
 create_ip -name axi_vip \
@@ -67,7 +67,7 @@ generate_target all [get_files  ${ip_dir}/${module_name}/${module_name}.xci] >> 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
-puts "                        generate axi slave vip"
+puts "                        Generate AXI Slave VIP"
 
 set module_name slv_m00_axi_vip
 create_ip -name axi_vip \
@@ -100,9 +100,9 @@ generate_target all [get_files  ${ip_dir}/${module_name}/${module_name}.xci] >> 
 # ----------------------------------------------------------------------------
 # generate fifo_638x128_GlayCacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "                        generate create fifo_638x128_GlayCacheRequestInterfaceInput"
+puts "                        Generate FIFO GlayCacheRequestInterfaceInput: fifo_638x128"
 
-set module_name fifo_638x128_GlayCacheRequestInterfaceInput
+set module_name fifo_638x128
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -115,9 +115,9 @@ set_property -dict [list                                                        
                     CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
-                    CONFIG.Reset_Pin {true}                                                           \
+                    CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width{false}                                               \
+                    CONFIG.asymmetric_port_width{0}                                                   \
                     CONFIG.Input_Data_Width {638}                                                     \
                     CONFIG.Input_Depth {128}                                                          \
                     CONFIG.Output_Data_Width {638}                                                    \
@@ -126,9 +126,9 @@ set_property -dict [list                                                        
                     CONFIG.Full_Threshold_Assert_Value {96}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
                     CONFIG.Empty_Threshold_Assert_Value {32}                                          \
-                    CONFIG.Valid_Flag {true}                                                          \
-                    CONFIG.Almost_Empty_Flag {true}                                                   \
-                    CONFIG.Almost_Full_Flag {true}                                                    
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
                    ] [get_ips ${module_name}]
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
@@ -139,9 +139,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_516x128_GlayCacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "                        generate fifo_516x128_GlayCacheRequestInterfaceOutput"
+puts "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x128"
 
-set module_name fifo_516x128_GlayCacheRequestInterfaceOutput
+set module_name fifo_516x128
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -154,9 +154,9 @@ set_property -dict [list                                                        
                     CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
-                    CONFIG.Reset_Pin {true}                                                           \
+                    CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width{false}                                               \
+                    CONFIG.asymmetric_port_width{0}                                                   \
                     CONFIG.Input_Data_Width {516}                                                     \
                     CONFIG.Input_Depth {128}                                                          \
                     CONFIG.Output_Data_Width {516}                                                    \
@@ -165,9 +165,9 @@ set_property -dict [list                                                        
                     CONFIG.Full_Threshold_Assert_Value {96}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
                     CONFIG.Empty_Threshold_Assert_Value {32}                                          \
-                    CONFIG.Valid_Flag {true}                                                          \
-                    CONFIG.Almost_Empty_Flag {true}                                                   \
-                    CONFIG.Almost_Full_Flag {true}                                                    
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
                    ] [get_ips ${module_name}]
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
