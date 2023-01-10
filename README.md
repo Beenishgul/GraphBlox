@@ -693,7 +693,7 @@ benchmarking suite for various graph processing algorithms using pure C.
 
 # GLay Organization
 
-* ```
+```console
 .
 ├── 00_host
 │   ├── include
