@@ -161,10 +161,11 @@ user@host:~GLay$ make report_metrics
 
 #### Open Project in Vivado GUI hardware or emulation mode (TARGET=hw/hw_emu)
 
-1. Generate Timing, Resource utilization and power reports:
+1. Generate Vivado project:
 ```console
 user@host:~GLay$ make open-vivado-project
 ```
+
 ## CPU Flow [<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
 ### Initial compilation for the Graph framework with OpenMP
