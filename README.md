@@ -29,6 +29,217 @@ maintaining the performance and power optimizations, an FPGA provides.
 Row Matrix (CSR) structure](./02_slides_figures_docs/fig/glay/fig1.png "Figure 1: Graph fundamental Compressed Sparse
 Row Matrix (CSR) structure")
 
+# GLay Benchmark Suite
+
+## Overview
+
+![End-to-End Evaluation](./02_slides_figures_docs/fig/theme.png "GLay")
+
+* Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
+  * Preprocessing two steps (third one is optional) :
+    1. [[Sorting the edge-list](./02_slides_figures_docs/02_preprocessing_countsort.pdf)], using count-sort or radix-sort.
+    2. [[Building the graph structure](./02_slides_figures_docs/03_preprocessing_DataStructures.pdf)]. CSR, Gird, Adjacency-Linked-List, and Adjacency-Array-List.
+        * [Ref](https://github.com/thu-pacman/GridGraph): Xiaowei Zhu, Wentao Han and Wenguang Chen. [GridGraph: Large-Scale Graph Processing on a Single Machine Using 2-Level Hierarchical Partitioning](https://www.usenix.org/system/files/conference/atc15/atc15-paper-zhu.pdf). Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
+        * [Ref](https://github.com/epfl-labos/EverythingGraph): Malicevic, Jasmina, Baptiste Lepers, and Willy Zwaenepoel. "Everything you always wanted to know about multicore graph processing but were afraid to ask." 2017 USENIX Annual Technical Conference. Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
+    3. [[Relabeling the graph](./02_slides_figures_docs/01_algorithm_PR_cache.pdf)], this step achieves better cache locality (better performance) with preprocessing overhead.
+        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
+        * [Ref](https://github.com/faldupriyank/dbg):P. Faldu and J. Diamond and B. Grot, "A Closer Look at Lightweight Graph Reordering," in Proceedings of the International Symposium on Workload Characterization (IISWC), November 2019.
+  * Graph Algorithm step depends on the direction of the data (Push/Pull):
+    1. [[BFS example](./02_slides_figures_docs/00_algorithm_BFS.pdf)], although it doesn't show direction optimized. But we discusses the Push and Pull approach separately.
+        * [[Ref](https://github.com/sbeamer/gapbs)]: Scott Beamer, Krste Asanović, David Patterson. [The GAP Benchmark Suite](http://arxiv.org/abs/1508.03619). arXiv:1508.03619 [cs.DC], 2015.
+    2. [[Page-Rank (PR) example](./02_slides_figures_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
+       * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
+
+# Installation and Dependencies
+
+## Xilinx Dependencies
+
+The designs have been verified with the following software/hardware environment and tool chain versions:
+* Operating Systems:
+  * Ubuntu 18.04/20.04 (See [Additional Requirements for Ubuntu](#cpu-mode))
+  * Perl package installed for Verilog simulation (**required**)
+  * GCC 7
+* Vitis: 2022.1
+* XRT: 2.13.466
+* Hardware and Platform for your Alveo card (you need both the deployment and development platforms):
+  * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1 (Currently Supported)
+  * Alveo U250: xilinx_u280_gen3x16_xdma_1_202211_1
+
+## CPU Mode
+
+### OpenMP
+
+1. Judy Arrays
+```console
+~$ sudo apt-get install libjudy-dev
+```
+2. OpenMP is already a feature of the compiler, so this step is not necessary.
+```console
+~$ sudo apt-get install libomp-dev
+```
+
+#### Setting up the source code
+
+1. Clone GLay.
+```console
+~$ git clone https://github.com/atmughrabi/GLay.git
+```
+2. From the home directory go to the GLay directory:
+```console
+~$ cd GLay/
+```
+3. Make the source code
+```console
+~GLay$ make
+```
+
+# Running GLay 
+
+## Simulation Mode
+
+## Hardware Emulation Mode
+
+## Hardware Mode
+
+## CPU Mode
+
+[<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+### Initial compilation for the Graph framework with OpenMP
+
+1. The default compilation is `openmp` mode:
+```console
+~GLay$ make
+```
+2. From the root directory you can modify the Makefile with the [(parameters)](#GLay-options) you need for OpenMP:
+```console
+~GLay$ make run
+```
+* OR
+```console
+~GLay$ make run-openmp
+```
+
+* You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GLay-options) to pass the correct values.
+
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| ARGS  | arguments passed to glay |
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *Graph Files Directory* |
+| FILE_BIN  | graph edge-list location |
+| FILE_LABEL  | graph edge-list reorder list | 
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *Graph Structures PreProcessing* |
+| SORT_TYPE  | graph edge-list sort (count/radix) |
+| DATA_STRUCTURES  | CSR,GRID,LinkedList,ArrayList |
+| REORDER_LAYER1  | Reorder graph for cache optimization |
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *Algorithms General* |
+| ALGORITHMS  | BFS, PR, DFS, etc |
+| PULL_PUSH  | Direction push,pull,hybrid |
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *Algorithms Specific* |
+| ROOT  | source node for BFS, etc |
+| TOLERANCE  | PR tolerance for convergence |
+| NUM_ITERATIONS  | PR iterations or convergence |
+| DELTA  | SSSP delta step |
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *General Performance* |
+| NUM_THREADS_PRE  | number of threads for the preprocess step (graph sorting, generation) |
+| NUM_THREADS_ALGO  | number of threads for the algorithm step (BFS,PR, etc) |
+| NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
+| NUM_TRIALS  | number of trials for the same algorithms | 
+
+
+# Graph structure Input (Edge list)
+
+* If you open the Makefile you will see the convention for graph directories : `BENCHMARKS_DIR/GRAPH_NAME/graph.wbin`.
+* `.bin` stands to unweighted edge list, `.wbin` stands for wighted, `In binary format`. (This is only a convention you don't have to use it)
+* The reason behind converting the edge-list from text to binary, it is simply takes less space on the drive for large graphs, and easier to use with the `mmap` function.
+
+| Source  | Dest | Weight (Optional) |
+| :---: | :---: | :---: |
+| 30  | 3  |  1 |
+| 3  | 4  |  1 |
+
+* Example:
+* INPUT: (unweighted textual edge-list)
+* ../BENCHMARKS_DIR/GRAPH_NAME/graph
+ ```
+  30    3
+  3     4
+  25    5
+  25    7
+  6     3
+  4     2
+  6     12
+  6     8
+  6     11
+  8     22
+  9     27
+
+ ```
+* convert to binary format and add random weights, for this example all the weights are `1`.
+* `--graph-file-format` is the type of graph you are reading, `--convert-format` is the type of format you are converting to.
+* NOTE: you can read the file from text format without the convert step. By adding `--graph-file-format 0` to the argument list. The default is `1` assuming it is binary. please check `--help` for better explanation.
+* `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
+* (unweighted graph)
+```console
+~GLay$ make convert
+```
+* OR (weighted graph)
+```console
+~GLay$ make convert-w
+```
+* OR (weighted graph)
+```console
+~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+```
+
+* `Makefile` parameters
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *File Formats* |
+| FILE_FORMAT  | the type of graph read |
+| CONVERT_FORMAT  | the type of graph converted |
+
+
+* OUTPUT: (weighted binary edge-list)
+*  ../BENCHMARKS_DIR/GRAPH_NAME/graph.wbin
+```
+1e00 0000 0300 0000 0100 0000 0300 0000
+0400 0000 0100 0000 1900 0000 0500 0000
+0100 0000 1900 0000 0700 0000 0100 0000
+0600 0000 0300 0000 0100 0000 0400 0000
+0200 0000 0100 0000 0600 0000 0c00 0000
+0100 0000 0600 0000 0800 0000 0100 0000
+0600 0000 0b00 0000 0100 0000 0800 0000
+1600 0000 0100 0000 0900 0000 1b00 0000
+0100 0000
+```
+
+# Graph Structure Preprocessing:
+GLay can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
+
+## Regular unsorted Edge-list as input.
+
+<p align="center"><img src="./02_slides_figures_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
+
+##  CSR (Compressed Sparse Row)
+<p align="center"><img src="./02_slides_figures_docs/fig/datastructures/csr.png" width ="450" ></p>
+
 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
@@ -213,201 +424,6 @@ BFS
 ---
 
 ![Figure 7: Transforming BFS algorithm to GGDL](./02_slides_figures_docs/fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
-
-# GLay Benchmark Suite
-
-## Overview
-
-![End-to-End Evaluation](./02_slides_figures_docs/fig/theme.png "GLay")
-
-* Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
-  * Preprocessing two steps (third one is optional) :
-    1. [[Sorting the edge-list](./02_slides_figures_docs/02_preprocessing_countsort.pdf)], using count-sort or radix-sort.
-    2. [[Building the graph structure](./02_slides_figures_docs/03_preprocessing_DataStructures.pdf)]. CSR, Gird, Adjacency-Linked-List, and Adjacency-Array-List.
-        * [Ref](https://github.com/thu-pacman/GridGraph): Xiaowei Zhu, Wentao Han and Wenguang Chen. [GridGraph: Large-Scale Graph Processing on a Single Machine Using 2-Level Hierarchical Partitioning](https://www.usenix.org/system/files/conference/atc15/atc15-paper-zhu.pdf). Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
-        * [Ref](https://github.com/epfl-labos/EverythingGraph): Malicevic, Jasmina, Baptiste Lepers, and Willy Zwaenepoel. "Everything you always wanted to know about multicore graph processing but were afraid to ask." 2017 USENIX Annual Technical Conference. Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
-    3. [[Relabeling the graph](./02_slides_figures_docs/01_algorithm_PR_cache.pdf)], this step achieves better cache locality (better performance) with preprocessing overhead.
-        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
-        * [Ref](https://github.com/faldupriyank/dbg):P. Faldu and J. Diamond and B. Grot, "A Closer Look at Lightweight Graph Reordering," in Proceedings of the International Symposium on Workload Characterization (IISWC), November 2019.
-  * Graph Algorithm step depends on the direction of the data (Push/Pull):
-    1. [[BFS example](./02_slides_figures_docs/00_algorithm_BFS.pdf)], although it doesn't show direction optimized. But we discusses the Push and Pull approach separately.
-        * [[Ref](https://github.com/sbeamer/gapbs)]: Scott Beamer, Krste Asanović, David Patterson. [The GAP Benchmark Suite](http://arxiv.org/abs/1508.03619). arXiv:1508.03619 [cs.DC], 2015.
-    2. [[Page-Rank (PR) example](./02_slides_figures_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
-       * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
-
-<!-- ## Details -->
-<!-- ### GLay Supported Algorithms -->
-
-# Installation and Dependencies
-
-## CPU Mode
-
-### OpenMP
-
-1. Judy Arrays
-```console
-gl@y:~$ sudo apt-get install libjudy-dev
-```
-2. OpenMP is already a feature of the compiler, so this step is not necessary.
-```console
-gl@y:~$ sudo apt-get install libomp-dev
-```
-
-#### Setting up the source code
-
-1. Clone GLay.
-```console
-gl@y:~$ git clone https://github.com/atmughrabi/GLay.git
-```
-2. From the home directory go to the GLay directory:
-```console
-gl@y:~$ cd GLay/
-```
-3. Make the source code
-```console
-gl@y:~GLay$ make
-```
-
-# Running GLay 
-
-## CPU Mode
-
-[<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
-### Initial compilation for the Graph framework with OpenMP
-
-1. The default compilation is `openmp` mode:
-```console
-gl@y:~GLay$ make
-```
-2. From the root directory you can modify the Makefile with the [(parameters)](#GLay-options) you need for OpenMP:
-```console
-gl@y:~GLay$ make run
-```
-* OR
-```console
-gl@y:~GLay$ make run-openmp
-```
-
-* You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GLay-options) to pass the correct values.
-
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| ARGS  | arguments passed to glay |
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *Graph Files Directory* |
-| FILE_BIN  | graph edge-list location |
-| FILE_LABEL  | graph edge-list reorder list | 
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *Graph Structures PreProcessing* |
-| SORT_TYPE  | graph edge-list sort (count/radix) |
-| DATA_STRUCTURES  | CSR,GRID,LinkedList,ArrayList |
-| REORDER_LAYER1  | Reorder graph for cache optimization |
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *Algorithms General* |
-| ALGORITHMS  | BFS, PR, DFS, etc |
-| PULL_PUSH  | Direction push,pull,hybrid |
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *Algorithms Specific* |
-| ROOT  | source node for BFS, etc |
-| TOLERANCE  | PR tolerance for convergence |
-| NUM_ITERATIONS  | PR iterations or convergence |
-| DELTA  | SSSP delta step |
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *General Performance* |
-| NUM_THREADS_PRE  | number of threads for the preprocess step (graph sorting, generation) |
-| NUM_THREADS_ALGO  | number of threads for the algorithm step (BFS,PR, etc) |
-| NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
-| NUM_TRIALS  | number of trials for the same algorithms | 
-
-
-# Graph structure Input (Edge list)
-
-* If you open the Makefile you will see the convention for graph directories : `BENCHMARKS_DIR/GRAPH_NAME/graph.wbin`.
-* `.bin` stands to unweighted edge list, `.wbin` stands for wighted, `In binary format`. (This is only a convention you don't have to use it)
-* The reason behind converting the edge-list from text to binary, it is simply takes less space on the drive for large graphs, and easier to use with the `mmap` function.
-
-| Source  | Dest | Weight (Optional) |
-| :---: | :---: | :---: |
-| 30  | 3  |  1 |
-| 3  | 4  |  1 |
-
-* Example:
-* INPUT: (unweighted textual edge-list)
-* ../BENCHMARKS_DIR/GRAPH_NAME/graph
- ```
-  30    3
-  3     4
-  25    5
-  25    7
-  6     3
-  4     2
-  6     12
-  6     8
-  6     11
-  8     22
-  9     27
-
- ```
-* convert to binary format and add random weights, for this example all the weights are `1`.
-* `--graph-file-format` is the type of graph you are reading, `--convert-format` is the type of format you are converting to.
-* NOTE: you can read the file from text format without the convert step. By adding `--graph-file-format 0` to the argument list. The default is `1` assuming it is binary. please check `--help` for better explanation.
-* `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
-* (unweighted graph)
-```console
-gl@y:~GLay/00_graph_bench$ make convert
-```
-* OR (weighted graph)
-```console
-gl@y:~GLay/00_graph_bench$ make convert-w
-```
-* OR (weighted graph)
-```console
-gl@y:~GLay/00_graph_bench$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
-```
-
-* `Makefile` parameters
-
-| PARAMETER  | FUNCTION | 
-| :--- | :--- |
-| *File Formats* |
-| FILE_FORMAT  | the type of graph read |
-| CONVERT_FORMAT  | the type of graph converted |
-
-
-* OUTPUT: (weighted binary edge-list)
-*  ../BENCHMARKS_DIR/GRAPH_NAME/graph.wbin
-```
-1e00 0000 0300 0000 0100 0000 0300 0000
-0400 0000 0100 0000 1900 0000 0500 0000
-0100 0000 1900 0000 0700 0000 0100 0000
-0600 0000 0300 0000 0100 0000 0400 0000
-0200 0000 0100 0000 0600 0000 0c00 0000
-0100 0000 0600 0000 0800 0000 0100 0000
-0600 0000 0b00 0000 0100 0000 0800 0000
-1600 0000 0100 0000 0900 0000 1b00 0000
-0100 0000
-```
-
-# Graph Structure Preprocessing:
-GLay can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
-
-## Regular unsorted Edge-list as input.
-
-<p align="center"><img src="./02_slides_figures_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
-
-##  CSR (Compressed Sparse Row)
-<p align="center"><img src="./02_slides_figures_docs/fig/datastructures/csr.png" width ="450" ></p>
 
 
 # GLay Options
@@ -632,9 +648,66 @@ benchmarking suite for various graph processing algorithms using pure C.
 ```
 
 
-# Organization
+# GLay Organization
 
-* `00_graph_bench`
+* ```
+.
+├── 00_host
+│   ├── include
+│   │   ├── algorithms
+│   │   │   ├── ggdl
+│   │   │   └── openmp
+│   │   ├── config
+│   │   ├── preprocess
+│   │   ├── structures
+│   │   ├── utils_fpga_c
+│   │   ├── utils_fpga_cpp
+│   │   └── utils_graph
+│   └── src
+│       ├── algorithms
+│       │   ├── ggdl
+│       │   └── openmp
+│       ├── config
+│       ├── main
+│       ├── preprocess
+│       ├── structures
+│       ├── tests_c
+│       ├── tests_cpp
+│       ├── utils_fpga_c
+│       ├── utils_fpga_cpp
+│       └── utils_graph
+├── 01_device
+│   ├── glay_ip
+│   │   ├── cache
+│   │   │   ├── iob_fifo_sync
+│   │   │   ├── iob_include
+│   │   │   │   └── portmaps
+│   │   │   ├── iob_ram_2p
+│   │   │   ├── iob_ram_2p_asym
+│   │   │   ├── iob_ram_sp
+│   │   │   ├── iob_regfile_sp
+│   │   │   └── iob_src_cache
+│   │   ├── kernel
+│   │   ├── kernel_testbench
+│   │   ├── pkgs
+│   │   └── top
+│   └── scripts
+├── 02_slides_figures_docs
+│   └── fig
+│       ├── datastructures
+│       └── glay
+└── 03_test_graphs
+    ├── LAW
+    │   ├── LAW-amazon-2008
+    │   ├── LAW-cnr-2000
+    │   ├── LAW-dblp-2010
+    │   └── LAW-enron
+    └── TEST
+        ├── graphbrew
+        ├── test
+        ├── v300_e2730
+        └── v51_e1021
+```
 
 * *`Makefile`* - Global makefile
 
@@ -663,6 +736,15 @@ benchmarking suite for various graph processing algorithms using pure C.
   - [ ] CC    (Connected Components)
   - [ ] TC    (Triangle Counting)
   - [ ] BC    (Betweenness Centrality)
+- [ ] Finish GLay FPGA Graph Description Language (GGDL)
+  - [x] Serial\_Read\_Engine
+  - [x] Serial\_Write\_Engine
+  - [x] Random\_Read\_Engine / Random\_Write\_Engine
+  - [x] Stride\_Index\_Generator
+  - [x] CSR\_Index\_Generator
+  - [ ] ALU\_Operation\_\<Mul, Add, Sub, Acc\>
+  - [ ] Conditional\_Break\_\<GT, LT, EQ\>
+  - [ ] Conditional\_Filter\_\<GT, LT, EQ\>
 - [ ] Finish graph algorithms suite GLay FPGA
   - [ ] BFS   (Breadth First Search)
   - [ ] PR    (Page-Rank)
