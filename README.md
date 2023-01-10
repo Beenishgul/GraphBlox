@@ -152,9 +152,8 @@ user@host:~GLay$ make build-hw TARGET=hw
 ```console
 user@host:~GLay$ make run-fpga
 ```
-## CPU Flow
+## CPU Flow [<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
-[<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 ### Initial compilation for the Graph framework with OpenMP
 
 1. The default compilation is `openmp` mode:
