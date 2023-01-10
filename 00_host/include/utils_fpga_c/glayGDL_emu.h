@@ -25,7 +25,7 @@ extern "C" {
 // related to reading CSR structure data, for example, reading the offsets
 // array.
 
-uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead,, uint32_t endRead, uint32_t stride, uint32_t granularity);
+uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity);
 
 // Serial\_Write\_Engine
 // ---------------------
@@ -93,7 +93,7 @@ uint32_t *CSRIndexGenerator(uint32_t *arrayPointer, uint32_t arraySize, uint32_t
 // arithmetic operations. Each output is coupled with an ID that can be
 // used for writing the result to the correct index if needed.
 
-uint32_t *ALUOperation(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mode);
+uint32_t *ALUOperation(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode);
 
 // Conditional\_Break\_\<GT, LT, EQ\>
 // ----------------------------------
@@ -105,7 +105,7 @@ uint32_t *ALUOperation(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mode);
 // module is reprogrammable to implement Less Than (LT), Greater Than (GT),
 // and Equal (EQ) operations.
 
-uint32_t *conditionalBreak(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mode);
+uint32_t *conditionalBreak(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode);
 
 // Conditional\_Filter\_\<GT, LT, EQ\>
 // -----------------------------------
@@ -116,7 +116,7 @@ uint32_t *conditionalBreak(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mod
 // Like Conditional\_Break, a filter would filter out results forwarded to
 // other engines in the overlay based on a condition.
 
-uint32_t *conditionalFilter(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mode);
+uint32_t *conditionalFilter(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode);
 
 
 // Conditional\_Continue\_\<GT, LT, EQ\>
@@ -128,7 +128,7 @@ uint32_t *conditionalFilter(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mo
 // be applied in order not to generate any subsequent dependent commands,
 // for example, reads/writes correlated with a vertex ID.
 
-uint32_t *conditionalContinue(uint32_t op1, uint32_t op1, uint32_t id, uint32_t mode);
+uint32_t *conditionalContinue(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode);
 
 #ifdef __cplusplus
 }
