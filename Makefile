@@ -210,14 +210,14 @@ export PART =  xcu250-figd2104-2L-e
 # export PART =  xcu55c-fsvh2892-2L-e
 # export PART =  xcu280-fsvh2892-2L-e
 
-# PLATFORM setting: uncomment the lin matching your Alveo card
+# PLATFORM setting: uncomment the line matching your Alveo card
 # export PLATFORM =  xilinx_u200_gen3x16_xdma_2_202110_1
 export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
 # export PLATFORM =  xilinx_u50_gen3x16_xdma_5_202210_1
 # export PLATFORM =  xilinx_u55c_gen3x16_xdma_3_202210_1
 # export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 
-# TARGET: set the build target, can be hw_fpga or hw_emu
+# TARGET: set the build target, can be hw or hw_emu
 export TARGET = hw_emu
 # export TARGET = hw
 

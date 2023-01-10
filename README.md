@@ -103,8 +103,8 @@ user@host:~GLay$ make
 | :--- | :--- | :--- |
 | PART  | xcu250-figd2104-2L-e | Part matching u250 Alveo card |
 | PLATFORM  | xilinx_u250_gen3x16_xdma_4_1_202210_1 | Platform matching u250 Alveo card |
-| TARGET  | hw_emu | Build target, can be hw_fpga or hw_emu |
-| XILINX_CTRL_MODE  | user_managed | Control Mode, ap_ctrl_hs or ap_ctrl_chain |
+| TARGET  | hw_emu | Build target hw or hw_emu |
+| XILINX_CTRL_MODE  | user_managed | ctrl mode, ap_ctrl_hs or ap_ctrl_chain |
 
 ### Simulation Mode
 
