@@ -62,7 +62,7 @@ The designs have been verified with the following software/hardware environment 
 * Vitis: 2022.1
 * XRT: 2.13.466
 * Hardware and Platform for your Alveo card (you need both the deployment and development platforms):
-  * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1 (Currently Supported)
+  * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1 (**Currently Supported**)
   * Alveo U250: xilinx_u280_gen3x16_xdma_1_202211_1
 
 ## CPU Dependencies
