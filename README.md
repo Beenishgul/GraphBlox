@@ -95,9 +95,9 @@ user@host:~GLay$ make
 
 # Running GLay (Under construction!)
 
-## Xilinx Flow
+## Xilinx Flow [<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
-[<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
+
 ### Simulation Mode
 
 1. generate Xilinx IPs:
