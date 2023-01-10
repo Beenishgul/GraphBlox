@@ -93,14 +93,62 @@ The designs have been verified with the following software/hardware environment 
 ~GLay$ make
 ```
 
-# Running GLay 
+# Running GLay (Under construction!)
 
 ## Simulation Mode
 
+1. generate xilinx IPs:
+```console
+~GLay$ make gen-vip
+```
+2. run simulation on xsim:
+```console
+~GLay$ make run-sim
+```
+3. view simulation waves:
+```console
+~GLay$ make run-sim
+```
 ## Hardware Emulation Mode
 
+1. generate xilinx IPs:
+```console
+~GLay$ make gen-vip
+```
+2. package GLay kernel:
+```console
+~GLay$ make package-kernel
+```
+3. build binary for emulation:
+```console
+~GLay$ make build-hw
+```
+4. run GLay on emulated hw:
+```console
+~GLay$ make run-emu
+```
+5. view emualation wave:
+```console
+~GLay$ make run-emu-wave
+```
 ## Hardware Mode
 
+1. generate xilinx IPs:
+```console
+~GLay$ make gen-vip
+```
+2. package GLay kernel:
+```console
+~GLay$ make package-kernel
+```
+3. build binary for emulation:
+```console
+~GLay$ make build-hw TARGET=hw
+```
+4. run GLay on taget fgpa:
+```console
+~GLay$ make run-fpga
+```
 ## CPU Mode
 
 [<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
@@ -114,11 +162,6 @@ The designs have been verified with the following software/hardware environment 
 ```console
 ~GLay$ make run
 ```
-* OR
-```console
-~GLay$ make run-openmp
-```
-
 * You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GLay-options) to pass the correct values.
 
 
