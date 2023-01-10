@@ -98,7 +98,7 @@ user@host:~GLay$ make
 ## Xilinx Flow
 
 [<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
-## Simulation Mode
+### Simulation Mode
 
 1. generate Xilinx IPs:
 ```console
@@ -112,7 +112,7 @@ user@host:~GLay$ make run-sim
 ```console
 user@host:~GLay$ make run-sim
 ```
-## Hardware Emulation Mode
+### Hardware Emulation Mode
 
 1. generate Xilinx IPs:
 ```console
@@ -134,7 +134,7 @@ user@host:~GLay$ make run-emu
 ```console
 user@host:~GLay$ make run-emu-wave
 ```
-## Hardware Mode
+### Hardware Mode
 
 1. generate Xilinx IPs:
 ```console
