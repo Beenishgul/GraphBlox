@@ -56,7 +56,7 @@ Row Matrix (CSR) structure")
 
 The designs have been verified with the following software/hardware environment and tool chain versions:
 * Operating Systems:
-  * Ubuntu 18.04/20.04 (See [Additional Requirements for Ubuntu](#cpu-mode))
+  * Ubuntu 18.04/20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
   * Perl package installed for Verilog simulation (**required**)
   * GCC 7
 * Vitis: 2022.1
@@ -65,7 +65,7 @@ The designs have been verified with the following software/hardware environment 
   * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1 (Currently Supported)
   * Alveo U250: xilinx_u280_gen3x16_xdma_1_202211_1
 
-## CPU Mode
+## CPU Dependencies
 
 ### OpenMP
 
@@ -95,9 +95,12 @@ user@host:~GLay$ make
 
 # Running GLay (Under construction!)
 
+## Xilinx Flow
+
+[<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 ## Simulation Mode
 
-1. generate xilinx IPs:
+1. generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
@@ -111,7 +114,7 @@ user@host:~GLay$ make run-sim
 ```
 ## Hardware Emulation Mode
 
-1. generate xilinx IPs:
+1. generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
@@ -133,7 +136,7 @@ user@host:~GLay$ make run-emu-wave
 ```
 ## Hardware Mode
 
-1. generate xilinx IPs:
+1. generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
@@ -149,7 +152,7 @@ user@host:~GLay$ make build-hw TARGET=hw
 ```console
 user@host:~GLay$ make run-fpga
 ```
-## CPU Mode
+## CPU Flow
 
 [<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 ### Initial compilation for the Graph framework with OpenMP
