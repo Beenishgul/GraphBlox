@@ -42,6 +42,7 @@ module glay_kernel_cu #(
   logic                          m_axi_areset    ;
   logic                          control_areset  ;
   logic                          cache_areset    ;
+  logic                          fifo_areset     ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
 
   AXI4MasterReadInterface  m_axi_read ;
@@ -51,6 +52,7 @@ module glay_kernel_cu #(
   GlayControlChainInterfaceOutput glay_control_out_reg   ;
   GLAYDescriptorInterface         glay_descriptor_in_reg ;
   GLAYDescriptorInterface         glay_descriptor_out_reg;
+
 
   // assign m_axi_write.out = 0;
   // assign m_axi_read.out  = 0;
@@ -72,6 +74,17 @@ module glay_kernel_cu #(
   GlayCacheRequestInterfaceInput  glay_cache_req_in ;
   GlayCacheRequestInterfaceOutput glay_cache_req_out;
 
+  GlayCacheRequestInterfaceInput  glay_cache_req_in_fifo_dout ;
+  GlayCacheRequestInterfaceInput  glay_cache_req_in_fifo_din  ;
+
+  GlayCacheRequestInterfaceOutput glay_cache_req_out_fifo_dout ;
+  GlayCacheRequestInterfaceOutput glay_cache_req_out_fifo_din  ;
+
+  assign glay_cache_req_out.valid = glay_cache_req_out.payload.ready;
+
+  assign glay_cache_req_out_fifo_din = glay_cache_req_out;
+  assign glay_cache_req_in_fifo_din  = 0;
+
   logic force_inv_in ;
   logic force_inv_out;
   logic wtb_empty_in ;
@@ -90,6 +103,7 @@ module glay_kernel_cu #(
     m_axi_areset   <= areset;
     control_areset <= areset;
     cache_areset   <= areset;
+    fifo_areset    <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -276,8 +290,51 @@ module glay_kernel_cu #(
   );
 
 
-// FIFO cache requests in
+  assign glay_cache_req_out.valid = glay_cache_req_out.payload.ready;
 
-// FIFO cache requests out 
+// --------------------------------------------------------------------------------------
+// FIFO cache requests in fifo_638x128_GlayCacheRequestInterfaceInput
+// --------------------------------------------------------------------------------------
+  fifo_638x128 inst_fifo_638x128
+    (
+      .clk          (ap_clk),
+      .srst         (fifo_areset),
+      .din          (din),
+      .wr_en        (glay_cache_req_in_fifo_din.valid),
+      .rd_en        (rd_en),
+      .dout         (glay_cache_req_in_fifo_dout),
+      .full         (full),
+      .almost_full  (almost_full),
+      .empty        (empty),
+      .almost_empty (almost_empty),
+      .valid        (glay_cache_req_in_fifo_dout.valid),
+      .prog_full    (prog_full),
+      .prog_empty   (prog_empty),
+      .wr_rst_busy  (wr_rst_busy),
+      .rd_rst_busy  (rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO cache requests out fifo_516x128_GlayCacheRequestInterfaceOutput
+// --------------------------------------------------------------------------------------
+  fifo_516x128 inst_fifo_516x128
+    (
+      .clk          (ap_clk),
+      .srst         (fifo_areset),
+      .din          (din),
+      .wr_en        (wr_en),
+      .rd_en        (rd_en),
+      .dout         (dout),
+      .full         (full),
+      .almost_full  (almost_full),
+      .empty        (empty),
+      .almost_empty (almost_empty),
+      .valid        (valid),
+      .prog_full    (prog_full),
+      .prog_empty   (prog_empty),
+      .wr_rst_busy  (wr_rst_busy),
+      .rd_rst_busy  (rd_rst_busy)
+    );
+
 
 endmodule : glay_kernel_cu
