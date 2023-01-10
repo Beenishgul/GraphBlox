@@ -1,5 +1,5 @@
 .PHONY: help
-help::
+help:
 	$(ECHO) "Makefile Usage:"
 	$(ECHO) "  make gen-vip"
 	$(ECHO) "      Command to generate the IPs used in this design"

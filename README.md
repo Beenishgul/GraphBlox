@@ -100,55 +100,55 @@ user@host:~GLay$ make
 
 ### Simulation Mode
 
-1. generate Xilinx IPs:
+1. Generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
-2. run simulation on xsim:
+2. Run simulation on xsim:
 ```console
 user@host:~GLay$ make run-sim
 ```
-3. view simulation waves:
+3. View simulation waves:
 ```console
 user@host:~GLay$ make run-sim-wave
 ```
 ### Hardware Emulation Mode
 
-1. generate Xilinx IPs:
+1. Generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
-2. package GLay kernel:
+2. Package GLay kernel:
 ```console
 user@host:~GLay$ make package-kernel
 ```
-3. build binary for emulation:
+3. Build binary for emulation:
 ```console
 user@host:~GLay$ make build-hw
 ```
-4. run GLay on emulated hw:
+4. Run GLay on emulated hw:
 ```console
 user@host:~GLay$ make run-emu
 ```
-5. view emualation wave:
+5. View emulation waves:
 ```console
 user@host:~GLay$ make run-emu-wave
 ```
 ### Hardware Mode
 
-1. generate Xilinx IPs:
+1. Generate Xilinx IPs:
 ```console
 user@host:~GLay$ make gen-vip
 ```
-2. package GLay kernel:
+2. Package GLay kernel:
 ```console
 user@host:~GLay$ make package-kernel
 ```
-3. build binary for emulation:
+3. Build binary for FPGA:
 ```console
 user@host:~GLay$ make build-hw TARGET=hw
 ```
-4. run GLay on taget fgpa:
+4. Run GLay on taget fgpa:
 ```console
 user@host:~GLay$ make run-fpga
 ```
