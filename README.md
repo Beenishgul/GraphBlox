@@ -110,7 +110,7 @@ user@host:~GLay$ make run-sim
 ```
 3. view simulation waves:
 ```console
-user@host:~GLay$ make run-sim
+user@host:~GLay$ make run-sim-wave
 ```
 ### Hardware Emulation Mode
 
