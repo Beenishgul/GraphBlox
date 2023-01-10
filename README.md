@@ -1,5 +1,5 @@
 [![Build Status](https://app.travis-ci.com/atmughrabi/GLay.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GLay)
-[<p align="center"><img src="./02_slides_figures_docs/fig/logo.png" width="400" ></p>](#GLay-benchmark-suite)
+[<p align="center"><img src="./02_slides_figures_docs/fig/logo.png" width="350" ></p>](#GLay-benchmark-suite)
 
 GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
