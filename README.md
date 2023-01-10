@@ -97,7 +97,7 @@ user@host:~GLay$ make
 
 ## Xilinx Flow [<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
-* You can pass parameters modifying `Makefile` parameters (easiest way) or change the Makefile in GLay root directory.
+* You can pass parameters or modify `Makefile` parameters (easiest way) at GLay root directory, to control the FPGA development flow and support.
 
 | PARAMETER  | VALUE | FUNCTION |
 | :--- | :--- | :--- |
