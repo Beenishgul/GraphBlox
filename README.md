@@ -78,7 +78,7 @@ user@host:~$ sudo apt-get install libjudy-dev
 user@host:~$ sudo apt-get install libomp-dev
 ```
 
-#### Setting up the source code
+## Setting up the source code
 
 1. Clone GLay.
 ```console
