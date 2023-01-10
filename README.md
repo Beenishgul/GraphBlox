@@ -71,26 +71,26 @@ The designs have been verified with the following software/hardware environment 
 
 1. Judy Arrays
 ```console
-~$ sudo apt-get install libjudy-dev
+user@host:~$ sudo apt-get install libjudy-dev
 ```
 2. OpenMP is already a feature of the compiler, so this step is not necessary.
 ```console
-~$ sudo apt-get install libomp-dev
+user@host:~$ sudo apt-get install libomp-dev
 ```
 
 #### Setting up the source code
 
 1. Clone GLay.
 ```console
-~$ git clone https://github.com/atmughrabi/GLay.git
+user@host:~$ git clone https://github.com/atmughrabi/GLay.git
 ```
 2. From the home directory go to the GLay directory:
 ```console
-~$ cd GLay/
+user@host:~$ cd GLay/
 ```
 3. Make the source code
 ```console
-~GLay$ make
+user@host:~GLay$ make
 ```
 
 # Running GLay (Under construction!)
@@ -99,55 +99,55 @@ The designs have been verified with the following software/hardware environment 
 
 1. generate xilinx IPs:
 ```console
-~GLay$ make gen-vip
+user@host:~GLay$ make gen-vip
 ```
 2. run simulation on xsim:
 ```console
-~GLay$ make run-sim
+user@host:~GLay$ make run-sim
 ```
 3. view simulation waves:
 ```console
-~GLay$ make run-sim
+user@host:~GLay$ make run-sim
 ```
 ## Hardware Emulation Mode
 
 1. generate xilinx IPs:
 ```console
-~GLay$ make gen-vip
+user@host:~GLay$ make gen-vip
 ```
 2. package GLay kernel:
 ```console
-~GLay$ make package-kernel
+user@host:~GLay$ make package-kernel
 ```
 3. build binary for emulation:
 ```console
-~GLay$ make build-hw
+user@host:~GLay$ make build-hw
 ```
 4. run GLay on emulated hw:
 ```console
-~GLay$ make run-emu
+user@host:~GLay$ make run-emu
 ```
 5. view emualation wave:
 ```console
-~GLay$ make run-emu-wave
+user@host:~GLay$ make run-emu-wave
 ```
 ## Hardware Mode
 
 1. generate xilinx IPs:
 ```console
-~GLay$ make gen-vip
+user@host:~GLay$ make gen-vip
 ```
 2. package GLay kernel:
 ```console
-~GLay$ make package-kernel
+user@host:~GLay$ make package-kernel
 ```
 3. build binary for emulation:
 ```console
-~GLay$ make build-hw TARGET=hw
+user@host:~GLay$ make build-hw TARGET=hw
 ```
 4. run GLay on taget fgpa:
 ```console
-~GLay$ make run-fpga
+user@host:~GLay$ make run-fpga
 ```
 ## CPU Mode
 
@@ -156,11 +156,11 @@ The designs have been verified with the following software/hardware environment 
 
 1. The default compilation is `openmp` mode:
 ```console
-~GLay$ make
+user@host:~GLay$ make
 ```
 2. From the root directory you can modify the Makefile with the [(parameters)](#GLay-options) you need for OpenMP:
 ```console
-~GLay$ make run
+user@host:~GLay$ make run
 ```
 * You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GLay-options) to pass the correct values.
 
@@ -239,15 +239,15 @@ The designs have been verified with the following software/hardware environment 
 * `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
 * (unweighted graph)
 ```console
-~GLay$ make convert
+user@host:~GLay$ make convert
 ```
 * OR (weighted graph)
 ```console
-~GLay$ make convert-w
+user@host:~GLay$ make convert-w
 ```
 * OR (weighted graph)
 ```console
-~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+user@host:~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
 * `Makefile` parameters
