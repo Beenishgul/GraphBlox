@@ -112,7 +112,7 @@ user@host:~GLay$ make run-sim
 ```console
 user@host:~GLay$ make run-sim-wave
 ```
-### Hardware Emulation Mode
+### Hardware Emulation Mode (TARGET=hw_emu)
 
 1. Generate Xilinx IPs:
 ```console
@@ -124,7 +124,7 @@ user@host:~GLay$ make package-kernel
 ```
 3. Build binary for emulation:
 ```console
-user@host:~GLay$ make build-hw
+user@host:~GLay$ make build-hw TARGET=hw_emu
 ```
 4. Run GLay on emulated hw:
 ```console
@@ -134,7 +134,7 @@ user@host:~GLay$ make run-emu
 ```console
 user@host:~GLay$ make run-emu-wave
 ```
-### Hardware Mode
+### Hardware Mode (TARGET=hw)
 
 1. Generate Xilinx IPs:
 ```console
@@ -151,6 +151,19 @@ user@host:~GLay$ make build-hw TARGET=hw
 4. Run GLay on taget fgpa:
 ```console
 user@host:~GLay$ make run-fpga
+```
+#### Generate reports in hardware mode (TARGET=hw)
+
+1. Generate Timing, Resource utilization and power reports:
+```console
+user@host:~GLay$ make report_metrics 
+```
+
+#### Open Project in Vivado GUI hardware or emulation mode (TARGET=hw/hw_emu)
+
+1. Generate Timing, Resource utilization and power reports:
+```console
+user@host:~GLay$ make open-vivado-project
 ```
 ## CPU Flow [<img src="./02_slides_figures_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
