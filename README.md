@@ -299,7 +299,6 @@ user@host:~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-form
 GLay can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
 
 ## Regular unsorted Edge-list as input.
-
 <p align="center"><img src="./02_slides_figures_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
 
 ##  CSR (Compressed Sparse Row)
@@ -493,6 +492,8 @@ BFS
 
 # GLay Options
 
+## GLay Host
+
 ```
 Usage: glay-openmp [OPTION...]
             -f <graph file> -d [data structure] -a [algorithm] -r [root] -n
@@ -532,10 +533,10 @@ benchmarking suite for various graph processing algorithms using pure C.
   -C, --cache-size=<LLC>     
                              LLC cache size for MASK vertex reodering
 
-
   -d, --data-structure=[DEFAULT:[0]-CSR]
 
-                             [0]-CSR
+                            [0]-CSR, 
+                            [1]-CSR Segmented (use cache-size parameter)
 
   -e, --tolerance=[EPSILON:0.0001]
 
@@ -580,42 +581,10 @@ benchmarking suite for various graph processing algorithms using pure C.
                              (critical-path) (graph algorithm)
 
   -l, --light-reorder-l1=[DEFAULT:[0]-no-reordering]
-
-                             Relabels the graph for better cache performance
-                             (first layer). 
-                             [0]-no-reordering, 
-                             [1]-out-degree,
-                             [2]-in-degree, 
-                             [3]-(in+out)-degree, 
-                             [4]-DBG-out,
-                             [5]-DBG-in, 
-                             [6]-HUBSort-out, 
-                             [7]-HUBSort-in,
-                             [8]-HUBCluster-out, 
-                             [9]-HUBCluster-in,
-                             [10]-(random)-degree,  
-                             [11]-LoadFromFile (used for Rabbit order).
-
   -L, --light-reorder-l2=[DEFAULT:[0]-no-reordering]
+  -O, --light-reorder-l3=[DEFAULT:[0]-no-reordering]
 
-                             Relabels the graph for better cache performance
-                             (second layer). 
-                             [0]-no-reordering, 
-                             [1]-out-degree,
-                             [2]-in-degree, 
-                             [3]-(in+out)-degree, 
-                             [4]-DBG-out,
-                             [5]-DBG-in, 
-                             [6]-HUBSort-out, 
-                             [7]-HUBSort-in,
-                             [8]-HUBCluster-out, 
-                             [9]-HUBCluster-in,
-                             [10]-(random)-degree,  
-                             [11]-LoadFromFile (used for Rabbit order).
-
- -O, --light-reorder-l3=[DEFAULT:[0]-no-reordering]
-
-                             Relabels the graph for better cache performance
+                             Relabels the graph for better cache performance (l1,l2,l3)
                              (third layer). 
                              [0]-no-reordering, 
                              [1]-out-degree,
@@ -657,8 +626,6 @@ benchmarking suite for various graph processing algorithms using pure C.
                              [1]-radix-src-dest, 
                              [2]-count-src,
                              [3]-count-src-dst.
-
-
 
   -p, --direction=[DEFAULT:[0]-PULL]
 
@@ -711,62 +678,73 @@ benchmarking suite for various graph processing algorithms using pure C.
 
 
 ```
+## GLay Device
 
+```
+Usage: glay-openmp [OPTION...]
+            -m <xclbin file> -q [device-index=0]
+
+   -q, --device-index=[DEFAULT:0]
+
+   -m, --xclbin-path=[DEFAULT:NULL]
+
+
+```
 
 # GLay Organization
 
 ```console
 .
 ├── 00_host
-│   ├── include
-│   │   ├── algorithms
-│   │   │   ├── ggdl
-│   │   │   └── openmp
-│   │   ├── config
-│   │   ├── preprocess
-│   │   ├── structures
-│   │   ├── utils_fpga_c
-│   │   ├── utils_fpga_cpp
-│   │   └── utils_graph
-│   └── src
-│       ├── algorithms
-│       │   ├── ggdl
-│       │   └── openmp
-│       ├── config
-│       ├── main
-│       ├── preprocess
-│       ├── structures
-│       ├── tests_c
-│       ├── tests_cpp
-│       ├── utils_fpga_c
-│       ├── utils_fpga_cpp
-│       └── utils_graph
+│           ├── include
+│           │           ├── algorithms
+│           │           │           ├── ggdl
+│           │           │           └── openmp
+│           │           ├── config
+│           │           ├── preprocess
+│           │           ├── structures
+│           │           ├── utils_fpga_c
+│           │           ├── utils_fpga_cpp
+│           │           └── utils_graph
+│           └── src
+│               ├── algorithms
+│               │           ├── ggdl
+│               │           └── openmp
+│               ├── config
+│               ├── main
+│               ├── preprocess
+│               ├── structures
+│               ├── tests_c
+│               ├── tests_cpp
+│               ├── utils_fpga_c
+│               ├── utils_fpga_cpp
+│               └── utils_graph
 ├── 01_device
-│   ├── glay_ip
-│   │   ├── cache
-│   │   │   ├── iob_fifo_sync
-│   │   │   ├── iob_include
-│   │   │   │   └── portmaps
-│   │   │   ├── iob_ram_2p
-│   │   │   ├── iob_ram_2p_asym
-│   │   │   ├── iob_ram_sp
-│   │   │   ├── iob_regfile_sp
-│   │   │   └── iob_src_cache
-│   │   ├── kernel
-│   │   ├── kernel_testbench
-│   │   ├── pkgs
-│   │   └── top
-│   └── scripts
+│           ├── glay_ip
+│           │           ├── cache
+│           │           │           ├── iob_fifo_sync
+│           │           │           ├── iob_include
+│           │           │           │           └── portmaps
+│           │           │           ├── iob_ram_2p
+│           │           │           ├── iob_ram_2p_asym
+│           │           │           ├── iob_ram_sp
+│           │           │           ├── iob_regfile_sp
+│           │           │           └── iob_src_cache
+│           │           ├── kernel
+│           │           ├── kernel_testbench
+│           │           ├── pkgs
+│           │           └── top
+│           └── scripts
 ├── 02_slides_figures_docs
-│   └── fig
-│       ├── datastructures
-│       └── glay
+│           └── fig
+│               ├── datastructures
+│               └── glay
 └── 03_test_graphs
     ├── LAW
-    │   ├── LAW-amazon-2008
-    │   ├── LAW-cnr-2000
-    │   ├── LAW-dblp-2010
-    │   └── LAW-enron
+    │           ├── LAW-amazon-2008
+    │           ├── LAW-cnr-2000
+    │           ├── LAW-dblp-2010
+    │           └── LAW-enron
     └── TEST
         ├── graphbrew
         ├── test
