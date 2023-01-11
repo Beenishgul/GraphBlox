@@ -739,20 +739,21 @@ Usage: glay-openmp [OPTION...]
 │           └── fig
 │               ├── datastructures
 │               └── glay
-└── 03_test_graphs
-    ├── LAW
-    │           ├── LAW-amazon-2008
-    │           ├── LAW-cnr-2000
-    │           ├── LAW-dblp-2010
-    │           └── LAW-enron
-    └── TEST
-        ├── graphbrew
-        ├── test
-        ├── v300_e2730
-        └── v51_e1021
-```
+├── 03_test_graphs
+│   ├── LAW
+│   │           ├── LAW-amazon-2008
+│   │           ├── LAW-cnr-2000
+│   │           ├── LAW-dblp-2010
+│   │           └── LAW-enron
+│   └── TEST
+│       ├── graphbrew
+│       ├── test
+│       ├── v300_e2730
+│       └── v51_e1021
+│
+└── Makefile - Global makefile
 
-* *`Makefile`* - Global makefile
+```
 
 # Tasks TODO:
 
