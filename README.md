@@ -25,9 +25,7 @@ interconnect. Compared to the classical FPGA ms-s reconfiguration time,
 GLay achieves ns-us reconfiguration time between graph algorithms. While
 maintaining the performance and power optimizations, an FPGA provides.
 
-![Figure 1: Graph fundamental Compressed Sparse
-Row Matrix (CSR) structure](./02_slides_figures_docs/fig/glay/fig1.png "Figure 1: Graph fundamental Compressed Sparse
-Row Matrix (CSR) structure")
+![Figure 1: Graph Overlay (GLay) Contributions](./02_slides_figures_docs/fig/glay_gist.png "FFigure 1: Graph Overlay (GLay) Contributions")
 
 # GLay Benchmark Suite
 
@@ -307,6 +305,8 @@ GLay can handle multiple representations of the graph structure in memory, each 
 ##  CSR (Compressed Sparse Row)
 <p align="center"><img src="./02_slides_figures_docs/fig/datastructures/csr.png" width ="450" ></p>
 
+##  CSR Segmented Format
+<p align="center"><img src="./02_slides_figures_docs/fig/datastructures/csr_segmented.png" width ="450" ></p>
 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
@@ -315,15 +315,15 @@ Graph processing kernels share common behaviors. GLay's primary purpose
 is to abstract such access flows into engines for faster programmability
 between graph algorithms instead of having a fixed accelerator. Such
 overlay architecture reduces the reconfiguration time from typical FPGA
-flow, taking ms-s into ns-us. Figure 2 and Figure 3 highlight the
+flow, taking ms-s into ns-us. Figure 3 and Figure 4 highlight the
 Breadth-First Search (BFS) bottom-up approach graph algorithm
 analysis and its correlation to the GLay architecture design. For
 instance, a graph algorithm needs to interact with the graph structure
 commonly represented in the Compressed Sparse Row Matrix (CSR), as shown
-in Figure 1. Such behaviors are abstracted into sequential accesses and
+in Figure 2. Such behaviors are abstracted into sequential accesses and
 usually relate to accessing the graph CSR structure data, for example,
 the degree, vertex offset data, and the neighbor list for the processed
-vertex as shown in Figure 3 step A.
+vertex as shown in Figure 4 step A.
 
 As illustrated in steps C and E, the graph property data is most often
 accessed randomly and has high cache miss rates. Both behaviors will be
@@ -335,18 +335,16 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Breadth-First Search (BFS) algorithm](./02_slides_figures_docs/fig/glay/fig2.png "Figure 2: Breadth-First Search (BFS) algorithm")
+![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./02_slides_figures_docs/fig/glay/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 3: BFS bottom-up approach, a graph
-kernel contains identifiable behaviors that can be abstracted into FPGA
-overlay engines.
-](./02_slides_figures_docs/fig/glay/fig3.png "Figure 3: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA
-overlay engines.")
+![Figure 3: Breadth-First Search (BFS) algorithm](./02_slides_figures_docs/fig/glay/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
 
 
-![Figure 4: Proposed Vertex Processing Elements
-(PEs) for graph processing kernels.](./02_slides_figures_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./02_slides_figures_docs/fig/glay/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
+
+
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./02_slides_figures_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
 GLay Architecture 
