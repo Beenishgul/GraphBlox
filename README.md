@@ -693,8 +693,9 @@ Usage: glay-openmp [OPTION...]
 
 # GLay Organization
 
-```
-.
+```console
+00_GLay
+│ 
 ├── 00_host
 │           ├── include
 │           │           ├── algorithms
