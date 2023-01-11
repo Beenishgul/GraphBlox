@@ -292,44 +292,44 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x128_GlayCacheRequestInterfaceInput
 // --------------------------------------------------------------------------------------
-  fifo_638x128 inst_fifo_638x128_GlayCacheRequestInterfaceInput (
-    .clk         (ap_clk                           ),
-    .srst        (fifo_areset                      ),
-    .din         (din                              ),
-    .wr_en       (glay_cache_req_in_fifo_din.valid ),
-    .rd_en       (rd_en                            ),
-    .dout        (glay_cache_req_in_fifo_dout      ),
-    .full        (full                             ),
-    .almost_full (almost_full                      ),
-    .empty       (empty                            ),
-    .almost_empty(almost_empty                     ),
-    .valid       (glay_cache_req_in_fifo_dout.valid),
-    .prog_full   (prog_full                        ),
-    .prog_empty  (prog_empty                       ),
-    .wr_rst_busy (wr_rst_busy                      ),
-    .rd_rst_busy (rd_rst_busy                      )
-  );
+  // fifo_638x128 inst_fifo_638x128_GlayCacheRequestInterfaceInput (
+  //   .clk         (ap_clk                           ),
+  //   .srst        (fifo_areset                      ),
+  //   .din         (din                              ),
+  //   .wr_en       (glay_cache_req_in_fifo_din.valid ),
+  //   .rd_en       (rd_en                            ),
+  //   .dout        (glay_cache_req_in_fifo_dout      ),
+  //   .full        (full                             ),
+  //   .almost_full (almost_full                      ),
+  //   .empty       (empty                            ),
+  //   .almost_empty(almost_empty                     ),
+  //   .valid       (glay_cache_req_in_fifo_dout.valid),
+  //   .prog_full   (prog_full                        ),
+  //   .prog_empty  (prog_empty                       ),
+  //   .wr_rst_busy (wr_rst_busy                      ),
+  //   .rd_rst_busy (rd_rst_busy                      )
+  // );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_516x128_GlayCacheRequestInterfaceOutput
 // --------------------------------------------------------------------------------------
-  fifo_516x128 inst_fifo_516x128_GlayCacheRequestInterfaceOutput (
-    .clk         (ap_clk      ),
-    .srst        (fifo_areset ),
-    .din         (din         ),
-    .wr_en       (wr_en       ),
-    .rd_en       (rd_en       ),
-    .dout        (dout        ),
-    .full        (full        ),
-    .almost_full (almost_full ),
-    .empty       (empty       ),
-    .almost_empty(almost_empty),
-    .valid       (valid       ),
-    .prog_full   (prog_full   ),
-    .prog_empty  (prog_empty  ),
-    .wr_rst_busy (wr_rst_busy ),
-    .rd_rst_busy (rd_rst_busy )
-  );
+  // fifo_516x128 inst_fifo_516x128_GlayCacheRequestInterfaceOutput (
+  //   .clk         (ap_clk      ),
+  //   .srst        (fifo_areset ),
+  //   .din         (din         ),
+  //   .wr_en       (wr_en       ),
+  //   .rd_en       (rd_en       ),
+  //   .dout        (dout        ),
+  //   .full        (full        ),
+  //   .almost_full (almost_full ),
+  //   .empty       (empty       ),
+  //   .almost_empty(almost_empty),
+  //   .valid       (valid       ),
+  //   .prog_full   (prog_full   ),
+  //   .prog_empty  (prog_empty  ),
+  //   .wr_rst_busy (wr_rst_busy ),
+  //   .rd_rst_busy (rd_rst_busy )
+  // );
 
 
 endmodule : glay_kernel_cu
