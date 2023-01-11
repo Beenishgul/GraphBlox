@@ -7,7 +7,26 @@ package GLAY_REQ_PKG;
 
 import GLAY_GLOBALS_PKG::*;
 
+// --------------------------------------------------------------------------------------
+// FIFO Signals
+// --------------------------------------------------------------------------------------
 
+typedef struct packed {
+  logic full        ;
+  logic almost_full ;
+  logic empty       ;
+  logic almost_empty;
+  logic prog_full   ;
+  logic prog_empty  ;
+  logic wr_rst_busy ;
+  logic rd_rst_busy ;
+} FIFOStateSignals;
+
+// --------------------------------------------------------------------------------------
+// Cache requests in GlayCacheRequestInterfaceOutput
+// --------------------------------------------------------------------------------------
+
+// SIZE = 516 bits
 typedef struct packed {
   logic valid;
   `ifdef WORD_ADDR
@@ -25,12 +44,16 @@ typedef struct packed {
   `endif
 } GlayCacheRequestInterfaceInputPayload;
 
+
 // SIZE = 644 - 6(CACHE_FRONTEND_BYTE_W) = 638 bits
 typedef struct packed {
   logic                                 valid  ;
   GlayCacheRequestInterfaceInputPayload payload;
 } GlayCacheRequestInterfaceInput;
 
+// --------------------------------------------------------------------------------------
+// Cache requests out GlayCacheRequestInterfaceOutput
+// --------------------------------------------------------------------------------------
 
 typedef struct packed {
   logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
