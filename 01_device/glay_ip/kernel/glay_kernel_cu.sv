@@ -335,9 +335,9 @@ module glay_kernel_cu #(
     .rd_rst_busy (cache_req_in_fifo_signals.rd_rst_busy )
   );
 
-// // --------------------------------------------------------------------------------------
-// // FIFO cache requests out fifo_516x128_GlayCacheRequestInterfaceOutput
-// // --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// FIFO cache requests out fifo_516x128_GlayCacheRequestInterfaceOutput
+// --------------------------------------------------------------------------------------
   assign cache_req_out_fifo_signals.wr_en  = glay_cache_req_in_fifo_din.valid;
   assign glay_cache_req_in_fifo_dout.valid = cache_req_out_fifo_signals.valid;
   assign glay_cache_req_out.valid          = glay_cache_req_out.payload.ready;
