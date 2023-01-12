@@ -12,10 +12,13 @@ import GLAY_GLOBALS_PKG::*;
 // --------------------------------------------------------------------------------------
 
 typedef struct packed {
+  logic rd_en       ;
+  logic wr_en       ;
   logic full        ;
   logic almost_full ;
   logic empty       ;
   logic almost_empty;
+  logic valid       ;
   logic prog_full   ;
   logic prog_empty  ;
   logic wr_rst_busy ;
