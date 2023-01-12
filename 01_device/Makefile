@@ -174,7 +174,7 @@ $(ACTIVE_APP_DIR)/vivado_simulate_kernel:
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 
 .PHONY: run-sim
-run-sim: $(ACTIVE_APP_DIR)/vivado_simulate_kernel gen-vip
+run-sim: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)
 
@@ -240,7 +240,7 @@ vivado_build_$(TARGET):
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)
 
 .PHONY: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
-$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo vivado_build_$(TARGET) 
+$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado_build_$(TARGET) 
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\

@@ -3,15 +3,14 @@
 //    "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
-// Copyright (c) 2021-2022 All rights reserved
+// Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : glay_kernel_cu.sv
-// Create : 2022-11-29 18:50:35
-// Revise : 2022-11-29 18:50:35
+// Create : 2023-01-11 23:47:45
+// Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
-
 
 import GLAY_AXI4_PKG::*;
 import GLAY_GLOBALS_PKG::*;
@@ -39,11 +38,13 @@ module glay_kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic                          m_axi_areset    ;
-  logic                          control_areset  ;
-  logic                          cache_areset    ;
-  logic                          fifo_areset     ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg;
+  logic                          m_axi_areset       ;
+  logic                          control_areset     ;
+  logic                          cache_areset       ;
+  logic                          fifo_areset        ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg   ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg  ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg_2;
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -67,7 +68,7 @@ module glay_kernel_cu #(
   logic [VERTEX_DATA_BITS-1:0] counter;
 
 // --------------------------------------------------------------------------------------
-//   AXI Cache signals
+//   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
 
   GlayCacheRequestInterfaceInput  glay_cache_req_in ;
@@ -82,10 +83,11 @@ module glay_kernel_cu #(
   FIFOStateSignals cache_req_in_fifo_signals ;
   FIFOStateSignals cache_req_out_fifo_signals;
 
-  logic force_inv_in ;
-  logic force_inv_out;
-  logic wtb_empty_in ;
-  logic wtb_empty_out;
+  logic force_inv_in           ;
+  logic force_inv_out          ;
+  logic wtb_empty_in           ;
+  logic wtb_empty_out          ;
+  logic cache_fifo_setup_signal;
 
   assign force_inv_in = 1'b0;
   assign wtb_empty_in = 1'b1;
@@ -108,7 +110,7 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 
   always_ff @(posedge ap_clk) begin
-    if (areset) begin
+    if (control_areset) begin
       counter          <= 0;
       glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
@@ -125,6 +127,15 @@ module glay_kernel_cu #(
         glay_cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
         counter          <= 0;
       end
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      glay_cu_setup_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+    end
+    else begin
+      glay_cu_setup_reg <= glay_cu_setup_reg_2;
     end
   end
 
@@ -163,6 +174,7 @@ module glay_kernel_cu #(
     .ap_clk             (ap_clk                 ),
     .areset             (control_areset         ),
     .glay_cu_done_in    (glay_cu_done_reg       ),
+    .glay_cu_setup_in   (glay_cu_setup_reg      ),
     .glay_control_in    (glay_control_in_reg    ),
     .glay_control_out   (glay_control_out_reg   ),
     .glay_descriptor_in (glay_descriptor_in_reg ),
@@ -240,6 +252,11 @@ module glay_kernel_cu #(
     glay_descriptor_in_reg.payload <= glay_descriptor.payload;
   end
 
+
+// --------------------------------------------------------------------------------------
+// GLAY AXI port cache 
+// --------------------------------------------------------------------------------------
+
   iob_cache_axi #(
     .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
@@ -286,6 +303,11 @@ module glay_kernel_cu #(
     .reset        (cache_areset                    )
   );
 
+
+// --------------------------------------------------------------------------------------
+// FIFO cache Ready
+// --------------------------------------------------------------------------------------
+  assign glay_cu_setup_reg_2 = control_areset | cache_req_out_fifo_signals.wr_rst_busy | cache_req_out_fifo_signals.rd_rst_busy | cache_req_in_fifo_signals.wr_rst_busy | cache_req_in_fifo_signals.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x128_GlayCacheRequestInterfaceInput
