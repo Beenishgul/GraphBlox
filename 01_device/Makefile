@@ -245,7 +245,7 @@ $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $< &
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
 
 .PHONY: build-hw
 build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
