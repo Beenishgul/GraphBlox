@@ -36,6 +36,7 @@ package GLAY_CONTROL_PKG;
     typedef enum int unsigned {
         CTRL_SYNC_RESET,
         CTRL_SYNC_IDLE,
+        CTRL_SYNC_SETUP,
         CTRL_SYNC_READY,
         CTRL_SYNC_START,
         CTRL_SYNC_BUSY,
