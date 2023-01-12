@@ -230,7 +230,7 @@ export XILINX_CTRL_MODE     = user_managed
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 
 #if you make a push and use a previous compile 
-export GIT_VER              = 0488c8c
+# export GIT_VER              = 0488c8c
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 
