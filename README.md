@@ -103,6 +103,8 @@ user@host:~GLay$ make
 | PLATFORM  | xilinx_u250_gen3x16_xdma_4_1_202210_1 | Platform matching u250 Alveo card |
 | TARGET  | hw_emu | Build target hw or hw_emu |
 | XILINX_CTRL_MODE  | user_managed | ctrl mode, ap_ctrl_hs or ap_ctrl_chain |
+| DEVICE_INDEX  | 0 | FPGA device index |
+| XCLBIN_PATH  | file.xclbin | .xclbin filepath |
 
 ### Simulation Mode
 
