@@ -13,6 +13,7 @@ INTEGRATION         ?= openmp
 
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
+HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
 GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%h")
 APP_DIR             ?= 00_GLay
 HOST_DIR            ?= 00_host
