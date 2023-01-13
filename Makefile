@@ -203,27 +203,20 @@ export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_AC
 export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 
+# PART setting: uncomment the line matching your Alveo card
+# PLATFORM setting: uncomment the line matching your Alveo card
 
 ifeq ($(HOST_NAME), panther)
 	export PART =  xcu280-fsvh2892-2L-e
 	export PLATFORM = xilinx_u280_xdma_201920_3
 else
-# PART setting: uncomment the line matching your Alveo card
-# export PART =  xcu200-fsgd2104-2-e
 	export PART =  xcu250-figd2104-2L-e
-# export PART =  xcu50-fsvh2104-2-e
-# export PART =  xcu55c-fsvh2892-2L-e
-# export PART =  xcu280-fsvh2892-2L-e
-
-# PLATFORM setting: uncomment the line matching your Alveo card
-# export PLATFORM =  xilinx_u200_gen3x16_xdma_2_202110_1
+# 	export PART =  xcu280-fsvh2892-2L-e
 	export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
-# export PLATFORM =  xilinx_u50_gen3x16_xdma_5_202210_1
-# export PLATFORM =  xilinx_u55c_gen3x16_xdma_3_202210_1
-# export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1e
+# 	export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1e
 endif
 
-$(info This work station is $(HOSTNAME))
+$(info This work station is $(HOST_NAME))
 $(info PART: $(PART))
 $(info PLATFORM: $(PLATFORM))
 
