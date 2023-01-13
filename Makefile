@@ -207,32 +207,34 @@ export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAM
 # PLATFORM setting: uncomment the line matching your Alveo card
 
 ifeq ($(HOST_NAME), panther)
-	export PART =  xcu280-fsvh2892-2L-e
+	export ALVEO =  U280
+	export PART  =  xcu280-fsvh2892-2L-e
 	export PLATFORM = xilinx_u280_xdma_201920_3
 else ifeq ($(HOST_NAME), jaguar)
-	export PART =  xcu250-figd2104-2L-e
+	export ALVEO =  U250
+	export PART  =  xcu250-figd2104-2L-e
 	export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
-else 
-	export PART =  xcu250-figd2104-2L-e
+else
+	export ALVEO =  U250
+	export PART  =  xcu250-figd2104-2L-e
 	export PLATFORM =  xilinx_u250_gen3x16_xdma_4_1_202210_1
 
-# 	export PART =  xcu200-fsgd2104-2-e
+# 	export ALVEO =  U200
+# 	export PART  =  xcu200-fsgd2104-2-e
 # 	export PLATFORM =  xilinx_u200_gen3x16_xdma_2_202110_1
 
-# 	export PART =  xcu50-fsvh2104-2-e
+# 	export ALVEO =  U50
+# 	export PART  =  xcu50-fsvh2104-2-e
 # 	export PLATFORM =  xilinx_u50_gen3x16_xdma_5_202210_1
 
-# 	export PART =  xcu55c-fsvh2892-2L-e
+# 	export ALVEO =  U55
+# 	export PART  =  xcu55c-fsvh2892-2L-e
 # 	export PLATFORM =  xilinx_u55c_gen3x16_xdma_3_202210_1
 
-# 	export PART =  xcu280-fsvh2892-2L-e
+# 	export ALVEO =  U280
+# 	export PART  =  xcu280-fsvh2892-2L-e
 # 	export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 endif
-
-$(info This session belongs to -> $(HOST_NAME))
-$(info PART: $(PART))
-$(info PLATFORM: $(PLATFORM))
-
 
 # TARGET: set the build target, can be hw or hw_emu
 export TARGET = hw_emu
@@ -358,3 +360,19 @@ open-vivado-project:
 .PHONY: report_metrics
 report_metrics: 
 	$(MAKE) report_metrics $(MAKE_DEVICE)
+
+
+# =========================================================
+#  Build info output to terminal
+# =========================================================
+$(info =========================================================)
+$(info Build info)
+$(info =========================================================)
+$(info HOST_NAME :$(HOST_NAME))
+$(info ALVEO     : $(ALVEO))
+$(info PART      : $(PART))
+$(info PLATFORM  : $(PLATFORM))
+$(info TARGET    : $(TARGET))
+$(info CTRL_MODE : $(XILINX_CTRL_MODE))
+$(info GIT_VER   : $(GIT_VER))
+$(info =========================================================)
