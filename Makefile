@@ -203,8 +203,12 @@ export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_AC
 export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 
+# =========================================================
+# PART and PLATFORM settings
+# =========================================================
 # PART setting: uncomment the line matching your Alveo card
 # PLATFORM setting: uncomment the line matching your Alveo card
+# =========================================================
 
 ifeq ($(HOST_NAME), panther)
 	export ALVEO =  U280
@@ -240,16 +244,47 @@ endif
 export TARGET = hw_emu
 # export TARGET = hw
 
-# Enabling Multiple Strategies For Closing Timing
+# =========================================================
+# Enabling Multiple Strategies For Closing Timing 
+# =========================================================
+# [0-7]-strategies
+# Example: (0-quick ~2hrs) or (2-aggressive 33 strategies ~13hrs)
+# Check 01_device/scripts/generate_build_cfg
+# pick a suitable strategy or add yours
+# =========================================================
 export XILINX_IMPL_STRATEGY = 2
+
+
+# =========================================================
+# Enabling paralle Strategies For Synth/Impl
+# =========================================================
+# How many parallel jobs works for [0-1] 
+# For [2-7] the number of jobs is 
+# Synth -> max_cores 
+# Impl  -> max_cores / 4 (too intensive!)
+# =========================================================
 export XILINX_JOBS_STRATEGY = 4
+
+
+# =========================================================
+# Control mode options
+# =========================================================
+# Control mode XRT/OCL/HLS (ap_ctrl_hs, ap_ctrl_chain) 
+# Control mode USER (user_managed)
+# =========================================================
 export XILINX_CTRL_MODE     = user_managed
 # export XILINX_CTRL_MODE     = ap_ctrl_hs
 # export XILINX_CTRL_MODE     = ap_ctrl_chain
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 
+
+# =========================================================
+# Each project is encapsulated with a GIT commit id
+# If you want to commit code and reuse same project
+# remove comment for this variable chose any number
+# =========================================================
 #if you make a push and use a previous compile 
-# export GIT_VER              = 0488c8c
+# export GIT_VER              = v1
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 
@@ -367,7 +402,7 @@ report_metrics:
 # =========================================================
 
 $(info =========================================================)
-$(info Build $(APP_DIR))
+$(info Build $(APP_DIR) -> $(MAKECMDGOALS))
 $(info =========================================================)
 $(info HOST_NAME   | $(HOST_NAME))
 $(info KERNEL_NAME | $(KERNEL_NAME))
