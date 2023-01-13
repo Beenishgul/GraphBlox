@@ -20,7 +20,7 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName)
 {
 
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
@@ -61,7 +61,7 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
         return NULL;
     }
 
-    glayHandle->kernelHandle = xrtPLKernelOpenExclusive(glayHandle->deviceHandle, glayHandle->xclbinUUID, "glay_kernel");
+    glayHandle->kernelHandle = xrtPLKernelOpenExclusive(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     if(glayHandle->kernelHandle == NULL)
     {
         printf("ERROR:--> xrtPLKernelOpen\n");

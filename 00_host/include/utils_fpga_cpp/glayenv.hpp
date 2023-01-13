@@ -123,6 +123,7 @@ struct __attribute__((__packed__)) GLAYGraphCSR
 
 struct xrtGLAYHandle
 {
+    char *kernelName;
     char *xclbinPath;
     unsigned int deviceIndex;
     xrt::device deviceHandle;
@@ -134,7 +135,7 @@ struct xrtGLAYHandle
     xrt::ip::interrupt interruptHandle;
 };
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName);
 
 // ********************************************************************************************
 // ***************                      XRT Buffer Management                    **************
