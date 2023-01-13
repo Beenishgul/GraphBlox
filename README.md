@@ -505,7 +505,6 @@ GLay is an open source graph processing framework, it is designed to be a
 benchmarking suite for various graph processing algorithms using pure C.
 
    -a, --algorithm=[DEFAULT:[0]-BFS]
-
                              [0]-BFS, 
                              [1]-Page-rank, 
                              [2]-SSSP-DeltaStepping,
@@ -520,7 +519,6 @@ benchmarking suite for various graph processing algorithms using pure C.
                              SSSP Delta value [Default:1].
 
   -c, --convert-format=[DEFAULT:[1]-binary-edgeList]
-
                              [serialize flag must be on --serialize to write]
                              Serialize graph text format (edge list format) to
                              binary graph file on load example:-f <graph file>
@@ -536,17 +534,14 @@ benchmarking suite for various graph processing algorithms using pure C.
                              LLC cache size for MASK vertex reodering
 
   -d, --data-structure=[DEFAULT:[0]-CSR]
-
-                            [0]-CSR, 
-                            [1]-CSR Segmented (use cache-size parameter)
+                             [0]-CSR, 
+                             [1]-CSR Segmented (use cache-size parameter)
 
   -e, --tolerance=[EPSILON:0.0001]
-
                              Tolerance value of for page rank
                              [default:0.0001].
 
   -f, --graph-file=<FILE>    
-
                              Edge list represents the graph binary format to
                              run the algorithm textual format change
                              graph-file-format.
@@ -562,12 +557,10 @@ benchmarking suite for various graph processing algorithms using pure C.
                              illustrate.
 
   -i, --num-iterations=[DEFAULT:20]
-
                              Number of iterations for page rank to converge
                              [default:20] SSSP-BellmanFord [default:V-1].
 
   -j, --verbosity=[DEFAULT:[0:no stats output]
-
                              For now it controls the output of .perf file and
                              PageRank .stats (needs --stats enabled)
                              filesPageRank .stat [1:top-k results] [2:top-k
@@ -578,14 +571,12 @@ benchmarking suite for various graph processing algorithms using pure C.
                              graph.
 
   -K, --Kernel-num-threads=[DEFAULT:algo-num-threads]
-
                              Number of threads for graph processing kernel
                              (critical-path) (graph algorithm)
 
   -l, --light-reorder-l1=[DEFAULT:[0]-no-reordering]
   -L, --light-reorder-l2=[DEFAULT:[0]-no-reordering]
   -O, --light-reorder-l3=[DEFAULT:[0]-no-reordering]
-
                              Relabels the graph for better cache performance (l1,l2,l3)
                              (third layer). 
                              [0]-no-reordering, 
@@ -602,7 +593,6 @@ benchmarking suite for various graph processing algorithms using pure C.
                              [11]-LoadFromFile (used for Rabbit order).
 
   -M, --mask-mode=[DEFAULT:[0:disabled]]
-
                              Encodes [0:disabled] the last two bits of
                              [1:out-degree]-Edgelist-labels
                              [2:in-degree]-Edgelist-labels or
@@ -613,24 +603,20 @@ benchmarking suite for various graph processing algorithms using pure C.
                              support value unmask to work.
 
   -n, --pre-num-threads=[DEFAULT:MAX]
-
                              Number of threads for preprocessing (graph
                              structure) step 
 
   -N, --algo-num-threads=[DEFAULT:MAX]
-
                              Number of threads for graph processing (graph
                              algorithm)
 
   -o, --sort=[DEFAULT:[0]-radix-src]
-
                              [0]-radix-src, 
                              [1]-radix-src-dest, 
                              [2]-count-src,
                              [3]-count-src-dst.
 
   -p, --direction=[DEFAULT:[0]-PULL]
-
                              [0]-PULL, 
                              [1]-PUSH,
                              [2]-HYBRID. 
@@ -650,7 +636,6 @@ benchmarking suite for various graph processing algorithms using pure C.
                              using QPR similarity metrics.
 
   -t, --num-trials=[DEFAULT:[1 Trial]]
-
                              Number of trials for whole run (graph algorithm
                              run) [default:1].
 
@@ -664,7 +649,6 @@ benchmarking suite for various graph processing algorithms using pure C.
                              --convert-format.
 
   -z, --graph-file-format=[DEFAULT:[1]-binary-edgeList]
-
                              Specify file format to be read, is it textual edge
                              list, or a binary file edge list. This is
                              specifically useful if you have Graph CSR/Grid
@@ -685,10 +669,16 @@ benchmarking suite for various graph processing algorithms using pure C.
 ```
 Usage: glay-openmp [OPTION...]
             -m <xclbin file> -q [device-index=0]
+   -Q, --kernel-name=[DEFAULT:NULL]
+                             Kernel package name.
 
    -q, --device-index=[DEFAULT:0]
+                             Device ID of your target card use "xbutil list"
+                             command.
 
    -m, --xclbin-path=[DEFAULT:NULL]
+                             Hardware overlay (XCLBIN) file for hw or hw_emu
+                             mode.
 
 
 ```
