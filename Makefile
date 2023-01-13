@@ -229,7 +229,7 @@ else
 # 	export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 endif
 
-$(info This work station is $(HOST_NAME))
+$(info This session belongs to -> $(HOST_NAME))
 $(info PART: $(PART))
 $(info PLATFORM: $(PLATFORM))
 
