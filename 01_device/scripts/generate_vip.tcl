@@ -119,8 +119,8 @@ create_ip -name fifo_generator \
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
-                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
@@ -159,8 +159,8 @@ create_ip -name fifo_generator \
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
-                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
