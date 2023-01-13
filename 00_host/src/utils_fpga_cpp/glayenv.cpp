@@ -20,12 +20,13 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName)
 {
 
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
+    glayHandle->kernelName = kernelName;
 
     //Open a Device (use "xbutil scan" to show the available devices)
     std::cout << "Open the device :" << glayHandle->deviceIndex << std::endl;
@@ -34,29 +35,29 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     std::cout << "Load the xclbin : " << glayHandle->xclbinPath << std::endl;
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
 
-    glayHandle->ipHandle      = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, "glay_kernel");
+    glayHandle->ipHandle      = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
 
     std::cout << "Fetch compute Units" << std::endl;
     for (auto &kernel : glayHandle->xclbinHandle.get_kernels())
     {
-        if (kernel.get_name() == "glay_kernel")
+        if (kernel.get_name() == glayHandle->kernelName)
         {
             glayHandle->cuHandles = kernel.get_cus();
         }
     }
 
-    if (glayHandle->cuHandles.empty()) throw std::runtime_error("IP glay_kernel not found in the provided xclbin");
+    if (glayHandle->cuHandles.empty()) throw std::runtime_error(std::string("IP ") + glayHandle->kernelName + std::string(" not found in the provided xclbin"));
 
-    std::cout << "Determine memory index\n";
-    for (auto &mem : glayHandle->xclbinHandle.get_mems())
-    {
-        if (mem.get_used())
-        {
-            glayHandle->mem_used = mem;
-            break;
-        }
-    }
+    // std::cout << "Determine memory index\n";
+    // for (auto &mem : glayHandle->xclbinHandle.get_mems())
+    // {
+    //     if (mem.get_used())
+    //     {
+    //         glayHandle->mem_used = mem;
+    //         break;
+    //     }
+    // }
 
     // glayHandle->interruptHandle = glayHandle->ipHandle.create_interrupt_notify();
     // glayHandle->interruptHandle.disable();

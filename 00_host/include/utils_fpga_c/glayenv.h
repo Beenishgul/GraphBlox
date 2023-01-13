@@ -133,6 +133,7 @@ struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
 struct xrtGLAYHandle
 {
     char *xclbinPath;
+    char *kernelName;
     int deviceIndex;
     xrtDeviceHandle deviceHandle;
     xrtXclbinHandle xclbinHandle;
@@ -142,7 +143,7 @@ struct xrtGLAYHandle
 };
 
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath);
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName);
 int setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAYRun(struct xrtGLAYHandle *glayHandle);
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
