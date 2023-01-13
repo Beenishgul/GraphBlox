@@ -199,7 +199,7 @@ export IP_DIR_ACTIVE      = $(IP_DIR)
 
 export DEVICE_INDEX       = 0
 export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
-export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH)
+export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 
 
@@ -230,7 +230,7 @@ export XILINX_CTRL_MODE     = user_managed
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 
 #if you make a push and use a previous compile 
-export GIT_VER              = 0488c8c
+# export GIT_VER              = 0488c8c
 
 # =========================================================
 #  Scripts/VIPs/Directories generation 

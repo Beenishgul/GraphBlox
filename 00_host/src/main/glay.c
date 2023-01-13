@@ -169,12 +169,16 @@ static struct argp_option options[] =
         "LLC cache size for MASK vertex reordering"
     },
     {
+        "kernel-name",            'Q', "[DEFAULT:NULL]\n",      0,
+        "\nKernel package name.\n"
+    },
+    {
         "xclbin-path",            'm', "[DEFAULT:NULL]\n",      0,
-        "\nPending Implementation.\n"
+        "\nHardware overlay (XCLBIN) file for hw or hw_emu mode.\n"
     },
     {
         "device-index",             'q', "[DEFAULT:0]\n",      0,
-        "\nPending Implementation.\n"
+        "\nDevice ID of your target card use \"xbutil list\" command.\n"
     },
     { 0 }
 };
@@ -279,6 +283,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
         break;
     case 'm':
         arguments->device_index = atoi(arg);
+        break;
+    case 'Q':
+        arguments->kernel_name = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->kernel_name  = strcpy (arguments->kernel_name, arg);
         break;
     case 'q':
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 10) * sizeof(char));

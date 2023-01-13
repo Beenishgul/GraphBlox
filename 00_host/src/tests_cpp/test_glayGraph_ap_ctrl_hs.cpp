@@ -43,7 +43,7 @@ extern "C" {
 #include "edgeList.h"
 
 const char *argp_program_version =
-    "GLay test v1.0";
+    "GLay v1.0";
 const char *argp_program_bug_address =
     "<atmughrabi@gmail.com>|<atmughra@virginia.edu>|<atmughra@alumni.ncsu.edu>";
 /* Program documentation. */
@@ -126,7 +126,7 @@ static struct argp_option options[] =
     },
     {
         "convert-format",     'c', "[DEFAULT:[1]-binary-edgeList]",      0,
-        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary."
+        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary [3]-graphCSR-test(5 files)."
     },
     {
         "generate-weights",   'w', 0,      0,
@@ -169,12 +169,16 @@ static struct argp_option options[] =
         "LLC cache size for MASK vertex reordering"
     },
     {
+        "kernel-name",            'Q', "[DEFAULT:NULL]\n",      0,
+        "\nKernel package name.\n"
+    },
+    {
         "xclbin-path",            'm', "[DEFAULT:NULL]\n",      0,
-        "\nPending Implementation.\n"
+        "\nHardware overlay (XCLBIN) file for hw or hw_emu mode.\n"
     },
     {
         "device-index",             'q', "[DEFAULT:0]\n",      0,
-        "\nPending Implementation.\n"
+        "\nDevice ID of your target card use \"xbutil list\" command.\n"
     },
     { 0 }
 };
@@ -279,6 +283,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
         break;
     case 'm':
         arguments->device_index = atoi(arg);
+        break;
+    case 'Q':
+        arguments->kernel_name = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->kernel_name  = strcpy (arguments->kernel_name, arg);
         break;
     case 'q':
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 10) * sizeof(char));

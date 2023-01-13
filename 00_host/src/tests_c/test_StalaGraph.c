@@ -59,8 +59,8 @@ static struct argp_option options[] =
         "Edge list represents the graph binary format to run the algorithm textual format change graph-file-format."
     },
     {
-        "graph-file-format",   'z', "[DEFAULT:[1]-binary-edgeListDynamic]",      0,
-        "Specify file format to be read, is it textual edge list, or a binary file edge list. This is specifically useful if you have Graph CSR/Grid structure already saved in a binary file format to skip the preprocessing step. [0]-text edgeListDynamic [1]-binary edgeListDynamic [2]-graphCSR binary."
+        "graph-file-format",   'z', "[DEFAULT:[1]-binary-edgeList]",      0,
+        "Specify file format to be read, is it textual edge list, or a binary file edge list. This is specifically useful if you have Graph CSR/Grid structure already saved in a binary file format to skip the preprocessing step. [0]-text edgeList [1]-binary edgeList [2]-graphCSR binary."
     },
     {
         "algorithm",          'a', "[DEFAULT:[0]-BFS]",      0,
@@ -123,8 +123,8 @@ static struct argp_option options[] =
         "Relabels the graph for better cache performance (third layer). [0]-no-reordering, [1]-out-degree, [2]-in-degree, [3]-(in+out)-degree, [4]-DBG-out, [5]-DBG-in, [6]-HUBSort-out, [7]-HUBSort-in, [8]-HUBCluster-out, [9]-HUBCluster-in, [10]-(random)-degree,  [11]-LoadFromFile (used for Rabbit order)."
     },
     {
-        "convert-format",     'c', "[DEFAULT:[1]-binary-edgeListDynamic]",      0,
-        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeListDynamic [1]-binary-edgeListDynamic [2]-graphCSR-binary."
+        "convert-format",     'c', "[DEFAULT:[1]-binary-edgeList]",      0,
+        "[serialize flag must be on --serialize to write] Serialize graph text format (edge list format) to binary graph file on load example:-f <graph file> -c this is specifically useful if you have Graph CSR/Grid structure and want to save in a binary file format to skip the preprocessing step for future runs. [0]-text-edgeList [1]-binary-edgeList [2]-graphCSR-binary [3]-graphCSR-test(5 files)."
     },
     {
         "generate-weights",   'w', 0,      0,
@@ -156,7 +156,7 @@ static struct argp_option options[] =
     },
     {
         "mask-mode",         'M', "[DEFAULT:[0:disabled]]",      0,
-        "Encodes [0:disabled] the last two bits of [1:out-degree]-EdgelistDynamic-labels [2:in-degree]-EdgelistDynamic-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work."
+        "Encodes [0:disabled] the last two bits of [1:out-degree]-Edgelist-labels [2:in-degree]-Edgelist-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work."
     },
     {
         "labels-file",       'F', "<FILE>",      0,
@@ -165,6 +165,18 @@ static struct argp_option options[] =
     {
         "cache-size",        'C', "<LLC=32768/32KB>",      0,
         "LLC cache size for MASK vertex reordering"
+    },
+    {
+        "kernel-name",            'Q', "[DEFAULT:NULL]\n",      0,
+        "\nKernel package name.\n"
+    },
+    {
+        "xclbin-path",            'm', "[DEFAULT:NULL]\n",      0,
+        "\nHardware overlay (XCLBIN) file for hw or hw_emu mode.\n"
+    },
+    {
+        "device-index",             'q', "[DEFAULT:0]\n",      0,
+        "\nDevice ID of your target card use \"xbutil list\" command.\n"
     },
     { 0 }
 };
@@ -267,13 +279,22 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'M':
         arguments->mmode = atoi(arg);
         break;
-
+    case 'm':
+        arguments->device_index = atoi(arg);
+        break;
+    case 'Q':
+        arguments->kernel_name = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->kernel_name  = strcpy (arguments->kernel_name, arg);
+        break;
+    case 'q':
+        arguments->xclbin_path = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->xclbin_path  = strcpy (arguments->xclbin_path, arg);
+        break;
     default:
         return ARGP_ERR_UNKNOWN;
     }
     return 0;
 }
-
 
 static struct argp argp = { options, parse_opt, args_doc, doc };
 

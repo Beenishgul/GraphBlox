@@ -28,6 +28,8 @@ void argumentsFree (struct Arguments *arguments)
             free(arguments->fnameb);
         if(arguments->fnamel)
             free(arguments->fnamel);
+        if(arguments->kernel_name)
+            free(arguments->kernel_name);
         if(arguments->xclbin_path)
             free(arguments->xclbin_path);
         free(arguments);
@@ -80,6 +82,7 @@ struct Arguments *argumentsNew()
     initializeMersenneState (&(arguments->mt19937var), 27491095);
     // GLay Xilinx Parameters
 
+    arguments->kernel_name = NULL;
     arguments->device_index = 0;
     arguments->xclbin_path = NULL;
     arguments->glayHandle = NULL;
