@@ -365,14 +365,17 @@ report_metrics:
 # =========================================================
 #  Build info output to terminal
 # =========================================================
+
 $(info =========================================================)
 $(info Build info)
 $(info =========================================================)
-$(info HOST_NAME :$(HOST_NAME))
+$(info HOST_NAME : $(HOST_NAME))
+$(info KERNEL_NAME : $(HOST_NAME))
 $(info ALVEO     : $(ALVEO))
 $(info PART      : $(PART))
 $(info PLATFORM  : $(PLATFORM))
 $(info TARGET    : $(TARGET))
 $(info CTRL_MODE : $(XILINX_CTRL_MODE))
+$(info =========================================================)
 $(info GIT_VER   : $(GIT_VER))
 $(info =========================================================)

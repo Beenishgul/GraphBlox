@@ -67,8 +67,8 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     std::cout << "device max_clock_frequency_mhz:     " << glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() << "\n";
 
     // glayHandle->cuHandles[0].
-    std::cout << "Kernel Arguments Offsets:" << "\n"; 
-    for (auto i: glayHandle->cuHandles[0].get_args())
+    std::cout << "Kernel Arguments Offsets:" << "\n";
+    for (auto i : glayHandle->cuHandles[0].get_args())
         std::cout << std::hex << std::uppercase << i.get_offset() << "\n";
 
 
@@ -99,7 +99,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     edges_array_dest_buffer     =  xrt::bo(glayHandle->deviceHandle, Edges_buffer_size_in_bytes,  bank_grp_idx);
 
 #if WEIGHTED
-   edges_array_weight_buffer   =  xrt::bo(glayHandle->deviceHandle, Edges_buffer_size_in_bytes, bank_grp_idx);
+    edges_array_weight_buffer   =  xrt::bo(glayHandle->deviceHandle, Edges_buffer_size_in_bytes, bank_grp_idx);
 #endif
 
     // auxiliary_1_buffer          =  xrt::bo(glayHandle->deviceHandle, Vertex_buffer_size_in_bytes, xrt::bo::flags::normal, bank_grp_idx);
@@ -188,6 +188,11 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
     return 0;
 }
 
+
+// ********************************************************************************************
+// ***************                  GLAY Control                                 **************
+// ********************************************************************************************
+
 GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
 {
 
@@ -199,13 +204,21 @@ GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glay
 }
 
 
+void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
+{
+
+    //Close an opened device
+    if(glayHandle)
+        free(glayHandle);
+
+}
 
 // ********************************************************************************************
-// ***************                  GLAY Control                                 **************
+// ***************                  GLAY Control UserManaged                     **************
 // ********************************************************************************************
 
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
-{    
+{
 
     uint32_t glay_control_write = 0;
     uint32_t glay_control_read  = 0;
@@ -250,11 +263,9 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
     freeGlayHandle(glayHandle);
 }
 
-void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
-{
 
-    //Close an opened device
-    if(glayHandle)
-        free(glayHandle);
 
-}
+
+// ********************************************************************************************
+// ***************                  GLAY Control UserManaged                     **************
+// ********************************************************************************************
