@@ -240,7 +240,9 @@ else
 # 	export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 endif
 
+# =========================================================
 # TARGET: set the build target, can be hw or hw_emu
+# =========================================================
 export TARGET = hw_emu
 # export TARGET = hw
 
