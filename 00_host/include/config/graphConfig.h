@@ -50,6 +50,7 @@ struct Arguments
     uint32_t cache_size;
     // GLay Xilinx Parameters
 
+    char *kernel_name;
     int device_index;
     char *xclbin_path;
     struct xrtGLAYHandle *glayHandle;
