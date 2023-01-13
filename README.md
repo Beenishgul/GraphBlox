@@ -52,16 +52,21 @@ maintaining the performance and power optimizations, an FPGA provides.
 
 ## Xilinx Dependencies
 
-The designs have been verified with the following software/hardware environment and tool chain versions:
-* Operating Systems:
-  * Ubuntu 18.04/20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-  * Perl package installed for Verilog simulation (**required**)
-  * GCC 7
-* Vitis: 2022.1
-* XRT: 2.13.466
+The design has been verified with the following software/hardware environment and tool chain versions:  
 * Hardware and Platform for your Alveo card (you need both the deployment and development platforms):
-  * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1 (**Currently Supported**)
-  * Alveo U280: xilinx_u280_gen3x16_xdma_1_202211_1
+  * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1
+    * XRT: 2.13.466 
+    * Vitis: 2022.1
+    * Operating Systems:
+      * Ubuntu 20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
+      * GCC 9
+  * Alveo U280: xilinx_u280_xdma_201920_3
+    * XRT: 2.11.634
+    * Vitis: 2021.1
+    * Operating Systems:
+      * Ubuntu 18.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
+      * GCC 7
+* Perl package installed for Verilog simulation (**required**)
 
 ## CPU Dependencies
 
