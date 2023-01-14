@@ -60,6 +60,22 @@ MKDIR   := @mkdir -p
 PASS = \033[92mPASS\033[0m
 FAIL = \033[91mFAIL\033[0m
 
+NO_COLOR   =\x1b[0m
+OK_COLOR   =\x1b[32;01m
+ERROR_COLOR=\x1b[31;01m
+WARN_COLOR =\x1b[33;01m
+
+YELLOW  =\033[0;33m
+GREEN   =\033[0;32m
+RED     =\033[0;31m
+NC      =\033[0m
+COMPILED_FILE = $(@F)
+SUCCESS = [${GREEN}success!${NC}]
+FAIL    = [${RED}failure!${NC}]
+SUCCESS_MSG   = echo  "$(SUCCESS) $(COMPILED_FILE)"
+FAIL_MSG      = echo  "$(FAIL) $(COMPILED_FILE)"
+EXIT_STATUS   = &&  $(SUCCESS_MSG) || { $(FAIL_MSG) ; exit 1; }
+
 # =========================================================
 # COMPILERS                         
 # =========================================================
@@ -156,16 +172,17 @@ all: $(APP)-$(INTEGRATION)
 
 .PHONY: $(APP)-$(INTEGRATION)
 $(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
-	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP)-$(INTEGRATION): $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)"
-	-$(ECHO) " ******************************************************************************  \n"
+	-$(ECHO) "\n========================================================="
+	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
+	-$(ECHO) "${YELLOW}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	-$(ECHO) "=========================================================\n"
 
 .PHONY: $(APP_TEST)-$(INTEGRATION)-$(APP_LANG)
 $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) 
-	-$(ECHO) "\n ******************************************************************************  "
-	-$(ECHO) " * DONE!! NOTHING ELSE TO COMPILE ---> $(APP_TEST): $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG)"
-	-$(ECHO) " ****************************************************************************** \n"
-
+	-$(ECHO) "\n========================================================="
+	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
+	-$(ECHO) "${YELLOW}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	-$(ECHO) "=========================================================\n"
 .PHONY: directories-obj
 directories-obj :
 	-$(MKDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
@@ -202,43 +219,43 @@ clean-results:
 # =========================================================
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-c : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-cpp : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_UTIL_FPGA_CPP) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_C)/$(APP_TEST).c $(ALL_HEADER_FILES) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)/$(APP_TEST).o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(TEST_DIR_CPP)/$(APP_TEST).cpp $(ALL_HEADER_FILES) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_C)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_C)/%.c $(INC_FILES_UTIL) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_CPP)/%.cpp $(INC_FILES_UTIL) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/$(INTEGRATION)/%.c $(ALL_HEADER_FILES) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR)/$(SRC_DIR)/$(CONFIG_DIR)/%.c $(INC_FILES_CONFIG) | directories-obj
-	$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 # =========================================================
 # RUN GLay
