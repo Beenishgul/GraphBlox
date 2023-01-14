@@ -247,10 +247,12 @@ export TARGET = hw_emu
 # export TARGET = hw
 
 # =========================================================
-# Enabling Multiple Strategies For Closing Timing 
+# Enabling Multiple Strategies For Closing Timing TARGET=hw
 # =========================================================
 # [0-7]-strategies
-# Example: (0-quick ~2hrs) or (2-aggressive 33 strategies ~13hrs)
+# Example: 
+# XILINX_IMPL_STRATEGY =0 #(fast ~2hrs) 
+# XILINX_IMPL_STRATEGY =2 #(slow upto 33 strategies ~13hrs)
 # Check 01_device/scripts/generate_build_cfg
 # pick a suitable strategy or add yours
 # =========================================================
@@ -258,7 +260,7 @@ export XILINX_IMPL_STRATEGY = 2
 
 
 # =========================================================
-# Enabling paralle Strategies For Synth/Impl
+# Enabling parallel Strategies For Synth/Impl TARGET=hw
 # =========================================================
 # How many parallel jobs works for [0-1] 
 # For [2-7] the number of jobs is 
