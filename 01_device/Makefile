@@ -36,6 +36,7 @@ INTEGRATION         ?= openmp
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
+HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
 GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%h")
 
 APP_DIR             ?= 00_GLay
