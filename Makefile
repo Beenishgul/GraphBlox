@@ -12,10 +12,9 @@ export BENCH_DIR               = 03_test_graphs
 
 
 # =========================================================
-#     CLI COMMANDS                           
+# CLI Commands                           
 # =========================================================
 ECHO    := @echo
-
 # =========================================================
 # Color coded messages                      
 # =========================================================
@@ -27,24 +26,29 @@ export NC      =\033[0m
 # =========================================================
 
 # =========================================================
-#                APP Host properties    
+#                APP HOST PROPERTIES    
 # =========================================================
 
 # =========================================================
-# Application name src/main folder (glay.c) 
+# Application name 00_GLay/src/main folder (glay.c) 
 # =========================================================
-export APP                 = glay
+export APP  = glay
 # =========================================================
 
 # =========================================================
-# Application name src/test folder (test_glayGraph.c/cpp) 
+# Application name 00_GLay/src/test folder (test.c/cpp) 
 # =========================================================
-# export APP_TEST            = test_match
-# export APP_TEST            = test_glay
-# export APP_TEST            = test_StalaGraph
-export APP_TEST            = test_glayGraph_$(XILINX_CTRL_MODE)
-# export APP_TEST            = test_glayGraph_emu
-export APP_LANG            = cpp
+# export APP_TEST  = test_match
+# export APP_TEST = test_glay
+# export APP_TEST = test_StalaGraph
+export APP_TEST = test_glayGraph_$(XILINX_CTRL_MODE)
+# export APP_TEST = test_glayGraph_emu
+
+# =========================================================
+# Application extention ./src/test folder (test.c/cpp) 
+# =========================================================
+export APP_LANG = cpp
+# export APP_LANG = c
 # =========================================================
 
 # =========================================================
@@ -75,11 +79,10 @@ start:
 	$(ECHO) "========================================================="
 	$(ECHO) "${YELLOW}Usage : make help -- to view options!${NC}"
 	$(ECHO) "========================================================="
-	
 # =========================================================
 
 # =========================================================
-#  Compile all steps
+# Compile all steps
 # =========================================================
 .PHONY: all
 all:
@@ -104,11 +107,10 @@ clean-results:
 help:
 	$(MAKE) help $(MAKE_DEVICE)
 	$(MAKE) help $(MAKE_HOST)
-
 # =========================================================
 
 # =========================================================
-# RUN GLay HOST
+# Run GLay HOST
 # =========================================================
 .PHONY: run
 run:
@@ -124,7 +126,7 @@ debug:
 # =========================================================
 
 # =========================================================
-# RUN Tests HOST
+# Run Tests HOST
 # =========================================================
 
 .PHONY: run-test
@@ -273,7 +275,7 @@ export IP_DIR_ACTIVE      = $(IP_DIR)
 # =========================================================
 
 # =========================================================
-#                APP Device properties    
+# APP Device properties    
 # =========================================================
 export KERNEL_NAME        = glay_kernel
 export DEVICE_INDEX       = 0
@@ -283,8 +285,8 @@ export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_AC
 # =========================================================
 # PART and PLATFORM settings
 # =========================================================
-# PART setting: uncomment the line matching your Alveo card
-# PLATFORM setting: uncomment the line matching your Alveo card
+# PART: remove comment the line matching Alveo card
+# PLATFORM: remove comment the line matching  Alveo card
 # =========================================================
 ifeq ($(HOST_NAME), panther)
 	export ALVEO =  U280
