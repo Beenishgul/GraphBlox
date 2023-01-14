@@ -283,15 +283,15 @@ export XILINX_CTRL_MODE     = user_managed
 
 
 # =========================================================
-# Each project is encapsulated with a GIT commit id
-# If you want to commit code and reuse same project
-# remove comment for this variable chose any number
+# Each project is tagged with a GIT commit id
+# If you want to commit code and reuse same project metadata
+# remove comment for this variable and choose any number
 # =========================================================
 #if you make a push and use a previous compile 
 # export GIT_VER              = v1
 
 # =========================================================
-#  Scripts/VIPs/Directories generation 
+# STEP 1. Scripts/VIPs/Directories generation 
 # =========================================================
 
 .PHONY: gen-vip
@@ -307,7 +307,7 @@ gen-ip-dir:
 	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
 
 # =========================================================
-#  Run Hardware Simulation  
+# STEP 2.a Run Hardware Simulation  
 # =========================================================
 
 .PHONY: run-sim
@@ -331,7 +331,7 @@ run-sim-help:
 	$(MAKE) run-sim-help $(MAKE_DEVICE)
 
 # =========================================================
-# Package Generation  
+# STEP 2.b Package Generation  
 # =========================================================
 
 .PHONY: package-kernel
@@ -339,7 +339,7 @@ package-kernel:
 	$(MAKE) package-kernel $(MAKE_DEVICE)
 
 # =========================================================
-# XCLBIN File Generation
+# STEP 3.a XCLBIN File Generation
 # =========================================================
 
 .PHONY: build-hw
@@ -347,19 +347,15 @@ build-hw:
 	$(MAKE) build-hw $(MAKE_DEVICE)
 
 # =========================================================
-# Run Hardware FPGA
+# STEP 3.b Application Executable File Generation
 # =========================================================
 
-.PHONY: run-fpga
-run-fpga:
-	$(MAKE) run-fpga $(MAKE_DEVICE)
-
-.PHONY: run-fpga-debug
-run-fpga-debug:
-	$(MAKE) run-fpga-debug $(MAKE_DEVICE)
+.PHONY: gen-host-bin
+gen-host-bin: 
+	$(MAKE) gen-host-bin $(MAKE_DEVICE)
 
 # =========================================================
-# Run Hardware Emulation  
+# STEP 4.a Run Hardware Emulation  
 # =========================================================
 
 .PHONY: run-emu
@@ -375,15 +371,20 @@ run-emu-wave:
 	$(MAKE) run-emu-wave $(MAKE_DEVICE)
 
 # =========================================================
-# Application Executable File Generation
+# STEP 4.b Run Hardware FPGA
 # =========================================================
 
-.PHONY: gen-host-bin
-gen-host-bin: 
-	$(MAKE) gen-host-bin $(MAKE_DEVICE)
+.PHONY: run-fpga
+run-fpga:
+	$(MAKE) run-fpga $(MAKE_DEVICE)
+
+.PHONY: run-fpga-debug
+run-fpga-debug:
+	$(MAKE) run-fpga-debug $(MAKE_DEVICE)
+
 
 # =========================================================
-# Open Project in Vivado GUI
+# STEP 5.a Open Project in Vivado GUI
 # =========================================================
 
 .PHONY: open-vivado-project
@@ -391,7 +392,7 @@ open-vivado-project:
 	$(MAKE) open-vivado-project $(MAKE_DEVICE)
 
 # =========================================================
-#  Report Utilization Metrics
+# STEP 5.b Report Utilization Metrics
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
