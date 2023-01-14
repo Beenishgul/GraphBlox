@@ -264,21 +264,22 @@ package-kernel: session-info $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NA
 # XCLBIN File Generation
 # =========================================================
 .PHONY: vivado_build_$(TARGET)
-vivado_build_$(TARGET):
+vivado_build_$(TARGET): session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)
+	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
+	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).log ;\
+	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).err 
 
 .PHONY: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado_build_$(TARGET) 
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo &
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
 
 .PHONY: build-hw
-build-hw: session-info $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
-	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail.pl
+build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
+	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail.pl
 	
 # =========================================================
 # Run Hardware FPGA
