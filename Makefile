@@ -62,8 +62,8 @@ export INTEGRATION         = openmp
 # Nested make calls args for host/device makefiles
 # =========================================================
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
-export MAKE_HOST               = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
-export MAKE_DEVICE             = -w -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
+export MAKE_HOST               = --no-print-directory -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
+export MAKE_DEVICE             = --no-print-directory -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
 # =========================================================
 
 # =========================================================
@@ -74,8 +74,8 @@ start:
 	$(ECHO) "========================================================="
 	$(ECHO) "${RED}Initial compile will only take a minute!${NC}"
 	$(ECHO) "========================================================="
-	$(MAKE) start $(MAKE_DEVICE)
-	$(MAKE) start $(MAKE_HOST)
+	-@$(MAKE) start $(MAKE_DEVICE)
+	-@$(MAKE) start $(MAKE_HOST)
 	$(ECHO) "========================================================="
 	$(ECHO) "${YELLOW}Usage : make help -- to view options!${NC}"
 	$(ECHO) "========================================================="
@@ -86,27 +86,27 @@ start:
 # =========================================================
 .PHONY: all
 all:
-	$(MAKE) all $(MAKE_DEVICE)
-	$(MAKE) all $(MAKE_HOST)
+	-@$(MAKE) all $(MAKE_DEVICE)
+	-@$(MAKE) all $(MAKE_HOST)
 	
 .PHONY: clean-all
 clean-all:
-	$(MAKE) clean-all $(MAKE_DEVICE)
-	$(MAKE) clean-all $(MAKE_HOST)
+	-@$(MAKE) clean-all $(MAKE_DEVICE)
+	-@$(MAKE) clean-all $(MAKE_HOST)
 	
 .PHONY: clean
 clean:
-	$(MAKE) clean $(MAKE_DEVICE)
-	$(MAKE) clean $(MAKE_HOST)
+	-@$(MAKE) clean $(MAKE_DEVICE)
+	-@$(MAKE) clean $(MAKE_HOST)
 	
 .PHONY: clean-results
 clean-results:
-	$(MAKE) clean-results $(MAKE_HOST)
+	-@$(MAKE) clean-results $(MAKE_HOST)
 
 .PHONY: help
 help:
-	$(MAKE) help $(MAKE_DEVICE)
-	$(MAKE) help $(MAKE_HOST)
+	-@$(MAKE) help $(MAKE_DEVICE)
+	-@$(MAKE) help $(MAKE_HOST)
 # =========================================================
 
 # =========================================================
@@ -114,15 +114,15 @@ help:
 # =========================================================
 .PHONY: run
 run:
-	$(MAKE) run $(MAKE_HOST) 
+	-@$(MAKE) run $(MAKE_HOST) 
 	
 .PHONY: debug-memory
 debug-memory:
-	$(MAKE) debug-memory $(MAKE_HOST) 
+	-@$(MAKE) debug-memory $(MAKE_HOST) 
 
 .PHONY: debug
 debug:
-	$(MAKE) debug $(MAKE_HOST) 
+	-@$(MAKE) debug $(MAKE_HOST) 
 # =========================================================
 
 # =========================================================
@@ -131,19 +131,19 @@ debug:
 
 .PHONY: run-test
 run-test:
-	$(MAKE) run-test $(MAKE_HOST) 
+	-@$(MAKE) run-test $(MAKE_HOST) 
 
 .PHONY: debug-test
 debug-test:
-	$(MAKE) debug-test $(MAKE_HOST) 
+	-@$(MAKE) debug-test $(MAKE_HOST) 
 
 .PHONY: debug-test-memory
 debug-test-memory:
-	$(MAKE) debug-test-memory $(MAKE_HOST)
+	-@$(MAKE) debug-test-memory $(MAKE_HOST)
 
 .PHONY: test
 test:
-	$(MAKE) test $(MAKE_HOST)
+	-@$(MAKE) test $(MAKE_HOST)
 # =========================================================
 
 # =========================================================
@@ -376,15 +376,15 @@ export XILINX_CTRL_MODE     = user_managed
 # =========================================================
 .PHONY: gen-vip
 gen-vip:
-	$(MAKE) gen-vip $(MAKE_DEVICE)
+	-@$(MAKE) gen-vip $(MAKE_DEVICE)
 
 .PHONY: gen-scripts-dir
 gen-scripts-dir: 
-	$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
+	-@$(MAKE) gen-scripts-dir $(MAKE_DEVICE)
 
 .PHONY: gen-ip-dir
 gen-ip-dir: 
-	$(MAKE) gen-ip-dir $(MAKE_DEVICE)
+	-@$(MAKE) gen-ip-dir $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -392,23 +392,23 @@ gen-ip-dir:
 # =========================================================
 .PHONY: run-sim
 run-sim:
-	$(MAKE) run-sim $(MAKE_DEVICE)
+	-@$(MAKE) run-sim $(MAKE_DEVICE)
 
 .PHONY: run-sim-noclean
 run-sim-noclean:
-	$(MAKE) run-sim-noclean $(MAKE_DEVICE)
+	-@$(MAKE) run-sim-noclean $(MAKE_DEVICE)
 
 .PHONY: run-sim-reset
 run-sim-reset:
-	$(MAKE) run-sim-reset $(MAKE_DEVICE)
+	-@$(MAKE) run-sim-reset $(MAKE_DEVICE)
 
 .PHONY: run-sim-wave
 run-sim-wave:
-	$(MAKE) run-sim-wave $(MAKE_DEVICE)
+	-@$(MAKE) run-sim-wave $(MAKE_DEVICE)
 
 .PHONY: run-sim-help
 run-sim-help:
-	$(MAKE) run-sim-help $(MAKE_DEVICE)
+	-@$(MAKE) run-sim-help $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -416,7 +416,7 @@ run-sim-help:
 # =========================================================
 .PHONY: package-kernel
 package-kernel:
-	$(MAKE) package-kernel $(MAKE_DEVICE)
+	-@$(MAKE) package-kernel $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -424,7 +424,7 @@ package-kernel:
 # =========================================================
 .PHONY: build-hw
 build-hw:
-	$(MAKE) build-hw $(MAKE_DEVICE)
+	-@$(MAKE) build-hw $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -432,7 +432,7 @@ build-hw:
 # =========================================================
 .PHONY: gen-host-bin
 gen-host-bin: 
-	$(MAKE) gen-host-bin $(MAKE_DEVICE)
+	-@$(MAKE) gen-host-bin $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -440,15 +440,15 @@ gen-host-bin:
 # =========================================================
 .PHONY: run-emu
 run-emu:
-	$(MAKE) run-emu $(MAKE_DEVICE)
+	-@$(MAKE) run-emu $(MAKE_DEVICE)
 
 .PHONY: run-emu-debug
 run-emu-debug:
-	$(MAKE) run-emu-debug $(MAKE_DEVICE)
+	-@$(MAKE) run-emu-debug $(MAKE_DEVICE)
 
 .PHONY: run-emu-wave
 run-emu-wave:
-	$(MAKE) run-emu-wave $(MAKE_DEVICE)
+	-@$(MAKE) run-emu-wave $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -456,11 +456,11 @@ run-emu-wave:
 # =========================================================
 .PHONY: run-fpga
 run-fpga:
-	$(MAKE) run-fpga $(MAKE_DEVICE)
+	-@$(MAKE) run-fpga $(MAKE_DEVICE)
 
 .PHONY: run-fpga-debug
 run-fpga-debug:
-	$(MAKE) run-fpga-debug $(MAKE_DEVICE)
+	-@$(MAKE) run-fpga-debug $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -468,7 +468,7 @@ run-fpga-debug:
 # =========================================================
 .PHONY: open-vivado-project
 open-vivado-project: 
-	$(MAKE) open-vivado-project $(MAKE_DEVICE)
+	-@$(MAKE) open-vivado-project $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -479,7 +479,7 @@ open-vivado-project:
 # =========================================================
 .PHONY: report_metrics
 report_metrics: 
-	$(MAKE) report_metrics $(MAKE_DEVICE)
+	-@$(MAKE) report_metrics $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
