@@ -38,9 +38,12 @@ proc color {foreground text} {
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
-puts "\[[color 4 "Generate GLay IPs....."]\] [color 2 "START! [clock format [clock seconds] -format {%T %a %b %d %Y}]"]"
-puts "\[[color 4 "Part ID               "]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel                "]\] [color 2 ${kernel_name}]" 
+puts "\[[color 2 "Generate GLay IPs....."]\] [color 1 "START!"]"
+puts "========================================================="
+puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
+puts "========================================================="
+puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
+puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
 puts "========================================================="
 
 set_part ${part_id} >> $log_file
@@ -205,8 +208,13 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "========================================================="
 puts "\[[color 4 "Check directory for VIP"]\]"
 puts "\[[color 3 ${ip_dir}]\]"
-puts "\[[color 4 "Part ID               "]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel                "]\] [color 2 ${kernel_name}]" 
-puts "\[[color 4 "Generate GLay IPs....."]\] [color 2 "DONE! [clock format [clock seconds] -format {%T %a %b %d %Y}]"]"
+puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
+puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
+puts "========================================================="
+
+puts "========================================================="
+puts "\[[color 2 [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
+puts "========================================================="
+puts "\[[color 4 "Generate GLay IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="
 close_project >> $log_file

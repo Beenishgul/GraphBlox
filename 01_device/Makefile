@@ -55,6 +55,11 @@ SCRIPTS_DIR         ?= scripts
 IP_DIR              ?= glay_ip
 REPORTS_DIR         ?= reports
 
+VIVADO_PACKAGE_DIR  = vivado_package_kernel
+VIVADO_SIMULATE_DIR = vivado_simulate_kernel
+VIVADO_RUN_DIR      = vivado_run_$(TARGET)
+VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
+
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 ALL_SYSTEM_VERILOG_SOURCES  := $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.sv)
 ALL_VERILOG_SOURCES 		:= $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.v)
@@ -180,9 +185,8 @@ gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_package_kernel_tcl.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
-
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE)
+	
 .PHONY: $(ACTIVE_APP_DIR)/vivado_generated_vip
 $(ACTIVE_APP_DIR)/vivado_generated_vip:
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_generated_vip;\
@@ -249,12 +253,12 @@ $(ACTIVE_APP_DIR)/vivado_package_kernel:
 	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xml ;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel
 
-$(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
+$(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
 	$(CD) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
 
 .PHONY: package-kernel
-package-kernel: session-info $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+package-kernel: session-info $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo
 	
 # =========================================================
 # XCLBIN File Generation
@@ -270,11 +274,11 @@ $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
 	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo &
 
 .PHONY: build-hw
 build-hw: session-info $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
-	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
+	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail.pl
 	
 # =========================================================
 # Run Hardware FPGA
