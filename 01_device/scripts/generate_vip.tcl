@@ -24,11 +24,24 @@ set ip_dir           ${device_directory}/${active_directory}
 set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
 
 # ----------------------------------------------------------------------------
+# Color function
+# ----------------------------------------------------------------------------
+
+proc color {foreground text} {
+    # tput is a little Unix utility that lets you use the termcap database
+    # *much* more easily...
+    return [exec tput setaf $foreground]$text[exec tput sgr0]
+}
+
+# ----------------------------------------------------------------------------
 # Generate GLay IPs..... START!
 # ----------------------------------------------------------------------------
-puts "\[Generate GLay IPs.....\] START! [clock format [clock seconds] -format {%T %a %b %d %Y}]"
-puts "\[Part ID: ${part_id}\]" 
-puts "\[Kernel: ${kernel_name}\]" 
+
+puts "========================================================="
+puts "\[[color 4 "Generate GLay IPs....."]\] [color 2 "START! [clock format [clock seconds] -format {%T %a %b %d %Y}]"]"
+puts "\[[color 4 "Part ID               "]\] [color 2 ${part_id}]" 
+puts "\[[color 4 "Kernel                "]\] [color 2 ${kernel_name}]" 
+puts "========================================================="
 
 set_part ${part_id} >> $log_file
 set_property target_language  Verilog [current_project] 
@@ -37,7 +50,7 @@ set_property target_simulator XSim    [current_project]
 # ----------------------------------------------------------------------------
 # generate axi master vip
 # ----------------------------------------------------------------------------
-puts "                        Generate AXI Master VIP"
+puts "[color 2 "                        Generate AXI Master VIP"]" 
 
 set module_name control_${kernel_name}_vip
 create_ip -name axi_vip \
@@ -71,7 +84,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
-puts "                        Generate AXI Slave VIP"
+puts "[color 2 "                        Generate AXI Slave VIP"]" 
 
 set module_name slv_m00_axi_vip
 create_ip -name axi_vip \
@@ -107,7 +120,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_638x128_GlayCacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "                        Generate FIFO GlayCacheRequestInterfaceInput: fifo_638x128"
+puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput: fifo_638x128"]" 
 
 set module_name fifo_638x128
 create_ip -name fifo_generator \
@@ -147,7 +160,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_516x128_GlayCacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x128"
+puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x128"]" 
 
 set module_name fifo_516x128
 create_ip -name fifo_generator \
@@ -188,7 +201,12 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
 # ----------------------------------------------------------------------------
-puts "\[Check directory:\]"
-puts "\[${ip_dir}\]"
-puts "\[Generate GLay IPs.....\] DONE!  [clock format [clock seconds] -format {%T %a %b %d %Y}]"
+
+puts "========================================================="
+puts "\[[color 4 "Check directory for VIP"]\]"
+puts "\[[color 3 ${ip_dir}]\]"
+puts "\[[color 4 "Part ID               "]\] [color 2 ${part_id}]" 
+puts "\[[color 4 "Kernel                "]\] [color 2 ${kernel_name}]" 
+puts "\[[color 4 "Generate GLay IPs....."]\] [color 2 "DONE! [clock format [clock seconds] -format {%T %a %b %d %Y}]"]"
+puts "========================================================="
 close_project >> $log_file

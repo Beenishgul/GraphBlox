@@ -1,30 +1,37 @@
-.PHONY: help
-help:
-	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make gen-vip"
-	$(ECHO) "      Command to generate the IPs used in this design"
-	$(ECHO) ""
-	$(ECHO) "  make package-kernel"
-	$(ECHO) "      Command to pack the module glay_kernel to Vitis kernel"
-	$(ECHO) ""
-	$(ECHO) "  make run-sim"
-	$(ECHO) "      Command to run the simulation"
-	$(ECHO) ""
-	$(ECHO) "  make build-hw"
-	$(ECHO) "      Command to build xclbin files for Alveo platform, including glay_kernel"
-	$(ECHO) ""
-	$(ECHO) "  make clean"
-	$(ECHO) "      Command to remove all the generated files."
-	$(ECHO) ""
-	$(ECHO) "  github commit version:"
-	$(ECHO) "  $(GIT_VER)"
+# =========================================================
+# Starting point of GLay generate IPs and compile Host
+# =========================================================
+.PHONY: start
+start: gen-vip
+
+# =========================================================
+
+# =========================================================
+#  Build info output to terminal
+# =========================================================
+.PHONY: session-info
+session-info: 
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}Build $(APP_DIR)${NC} -> ${RED}$(MAKECMDGOALS)${NC}"
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}HOST_NAME   ${NC}| ${GREEN}$(HOST_NAME)${NC}"
+	$(ECHO) "${BLUE}KERNEL_NAME ${NC}| ${GREEN}$(KERNEL_NAME)${NC}"
+	$(ECHO) "${BLUE}ALVEO       ${NC}| ${GREEN}$(ALVEO)${NC}"
+	$(ECHO) "${BLUE}PART        ${NC}| ${GREEN}$(PART)${NC}"
+	$(ECHO) "${BLUE}PLATFORM    ${NC}| ${GREEN}$(PLATFORM)${NC}"
+	$(ECHO) "${BLUE}TARGET      ${NC}| ${GREEN}$(TARGET)${NC}"
+	$(ECHO) "${BLUE}CTRL_MODE   ${NC}| ${GREEN}$(XILINX_CTRL_MODE)${NC}"
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}GIT_VER     | ${YELLOW}$(GIT_VER)${NC}"
+	$(ECHO) "========================================================="
+# =========================================================
 
 # =========================================================
 # Directory/Project Configurations                           
 # =========================================================
 
 APP                 ?= glay
-KERNEL_NAME         ?= glay_kernel
+
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
 # APP_TEST            ?= test_StalaGraph
@@ -62,6 +69,7 @@ REPORTS_DIR_ACTIVE  ?= $(REPORTS_DIR)
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
+KERNEL_NAME         ?= glay_kernel
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
@@ -111,7 +119,6 @@ XILINX_CTRL_MODE     ?= user_managed
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
-
 RM      :=@rm -f
 RMDIR   :=@rm -rf
 CP_RF   :=@cp -rf
@@ -125,13 +132,18 @@ TAIL_F  :=@tail -f
 UNSET   :=@unset
 EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
 
-RED     =\033[0;31m
-NC      =\033[0m # No Color
+# =========================================================
+# Color coded messages                      
+# =========================================================
+YELLOW  ?=\033[0;33m
+GREEN   ?=\033[0;32m
+BLUE    ?=\033[0;34m
+RED     ?=\033[0;31m
+NC      ?=\033[0m
 
 # =========================================================
 # COMPILER FLAGS                         
 # =========================================================
-
 CXX     := g++
 VPP     := v++
 GCC     := gcc
@@ -177,48 +189,46 @@ $(ACTIVE_APP_DIR)/vivado_generated_vip:
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_generated_vip
 
 .PHONY: gen-vip
-gen-vip:  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
+gen-vip: session-info  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
 	$(CD) $(ACTIVE_APP_DIR)/vivado_generated_vip;\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
 
 # =========================================================
 #  Run Hardware Simulation  
 # =========================================================
-
 .PHONY: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 $(ACTIVE_APP_DIR)/vivado_simulate_kernel:
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 
 .PHONY: run-sim
-run-sim: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
+run-sim: session-info $(ACTIVE_APP_DIR)/vivado_simulate_kernel
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)
 
 .PHONY: run-sim-noclean
-run-sim-noclean:
+run-sim-noclean: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -noclean_files
 
 .PHONY: run-sim-reset
-run-sim-reset:
+run-sim-reset: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -reset_run 
 
 .PHONY: run-sim-wave
-run-sim-wave: $(ACTIVE_APP_DIR)/vivado_simulate_kernel/work.$(KERNEL_NAME)_testbench.wdb
+run-sim-wave: session-info  $(ACTIVE_APP_DIR)/vivado_simulate_kernel/work.$(KERNEL_NAME)_testbench.wdb
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -wave_run 
 
 .PHONY: run-sim-help
-run-sim-help:
+run-sim-help: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -help 
 
 # =========================================================
 # XCLBIN V++ Flags
 # =========================================================
-
 XOCCFLAGS   = 	--platform $(PLATFORM) -t $(TARGET) -s -g
 XOCCLFLAGS  = 	--link --optimize 3
 VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
@@ -232,7 +242,6 @@ VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_b
 # =========================================================
 # Package Generation .XO
 # =========================================================
-
 .PHONY: $(ACTIVE_APP_DIR)/vivado_package_kernel
 $(ACTIVE_APP_DIR)/vivado_package_kernel:
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
@@ -245,12 +254,11 @@ $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_pa
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
 
 .PHONY: package-kernel
-package-kernel: $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
+package-kernel: session-info $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo
 	
 # =========================================================
 # XCLBIN File Generation
 # =========================================================
-
 .PHONY: vivado_build_$(TARGET)
 vivado_build_$(TARGET):
 	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
@@ -265,13 +273,12 @@ $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado
 	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo &
 
 .PHONY: build-hw
-build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
+build-hw: session-info $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
 	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/nohup.out
 	
 # =========================================================
 # Run Hardware FPGA
 # =========================================================
-
 .PHONY: vivado_run_$(TARGET)
 vivado_run_$(TARGET):
 ifeq ($(TARGET),hw_emu)
@@ -303,16 +310,15 @@ endif
 	
 .PHONY: run-fpga
 run-fpga: DEBUG_CMD=0
-run-fpga: run-fpga-cmd
+run-fpga: session-info run-fpga-cmd
 	
 .PHONY: run-fpga-debug
 run-fpga-debug: DEBUG_CMD=1
-run-fpga-debug: run-fpga-cmd
+run-fpga-debug: session-info run-fpga-cmd
 	
 # =========================================================
 # Run Hardware Emulation  
 # =========================================================
-
 .PHONY: run-emu-cmd
 run-emu-cmd: gen-host-bin vivado_run_$(TARGET)
 ifeq ($(TARGET),hw_emu)
@@ -334,21 +340,20 @@ endif
 
 .PHONY: run-emu
 run-emu: DEBUG_CMD=0
-run-emu: run-emu-cmd
+run-emu: session-info run-emu-cmd
 	
 .PHONY: run-emu-debug
 run-emu-debug: DEBUG_CMD=1
 run-emu-debug: run-emu-cmd
 	
 .PHONY: run-emu-wave
-run-emu-wave: $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
+run-emu-wave: session-info $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	$(CD) $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 
 # =========================================================
 # Application Executable File Generation
 # =========================================================
-
 .PHONY: gen-host-bin
 gen-host-bin:
 	make $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
@@ -356,9 +361,8 @@ gen-host-bin:
 # =========================================================
 # Open Project in Vivado GUI
 # =========================================================
-
 .PHONY: open-vivado-project
-open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+open-vivado-project: session-info $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET); \
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
@@ -367,8 +371,9 @@ open-vivado-project: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_tem
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
-
-report_metrics: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
+# =========================================================
+.PHONY: report_metrics
+report_metrics: session-info $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
 ifeq ($(TARGET),hw_emu)
 	$(ECHO) "${RED}This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
 else
@@ -383,9 +388,56 @@ else
 endif
 
 # =========================================================
+#  Help menu
+# =========================================================
+.PHONY: help
+help: session-info 
+	$(ECHO) "Makefile Usage:"
+	$(ECHO) "  STEP 1. Scripts/VIPs/Directories generation "
+	$(ECHO) "   make gen-vip"
+	$(ECHO) "      Command to generate the IPs used in this design"
+	$(ECHO) ""
+	$(ECHO) "  STEP 2.a Run Hardware Simulation "
+	$(ECHO) "   make run-sim"
+	$(ECHO) "      Command to run the simulation"
+	$(ECHO) ""
+	$(ECHO) "  STEP 2.b Package Generation "
+	$(ECHO) "   make package-kernel"
+	$(ECHO) "      Command to pack the module $(KERNEL_NAME) to Vitis kernel"
+	$(ECHO) ""
+	$(ECHO) "  STEP 3.a XCLBIN File Generation"
+	$(ECHO) "   make build-hw"
+	$(ECHO) "      Command to build xclbin files for Alveo platform, including $(KERNEL_NAME)"
+	$(ECHO) ""
+	$(ECHO) "  STEP 3.b Application Executable File Generation"
+	$(ECHO) "   make gen-host-bin"
+	$(ECHO) "      compiles host binary to call $(KERNEL_NAME), auto-generated with other make rules"
+	$(ECHO) ""
+	$(ECHO) "  STEP 4.a Run Hardware Emulation"
+	$(ECHO) "   make run-emu"
+	$(ECHO) "      compiles host binary and emulates $(KERNEL_NAME)"
+	$(ECHO) ""
+	$(ECHO) "  STEP 4.b Run Hardware FPGA"
+	$(ECHO) "   make run-fpga"
+	$(ECHO) "      compiles host binary and run $(KERNEL_NAME) on Alveo FPGA board"
+	$(ECHO) ""
+	$(ECHO) "  STEP 5.a Open Project in Vivado GUI"
+	$(ECHO) "   make open-vivado-project"
+	$(ECHO) "      opens hw/hw_emu project in GUI mode"
+	$(ECHO) ""
+	$(ECHO) "  STEP 5.b Report Utilization Metrics"
+	$(ECHO) "   make report_metrics"
+	$(ECHO) "      generates reports folder after synthesis complete"
+	$(ECHO) ""
+	$(ECHO) "   make clean"
+	$(ECHO) "      Command to remove all the generated files."
+	$(ECHO) ""
+	$(ECHO) "   Github commit version:"
+	$(ECHO) "      $(GIT_VER)"
+
+# =========================================================
 # Clean Projects
 # =========================================================
-
 .PHONY: clean
 clean:
 	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)*$(GIT_VER)
