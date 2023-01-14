@@ -67,6 +67,7 @@ WARN_COLOR =\x1b[33;01m
 
 YELLOW  =\033[0;33m
 GREEN   =\033[0;32m
+BLUE   =\033[0;34m
 RED     =\033[0;31m
 NC      =\033[0m
 COMPILED_FILE = $(@F)
@@ -174,14 +175,14 @@ all: $(APP)-$(INTEGRATION)
 $(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
 	-$(ECHO) "\n========================================================="
 	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
-	-$(ECHO) "${YELLOW}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	-$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
 	-$(ECHO) "=========================================================\n"
 
 .PHONY: $(APP_TEST)-$(INTEGRATION)-$(APP_LANG)
 $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) 
 	-$(ECHO) "\n========================================================="
 	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
-	-$(ECHO) "${YELLOW}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	-$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
 	-$(ECHO) "=========================================================\n"
 .PHONY: directories-obj
 directories-obj :
