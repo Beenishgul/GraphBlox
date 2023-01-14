@@ -15,8 +15,9 @@
 # limitations under the License.
 #
 
-
+# =========================================================
 # create ip project with part name in command line argvs
+# =========================================================
 set part_id             [lindex $argv 0]
 set kernel_name         [lindex $argv 1]
 set app_directory       [lindex $argv 2]
@@ -25,6 +26,8 @@ set active_ip_directory [lindex $argv 4]
 set ctrl_mode           [lindex $argv 5]
 set package_dir      ${app_directory}/${xilinx_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
+# =========================================================
+
 
 proc color {foreground text} {
     # tput is a little Unix utility that lets you use the termcap database
@@ -39,6 +42,8 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
     puts "[color 4 "                             description    "][color 2 "${description_text}"]"
 }
 
+
+# =========================================================
 puts "========================================================="
 puts "\[[color 2 "Packaging GLay IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
@@ -53,13 +58,18 @@ puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
 puts "========================================================="
 
-##################################### Step 1: create vivado project and add design sources
+# =========================================================
+# Step 1: create vivado project and add design sources
+# =========================================================
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
 create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
+# =========================================================
 
-puts "[color 4 "                        Add design sources into project"]" 
+# =========================================================
 # add design sources into project
+# =========================================================
+puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/scripts/${kernel_name}_filelist_package.f]] >> $log_file
 update_compile_order -fileset sources_1  
 
@@ -70,8 +80,9 @@ set core [ipx::current_core]
 foreach user_parameter [list C_S_AXI_CONTROL_ADDR_WIDTH C_S_AXI_CONTROL_DATA_WIDTH C_M00_AXI_ADDR_WIDTH C_M00_AXI_DATA_WIDTH] {
     ::ipx::remove_user_parameter $user_parameter $core
   }
-
-##################################### Step 2: Inference clock, reset, AXI interfaces and associate them with clock
+# =========================================================
+# Step 2: Inference clock, reset, AXI interfaces and associate them with clock
+# =========================================================
 puts "[color 3 "                Step 2: Inference clock, reset, AXI interfaces and associate them with clock"]" 
 
 # inference clock and reset signals
@@ -90,33 +101,48 @@ set_property value_source constant     $bifparam
 ::ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
 ::ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
 
-# Specify the freq_hz parameter 
+# =========================================================
+# Specify the freq_hz parameter
+# =========================================================
 puts "[color 4 "                        Specify the freq_hz parameter"]" 
 set clkbif      [::ipx::get_bus_interfaces -of $core "ap_clk"]
 set clkbifparam [::ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 
-# Set desired frequency                   
+# =========================================================
+# Set desired frequency
+# =========================================================                   
 puts "[color 4 "                        Set desired frequency "][color 5 "300000000 Hz"]"
 set_property value 300000000 $clkbifparam
 
-# set value_resolve_type user if the frequency can vary. 
+# =========================================================
+# set value_resolve_type user if the frequency can vary.
+# =========================================================
 puts "[color 4 "                        Set value_resolve_type user if the frequency can vary. Type: "][color 5 "user"]"
 set_property value_resolve_type user $clkbifparam
 
+# =========================================================
 # associate AXI/AXIS interface with clock
+# =========================================================
 puts "[color 4 "                        Associate AXI/AXIS interface with clock"]" 
 ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core
 ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core
 
+# =========================================================
 # associate reset signal with clock
+# =========================================================
 puts "[color 4 "                        Associate reset signal with clock"]" 
 ipx::associate_bus_interfaces -clock ap_clk -reset ap_rst_n $core
+# =========================================================
 
-##################################### Step 3: Set the definition of AXI control slave registers, including CTRL and user kernel arguments
+# =========================================================
+# Step 3: Set the definition of AXI control slave registers, including CTRL and user kernel arguments
+# =========================================================
 puts "[color 3 "                Step 3: Set the definition of AXI control slave registers,"]" 
 puts "[color 3 "                        including CTRL and user kernel arguments"]" 
 
+# =========================================================
 # Add RTL kernel registers
+# =========================================================
 puts "[color 4 "                        Add RTL kernel registers"]" 
 ipx::add_register CTRL [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects $core]]
 
@@ -125,7 +151,9 @@ set addr_block [::ipx::add_address_block -quiet "reg0" $mem_map]
 set reg        [::ipx::add_register "CTRL" $addr_block]
 set field      [ipx::add_field AP_START $reg]
 
+# =========================================================
 # Set RTL kernel registers property
+# =========================================================
 puts "[color 4 "                        Set RTL kernel registers property"]" 
 
 puts_reg_info "CTRL" "Control signals" "0x000" 32
@@ -212,13 +240,18 @@ puts_reg_info "IP_ISR" "IP Interrupt Status Register" "0x00C" 32
   set_property description    "IP Interrupt Status Register"    $reg
   set_property address_offset 0x00C $reg
   set_property size           32    $reg
+# =========================================================
 
-##################################### Step 4: Define and setup user kernel arguments (offsets, descriptions, and sizes)
+# =========================================================
+# Step 4: Define and setup user kernel arguments (offsets, descriptions, and sizes)
+# =========================================================
 puts "[color 3 "                Step 4: Define and setup user kernel (${kernel_name}) arguments"]" 
 puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"]" 
+# =========================================================
 
-
+# =========================================================
 # Set RTL kernel (${kernel_name}) registers property
+# =========================================================
 puts "[color 4 "                        Set RTL kernel (${kernel_name}) registers property"]" 
 
 puts_reg_info "graph_csr_struct" "description_text" "0x010" [expr {8*8}]
@@ -289,11 +322,16 @@ puts_reg_info "auxiliary_2" "description_text" "0x070" [expr {8*8}]
   set_property xpm_libraries {XPM_CDC XPM_MEMORY XPM_FIFO} $core
   set_property sdx_kernel true $core
   set_property sdx_kernel_type rtl $core
+# =========================================================
 
-#### Step 5: Package Vivado IP and generate Vitis kernel file
+# =========================================================
+# Step 5: Package Vivado IP and generate Vitis kernel file
+# =========================================================
 puts "[color 3 "                Step 5: Package Vivado IP and generate Vitis kernel file"]" 
 
+# =========================================================
 # Set required property for Vitis kernel
+# =========================================================
 puts "[color 4 "                        Set required property for Vitis kernel"]" 
 set_property sdx_kernel true $core
 set_property sdx_kernel_type rtl $core
@@ -314,7 +352,9 @@ if {${ctrl_mode} == "user_managed"} {
   set_property vitis_drc {ctrl_protocol user_managed} $core
 }
 
+# =========================================================
 # Packaging Vivado IP
+# =========================================================
 puts "[color 4 "                        Packaging Vivado IP"]" 
 ::ipx::update_checksums $core
 ::ipx::check_integrity -kernel $core >> $log_file
@@ -322,7 +362,9 @@ puts "[color 4 "                        Packaging Vivado IP"]"
 ::ipx::save_core $core
 ::ipx::unload_core $core
 
+# =========================================================
 # Generate Vitis Kernel from Vivado IP
+# =========================================================
 puts "[color 4 "                        Generate Vitis Kernel from Vivado IP"]" 
 # package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml >> $log_file
 
@@ -335,7 +377,7 @@ if {${ctrl_mode} == "user_managed"} {
 } else {
   package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
 }
-
+# =========================================================
 
 puts "========================================================="
 puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
