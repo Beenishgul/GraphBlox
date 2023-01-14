@@ -83,27 +83,28 @@ start:
 # =========================================================
 .PHONY: all
 all:
-	$(MAKE) all $(MAKE_HOST)
 	$(MAKE) all $(MAKE_DEVICE)
-
+	$(MAKE) all $(MAKE_HOST)
+	
 .PHONY: clean-all
 clean-all:
-	$(MAKE) clean-all $(MAKE_HOST)
 	$(MAKE) clean-all $(MAKE_DEVICE)
-
+	$(MAKE) clean-all $(MAKE_HOST)
+	
 .PHONY: clean
 clean:
-	$(MAKE) clean $(MAKE_HOST)
 	$(MAKE) clean $(MAKE_DEVICE)
-
+	$(MAKE) clean $(MAKE_HOST)
+	
 .PHONY: clean-results
 clean-results:
 	$(MAKE) clean-results $(MAKE_HOST)
 
 .PHONY: help
-help: 
-	$(MAKE) help $(MAKE_HOST)
+help:
 	$(MAKE) help $(MAKE_DEVICE)
+	$(MAKE) help $(MAKE_HOST)
+
 # =========================================================
 
 # =========================================================
