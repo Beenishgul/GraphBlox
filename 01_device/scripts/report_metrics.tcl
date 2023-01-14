@@ -5,6 +5,8 @@ open_run impl_1
 report_utilization -file utilization_hierarchical.txt -hierarchical
 report_utilization -file utilization_report.txt
 
+report_design_analysis -file logic_level_distribution_report.txt -logic_level_distribution 
+
 #Power
 report_power -file power_hierarchical.txt
 report_power -file {power.txt} -xpe {power.xpe} -rpx {power.rpx}
