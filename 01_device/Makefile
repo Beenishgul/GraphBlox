@@ -124,17 +124,17 @@ XILINX_CTRL_MODE     ?= user_managed
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
-RM      :=@rm -f
-RMDIR   :=@rm -rf
-CP_RF   :=@cp -rf
-MKDIR   :=@mkdir
-MKDIR_P :=@mkdir -p
-EXPORT  :=@export
-CD      :=@cd
-ECHO    :=@echo
-BASH    :=@bash
-TAIL_F  :=@tail -f 
-UNSET   :=@unset
+RM      :=-@rm -f
+RMDIR   :=-@rm -rf
+CP_RF   :=-@cp -rf
+MKDIR   :=-@mkdir
+MKDIR_P :=-@mkdir -p
+EXPORT  :=-@export
+CD      :=-@cd
+ECHO    :=-@echo
+BASH    :=-@bash
+TAIL_F  :=-@tail -f 
+UNSET   :=-@unset
 EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
 
 # =========================================================

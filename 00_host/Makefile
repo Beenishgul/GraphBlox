@@ -59,11 +59,11 @@ MAIN_DIR            ?= main
 #     CLI COMMANDS                           
 # =========================================================
 
-RM      := @rm -f
-RMDIR   := @rm -rf
-ECHO    := @echo
-CP      := @cp -rf
-MKDIR   := @mkdir -p
+RM      := -@rm -f
+RMDIR   := -@rm -rf
+ECHO    := -@echo
+CP      := -@cp -rf
+MKDIR   := -@mkdir -p
 
 # TEST PASS OR FAIL
 PASS = \033[92mPASS\033[0m
@@ -182,32 +182,32 @@ all: $(APP)-$(INTEGRATION)
 
 .PHONY: $(APP)-$(INTEGRATION)
 $(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION)
-	-$(ECHO) "\n========================================================="
-	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
-	-$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
-	-$(ECHO) "=========================================================\n"
+	$(ECHO) "\n========================================================="
+	$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
+	$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	$(ECHO) "=========================================================\n"
 
 .PHONY: $(APP_TEST)-$(INTEGRATION)-$(APP_LANG)
 $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) 
-	-$(ECHO) "\n========================================================="
-	-$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
-	-$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
-	-$(ECHO) "=========================================================\n"
+	$(ECHO) "\n========================================================="
+	$(ECHO) "${GREEN}DONE!! NOTHING ELSE TO COMPILE${NC}"
+	$(ECHO) "${BLUE}$(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$@${NC}"
+	$(ECHO) "=========================================================\n"
 .PHONY: directories-obj
 directories-obj :
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_C)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
-	-$(MKDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_C)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
+	$(MKDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
 
 .PHONY: clean-all
 clean-all:

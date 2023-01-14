@@ -7,11 +7,11 @@ while(<STDIN>) {
     chomp($line);
 
     for($line){
-        s/\[.*\]/\e[1;34m$&\e[0m/g; #warning replacement in blue
+        s/\[.*\]/\e[1;34m$&\e[0m/g;   #vivdo operation in blue
         s/ERROR:/\e[0;31m$&\e[0m/g;   #vivdo errors & stacktraces in red
         s/INFO:/\e[1;32m$&\e[0m/g;    #info replacement in green
         s/WARNING:/\e[1;33m$&\e[0m/g; #warning replacement in yellow
-        s/Time \(s\)/\e[0;35m$&\e[0m/g;#vivdo
+        s/Time \(s\):/\e[0;35m$&\e[0m/g;#vivdo
         s/Run vpl/\e[0;35m$&\e[0m/g;   #vivdo
         s/Creating Vivado project/\e[0;31m$&\e[0m/g;   #vivdo errors & stacktraces in red
         s/Running Dispatch.*/\e[0;31m$&\e[0m/g;   #vivdo errors & stacktraces in red
