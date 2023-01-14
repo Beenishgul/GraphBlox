@@ -1,4 +1,13 @@
 # =========================================================
+# Starting point of GLay generate IPs and compile Host
+# =========================================================
+.PHONY: start
+start: $(APP)-$(INTEGRATION)
+	
+# =========================================================
+
+
+# =========================================================
 #                GENERAL DIRECTOIRES HOST               
 # =========================================================
 APP                 ?= glay
@@ -60,16 +69,16 @@ MKDIR   := @mkdir -p
 PASS = \033[92mPASS\033[0m
 FAIL = \033[91mFAIL\033[0m
 
-NO_COLOR   =\x1b[0m
-OK_COLOR   =\x1b[32;01m
-ERROR_COLOR=\x1b[31;01m
-WARN_COLOR =\x1b[33;01m
 
-YELLOW  =\033[0;33m
-GREEN   =\033[0;32m
-BLUE   =\033[0;34m
-RED     =\033[0;31m
-NC      =\033[0m
+# =========================================================
+# Color coded messages                      
+# =========================================================
+YELLOW  ?=\033[0;33m
+GREEN   ?=\033[0;32m
+BLUE    ?=\033[0;34m
+RED     ?=\033[0;31m
+NC      ?=\033[0m
+
 COMPILED_FILE = $(@F)
 SUCCESS = [${GREEN}success!${NC}]
 FAIL    = [${RED}failure!${NC}]

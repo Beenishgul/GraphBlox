@@ -10,6 +10,22 @@ export DEVICE_DIR              = 01_device
 export BENCH_DIR               = 03_test_graphs
 # =========================================================
 
+
+# =========================================================
+#     CLI COMMANDS                           
+# =========================================================
+ECHO    := @echo
+
+# =========================================================
+# Color coded messages                      
+# =========================================================
+export YELLOW  =\033[0;33m
+export GREEN   =\033[0;32m
+export BLUE    =\033[0;34m
+export RED     =\033[0;31m
+export NC      =\033[0m
+# =========================================================
+
 # =========================================================
 #                APP Host properties    
 # =========================================================
@@ -45,10 +61,18 @@ export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
 export MAKE_HOST               = -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 export MAKE_DEVICE             = -w -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
 # =========================================================
-.PHONY: help
-help: 
-	$(MAKE) help $(MAKE_HOST)
-	$(MAKE) help $(MAKE_DEVICE)
+
+# =========================================================
+# Starting point of GLay generate IPs and compile Host
+# =========================================================
+.PHONY: start
+start: 
+	$(MAKE) start $(MAKE_DEVICE)
+	$(MAKE) start $(MAKE_HOST)
+	$(ECHO) "========================================================="
+	$(ECHO) "${RED}Usage : make help -- to view options!${NC}"
+	$(ECHO) "========================================================="
+	
 # =========================================================
 
 # =========================================================
@@ -72,6 +96,11 @@ clean:
 .PHONY: clean-results
 clean-results:
 	$(MAKE) clean-results $(MAKE_HOST)
+
+.PHONY: help
+help: 
+	$(MAKE) help $(MAKE_HOST)
+	$(MAKE) help $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -454,20 +483,3 @@ export GLAY_FPGA_ARGS     = -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAM
 export ARGS = $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 # =========================================================
 
-# =========================================================
-#  Build info output to terminal
-# =========================================================
-$(info =========================================================)
-$(info Build $(APP_DIR) -> $(MAKECMDGOALS))
-$(info =========================================================)
-$(info HOST_NAME   | $(HOST_NAME))
-$(info KERNEL_NAME | $(KERNEL_NAME))
-$(info ALVEO       | $(ALVEO))
-$(info PART        | $(PART))
-$(info PLATFORM    | $(PLATFORM))
-$(info TARGET      | $(TARGET))
-$(info CTRL_MODE   | $(XILINX_CTRL_MODE))
-$(info =========================================================)
-$(info GIT_VER     | $(GIT_VER))
-$(info =========================================================)
-# =========================================================
