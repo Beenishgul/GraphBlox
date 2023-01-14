@@ -66,11 +66,14 @@ export MAKE_DEVICE             = -w -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(
 # Starting point of GLay generate IPs and compile Host
 # =========================================================
 .PHONY: start
-start: 
+start:
+	$(ECHO) "========================================================="
+	$(ECHO) "${RED}Initial compile will only take a minute!${NC}"
+	$(ECHO) "========================================================="
 	$(MAKE) start $(MAKE_DEVICE)
 	$(MAKE) start $(MAKE_HOST)
 	$(ECHO) "========================================================="
-	$(ECHO) "${RED}Usage : make help -- to view options!${NC}"
+	$(ECHO) "${YELLOW}Usage : make help -- to view options!${NC}"
 	$(ECHO) "========================================================="
 	
 # =========================================================
