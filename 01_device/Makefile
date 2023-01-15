@@ -2,7 +2,7 @@
 # Starting point of GLay generate IPs and compile Host
 # =========================================================
 .PHONY: start
-start: gen-vip
+start: gen-vip package-kernel
 
 # =========================================================
 
@@ -59,6 +59,7 @@ VIVADO_PACKAGE_DIR  = vivado_package_kernel
 VIVADO_SIMULATE_DIR = vivado_simulate_kernel
 VIVADO_RUN_DIR      = vivado_run_$(TARGET)
 VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
+VIVADO_VIP_DIR      = vivado_generated_vip
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 ALL_SYSTEM_VERILOG_SOURCES  := $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR)/,*.sv)
@@ -68,9 +69,9 @@ ALL_SCRIPTS_SOURCES 		:= $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$
 ALL_DESIGN_SOURCES 		    := $(ALL_SYSTEM_VERILOG_SOURCES) $(ALL_VERILOG_SOURCES) $(ALL_VERILOG_HEADERS)
 
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
-SCRIPTS_DIR_ACTIVE 	?= $(SCRIPTS_DIR)
-IP_DIR_ACTIVE       ?= $(IP_DIR)
-REPORTS_DIR_ACTIVE  ?= $(REPORTS_DIR)
+SCRIPTS_DIR_ACTIVE 	?= vivado_$(SCRIPTS_DIR)
+IP_DIR_ACTIVE       ?= vivado_$(IP_DIR)
+REPORTS_DIR_ACTIVE  ?= vivado_$(REPORTS_DIR)
 
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
@@ -187,15 +188,15 @@ gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE)
 	
-.PHONY: $(ACTIVE_APP_DIR)/vivado_generated_vip
-$(ACTIVE_APP_DIR)/vivado_generated_vip:
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_generated_vip;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_generated_vip
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 
 .PHONY: gen-vip
-gen-vip: session-info  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
-	$(CD) $(ACTIVE_APP_DIR)/vivado_generated_vip;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_generated_vip
+gen-vip: session-info  gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR)
 
 # =========================================================
 #  Run Hardware Simulation  
@@ -255,7 +256,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
 
 $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE)
 
 .PHONY: package-kernel
 package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo

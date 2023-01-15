@@ -24,6 +24,7 @@ set app_directory       [lindex $argv 2]
 set xilinx_directory    [lindex $argv 3]
 set active_ip_directory [lindex $argv 4]
 set ctrl_mode           [lindex $argv 5]
+set scripts_directory   [lindex $argv 6]
 set package_dir      ${app_directory}/${xilinx_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -70,7 +71,7 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # add design sources into project
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
-add_files -fileset sources_1 [read [open ${app_directory}/scripts/${kernel_name}_filelist_package.f]] >> $log_file
+add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
 update_compile_order -fileset sources_1  
 
 puts "[color 4 "                        Create IP packaging project"]" 
