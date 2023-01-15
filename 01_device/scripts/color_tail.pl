@@ -147,6 +147,19 @@ sub sub_print_info {
  
 }
 
+sub sub_print_section {
+ my $line = $_;
+ $time_flag = 0;
+ my @fields_i2 = split ':', $line;
+
+ print ' ' x 24;
+ print "[", BLUE, "SECTION", RESET, "] "; 
+ shift(@fields_i2);
+ # print GREEN, @fields_i2, RESET;
+ print MAGENTA, wrap('', ' ' x 32, @fields_i2), RESET;    
+ 
+}
+
 sub sub_print_substep {
  my $line = $_;
 
@@ -217,7 +230,7 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^$step_6$/ )   { $log_file = $line;}
                 elsif ($fields_s[0] =~ /^$step_7$/ )   { $guidance_file = $line;}
                 elsif ($fields_s[0] =~ /^$step_8$/ )   { $steps_file = $line;}
-                elsif ($fields_s[0] =~ /^$step_9$/ )   { sub_print_substep($line);}
+                elsif ($fields_s[0] =~ /^$step_9$/ )   { sub_print_section($line);}
                 elsif ($fields_s[0] =~ /^INFO:/   )    { if($time_flag == 1){sub_print_info($line);} }
                 elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_error ($line);}
                 elsif ($fields_s[0] =~ /^WARNING:/)    { sub_print_warning ($line);}
