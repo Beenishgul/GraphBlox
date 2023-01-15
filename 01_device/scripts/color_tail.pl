@@ -138,15 +138,19 @@ sub sub_print_substep {
 
  print "                        ";
  print BLUE, $line, RESET;  
- $time_flag = 0;;
+ $time_flag = 0;
 }
 
 sub sub_print_vpl {
  my $line = $_;
 
+ my @fields_v3 =  split /[\[\]]/, $line;
+ my @fields_v2 =  split ',', $fields_v3[2];
+
  print "                        ";
- print MAGENTA, $line, RESET;  
- $time_flag = 0;;
+ print "[", BLUE, $fields_v3[1], RESET, "] "; 
+ print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
+ $time_flag = 0;
 }
 
 print "\n", "=========================================================", "\n";
@@ -202,7 +206,7 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_error ($line);}
                 elsif ($fields_s[0] =~ /^WARNING:/)    { sub_print_warning ($line);}
                 elsif ($fields_s[0] =~ /^Time/    )    { sub_print_time ($line);}
-                elsif ($fields_s[0] =~ /^\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]$/       )  { sub_print_vpl();}
+                elsif ($fields_s[0] =~ /^\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]$/       )  { sub_print_vpl($line);}
                 else                                 { }       
 
                  # STDOUT->flush();
