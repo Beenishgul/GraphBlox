@@ -2,7 +2,8 @@
 
 use IO::Handle qw( );
 use Term::ANSIColor qw(:constants);
-
+use Text::Wrap;
+$Text::Wrap::columns = 80;
 
 $time_flag     = 0;
 @error_array   = ();
@@ -44,11 +45,19 @@ sub sub_print_time {
 }
 
 sub sub_print_error {
- my $line = $_;
 
-   # print "\n", RED, $line, RESET;  
-   $time_flag = 1;
-   push(@error_array, $line);
+ my $line = $_;
+ push(@error_array, $line);
+ $time_flag = 0;
+ my @fields_i2 = split ':', $line;
+ my @fields_i = split '/', $line;
+
+ print "                        ";
+ print "[", RED, $fields_i2[0], RESET, "] "; 
+ shift(@fields_i2);
+ # print MAGENTA, join("\n                                ",@fields_i2), RESET; 
+ print MAGENTA, wrap('', "                        ", @fields_i2), RESET;
+
 }
 
 sub sub_print_warning {
@@ -107,13 +116,17 @@ sub sub_print_close {
  print  RED, scalar(@error_array), RESET, "\n";
  print "=========================================================", "\n";
  print "[", BLUE, "Reports..........", RESET, "] ";
- print  YELLOW, $fields_r[1], RESET, "\n";
+ # print  YELLOW, $fields_r[1], RESET, "\n";
+ print YELLOW, wrap('', '', $fields_r[1]), RESET, "\n";
  print "[", BLUE, "Log files........", RESET, "] ";
- print  YELLOW, $fields_l[1], RESET, "\n";
+ # print  YELLOW, $fields_l[1], RESET, "\n";
+ print YELLOW, wrap('', '', $fields_l[1]), RESET, "\n"; 
  print "[", BLUE, "Guidance.........", RESET, "] ";
- print  YELLOW, $fields_g[1], RESET, "\n";
+ # print  YELLOW, $fields_g[1], RESET, "\n";
+ print YELLOW, wrap('', '', $fields_g[1]), RESET, "\n"; 
  print "[", BLUE, "Steps Log File...", RESET, "] ";
- print  YELLOW, $fields_s[1], RESET, "\n";
+ # print  YELLOW, $fields_s[1], RESET, "\n";
+ print YELLOW, wrap('', '', $fields_s[1]), RESET, "\n";  
  print "=========================================================", "\n";
 
  exit 0;
@@ -129,7 +142,8 @@ sub sub_print_info {
  print "                        ";
  print "[", BLUE, $fields_i2[0], RESET, "] "; 
  shift(@fields_i2);
- print GREEN, @fields_i2, RESET;  
+ # print GREEN, @fields_i2, RESET;
+ print GREEN, wrap('', "                        ", @fields_i2), RESET;    
  
 }
 
@@ -137,7 +151,8 @@ sub sub_print_substep {
  my $line = $_;
 
  print "                        ";
- print BLUE, $line, RESET;  
+ # print BLUE, $line, RESET;
+ print BLUE, wrap('', "                        ", $line), RESET;   
  $time_flag = 0;
 }
 
@@ -149,7 +164,8 @@ sub sub_print_vpl {
 
  print "                        ";
  print "[", BLUE, $fields_v3[1], RESET, "] "; 
- print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
+ # print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
+ print MAGENTA, wrap('', "                        ", @fields_v2), RESET; 
  $time_flag = 0;
 }
 

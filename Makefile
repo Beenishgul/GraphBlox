@@ -63,7 +63,7 @@ export INTEGRATION         = openmp
 # =========================================================
 export MAKE_NUM_THREADS        = $(shell grep -c ^processor /proc/cpuinfo)
 export MAKE_HOST               = --no-print-directory -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
-export MAKE_DEVICE             = --no-print-directory -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) -j$(MAKE_NUM_THREADS)
+export MAKE_DEVICE             = --no-print-directory -C $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)
 # =========================================================
 
 # =========================================================
