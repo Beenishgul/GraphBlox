@@ -76,7 +76,7 @@ ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
 KERNEL_NAME         ?= glay_kernel
 DEVICE_INDEX        ?= 0
-XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
+XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 ifeq ($(HOST_NAME), panther)
@@ -200,34 +200,34 @@ gen-vip: session-info  gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_generated_vip
 # =========================================================
 #  Run Hardware Simulation  
 # =========================================================
-.PHONY: $(ACTIVE_APP_DIR)/vivado_simulate_kernel
-$(ACTIVE_APP_DIR)/vivado_simulate_kernel:
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_simulate_kernel
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR):
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 
 .PHONY: run-sim
-run-sim: session-info $(ACTIVE_APP_DIR)/vivado_simulate_kernel
-	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+run-sim: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)
 
 .PHONY: run-sim-noclean
 run-sim-noclean: session-info 
-	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -noclean_files
 
 .PHONY: run-sim-reset
 run-sim-reset: session-info 
-	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -reset_run 
 
 .PHONY: run-sim-wave
-run-sim-wave: session-info  $(ACTIVE_APP_DIR)/vivado_simulate_kernel/work.$(KERNEL_NAME)_testbench.wdb
-	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+run-sim-wave: session-info  $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)/work.$(KERNEL_NAME)_testbench.wdb
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -wave_run 
 
 .PHONY: run-sim-help
 run-sim-help: session-info 
-	$(CD) $(ACTIVE_APP_DIR)/vivado_simulate_kernel;\
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) -help 
 
 # =========================================================
@@ -236,9 +236,9 @@ run-sim-help: session-info
 XOCCFLAGS   = 	--platform $(PLATFORM) -t $(TARGET) -s -g
 XOCCLFLAGS  = 	--link --optimize 3
 VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
-				--temp_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp \
-				--log_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_log \
-				--report_dir $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_report
+				--temp_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp \
+				--log_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_log \
+				--report_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_report
 
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
@@ -246,63 +246,63 @@ VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_b
 # =========================================================
 # Package Generation .XO
 # =========================================================
-.PHONY: $(ACTIVE_APP_DIR)/vivado_package_kernel
-$(ACTIVE_APP_DIR)/vivado_package_kernel:
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo ;\
 	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xml ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_package_kernel
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 
-$(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/vivado_package_kernel
-	$(CD) $(ACTIVE_APP_DIR)/vivado_package_kernel;\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) vivado_package_kernel $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
 
 .PHONY: package-kernel
-package-kernel: session-info $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo
+package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
 	
 # =========================================================
 # XCLBIN File Generation
 # =========================================================
-.PHONY: vivado_build_$(TARGET)
-vivado_build_$(TARGET): session-info
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).log ;\
-	touch $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).err 
+.PHONY: $(VIVADO_BUILD_DIR)
+$(VIVADO_BUILD_DIR): session-info
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err 
 
-.PHONY: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
-$(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin: vivado_build_$(TARGET) 
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
+$(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: $(VIVADO_BUILD_DIR) 
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_build_$(TARGET) ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/vivado_package_kernel/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
+	cd $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
 
 .PHONY: build-hw
-build-hw: $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin 
-	$(TAIL_F) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail.pl
+build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin 
+	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail.pl
 	
 # =========================================================
 # Run Hardware FPGA
 # =========================================================
-.PHONY: vivado_run_$(TARGET)
-vivado_run_$(TARGET):
+.PHONY: $(VIVADO_RUN_DIR)
+$(VIVADO_RUN_DIR):
 ifeq ($(TARGET),hw_emu)
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/xrt.ini ;\
-	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/xsim.tcl
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/xrt.ini ;\
+	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/cmd_xsim.tcl $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/xsim.tcl
 else
-	$(RMDIR) $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)
 endif
 
 .PHONY: run-fpga-cmd
-run-fpga-cmd: gen-host-bin vivado_run_$(TARGET)
+run-fpga-cmd: gen-host-bin $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw)
 	$(UNSET) XCL_EMULATION_MODE ;\
-	rm -rf $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	rm -rf $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	cd $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	if [ $(DEBUG_CMD) -eq 1 ]; then \
 		gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
@@ -325,19 +325,19 @@ run-fpga-debug: session-info run-fpga-cmd
 # Run Hardware Emulation  
 # =========================================================
 .PHONY: run-emu-cmd
-run-emu-cmd: gen-host-bin vivado_run_$(TARGET)
+run-emu-cmd: gen-host-bin $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw_emu)
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
-	cd $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+	cd $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	echo "Generating emulation config file for platform $(PLATFORM).." ;\
 	emconfigutil --platform $(PLATFORM)  ;\
 	echo "Enter Hardware Emulation Mode" ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	if [ $(DEBUG_CMD) -eq 1 ]; then \
-		gdb -ex=r --args $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+		gdb -ex=r --args $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	else \
-		$(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+		$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	fi
 else
 	$(ECHO) "${RED}This build target <TARGET=hw_emu> not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
@@ -352,8 +352,8 @@ run-emu-debug: DEBUG_CMD=1
 run-emu-debug: run-emu-cmd
 	
 .PHONY: run-emu-wave
-run-emu-wave: session-info $(ACTIVE_APP_DIR)/vivado_run_$(TARGET)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
-	$(CD) $(ACTIVE_APP_DIR)/vivado_run_$(TARGET) ;\
+run-emu-wave: session-info $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 
 # =========================================================
@@ -367,8 +367,8 @@ gen-host-bin:
 # Open Project in Vivado GUI
 # =========================================================
 .PHONY: open-vivado-project
-open-vivado-project: session-info $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
-	$(CD) $(ACTIVE_APP_DIR)/vivado_build_$(TARGET); \
+open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR); \
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
 # =========================================================
@@ -385,7 +385,7 @@ else
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(CD) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE); \
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl -notrace $(ACTIVE_APP_DIR)/vivado_build_$(TARGET)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl -notrace $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(ECHO) ""
 	$(ECHO) "Vivado Utilization/Power Report Generation Complete..."
 	$(ECHO) "####################################"
