@@ -268,10 +268,12 @@ export MASK_MODE        = 0
 export XILINX_DIR         = xilinx_project
 export SCRIPTS_DIR        = scripts
 export IP_DIR             = glay_ip
+export REPORTS_DIR        = reports
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
-export SCRIPTS_DIR_ACTIVE = $(SCRIPTS_DIR)
-export IP_DIR_ACTIVE      = $(IP_DIR)
+export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
+export IP_DIR_ACTIVE      = vivado_$(IP_DIR)
+export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
 # =========================================================
 
 # =========================================================
