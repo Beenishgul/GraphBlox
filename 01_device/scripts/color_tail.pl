@@ -164,8 +164,8 @@ sub sub_print_vpl {
 
  print ' ' x 24;
  print "[", BLUE, $fields_v3[1], RESET, "] "; 
- # print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
- print MAGENTA, wrap('', ' ' x 36, @fields_v2), RESET; 
+ print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
+ # print MAGENTA, wrap('', ' ' x 36, @fields_v2), RESET; 
  $time_flag = 0;
 }
 
