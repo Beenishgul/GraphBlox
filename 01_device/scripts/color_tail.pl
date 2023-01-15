@@ -3,7 +3,7 @@
 use IO::Handle qw( );
 use Term::ANSIColor qw(:constants);
 use Text::Wrap;
-$Text::Wrap::columns = 80;
+$Text::Wrap::columns = 60;
 
 $time_flag     = 0;
 @error_array   = ();
@@ -38,8 +38,8 @@ sub sub_print_time {
  my @fields_t = split ';', $line;
    # my @fields_t2 = split ':', @fields_i2[0];
    
-   print "                        ";
-   print "[", CYAN, "TIME" , RESET, "]"; 
+   print ' ' x 24;
+   print "[", CYAN, "TIME" , RESET, "] "; 
    print GREEN, $fields_t[1] , RESET,"\n"; 
    # print GREEN, @fields_i2[1] , RESET;   
 }
@@ -52,11 +52,11 @@ sub sub_print_error {
  my @fields_i2 = split ':', $line;
  my @fields_i = split '/', $line;
 
- print "                        ";
+ print ' ' x 24;
  print "[", RED, $fields_i2[0], RESET, "] "; 
  shift(@fields_i2);
  # print MAGENTA, join("\n                                ",@fields_i2), RESET; 
- print MAGENTA, wrap('', "                        ", @fields_i2), RESET;
+ print MAGENTA, wrap('', ' ' x 24, @fields_i2), RESET;
 
 }
 
@@ -84,7 +84,7 @@ sub sub_print_step {
  my $line = $_;
  $step_cnt++;
 
- print "                ";
+ print ' ' x 16;
  print YELLOW,"Step ", $step_cnt, ": ";
  print $line, RESET;  
  $time_flag = 0;
@@ -94,7 +94,7 @@ sub sub_print_close {
  my $line = $_;
  $step_cnt++;
 
- print "                ";
+ print ' ' x 16;
  print YELLOW,"Step ", $step_cnt, ": ";
  print $line, RESET;  
  $time_flag = 0;
@@ -139,20 +139,20 @@ sub sub_print_info {
  my @fields_i = split '/', $fields_i2[1];
 
 
- print "                        ";
+ print ' ' x 24;
  print "[", BLUE, $fields_i2[0], RESET, "] "; 
  shift(@fields_i2);
  # print GREEN, @fields_i2, RESET;
- print GREEN, wrap('', "                        ", @fields_i2), RESET;    
+ print GREEN, wrap('', ' ' x 32, @fields_i2), RESET;    
  
 }
 
 sub sub_print_substep {
  my $line = $_;
 
- print "                        ";
+ print ' ' x 24;
  # print BLUE, $line, RESET;
- print BLUE, wrap('', "                        ", $line), RESET;   
+ print BLUE, wrap('', ' ' x 32, $line), RESET;   
  $time_flag = 0;
 }
 
@@ -162,10 +162,10 @@ sub sub_print_vpl {
  my @fields_v3 =  split /[\[\]]/, $line;
  my @fields_v2 =  split ',', $fields_v3[2];
 
- print "                        ";
+ print ' ' x 24;
  print "[", BLUE, $fields_v3[1], RESET, "] "; 
  # print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
- print MAGENTA, wrap('', "                        ", @fields_v2), RESET; 
+ print MAGENTA, wrap('', ' ' x 36, @fields_v2), RESET; 
  $time_flag = 0;
 }
 
