@@ -38,10 +38,11 @@ echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 run()
 {
   echo "run $#"
-  echo "MSG: $kernel_name   $1"
-  echo "MSG: $app_directory $2"
-  echo "MSG: $scripts_directory $3"
-  echo "MSG: $ip_directory $4"
+  echo "MSG: Kernel:      $1"
+  echo "MSG: APP DIR      $2"
+  echo "MSG: Scripts DIR: $3"
+  echo "MSG: IP DIR:      $4"
+  echo "MSG: Arguments    $5"
   check_args $# $5
   setup $5 $6
 }
