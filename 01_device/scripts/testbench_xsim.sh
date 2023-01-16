@@ -26,9 +26,10 @@ kernel_name=$1
 app_directory=$2
 scripts_directory=$3
 ip_directory=$4
+ctrl_mode= $5
 
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f  -i ${app_directory}/${ip_directory}/cache/iob_include -i ${app_directory}/${ip_directory}/cache/iob_include/portmaps -L xilinx_vip --sv"
+xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f -d ${ctrl_mode} -i ${app_directory}/${ip_directory}/cache/iob_include -i ${app_directory}/${ip_directory}/cache/iob_include/portmaps -L xilinx_vip --sv"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
 xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
@@ -42,9 +43,11 @@ run()
   echo "MSG: APP DIR      $2"
   echo "MSG: Scripts DIR: $3"
   echo "MSG: IP DIR:      $4"
-  echo "MSG: Arguments    $5"
-  check_args $# $5
-  setup $5 $6
+  echo "MSG: CTRL MODE    $5"
+  echo "MSG: Arguments    $6"
+  
+  check_args $# $6
+  setup $6 $7
 }
 
 # RUN_STEP: <compile>
@@ -132,7 +135,7 @@ check_args()
 {
   echo "check_args $1"
   echo "check_args $2"
-  if [[ ($1 == 5 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
+  if [[ ($1 == 6 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
     echo -e "ERROR: Unknown option specified '$2' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
@@ -162,4 +165,4 @@ from the previous run will be removed. If you don't want to remove the simulator
 }
 
 # Launch script
-run $1 $2 $3 $4 $5
+run $1 $2 $3 $4 $5 $6
