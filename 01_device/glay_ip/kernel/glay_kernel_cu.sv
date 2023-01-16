@@ -172,7 +172,7 @@ module glay_kernel_cu #(
     glay_kernel_control_ap_ctrl_chain #(
       .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
       .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-    ) inst_glay_kernel_control (
+    ) inst_glay_kernel_control_ap_ctrl_chain (
       .ap_clk             (ap_clk                 ),
       .areset             (control_areset         ),
       .glay_cu_done_in    (glay_cu_done_reg       ),
@@ -186,7 +186,7 @@ module glay_kernel_cu #(
     glay_kernel_control_ap_ctrl_hs #(
       .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
       .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-    ) inst_glay_kernel_control (
+    ) inst_glay_kernel_control_ap_ctrl_hs (
       .ap_clk             (ap_clk                 ),
       .areset             (control_areset         ),
       .glay_cu_done_in    (glay_cu_done_reg       ),
@@ -200,7 +200,7 @@ module glay_kernel_cu #(
     glay_kernel_control_user_managed #(
       .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
       .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-    ) inst_glay_kernel_control (
+    ) inst_glay_kernel_control_user_managed (
       .ap_clk             (ap_clk                 ),
       .areset             (control_areset         ),
       .glay_cu_done_in    (glay_cu_done_reg       ),
