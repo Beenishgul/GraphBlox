@@ -3,7 +3,7 @@
 use IO::Handle qw( );
 use Term::ANSIColor qw(:constants);
 use Text::Wrap;
-$Text::Wrap::columns = 60;
+$Text::Wrap::columns = 72;
 
 $time_flag     = 0;
 @error_array   = ();
@@ -56,7 +56,8 @@ sub sub_print_error {
  print "[", RED, $fields_i2[0], RESET, "] "; 
  shift(@fields_i2);
  # print MAGENTA, join("\n                                ",@fields_i2), RESET; 
- print MAGENTA, wrap('', ' ' x 24, @fields_i2), RESET;
+ # print MAGENTA, wrap('', ' ' x 24, @fields_i2), RESET;
+ print MAGENTA, wrap('', ' ' x 24, join("\n", @fields_i2)), RESET; 
 
 }
 
@@ -177,8 +178,8 @@ sub sub_print_vpl {
 
  print ' ' x 24;
  print "[", BLUE, $fields_v3[1], RESET, "] "; 
- print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
- # print MAGENTA, wrap('', ' ' x 36, @fields_v2), RESET; 
+ # print MAGENTA, join("\n                                   ",@fields_v2), RESET; 
+ print MAGENTA, wrap('', ' ' x 36, join("\n", @fields_v2)), RESET; 
  $time_flag = 0;
 }
 
