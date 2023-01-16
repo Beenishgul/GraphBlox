@@ -61,6 +61,7 @@ sub sub_print_error {
  # print MAGENTA, wrap('', ' ' x 24, @fields_i2), RESET;
  print MAGENTA, wrap('', ' ' x 24, join("\n", @fields_i2)), RESET; 
 
+ sub_print_close($line);
 }
 
 sub sub_print_warning {
