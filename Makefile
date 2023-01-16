@@ -324,8 +324,8 @@ endif
 # =========================================================
 # TARGET: set the build target, can be hw or hw_emu
 # =========================================================
-# export TARGET = hw_emu
-export TARGET = hw
+export TARGET = hw_emu
+# export TARGET = hw
 # =========================================================
 
 # =========================================================
@@ -370,7 +370,7 @@ export XILINX_CTRL_MODE     = user_managed
 # remove comment for this variable and choose any number
 # =========================================================
 #if you make a push and use a previous compile 
-export GIT_VER              = 03c8d73
+# export GIT_VER              = 03c8d73
 # =========================================================
 
 # =========================================================
