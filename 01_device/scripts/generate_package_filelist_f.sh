@@ -20,6 +20,7 @@ ACTIVE_APP_DIR=$1
 SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 IP_DIR=$4
+VIP_DIR=$5
 
 glay_pkgs="pkgs"
 glay_kernel="kernel"
@@ -59,8 +60,8 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FI
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/fifo_638x128.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x128/fifo_638x128.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_516x128/fifo_516x128.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/fifo_516x128.xci"
 echo $newtext >> ${CFG_FILE_NAME}
