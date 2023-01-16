@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : glay_kernel_control.sv
+// File   : glay_kernel_control_ap_ctrl_chain.sv
 // Create : 2022-12-20 21:55:38
 // Revise : 2022-12-20 21:55:38
 // Editor : sublime text4, tab size (4)
@@ -228,4 +228,4 @@ module glay_kernel_control_ap_ctrl_chain #(
         endcase
     end // always_ff @(posedge ap_clk)
 
-endmodule : glay_kernel_control
+endmodule : glay_kernel_control_ap_ctrl_chain

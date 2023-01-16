@@ -182,8 +182,7 @@ module glay_kernel_cu #(
       .glay_descriptor_in (glay_descriptor_in_reg ),
       .glay_descriptor_out(glay_descriptor_out_reg)
     );
-
-    `elseif ap_ctrl_hs
+  `elseif ap_ctrl_hs
     glay_kernel_control_ap_ctrl_hs #(
       .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
       .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
@@ -197,7 +196,6 @@ module glay_kernel_cu #(
       .glay_descriptor_in (glay_descriptor_in_reg ),
       .glay_descriptor_out(glay_descriptor_out_reg)
     );
-
   `else
     glay_kernel_control_user_managed #(
       .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
