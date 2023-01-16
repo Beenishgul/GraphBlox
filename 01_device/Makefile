@@ -206,30 +206,30 @@ $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR):
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 
-.PHONY: run-sim
+.PHONY: run-sim 
 run-sim: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 .PHONY: run-sim-noclean
 run-sim-noclean: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) -noclean_files | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) -noclean_files | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 .PHONY: run-sim-reset
 run-sim-reset: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) -reset_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) -reset_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 .PHONY: run-sim-wave
 run-sim-wave: session-info  $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)/work.$(KERNEL_NAME)_testbench.wdb
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) -wave_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) -wave_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 .PHONY: run-sim-help
 run-sim-help: session-info 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) -help  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) -help  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 # =========================================================
 # XCLBIN V++ Flags

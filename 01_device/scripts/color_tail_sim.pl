@@ -224,7 +224,7 @@ sub sub_print_msg {
  my @fields_v3 =  split ' ', $line;
 
  print ' ' x 24;
- print "[", BLUE, "MESSAGE ", RESET , "] "; 
+ print "[", BLUE, "MESSAGE", RESET , "] "; 
  # print MAGENTA, join("\n                                   ",@fields_v2), RESET;
  shift(@fields_v3); 
  print MAGENTA, wrap('', ' ' x 36, @fields_v3), RESET, "\n"; 
