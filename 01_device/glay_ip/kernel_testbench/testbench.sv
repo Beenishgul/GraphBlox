@@ -41,9 +41,9 @@ class GraphCSR;
 
     function void display ();
         $display("---------------------------------------------------------------------------");
-        $display("  GRAPH CSR : %s", this.graph_name);
-        $display("  VERTEX COUNT : %0d", this.vertex_count);
-        $display("  EDGE COUNT   : %0d", this.edge_count);
+        $display("MSG: GRAPH CSR : %s", this.graph_name);
+        $display("MSG: VERTEX COUNT : %0d", this.vertex_count);
+        $display("MSG: EDGE COUNT   : %0d", this.edge_count);
         $display("---------------------------------------------------------------------------");
     endfunction
 
