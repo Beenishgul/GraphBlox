@@ -26,15 +26,30 @@ kernel_name=$1
 app_directory=$2
 scripts_directory=$3
 ip_directory=$4
-ctrl_mode= $5
+ctrl_mode=$5
 
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f --define user_managed -i ${app_directory}/${ip_directory}/cache/iob_include -i ${app_directory}/${ip_directory}/cache/iob_include/portmaps -L xilinx_vip --sv"
+xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f -i ${app_directory}/${ip_directory}/cache/iob_include -i ${app_directory}/${ip_directory}/cache/iob_include/portmaps -L xilinx_vip --sv"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
 xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 
+if [[ "$ctrl_mode" == "user_managed" ]]
+then
+   xvlog_opts+=" --define user_managed"
+elif [[ "$ctrl_mode" == "ap_ctrl_hs" ]]
+then
+   xvlog_opts+=" --define ap_ctrl_hs"
+elif [[ "$ctrl_mode" == "ap_ctrl_chain" ]]
+then
+   xvlog_opts+=" --define ap_ctrl_chain"
+else
+  echo "MSG: else |$ctrl_mode|"
+   xvlog_opts+=" --define user_managed"
+fi
+
+ 
 # Main steps
 run()
 {
@@ -53,12 +68,17 @@ run()
 # RUN_STEP: <compile>
 compile()
 {
+  echo "Starting Compile [xvlog]"
+  echo "MSG: Arg: $xvlog_opts"
   xvlog $xvlog_opts 2>&1 | tee compile.log
 }
 
 # RUN_STEP: <elaborate>
 elaborate()
 {
+
+  echo "Starting Elaborate [xelab]"
+  echo "MSG: Arg: $xelab_opts"
   xelab ${kernel_name}_testbench glbl $xelab_opts -log elaborate.log
 
 }
@@ -66,12 +86,17 @@ elaborate()
 # RUN_STEP: <simulate>
 simulate()
 {
+  echo "Starting Simulate [xsim]"
+  echo "MSG: Arg: $xsim_opts"
   xsim  $xsim_opts -log simulate.log
 }
 
 # RUN_STEP: <GUI wave>
 wave_run()
 {
+
+  echo "Starting Wave Run [xsim --gui]"
+  echo "MSG: Arg: work.${kernel_name}_testbench.wdb"
   xsim --gui work.${kernel_name}_testbench.wdb
 }
 
