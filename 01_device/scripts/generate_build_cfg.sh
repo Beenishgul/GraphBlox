@@ -33,11 +33,14 @@ config+="[connectivity]\n"
 if [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR0\n"
+   config+="sp=${KERNEL_NAME}_1:HBM[1]\n"
 elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
+   config+="sp=${KERNEL_NAME}_1:DDR[1]\n"
 else
   config+="slr=${KERNEL_NAME}_1:SLR1\n"
+  config+="sp=${KERNEL_NAME}_1:DDR[1]\n"
 fi
 
 
