@@ -20,7 +20,7 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName, int ctrl_mode)
 {
 
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
@@ -38,15 +38,15 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
 
-    if(glayHandle->ctrl_moder == 0)              // user_managed
+    if(glayHandle->ctrl_mode == 0)              // user_managed
     {
         glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_moder == 0)        // ap_ctrl_hs
+    else if (glayHandle->ctrl_mode == 0)        // ap_ctrl_hs
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_moder == 0)        // ap_ctrl_chain
+    else if (glayHandle->ctrl_mode == 0)        // ap_ctrl_chain
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
@@ -206,23 +206,24 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
     return 0;
 }
 
-int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle)
+int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
 
-    glayHandle->glay_kernel.set_arg(GRAPH_CSR_STRUCT_ID, glayHandle->graph_csr_struct_buffer);
-    glayHandle->glay_kernel.set_arg(VERTEX_OUT_DEGREE_ID, glayHandle->vertex_out_degree_buffer);
-    glayHandle->glay_kernel.set_arg(VERTEX_IN_DEGREE_ID, glayHandle->vertex_in_degree_buffer);
-    glayHandle->glay_kernel.set_arg(VERTEX_EDGES_IDX_ID, glayHandle->vertex_edges_idx_buffer);
+    glayHandle->runKernelHandle = xrt::run(glayHandle->kernelHandle);
+    glayHandle->runKernelHandle.set_arg(GRAPH_CSR_STRUCT_ID, glayGraphCSRxrtBufferHandlePerBank->graph_csr_struct_buffer);
+    glayHandle->runKernelHandle.set_arg(VERTEX_OUT_DEGREE_ID, glayGraphCSRxrtBufferHandlePerBank->vertex_out_degree_buffer);
+    glayHandle->runKernelHandle.set_arg(VERTEX_IN_DEGREE_ID, glayGraphCSRxrtBufferHandlePerBank->vertex_in_degree_buffer);
+    glayHandle->runKernelHandle.set_arg(VERTEX_EDGES_IDX_ID, glayGraphCSRxrtBufferHandlePerBank->vertex_edges_idx_buffer);
 
 #if WEIGHTED
-    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_WEIGHT_ID, glayHandle->edges_array_weight_buffer);
+    glayHandle->runKernelHandle.set_arg(EDGES_ARRAY_WEIGHT_ID, glayGraphCSRxrtBufferHandlePerBank->edges_array_weight_buffer);
 #endif
 
-    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_DEST_ID, glayHandle->edges_array_dest_buffer);
-    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_SRC_ID, glayHandle->edges_array_src_buffer);
+    glayHandle->runKernelHandle.set_arg(EDGES_ARRAY_DEST_ID, glayGraphCSRxrtBufferHandlePerBank->edges_array_dest_buffer);
+    glayHandle->runKernelHandle.set_arg(EDGES_ARRAY_SRC_ID, glayGraphCSRxrtBufferHandlePerBank->edges_array_src_buffer);
 
-    // glayHandle->glay_kernel.set_arg(AUXILIARY_1_ID, glayHandle->);
-    // glayHandle->glay_kernel.set_arg(AUXILIARY_2_ID, glayHandle->);
+    // glayHandle->runKernelHandle.set_arg(AUXILIARY_1_ID, glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer);
+    // glayHandle->runKernelHandle.set_arg(AUXILIARY_2_ID, glayGraphCSRxrtBufferHandlePerBank->auxiliary_2_buffer);
 
     return 0;
 }
@@ -315,12 +316,12 @@ void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 // ***************                  GLAY Control ap_ctrl_hs                      **************
 // ********************************************************************************************
 
-GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
+GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlHs(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
 {
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
     glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
-    glayGraphCSRxrtBufferHandlePerBank->setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle);
+    glayGraphCSRxrtBufferHandlePerBank->setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, glayGraphCSRxrtBufferHandlePerBank);
 
     return glayGraphCSRxrtBufferHandlePerBank;
 }
@@ -328,14 +329,13 @@ GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYH
 void startGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
 {
 
-    glayHandle->run_glay_kernel = xrt::run(glayHandle->glay_kernel);
-    glayHandle->run_glay_kernel.start();
+    glayHandle->runKernelHandle.start();
 
 }
 
 void waitGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
 {
-    glayHandle->run_glay_kernel.wait();
+    glayHandle->runKernelHandle.wait();
 }
 
 void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
@@ -351,42 +351,26 @@ void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
 // ***************                  GLAY Control ap_ctrl_chain                   **************
 // ********************************************************************************************
 
+GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
+{
+
+    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
+    glayGraphCSRxrtBufferHandlePerBank->setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, glayGraphCSRxrtBufferHandlePerBank);
+
+    return glayGraphCSRxrtBufferHandlePerBank;
+}
+
 void startGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
 {
 
-    uint32_t glay_control_write = 0;
-    uint32_t glay_control_read  = 0;
-    glay_control_write = CONTROL_START;
-
-    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
-
-    do
-    {
-        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-        printf("start %x \n", glay_control_read);
-    }
-    while(!(glay_control_read & CONTROL_READY));
-
-    printf("wait %x \n", glay_control_read);
+    glayHandle->runKernelHandle.start();
 
 }
 
 void waitGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
 {
-    uint32_t glay_control_write = 0;
-    uint32_t glay_control_read  = 0;
-    glay_control_write = CONTROL_START;
-
-    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
-
-    do
-    {
-        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-        printf("wait %x \n", glay_control_read);
-    }
-    while(!(glay_control_read & CONTROL_IDLE));
-
-    printf("wait %x \n", glay_control_read);
+    glayHandle->runKernelHandle.wait();
 }
 
 void releaseGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
@@ -396,3 +380,4 @@ void releaseGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
     // xrtDeviceClose(glayHandle->deviceHandle);
     freeGlayHandle(glayHandle);
 }
+
