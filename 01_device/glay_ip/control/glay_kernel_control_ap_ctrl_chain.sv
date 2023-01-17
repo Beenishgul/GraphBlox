@@ -45,8 +45,8 @@ module glay_kernel_control #(
 
     logic glay_continue_reg;
 
-    control_sync_state_user_managed current_state;
-    control_sync_state_user_managed next_state   ;
+    control_sync_state_ap_ctrl_chain current_state;
+    control_sync_state_ap_ctrl_chain next_state   ;
 
     GlayControlChainInterfaceOutput glay_control_out_reg;
 
@@ -139,7 +139,7 @@ module glay_kernel_control #(
 
     always_ff @(posedge ap_clk) begin
         if(control_areset)
-            current_state <= USER_MANAGED_SYNC_RESET;
+            current_state <= CTRL_CHAIN_SYNC_RESET;
         else begin
             current_state <= next_state;
         end
@@ -148,78 +148,78 @@ module glay_kernel_control #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            USER_MANAGED_SYNC_RESET : begin
-                next_state = USER_MANAGED_SYNC_IDLE;
+            CTRL_CHAIN_SYNC_RESET : begin
+                next_state = CTRL_CHAIN_SYNC_IDLE;
             end
-            USER_MANAGED_SYNC_IDLE : begin
-                next_state = USER_MANAGED_SYNC_SETUP;
+            CTRL_CHAIN_SYNC_IDLE : begin
+                next_state = CTRL_CHAIN_SYNC_SETUP;
             end
-            USER_MANAGED_SYNC_SETUP : begin
+            CTRL_CHAIN_SYNC_SETUP : begin
                 if(glay_start_reg & ~|glay_cu_setup_reg)
-                    next_state = USER_MANAGED_SYNC_READY;
+                    next_state = CTRL_CHAIN_SYNC_READY;
                 else
-                    next_state = USER_MANAGED_SYNC_SETUP;
+                    next_state = CTRL_CHAIN_SYNC_SETUP;
             end
-            USER_MANAGED_SYNC_READY : begin
-                next_state = USER_MANAGED_SYNC_START;
+            CTRL_CHAIN_SYNC_READY : begin
+                next_state = CTRL_CHAIN_SYNC_START;
             end
-            USER_MANAGED_SYNC_START : begin
-                next_state = USER_MANAGED_SYNC_BUSY;
+            CTRL_CHAIN_SYNC_START : begin
+                next_state = CTRL_CHAIN_SYNC_BUSY;
             end
-            USER_MANAGED_SYNC_BUSY : begin
+            CTRL_CHAIN_SYNC_BUSY : begin
                 if (&glay_cu_done_reg)
-                    next_state = USER_MANAGED_SYNC_DONE;
+                    next_state = CTRL_CHAIN_SYNC_DONE;
                 else
-                    next_state = USER_MANAGED_SYNC_BUSY;
+                    next_state = CTRL_CHAIN_SYNC_BUSY;
             end
-            USER_MANAGED_SYNC_DONE : begin
+            CTRL_CHAIN_SYNC_DONE : begin
                 if(glay_continue_reg | glay_start_reg)
-                    next_state = USER_MANAGED_SYNC_READY;
+                    next_state = CTRL_CHAIN_SYNC_READY;
                 else
-                    next_state = USER_MANAGED_SYNC_DONE;
+                    next_state = CTRL_CHAIN_SYNC_DONE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            USER_MANAGED_SYNC_RESET : begin
+            CTRL_CHAIN_SYNC_RESET : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
-            USER_MANAGED_SYNC_IDLE : begin
+            CTRL_CHAIN_SYNC_IDLE : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
-            USER_MANAGED_SYNC_SETUP : begin
+            CTRL_CHAIN_SYNC_SETUP : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
-            USER_MANAGED_SYNC_READY : begin
+            CTRL_CHAIN_SYNC_READY : begin
                 glay_ready_reg            <= 1'b1;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b0;
             end
-            USER_MANAGED_SYNC_START : begin
+            CTRL_CHAIN_SYNC_START : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b1;
             end
-            USER_MANAGED_SYNC_BUSY : begin
+            CTRL_CHAIN_SYNC_BUSY : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
                 glay_idle_reg             <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b1;
             end
-            USER_MANAGED_SYNC_DONE : begin
+            CTRL_CHAIN_SYNC_DONE : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b1;
                 glay_idle_reg             <= 1'b1;

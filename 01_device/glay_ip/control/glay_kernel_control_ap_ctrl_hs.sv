@@ -134,7 +134,7 @@ module glay_kernel_control #(
     end
 
 // --------------------------------------------------------------------------------------
-//   State Machine AP_CTRL_CHAIN sync
+//   State Machine AP_CTRL_HS sync
 // --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
