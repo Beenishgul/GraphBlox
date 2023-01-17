@@ -35,8 +35,26 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     std::cout << "Load the xclbin : " << glayHandle->xclbinPath << std::endl;
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
 
-    glayHandle->ipHandle      = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
+
+    if(glayHandle->ctrl_moder == 0)              // user_managed
+    {
+        glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    }
+    else if (glayHandle->ctrl_moder == 0)        // ap_ctrl_hs
+    {
+        glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    }
+    else if (glayHandle->ctrl_moder == 0)        // ap_ctrl_chain
+    {
+        glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    }
+    else      // user_managed : default
+    {
+        glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    }
+
 
     std::cout << "Fetch compute Units" << std::endl;
     for (auto &kernel : glayHandle->xclbinHandle.get_kernels())
@@ -152,7 +170,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
     return 0;
 }
 
-int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
+int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle)
 {
 
     glayHandle->ipHandle.write_register(GRAPH_CSR_STRUCT_OFFSET, (buf_addr[0]));
@@ -188,21 +206,31 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
     return 0;
 }
 
+int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle)
+{
+
+    glayHandle->glay_kernel.set_arg(GRAPH_CSR_STRUCT_ID, glayHandle->graph_csr_struct_buffer);
+    glayHandle->glay_kernel.set_arg(VERTEX_OUT_DEGREE_ID, glayHandle->vertex_out_degree_buffer);
+    glayHandle->glay_kernel.set_arg(VERTEX_IN_DEGREE_ID, glayHandle->vertex_in_degree_buffer);
+    glayHandle->glay_kernel.set_arg(VERTEX_EDGES_IDX_ID, glayHandle->vertex_edges_idx_buffer);
+
+#if WEIGHTED
+    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_WEIGHT_ID, glayHandle->edges_array_weight_buffer);
+#endif
+
+    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_DEST_ID, glayHandle->edges_array_dest_buffer);
+    glayHandle->glay_kernel.set_arg(EDGES_ARRAY_SRC_ID, glayHandle->edges_array_src_buffer);
+
+    // glayHandle->glay_kernel.set_arg(AUXILIARY_1_ID, glayHandle->);
+    // glayHandle->glay_kernel.set_arg(AUXILIARY_2_ID, glayHandle->);
+
+    return 0;
+}
+
 
 // ********************************************************************************************
 // ***************                  GLAY Control                                 **************
 // ********************************************************************************************
-
-GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
-{
-
-    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
-    glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
-    glayGraphCSRxrtBufferHandlePerBank->writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
-
-    return glayGraphCSRxrtBufferHandlePerBank;
-}
-
 
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
 {
@@ -213,9 +241,28 @@ void freeGlayHandle(struct xrtGLAYHandle *glayHandle)
 
 }
 
+void releaseGLAY(struct xrtGLAYHandle *glayHandle)
+{
+    //Close an opened device
+    // xrtKernelClose(glayHandle->kernelHandle);
+    // xrtDeviceClose(glayHandle->deviceHandle);
+    freeGlayHandle(glayHandle);
+}
+
+
 // ********************************************************************************************
-// ***************                  GLAY Control UserManaged                     **************
+// ***************                  GLAY Control user_managed                    **************
 // ********************************************************************************************
+
+GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
+{
+
+    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
+    glayGraphCSRxrtBufferHandlePerBank->writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle);
+
+    return glayGraphCSRxrtBufferHandlePerBank;
+}
 
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 {
@@ -255,7 +302,7 @@ void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
     printf("wait %x \n", glay_control_read);
 }
 
-void releaseGLAY(struct xrtGLAYHandle *glayHandle)
+void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 {
     //Close an opened device
     // xrtKernelClose(glayHandle->kernelHandle);
@@ -264,8 +311,88 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 }
 
 
+// ********************************************************************************************
+// ***************                  GLAY Control ap_ctrl_hs                      **************
+// ********************************************************************************************
+
+GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
+{
+
+    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
+    glayGraphCSRxrtBufferHandlePerBank->setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle);
+
+    return glayGraphCSRxrtBufferHandlePerBank;
+}
+
+void startGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
+{
+
+    glayHandle->run_glay_kernel = xrt::run(glayHandle->glay_kernel);
+    glayHandle->run_glay_kernel.start();
+
+}
+
+void waitGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
+{
+    glayHandle->run_glay_kernel.wait();
+}
+
+void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
+{
+    //Close an opened device
+    // xrtKernelClose(glayHandle->kernelHandle);
+    // xrtDeviceClose(glayHandle->deviceHandle);
+    freeGlayHandle(glayHandle);
+}
 
 
 // ********************************************************************************************
-// ***************                  GLAY Control UserManaged                     **************
+// ***************                  GLAY Control ap_ctrl_chain                   **************
 // ********************************************************************************************
+
+void startGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
+{
+
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
+
+    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+
+    do
+    {
+        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
+        printf("start %x \n", glay_control_read);
+    }
+    while(!(glay_control_read & CONTROL_READY));
+
+    printf("wait %x \n", glay_control_read);
+
+}
+
+void waitGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
+{
+    uint32_t glay_control_write = 0;
+    uint32_t glay_control_read  = 0;
+    glay_control_write = CONTROL_START;
+
+    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+
+    do
+    {
+        glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
+        printf("wait %x \n", glay_control_read);
+    }
+    while(!(glay_control_read & CONTROL_IDLE));
+
+    printf("wait %x \n", glay_control_read);
+}
+
+void releaseGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
+{
+    //Close an opened device
+    // xrtKernelClose(glayHandle->kernelHandle);
+    // xrtDeviceClose(glayHandle->deviceHandle);
+    freeGlayHandle(glayHandle);
+}

@@ -55,7 +55,7 @@ package GLAY_CONTROL_PKG;
         CTRL_CHAIN_SYNC_START,
         CTRL_CHAIN_SYNC_BUSY,
         CTRL_CHAIN_SYNC_DONE
-    } control_sync_state_ctrl_chain;
+    } control_sync_state_ap_ctrl_chain;
 
 
 // --------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ package GLAY_CONTROL_PKG;
         CTRL_HS_SYNC_START,
         CTRL_HS_SYNC_BUSY,
         CTRL_HS_SYNC_DONE
-    } control_sync_state_ctrl_hs;
+    } control_sync_state_ap_ctrl_hs;
 
 
 endpackage
