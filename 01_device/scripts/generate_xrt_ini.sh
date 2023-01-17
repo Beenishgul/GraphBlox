@@ -3,11 +3,12 @@
 
 print_usage () {
   echo "Usage: "
-  echo "  generate_xrt_ini.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME"
+  echo "  generate_xrt_ini.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME ctrl_mode"
   echo ""
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
   echo "  KERNEL_NAME: glay_kernel"
+  echo "  ctrl_mode  : USER_MANAGED"
   echo "" 
 }
 if [ "$1" = "" ]

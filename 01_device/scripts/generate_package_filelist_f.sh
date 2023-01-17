@@ -3,12 +3,13 @@
 
 print_usage () {
   echo "Usage: "
-  echo "  generate_package_filelist_f.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME IP_DIR"
+  echo "  generate_package_filelist_f.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME IP_DIR VIP_DIR"
   echo ""
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
   echo "  KERNEL_NAME: glay_kernel"
   echo "  IP_DIR: IP"
+  echo "  VIP_DIR: vivado_generated_vip"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -26,6 +27,8 @@ glay_pkgs="pkgs"
 glay_kernel="kernel"
 glay_top="top"
 glay_cache="cache"
+glay_control="control"
+
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -56,9 +59,12 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/${iob_incl
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
 
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
+
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
+
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x128/fifo_638x128.xci"
 echo $newtext >> ${CFG_FILE_NAME}

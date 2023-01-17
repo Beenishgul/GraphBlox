@@ -72,10 +72,10 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
-# add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f]] >> $log_file
+add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f]] >> $log_file
 
 puts "[color 4 "                        Set Defines ${ctrl_mode}"]"
-set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
+# set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
 # set_property verilog_define ${ctrl_mode} [get_filesets sim_1]
 update_compile_order -fileset sources_1  
 update_compile_order -fileset sim_1  

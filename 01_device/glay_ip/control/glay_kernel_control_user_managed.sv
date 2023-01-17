@@ -18,7 +18,7 @@ import GLAY_AXI4_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 
-module glay_kernel_control_user_managed #(
+module glay_kernel_control #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
