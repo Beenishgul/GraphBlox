@@ -167,21 +167,21 @@ module glay_kernel_cu #(
     end
   end
 
-  
-    glay_kernel_control #(
-      .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-      .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-    ) inst_glay_kernel_control_ap_ctrl_chain (
-      .ap_clk             (ap_clk                 ),
-      .areset             (control_areset         ),
-      .glay_cu_done_in    (glay_cu_done_reg       ),
-      .glay_cu_setup_in   (glay_cu_setup_reg      ),
-      .glay_control_in    (glay_control_in_reg    ),
-      .glay_control_out   (glay_control_out_reg   ),
-      .glay_descriptor_in (glay_descriptor_in_reg ),
-      .glay_descriptor_out(glay_descriptor_out_reg)
-    );
-  
+
+  glay_kernel_control #(
+    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
+    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
+  ) inst_glay_kernel_control (
+    .ap_clk             (ap_clk                 ),
+    .areset             (control_areset         ),
+    .glay_cu_done_in    (glay_cu_done_reg       ),
+    .glay_cu_setup_in   (glay_cu_setup_reg      ),
+    .glay_control_in    (glay_control_in_reg    ),
+    .glay_control_out   (glay_control_out_reg   ),
+    .glay_descriptor_in (glay_descriptor_in_reg ),
+    .glay_descriptor_out(glay_descriptor_out_reg)
+  );
+
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
