@@ -173,10 +173,8 @@ module glay_kernel_control #(
                     next_state = CTRL_HS_SYNC_BUSY;
             end
             CTRL_HS_SYNC_DONE : begin
-                if(glay_continue_reg | glay_start_reg)
-                    next_state = CTRL_HS_SYNC_READY;
                 else
-                    next_state = CTRL_HS_SYNC_DONE;
+                    next_state = CTRL_HS_SYNC_IDLE;
             end
         endcase
     end // always_comb
