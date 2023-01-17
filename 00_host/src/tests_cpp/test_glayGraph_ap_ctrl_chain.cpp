@@ -311,7 +311,7 @@ main (int argc, char **argv)
     int bank_grp_idx = 1;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->kernel_name);
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->kernel_name, 2);
    
     if(arguments->glayHandle == NULL)
     {
@@ -319,11 +319,11 @@ main (int argc, char **argv)
     }
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
-    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSR(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain((arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
-    startGLAYUserManaged(arguments->glayHandle);
+    startGLAYCtrlChain(arguments->glayHandle);
 
-    waitGLAYUserManaged(arguments->glayHandle);
+    waitGLAYCtrlChain((arguments->glayHandle);
 
     // closeGLAYUserManaged(arguments->glayHandle);
 
