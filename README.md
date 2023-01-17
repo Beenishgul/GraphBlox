@@ -99,17 +99,17 @@ user@host:~GLay$ make
 ```
 4. Running GLay overlay emulation
     1. Make xclbin file for emulation (cycle accurate emualtion of hw):
-```console
-user@host:~GLay$ make build-hw TARGET=hw_emu
-```
+    ```console
+    user@host:~GLay$ make build-hw TARGET=hw_emu
+    ```
     2. Run in emulation mode:
-```console
-user@host:~GLay$ make run-emu
-```
+    ```console
+    user@host:~GLay$ make run-emu
+    ```
     3. View emulation waves:
-```console
-user@host:~GLay$ make run-emu-waves
-```
+    ```console
+    user@host:~GLay$ make run-emu-waves
+    ```
 
 ## Xilinx Flow [<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
