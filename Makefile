@@ -41,7 +41,7 @@ export APP  = glay
 # export APP_TEST  = test_match
 # export APP_TEST = test_glay
 # export APP_TEST = test_StalaGraph
-export APP_TEST = test_glayGraph_$(shell echo $(XILINX_CTRL_MODE) | tr A-Z a-z)
+export APP_TEST = test_glayGraph_$(XILINX_CTRL_MODE)
 # export APP_TEST = test_glayGraph_emu
 
 # =========================================================
