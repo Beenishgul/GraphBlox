@@ -42,11 +42,11 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     {
         glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_mode == 0)        // AP_CTRL_HS
+    else if (glayHandle->ctrl_mode == 1)        // AP_CTRL_HS
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_mode == 0)        // AP_CTRL_CHAIN
+    else if (glayHandle->ctrl_mode == 2)        // AP_CTRL_CHAIN
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
