@@ -120,7 +120,7 @@ user@host:~GLay$ make
 | PART  | xcu250-figd2104-2L-e | Part matching u250 Alveo card |
 | PLATFORM  | xilinx_u250_gen3x16_xdma_4_1_202210_1 | Platform matching u250 Alveo card |
 | TARGET  | hw_emu | Build target, hw or hw_emu |
-| XILINX_CTRL_MODE  | user_managed | ctrl mode, ap_ctrl_hs or ap_ctrl_chain |
+| XILINX_CTRL_MODE  | USER_MANAGED | ctrl mode, AP_CTRL_HS or AP_CTRL_CHAIN |
 | KERNEL_NAME  | glay_kernel | packaged kernel |
 | DEVICE_INDEX  | 0 | FPGA device index |
 | XCLBIN_PATH  | file.xclbin | .xclbin filepath |

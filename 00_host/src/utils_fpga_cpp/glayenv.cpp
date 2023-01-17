@@ -38,19 +38,19 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
 
-    if(glayHandle->ctrl_mode == 0)              // user_managed
+    if(glayHandle->ctrl_mode == 0)              // USER_MANAGED
     {
         glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_mode == 0)        // ap_ctrl_hs
+    else if (glayHandle->ctrl_mode == 0)        // AP_CTRL_HS
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else if (glayHandle->ctrl_mode == 0)        // ap_ctrl_chain
+    else if (glayHandle->ctrl_mode == 0)        // AP_CTRL_CHAIN
     {
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-    else      // user_managed : default
+    else      // USER_MANAGED : default
     {
         glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
@@ -252,7 +252,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle)
 
 
 // ********************************************************************************************
-// ***************                  GLAY Control user_managed                    **************
+// ***************                  GLAY Control USER_MANAGED                    **************
 // ********************************************************************************************
 
 GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
@@ -313,7 +313,7 @@ void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 
 
 // ********************************************************************************************
-// ***************                  GLAY Control ap_ctrl_hs                      **************
+// ***************                  GLAY Control AP_CTRL_HS                      **************
 // ********************************************************************************************
 
 GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlHs(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)
@@ -348,7 +348,7 @@ void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle)
 
 
 // ********************************************************************************************
-// ***************                  GLAY Control ap_ctrl_chain                   **************
+// ***************                  GLAY Control AP_CTRL_CHAIN                   **************
 // ********************************************************************************************
 
 GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx)

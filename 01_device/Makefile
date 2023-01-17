@@ -117,9 +117,9 @@ TARGET   ?= hw_emu
 # Enabling Multiple Strategies For Closing Timing
 XILINX_IMPL_STRATEGY ?= 0
 XILINX_JOBS_STRATEGY ?= 2
-XILINX_CTRL_MODE     ?= user_managed
-# XILINX_CTRL_MODE     ?= ap_ctrl_hs
-# XILINX_CTRL_MODE     ?= ap_ctrl_chain
+XILINX_CTRL_MODE     ?= USER_MANAGED
+# XILINX_CTRL_MODE     ?= AP_CTRL_HS
+# XILINX_CTRL_MODE     ?= AP_CTRL_CHAIN
 # XILINX_CTRL_MODE     ?= ap_ctrl_none
 
 # =========================================================

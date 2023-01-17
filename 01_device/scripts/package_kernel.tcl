@@ -72,9 +72,13 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
-puts "[color 4 "                        Set Defines ${ctrl_mode}=1"]"
-set_property verilog_define {"${ctrl_mode}=1"} [get_filesets sources_1]
+add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f]] >> $log_file
+
+puts "[color 4 "                        Set Defines ${ctrl_mode}"]"
+set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
+set_property verilog_define ${ctrl_mode} [get_filesets sim_1]
 update_compile_order -fileset sources_1  
+update_compile_order -fileset sim_1  
 
 puts "[color 4 "                        Create IP packaging project"]" 
 # create IP packaging project
@@ -336,19 +340,19 @@ puts "[color 4 "                        Set required property for Vitis kernel"]
 set_property sdx_kernel true $core
 set_property sdx_kernel_type rtl $core
 set_property ipi_drc {ignore_freq_hz true} $core
-# set_property vitis_drc {ctrl_protocol user_managed} $core
+# set_property vitis_drc {ctrl_protocol USER_MANAGED} $core
 
-if {${ctrl_mode} == "user_managed"} {
-  puts "[color 4 "                        Set ctrl mode "][color 1 "user_managed"]" 
+if {${ctrl_mode} == "USER_MANAGED"} {
+  puts "[color 4 "                        Set ctrl mode "][color 1 "USER_MANAGED"]" 
   set_property vitis_drc {ctrl_protocol user_managed} $core
-} elseif {${ctrl_mode} == "ap_ctrl_hs"} {
-  puts "[color 4 "                        Set ctrl mode "][color 1 "ap_ctrl_hs"]"  
+} elseif {${ctrl_mode} == "AP_CTRL_HS"} {
+  puts "[color 4 "                        Set ctrl mode "][color 1 "AP_CTRL_HS"]"  
   set_property vitis_drc {ctrl_protocol ap_ctrl_hs} $core
-} elseif {${ctrl_mode} == "ap_ctrl_chain"} {
-  puts "[color 4 "                        Set ctrl mode "][color 1 "ap_ctrl_chain"]"  
+} elseif {${ctrl_mode} == "AP_CTRL_CHAIN"} {
+  puts "[color 4 "                        Set ctrl mode "][color 1 "AP_CTRL_CHAIN"]"  
   set_property vitis_drc {ctrl_protocol ap_ctrl_chain} $core
 } else {
-  puts "[color 4 "                        Set ctrl mode "][color 1 "user_managed"]"  
+  puts "[color 4 "                        Set ctrl mode "][color 1 "USER_MANAGED"]"  
   set_property vitis_drc {ctrl_protocol user_managed} $core
 }
 
@@ -366,13 +370,13 @@ puts "[color 4 "                        Packaging Vivado IP"]"
 # Generate Vitis Kernel from Vivado IP
 # =========================================================
 puts "[color 4 "                        Generate Vitis Kernel from Vivado IP"]" 
-# package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml >> $log_file
+# package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol USER_MANAGED -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml >> $log_file
 
-if {${ctrl_mode} == "user_managed"} {
+if {${ctrl_mode} == "USER_MANAGED"} {
   package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
-} elseif {${ctrl_mode} == "ap_ctrl_hs"} {
+} elseif {${ctrl_mode} == "AP_CTRL_HS"} {
   package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_hs -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
-} elseif {${ctrl_mode} == "ap_ctrl_chain"} { 
+} elseif {${ctrl_mode} == "AP_CTRL_CHAIN"} { 
   package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
 } else {
   package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file

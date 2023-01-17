@@ -64,7 +64,7 @@ module glay_kernel_testbench ();
     parameter CTRL_DONE_MASK         = 32'h00000002;
     parameter CTRL_IDLE_MASK         = 32'h00000004;
     parameter CTRL_READY_MASK        = 32'h00000008;
-    parameter CTRL_CONTINUE_MASK     = 32'h00000010; // Only ap_ctrl_chain
+    parameter CTRL_CONTINUE_MASK     = 32'h00000010; // Only AP_CTRL_CHAIN
     parameter CTRL_AUTO_RESTART_MASK = 32'h00000080; // Not used
 
 // Global Interrupt Enable Register
