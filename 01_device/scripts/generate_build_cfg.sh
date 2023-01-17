@@ -33,14 +33,38 @@ config+="[connectivity]\n"
 if [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR0\n"
-   config+="sp=${KERNEL_NAME}_1:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.graph_csr_struct:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_out_degree:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_in_degree:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_edges_idx:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_weight:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_src:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_dest:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.auxiliary_1:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.auxiliary_2:HBM[1]\n"
 elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR1\n"
-   config+="sp=${KERNEL_NAME}_1:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.graph_csr_struct:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_out_degree:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_in_degree:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.vertex_edges_idx:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_weight:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_src:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.edges_array_dest:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.auxiliary_1:DDR[1]\n"
+   config+="sp=${KERNEL_NAME}_1.auxiliary_2:DDR[1]\n"
 else
   config+="slr=${KERNEL_NAME}_1:SLR1\n"
-  config+="sp=${KERNEL_NAME}_1:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.graph_csr_struct:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.vertex_out_degree:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.vertex_in_degree:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.vertex_edges_idx:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.edges_array_weight:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.edges_array_src:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.edges_array_dest:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.auxiliary_1:DDR[1]\n"
+  config+="sp=${KERNEL_NAME}_1.auxiliary_2:DDR[1]\n"
 fi
 
 
