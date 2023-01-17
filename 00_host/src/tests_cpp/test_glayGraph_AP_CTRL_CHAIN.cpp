@@ -298,6 +298,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
     return 0;
 }
 
+
 static struct argp argp = { options, parse_opt, args_doc, doc };
 
 int
@@ -319,11 +320,11 @@ main (int argc, char **argv)
     }
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
-    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain((arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
 
     startGLAYCtrlChain(arguments->glayHandle);
 
-    waitGLAYCtrlChain((arguments->glayHandle);
+    waitGLAYCtrlChain(arguments->glayHandle);
 
     // closeGLAYUserManaged(arguments->glayHandle);
 
