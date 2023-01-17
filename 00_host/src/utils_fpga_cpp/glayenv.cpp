@@ -37,23 +37,25 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
 
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
-
-    if(glayHandle->ctrl_mode == 0)              // USER_MANAGED
-    {
-        glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    }
-    else if (glayHandle->ctrl_mode == 1)        // AP_CTRL_HS
-    {
-        glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    }
-    else if (glayHandle->ctrl_mode == 2)        // AP_CTRL_CHAIN
-    {
-        glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    }
-    else      // USER_MANAGED : default
-    {
-        glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    }
+    glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    
+    // if(glayHandle->ctrl_mode == 0)              // USER_MANAGED
+    // {
+    //     glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    // }
+    // else if (glayHandle->ctrl_mode == 1)        // AP_CTRL_HS
+    // {
+    //     glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    // }
+    // else if (glayHandle->ctrl_mode == 2)        // AP_CTRL_CHAIN
+    // {
+    //     glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    // }
+    // else      // USER_MANAGED : default
+    // {
+    //     glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    // }
 
 
     std::cout << "Fetch compute Units" << std::endl;
