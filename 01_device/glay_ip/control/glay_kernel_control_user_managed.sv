@@ -228,4 +228,4 @@ module glay_kernel_control #(
         endcase
     end // always_ff @(posedge ap_clk)
 
-endmodule : glay_kernel_control_user_managed
+endmodule : glay_kernel_control
