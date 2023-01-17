@@ -186,13 +186,13 @@ module glay_kernel_control #(
             CTRL_HS_SYNC_RESET : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b0;
+                glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
             CTRL_HS_SYNC_IDLE : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b0;
+                glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
             CTRL_HS_SYNC_SETUP : begin
@@ -222,7 +222,7 @@ module glay_kernel_control #(
             CTRL_HS_SYNC_DONE : begin
                 glay_ready_reg            <= 1'b0;
                 glay_done_reg             <= 1'b1;
-                glay_idle_reg             <= 1'b0;
+                glay_idle_reg             <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
             end
         endcase
