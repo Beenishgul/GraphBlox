@@ -10,6 +10,7 @@ print_usage () {
   echo "  KERNEL_NAME: glay_kernel"
   echo "  IMPL_STRATEGY: 0"
   echo "  JOBS_STRATEGY: 2"
+  echo "  PART: xcu280-fsvh2892-2L-e"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -22,27 +23,35 @@ SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 IMPL_STRATEGY=$4
 JOBS_STRATEGY=$5
+PART=$6
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
 
 config=""
+ 
+config+="[connectivity]\n"
+if [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
+then
+   config+="slr=${KERNEL_NAME}_1:SLR0\n"
+elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
+then
+   config+="slr=${KERNEL_NAME}_1:SLR1\n"
+else
+  config+="slr=${KERNEL_NAME}_1:SLR1\n"
+fi
+
+
 if [[ ${IMPL_STRATEGY} -eq 0 ]]
 then
- config="[advanced]\n"
+ config+="\n[advanced]\n"
  config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
-
- config+="\n[connectivity]\n"
- config+="slr=${KERNEL_NAME}_1:SLR1\n"
-
  echo -e "${config}" >> ${CFG_FILE_NAME}
 elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    config+="\n[vivado]\n"
    config+="impl.strategies=Performance_Explore,Area_Explore\n"
@@ -51,12 +60,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 2 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -68,12 +75,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 3 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -96,12 +101,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 4 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -122,12 +125,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
  elif [[ ${IMPL_STRATEGY} -eq 5 ]]
   then
 
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -147,12 +148,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 6 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -172,12 +171,10 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 7 ]]
   then
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
 
    JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
 
@@ -196,10 +193,8 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
 
    echo -e "${config}" >> ${CFG_FILE_NAME}
  else
-   config="[advanced]\n"
+   config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
-   config+="\n[connectivity]\n"
-   config+="slr=${KERNEL_NAME}_1:SLR1\n"
    echo -e  "${config}" >> ${CFG_FILE_NAME}
  fi
 
