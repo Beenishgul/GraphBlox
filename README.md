@@ -81,7 +81,9 @@ user@host:~$ sudo apt-get install libjudy-dev
 user@host:~$ sudo apt-get install libomp-dev
 ```
 
-## Setting up the source code
+# Running GLay
+
+## Setting up the GLay emulation example
 
 1. Clone GLay.
 ```console
@@ -91,12 +93,23 @@ user@host:~$ git clone https://github.com/atmughrabi/GLay.git
 ```console
 user@host:~$ cd GLay/
 ```
-3. Make the source code
+3. Make the source code, package kernel, and generate Xilinxs IPs (AXI/FIFOs).
 ```console
 user@host:~GLay$ make
 ```
-
-# Running GLay (Under construction!)
+4. Running GLay overlay emulation
+    1. Make xclbin file for emulation (cycle accurate emualtion of hw):
+```console
+user@host:~GLay$ make build-hw TARGET=hw_emu
+```
+    2. Run in emulation mode:
+```console
+user@host:~GLay$ make run-emu
+```
+    3. View emulation waves:
+```console
+user@host:~GLay$ make run-emu-waves
+```
 
 ## Xilinx Flow [<img src="./02_slides_figures_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
