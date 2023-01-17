@@ -20,12 +20,7 @@ SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 ctrl_mode=$4
 
-if [[ "$ctrl_mode" == "user_managed" ]]
-then
-   exclusive_cu_context="true"
-else
-   exclusive_cu_context="false"
-fi
+
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
 
@@ -39,10 +34,10 @@ timeline_trace="true"
 device_trace="coarse"
 
 
-config="[Runtime]\n"
-config+="exclusive_cu_context=${exclusive_cu_context}\n"
 
-config+="\n[Emulation]\n"
+
+  
+config="[Emulation]\n"
 config+="debug_mode=${debug_mode}\n"
 config+="user_pre_sim_script=${user_pre_sim_script}\n"
 
@@ -50,5 +45,12 @@ config+="\n[Debug]\n"
 config+="profile=${profile}\n"
 config+="timeline_trace=${timeline_trace}\n"
 config+="device_trace=${device_trace}\n"
+
+if [[ "$ctrl_mode" == "user_managed" ]]
+then
+   config+="\n[Runtime]\n"
+   config+="exclusive_cu_context=true\n"
+fi
+
 
 echo -e "${config}" >> ${CFG_FILE_NAME}

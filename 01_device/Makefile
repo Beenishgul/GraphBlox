@@ -355,7 +355,7 @@ run-emu-debug: run-emu-cmd
 .PHONY: run-emu-wave
 run-emu-wave: session-info $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
-	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
+	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_sim.pl
 
 # =========================================================
 # Application Executable File Generation
