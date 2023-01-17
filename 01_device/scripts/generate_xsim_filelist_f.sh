@@ -26,6 +26,7 @@ glay_kernel="kernel"
 glay_top="top"
 glay_kernel_testbench="kernel_testbench"
 glay_cache="cache"
+glay_control="control"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -54,6 +55,8 @@ echo $newtext > ${CFG_FILE_NAME}
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
