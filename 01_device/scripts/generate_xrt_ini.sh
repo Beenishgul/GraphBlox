@@ -18,6 +18,14 @@ fi
 ACTIVE_APP_DIR=$1
 SCRIPTS_DIR=$2
 KERNEL_NAME=$3
+ctrl_mode=$4
+
+if [[ "$ctrl_mode" == "user_managed" ]]
+then
+   exclusive_cu_context="true"
+else
+   exclusive_cu_context="false"
+fi
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
 
