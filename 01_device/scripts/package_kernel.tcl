@@ -72,7 +72,8 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
-set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
+puts "[color 4 "                        Set Defines ${ctrl_mode}=1"]"
+set_property verilog_define {"${ctrl_mode}=1"} [get_filesets sources_1]
 update_compile_order -fileset sources_1  
 
 puts "[color 4 "                        Create IP packaging project"]" 
@@ -245,15 +246,12 @@ puts_reg_info "IP_ISR" "IP Interrupt Status Register" "0x00C" 32
 # =========================================================
 
 # =========================================================
-# Step 4: Define and setup user kernel arguments (offsets, descriptions, and sizes)
+# Step 4: Associate AXI master port to pointer argument and set data width
 # =========================================================
-puts "[color 3 "                Step 4: Define and setup user kernel (${kernel_name}) arguments"]" 
+puts "[color 3 "                Step 4: Associate AXI master port to pointer argument and set data width"]" 
 puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"]" 
 # =========================================================
 
-# =========================================================
-# Set RTL kernel (${kernel_name}) registers property
-# =========================================================
 puts "[color 4 "                        Set RTL kernel (${kernel_name}) registers property"]" 
 
 puts_reg_info "graph_csr_struct" "description_text" "0x010" [expr {8*8}]
