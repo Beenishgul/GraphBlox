@@ -83,7 +83,7 @@ user@host:~$ sudo apt-get install libomp-dev
 
 # Running GLay
 
-## Setting up the GLay emulation example
+## Setting up GLay for Emulation - Example
 
 1. Clone GLay.
 ```console
