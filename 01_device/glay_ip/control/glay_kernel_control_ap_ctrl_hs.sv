@@ -155,13 +155,16 @@ module glay_kernel_control #(
                 next_state = CTRL_HS_SYNC_SETUP;
             end
             CTRL_HS_SYNC_SETUP : begin
-                if(glay_start_reg & ~|glay_cu_setup_reg)
+                if(glay_start_reg)
                     next_state = CTRL_HS_SYNC_READY;
                 else
                     next_state = CTRL_HS_SYNC_SETUP;
             end
             CTRL_HS_SYNC_READY : begin
-                next_state = CTRL_HS_SYNC_START;
+                if(~|glay_cu_setup_reg)
+                    next_state = CTRL_HS_SYNC_START;
+                else
+                    next_state = CTRL_HS_SYNC_READY;
             end
             CTRL_HS_SYNC_START : begin
                 next_state = CTRL_HS_SYNC_BUSY;
