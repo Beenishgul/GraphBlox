@@ -37,7 +37,7 @@ runtime_log="console"
 profile="true"
 timeline_trace="true"
 device_trace="coarse"
-exclusive_cu_context="true"
+
 
 config="[Runtime]\n"
 config+="exclusive_cu_context=${exclusive_cu_context}\n"
