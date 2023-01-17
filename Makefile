@@ -41,7 +41,7 @@ export APP  = glay
 # export APP_TEST  = test_match
 # export APP_TEST = test_glay
 # export APP_TEST = test_StalaGraph
-export APP_TEST = test_glayGraph_$(XILINX_CTRL_MODE)
+export APP_TEST = test_glayGraph_$(shell echo $(XILINX_CTRL_MODE) | tr A-Z a-z)
 # export APP_TEST = test_glayGraph_emu
 
 # =========================================================
@@ -366,12 +366,12 @@ export XILINX_JOBS_STRATEGY = 4
 # =========================================================
 # Control mode options
 # =========================================================
-# Control mode XRT/OCL/HLS (ap_ctrl_hs, ap_ctrl_chain) 
-# Control mode USER (user_managed)
+# Control mode XRT/OCL/HLS (AP_CTRL_HS, AP_CTRL_CHAIN) 
+# Control mode USER (USER_MANAGED)
 # =========================================================
-# export XILINX_CTRL_MODE     = user_managed
-export XILINX_CTRL_MODE     = ap_ctrl_hs
-# export XILINX_CTRL_MODE     = ap_ctrl_chain
+# export XILINX_CTRL_MODE     = USER_MANAGED
+export XILINX_CTRL_MODE     = AP_CTRL_HS
+# export XILINX_CTRL_MODE     = AP_CTRL_CHAIN
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 # =========================================================
 

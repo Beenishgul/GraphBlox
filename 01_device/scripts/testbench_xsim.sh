@@ -35,18 +35,18 @@ xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb wo
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 
-if [[ "$ctrl_mode" == "user_managed" ]]
+if [[ "$ctrl_mode" == "USER_MANAGED" ]]
 then
-   xvlog_opts+=" --define user_managed"
-elif [[ "$ctrl_mode" == "ap_ctrl_hs" ]]
+   xvlog_opts+=" --define USER_MANAGED"
+elif [[ "$ctrl_mode" == "AP_CTRL_HS" ]]
 then
-   xvlog_opts+=" --define ap_ctrl_hs"
-elif [[ "$ctrl_mode" == "ap_ctrl_chain" ]]
+   xvlog_opts+=" --define AP_CTRL_HS"
+elif [[ "$ctrl_mode" == "AP_CTRL_CHAIN" ]]
 then
-   xvlog_opts+=" --define ap_ctrl_chain"
+   xvlog_opts+=" --define AP_CTRL_CHAIN"
 else
   echo "MSG: else |$ctrl_mode|"
-   xvlog_opts+=" --define user_managed"
+   xvlog_opts+=" --define USER_MANAGED"
 fi
 
  

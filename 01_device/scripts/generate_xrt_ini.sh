@@ -46,7 +46,7 @@ config+="profile=${profile}\n"
 config+="timeline_trace=${timeline_trace}\n"
 config+="device_trace=${device_trace}\n"
 
-if [[ "$ctrl_mode" == "user_managed" ]]
+if [[ "$ctrl_mode" == "USER_MANAGED" ]]
 then
    config+="\n[Runtime]\n"
    config+="exclusive_cu_context=true\n"

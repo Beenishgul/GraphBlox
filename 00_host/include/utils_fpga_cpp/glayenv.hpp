@@ -193,7 +193,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle);
 
 
 // ********************************************************************************************
-// ***************                  GLAY Control user_managed                    **************
+// ***************                  GLAY Control USER_MANAGED                    **************
 // ********************************************************************************************
 struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
@@ -201,7 +201,7 @@ void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 
 // ********************************************************************************************
-// ***************                  GLAY Control ap_ctrl_hs                      **************
+// ***************                  GLAY Control AP_CTRL_HS                      **************
 // ********************************************************************************************
 struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlHs(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
@@ -209,7 +209,7 @@ void waitGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
 
 // ********************************************************************************************
-// ***************                  GLAY Control ap_ctrl_chain                   **************
+// ***************                  GLAY Control AP_CTRL_CHAIN                   **************
 // ********************************************************************************************
 struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAYCtrlChain(struct xrtGLAYHandle *glayHandle);
