@@ -1,30 +1,4 @@
-# =========================================================
-# Starting point of GLay generate IPs and compile Host
-# =========================================================
-.PHONY: start
-start: gen-vip package-kernel
 
-# =========================================================
-
-# =========================================================
-#  Build info output to terminal
-# =========================================================
-.PHONY: session-info
-session-info: 
-	$(ECHO) "========================================================="
-	$(ECHO) "${BLUE}Build $(APP_DIR)${NC} -> ${RED}$(MAKECMDGOALS)${NC}"
-	$(ECHO) "========================================================="
-	$(ECHO) "${BLUE}HOST_NAME   ${NC}| ${GREEN}$(HOST_NAME)${NC}"
-	$(ECHO) "${BLUE}KERNEL_NAME ${NC}| ${GREEN}$(KERNEL_NAME)${NC}"
-	$(ECHO) "${BLUE}ALVEO       ${NC}| ${GREEN}$(ALVEO)${NC}"
-	$(ECHO) "${BLUE}PART        ${NC}| ${GREEN}$(PART)${NC}"
-	$(ECHO) "${BLUE}PLATFORM    ${NC}| ${GREEN}$(PLATFORM)${NC}"
-	$(ECHO) "${BLUE}TARGET      ${NC}| ${GREEN}$(TARGET)${NC}"
-	$(ECHO) "${BLUE}CTRL_MODE   ${NC}| ${GREEN}$(XILINX_CTRL_MODE)${NC}"
-	$(ECHO) "========================================================="
-	$(ECHO) "${BLUE}GIT_VER     | ${YELLOW}$(GIT_VER)${NC}"
-	$(ECHO) "========================================================="
-# =========================================================
 
 # =========================================================
 # Directory/Project Configurations                           
@@ -156,9 +130,36 @@ GCC     := gcc
 CC      := gcc
 
 # =========================================================
-#  Compile all steps
+# Starting point of GLay generate IPs and compile Host
+# =========================================================
+.PHONY: start
+start: gen-vip package-kernel
+
 # =========================================================
 
+# =========================================================
+#  Build info output to terminal
+# =========================================================
+.PHONY: session-info
+session-info: 
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}Build $(APP_DIR)${NC} -> ${RED}$(MAKECMDGOALS)${NC}"
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}HOST_NAME   ${NC}| ${GREEN}$(HOST_NAME)${NC}"
+	$(ECHO) "${BLUE}KERNEL_NAME ${NC}| ${GREEN}$(KERNEL_NAME)${NC}"
+	$(ECHO) "${BLUE}ALVEO       ${NC}| ${GREEN}$(ALVEO)${NC}"
+	$(ECHO) "${BLUE}PART        ${NC}| ${GREEN}$(PART)${NC}"
+	$(ECHO) "${BLUE}PLATFORM    ${NC}| ${GREEN}$(PLATFORM)${NC}"
+	$(ECHO) "${BLUE}TARGET      ${NC}| ${GREEN}$(TARGET)${NC}"
+	$(ECHO) "${BLUE}CTRL_MODE   ${NC}| ${GREEN}$(XILINX_CTRL_MODE)${NC}"
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}GIT_VER     | ${YELLOW}$(GIT_VER)${NC}"
+	$(ECHO) "========================================================="
+# =========================================================
+
+# =========================================================
+#  Compile all steps
+# =========================================================
 .PHONY: all
 all: gen-vip package-kernel build-hw
 
