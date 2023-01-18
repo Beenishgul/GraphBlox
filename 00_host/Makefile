@@ -1,13 +1,4 @@
 # =========================================================
-# Starting point of GLay generate IPs and compile Host
-# =========================================================
-.PHONY: start
-start: $(APP)-$(INTEGRATION)
-	
-# =========================================================
-
-
-# =========================================================
 #                GENERAL DIRECTOIRES HOST               
 # =========================================================
 APP                 ?= glay
@@ -23,8 +14,8 @@ INTEGRATION         ?= openmp
 # Directories for host app
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
-GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%h")
-APP_DIR             ?= 00_GLay
+GIT_VER             ?= $(shell cd .. ; git log -1 --pretty=format:"%h")
+APP_DIR             ?= $(shell cd .. && pwd | xargs basename )
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
@@ -169,6 +160,13 @@ OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(UTIL_DIR_FPGA_CPP)        \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)
 
+# =========================================================
+# Starting point of GLay generate IPs and compile Host
+# =========================================================
+.PHONY: start
+start: $(APP)-$(INTEGRATION)
+	
+# =========================================================
 # =========================================================
 # GLAY GENERATION                        
 # =========================================================
