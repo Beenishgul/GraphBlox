@@ -44,9 +44,9 @@ INTEGRATION         ?= openmp
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
-GIT_VER             ?= $(shell cd .. && git log -1 --pretty=format:"%h")
+GIT_VER             ?= $(shell cd .. ; git log -1 --pretty=format:"%h")
 
-APP_DIR             ?= 00_GLay
+APP_DIR             ?= $(shell cd .. && pwd | xargs basename )
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
 

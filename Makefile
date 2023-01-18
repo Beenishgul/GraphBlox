@@ -3,8 +3,8 @@
 # =========================================================
 export ROOT_DIR                = $(shell cd .. ; pwd)
 export HOST_NAME               = $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
-export GIT_VER                 = $(shell cd . && git log -1 --pretty=format:"%h")
-export APP_DIR                 = 00_GLay
+export GIT_VER                 = $(shell cd . ; git log -1 --pretty=format:"%h")
+export APP_DIR                 = $(shell basename "$(PWD)")
 export HOST_DIR                = 00_host
 export DEVICE_DIR              = 01_device
 export BENCH_DIR               = 03_test_graphs

@@ -125,7 +125,15 @@ user@host:~GLay$ make
 | DEVICE_INDEX  | 0 | FPGA device index |
 | XCLBIN_PATH  | file.xclbin | .xclbin filepath |
 
+
 ### Simulation Mode
+
+## Refreshing glay_ip and scripts into xilinx_project directory
+1. When modifying glay_ip and scripts directories, especially in `simulation mode` use the following rule - this makes sure that the updated scripts and Verilog code are copied to the active `xilinx_project` directory:
+```console
+user@host:~GLay$ make gen-scripts-dir
+```
+## Simulation glay_ip flow
 
 1. Generate Xilinx IPs:
 ```console
