@@ -56,26 +56,26 @@ set_property target_simulator XSim    [current_project]
 puts "[color 2 "                        Generate AXI Master VIP"]" 
 
 set module_name control_${kernel_name}_vip
-create_ip -name axi_vip \
-          -vendor xilinx.com \
-          -library ip \
-          -version 1.* \
-          -module_name ${module_name} \
+create_ip -name axi_vip                 \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 1.*                  \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
           
 set_property -dict [list \
-                    CONFIG.INTERFACE_MODE {MASTER} \
-                    CONFIG.PROTOCOL {AXI4LITE} \
-                    CONFIG.ADDR_WIDTH {12} \
-                    CONFIG.DATA_WIDTH {32} \
-                    CONFIG.SUPPORTS_NARROW {0} \
-                    CONFIG.HAS_BURST {0} \
-                    CONFIG.HAS_LOCK {0} \
-                    CONFIG.HAS_CACHE {0} \
-                    CONFIG.HAS_REGION {0} \
-                    CONFIG.HAS_QOS {0} \
-                    CONFIG.HAS_PROT {0} \
-                    CONFIG.HAS_WSTRB {1} \
+                    CONFIG.INTERFACE_MODE {MASTER}              \
+                    CONFIG.PROTOCOL {AXI4LITE}                  \
+                    CONFIG.ADDR_WIDTH {12}                      \
+                    CONFIG.DATA_WIDTH {32}                      \
+                    CONFIG.SUPPORTS_NARROW {0}                  \
+                    CONFIG.HAS_BURST {0}                        \
+                    CONFIG.HAS_LOCK {0}                         \
+                    CONFIG.HAS_CACHE {0}                        \
+                    CONFIG.HAS_REGION {0}                       \
+                    CONFIG.HAS_QOS {0}                          \
+                    CONFIG.HAS_PROT {0}                         \
+                    CONFIG.HAS_WSTRB {1}                        \
                     ] [get_ips ${module_name}]
              
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
@@ -90,28 +90,28 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate AXI Slave VIP"]" 
 
 set module_name slv_m00_axi_vip
-create_ip -name axi_vip \
-          -vendor xilinx.com \
-          -library ip \
-          -version 1.* \
-          -module_name ${module_name}  \
+create_ip -name axi_vip                 \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 1.*                  \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
           
 set_property -dict [list \
-                    CONFIG.INTERFACE_MODE {SLAVE} \
-                    CONFIG.PROTOCOL {AXI4} \
-                    CONFIG.ADDR_WIDTH {64} \
-                    CONFIG.DATA_WIDTH {512} \
-                    CONFIG.SUPPORTS_NARROW {0} \
-                    CONFIG.HAS_LOCK {1} \
-                    CONFIG.HAS_CACHE {1} \
-                    CONFIG.HAS_REGION {0} \
-                    CONFIG.HAS_BURST {1} \
-                    CONFIG.HAS_QOS {1} \
-                    CONFIG.HAS_PROT {1} \
-                    CONFIG.HAS_WSTRB {1} \
-                    CONFIG.HAS_SIZE {1} \
-                    CONFIG.ID_WIDTH   {1}\
+                    CONFIG.INTERFACE_MODE {SLAVE}               \
+                    CONFIG.PROTOCOL {AXI4}                      \
+                    CONFIG.ADDR_WIDTH {64}                      \
+                    CONFIG.DATA_WIDTH {512}                     \
+                    CONFIG.SUPPORTS_NARROW {0}                  \
+                    CONFIG.HAS_LOCK {1}                         \
+                    CONFIG.HAS_CACHE {1}                        \
+                    CONFIG.HAS_REGION {0}                       \
+                    CONFIG.HAS_BURST {1}                        \
+                    CONFIG.HAS_QOS {1}                          \
+                    CONFIG.HAS_PROT {1}                         \
+                    CONFIG.HAS_WSTRB {1}                        \
+                    CONFIG.HAS_SIZE {1}                         \
+                    CONFIG.ID_WIDTH   {1}                       \
                     ] [get_ips ${module_name}]
 
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
@@ -200,6 +200,34 @@ generate_target all                          [get_files $ip_dir/${module_name}/$
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
+
+# ----------------------------------------------------------------------------
+# generate arb_master_2x1
+# ----------------------------------------------------------------------------
+# puts "[color 2 "                        Generate Arbiter GlayCacheRequestInterfaceInput: arb_master_2x1"]" 
+
+# set module_name arb_master_2x1
+# create_ip -name arb_master          \
+#         -vendor xilinx.com          \
+#         -library ip                 \
+#         -version 1.0                \
+#         -module_name ${module_name} \
+#         -dir ${ip_dir} >> $log_file
+
+# set_property -dict [list                                        \
+#                     CONFIG.C_REQ_WIDTH {2}                      \
+#                     CONFIG.C_HAS_REQ {2}                        \
+#                     CONFIG.C_GNT_WIDTH {2}                      \ 
+#                     CONFIG.C_HAS_GNT {2}                        \
+#                     CONFIG.C_REL_WIDTH {2}                      \ 
+#                     CONFIG.C_HAS_REL {2}                        \
+#                     ] [get_ips ${module_name}]
+
+# set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+# generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+# generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+# export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+# export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
