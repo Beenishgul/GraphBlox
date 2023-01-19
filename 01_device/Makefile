@@ -94,6 +94,10 @@ XILINX_CTRL_MODE     ?= USER_MANAGED
 # XILINX_CTRL_MODE     ?= AP_CTRL_CHAIN
 # XILINX_CTRL_MODE     ?= ap_ctrl_none
 
+
+TESTBENCH_MODULE     ?= glay
+# TESTBENCH_MODULE     ?= arbiter
+
 # =========================================================
 # CLI COMMANDS                           
 # =========================================================
@@ -184,7 +188,7 @@ gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_CTRL_MODE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY)  $(PART);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) $(VIVADO_VIP_DIR) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) $(VIVADO_VIP_DIR)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(TESTBENCH_MODULE)
 	
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
