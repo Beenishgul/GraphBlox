@@ -110,7 +110,7 @@ end
 	assign next_state = (req[1] & ~req[0]) | (req[1] & grant_state);
 
 // state register
-	always @(posedge ap_clk, posedge areset)
+	always_ff @(posedge ap_clk)
 		begin
 			if(areset)
 				grant_state <= 0;

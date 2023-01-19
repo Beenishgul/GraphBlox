@@ -31,13 +31,13 @@
 `timescale 1ns / 1ps
 import GLAY_FUNCTIONS_PKG::*;
 
-module mux_array #(parameter width = 0) (
-	input  logic [(2*width)-1:0] in    ,
-	input  logic [    width-1:0] select,
-	output logic [    width-1:0] out
+module mux_array #(parameter WIDTH = 8) (
+	input  logic [(2*WIDTH)-1:0] in    ,
+	input  logic [    WIDTH-1:0] select,
+	output logic [    WIDTH-1:0] out
 );
 
-	mux_node nodes[width-1:0] (
+	mux_node nodes[WIDTH-1:0] (
 		.in(in),
 		.select(select),
 		.out(out)

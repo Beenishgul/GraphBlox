@@ -31,9 +31,9 @@
 // 'arbiter' is a tree made from unregistered 'arbiter_node'
 // modules. Unregistered carries between nodes allows
 // the tree to change state on the same ap_clk. The tree
-// contains (width - 1) nodes, so resource usage of the
+// contains (WIDTH - 1) nodes, so resource usage of the
 // arbiter grows linearly. The number of levels and thus the
-// propogation delay down the tree grows with log2(width).
+// propogation delay down the tree grows with log2(WIDTH).
 // The logarithmic delay scaling makes this arbiter suitable
 // for large configuations. This module can take up to three
 // ap_clks to grant the next requestor after its inputs change
@@ -44,13 +44,13 @@
 import GLAY_FUNCTIONS_PKG::*;
 
 module arbiter #(
-	parameter width        = 0,
-	parameter select_width = 1
+	parameter WIDTH        = 8,
+	parameter SELECT_WIDTH = 8
 ) (
 	input  logic                    enable,
-	input  logic [       width-1:0] req   ,
-	output logic [       width-1:0] grant ,
-	output logic [select_width-1:0] select,
+	input  logic [       WIDTH-1:0] req   ,
+	output logic [       WIDTH-1:0] grant ,
+	output logic [SELECT_WIDTH-1:0] select,
 	output logic                    valid ,
 	input  logic                    ap_clk,
 	input  logic                    areset
@@ -59,21 +59,21 @@ module arbiter #(
 	genvar g;
 
 // These logics interconnect arbiter nodes.
-	logic [2*width-2:0] interconnect_req   ;
-	logic [2*width-2:0] interconnect_grant ;
-	logic [  width-2:0] interconnect_select;
-	logic [mux_sum(width,clog2(width))-1:0] interconnect_mux;
+	logic [               2*WIDTH-2:0] interconnect_req   ;
+	logic [               2*WIDTH-2:0] interconnect_grant ;
+	logic [                 WIDTH-2:0] interconnect_select;
+	logic [mux_sum(WIDTH,$clog2(WIDTH))-1:0] interconnect_mux   ;
 
 // Assign inputs to some interconnects.
-	assign interconnect_req[2*width-2-:width] = req;
+	assign interconnect_req[2*WIDTH-2-:WIDTH] = req;
 	assign interconnect_grant[0]              = enable;
 
 // Assign the select outputs of the first arbiter stage to
 // the first mux stage.
-	assign interconnect_mux[mux_sum(width,clog2(width))-1-:width/2] = interconnect_select[width-2-:width/2];
+	assign interconnect_mux[mux_sum(WIDTH,$clog2(WIDTH))-1-:WIDTH/2] = interconnect_select[WIDTH-2-:WIDTH/2];
 
 // Register some interconnects as outputs.
-	always @(posedge ap_clk, posedge areset)
+	always_ff @(posedge ap_clk)
 		begin
 			if(areset)
 				begin
@@ -84,19 +84,19 @@ module arbiter #(
 			else
 				begin
 					valid  <= interconnect_req[0];
-					grant  <= interconnect_grant[2*width-2-:width];
-					select <= interconnect_mux[clog2(width)-1:0];
+					grant  <= interconnect_grant[2*WIDTH-2-:WIDTH];
+					select <= interconnect_mux[$clog2(WIDTH)-1:0];
 				end
 		end
 
 // Generate the stages of the arbiter tree. Each stage is
 // instantiated as an array of 'abiter_node' modules and
-// is half the width of the previous stage. Some simple
+// is half the WIDTH of the previous stage. Some simple
 // arithmetic part-selects the interconnects for each stage.
 // See the "Request/Grant Interconnections" diagram of an
 // arbiter in the documentation.
 	generate
-		for(g = width; g >= 2; g = g / 2)
+		for(g = WIDTH; g >= 2; g = g / 2)
 			begin: gen_arb
 				arbiter_node nodes[(g/2)-1:0] (
 					.enable(interconnect_grant[g-2-:g/2]),
@@ -121,16 +121,16 @@ module arbiter #(
 // stage. See the "Select Interconnections" diagram of an
 // arbiter in the documentation.
 	generate
-		for(g = width/2; g >= 2; g = g / 2)
+		for(g = WIDTH/2; g >= 2; g = g / 2)
 			begin: gen_mux
 				mux_array #(
-					.width(g/2)
-				) mux_array[clog2(width/g)-1:0] (
-					.in(interconnect_mux[mux_sum(g,clog2(width))-1-:clog2(width/g)*g]),
+					.WIDTH(g/2)
+				) mux_array[$clog2(WIDTH/g)-1:0] (
+					.in(interconnect_mux[mux_sum(g,$clog2(WIDTH))-1-:$clog2(WIDTH/g)*g]),
 					.select(interconnect_select[g-2-:g/2]),
-					.out(interconnect_mux[mux_sum(g/2,clog2(width))-(g/2)-1-:clog2(width/g)*g/2])
+					.out(interconnect_mux[mux_sum(g/2,$clog2(WIDTH))-(g/2)-1-:$clog2(WIDTH/g)*g/2])
 				);
-				assign interconnect_mux[mux_sum(g/2,clog2(width))-1-:g/2] = interconnect_select[g-2-:g/2];
+				assign interconnect_mux[mux_sum(g/2,$clog2(WIDTH))-1-:g/2] = interconnect_select[g-2-:g/2];
 			end
 	endgenerate
 

@@ -94,7 +94,7 @@ begin
 			begin
 				monitor_exceptions = monitor_exceptions + 1;
 				
-				$display("EXCEPTION @%e: grant line %d with no req",
+				$display("%t - EXCEPTION @%e: grant line %d with no req", $time,
 					$realtime, grant_i);
 			end
 			
@@ -102,7 +102,7 @@ begin
 			begin
 				monitor_exceptions = monitor_exceptions + 1;
 				
-				$display("EXCEPTION @%e: select of %d does not match grant of line %d",
+				$display("%t - EXCEPTION @%e: select of %d does not match grant of line %d", $time,
 					$realtime, select, grant_i);
 			end
 		end
@@ -112,7 +112,7 @@ begin
 	begin
 		monitor_exceptions = monitor_exceptions + 1;
 		
-		$display("EXCEPTION @%e: grant %h asserts multiple lines",
+		$display("%t - EXCEPTION @%e: grant %h asserts multiple lines", $time,
 			$realtime, grant);
 	end
 end
@@ -146,23 +146,23 @@ begin
 		begin
 			failures = failures + 1;
 			
-			$display("FAILED %d: req %h, grant %h (expected %h)",
+			$display("%t - FAILED %d: req %h, grant %h (expected %h)", $time,
 				test_i, req, grant, grant_expected);
 		end
 		else
 		begin
-			$display("ok %d: req %h, grant %h (expected %h)",
+			$display("%t - ok %d: req %h, grant %h (expected %h)", $time,
 				test_i, req, grant, grant_expected);
 		end
 	end
 	
-	$display("%d failures", failures);
-	$display("%d monitor exceptions", monitor_exceptions);
+	$display("%t - %d failures", $time, failures);
+	$display("%t - %d monitor exceptions", $time, monitor_exceptions);
 	
 	if(failures == 0 && monitor_exceptions == 0)
-		$display("PASS");
+		$display("%t - PASS", $time);
 	else
-		$display("FAIL");
+		$display("%t - FAIL", $time);
 
 	 #1000  $finish;
 end
