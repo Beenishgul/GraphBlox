@@ -362,5 +362,26 @@ module glay_kernel_cu #(
     .rd_rst_busy (cache_req_out_fifo_signals.rd_rst_busy )
   );
 
+  logic [1:0] select;
+  logic [1:0] grant;
+  logic [1:0] req;
+  logic valid;
+
+  assign req[0] = ~cache_req_in_fifo_signals.empty;
+  assign req[1] = 0;
+
+  arbiter #(
+    .WIDTH       (2),
+    .SELECT_WIDTH(2)
+  ) inst_arbiter (
+    .enable(1'b1),
+    .req   (req   ),
+    .grant (grant ),
+    .select(select),
+    .valid (valid),
+    .ap_clk(ap_clk),
+    .areset(fifo_areset)
+  );
+
 
 endmodule : glay_kernel_cu
