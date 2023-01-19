@@ -20,6 +20,8 @@ ACTIVE_APP_DIR=$1
 SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 IP_DIR=$4
+VIP_DIR=$5
+MODULE=$6
 
 glay_pkgs="pkgs"
 glay_kernel="kernel"
@@ -67,44 +69,48 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/simulation/fifo_generator_vlog_beh.v"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/hdl/fifo_generator_v13_2_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_638x128/sim/fifo_638x128.v"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/vivado_generated_vip/fifo_516x128/sim/fifo_516x128.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench.sv"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x128/simulation/fifo_generator_vlog_beh.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x128/hdl/fifo_generator_v13_2_rfs.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x128/sim/fifo_638x128.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/sim/fifo_516x128.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
+
+# activetb="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench_${MODULE}.sv"
+newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench_${MODULE}.sv"
 newtext_cp="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/${KERNEL_NAME}_testbench.sv"
+
+# echo ${activetb}
+
 cp ${newtext} ${newtext_cp}
 cp ${newtext} ${newtext_cp}.bkp
 search="glay_kernel"

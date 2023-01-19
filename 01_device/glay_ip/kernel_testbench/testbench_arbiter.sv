@@ -31,7 +31,7 @@ import GLAY_FUNCTIONS_PKG::*;
 `define HALF_TICK 5
 `define TEST_VEC_COUNT 241
 `define TEST_VEC_MULT 2
-`define PATTERN_FILE "testbench_arbiter.txt"
+`define PATTERN_FILE "../vivado_glay_ip/kernel_testbench/testbench_arbiter.txt"
 
 module glay_kernel_testbench ();
 

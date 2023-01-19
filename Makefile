@@ -375,6 +375,15 @@ export XILINX_CTRL_MODE     = AP_CTRL_HS
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 # =========================================================
 
+
+
+# =========================================================
+# Select Testbench for simulation testbench_glay/arbiter
+# =========================================================
+export TESTBENCH_MODULE     = glay
+# export TESTBENCH_MODULE     = arbiter
+# =========================================================
+
 # =========================================================
 # Each project is tagged with a GIT commit id
 # If you want to commit code and reuse same project metadata
