@@ -19,7 +19,8 @@ ORIGINAL_IP_DIR=$1
 ACTIVE_IP_DIR=$2
 ctrl_mode=$3
 
-glay_pkgs="pkgs"
+glay_pkgs="pkg"
+glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
 glay_cache="cache"
@@ -32,6 +33,7 @@ portmaps="portmaps"
 
 
 mkdir -p ${ACTIVE_IP_DIR}/${glay_pkgs}
+mkdir -p ${ACTIVE_IP_DIR}/${glay_engine}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_kernel}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_top}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_cache}
@@ -40,6 +42,7 @@ mkdir -p ${ACTIVE_IP_DIR}/${glay_control}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_utils}
 
 cp -r ${ORIGINAL_IP_DIR}/${glay_pkgs}/* ${ACTIVE_IP_DIR}/${glay_pkgs}
+cp -r ${ORIGINAL_IP_DIR}/${glay_kernel}/* ${ACTIVE_IP_DIR}/${glay_engine}
 cp -r ${ORIGINAL_IP_DIR}/${glay_kernel}/* ${ACTIVE_IP_DIR}/${glay_kernel}
 cp -r ${ORIGINAL_IP_DIR}/${glay_top}/* ${ACTIVE_IP_DIR}/${glay_top}
 cp -r ${ORIGINAL_IP_DIR}/${glay_cache}/* ${ACTIVE_IP_DIR}/${glay_cache}
