@@ -23,7 +23,7 @@ glay_pkgs="pkgs"
 glay_kernel="kernel"
 glay_top="top"
 glay_cache="cache"
-glay_kernel_testbench="kernel_testbench"
+glay_kernel_testbench="testbench"
 glay_control="control"
 glay_utils="utils"
 
