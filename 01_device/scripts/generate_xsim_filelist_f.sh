@@ -23,7 +23,8 @@ IP_DIR=$4
 VIP_DIR=$5
 MODULE=$6
 
-glay_pkgs="pkgs"
+glay_pkgs="pkg"
+glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
 glay_kernel_testbench="testbench"
@@ -64,6 +65,8 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_engine}/ ${CFG_FILE_NAME} "sv"
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 

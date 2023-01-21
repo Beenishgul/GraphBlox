@@ -23,7 +23,8 @@ KERNEL_NAME=$3
 IP_DIR=$4
 VIP_DIR=$5
 
-glay_pkgs="pkgs"
+glay_pkgs="pkg"
+glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
 glay_cache="cache"
@@ -66,6 +67,8 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_uti
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_arbiter}/ ${CFG_FILE_NAME} "sv" 
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
+
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_engine}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
 
