@@ -59,10 +59,10 @@ module arbiter #(
 	genvar g;
 
 // These logics interconnect arbiter nodes.
-	logic [               2*WIDTH-2:0] interconnect_req   ;
-	logic [               2*WIDTH-2:0] interconnect_grant ;
-	logic [                 WIDTH-2:0] interconnect_select;
-	logic [mux_sum(WIDTH,$clog2(WIDTH))-1:0] interconnect_mux   ;
+	logic [2*WIDTH-2:0] interconnect_req   ;
+	logic [2*WIDTH-2:0] interconnect_grant ;
+	logic [  WIDTH-2:0] interconnect_select;
+	logic [mux_sum(WIDTH,clog2(WIDTH))-1:0] interconnect_mux   ;
 
 // Assign inputs to some interconnects.
 	assign interconnect_req[2*WIDTH-2-:WIDTH] = req;
@@ -70,7 +70,7 @@ module arbiter #(
 
 // Assign the select outputs of the first arbiter stage to
 // the first mux stage.
-	assign interconnect_mux[mux_sum(WIDTH,$clog2(WIDTH))-1-:WIDTH/2] = interconnect_select[WIDTH-2-:WIDTH/2];
+	assign interconnect_mux[mux_sum(WIDTH,clog2(WIDTH))-1-:WIDTH/2] = interconnect_select[WIDTH-2-:WIDTH/2];
 
 // Register some interconnects as outputs.
 	always_ff @(posedge ap_clk)
@@ -85,7 +85,7 @@ module arbiter #(
 				begin
 					valid  <= interconnect_req[0];
 					grant  <= interconnect_grant[2*WIDTH-2-:WIDTH];
-					select <= interconnect_mux[$clog2(WIDTH)-1:0];
+					select <= interconnect_mux[clog2(WIDTH)-1:0];
 				end
 		end
 
@@ -125,12 +125,12 @@ module arbiter #(
 			begin: gen_mux
 				mux_array #(
 					.WIDTH(g/2)
-				) mux_array[$clog2(WIDTH/g)-1:0] (
-					.in(interconnect_mux[mux_sum(g,$clog2(WIDTH))-1-:$clog2(WIDTH/g)*g]),
+				) mux_array[clog2(WIDTH/g)-1:0] (
+					.in(interconnect_mux[mux_sum(g,clog2(WIDTH))-1-:clog2(WIDTH/g)*g]),
 					.select(interconnect_select[g-2-:g/2]),
-					.out(interconnect_mux[mux_sum(g/2,$clog2(WIDTH))-(g/2)-1-:$clog2(WIDTH/g)*g/2])
+					.out(interconnect_mux[mux_sum(g/2,clog2(WIDTH))-(g/2)-1-:clog2(WIDTH/g)*g/2])
 				);
-				assign interconnect_mux[mux_sum(g/2,$clog2(WIDTH))-1-:g/2] = interconnect_select[g-2-:g/2];
+				assign interconnect_mux[mux_sum(g/2,clog2(WIDTH))-1-:g/2] = interconnect_select[g-2-:g/2];
 			end
 	endgenerate
 
