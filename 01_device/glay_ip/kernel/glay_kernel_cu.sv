@@ -369,7 +369,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for fifo_638x128_GlayCacheRequestInterfaceInput
 // --------------------------------------------------------------------------------------
-
   localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = 2                                    ;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH         ;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(GlayCacheRequestInterfaceInput);
@@ -381,15 +380,14 @@ module glay_kernel_cu #(
   assign req[0]    = glay_cache_req_in_fifo_din.valid;
 
   assign bus_in[1] = 0;
+  assign req[1] = 0;
+  
   assign enable    = ~arbiter_areset;
 
   logic [1:0] select;
   logic [1:0] grant ;
   logic [1:0] req   ;
   logic       enable;
-
-
-  assign req[1] = 0;
 
   bus_arbiter_N_in_1_out #(
     .WIDTH    (BUS_ARBITER_N_IN_1_OUT_WIDTH    ),
