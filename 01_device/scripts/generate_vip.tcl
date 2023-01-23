@@ -59,7 +59,6 @@ set_property target_simulator XSim    [current_project]
 # set ip_repo_list [get_property IP_REPO_PATHS [current_project]] 
 
 set ip_repo_list {\
- "../vivado_glay_ip/iprepo" \
  "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo_ert_firmware" \
  "/tools/Xilinx/Vitis/2022.1/data/cache/xilinx" \
  "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo" \
@@ -223,30 +222,30 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate arb_master_2x1
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Arbiter GlayCacheRequestInterfaceInput: arb_master_2x1"]" 
+# puts "[color 2 "                        Generate Arbiter GlayCacheRequestInterfaceInput: arb_slave_2x1"]" 
 
-set module_name arb_master_2x1
-create_ip -name arb_master          \
-        -vendor xilinx.com          \
-        -library ip                 \
-        -version 1.0                \
-        -module_name ${module_name} \
-        -dir ${ip_dir} >> $log_file
+# set module_name arb_slave_2x1
+# create_ip -name arb_slave          \
+#         -vendor xilinx.com          \
+#         -library ip                 \
+#         -version 1.0                \
+#         -module_name ${module_name} \
+#         -dir ${ip_dir} >> $log_file
 
-set_property -dict [list                                        \
-                    CONFIG.C_REQ_WIDTH {2}                      \
-                    CONFIG.C_HAS_REQ {2}                        \
-                    CONFIG.C_GNT_WIDTH {2}                      \
-                    CONFIG.C_HAS_GNT {2}                        \
-                    CONFIG.C_REL_WIDTH {2}                      \
-                    CONFIG.C_HAS_REL {2}                        \
-                    ] [get_ips ${module_name}]
+# set_property -dict [list                                        \
+#                     CONFIG.C_REQ_WIDTH {2}                      \
+#                     CONFIG.C_HAS_REQ {2}                        \
+#                     CONFIG.C_GNT_WIDTH {2}                      \
+#                     CONFIG.C_HAS_GNT {2}                        \
+#                     CONFIG.C_REL_WIDTH {2}                      \
+#                     CONFIG.C_HAS_REL {2}                        \
+#                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+# set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+# generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+# generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+# export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+# export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
