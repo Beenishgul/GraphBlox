@@ -47,7 +47,8 @@ module bus_arbiter_N_in_1_out #(
     parameter WIDTH        = 2            ,
     parameter SELECT_WIDTH = $clog2(WIDTH),
     parameter BUS_WIDTH    = 8            ,
-    parameter BUS_NUM      = 2
+    parameter BUS_NUM      = 2            ,
+    parameter NUM_REQUESTS = 2
 ) (
     input  logic             enable                   ,
     input  logic [WIDTH-1:0] req                      ,
@@ -76,7 +77,9 @@ module bus_arbiter_N_in_1_out #(
         .areset(areset    )
     );
 
-    always_ff @(posedge clock) begin
+    integer i;
+    
+    always_ff @(posedge ap_clk) begin
         if (areset) begin
             bus_out <= 0;
             grant   <= 0;

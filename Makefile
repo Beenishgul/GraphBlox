@@ -380,8 +380,8 @@ export XILINX_CTRL_MODE     = AP_CTRL_HS
 # =========================================================
 # Select Testbench for simulation testbench_glay/arbiter
 # =========================================================
-# export TESTBENCH_MODULE     = glay
-export TESTBENCH_MODULE     = arbiter
+export TESTBENCH_MODULE     = glay
+# export TESTBENCH_MODULE     = arbiter
 # =========================================================
 
 # =========================================================

@@ -362,26 +362,35 @@ module glay_kernel_cu #(
     .rd_rst_busy (cache_req_out_fifo_signals.rd_rst_busy )
   );
 
+
+
+  assign req[0] = 1;
+  assign req[1] = 1;
+
+
+localparam LP_INPUTS_WIDTH =  (C_REQ_WIDTH);
+localparam LP_SHIFTER_WIDTH = (LP_INPUTS_WIDTH >= 4) ? LP_INPUTS_WIDTH : 4;
+
   logic [1:0] select;
   logic [1:0] grant;
   logic [1:0] req;
   logic valid;
 
-  assign req[0] = ~cache_req_in_fifo_signals.empty;
-  assign req[1] = 0;
-
-  arbiter #(
-    .WIDTH       (2),
-    .SELECT_WIDTH(2)
-  ) inst_arbiter (
-    .enable(1'b1),
-    .req   (req   ),
-    .grant (grant ),
-    .select(select),
-    .valid (valid),
-    .ap_clk(ap_clk),
-    .areset(fifo_areset)
-  );
+  bus_arbiter_N_in_1_out #(
+      .WIDTH(WIDTH),
+      .SELECT_WIDTH(SELECT_WIDTH),
+      .BUS_WIDTH(BUS_WIDTH),
+      .BUS_NUM(BUS_NUM),
+      .NUM_REQUESTS(NUM_REQUESTS)
+    ) inst_bus_arbiter_N_in_1_out (
+      .enable  (enable),
+      .req     (req),
+      .bus_in  (bus_in),
+      .grant   (grant),
+      .bus_out (bus_out),
+      .ap_clk  (ap_clk),
+      .areset  (areset)
+    );
 
 
 endmodule : glay_kernel_cu
