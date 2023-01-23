@@ -74,8 +74,6 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
-
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
@@ -108,6 +106,8 @@ echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/sim/fifo_516x128.v"
 echo $newtext >> ${CFG_FILE_NAME}
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}

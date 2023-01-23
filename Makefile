@@ -382,6 +382,16 @@ export XILINX_CTRL_MODE     = AP_CTRL_HS
 # =========================================================
 export TESTBENCH_MODULE     = glay
 # export TESTBENCH_MODULE     = arbiter
+# export TESTBENCH_MODULE     = glay_setup
+# export TESTBENCH_MODULE     = alu_operations
+# export TESTBENCH_MODULE     = conditional_break
+# export TESTBENCH_MODULE     = conditional_continue
+# export TESTBENCH_MODULE     = conditional_filter
+# export TESTBENCH_MODULE     = random_read_engine
+# export TESTBENCH_MODULE     = random_write_engine
+# export TESTBENCH_MODULE     = serial_read_engine
+# export TESTBENCH_MODULE     = serial_write_engine
+# export TESTBENCH_MODULE     = stride_index_generator
 # =========================================================
 
 # =========================================================
