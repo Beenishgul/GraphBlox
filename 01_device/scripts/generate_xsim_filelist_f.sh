@@ -8,7 +8,9 @@ print_usage () {
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
   echo "  KERNEL_NAME: glay_kernel"
-  echo "  IP_DIR: IP"
+  echo "  IP_DIR : IP"
+  echo "  VIP_DIR: vivado_generated_vip"
+  echo "  MODULE : glay|arbiter"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -27,7 +29,7 @@ glay_pkgs="pkg"
 glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
-glay_kernel_testbench="testbench"
+glay_testbench="testbench"
 glay_cache="cache"
 glay_control="control"
 glay_utils="utils"
@@ -72,6 +74,8 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
 
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
+
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
 
@@ -104,24 +108,6 @@ echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/sim/fifo_516x128.v"
 echo $newtext >> ${CFG_FILE_NAME}
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-
-# activetb="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench_${MODULE}.sv"
-newtext="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/testbench_${MODULE}.sv"
-newtext_cp="${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel_testbench}/${KERNEL_NAME}_testbench.sv"
-
-# echo ${activetb}
-
-cp ${newtext} ${newtext_cp}
-cp ${newtext} ${newtext_cp}.bkp
-search="glay_kernel"
-replace=${KERNEL_NAME}
-if [[ $search != "" && $replace != "" ]]; then
-sed -i "s/$search/$replace/" $newtext_cp
-fi
-echo $newtext_cp >> ${CFG_FILE_NAME}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}

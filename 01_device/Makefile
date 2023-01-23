@@ -172,7 +172,7 @@ all: gen-vip package-kernel build-hw
 $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE):
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(TESTBENCH_MODULE)
 
 .PHONY: gen-ip-dir
 gen-ip-dir: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
