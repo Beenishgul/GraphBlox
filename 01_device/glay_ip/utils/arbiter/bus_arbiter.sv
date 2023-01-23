@@ -47,15 +47,14 @@ module bus_arbiter_N_in_1_out #(
     parameter WIDTH        = 2            ,
     parameter SELECT_WIDTH = $clog2(WIDTH),
     parameter BUS_WIDTH    = 8            ,
-    parameter BUS_NUM      = 2            ,
-    parameter NUM_REQUESTS = 2
+    parameter BUS_NUM      = 2
 ) (
-    input  logic             enable                   ,
-    input  logic [WIDTH-1:0] req                      ,
-    input  logic [WIDTH-1:0] bus_in [0:NUM_REQUESTS-1],
-    output logic [WIDTH-1:0] grant                    ,
-    output logic [WIDTH-1:0] bus_out                  ,
-    input  logic             ap_clk                   ,
+    input  logic             enable              ,
+    input  logic [WIDTH-1:0] req                 ,
+    input  logic [WIDTH-1:0] bus_in [0:BUS_NUM-1],
+    output logic [WIDTH-1:0] grant               ,
+    output logic [WIDTH-1:0] bus_out             ,
+    input  logic             ap_clk              ,
     input  logic             areset
 );
 
@@ -78,14 +77,14 @@ module bus_arbiter_N_in_1_out #(
     );
 
     integer i;
-    
+
     always_ff @(posedge ap_clk) begin
         if (areset) begin
             bus_out <= 0;
             grant   <= 0;
         end else begin
             if (enable_reg) begin
-                for ( i = 0; i < NUM_REQUESTS; i++) begin
+                for ( i = 0; i < BUS_NUM; i++) begin
                     if (select[i]) begin
                         bus_out <= bus_in[i];
                     end
