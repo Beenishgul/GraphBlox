@@ -26,6 +26,9 @@ set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
 # ----------------------------------------------------------------------------
 # Color function
 # ----------------------------------------------------------------------------
+# set ip_repo_list [get_property IP_REPO_PATHS [current_project]] 
+set vivado_dir $::env(XILINX_VIVADO)
+set vitis_dir $::env(XILINX_VITIS)
 
 proc color {foreground text} {
     # tput is a little Unix utility that lets you use the termcap database
@@ -45,6 +48,9 @@ puts "========================================================="
 puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
 puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
 puts "========================================================="
+puts "\[[color 4 "XILINX_VIVADO"]\] [color 2 ${vivado_dir}]" 
+puts "\[[color 4 "XILINX_VITIS "]\] [color 2 ${vitis_dir}]" 
+puts "========================================================="
 
 # set_part ${part_id} >> $log_file
 
@@ -56,16 +62,14 @@ set_property PART $part_id [current_project]
 set_property target_language  Verilog [current_project] 
 set_property target_simulator XSim    [current_project] 
 
-# set ip_repo_list [get_property IP_REPO_PATHS [current_project]] 
+set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
+set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
+set data_ip              [file normalize $vitis_dir/data/ip]
+set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo] 
 
-set ip_repo_list {\
- "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo_ert_firmware" \
- "/tools/Xilinx/Vitis/2022.1/data/cache/xilinx" \
- "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo" \
- "/tools/Xilinx/Vitis/2022.1/data/ip"\
-} 
+set ip_repo_list [concat $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
 
-set_property IP_REPO_PATHS $ip_repo_list [current_project] 
+set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
 
 # ----------------------------------------------------------------------------
