@@ -59,7 +59,7 @@ set_property target_simulator XSim    [current_project]
 # set ip_repo_list [get_property IP_REPO_PATHS [current_project]] 
 
 set ip_repo_list {\
- "../vivado_build_hw_emu/glay_kernel_temp/link/vivado/vpl/.local/hw_platform/iprepo" \
+ "../vivado_glay_ip/iprepo" \
  "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo_ert_firmware" \
  "/tools/Xilinx/Vitis/2022.1/data/cache/xilinx" \
  "/tools/Xilinx/Vivado/2022.1/data/emulation/hw_em/ip_repo" \
