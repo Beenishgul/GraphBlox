@@ -42,6 +42,7 @@ module glay_kernel_cu #(
   logic                          control_areset     ;
   logic                          cache_areset       ;
   logic                          fifo_areset        ;
+  logic                          arbiter_areset     ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg   ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg  ;
   logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg_2;
@@ -103,6 +104,7 @@ module glay_kernel_cu #(
     control_areset <= areset;
     cache_areset   <= areset;
     fifo_areset    <= areset;
+    arbiter_areset <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -364,33 +366,44 @@ module glay_kernel_cu #(
 
 
 
-  assign req[0] = 1;
-  assign req[1] = 1;
+// --------------------------------------------------------------------------------------
+// Bus arbiter for fifo_638x128_GlayCacheRequestInterfaceInput
+// --------------------------------------------------------------------------------------
 
+  localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = 2                                    ;
+  localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH         ;
+  localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(GlayCacheRequestInterfaceInput);
 
-localparam LP_INPUTS_WIDTH =  (C_REQ_WIDTH);
-localparam LP_SHIFTER_WIDTH = (LP_INPUTS_WIDTH >= 4) ? LP_INPUTS_WIDTH : 4;
+  GlayCacheRequestInterfaceInput bus_out                                    ;
+  GlayCacheRequestInterfaceInput bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
+
+  assign bus_in[0] = glay_cache_req_in_fifo_din;
+  assign req[0]    = glay_cache_req_in_fifo_din.valid;
+
+  assign bus_in[1] = 0;
+  assign enable    = ~arbiter_areset;
 
   logic [1:0] select;
-  logic [1:0] grant;
-  logic [1:0] req;
-  logic valid;
+  logic [1:0] grant ;
+  logic [1:0] req   ;
+  logic       enable;
+
+
+  assign req[1] = 0;
 
   bus_arbiter_N_in_1_out #(
-      .WIDTH(WIDTH),
-      .SELECT_WIDTH(SELECT_WIDTH),
-      .BUS_WIDTH(BUS_WIDTH),
-      .BUS_NUM(BUS_NUM),
-      .NUM_REQUESTS(NUM_REQUESTS)
-    ) inst_bus_arbiter_N_in_1_out (
-      .enable  (enable),
-      .req     (req),
-      .bus_in  (bus_in),
-      .grant   (grant),
-      .bus_out (bus_out),
-      .ap_clk  (ap_clk),
-      .areset  (areset)
-    );
+    .WIDTH    (BUS_ARBITER_N_IN_1_OUT_WIDTH    ),
+    .BUS_WIDTH(BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH),
+    .BUS_NUM  (BUS_ARBITER_N_IN_1_OUT_BUS_NUM  )
+  ) inst_bus_arbiter_N_in_1_out (
+    .enable (enable        ),
+    .req    (req           ),
+    .bus_in (bus_in        ),
+    .grant  (grant         ),
+    .bus_out(bus_out       ),
+    .ap_clk (ap_clk        ),
+    .areset (arbiter_areset)
+  );
 
 
 endmodule : glay_kernel_cu
