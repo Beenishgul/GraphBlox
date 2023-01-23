@@ -110,7 +110,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Done Logic
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       counter          <= 0;
@@ -144,7 +143,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay control chain signals
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       glay_control_in_reg.glay_start    <= 1'b0;
@@ -169,7 +167,6 @@ module glay_kernel_cu #(
     end
   end
 
-
   glay_kernel_control #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
@@ -187,7 +184,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_write.in <= 0;
@@ -200,7 +196,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_read.in <= 0;
@@ -210,11 +205,9 @@ module glay_kernel_cu #(
     end
   end
 
-
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_write_out <= 0;
@@ -227,7 +220,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       m_axi_read_out <= 0;
@@ -237,11 +229,9 @@ module glay_kernel_cu #(
     end
   end
 
-
 // --------------------------------------------------------------------------------------
 // READ GLAY Descriptor
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (m_axi_areset) begin
       glay_descriptor_in_reg.valid <= 0;
@@ -254,7 +244,6 @@ module glay_kernel_cu #(
   always_ff @(posedge ap_clk) begin
     glay_descriptor_in_reg.payload <= glay_descriptor.payload;
   end
-
 
 // --------------------------------------------------------------------------------------
 // GLAY AXI port cache
@@ -305,7 +294,6 @@ module glay_kernel_cu #(
     .ap_clk       (ap_clk                          ),
     .reset        (cache_areset                    )
   );
-
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
@@ -364,8 +352,6 @@ module glay_kernel_cu #(
     .rd_rst_busy (cache_req_out_fifo_signals.rd_rst_busy )
   );
 
-
-
 // --------------------------------------------------------------------------------------
 // Bus arbiter for fifo_638x128_GlayCacheRequestInterfaceInput
 // --------------------------------------------------------------------------------------
@@ -380,9 +366,9 @@ module glay_kernel_cu #(
   assign req[0]    = glay_cache_req_in_fifo_din.valid;
 
   assign bus_in[1] = 0;
-  assign req[1] = 0;
-  
-  assign enable    = ~arbiter_areset;
+  assign req[1]    = 0;
+
+  assign enable = ~arbiter_areset;
 
   logic [1:0] select;
   logic [1:0] grant ;
@@ -402,6 +388,11 @@ module glay_kernel_cu #(
     .ap_clk (ap_clk        ),
     .areset (arbiter_areset)
   );
+
+// --------------------------------------------------------------------------------------
+// GLay initial setup and configuration reading
+// --------------------------------------------------------------------------------------
+
 
 
 endmodule : glay_kernel_cu
