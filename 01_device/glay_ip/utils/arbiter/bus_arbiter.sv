@@ -49,13 +49,13 @@ module bus_arbiter_N_in_1_out #(
     parameter BUS_WIDTH    = 8            ,
     parameter BUS_NUM      = 2
 ) (
-    input  logic             enable              ,
-    input  logic [WIDTH-1:0] req                 ,
-    input  logic [WIDTH-1:0] bus_in [0:BUS_NUM-1],
-    output logic [WIDTH-1:0] grant               ,
-    output logic [WIDTH-1:0] bus_out             ,
-    input  logic             ap_clk              ,
-    input  logic             areset
+    input  logic                 enable              ,
+    input  logic [    WIDTH-1:0] req                 ,
+    input  logic [BUS_WIDTH-1:0] bus_in [0:BUS_NUM-1],
+    output logic [    WIDTH-1:0] grant               ,
+    output logic [BUS_WIDTH-1:0] bus_out             ,
+    input  logic                 ap_clk              ,
+    input  logic                 areset
 );
 
     logic [SELECT_WIDTH-1:0] select    ;
