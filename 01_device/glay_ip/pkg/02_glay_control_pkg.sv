@@ -21,12 +21,14 @@ package GLAY_CONTROL_PKG;
     typedef struct packed{
         logic glay_start   ;
         logic glay_continue;
+        logic glay_setup   ;
     } GlayControlChainInterfaceInput;
 
     typedef struct packed{
-        logic glay_ready;
-        logic glay_done ;
-        logic glay_idle ;
+        logic glay_ready ;
+        logic glay_done  ;
+        logic glay_idle  ;
+        logic glay_enable;
     } GlayControlChainInterfaceOutput;
 
 // --------------------------------------------------------------------------------------
