@@ -24,12 +24,12 @@ module glay_kernel_setup #(
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
     // System Signals
-    input  logic                           ap_clk            ,
-    input  logic                           areset            ,
-    input  GlayControlChainInterfaceOutput glay_control_state,
-    input  GLAYDescriptorInterface         glay_descriptor   ,
-    input  GLAYDescriptorInterface         glay_descriptor   ,
-    output GLAYDescriptorInterface         glay_descriptor
+    input  logic                           ap_clk                  ,
+    input  logic                           areset                  ,
+    input  GlayControlChainInterfaceOutput glay_control_state      ,
+    input  GLAYDescriptorInterface         glay_descriptor         ,
+    input  GlayCacheRequestInterfaceInput  glay_setup_cache_req_in ,
+    output GlayCacheRequestInterfaceOutput glay_setup_cache_req_out
 );
 
 
