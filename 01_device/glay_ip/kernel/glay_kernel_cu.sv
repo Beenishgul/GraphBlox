@@ -98,7 +98,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     m_axi_areset   <= areset;
     control_areset <= areset;
@@ -141,7 +140,7 @@ module glay_kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
-// GLay control chain signals
+// GLay control signals
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin

@@ -27,7 +27,7 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
     glayHandle->kernelName = kernelName;
-
+    glayHandle->ctrl_mode  = ctrl_mode;
     //Open a Device (use "xbutil scan" to show the available devices)
     std::cout << "Open the device :" << glayHandle->deviceIndex << std::endl;
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
@@ -35,27 +35,20 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     std::cout << "Load the xclbin : " << glayHandle->xclbinPath << std::endl;
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
 
-
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
-    glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    
-    // if(glayHandle->ctrl_mode == 0)              // USER_MANAGED
-    // {
-    //     glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    // }
-    // else if (glayHandle->ctrl_mode == 1)        // AP_CTRL_HS
-    // {
-    //     glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    // }
-    // else if (glayHandle->ctrl_mode == 2)        // AP_CTRL_CHAIN
-    // {
-    //     glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    // }
-    // else      // USER_MANAGED : default
-    // {
-    //     glayHandle->ipHandle     = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
-    // }
+
+    switch (glayHandle->ctrl_mode)
+    {
+    case 0:
+        glayHandle->ipHandle = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+        break;
+    case 1:
+    case 2:
+        glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+        break;
+    default:
+        glayHandle->ipHandle = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
+    }
 
 
     std::cout << "Fetch compute Units" << std::endl;

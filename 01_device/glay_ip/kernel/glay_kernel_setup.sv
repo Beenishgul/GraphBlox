@@ -32,10 +32,33 @@ module glay_kernel_setup #(
     output GlayCacheRequestInterfaceOutput glay_setup_cache_req_out
 );
 
+    GlayControlChainInterfaceOutput glay_control_state_reg      ;
+    GLAYDescriptorInterface         glay_descriptor_reg         ;
+    GlayCacheRequestInterfaceInput  glay_setup_cache_req_in_reg ;
+    GlayCacheRequestInterfaceOutput glay_setup_cache_req_out_reg;
 
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        setup_areset <= areset;
+    end
 
+// --------------------------------------------------------------------------------------
+// READ GLAY Descriptor
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (setup_areset) begin
+      glay_descriptor_reg.valid <= 0;
+    end
+    else begin
+      glay_descriptor_reg.valid <= glay_descriptor.valid;
+    end
+  end
 
-
+  always_ff @(posedge ap_clk) begin
+    glay_descriptor_reg.payload <= glay_descriptor.payload;
+  end
 
 
 endmodule : glay_kernel_setup
