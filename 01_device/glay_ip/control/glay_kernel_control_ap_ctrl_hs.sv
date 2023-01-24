@@ -25,25 +25,24 @@ module glay_kernel_control #(
     // System Signals
     input  logic                           ap_clk             ,
     input  logic                           areset             ,
-    input  logic [NUM_GRAPH_CLUSTERS-1:0]  glay_cu_done_in    ,
-    input  logic [NUM_GRAPH_CLUSTERS-1:0]  glay_cu_setup_in   ,
     input  GlayControlChainInterfaceInput  glay_control_in    ,
     output GlayControlChainInterfaceOutput glay_control_out   ,
     input  GLAYDescriptorInterface         glay_descriptor_in ,
     output GLAYDescriptorInterface         glay_descriptor_out
 );
 
-    logic                          glay_descriptor_valid_reg;
-    logic                          control_areset           ;
-    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg         ;
-    logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg        ;
+    logic glay_descriptor_valid_reg;
+    logic control_areset           ;
+    logic glay_cu_done_reg         ;
+    logic glay_cu_setup_reg        ;
 
     logic glay_start_reg;
-    logic glay_ready_reg;
-    logic glay_idle_reg ;
-    logic glay_done_reg ;
+    logic ap_start_reg  ;
+    logic ap_ready_reg  ;
+    logic ap_idle_reg   ;
+    logic ap_done_reg   ;
 
-    logic glay_continue_reg;
+    logic ap_continue_reg;
 
     control_sync_state_ap_ctrl_hs current_state;
     control_sync_state_ap_ctrl_hs next_state   ;
@@ -53,7 +52,6 @@ module glay_kernel_control #(
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         control_areset <= areset;
     end
@@ -61,27 +59,25 @@ module glay_kernel_control #(
 // --------------------------------------------------------------------------------------
 //   Reset internal registers
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
             glay_cu_done_reg  <= 0;
             glay_cu_setup_reg <= 1;
         end
         else begin
-            glay_cu_done_reg  <= glay_cu_done_in;
-            glay_cu_setup_reg <= glay_cu_setup_in;
+            glay_cu_done_reg  <= glay_control_in.glay_done;
+            glay_cu_setup_reg <= glay_control_in.glay_setup;
         end
     end
 
 // --------------------------------------------------------------------------------------
 //   Reset output registers
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_control_out.glay_ready <= 1'b0;
-            glay_control_out.glay_done  <= 1'b0;
-            glay_control_out.glay_idle  <= 1'b1;
+            glay_control_out.ap_ready <= 1'b0;
+            glay_control_out.ap_done  <= 1'b0;
+            glay_control_out.ap_idle  <= 1'b1;
         end
         else begin
             glay_control_out <= glay_control_out_reg;
@@ -90,36 +86,36 @@ module glay_kernel_control #(
 
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_control_out_reg.glay_ready <= 1'b0;
-            glay_control_out_reg.glay_done  <= 1'b0;
-            glay_control_out_reg.glay_idle  <= 1'b1;
+            glay_control_out_reg.ap_ready   <= 1'b0;
+            glay_control_out_reg.ap_done    <= 1'b0;
+            glay_control_out_reg.ap_idle    <= 1'b1;
+            glay_control_out_reg.glay_start <= 1'b0;
         end
         else begin
-            glay_control_out_reg.glay_ready <= glay_ready_reg;
-            glay_control_out_reg.glay_done  <= glay_done_reg;
-            glay_control_out_reg.glay_idle  <= glay_idle_reg;
+            glay_control_out_reg.ap_ready   <= ap_ready_reg;
+            glay_control_out_reg.ap_done    <= ap_done_reg;
+            glay_control_out_reg.ap_idle    <= ap_idle_reg;
+            glay_control_out_reg.glay_start <= glay_start_reg;
         end
     end
 
 // --------------------------------------------------------------------------------------
 //   Reset input registers
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_start_reg    <= 0;
-            glay_continue_reg <= 0;
+            ap_start_reg    <= 0;
+            ap_continue_reg <= 0;
         end
         else begin
-            glay_start_reg    <= glay_control_in.glay_start;
-            glay_continue_reg <= 1;
+            ap_start_reg    <= glay_control_in.ap_start;
+            ap_continue_reg <= 1;
         end
     end
 
 // --------------------------------------------------------------------------------------
 //   Glay_descriptor LOGIC
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
             glay_descriptor_out.valid <= 1'b0;
@@ -136,7 +132,6 @@ module glay_kernel_control #(
 // --------------------------------------------------------------------------------------
 //   State Machine AP_CTRL_HS sync
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if(control_areset)
             current_state <= CTRL_HS_SYNC_RESET;
@@ -155,13 +150,13 @@ module glay_kernel_control #(
                 next_state = CTRL_HS_SYNC_SETUP;
             end
             CTRL_HS_SYNC_SETUP : begin
-                if(glay_start_reg)
+                if(ap_start_reg)
                     next_state = CTRL_HS_SYNC_READY;
                 else
                     next_state = CTRL_HS_SYNC_SETUP;
             end
             CTRL_HS_SYNC_READY : begin
-                if(~|glay_cu_setup_reg)
+                if(glay_cu_setup_reg)
                     next_state = CTRL_HS_SYNC_START;
                 else
                     next_state = CTRL_HS_SYNC_READY;
@@ -170,13 +165,13 @@ module glay_kernel_control #(
                 next_state = CTRL_HS_SYNC_BUSY;
             end
             CTRL_HS_SYNC_BUSY : begin
-                if (&glay_cu_done_reg)
+                if (glay_cu_done_reg)
                     next_state = CTRL_HS_SYNC_DONE;
                 else
                     next_state = CTRL_HS_SYNC_BUSY;
             end
             CTRL_HS_SYNC_DONE : begin
-                if(glay_start_reg)
+                if(ap_start_reg)
                     next_state = CTRL_HS_SYNC_READY;
                 else
                     next_state = CTRL_HS_SYNC_DONE;
@@ -187,46 +182,53 @@ module glay_kernel_control #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             CTRL_HS_SYNC_RESET : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b1;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b0;
             end
             CTRL_HS_SYNC_IDLE : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b1;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b0;
             end
             CTRL_HS_SYNC_SETUP : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b1;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b1;
             end
             CTRL_HS_SYNC_READY : begin
-                glay_ready_reg            <= 1'b1;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b0;
+                ap_ready_reg              <= 1'b1;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b1;
             end
             CTRL_HS_SYNC_START : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b0;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b1;
+                glay_start_reg            <= 1'b1;
             end
             CTRL_HS_SYNC_BUSY : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b0;
-                glay_idle_reg             <= 1'b0;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b0;
                 glay_descriptor_valid_reg <= 1'b1;
+                glay_start_reg            <= 1'b1;
             end
             CTRL_HS_SYNC_DONE : begin
-                glay_ready_reg            <= 1'b0;
-                glay_done_reg             <= 1'b1;
-                glay_idle_reg             <= 1'b1;
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b1;
+                ap_idle_reg               <= 1'b1;
                 glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)

@@ -145,25 +145,29 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_control_in_reg.glay_start    <= 1'b0;
-      glay_control_in_reg.glay_continue <= 1'b0;
+      glay_control_in_reg.ap_start    <= 1'b0;
+      glay_control_in_reg.ap_continue <= 1'b0;
+      glay_control_in_reg.glay_setup  <= 1'b1;
+      glay_control_in_reg.glay_done   <= 1'b0;
     end
     else begin
-      glay_control_in_reg.glay_start    <= glay_control_in.glay_start ;
-      glay_control_in_reg.glay_continue <= glay_control_in.glay_continue;
+      glay_control_in_reg.ap_start    <= glay_control_in.ap_start ;
+      glay_control_in_reg.ap_continue <= glay_control_in.ap_continue;
+      glay_control_in_reg.glay_setup  <= ~|glay_cu_setup_reg;
+      glay_control_in_reg.glay_done   <= &glay_cu_done_reg;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_control_out.glay_ready <= 1'b0;
-      glay_control_out.glay_done  <= 1'b0;
-      glay_control_out.glay_idle  <= 1'b1;
+      glay_control_out.ap_ready <= 1'b0;
+      glay_control_out.ap_done  <= 1'b0;
+      glay_control_out.ap_idle  <= 1'b1;
     end
     else begin
-      glay_control_out.glay_ready <= glay_control_out_reg.glay_ready;
-      glay_control_out.glay_idle  <= glay_control_out_reg.glay_idle;
-      glay_control_out.glay_done  <= glay_control_out_reg.glay_done;
+      glay_control_out.ap_ready <= glay_control_out_reg.ap_ready;
+      glay_control_out.ap_idle  <= glay_control_out_reg.ap_idle;
+      glay_control_out.ap_done  <= glay_control_out_reg.ap_done;
     end
   end
 
@@ -173,8 +177,6 @@ module glay_kernel_cu #(
   ) inst_glay_kernel_control (
     .ap_clk             (ap_clk                 ),
     .areset             (control_areset         ),
-    .glay_cu_done_in    (glay_cu_done_reg       ),
-    .glay_cu_setup_in   (glay_cu_setup_reg      ),
     .glay_control_in    (glay_control_in_reg    ),
     .glay_control_out   (glay_control_out_reg   ),
     .glay_descriptor_in (glay_descriptor_in_reg ),
