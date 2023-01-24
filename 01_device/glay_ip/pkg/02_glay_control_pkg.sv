@@ -19,16 +19,17 @@ package GLAY_CONTROL_PKG;
     import GLAY_GLOBALS_PKG::*;
 
     typedef struct packed{
-        logic glay_start   ;
-        logic glay_continue;
-        logic glay_setup   ;
+        logic ap_start   ;
+        logic ap_continue;
+        logic glay_setup ;
+        logic glay_done  ;
     } GlayControlChainInterfaceInput;
 
     typedef struct packed{
-        logic glay_ready ;
-        logic glay_done  ;
-        logic glay_idle  ;
-        logic glay_enable;
+        logic ap_ready  ;
+        logic ap_done   ;
+        logic ap_idle   ;
+        logic glay_start;
     } GlayControlChainInterfaceOutput;
 
 // --------------------------------------------------------------------------------------

@@ -79,9 +79,9 @@ module glay_kernel_control #(
 
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_control_out.glay_ready <= 1'b0;
-            glay_control_out.glay_done  <= 1'b0;
-            glay_control_out.glay_idle  <= 1'b1;
+            glay_control_out.ap_ready <= 1'b0;
+            glay_control_out.ap_done  <= 1'b0;
+            glay_control_out.ap_idle  <= 1'b1;
         end
         else begin
             glay_control_out <= glay_control_out_reg;
@@ -90,14 +90,14 @@ module glay_kernel_control #(
 
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_control_out_reg.glay_ready <= 1'b0;
-            glay_control_out_reg.glay_done  <= 1'b0;
-            glay_control_out_reg.glay_idle  <= 1'b1;
+            glay_control_out_reg.ap_ready <= 1'b0;
+            glay_control_out_reg.ap_done  <= 1'b0;
+            glay_control_out_reg.ap_idle  <= 1'b1;
         end
         else begin
-            glay_control_out_reg.glay_ready <= glay_ready_reg;
-            glay_control_out_reg.glay_done  <= glay_done_reg;
-            glay_control_out_reg.glay_idle  <= glay_idle_reg;
+            glay_control_out_reg.ap_ready <= glay_ready_reg;
+            glay_control_out_reg.ap_done  <= glay_done_reg;
+            glay_control_out_reg.ap_idle  <= glay_idle_reg;
         end
     end
 
@@ -111,8 +111,8 @@ module glay_kernel_control #(
             glay_continue_reg <= 0;
         end
         else begin
-            glay_start_reg    <= glay_control_in.glay_start;
-            glay_continue_reg <= glay_control_in.glay_continue;
+            glay_start_reg    <= glay_control_in.ap_start;
+            glay_continue_reg <= glay_control_in.ap_continue;
         end
     end
 
