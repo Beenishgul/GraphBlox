@@ -369,8 +369,8 @@ export XILINX_JOBS_STRATEGY = 4
 # Control mode XRT/OCL/HLS (AP_CTRL_HS, AP_CTRL_CHAIN) 
 # Control mode USER (USER_MANAGED)
 # =========================================================
-# export XILINX_CTRL_MODE     = USER_MANAGED
-export XILINX_CTRL_MODE     = AP_CTRL_HS
+export XILINX_CTRL_MODE     = USER_MANAGED
+# export XILINX_CTRL_MODE     = AP_CTRL_HS
 # export XILINX_CTRL_MODE     = AP_CTRL_CHAIN
 # export XILINX_CTRL_MODE     = ap_ctrl_none
 # =========================================================

@@ -75,9 +75,9 @@ module glay_kernel_control #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (control_areset) begin
-            glay_control_out.ap_ready <= 1'b0;
-            glay_control_out.ap_done  <= 1'b0;
-            glay_control_out.ap_idle  <= 1'b1;
+            glay_control_out.ap_ready   <= 1'b0;
+            glay_control_out.ap_done    <= 1'b0;
+            glay_control_out.ap_idle    <= 1'b1;
             glay_control_out.glay_start <= 1'b0;
         end
         else begin

@@ -195,7 +195,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle);
 // ********************************************************************************************
 // ***************                  GLAY Control USER_MANAGED                    **************
 // ********************************************************************************************
-struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
+struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
