@@ -75,7 +75,7 @@ update_ip_catalog >> $log_file
 # ----------------------------------------------------------------------------
 # generate axi master vip
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI Master VIP"]" 
+puts "[color 2 "                        Generate AXI VIP Master"]" 
 
 set module_name control_${kernel_name}_vip
 create_ip -name axi_vip                 \
@@ -109,7 +109,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI Slave VIP"]" 
+puts "[color 2 "                        Generate AXI VIP Slave"]" 
 
 set module_name slv_m00_axi_vip
 create_ip -name axi_vip                 \
@@ -145,7 +145,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_638x128_GlayCacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput: fifo_638x128"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput : fifo_638x128"]" 
 
 set module_name fifo_638x128
 create_ip -name fifo_generator \
@@ -221,6 +221,87 @@ generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/$
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate fifo_638x128_GlayCacheRequestInterfaceInput
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput : fifo_638x32"]" 
+
+set module_name fifo_638x32
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {1}                                                              \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width {0}                                                  \
+                    CONFIG.Input_Data_Width {638}                                                     \
+                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Output_Data_Width {638}                                                    \
+                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
+                   ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate fifo_516x128_GlayCacheRequestInterfaceOutput
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x32"]" 
+
+set module_name fifo_516x32
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {1}                                                              \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width {0}                                                  \
+                    CONFIG.Input_Data_Width {516}                                                     \
+                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Output_Data_Width {516}                                                    \
+                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
+                   ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
 
 
 # ----------------------------------------------------------------------------

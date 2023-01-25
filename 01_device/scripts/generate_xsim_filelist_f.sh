@@ -107,6 +107,13 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/sim/fifo_516x128.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x32/sim/fifo_638x32.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x32/sim/fifo_516x32.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 
 newtext=""

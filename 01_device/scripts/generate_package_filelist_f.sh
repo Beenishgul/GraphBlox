@@ -79,3 +79,10 @@ echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x128/fifo_516x128.xci"
 echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_638x32/fifo_638x32.xci"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x32/fifo_516x32.xci"
+echo $newtext >> ${CFG_FILE_NAME}
+
