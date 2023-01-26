@@ -12,8 +12,6 @@ import GLAY_GLOBALS_PKG::*;
 // --------------------------------------------------------------------------------------
 
 typedef struct packed {
-  logic rd_en       ;
-  logic wr_en       ;
   logic full        ;
   logic almost_full ;
   logic empty       ;
@@ -23,7 +21,12 @@ typedef struct packed {
   logic prog_empty  ;
   logic wr_rst_busy ;
   logic rd_rst_busy ;
-} FIFOStateSignals;
+} FIFOStateSignalsOutput;
+
+typedef struct packed {
+  logic rd_en;
+  logic wr_en;
+} FIFOStateSignalsInput;
 
 // --------------------------------------------------------------------------------------
 // Cache requests in GlayCacheRequestInterfaceOutput
