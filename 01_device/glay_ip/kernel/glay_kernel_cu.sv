@@ -101,6 +101,22 @@ module glay_kernel_cu #(
   assign glay_cache_req_in.valid = 1'b0;
 
 // --------------------------------------------------------------------------------------
+// Bus arbiter Signals fifo_638x128_GlayCacheRequestInterfaceInput
+// --------------------------------------------------------------------------------------
+  localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = 2                                    ;
+  localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH         ;
+  localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(GlayCacheRequestInterfaceInput);
+
+  GlayCacheRequestInterfaceInput bus_out                                    ;
+  GlayCacheRequestInterfaceInput bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
+
+
+  logic [1:0] select;
+  logic [1:0] grant ;
+  logic [1:0] req   ;
+  logic       enable;
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -363,13 +379,6 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for fifo_638x128_GlayCacheRequestInterfaceInput
 // --------------------------------------------------------------------------------------
-  localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = 2                                    ;
-  localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH         ;
-  localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(GlayCacheRequestInterfaceInput);
-
-  GlayCacheRequestInterfaceInput bus_out                                    ;
-  GlayCacheRequestInterfaceInput bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
-
   assign bus_in[0] = glay_cache_req_in_fifo_din;
   assign req[0]    = glay_cache_req_in_fifo_din.valid;
 
@@ -377,11 +386,6 @@ module glay_kernel_cu #(
   assign req[1]    = 0;
 
   assign enable = ~arbiter_areset;
-
-  logic [1:0] select;
-  logic [1:0] grant ;
-  logic [1:0] req   ;
-  logic       enable;
 
   bus_arbiter_N_in_1_out #(
     .WIDTH    (BUS_ARBITER_N_IN_1_OUT_WIDTH    ),
