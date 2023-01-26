@@ -109,6 +109,8 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 // GLAY SETUP State Machine
 // --------------------------------------------------------------------------------------
+    assign glay_setup_cache_req_out_din = 0;
+    assign req_in_fifo_signals_reg.rd_en = 0;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
@@ -120,7 +122,6 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign req_in_fifo_signals_reg.wr_en      = glay_setup_cache_req_in_din.valid;
     assign glay_setup_cache_req_in_dout.valid = req_in_fifo_signals_reg.valid;
-    assign glay_cache_req_in                  = glay_setup_cache_req_in_dout;
 
     fifo_638x32 inst_fifo_638x32_GlaySetupRequestInterfaceInput (
         .clk         (ap_clk                              ),
@@ -145,8 +146,6 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign req_out_fifo_signals_reg.wr_en     = glay_setup_cache_req_in_din.valid;
     assign glay_setup_cache_req_in_dout.valid = req_out_fifo_signals_reg.valid;
-    assign glay_cache_req_out.valid           = glay_cache_req_out.payload.ready;
-    assign glay_setup_cache_req_out_din       = glay_cache_req_out;
 
     fifo_516x32 inst_fifo_516x32_GlaySetupRequestInterfaceOutput (
         .clk         (ap_clk                               ),
