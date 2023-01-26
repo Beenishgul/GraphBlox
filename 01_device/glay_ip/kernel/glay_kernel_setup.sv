@@ -33,9 +33,12 @@ module glay_kernel_setup #(
     output FIFOStateSignalsInput           req_in_fifo_in_signals  ,
     output GlayCacheRequestInterfaceInput  glay_setup_cache_req_out,
     output FIFOStateSignalsOutput          req_out_fifo_out_signals,
-    output FIFOStateSignalsInput           req_out_fifo_in_signals
+    output FIFOStateSignalsInput           req_out_fifo_in_signals ,
+    output logic                           fifo_setup_signal
 );
 
+    logic setup_areset;
+    
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
@@ -54,8 +57,7 @@ module glay_kernel_setup #(
     FIFOStateSignalsInput req_in_fifo_in_signals_reg ;
     FIFOStateSignalsInput req_out_fifo_in_signals_reg;
 
-
-    logic fifo_setup_signal;
+    logic fifo_setup_signal_reg;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -101,9 +103,11 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
+            fifo_setup_signal              <= 1;
             glay_setup_cache_req_out.valid <= 0;
         end
         else begin
+            fifo_setup_signal              <= fifo_setup_signal_reg;
             glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid;
         end
     end
@@ -118,12 +122,13 @@ module glay_kernel_setup #(
     assign glay_setup_cache_req_out_din     = 0;
     assign req_in_fifo_in_signals_reg.rd_en = 0;
 
-    glay_setup_cache_req_in_dout
+
+
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-        assign fifo_setup_signal = setup_areset | req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | req_in_fifo_out_signals_reg.wr_rst_busy | req_in_fifo_out_signals_reg.rd_rst_busy;
+    assign fifo_setup_signal_reg = req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | req_in_fifo_out_signals_reg.wr_rst_busy | req_in_fifo_out_signals_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x32_GlaySetupRequestInterfaceInput
