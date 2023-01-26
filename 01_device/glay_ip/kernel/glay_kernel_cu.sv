@@ -20,6 +20,7 @@ import GLAY_REQ_PKG::*;
 
 module glay_kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
+  parameter NUM_MODULES        = 2              ,
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
   // System Signals
@@ -38,14 +39,15 @@ module glay_kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic                          m_axi_areset       ;
-  logic                          control_areset     ;
-  logic                          cache_areset       ;
-  logic                          fifo_areset        ;
-  logic                          arbiter_areset     ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg   ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg  ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_setup_reg_2;
+  logic                          m_axi_areset            ;
+  logic                          control_areset          ;
+  logic                          cache_areset            ;
+  logic                          fifo_areset             ;
+  logic                          arbiter_areset          ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg        ;
+  logic [       NUM_MODULES-1:0] glay_cu_setup_state     ;
+  logic                          glay_cu_cache_fifo_state;
+  logic                          glay_cu_setup_fifo_state;
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -132,10 +134,10 @@ module glay_kernel_cu #(
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_cu_setup_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+      glay_cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
     end
     else begin
-      glay_cu_setup_reg <= glay_cu_setup_reg_2;
+      glay_cu_setup_state <= glay_cu_cache_fifo_state;
     end
   end
 
@@ -152,7 +154,7 @@ module glay_kernel_cu #(
     else begin
       glay_control_in_reg.ap_start    <= glay_control_in.ap_start ;
       glay_control_in_reg.ap_continue <= glay_control_in.ap_continue;
-      glay_control_in_reg.glay_setup  <= ~|glay_cu_setup_reg;
+      glay_control_in_reg.glay_setup  <= ~|glay_cu_setup_state;
       glay_control_in_reg.glay_done   <= &glay_cu_done_reg;
     end
   end
@@ -301,7 +303,7 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign glay_cu_setup_reg_2 = control_areset | cache_req_out_fifo_signals.wr_rst_busy | cache_req_out_fifo_signals.rd_rst_busy | cache_req_in_fifo_signals.wr_rst_busy | cache_req_in_fifo_signals.rd_rst_busy;
+  assign glay_cu_cache_fifo_state = control_areset | cache_req_out_fifo_signals.wr_rst_busy | cache_req_out_fifo_signals.rd_rst_busy | cache_req_in_fifo_signals.wr_rst_busy | cache_req_in_fifo_signals.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x128_GlayCacheRequestInterfaceInput
