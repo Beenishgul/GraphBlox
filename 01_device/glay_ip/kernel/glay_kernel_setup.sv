@@ -75,6 +75,38 @@ module glay_kernel_setup #(
     end
 
 // --------------------------------------------------------------------------------------
+// Drive input signals
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            glay_setup_cache_req_in_din.valid <= 0;
+        end
+        else begin
+            glay_setup_cache_req_in_din.valid <= glay_setup_cache_req_in.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        glay_setup_cache_req_in_din.payload <= glay_setup_cache_req_in.payload;
+    end
+
+// --------------------------------------------------------------------------------------
+// Drive output signals
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            glay_setup_cache_req_out.valid <= 0;
+        end
+        else begin
+            glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        glay_setup_cache_req_out.payload <= glay_setup_cache_req_out_dout.payload;
+    end
+
+// --------------------------------------------------------------------------------------
 // GLAY SETUP State Machine
 // --------------------------------------------------------------------------------------
 
@@ -88,7 +120,6 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign req_in_fifo_signals_reg.wr_en      = glay_setup_cache_req_in_din.valid;
     assign glay_setup_cache_req_in_dout.valid = req_in_fifo_signals_reg.valid;
-    assign glay_setup_cache_req_in_din        = 0;
     assign glay_cache_req_in                  = glay_setup_cache_req_in_dout;
 
     fifo_638x32 inst_fifo_638x32_GlaySetupRequestInterfaceInput (
