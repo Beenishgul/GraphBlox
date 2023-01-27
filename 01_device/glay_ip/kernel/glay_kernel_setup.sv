@@ -42,7 +42,6 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
-    GlayControlChainInterfaceOutput glay_control_state_reg;
     GLAYDescriptorInterface         glay_descriptor_reg   ;
 
     GlayCacheRequestInterfaceInput glay_setup_cache_req_in_dout;

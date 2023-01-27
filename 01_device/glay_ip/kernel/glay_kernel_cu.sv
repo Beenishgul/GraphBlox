@@ -49,7 +49,6 @@ module glay_kernel_cu #(
   logic [       NUM_MODULES-1:0] glay_cu_setup_state      ;
   logic                          fifo_setup_signal_638x128;
   logic                          fifo_setup_signal_516x128;
-  logic                          glay_cu_setup_fifo_state ;
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -76,8 +75,7 @@ module glay_kernel_cu #(
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
 
-  GlayCacheRequestInterfaceInput  glay_cache_req_in ;
-  GlayCacheRequestInterfaceOutput glay_cache_req_out;
+  GlayCacheRequestInterfaceInput glay_cache_req_in;
 
   GlayCacheRequestInterfaceInput glay_cache_req_in_fifo_dout;
   GlayCacheRequestInterfaceInput glay_cache_req_in_fifo_din ;
@@ -91,11 +89,10 @@ module glay_kernel_cu #(
   FIFOStateSignalsInput cache_req_in_fifo_in_signals ;
   FIFOStateSignalsInput cache_req_out_fifo_in_signals;
 
-  logic force_inv_in           ;
-  logic force_inv_out          ;
-  logic wtb_empty_in           ;
-  logic wtb_empty_out          ;
-  logic cache_fifo_setup_signal;
+  logic force_inv_in ;
+  logic force_inv_out;
+  logic wtb_empty_in ;
+  logic wtb_empty_out;
 
   assign force_inv_in = 1'b0;
   assign wtb_empty_in = 1'b1;
@@ -113,10 +110,8 @@ module glay_kernel_cu #(
   GlayCacheRequestInterfaceInput bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
 
 
-  logic [1:0] select;
-  logic [1:0] grant ;
-  logic [1:0] req   ;
-  logic       enable;
+  logic [1:0] grant;
+  logic [1:0] req  ;
 
 // --------------------------------------------------------------------------------------
 // GLay Signals setup and configuration reading
