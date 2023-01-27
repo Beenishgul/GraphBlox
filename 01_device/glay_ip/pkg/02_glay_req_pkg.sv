@@ -78,4 +78,17 @@ typedef struct packed {
   GlayCacheRequestInterfaceOutputPayload payload;
 } GlayCacheRequestInterfaceOutput;
 
+
+// --------------------------------------------------------------------------------------
+//   State Machine Setup Requests
+// --------------------------------------------------------------------------------------
+
+    typedef enum int unsigned {
+        SETUP_RESET,
+        SETUP_IDLE,
+        SETUP_REQ_START,
+        SETUP_REQ_BUSY,
+        SETUP_REQ_DONE
+    } kernel_setup_state;
+
 endpackage
