@@ -30,23 +30,27 @@ module glay_kernel_setup #(
     input  GLAYDescriptorInterface         glay_descriptor         ,
     input  GlayCacheRequestInterfaceOutput glay_setup_cache_req_in ,
     output FIFOStateSignalsOutput          req_in_fifo_out_signals ,
-    output FIFOStateSignalsInput           req_in_fifo_in_signals  ,
+    input  FIFOStateSignalsInput           req_in_fifo_in_signals  ,
     output GlayCacheRequestInterfaceInput  glay_setup_cache_req_out,
     output FIFOStateSignalsOutput          req_out_fifo_out_signals,
-    output FIFOStateSignalsInput           req_out_fifo_in_signals ,
+    input  FIFOStateSignalsInput           req_out_fifo_in_signals ,
     output logic                           fifo_setup_signal
 );
 
     logic setup_areset;
-    
+
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
+    kernel_setup_state current_state;
+    kernel_setup_state next_state   ;
+
+    logic setup_complete;
 
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
-    GLAYDescriptorInterface         glay_descriptor_reg   ;
+    GLAYDescriptorInterface glay_descriptor_reg;
 
     GlayCacheRequestInterfaceInput glay_setup_cache_req_in_dout;
     GlayCacheRequestInterfaceInput glay_setup_cache_req_in_din ;
@@ -125,8 +129,85 @@ module glay_kernel_setup #(
     assign glay_setup_cache_req_out_din     = 0;
     assign req_in_fifo_in_signals_reg.rd_en = 0;
 
+    FIFOStateSignalsInput req_out_fifo_in_signals_reg;
 
+    req_out_fifo_in_signals_reg.wr_en
 
+        // GlayCacheRequestInterfaceOutput glay_setup_cache_req_out_din ;
+
+        //     glay_descriptor.graph_csr_struct
+
+        //         glay_setup_cache_req_in_build
+
+        always_ff @(posedge ap_clk) begin
+            if(control_areset)
+                current_state <= SETUP_KERNEL_RESET;
+            else begin
+                current_state <= next_state;
+            end
+        end // always_ff @(posedge ap_clk)
+
+    always_comb begin
+        next_state = current_state;
+        case (current_state)
+            SETUP_KERNEL_RESET : begin
+                next_state = SETUP_KERNEL_IDLE;
+            end
+            SETUP_KERNEL_IDLE : begin
+                next_state = SETUP_KERNEL_REQ_START;
+            end
+            SETUP_KERNEL_REQ_START : begin
+                next_state = SETUP_KERNEL_REQ_BUSY;
+            end
+            SETUP_KERNEL_REQ_BUSY : begin
+                if (setup_complete)
+                    next_state = SETUP_KERNEL_REQ_DONE;
+                else
+                    next_state = SETUP_KERNEL_REQ_BUSY;
+            end
+            SETUP_KERNEL_REQ_DONE : begin
+                next_state = SETUP_KERNEL_IDLE;
+            end
+        endcase
+    end // always_comb
+
+    always_ff @(posedge ap_clk) begin
+        case (current_state)
+            SETUP_KERNEL_RESET : begin
+                glay_setup_cache_req_out_din.valid <= 1'b0;
+                req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
+                req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
+                setup_complete                     <= 1'b0;
+            end
+            SETUP_KERNEL_IDLE : begin
+                glay_setup_cache_req_out_din.valid <= 1'b0;
+                req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
+                req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
+                setup_complete                     <= 1'b0;
+            end
+            SETUP_KERNEL_REQ_START : begin
+                ap_ready_reg              <= 1'b0;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b1;
+                glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b1;
+            end
+            SETUP_KERNEL_REQ_BUSY : begin
+                ap_ready_reg              <= 1'b1;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b0;
+                glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b1;
+            end
+            SETUP_KERNEL_REQ_DONE : begin
+                ap_ready_reg              <= 1'b1;
+                ap_done_reg               <= 1'b0;
+                ap_idle_reg               <= 1'b0;
+                glay_descriptor_valid_reg <= 1'b0;
+                glay_start_reg            <= 1'b1;
+            end
+        endcase
+    end // always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready

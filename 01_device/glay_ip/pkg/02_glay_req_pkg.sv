@@ -83,12 +83,12 @@ typedef struct packed {
 //   State Machine Setup Requests
 // --------------------------------------------------------------------------------------
 
-    typedef enum int unsigned {
-        SETUP_RESET,
-        SETUP_IDLE,
-        SETUP_REQ_START,
-        SETUP_REQ_BUSY,
-        SETUP_REQ_DONE
-    } kernel_setup_state;
+typedef enum int unsigned {
+  SETUP_KERNEL_RESET,
+  SETUP_KERNEL_IDLE,
+  SETUP_KERNEL_REQ_START,
+  SETUP_KERNEL_REQ_BUSY,
+  SETUP_KERNEL_REQ_DONE
+} kernel_setup_state;
 
 endpackage
