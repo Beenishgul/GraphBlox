@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-09 17:51:23
+* @Last Modified time: 2023-02-11 20:30:44
 */
 
 #include <stdio.h>
@@ -60,10 +60,83 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 
 }
 
+
+
+inline long double degreeWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
+{
+    struct Vertex *vertices = NULL;
+    uint32_t *sorted_edges_array = NULL;
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#endif
+
+    degree = vertices->out_degree[node];
+    edge_idx = vertices->edges_idx[node];
+
+#if WEIGHTED
+    for(j = edge_idx ; j < (edge_idx + degree) ; j++)
+    {
+        res += edges_array_weight[j];
+    }
+#else
+    res = 1.*(degree);
+#endif
+
+    return res;
+}
+
+
+inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
+{
+    uint32_t v;
+
+    uint32_t src ;
+    uint32_t dest = node;
+
+    src = EXTRACT_VALUE(sorted_edges_array[j]);
+
+    for (v = g->cd[node]; v < g->cd[node + 1]; v++)
+    {
+        if (g->adj[v] == node)
+        {
+            return (g->weights == NULL) ? 1.0 : g->weights[v];
+        }
+    }
+
+    return 0.0;
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#endif
+
+    degree = vertices->out_degree[node];
+    edge_idx = vertices->edges_idx[node];
+
+#if WEIGHTED
+    for(j = edge_idx ; j < (edge_idx + degree) ; j++)
+    {
+        res += edges_array_weight[j];
+    }
+#else
+    res = 1.*(degree);
+#endif
+
+    return 0.0;
+}
+
 struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
 {
 
-    uint32_t i;
+    uint32_t v;
 
     struct ClusterPartition *partition = (struct ClusterPartition *) my_malloc(sizeof(struct ClusterPartition));
 
@@ -77,13 +150,13 @@ struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
     partition->neighCommPos = (uint32_t *) my_malloc(partition->size * sizeof(uint32_t));
     partition->neighCommNb = 0;
 
-    for (i = 0; i < partition->size; i++)
+    for (v = 0; v < partition->size; v++)
     {
-        partition->node2Community[i] = i;
-        // partition->in[i]  = selfloopWeighted(g, i);
-        // partition->tot[i] = degreeWeighted(g, i);
-        partition->neighCommWeights[i] = -1;
-        partition->neighCommPos[i] = 0;
+        partition->node2Community[v] = v;
+        partition->in[v]  = selfloopWeightedGraphCSR(graph, v);
+        partition->tot[v] = degreeWeightedGraphCSR(graph, v);
+        partition->neighCommWeights[v] = -1;
+        partition->neighCommPos[v] = 0;
     }
 
     return partition;
