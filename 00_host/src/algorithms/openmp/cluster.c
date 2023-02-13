@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-13 14:28:29
+* @Last Modified time: 2023-02-13 16:06:39
 */
 
 #include <stdio.h>
@@ -33,6 +33,8 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 {
 
     uint32_t vertex_id;
+    uint32_t edge_id;
+    long double totalWeight = 0.0;
 
     struct ClusterStats *stats = (struct ClusterStats *) my_malloc(sizeof(struct ClusterStats));
 
@@ -41,6 +43,38 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
     stats->iteration = 0;
     stats->num_vertices = graph->num_vertices;
     stats->time_total = 0.0f;
+
+
+#if WEIGHTED
+    float *edges_array_weight = NULL;
+#endif
+
+#if DIRECTED
+#if WEIGHTED
+    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
+#endif
+#else
+#if WEIGHTED
+    edges_array_weight = graph->sorted_edges_array->edges_array_weight;
+#endif
+#endif
+
+
+#if WEIGHTED
+    #pragma omp parallel for default(none) private(edge_id) shared(graph,edges_array_weight) reduction(+ : totalWeight)
+#else
+    #pragma omp parallel for default(none) private(edge_id) shared(graph) reduction(+ : totalWeight)
+#endif
+    for(edge_id = 0 ; edge_id < graph->num_edges ; edge_id++)
+    {
+#if WEIGHTED
+        totalWeight +=  edges_array_weight[edge_id];
+#else
+        totalWeight += 1.0 ;
+#endif
+    }
+
+    stats->totalWeight = totalWeight;
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(vertex_id) shared(stats,graph)
@@ -98,14 +132,24 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
     struct Vertex *vertices = NULL;
     uint32_t *sorted_edges_array = NULL;
 
+#if WEIGHTED
+    float *edges_array_weight = NULL;
+#endif
+
     weights = 0.0;
 
 #if DIRECTED
     vertices = graph->inverse_vertices;
     sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
+#endif
 #else
     vertices = graph->vertices;
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->sorted_edges_array->edges_array_weight;
+#endif
 #endif
 
     degree = vertices->out_degree[node];
@@ -216,6 +260,34 @@ struct ClusterStats *clusterGraphCSR(struct Arguments *arguments, struct GraphCS
 }
 
 
+// ********************************************************************************************
+// ***************                  CSR Louvain                                  **************
+// ********************************************************************************************
+
+long double modularityGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph)
+{
+    long double q  = 0.0L;
+    long double m2 = stats->totalWeight;
+    uint32_t i;
+
+    for (i = 0; i < partition->size; i++)
+    {
+        if (partition->tot[i] > 0.0L)
+            q += partition->in[i] - (partition->tot[i] * partition->tot[i]) / m2;
+    }
+
+    return q / m2;
+}
+
+long double louvainPassGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph)
+{
+
+    long double startModularity = modularityGraphCSR(stats, partition, graph);
+
+    return startModularity;
+
+}
+
 struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
@@ -227,14 +299,19 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
-    // part = malloc(g->n * sizeof(unsigned long));
-    // louvainComplete(g, part);
+    struct ClusterPartition *partition;
 
+    partition = newClusterPartitionGraphCSR(graph);
+
+    freeClusterPartition(partition);
     free(timer);
 
     return stats;
 }
 
+// ********************************************************************************************
+// ***************                  CSR Leiden                                  **************
+// ********************************************************************************************
 
 struct ClusterStats *leidenGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
@@ -251,6 +328,11 @@ struct ClusterStats *leidenGraphCSR(struct Arguments *arguments, struct GraphCSR
 
     return stats;
 }
+
+
+// ********************************************************************************************
+// ***************                  CSR Incremental Aggregation                  **************
+// ********************************************************************************************
 
 struct ClusterStats *incrementalAggregationGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {

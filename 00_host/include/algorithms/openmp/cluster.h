@@ -25,7 +25,9 @@ struct ClusterStats
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     uint32_t iteration;
+    long double totalWeight;//total weight of the links
     double time_total;
+
 };
 
 struct ClusterPartition
@@ -63,7 +65,10 @@ void freeClusterPartition(struct ClusterPartition *partition);
 
 struct ClusterStats *clusterGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 
+long double modularityGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph);
+long double louvainPassGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph);
 struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
+
 struct ClusterStats *leidenGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 struct ClusterStats *incrementalAggregationGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 

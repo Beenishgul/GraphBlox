@@ -219,7 +219,7 @@ export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 # ALGORITHM Flow
 # =========================================================
 export PULL_PUSH        = 0
-export ALGORITHMS       = 1
+export ALGORITHMS       = 9
 # =========================================================
 
 # =========================================================
@@ -247,9 +247,9 @@ export NUM_ITERATIONS   = 1
 # =========================================================
 # Parallel Pre-Processing/Algorithm/Kernel (dominant loop)
 # =========================================================
-export NUM_THREADS_PRE  = 1
-export NUM_THREADS_ALGO = 1
-export NUM_THREADS_KER  = 1
+export NUM_THREADS_PRE  = 8
+export NUM_THREADS_ALGO = 8
+export NUM_THREADS_KER  = 8
 # =========================================================
 
 # =========================================================
