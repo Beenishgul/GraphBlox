@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-11 20:30:44
+* @Last Modified time: 2023-02-13 13:36:27
 */
 
 #include <stdio.h>
@@ -65,20 +65,23 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 inline long double degreeWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
 {
     struct Vertex *vertices = NULL;
-    uint32_t *sorted_edges_array = NULL;
+    uint32_t degree;
+    
+    long double res = 0.0L;
 
 #if DIRECTED
     vertices = graph->inverse_vertices;
-    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
 #else
     vertices = graph->vertices;
-    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #endif
 
     degree = vertices->out_degree[node];
-    edge_idx = vertices->edges_idx[node];
+
 
 #if WEIGHTED
+    uint32_t edge_idx;
+    uint32_t j;
+    edge_idx = vertices->edges_idx[node];
     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
     {
         res += edges_array_weight[j];
@@ -93,22 +96,16 @@ inline long double degreeWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
 
 inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
 {
-    uint32_t v;
+    uint32_t u;
+    uint32_t j;
+    uint32_t degree;
+    uint32_t edge_idx;
 
-    uint32_t src ;
-    uint32_t dest = node;
+    long double weights;
+    struct Vertex *vertices = NULL;
+    uint32_t *sorted_edges_array = NULL;
 
-    src = EXTRACT_VALUE(sorted_edges_array[j]);
-
-    for (v = g->cd[node]; v < g->cd[node + 1]; v++)
-    {
-        if (g->adj[v] == node)
-        {
-            return (g->weights == NULL) ? 1.0 : g->weights[v];
-        }
-    }
-
-    return 0.0;
+    weights = 0.0;
 
 #if DIRECTED
     vertices = graph->inverse_vertices;
@@ -121,16 +118,20 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
     degree = vertices->out_degree[node];
     edge_idx = vertices->edges_idx[node];
 
-#if WEIGHTED
     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
     {
-        res += edges_array_weight[j];
-    }
+        u = EXTRACT_VALUE(sorted_edges_array[j]);
+        if(u == node)
+        {
+#if WEIGHTED
+            weights =  edges_array_weight[j];
 #else
-    res = 1.*(degree);
+            weights = 1.0 ;
 #endif
+        }
+    }
 
-    return 0.0;
+    return weights;
 }
 
 struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
