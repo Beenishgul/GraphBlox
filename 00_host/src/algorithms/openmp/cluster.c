@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-13 16:15:35
+* @Last Modified time: 2023-02-13 16:17:57
 */
 
 #include <stdio.h>
@@ -306,7 +306,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
     improvement = louvainPassGraphCSR(stats, partition, graph);
 
-    printf("%Lf  %Lf \n", improvement, stats->total_weight);
+    printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 
     freeClusterPartition(partition);
     free(timer);
