@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-13 16:06:39
+* @Last Modified time: 2023-02-13 16:15:35
 */
 
 #include <stdio.h>
@@ -34,7 +34,7 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 
     uint32_t vertex_id;
     uint32_t edge_id;
-    long double totalWeight = 0.0;
+    long double total_weight = 0.0;
 
     struct ClusterStats *stats = (struct ClusterStats *) my_malloc(sizeof(struct ClusterStats));
 
@@ -61,20 +61,20 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 
 
 #if WEIGHTED
-    #pragma omp parallel for default(none) private(edge_id) shared(graph,edges_array_weight) reduction(+ : totalWeight)
+    #pragma omp parallel for default(none) private(edge_id) shared(graph,edges_array_weight) reduction(+ : total_weight)
 #else
-    #pragma omp parallel for default(none) private(edge_id) shared(graph) reduction(+ : totalWeight)
+    #pragma omp parallel for default(none) private(edge_id) shared(graph) reduction(+ : total_weight)
 #endif
     for(edge_id = 0 ; edge_id < graph->num_edges ; edge_id++)
     {
 #if WEIGHTED
-        totalWeight +=  edges_array_weight[edge_id];
+        total_weight +=  edges_array_weight[edge_id];
 #else
-        totalWeight += 1.0 ;
+        total_weight += 1.0 ;
 #endif
     }
 
-    stats->totalWeight = totalWeight;
+    stats->total_weight = total_weight;
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(vertex_id) shared(stats,graph)
@@ -267,7 +267,7 @@ struct ClusterStats *clusterGraphCSR(struct Arguments *arguments, struct GraphCS
 long double modularityGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph)
 {
     long double q  = 0.0L;
-    long double m2 = stats->totalWeight;
+    long double m2 = stats->total_weight;
     uint32_t i;
 
     for (i = 0; i < partition->size; i++)
@@ -300,8 +300,13 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     struct ClusterPartition *partition;
+    long double improvement;
 
     partition = newClusterPartitionGraphCSR(graph);
+
+    improvement = louvainPassGraphCSR(stats, partition, graph);
+
+    printf("%Lf  %Lf \n", improvement, stats->total_weight);
 
     freeClusterPartition(partition);
     free(timer);

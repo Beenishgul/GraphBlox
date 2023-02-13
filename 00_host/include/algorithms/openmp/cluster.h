@@ -25,7 +25,7 @@ struct ClusterStats
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     uint32_t iteration;
-    long double totalWeight;//total weight of the links
+    long double total_weight;//total weight of the links
     double time_total;
 
 };
