@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-13 13:36:27
+* @Last Modified time: 2023-02-13 14:28:29
 */
 
 #include <stdio.h>
@@ -36,7 +36,7 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 
     struct ClusterStats *stats = (struct ClusterStats *) my_malloc(sizeof(struct ClusterStats));
 
-    stats->parents = (int *) my_malloc(graph->num_vertices * sizeof(int));
+    stats->partitions = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
     stats->processed_nodes = 0;
     stats->iteration = 0;
     stats->num_vertices = graph->num_vertices;
@@ -46,14 +46,7 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
     #pragma omp parallel for default(none) private(vertex_id) shared(stats,graph)
     for(vertex_id = 0; vertex_id < graph->num_vertices ; vertex_id++)
     {
-        if(graph->vertices->out_degree[vertex_id])
-        {
-            stats->parents[vertex_id] = graph->vertices->out_degree[vertex_id] * (-1);
-        }
-        else
-        {
-            stats->parents[vertex_id] = -1;
-        }
+        stats->partitions[vertex_id] = vertex_id;
     }
 
     return stats;
@@ -66,7 +59,7 @@ inline long double degreeWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
 {
     struct Vertex *vertices = NULL;
     uint32_t degree;
-    
+
     long double res = 0.0L;
 
 #if DIRECTED
@@ -168,8 +161,8 @@ void freeClusterStats(struct ClusterStats *stats)
 {
     if(stats)
     {
-        if(stats->parents)
-            free(stats->parents);
+        if(stats->partitions)
+            free(stats->partitions);
         free(stats);
     }
 }
@@ -233,6 +226,9 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     printf(" -----------------------------------------------------\n");
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+
+    // part = malloc(g->n * sizeof(unsigned long));
+    // louvainComplete(g, part);
 
     free(timer);
 

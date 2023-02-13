@@ -52,6 +52,7 @@ struct BellmanFordStats *runBellmanFordAlgorithm(struct Arguments *arguments, vo
 struct SSSPStats *runSSSPAlgorithm(struct Arguments *arguments, void *graph);
 struct SPMVStats *runSPMVAlgorithm(struct Arguments *arguments, void *graph);
 struct CCStats *runConnectedComponentsAlgorithm(struct Arguments *arguments, void *graph);
+struct ClusterStats *runClusterAlgorithm(struct Arguments *arguments, void *graph);
 struct TCStats *runTriangleCountAlgorithm(struct Arguments *arguments, void *graph);
 struct BetweennessCentralityStats *runBetweennessCentralityAlgorithm(struct Arguments *arguments, void *graph);
 
