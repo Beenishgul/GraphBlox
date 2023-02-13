@@ -32,6 +32,7 @@
 #include "SSSP.h"
 #include "SPMV.h"
 #include "connectedComponents.h"
+#include "cluster.h"
 #include "triangleCount.h"
 #include "betweennessCentrality.h"
 
@@ -531,6 +532,16 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
             }
         }
         break;
+        case 9: // Clustering
+        {
+            struct ClusterStats *stats = runClusterAlgorithm(arguments, graph);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeClusterStats(stats);
+            }
+        }
+        break;
 
 
         default: // BFS
@@ -733,6 +744,41 @@ struct CCStats *runConnectedComponentsAlgorithm(struct Arguments *arguments, voi
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
         stats = connectedComponentsGraphCSR(arguments, graphCSR);
+        break;
+    }
+
+
+    return stats;
+
+}
+
+struct ClusterStats *runClusterAlgorithm(struct Arguments *arguments, void *graph)
+{
+
+
+    struct GraphCSR *graphCSR = NULL;
+    // struct GraphCSRSegments *graphCSRSegments = NULL;
+    struct ClusterStats *stats = NULL;
+
+    switch (arguments->datastructure)
+    {
+    case 0: // CSR
+    case 4:
+        graphCSR = (struct GraphCSR *)graph;
+        stats = clusterGraphCSR(arguments, graphCSR);
+        break;
+    case 1: // Segments
+    case 5:
+        // graphCSRSegments = (struct GraphCSRSegments *)graph;
+        // stats = triangleCountGraphCSRSegments(arguments, graphCSRSegments);
+        generateGraphPrintMessageWithtime("CLUSTERING NOT YET IMPLEMENTED", 0);
+        break;
+    case 6: // CSR
+        generateGraphPrintMessageWithtime("CLUSTERING NOT YET IMPLEMENTED", 0);
+        break;
+    default:// CSR
+        graphCSR = (struct GraphCSR *)graph;
+        stats = clusterGraphCSR(arguments, graphCSR);
         break;
     }
 
@@ -1072,6 +1118,12 @@ void freeGraphStatsGeneral(void *stats, uint32_t algorithm)
     {
         struct TCStats *freeStats = (struct TCStats *)stats;
         freeTCStats(freeStats);
+    }
+    break;
+    case 9: // clustering
+    {
+        struct ClusterStats *freeStats = (struct ClusterStats *)stats;
+        freeClusterStats(freeStats);
     }
     break;
     default:// BFS

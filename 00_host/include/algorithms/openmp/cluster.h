@@ -21,32 +21,33 @@ extern "C" {
 
 struct ClusterStats
 {
-    int *parents;
+    uint32_t *partitions;
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     uint32_t iteration;
     double time_total;
 };
 
-struct ClusterPartition{
-  // size of the partition
-  uint32_t size;
-  
-  // community to which each node belongs
-  uint32_t *node2Community;
-  
-  // in and tot values of each node to compute modularity 
-  long double *in;
-  long double *tot;
-  
-  // utility arrays to find communities adjacent to a node
-  // communities are stored using three variables
-  // - neighCommWeights: stores weights to communities
-  // - neighCommPos: stores list of neighbor communities
-  // - neighCommNb: stores the number of neighbor communities
-  long double *neighCommWeights;
-  uint32_t *neighCommPos;
-  uint32_t neighCommNb;
+struct ClusterPartition
+{
+    // size of the partition
+    uint32_t size;
+
+    // community to which each node belongs
+    uint32_t *node2Community;
+
+    // in and tot values of each node to compute modularity
+    long double *in;
+    long double *tot;
+
+    // utility arrays to find communities adjacent to a node
+    // communities are stored using three variables
+    // - neighCommWeights: stores weights to communities
+    // - neighCommPos: stores list of neighbor communities
+    // - neighCommNb: stores the number of neighbor communities
+    long double *neighCommWeights;
+    uint32_t *neighCommPos;
+    uint32_t neighCommNb;
 };
 
 
