@@ -55,6 +55,8 @@ struct ClusterPartition
 
 struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph);
 struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph);
+void neighboringCommunitiesInitialize(struct ClusterPartition *partition);
+void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node);
 
 void freeClusterStats(struct ClusterStats *stats);
 void freeClusterPartition(struct ClusterPartition *partition);

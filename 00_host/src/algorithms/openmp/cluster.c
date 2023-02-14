@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-13 16:17:57
+* @Last Modified time: 2023-02-14 18:33:28
 */
 
 #include <stdio.h>
@@ -161,9 +161,9 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
         if(u == node)
         {
 #if WEIGHTED
-            weights =  edges_array_weight[j];
+            weights +=  edges_array_weight[j];
 #else
-            weights = 1.0 ;
+            weights += 1.0 ;
 #endif
         }
     }
@@ -199,6 +199,78 @@ struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
 
     return partition;
 
+}
+
+void neighboringCommunitiesInitialize(struct ClusterPartition *partition)
+{
+    uint32_t i;
+    for (i = 0; i < partition->neighCommNb; i++)
+    {
+        partition->neighCommWeights[partition->neighCommPos[i]] = -1;
+    }
+    partition->neighCommNb = 0;
+}
+
+/*
+Computes the set of neighbor communities of a given node (excluding self-loops)
+*/
+void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node)
+{
+    unsigned long long i;
+    unsigned long neigh, neighComm;
+    long double neighW;
+    partition->neighCommPos[0] = partition->node2Community[node];
+    partition->neighCommWeights[partition->neighCommPos[0]] = 0.;
+    partition->neighCommNb = 1;
+
+
+    uint32_t degree;
+    uint32_t edge_idx;
+
+    long double weights;
+    struct Vertex *vertices = NULL;
+    uint32_t *sorted_edges_array = NULL;
+
+#if WEIGHTED
+    float *edges_array_weight = NULL;
+#endif
+
+    weights = 0.0;
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
+#endif
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->sorted_edges_array->edges_array_weight;
+#endif
+#endif
+
+    // for all neighbors of node, add weight to the corresponding community
+    for (i = g->cd[node]; i < g->cd[node + 1]; i++)
+    {
+        neigh  = g->adj[i];
+        neighComm = partition->node2Community[neigh];
+        neighW = (g->weights == NULL) ? 1.0 : g->weights[i];
+
+        // if not a self-loop
+        if (neigh != node)
+        {
+            // if community is new (weight == -1)
+            if (partition->neighCommWeights[neighComm] == -1)
+            {
+                partition->neighCommPos[partition->neighCommNb] = neighComm;
+                partition->neighCommWeights[neighComm] = 0.;
+                partition->neighCommNb++;
+            }
+            partition->neighCommWeights[neighComm] += neighW;
+        }
+    }
 }
 
 void freeClusterStats(struct ClusterStats *stats)
@@ -283,6 +355,13 @@ long double louvainPassGraphCSR(struct ClusterStats *stats, struct ClusterPartit
 {
 
     long double startModularity = modularityGraphCSR(stats, partition, graph);
+    long double newModularity = startModularity;
+    long double curModularity;
+    long double degreeW, bestCommW, bestGain, newGain;
+    uint32_t i, j, node;
+    uint32_t oldComm, newComm, bestComm;
+    uint32_t nbMoves;
+
 
     return startModularity;
 
