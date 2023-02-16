@@ -330,7 +330,9 @@ struct GraphCSR *mapVerticesWithInOutDegree_base (struct GraphCSR *graph, uint8_
 struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inverse)
 {
 
+#if DIRECTED
     uint32_t vertex_id;
+#endif
     // uint32_t vertex_id_dest;
     struct Vertex *vertices;
     struct EdgeList *sorted_edges_array;
