@@ -418,15 +418,14 @@ void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR)
     uint32_t *label_array_el = NULL;
     uint32_t *label_array_iel = NULL;
     uint32_t *inverse_label_array_el = NULL;
-    uint32_t *inverse_label_array_iel = NULL;
     uint32_t num_vertices = graphCSR->num_vertices;
     uint32_t v;
 
 #if DIRECTED
+    uint32_t *inverse_label_array_iel = NULL;
     inverse_label_array_iel = graphCSR->inverse_sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->inverse_sorted_edges_array->label_array;
 #else
-    inverse_label_array_iel = graphCSR->sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->sorted_edges_array->label_array;
 #endif
 
@@ -618,17 +617,17 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
     free(fname_txt_out_degree);
     // free(fname_bin_out_degree);
     free(fname_txt_in_degree);
-//     free(fname_bin_in_degree);
+    //     free(fname_bin_in_degree);
     free(fname_txt_edges_idx);
-//     free(fname_bin_edges_idx);
+    //     free(fname_bin_edges_idx);
     free(fname_txt_edges_array_src);
-//     free(fname_bin_edges_array_src);
+    //     free(fname_bin_edges_array_src);
     free(fname_txt_edges_array_dest);
-//     free(fname_bin_edges_array_dest);
+    //     free(fname_bin_edges_array_dest);
 
 #if WEIGHTED
     free(fname_txt_edges_array_weight);
-//     free(fname_bin_edges_array_weight);
+    //     free(fname_bin_edges_array_weight);
 #endif
 
 
