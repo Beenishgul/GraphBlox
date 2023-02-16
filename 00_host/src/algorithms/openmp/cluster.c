@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-15 19:23:11
+* @Last Modified time: 2023-02-16 14:23:29
 */
 
 #include <stdio.h>
@@ -49,16 +49,9 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
     float *edges_array_weight = NULL;
 #endif
 
-#if DIRECTED
-#if WEIGHTED
-    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
-#endif
-#else
 #if WEIGHTED
     edges_array_weight = graph->sorted_edges_array->edges_array_weight;
 #endif
-#endif
-
 
 #if WEIGHTED
     #pragma omp parallel for default(none) private(edge_id) shared(graph,edges_array_weight) reduction(+ : total_weight)
@@ -96,14 +89,16 @@ inline long double degreeWeightedGraphCSR(struct GraphCSR *graph, uint32_t node)
 
     long double res = 0.0L;
 
-#if DIRECTED
-    vertices = graph->inverse_vertices;
-#else
+#if WEIGHTED
+    float *edges_array_weight = NULL;
+#endif
+
     vertices = graph->vertices;
+#if WEIGHTED
+    edges_array_weight = graph->sorted_edges_array->edges_array_weight;
 #endif
 
     degree = vertices->out_degree[node];
-
 
 #if WEIGHTED
     uint32_t edge_idx;
@@ -138,18 +133,10 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
 
     weights = 0.0;
 
-#if DIRECTED
-    vertices = graph->inverse_vertices;
-    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
-#if WEIGHTED
-    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
-#endif
-#else
     vertices = graph->vertices;
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #if WEIGHTED
     edges_array_weight = graph->sorted_edges_array->edges_array_weight;
-#endif
 #endif
 
     degree = vertices->out_degree[node];
@@ -224,6 +211,31 @@ struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
 
 }
 
+uint32_t updateClusterPartitionGraphCSR(struct ClusterPartition *partition, uint32_t *partitions, uint32_t size)
+{
+
+    // Renumber the communities in partition
+    uint32_t *renumber = (uint32_t *) calloc(partition->size, sizeof(uint32_t));
+    uint32_t i, last = 1;
+    for (i = 0; i < partition->size; i++)
+    {
+        if (renumber[partition->node2Community[i]] == 0)
+        {
+            renumber[partition->node2Community[i]] = last++;
+        }
+    }
+
+    // Update partitions with the renumbered communities in partition
+    for (i = 0; i < size; i++)
+    {
+        partitions[i] = renumber[partition->node2Community[partitions[i]]] - 1;
+    }
+
+    free(renumber);
+    return last - 1;
+
+}
+
 void neighboringCommunitiesInitialize(struct ClusterPartition *partition)
 {
     uint32_t i;
@@ -256,18 +268,10 @@ void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR 
     float *edges_array_weight = NULL;
 #endif
 
-#if DIRECTED
-    vertices = graph->inverse_vertices;
-    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
-#if WEIGHTED
-    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
-#endif
-#else
     vertices = graph->vertices;
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #if WEIGHTED
     edges_array_weight = graph->sorted_edges_array->edges_array_weight;
-#endif
 #endif
 
     degree = vertices->out_degree[node];
@@ -321,18 +325,10 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
     float *edges_array_weight = NULL;
 #endif
 
-#if DIRECTED
-    vertices = graph->inverse_vertices;
-    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
-#if WEIGHTED
-    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
-#endif
-#else
     vertices = graph->vertices;
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #if WEIGHTED
     edges_array_weight = graph->sorted_edges_array->edges_array_weight;
-#endif
 #endif
 
     degree = vertices->out_degree[node];
@@ -359,6 +355,13 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
     }
 }
 
+
+// Return the meta graph induced by a partition of a graph
+// See Louvain article for more details
+struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph)
+{
+
+}
 
 void freeClusterStats(struct ClusterStats *stats)
 {
@@ -527,10 +530,21 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
     struct ClusterPartition *partition;
     long double improvement;
+    uint32_t n;
+    uint32_t originalSize = graph->num_vertices;
 
     partition = newClusterPartitionGraphCSR(graph);
 
     improvement = louvainPassGraphCSR(stats, partition, graph);
+
+    n = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+
+    if (improvement < MIN_IMPROVEMENT)
+    {
+        freeClusterPartition(partition);
+        // break;
+        return stats;
+    }
 
     printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 

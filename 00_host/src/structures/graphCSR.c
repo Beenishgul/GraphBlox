@@ -601,7 +601,7 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
         fprintf(fptr_edges_array_src, "%u\n", graphCSR->sorted_edges_array->edges_array_src[vertex_id]);
         fprintf(fptr_edges_array_dest, "%u\n", graphCSR->sorted_edges_array->edges_array_dest[vertex_id]);
 #if WEIGHTED
-        fprintf(fptr_edges_array_weight, "%u\n", graphCSR->sorted_edges_array->edges_array_weight[vertex_id]);
+        fprintf(fptr_edges_array_weight, "%f\n", graphCSR->sorted_edges_array->edges_array_weight[vertex_id]);
 #endif
     }
 
