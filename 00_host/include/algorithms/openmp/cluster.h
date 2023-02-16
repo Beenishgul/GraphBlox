@@ -64,6 +64,8 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
 void freeClusterStats(struct ClusterStats *stats);
 void freeClusterPartition(struct ClusterPartition *partition);
 
+void printClusterPartition(struct ClusterPartition *partition);
+
 // ********************************************************************************************
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
