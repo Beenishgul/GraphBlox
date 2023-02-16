@@ -170,14 +170,14 @@ export GRAPH_DIR = $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 # =========================================================
 # TEST # small test graphs
 # =========================================================
-# export GRAPH_SUIT = TEST
+export GRAPH_SUIT = TEST
 # export GRAPH_NAME = test
 # export GRAPH_NAME = v51_e1021
 # export GRAPH_NAME = v300_e2730
-# export GRAPH_NAME = graphbrew
+export GRAPH_NAME = graphbrew
 
-export GRAPH_SUIT = LAW
-export GRAPH_NAME = LAW-amazon-2008
+# # export GRAPH_SUIT = LAW
+# export GRAPH_NAME = LAW-amazon-2008
 # export GRAPH_NAME = LAW-cnr-2000
 # export GRAPH_NAME = LAW-dblp-2010
 # export GRAPH_NAME = LAW-enron
@@ -481,7 +481,7 @@ run-emu-debug:
 .PHONY: run-emu-wave
 run-emu-wave:
 	-@$(MAKE) run-emu-wave $(MAKE_DEVICE)
-# =========================================================
+# ================================= ========================
 
 # =========================================================
 # STEP 4.b Run Hardware FPGA

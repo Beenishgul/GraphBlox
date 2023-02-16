@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-16 14:33:27
+* @Last Modified time: 2023-02-16 15:41:07
 */
 
 #include <stdio.h>
@@ -153,7 +153,7 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
 #if WEIGHTED
             weights +=  edges_array_weight[j];
 #else
-            weights += 1.0 ;
+            weights = 1.0 ;
 #endif
         }
     }
@@ -394,6 +394,27 @@ void freeClusterPartition(struct ClusterPartition *partition)
     }
 }
 
+void printClusterPartition(struct ClusterPartition *partition)
+{
+
+    uint32_t v;
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-21s | %-27s | \n", "size", "neighCommNb");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-21u | %-27u | \n",  partition->size, partition->neighCommNb);
+    printf(" ----------------------------------------------------------------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | \n", "V", "node2Community", "in", "tot", "neighCommWeights", "neighCommPos");
+    printf(" ----------------------------------------------------------------------------------------------------------\n");
+
+
+    for (v = 0; v < partition->size; v++)
+    {
+        printf("| %-15u | %-15u | %-15Lf | %-15Lf | %-15Lf | %-15u | \n", v, partition->node2Community[v], partition->in[v], partition->tot[v], partition->neighCommWeights[v], partition->neighCommPos[v]);
+
+    }
+    printf(" ----------------------------------------------------------------------------------------------------------\n");
+}
 
 // ********************************************************************************************
 // ***************                  CSR DataStructure                            **************
@@ -537,10 +558,13 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     uint32_t originalSize = graph->num_vertices;
 
     partition = newClusterPartitionGraphCSR(graph);
+    printClusterPartition(partition);
 
     improvement = louvainPassGraphCSR(stats, partition, graph);
+    printClusterPartition(partition);
 
     n = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+    printClusterPartition(partition);
 
     if (improvement < MIN_IMPROVEMENT)
     {
