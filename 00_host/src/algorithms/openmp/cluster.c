@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-14 18:33:28
+* @Last Modified time: 2023-02-15 19:23:11
 */
 
 #include <stdio.h>
@@ -171,6 +171,29 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
     return weights;
 }
 
+inline void removeNodeGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node, uint32_t comm, long double dnodecomm)
+{
+    partition->in[comm]  -= 2.0L * dnodecomm + selfloopWeightedGraphCSR(graph, node);
+    partition->tot[comm] -= degreeWeightedGraphCSR(graph, node);
+}
+
+inline void insertNodeGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node, uint32_t comm, long double dnodecomm)
+{
+    partition->in[comm]  += 2.0L * dnodecomm + selfloopWeightedGraphCSR(graph, node);
+    partition->tot[comm] += degreeWeightedGraphCSR(graph, node);
+
+    partition->node2Community[node] = comm;
+}
+
+inline long double gainGraphCSR(struct ClusterPartition *partition, struct ClusterStats *stats, uint32_t comm, long double dnc, long double degc)
+{
+    long double totc = partition->tot[comm];
+    long double m2   = stats->total_weight;
+
+    return (dnc - totc * degc / m2);
+}
+
+
 struct ClusterPartition *newClusterPartitionGraphCSR(struct GraphCSR *graph)
 {
 
@@ -216,26 +239,22 @@ Computes the set of neighbor communities of a given node (excluding self-loops)
 */
 void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node)
 {
-    unsigned long long i;
-    unsigned long neigh, neighComm;
+    uint32_t j;
+    uint32_t neigh, neighComm;
     long double neighW;
     partition->neighCommPos[0] = partition->node2Community[node];
     partition->neighCommWeights[partition->neighCommPos[0]] = 0.;
     partition->neighCommNb = 1;
 
-
     uint32_t degree;
     uint32_t edge_idx;
 
-    long double weights;
     struct Vertex *vertices = NULL;
     uint32_t *sorted_edges_array = NULL;
 
 #if WEIGHTED
     float *edges_array_weight = NULL;
 #endif
-
-    weights = 0.0;
 
 #if DIRECTED
     vertices = graph->inverse_vertices;
@@ -251,13 +270,18 @@ void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR 
 #endif
 #endif
 
+    degree = vertices->out_degree[node];
+    edge_idx = vertices->edges_idx[node];
     // for all neighbors of node, add weight to the corresponding community
-    for (i = g->cd[node]; i < g->cd[node + 1]; i++)
+    for(j = edge_idx ; j < (edge_idx + degree) ; j++)
     {
-        neigh  = g->adj[i];
+        neigh = EXTRACT_VALUE(sorted_edges_array[j]);
         neighComm = partition->node2Community[neigh];
-        neighW = (g->weights == NULL) ? 1.0 : g->weights[i];
-
+#if WEIGHTED
+        neighW =  edges_array_weight[j];
+#else
+        neighW = 1.0 ;
+#endif
         // if not a self-loop
         if (neigh != node)
         {
@@ -272,6 +296,69 @@ void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR 
         }
     }
 }
+
+/*
+Same behavior as neighCommunities except:
+- self loop are counted
+- data structure if not reinitialised
+*/
+void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node)
+{
+    uint32_t j;
+    uint32_t neigh, neighComm;
+    long double neighW;
+    partition->neighCommPos[0] = partition->node2Community[node];
+    partition->neighCommWeights[partition->neighCommPos[0]] = 0.;
+    partition->neighCommNb = 1;
+
+    uint32_t degree;
+    uint32_t edge_idx;
+
+    struct Vertex *vertices = NULL;
+    uint32_t *sorted_edges_array = NULL;
+
+#if WEIGHTED
+    float *edges_array_weight = NULL;
+#endif
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->inverse_sorted_edges_array->edges_array_weight;
+#endif
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#if WEIGHTED
+    edges_array_weight = graph->sorted_edges_array->edges_array_weight;
+#endif
+#endif
+
+    degree = vertices->out_degree[node];
+    edge_idx = vertices->edges_idx[node];
+    // for all neighbors of node, add weight to the corresponding community
+    for(j = edge_idx ; j < (edge_idx + degree) ; j++)
+    {
+        neigh = EXTRACT_VALUE(sorted_edges_array[j]);
+        neighComm = partition->node2Community[neigh];
+#if WEIGHTED
+        neighW =  edges_array_weight[j];
+#else
+        neighW = 1.0 ;
+#endif
+
+        // if community is new (weight == -1)
+        if (partition->neighCommWeights[neighComm] == -1)
+        {
+            partition->neighCommPos[partition->neighCommNb] = neighComm;
+            partition->neighCommWeights[neighComm] = 0.;
+            partition->neighCommNb++;
+        }
+        partition->neighCommWeights[neighComm] += neighW;
+    }
+}
+
 
 void freeClusterStats(struct ClusterStats *stats)
 {
@@ -362,8 +449,68 @@ long double louvainPassGraphCSR(struct ClusterStats *stats, struct ClusterPartit
     uint32_t oldComm, newComm, bestComm;
     uint32_t nbMoves;
 
+    // repeat while
+    //   there are some nodes moving
+    //   or there is an improvement of quality greater than a given epsilon
+    do
+    {
 
-    return startModularity;
+        curModularity = newModularity;
+        nbMoves = 0;
+
+        // for each node:
+        //   remove the node from its community
+        //   compute the gain for its insertion in all neighboring communities
+        //   insert it in the best community with the highest gain
+        for (i = 0; i < graph->num_vertices; i++)
+        {
+            node = i;
+            oldComm = partition->node2Community[node];
+            degreeW = degreeWeightedGraphCSR(graph, node);
+
+            // computation of all neighboring communities of current node
+            neighboringCommunitiesInitialize(partition);
+            neighboringCommunities(partition, graph, node);
+
+            // remove node from its current community
+            removeNodeGraphCSR(partition, graph, node, oldComm, partition->neighCommWeights[oldComm]);
+
+            // compute the gain for all neighboring communities
+            // default choice is the former community
+            bestComm = oldComm;
+            bestCommW  = 0.0L;
+            bestGain = 0.0L;
+
+            for (j = 0; j < partition->neighCommNb; j++)
+            {
+                newComm = partition->neighCommPos[j];
+                newGain = gainGraphCSR(partition, stats, newComm, partition->neighCommWeights[newComm], degreeW);
+
+                if (newGain > bestGain)
+                {
+                    bestComm = newComm;
+                    bestCommW = partition->neighCommWeights[newComm];
+                    bestGain = newGain;
+                }
+            }
+
+            // insert node in the nearest community
+            insertNodeGraphCSR(partition, graph, node, bestComm, bestCommW);
+
+            if (bestComm != oldComm)
+            {
+                nbMoves++;
+            }
+
+        }
+
+        newModularity = modularityGraphCSR(stats, partition, graph);
+    }
+    while (nbMoves > 0 &&
+            newModularity - curModularity > MIN_IMPROVEMENT);
+
+
+    return newModularity - startModularity;
 
 }
 
