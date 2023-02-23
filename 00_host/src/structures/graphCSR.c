@@ -317,7 +317,7 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
 
 
     graphCSRPrint(graphCSR);
-    edgeListPrint(graphCSR->sorted_edges_array);
+    // edgeListPrint(graphCSR->sorted_edges_array);
 
     free(timer);
 
