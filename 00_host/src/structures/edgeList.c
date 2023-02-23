@@ -321,7 +321,10 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
         fwrite(&dest, sizeof (dest), 1, pBinary);
 
 #if WEIGHTED
-        fwrite(&weight, sizeof (weight), 1, pBinary);
+        if(weighted)
+        {
+            fwrite(&weight, sizeof (weight), 1, pBinary);
+        }
 #endif
         size++;
     }
@@ -393,7 +396,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     else
     {
         offset = 2;
-        offset_size = (2 * sizeof(uint32_t)) + sizeof(float);
+        offset_size = (2 * sizeof(uint32_t));
     }
 #else
     if(weighted) // you will skip the weights

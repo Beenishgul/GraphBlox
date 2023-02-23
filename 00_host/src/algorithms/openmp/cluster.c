@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-16 15:41:07
+* @Last Modified time: 2023-02-22 21:03:35
 */
 
 #include <stdio.h>
@@ -70,7 +70,7 @@ struct ClusterStats *newClusterStatsGraphCSR(struct GraphCSR *graph)
 
     stats->total_weight = total_weight;
 
-    printf("-------------> %Lf \n", total_weight);
+    // printf("-------------> %Lf \n", total_weight);
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(vertex_id) shared(stats,graph)
@@ -153,7 +153,7 @@ inline long double selfloopWeightedGraphCSR(struct GraphCSR *graph, uint32_t nod
 #if WEIGHTED
             weights +=  edges_array_weight[j];
 #else
-            weights = 1.0 ;
+            weights += 1.0 ;
 #endif
         }
     }
