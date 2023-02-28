@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-22 21:03:35
+* @Last Modified time: 2023-02-27 19:12:48
 */
 
 #include <stdio.h>
@@ -364,6 +364,40 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
 struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph)
 {
 
+    uint32_t v;
+    uint32_t last;
+    uint32_t *order;
+    uint32_t *renumber;
+
+    last = 1;
+
+    order = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
+    renumber = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
+
+    #pragma omp parallel for
+    for(v = 0; v < graph->num_vertices; v++)
+    {
+        order[v] = v;
+        renumber[v] = 0;
+    }
+
+    #pragma omp parallel for
+    for(v = 0; v < graph->num_vertices; v++)
+    {
+        if (renumber[partition->node2Community[v]] == 0)
+        {
+            renumber[partition->node2Community[v]] = __sync_fetch_and_add(&last, 1);
+        }
+    }
+
+    order = radixSortEdgesByDegree(partition->node2Community, order, graph->num_vertices);
+
+
+    free(order);
+    free(renumber);
+
+    return graph;
+
 }
 
 void freeClusterStats(struct ClusterStats *stats)
@@ -545,7 +579,11 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 {
 
     struct ClusterStats *stats = newClusterStatsGraphCSR(graph);
+    struct GraphCSR *graph_clustered;
+    struct GraphCSR *graph_running;
 
+
+    graph_running = graph;
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Louvain");
     printf(" -----------------------------------------------------\n");
@@ -554,7 +592,6 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
     struct ClusterPartition *partition;
     long double improvement;
-    uint32_t n;
     uint32_t originalSize = graph->num_vertices;
 
     partition = newClusterPartitionGraphCSR(graph);
@@ -563,7 +600,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     improvement = louvainPassGraphCSR(stats, partition, graph);
     printClusterPartition(partition);
 
-    n = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+    stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
     printClusterPartition(partition);
 
     if (improvement < MIN_IMPROVEMENT)
@@ -573,10 +610,19 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
         return stats;
     }
 
+    graph_clustered = louvainPartitionToGraphCSR(partition, graph);
+
     printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 
     freeClusterPartition(partition);
     free(timer);
+
+    graph_running = graph_clustered;
+
+    if(graph_running->num_vertices < originalSize)
+    {
+        graphCSRFree(graph_running);
+    }
 
     return stats;
 }
