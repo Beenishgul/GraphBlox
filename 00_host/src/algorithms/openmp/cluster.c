@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-27 19:12:48
+* @Last Modified time: 2023-02-28 21:36:46
 */
 
 #include <stdio.h>
@@ -594,30 +594,34 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     long double improvement;
     uint32_t originalSize = graph->num_vertices;
 
-    partition = newClusterPartitionGraphCSR(graph);
-    printClusterPartition(partition);
-
-    improvement = louvainPassGraphCSR(stats, partition, graph);
-    printClusterPartition(partition);
-
-    stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
-    printClusterPartition(partition);
-
-    if (improvement < MIN_IMPROVEMENT)
+    // Execution of Louvain method
+    while(1)
     {
+
+        partition = newClusterPartitionGraphCSR(graph);
+        printClusterPartition(partition);
+
+        improvement = louvainPassGraphCSR(stats, partition, graph);
+        printClusterPartition(partition);
+
+        stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+        printClusterPartition(partition);
+
+        if (improvement < MIN_IMPROVEMENT)
+        {
+            freeClusterPartition(partition);
+            break;
+        }
+
+        graph_clustered = louvainPartitionToGraphCSR(partition, graph);
+
+        printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
+
         freeClusterPartition(partition);
-        // break;
-        return stats;
+        free(timer);
+
+        graph_running = graph_clustered;
     }
-
-    graph_clustered = louvainPartitionToGraphCSR(partition, graph);
-
-    printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
-
-    freeClusterPartition(partition);
-    free(timer);
-
-    graph_running = graph_clustered;
 
     if(graph_running->num_vertices < originalSize)
     {
