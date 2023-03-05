@@ -135,6 +135,54 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
 }
 
 
+// read edge file to edge_array in memory
+struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeList *edgeListTo)
+{
+
+    if(edgeListFrom->num_edges < edgeListTo->num_edges)
+        return NULL;
+
+    edgeListTo->num_edges = edgeListTo->num_edges;
+    edgeListTo->num_vertices = edgeListTo->num_vertices;
+    edgeListTo->avg_degree = edgeListTo->avg_degree;
+
+    uint32_t i;
+    #pragma omp parallel for
+    for(i = 0; i < edgeListFrom->num_edges; i++)
+    {
+        edgeListTo->edges_array_dest[i] = edgeListFrom->edges_array_dest[i];
+        edgeListTo->edges_array_src[i] = edgeListFrom->edges_array_src[i];
+#if WEIGHTED
+        edgeListTo->edges_array_weight[i] = edgeListFrom->edges_array_weight[i];
+#endif
+    }
+
+    edgeListTo->mask_array = NULL;
+    edgeListTo->label_array = NULL;
+    edgeListTo->inverse_label_array = NULL;
+
+    // newEdgeList->edges_array = newEdgeList(num_edges);
+
+#if WEIGHTED
+    edgeListTo->max_weight = edgeListFrom->max_weight;
+#endif
+
+    edgeListTo->mask_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
+    edgeListTo->label_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
+    edgeListTo->inverse_label_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
+
+    #pragma omp parallel for
+    for (i = 0; i < (edgeListTo->num_vertices); ++i)
+    {
+        edgeListTo->mask_array[i] = edgeListFrom->mask_array[i] ;
+        edgeListTo->label_array[i] =  edgeListFrom->label_array[i];
+        edgeListTo->inverse_label_array[i] =  edgeListFrom->inverse_label_array[i];
+    }
+
+    return edgeListTo;
+
+}
+
 struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
 {
 

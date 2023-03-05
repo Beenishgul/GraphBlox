@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-02-28 21:36:46
+* @Last Modified time: 2023-03-04 21:32:12
 */
 
 #include <stdio.h>
@@ -381,17 +381,24 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
         renumber[v] = 0;
     }
 
-    #pragma omp parallel for
+    // #pragma omp parallel for
     for(v = 0; v < graph->num_vertices; v++)
     {
         if (renumber[partition->node2Community[v]] == 0)
         {
-            renumber[partition->node2Community[v]] = __sync_fetch_and_add(&last, 1);
+            renumber[partition->node2Community[v]] = last++;
         }
     }
 
     order = radixSortEdgesByDegree(partition->node2Community, order, graph->num_vertices);
 
+
+    for(v = 0; v < graph->num_vertices+1; v++)
+    {
+        printf("%u %u - %u %u \n", partition->node2Community[v], order[v], v, renumber[v]);
+    }
+
+    printf("%u \n", last);
 
     free(order);
     free(renumber);
@@ -595,33 +602,33 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     uint32_t originalSize = graph->num_vertices;
 
     // Execution of Louvain method
-    while(1)
+    // while(1)
+    // {
+
+    partition = newClusterPartitionGraphCSR(graph);
+    printClusterPartition(partition);
+
+    improvement = louvainPassGraphCSR(stats, partition, graph);
+    printClusterPartition(partition);
+
+    stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+    printClusterPartition(partition);
+
+    if (improvement < MIN_IMPROVEMENT)
     {
-
-        partition = newClusterPartitionGraphCSR(graph);
-        printClusterPartition(partition);
-
-        improvement = louvainPassGraphCSR(stats, partition, graph);
-        printClusterPartition(partition);
-
-        stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
-        printClusterPartition(partition);
-
-        if (improvement < MIN_IMPROVEMENT)
-        {
-            freeClusterPartition(partition);
-            break;
-        }
-
-        graph_clustered = louvainPartitionToGraphCSR(partition, graph);
-
-        printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
-
         freeClusterPartition(partition);
-        free(timer);
-
-        graph_running = graph_clustered;
+        // break;
     }
+
+    graph_clustered = louvainPartitionToGraphCSR(partition, graph);
+
+    printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
+
+    freeClusterPartition(partition);
+    free(timer);
+
+    graph_running = graph_clustered;
+    // }
 
     if(graph_running->num_vertices < originalSize)
     {
