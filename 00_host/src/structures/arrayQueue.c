@@ -355,15 +355,13 @@ void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_
     // b->numSetBits = q->q_bitmap->numSetBits;
     q->head = q->tail;
     q->tail_next = q->tail;
-
-
 }
 
 
 void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues, uint32_t *labels)
 {
 
-   
+
     #pragma omp parallel default(none) shared(b,localFrontierQueues,q,labels)
     {
         uint32_t i;
