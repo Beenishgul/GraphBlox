@@ -174,13 +174,19 @@ struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeLis
     #pragma omp parallel for
     for (i = 0; i < (edgeListTo->num_vertices); ++i)
     {
-        edgeListTo->mask_array[i] = edgeListFrom->mask_array[i] ;
-        edgeListTo->label_array[i] =  edgeListFrom->label_array[i];
-        edgeListTo->inverse_label_array[i] =  edgeListFrom->inverse_label_array[i];
+        edgeListTo->mask_array[i] = 0;
+        edgeListTo->label_array[i] =  i;
+        edgeListTo->inverse_label_array[i] =  i;
     }
 
     return edgeListTo;
 
+}
+
+void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight){
+
+
+    
 }
 
 struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
