@@ -42,6 +42,7 @@ void writeEdgeListToTXTFile(struct EdgeList *edgeList, const char *fname);
 struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList);
 struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeList *edgeListTo);
 void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight);
+struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList);
 
 #ifdef __cplusplus
 }
