@@ -167,27 +167,61 @@ struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeLis
     edgeListTo->max_weight = edgeListFrom->max_weight;
 #endif
 
-    edgeListTo->mask_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
-    edgeListTo->label_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
-    edgeListTo->inverse_label_array = (uint32_t *) my_malloc((edgeListFrom->num_vertices + 1) * sizeof(uint32_t));
-
-    #pragma omp parallel for
-    for (i = 0; i < (edgeListTo->num_vertices); ++i)
-    {
-        edgeListTo->mask_array[i] = 0;
-        edgeListTo->label_array[i] =  i;
-        edgeListTo->inverse_label_array[i] =  i;
-    }
 
     return edgeListTo;
 
 }
 
-void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight){
+void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight)
+{
 
+    uint32_t num_vertices = 0;
 
-    
+#if WEIGHTED
+    float max_weight = 0;
+#endif
+
+    edgeList->edges_array_dest[edgeList->num_edges] = dest;
+    edgeList->edges_array_src[edgeList->num_edges] = src;
+#if WEIGHTED
+    edgeList->edges_array_weight[edgeList->num_edges] = weight;
+#endif
+
+    num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(edgeList->edges_array_src[edgeList->num_edges], edgeList->edges_array_dest[edgeList->num_edges]));
+
+#if WEIGHTED
+    max_weight = maxTwoFloats(max_weight, edgeList->edges_array_weight[edgeList->num_edges]);
+#endif
+
+    edgeList->num_edges++;
+    edgeList->num_vertices = num_vertices;
+#if WEIGHTED
+    edgeList->max_weight = max_weight;
+#endif
 }
+
+struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList)
+{
+
+
+    uint32_t i;
+    edgeList->mask_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->inverse_label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->avg_degree = edgeList->num_edges / edgeList->num_vertices;
+
+    #pragma omp parallel for
+    for (i = 0; i < (edgeList->num_vertices); ++i)
+    {
+        edgeList->mask_array[i] = 0;
+        edgeList->label_array[i] =  i;
+        edgeList->inverse_label_array[i] =  i;
+    }
+
+
+    return edgeList;
+}
+
 
 struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
 {
