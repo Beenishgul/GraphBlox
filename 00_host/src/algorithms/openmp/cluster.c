@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-08 01:13:18
+* @Last Modified time: 2023-03-08 01:19:34
 */
 
 #include <stdio.h>
@@ -424,7 +424,6 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
 
     struct EdgeList *edgeList = newEdgeListIncremental(num_edges);
     neighboringCommunitiesInitialize(partition);
-    // neighboringCommunitiesAll(partition, graph, node);
 
     old_community  = partition->node2Community[order[0]];
 
@@ -669,33 +668,33 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     uint32_t originalSize = graph->num_vertices;
 
     // Execution of Louvain method
-    // while(1)
-    // {
-
-    partition = newClusterPartitionGraphCSR(graph);
-    printClusterPartition(partition);
-
-    improvement = louvainPassGraphCSR(stats, partition, graph);
-    printClusterPartition(partition);
-
-    stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
-    printClusterPartition(partition);
-
-    if (improvement < MIN_IMPROVEMENT)
+    while(1)
     {
+
+        partition = newClusterPartitionGraphCSR(graph);
+        printClusterPartition(partition);
+
+        improvement = louvainPassGraphCSR(stats, partition, graph);
+        printClusterPartition(partition);
+
+        stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
+        printClusterPartition(partition);
+
+        if (improvement < MIN_IMPROVEMENT)
+        {
+            freeClusterPartition(partition);
+            // break;
+        }
+
+        graph_clustered = louvainPartitionToGraphCSR(partition, graph, arguments);
+
+        printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
+
         freeClusterPartition(partition);
-        // break;
+        free(timer);
+
+        graph_running = graph_clustered;
     }
-
-    graph_clustered = louvainPartitionToGraphCSR(partition, graph, arguments);
-
-    printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
-
-    freeClusterPartition(partition);
-    free(timer);
-
-    graph_running = graph_clustered;
-    // }
 
     if(graph_running->num_vertices < originalSize)
     {
