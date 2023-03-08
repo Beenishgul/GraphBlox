@@ -134,6 +134,46 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
 
 }
 
+// read edge file to edge_array in memory
+struct EdgeList *newEdgeListIncremental( uint32_t num_edges)
+{
+
+
+    struct EdgeList *newEdgeList = (struct EdgeList *) my_malloc(sizeof(struct EdgeList));
+    newEdgeList->edges_array_src = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
+    newEdgeList->edges_array_dest = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
+
+#if WEIGHTED
+    newEdgeList->edges_array_weight = (float *) my_malloc(num_edges * sizeof(float));
+#endif
+
+    uint32_t i;
+    #pragma omp parallel for
+    for(i = 0; i < num_edges; i++)
+    {
+        newEdgeList->edges_array_dest[i] = 0;
+        newEdgeList->edges_array_src[i] = 0;
+#if WEIGHTED
+        newEdgeList->edges_array_weight[i] = 0;
+#endif
+    }
+
+    newEdgeList->mask_array = NULL;
+    newEdgeList->label_array = NULL;
+    newEdgeList->inverse_label_array = NULL;
+    newEdgeList->num_edges = 0;
+    newEdgeList->num_vertices = 0;
+    newEdgeList->avg_degree = 0;
+    // newEdgeList->edges_array = newEdgeList(num_edges);
+
+#if WEIGHTED
+    newEdgeList->max_weight = 0;
+#endif
+
+    return newEdgeList;
+
+}
+
 
 // read edge file to edge_array in memory
 struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeList *edgeListTo)
@@ -172,7 +212,24 @@ struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeLis
 
 }
 
-void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight)
+// read edge file to edge_array in memory
+struct EdgeList *resizeEdgeList( struct EdgeList *edgeListFrom, uint32_t num_edges)
+{
+
+    if(edgeListFrom->num_edges > num_edges)
+        return NULL;
+
+    struct EdgeList *edgeListTo = newEdgeList(num_edges);
+
+    edgeListTo = deepCopyEdgeList(edgeListFrom, edgeListTo);
+
+    freeEdgeList(edgeListFrom);
+
+    return edgeListTo;
+
+}
+
+void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  float weight)
 {
 
     uint32_t num_vertices = 0;
