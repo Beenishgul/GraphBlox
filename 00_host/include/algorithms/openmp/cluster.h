@@ -59,7 +59,7 @@ uint32_t updateClusterPartitionGraphCSR(struct ClusterPartition *partition, uint
 void neighboringCommunitiesInitialize(struct ClusterPartition *partition);
 void neighboringCommunities(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node);
 void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphCSR *graph, uint32_t node);
-struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph);
+struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph, struct Arguments *arguments);
 
 void freeClusterStats(struct ClusterStats *stats);
 void freeClusterPartition(struct ClusterPartition *partition);

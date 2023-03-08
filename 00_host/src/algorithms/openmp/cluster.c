@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-07 23:47:44
+* @Last Modified time: 2023-03-08 01:13:18
 */
 
 #include <stdio.h>
@@ -361,13 +361,24 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
 
 // Return the meta graph induced by a partition of a graph
 // See Louvain article for more details
-struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph)
+struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph, struct Arguments *arguments)
 {
 
     uint32_t v;
+    uint32_t i;
+    uint32_t j;
     uint32_t last;
     uint32_t *order;
     uint32_t *renumber;
+    uint32_t  num_edges = 8;
+    uint32_t  old_community = 0;
+    uint32_t  curr_community = 0;
+
+    struct GraphCSR *meta_graph;
+
+    uint32_t src = 0;
+    uint32_t dest = 0;
+    float weight = 0.0;
 
     last = 1;
 
@@ -411,18 +422,55 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
 
     order = radixSortEdgesByDegree(partition->node2Community, order, graph->num_vertices);
 
+    struct EdgeList *edgeList = newEdgeListIncremental(num_edges);
+    neighboringCommunitiesInitialize(partition);
+    // neighboringCommunitiesAll(partition, graph, node);
 
-    for(v = 0; v < graph->num_vertices ; v++)
+    old_community  = partition->node2Community[order[0]];
+
+    for(i = 0; i <= partition->size ; i++)
     {
-        printf("%u %u - %u %u \n", partition->node2Community[v], order[v], v, renumber[v]);
+        // current node and current community with dummy values if out of bounds
+        v = (i == partition->size) ? 0 : order[i];
+        curr_community = (i == partition->size) ? curr_community + 1 : partition->node2Community[order[i]];
+
+        // new community, write previous one
+        if (old_community != curr_community)
+        {
+
+            // for all neighboring communities of current community
+            for (j = 0; j < partition->neighCommNb; j++)
+            {
+                uint32_t neighComm = partition->neighCommPos[j];
+                float neighCommWeight = partition->neighCommWeights[partition->neighCommPos[j]];
+
+                src = old_community;
+                dest = neighComm;
+                weight = neighCommWeight;
+                insertEdgeInEdgeList(edgeList, src, dest, weight);
+
+                if(edgeList->num_edges == num_edges)
+                {
+                    num_edges = num_edges * 2;
+                    edgeList = resizeEdgeList(edgeList, num_edges);
+                }
+            }
+
+            old_community = curr_community;
+            neighboringCommunitiesInitialize(partition);
+        }
+
+        neighboringCommunitiesAll(partition, graph, v);
     }
 
-    printf("%u \n", last);
+    edgeList = finalizeInsertEdgeInEdgeList(edgeList);
+
+    meta_graph = graphCSRPreProcessingStepFromEdgelist (arguments, edgeList);
 
     free(order);
     free(renumber);
 
-    return graph;
+    return meta_graph;
 
 }
 
@@ -639,7 +687,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
         // break;
     }
 
-    graph_clustered = louvainPartitionToGraphCSR(partition, graph);
+    graph_clustered = louvainPartitionToGraphCSR(partition, graph, arguments);
 
     printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 

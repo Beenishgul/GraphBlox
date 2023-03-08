@@ -38,11 +38,13 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted);
 struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t symmetric, uint32_t weighted);
 struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t inverse, uint32_t symmetric, uint32_t weighted);
 struct EdgeList *newEdgeList(uint32_t num_edges);
+struct EdgeList *newEdgeListIncremental( uint32_t num_edges);
 void writeEdgeListToTXTFile(struct EdgeList *edgeList, const char *fname);
 struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList);
 struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeList *edgeListTo);
-void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  uint32_t weight);
+void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  float weight);
 struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList);
+struct EdgeList *resizeEdgeList( struct EdgeList *edgeListFrom, uint32_t num_edges);
 
 #ifdef __cplusplus
 }
