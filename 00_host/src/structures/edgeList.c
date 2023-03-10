@@ -179,7 +179,7 @@ struct EdgeList *newEdgeListIncremental( uint32_t num_edges)
 struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeList *edgeListTo)
 {
 
-    if(edgeListFrom->num_edges < edgeListTo->num_edges)
+    if(edgeListFrom->num_edges > edgeListTo->num_edges)
         return NULL;
 
     edgeListTo->num_edges = edgeListTo->num_edges;
@@ -201,8 +201,6 @@ struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeLis
     edgeListTo->label_array = NULL;
     edgeListTo->inverse_label_array = NULL;
 
-    // newEdgeList->edges_array = newEdgeList(num_edges);
-
 #if WEIGHTED
     edgeListTo->max_weight = edgeListFrom->max_weight;
 #endif
@@ -221,6 +219,7 @@ struct EdgeList *resizeEdgeList( struct EdgeList *edgeListFrom, uint32_t num_edg
 
     struct EdgeList *edgeListTo = newEdgeList(num_edges);
 
+    edgeListTo->num_edges = edgeListFrom->num_edges;
     edgeListTo = deepCopyEdgeList(edgeListFrom, edgeListTo);
 
     freeEdgeList(edgeListFrom);
@@ -373,7 +372,6 @@ void freeEdgeList( struct EdgeList *edgeList)
                 free(edgeList->label_array);
             if(edgeList->inverse_label_array)
                 free(edgeList->inverse_label_array);
-
 #if WEIGHTED
             if(edgeList->edges_array_weight)
                 free(edgeList->edges_array_weight);

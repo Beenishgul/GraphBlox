@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-08 01:19:34
+* @Last Modified time: 2023-03-09 23:43:38
 */
 
 #include <stdio.h>
@@ -440,19 +440,21 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
             // for all neighboring communities of current community
             for (j = 0; j < partition->neighCommNb; j++)
             {
+                if(edgeList->num_edges == (num_edges - 2))
+                {
+                    num_edges = num_edges * 2;
+                    edgeList = resizeEdgeList(edgeList, num_edges);
+                }
+
                 uint32_t neighComm = partition->neighCommPos[j];
                 float neighCommWeight = partition->neighCommWeights[partition->neighCommPos[j]];
 
                 src = old_community;
                 dest = neighComm;
                 weight = neighCommWeight;
-                insertEdgeInEdgeList(edgeList, src, dest, weight);
 
-                if(edgeList->num_edges == num_edges)
-                {
-                    num_edges = num_edges * 2;
-                    edgeList = resizeEdgeList(edgeList, num_edges);
-                }
+                printf("src:%u dest:%u weight:%f num_edges:%u new_num:%u \n", src, dest, weight, edgeList->num_edges, num_edges);
+                insertEdgeInEdgeList(edgeList, src, dest, weight);
             }
 
             old_community = curr_community;
