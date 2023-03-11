@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-09 23:58:32
+* @Last Modified time: 2023-03-10 22:38:58
 */
 
 #include <stdio.h>
@@ -361,7 +361,7 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
 
 // Return the meta graph induced by a partition of a graph
 // See Louvain article for more details
-struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, struct GraphCSR *graph, struct Arguments *arguments)
+struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct ClusterPartition *partition, struct GraphCSR *graph, struct Arguments *arguments)
 {
 
     uint32_t v;
@@ -381,6 +381,7 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
     float weight = 0.0;
 
     last = 1;
+    stats->total_weight = 0;
 
     order = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
     renumber = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
@@ -452,8 +453,10 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
                 src = old_community;
                 dest = neighComm;
                 weight = neighCommWeight;
+                stats->total_weight += neighCommWeight;
+                // printf("src:%u dest:%u weight:%f num_edges:%u new_num:%u \n", src, dest, weight, edgeList->num_edges, num_edges);
+                printf("oldComm:%u currentComm:%u neighComm:%u neighCommWeight:%f new_num:%u \n", old_community, curr_community, neighComm, neighCommWeight, edgeList->num_edges);
 
-                printf("src:%u dest:%u weight:%f num_edges:%u new_num:%u \n", src, dest, weight, edgeList->num_edges, num_edges);
                 insertEdgeInEdgeList(edgeList, src, dest, weight);
             }
 
@@ -465,8 +468,8 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
     }
 
     edgeList = finalizeInsertEdgeInEdgeList(edgeList);
-    edgeListPrint(edgeList);
-    edgeListPrint(graph->sorted_edges_array);
+    // edgeListPrint(edgeList);
+    // edgeListPrint(graph->sorted_edges_array);
 
     meta_graph = graphCSRPreProcessingStepFromEdgelist (arguments, edgeList);
 
@@ -672,7 +675,8 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     uint32_t originalSize = graph->num_vertices;
 
     // Execution of Louvain method
-    while(1)
+
+    do
     {
 
         partition = newClusterPartitionGraphCSR(graph_running);
@@ -690,7 +694,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
             break;
         }
 
-        graph_clustered = louvainPartitionToGraphCSR(partition, graph_running, arguments);
+        graph_clustered = louvainPartitionToGraphCSR(stats, partition, graph_running, arguments);
 
         printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 
@@ -702,6 +706,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
         graph_running = graph_clustered;
     }
+    while(0);
 
     if(graph_running->num_vertices < originalSize)
     {
