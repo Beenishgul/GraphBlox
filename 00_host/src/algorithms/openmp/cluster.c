@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-09 23:43:38
+* @Last Modified time: 2023-03-09 23:58:32
 */
 
 #include <stdio.h>
@@ -465,6 +465,8 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterPartition *partition, 
     }
 
     edgeList = finalizeInsertEdgeInEdgeList(edgeList);
+    edgeListPrint(edgeList);
+    edgeListPrint(graph->sorted_edges_array);
 
     meta_graph = graphCSRPreProcessingStepFromEdgelist (arguments, edgeList);
 
@@ -673,10 +675,10 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     while(1)
     {
 
-        partition = newClusterPartitionGraphCSR(graph);
+        partition = newClusterPartitionGraphCSR(graph_running);
         printClusterPartition(partition);
 
-        improvement = louvainPassGraphCSR(stats, partition, graph);
+        improvement = louvainPassGraphCSR(stats, partition, graph_running);
         printClusterPartition(partition);
 
         stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
@@ -685,15 +687,18 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
         if (improvement < MIN_IMPROVEMENT)
         {
             freeClusterPartition(partition);
-            // break;
+            break;
         }
 
-        graph_clustered = louvainPartitionToGraphCSR(partition, graph, arguments);
+        graph_clustered = louvainPartitionToGraphCSR(partition, graph_running, arguments);
 
         printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 
+        if(graph_running->num_vertices < originalSize)
+        {
+            graphCSRFree(graph_running);
+        }
         freeClusterPartition(partition);
-        free(timer);
 
         graph_running = graph_clustered;
     }
@@ -702,6 +707,8 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     {
         graphCSRFree(graph_running);
     }
+
+    free(timer);
 
     return stats;
 }
