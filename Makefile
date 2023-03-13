@@ -225,7 +225,7 @@ export ALGORITHMS       = 9
 # =========================================================
 # GRAPH DATA_STRUCTURES Pre-Processing
 # =========================================================
-export SORT_TYPE        = 2
+export SORT_TYPE        = 0
 export DATA_STRUCTURES  = 0
 export REORDER_LAYER1   = 0
 export REORDER_LAYER2   = 0
@@ -247,9 +247,9 @@ export NUM_ITERATIONS   = 1
 # =========================================================
 # Parallel Pre-Processing/Algorithm/Kernel (dominant loop)
 # =========================================================
-export NUM_THREADS_PRE  = 8
-export NUM_THREADS_ALGO = 8
-export NUM_THREADS_KER  = 8
+export NUM_THREADS_PRE  = 1
+export NUM_THREADS_ALGO = 1
+export NUM_THREADS_KER  = 1
 # =========================================================
 
 # =========================================================
