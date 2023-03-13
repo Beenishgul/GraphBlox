@@ -231,10 +231,10 @@ struct EdgeList *resizeEdgeList( struct EdgeList *edgeListFrom, uint32_t num_edg
 void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  float weight)
 {
 
-    uint32_t num_vertices = 0;
+    uint32_t num_vertices = edgeList->num_vertices;
 
 #if WEIGHTED
-    float max_weight = 0;
+    float max_weight = edgeList->max_weight;
 #endif
 
     edgeList->edges_array_dest[edgeList->num_edges] = dest;
@@ -243,17 +243,18 @@ void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t d
     edgeList->edges_array_weight[edgeList->num_edges] = weight;
 #endif
 
-    num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(edgeList->edges_array_src[edgeList->num_edges], edgeList->edges_array_dest[edgeList->num_edges]));
+    num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(src, dest));
 
 #if WEIGHTED
-    max_weight = maxTwoFloats(max_weight, edgeList->edges_array_weight[edgeList->num_edges]);
+    max_weight = maxTwoFloats(max_weight, weight);
 #endif
 
-    edgeList->num_edges++;
     edgeList->num_vertices = num_vertices;
 #if WEIGHTED
     edgeList->max_weight = max_weight;
 #endif
+
+    edgeList->num_edges++;
 }
 
 struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList)
@@ -679,12 +680,12 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
 #if WEIGHTED
             if(weighted)
             {
-                edgeList->edges_array_weight[i] = 1;
+                edgeList->edges_array_weight[i] = buf_pointer_float[((offset) * i) + 2];
                 edgeList->edges_array_weight[i + (num_edges)] = edgeList->edges_array_weight[i];
             }
             else
             {
-                edgeList->edges_array_weight[i] = buf_pointer_float[((offset) * i) + 2];
+                edgeList->edges_array_weight[i] = 1.0;
                 edgeList->edges_array_weight[i + (num_edges)] = edgeList->edges_array_weight[i];
             }
 #endif
@@ -799,7 +800,7 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 #if WEIGHTED
         float weight = edgeListmem->edges_array_weight[i];
 #endif
-        // printf(" %u %lu -> %lu \n",src,dest);
+        // printf("%u %lu -> %lu \n",src,dest);
 #if DIRECTED
         if(!inverse)
         {

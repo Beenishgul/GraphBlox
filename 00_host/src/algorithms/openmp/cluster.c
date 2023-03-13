@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-10 22:38:58
+* @Last Modified time: 2023-03-12 23:18:32
 */
 
 #include <stdio.h>
@@ -314,9 +314,6 @@ void neighboringCommunitiesAll(struct ClusterPartition *partition, struct GraphC
     uint32_t j;
     uint32_t neigh, neighComm;
     long double neighW;
-    partition->neighCommPos[0] = partition->node2Community[node];
-    partition->neighCommWeights[partition->neighCommPos[0]] = 0.;
-    partition->neighCommNb = 1;
 
     uint32_t degree;
     uint32_t edge_idx;
@@ -370,6 +367,7 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
     uint32_t last;
     uint32_t *order;
     uint32_t *renumber;
+    uint32_t *node2Community;
     uint32_t  num_edges = 8;
     uint32_t  old_community = 0;
     uint32_t  curr_community = 0;
@@ -385,11 +383,11 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
 
     order = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
     renumber = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
+    node2Community = (uint32_t *) my_malloc((graph->num_vertices + 1) * sizeof(uint32_t));
 
     #pragma omp parallel for
     for(v = 0; v < graph->num_vertices; v++)
     {
-        order[v] = v;
         renumber[v] = 0;
     }
 
@@ -406,6 +404,13 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
         partition->node2Community[v] = renumber[partition->node2Community[v]] - 1;
     }
 
+    #pragma omp parallel for
+    for(v = 0; v < graph->num_vertices; v++)
+    {
+        order[v] = v;
+        node2Community[v] = partition->node2Community[v];
+    }
+
     // #pragma omp parallel for
     // for(v = 0; v < graph->num_vertices; v++)
     // {
@@ -420,20 +425,26 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
     // {
     //     partition->node2Community[v] = renumber[partition->node2Community[v]] - 1;
     // }
+    printClusterPartition(partition);
+    order = radixSortEdgesByDegree(node2Community, order, graph->num_vertices);
 
-    order = radixSortEdgesByDegree(partition->node2Community, order, graph->num_vertices);
+    for(i = 0; i < graph->num_vertices ; i++)
+    {
+        printf("%u %u\n", node2Community[i], order[i]);
+    }
 
     struct EdgeList *edgeList = newEdgeListIncremental(num_edges);
     neighboringCommunitiesInitialize(partition);
 
-    old_community  = partition->node2Community[order[0]];
-
+    old_community  = node2Community[order[0]];
+    printClusterPartition(partition);
     for(i = 0; i <= partition->size ; i++)
     {
+
         // current node and current community with dummy values if out of bounds
         v = (i == partition->size) ? 0 : order[i];
-        curr_community = (i == partition->size) ? curr_community + 1 : partition->node2Community[order[i]];
-
+        curr_community = (i == partition->size) ? curr_community + 1 : node2Community[i];
+        printf("%u %u %u\n", v, curr_community, old_community);
         // new community, write previous one
         if (old_community != curr_community)
         {
@@ -454,8 +465,8 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
                 dest = neighComm;
                 weight = neighCommWeight;
                 stats->total_weight += neighCommWeight;
-                // printf("src:%u dest:%u weight:%f num_edges:%u new_num:%u \n", src, dest, weight, edgeList->num_edges, num_edges);
-                printf("oldComm:%u currentComm:%u neighComm:%u neighCommWeight:%f new_num:%u \n", old_community, curr_community, neighComm, neighCommWeight, edgeList->num_edges);
+
+                printf("node:%u oldComm:%u currentComm:%u neighComm:%u neighCommWeight:%f new_num:%u \n", v, old_community, curr_community, neighComm, neighCommWeight, edgeList->num_edges);
 
                 insertEdgeInEdgeList(edgeList, src, dest, weight);
             }
@@ -475,6 +486,7 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
 
     free(order);
     free(renumber);
+    free(node2Community);
 
     return meta_graph;
 
@@ -612,7 +624,7 @@ long double louvainPassGraphCSR(struct ClusterStats *stats, struct ClusterPartit
             // computation of all neighboring communities of current node
             neighboringCommunitiesInitialize(partition);
             neighboringCommunities(partition, graph, node);
-
+            // printClusterPartition(partition);
             // remove node from its current community
             removeNodeGraphCSR(partition, graph, node, oldComm, partition->neighCommWeights[oldComm]);
 
@@ -680,13 +692,14 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
     {
 
         partition = newClusterPartitionGraphCSR(graph_running);
-        printClusterPartition(partition);
+        // printClusterPartition(partition);
 
         improvement = louvainPassGraphCSR(stats, partition, graph_running);
-        printClusterPartition(partition);
+        // printClusterPartition(partition);
 
         stats->processed_nodes = updateClusterPartitionGraphCSR(partition, stats->partitions, originalSize);
-        printClusterPartition(partition);
+        // printClusterPartition(partition);
+        printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
 
         if (improvement < MIN_IMPROVEMENT)
         {
@@ -696,8 +709,6 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
         graph_clustered = louvainPartitionToGraphCSR(stats, partition, graph_running, arguments);
 
-        printf("improvement:%Lf - total_weight:%Lf \n", improvement, stats->total_weight);
-
         if(graph_running->num_vertices < originalSize)
         {
             graphCSRFree(graph_running);
@@ -706,7 +717,7 @@ struct ClusterStats *louvainGraphCSR(struct Arguments *arguments, struct GraphCS
 
         graph_running = graph_clustered;
     }
-    while(0);
+    while(1);
 
     if(graph_running->num_vertices < originalSize)
     {

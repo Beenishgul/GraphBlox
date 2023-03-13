@@ -11,7 +11,7 @@ extern "C" {
 #include "mt19937.h"
 
 #define WEIGHTED 1
-#define DIRECTED 1
+#define DIRECTED 0
 #define DYNAMIC  0
 
 /* Used by main to communicate with parse_opt. */
