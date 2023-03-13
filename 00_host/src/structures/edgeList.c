@@ -254,8 +254,6 @@ void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t d
     edgeList->max_weight = max_weight;
 #endif
 
-
-    printf("%u VV\n", num_vertices);
     edgeList->num_edges++;
 }
 
