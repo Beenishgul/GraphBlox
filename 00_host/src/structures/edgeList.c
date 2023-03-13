@@ -254,6 +254,8 @@ void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t d
     edgeList->max_weight = max_weight;
 #endif
 
+
+    printf("%u VV\n", num_vertices);
     edgeList->num_edges++;
 }
 
@@ -265,6 +267,7 @@ struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList)
     edgeList->mask_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
     edgeList->label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
     edgeList->inverse_label_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
+    edgeList->num_vertices++;
     edgeList->avg_degree = edgeList->num_edges / edgeList->num_vertices;
 
     #pragma omp parallel for
