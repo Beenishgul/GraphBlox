@@ -2,7 +2,7 @@
 * @Author: Abdullah
 * @Date:   2023-02-07 17:28:50
 * @Last Modified by:   Abdullah
-* @Last Modified time: 2023-03-12 23:18:32
+* @Last Modified time: 2023-03-13 13:18:03
 */
 
 #include <stdio.h>
@@ -479,10 +479,11 @@ struct GraphCSR *louvainPartitionToGraphCSR(struct ClusterStats *stats, struct C
     }
 
     edgeList = finalizeInsertEdgeInEdgeList(edgeList);
-    // edgeListPrint(edgeList);
-    // edgeListPrint(graph->sorted_edges_array);
+    edgeListPrint(edgeList);
 
+    arguments->dflag = 0; // disable removing selfloops
     meta_graph = graphCSRPreProcessingStepFromEdgelist (arguments, edgeList);
+    edgeListPrint(meta_graph->sorted_edges_array);
 
     free(order);
     free(renumber);
