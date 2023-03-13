@@ -170,14 +170,14 @@ export GRAPH_DIR = $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 # =========================================================
 # TEST # small test graphs
 # =========================================================
-export GRAPH_SUIT = TEST
+# export GRAPH_SUIT = TEST
 # export GRAPH_NAME = test
 # export GRAPH_NAME = v51_e1021
 # export GRAPH_NAME = v300_e2730
-export GRAPH_NAME = graphbrew
+# export GRAPH_NAME = graphbrew
 
-# # export GRAPH_SUIT = LAW
-# export GRAPH_NAME = LAW-amazon-2008
+export GRAPH_SUIT = LAW
+export GRAPH_NAME = LAW-amazon-2008
 # export GRAPH_NAME = LAW-cnr-2000
 # export GRAPH_NAME = LAW-dblp-2010
 # export GRAPH_NAME = LAW-enron
@@ -219,13 +219,13 @@ export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 # ALGORITHM Flow
 # =========================================================
 export PULL_PUSH        = 0
-export ALGORITHMS       = 9
+export ALGORITHMS       = 0
 # =========================================================
 
 # =========================================================
 # GRAPH DATA_STRUCTURES Pre-Processing
 # =========================================================
-export SORT_TYPE        = 0
+export SORT_TYPE        = 1
 export DATA_STRUCTURES  = 0
 export REORDER_LAYER1   = 0
 export REORDER_LAYER2   = 0
