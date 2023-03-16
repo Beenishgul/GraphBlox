@@ -168,7 +168,7 @@ module glay_kernel_setup #(
                 glay_setup_cache_req_out_din.valid <= 1'b0;
                 req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
                 req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
-                kernel_setup_done                  <= 1'b0;
+                kernel_setup_done                  <= 1'b1;
                 kernel_setup_start                 <= 1'b0;
             end
             SETUP_KERNEL_IDLE : begin
@@ -176,27 +176,35 @@ module glay_kernel_setup #(
                 req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
                 req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
                 kernel_setup_done                  <= 1'b0;
+                kernel_setup_start                 <= 1'b0;
             end
             SETUP_KERNEL_REQ_START : begin
                 glay_setup_cache_req_out_din.valid <= 1'b0;
                 req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
                 req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
                 kernel_setup_done                  <= 1'b0;
+                kernel_setup_start                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 glay_setup_cache_req_out_din.valid <= 1'b0;
                 req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
                 req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
-                kernel_setup_done                  <= 1'b1;
+                kernel_setup_done                  <= 1'b0;
+                kernel_setup_start                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_DONE : begin
                 glay_setup_cache_req_out_din.valid <= 1'b0;
                 req_out_fifo_in_signals_reg.wr_en  <= 1'b0;
                 req_out_fifo_in_signals_reg.rd_en  <= 1'b0;
-                kernel_setup_done                  <= 1'b0;
+                kernel_setup_done                  <= 1'b1;
+                kernel_setup_start                 <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
+
+// --------------------------------------------------------------------------------------
+// Generate Requests Logic
+// --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
