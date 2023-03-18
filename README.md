@@ -7,23 +7,8 @@ GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
 Abstract
 --------
 
-FPGA reconfiguration time between accelerated graph processing
-algorithms is becoming a top priority requirement. It is of prime
-importance to rethink today\'s graph algorithm acceleration design on
-FPGAs for faster reconfiguration between algorithms while maintaining
-execution performance and custom memory optimizations. For instance, the
-reconfiguration of the FPGA graph processing algorithms causes
-substantial pauses to reprogram the FPGA chip when switching from one
-graph algorithm to another, affecting the algorithm\'s critical path and
-performance. Such a paradigm heavily exists in virtual systems that
-demand generic support for graph processing to cover a wide range of
-use-cases while being managed efficiently by the hypervisor. In this
-work, we propose a coarse-grain overlay for graph processing GLay. This
-overlay extracts the typical access patterns in many graph algorithms
-and abstracts them into domain-specific graph Processing Elements (PE)
-interconnect. Compared to the classical FPGA ms-s reconfiguration time,
-GLay achieves ns-us reconfiguration time between graph algorithms. While
-maintaining the performance and power optimizations, an FPGA provides.
+FPGA reconfiguration time for accelerated graph processing algorithms has become a top priority requirement. It is essential to rethink the design of today's graph algorithm acceleration on FPGAs to achieve faster reconfiguration times between algorithms while maintaining execution performance and custom memory optimizations. For instance, reconfiguring the FPGA for different graph processing algorithms can cause substantial pauses that affect the algorithm's critical path and performance. This paradigm is prevalent in virtual systems that require generic support for graph processing to cover a wide range of use cases while being efficiently managed by the hypervisor.
+This work proposes a coarse-grain overlay for graph processing called GLay. This overlay identifies typical access patterns in many graph algorithms and abstracts them into interconnected domain-specific graph Processing Elements (PE). Compared to classical FPGA reconfiguration times, GLay achieves reconfiguration times of nanoseconds to microseconds between graph algorithms while maintaining the performance and power optimizations that an FPGA provides.
 
 ![Figure 1: Graph Overlay (GLay) Contributions](./02_slides_figures_docs/fig/glay_gist.png "FFigure 1: Graph Overlay (GLay) Contributions")
 
