@@ -18,6 +18,22 @@ import GLAY_GLOBALS_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 import GLAY_REQ_PKG::*;
+import GLAY_ENGINE_PKG::*;
+
+// Serial\_Read\_Engine
+// --------------------
+
+// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
+
+// The serial read engine sends read commands to the memory control layer.
+// Each read or write requests a chunk of data specified with the
+// "granularity" parameter -- alignment should be honored for a cache line.
+// The "stride" parameter sets the offset taken by each consecutive read;
+// strides should also honor alignment restrictions. This behavior is
+// related to reading CSR structure data, for example, reading the offsets
+// array.
+
+// uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity)
 
 module serial_read_engine #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
