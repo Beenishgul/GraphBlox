@@ -17,6 +17,40 @@ package GLAY_ENGINE_PKG;
 
     import GLAY_GLOBALS_PKG::*;
 
+// Stride\_Index\_Generator
+// ------------------------
+
+// ### Input: index\_start, index\_end, stride, granularity
+
+// The stride index generator serves two purposes. First, it generates a
+// sequence of indices or Vertex-IDs scheduled to the Vertex Compute Units
+// (CUs). For each Vertex-CU, a batch of Vertex-IDs is sent to be processed
+// based on the granularity. For example, if granularity is (8), each CU
+// (Compute Units) would get eight vertex IDs in chunks.
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
+    } StrideIndexGeneratorConfiguration;
+
+// CSR\_Index\_Generator
+// ---------------------
+
+// ### Input: array\_pointer, array\_size, offset, degree
+
+// When reading the edge list of the Graph CSR structure, a sequence of
+// Vertex-IDs is generated based on the edges\_index and the degree size of
+// the processed vertex. The read engines can connect to the
+// CSR\_Index\_Generator to acquire the neighbor IDs for further
+// processing, in this scenario reading the data of the vertex neighbors.
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] offset       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] degree       ;
+    } CSRIndexGeneratorConfiguration;
 
 // Serial\_Read\_Engine
 // --------------------
@@ -31,15 +65,6 @@ package GLAY_ENGINE_PKG;
 // related to reading CSR structure data, for example, reading the offsets
 // array.
 
-    typedef enum int unsigned {
-        GLAY_RESET,
-        GLAY_IDLE,
-        GLAY_REQ,
-        GLAY_WAITING_FOR_REQUEST,
-        GLAY_READ_DATA,
-        GLAY_DONE_REQ
-    } serial_read_engine_state;
-
     typedef struct packed{
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
@@ -47,7 +72,67 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } serialReadEngineIntefaceInput;
+    } SerialReadEngineConfiguration;
+
+
+// Serial\_Write\_Engine
+// ---------------------
+
+// ### Input :array\_pointer, array\_size, index, granularity
+
+// The serial write engine sends coalesced write commands to the memory
+// control layer. Each write-request groups a chunk of data (group of
+// vertices) intended to be written in a serial pattern. The serial write
+// engine is simpler to design as it plans only to group serial data and
+// write them in single bursts depending on the "granularity" parameter.
+// This behavior can be found in iterative SpMV-based graph algorithms like
+// PageRank.
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialWriteEngineConfiguration;
+
+// Random\_Read\_Engine
+// --------------------------------------------
+
+// ### Input: array\_pointer, array\_size, index, granularity
+
+// A random read engine does not require a stride access pattern. Instead,
+// arbitrary fine-grain commands are sent straight to a caching element in
+// a fine-grained manner. Optimizations can occur on the caching level with
+// grouping or reordering. The main challenge would be designing an engine
+// that supports fine-grain accesses while balancing the design complexity
+// if such optimizations were to be kept.
+
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } RandomReadEngineConfiguration;
+
+// Random\_Write\_Engine
+// --------------------------------------------
+
+// ### Input: array\_pointer, array\_size, index, granularity
+
+// A random read engine does not require a stride access pattern. Instead,
+// arbitrary fine-grain commands are sent straight to a caching element in
+// a fine-grained manner. Optimizations can occur on the caching level with
+// grouping or reordering. The main challenge would be designing an engine
+// that supports fine-grain accesses while balancing the design complexity
+// if such optimizations were to be kept.
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } RandomWriteEngineConfiguration;
 
 
 endpackage
