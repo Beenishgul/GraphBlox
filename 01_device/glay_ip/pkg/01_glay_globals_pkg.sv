@@ -19,9 +19,11 @@ package GLAY_GLOBALS_PKG;
 //  COMPUTE UNITS COUNT GLOBALS
 // --------------------------------------------------------------------------------------
 
-	parameter CU_COUNT_GLOBAL     = 1    ;
-	parameter CU_COUNT_LOCAL      = 1    ;
-	parameter CU_CACHE_SIZE_BYTES = 32768; // size in Bytes 32KB
+	parameter CU_COUNT_GLOBAL     = 1                     ;
+	parameter CU_COUNT_LOCAL      = 1                     ;
+	parameter CU_CACHE_SIZE_BYTES = 32768                 ; // size in Bytes 32KB
+	parameter CU_COUNT_TOTAL      = 8                     ;
+	paramter  CU_ID_BITS          = $clog2(CU_COUNT_TOTAL);
 
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS

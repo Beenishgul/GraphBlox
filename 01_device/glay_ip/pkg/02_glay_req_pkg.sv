@@ -95,14 +95,40 @@ typedef enum int unsigned {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 
-    typedef struct packed{
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } SerialReadEngineConfiguration;
+typedef enum int unsigned {
+  CMD_INVALID,
+  CMD_READ,
+  CMD_WRITE,
+  CMD_PREFETCH_READ,
+  CMD_PREFETCH_WRITE
+} command_type;
+
+
+typedef struct packed{
+  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
+  command_type                        cmd           ;
+} MemoryRequestPacketPayload;
+
+typedef struct packed{
+  logic                      valid  ;
+  MemoryRequestPacketPayload payload;
+} MemoryRequestPacket;
+
+
+typedef struct packed{
+  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
+  logic [  CACHE_FRONTEND_DATA_W-1:0] rdata         ;
+  command_type                        cmd           ;
+} MemoryResponsePacketPayload;
+
+typedef struct packed{
+  logic                      valid  ;
+  MemoryRequestPacketPayload payload;
+} MemoryResponsePacket;
 
 
 
