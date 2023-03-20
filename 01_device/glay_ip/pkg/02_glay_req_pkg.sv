@@ -91,4 +91,19 @@ typedef enum int unsigned {
   SETUP_KERNEL_REQ_DONE
 } kernel_setup_state;
 
+// --------------------------------------------------------------------------------------
+//   Generic Memory request packet
+// --------------------------------------------------------------------------------------
+
+    typedef struct packed{
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+      logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialReadEngineConfiguration;
+
+
+
 endpackage

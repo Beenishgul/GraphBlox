@@ -43,6 +43,7 @@ module serial_read_engine #(
     // System Signals
     input  logic                           ap_clk                  ,
     input  logic                           areset                  ,
+    input  SerialReadEngineConfiguration   serial_read_engine_in   ,
     input  GlayControlChainInterfaceOutput glay_control_state      ,
     input  GLAYDescriptorInterface         glay_descriptor         ,
     input  GlayCacheRequestInterfaceOutput glay_setup_cache_req_in ,
