@@ -125,8 +125,8 @@ typedef struct packed{
 } MemoryRequestPacketPayload;
 
 typedef struct packed{
-  logic                      valid  ;
-  MemoryRequestPacketPayload payload;
+  logic                      valid   ;
+  MemoryRequestPacketPayload paylodad;
 } MemoryRequestPacket;
 
 // SIZE = 654 bits

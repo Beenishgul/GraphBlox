@@ -89,7 +89,6 @@ package GLAY_ENGINE_PKG;
         SerialReadEngineConfigurationPayload payload;
     } SerialReadEngineConfiguration;
 
-
 // Serial\_Write\_Engine
 // ---------------------
 
@@ -108,6 +107,11 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialWriteEngineConfigurationPayload;
+
+    typedef struct packed{
+        logic                                 valid  ;
+        SerialWriteEngineConfigurationPayload payload;
     } SerialWriteEngineConfiguration;
 
 // Random\_Read\_Engine
@@ -122,12 +126,16 @@ package GLAY_ENGINE_PKG;
 // that supports fine-grain accesses while balancing the design complexity
 // if such optimizations were to be kept.
 
-
     typedef struct packed{
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } RandomReadEngineConfigurationPayload;
+
+    typedef struct packed{
+        logic                                valid  ;
+        RandomReadEngineConfigurationPayload payload;
     } RandomReadEngineConfiguration;
 
 // Random\_Write\_Engine
@@ -147,6 +155,12 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } RandomWriteEngineConfigurationPayload;
+
+
+    typedef struct packed{
+        logic                                 valid  ;
+        RandomWriteEngineConfigurationPayload payload;
     } RandomWriteEngineConfiguration;
 
 
