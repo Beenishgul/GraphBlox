@@ -102,7 +102,6 @@ module serial_read_engine #(
     always_ff @(posedge ap_clk) begin
         if (engine_areset) begin
             serial_read_config_reg.valid <= 0;
-            req_in_fifo_in_signals_reg   <= 0;
             req_out_fifo_in_signals_reg  <= 0;
         end
         else begin

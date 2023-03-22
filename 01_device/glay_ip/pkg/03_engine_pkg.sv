@@ -75,6 +75,14 @@ package GLAY_ENGINE_PKG;
 // related to reading CSR structure data, for example, reading the offsets
 // array.
 
+    typedef enum int unsigned {
+        SERIAL_READ_ENGINE_RESET,
+        SERIAL_READ_ENGINE_IDLE,
+        SERIAL_READ_ENGINE_START,
+        SERIAL_READ_ENGINE_BUSY,
+        SERIAL_READ_ENGINE_REQ_DONE
+    } serial_read_engine_state;
+
     typedef struct packed{
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
