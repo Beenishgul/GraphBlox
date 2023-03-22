@@ -156,20 +156,20 @@ module serial_read_engine #(
             end
             SERIAL_READ_ENGINE_IDLE : begin
                 if(glay_descriptor_reg.valid)
-                    next_state = SERIAL_READ_ENGINE_REQ_START;
+                    next_state = SERIAL_READ_ENGINE_START;
                 else
                     next_state = SERIAL_READ_ENGINE_IDLE;
             end
-            SERIAL_READ_ENGINE_REQ_START : begin
-                next_state = SERIAL_READ_ENGINE_REQ_BUSY;
+            SERIAL_READ_ENGINE_START : begin
+                next_state = SERIAL_READ_ENGINE_BUSY;
             end
-            SERIAL_READ_ENGINE_REQ_BUSY : begin
+            SERIAL_READ_ENGINE_BUSY : begin
                 if (serial_read_engine_done)
-                    next_state = SERIAL_READ_ENGINE_REQ_DONE;
+                    next_state = SERIAL_READ_ENGINE_DONE;
                 else
-                    next_state = SERIAL_READ_ENGINE_REQ_BUSY;
+                    next_state = SERIAL_READ_ENGINE_BUSY;
             end
-            SERIAL_READ_ENGINE_REQ_DONE : begin
+            SERIAL_READ_ENGINE_DONE : begin
                 next_state = SERIAL_READ_ENGINE_IDLE;
             end
         endcase
@@ -187,17 +187,17 @@ module serial_read_engine #(
                 serial_read_engine_done              <= 1'b0;
                 serial_read_engine_start             <= 1'b0;
             end
-            SERIAL_READ_ENGINE_REQ_START : begin
+            SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_req_out_din.valid <= 1'b0;
                 serial_read_engine_done              <= 1'b0;
                 serial_read_engine_start             <= 1'b1;
             end
-            SERIAL_READ_ENGINE_REQ_BUSY : begin
+            SERIAL_READ_ENGINE_BUSY : begin
                 serial_read_engine_req_out_din.valid <= 1'b0;
                 serial_read_engine_done              <= 1'b0;
                 serial_read_engine_start             <= 1'b1;
             end
-            SERIAL_READ_ENGINE_REQ_DONE : begin
+            SERIAL_READ_ENGINE_DONE : begin
                 serial_read_engine_req_out_din.valid <= 1'b0;
                 serial_read_engine_done              <= 1'b1;
                 serial_read_engine_start             <= 1'b0;
