@@ -135,8 +135,75 @@ module serial_read_engine #(
     end
 
 // --------------------------------------------------------------------------------------
-// ENGINE State Machine
+// Engine State Machine
 // --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// GLAY SETUP State Machine
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if(engine_areset)
+            current_state <= SERIAL_READ_ENGINE_RESET;
+        else begin
+            current_state <= next_state;
+        end
+    end // always_ff @(posedge ap_clk)
+
+    always_comb begin
+        next_state = current_state;
+        case (current_state)
+            SERIAL_READ_ENGINE_RESET : begin
+                next_state = SERIAL_READ_ENGINE_IDLE;
+            end
+            SERIAL_READ_ENGINE_IDLE : begin
+                if(glay_descriptor_reg.valid)
+                    next_state = SERIAL_READ_ENGINE_REQ_START;
+                else
+                    next_state = SERIAL_READ_ENGINE_IDLE;
+            end
+            SERIAL_READ_ENGINE_REQ_START : begin
+                next_state = SERIAL_READ_ENGINE_REQ_BUSY;
+            end
+            SERIAL_READ_ENGINE_REQ_BUSY : begin
+                if (serial_read_engine_done)
+                    next_state = SERIAL_READ_ENGINE_REQ_DONE;
+                else
+                    next_state = SERIAL_READ_ENGINE_REQ_BUSY;
+            end
+            SERIAL_READ_ENGINE_REQ_DONE : begin
+                next_state = SERIAL_READ_ENGINE_IDLE;
+            end
+        endcase
+    end // always_comb
+
+    always_ff @(posedge ap_clk) begin
+        case (current_state)
+            SERIAL_READ_ENGINE_RESET : begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+                serial_read_engine_done              <= 1'b1;
+                serial_read_engine_start             <= 1'b0;
+            end
+            SERIAL_READ_ENGINE_IDLE : begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+                serial_read_engine_done              <= 1'b0;
+                serial_read_engine_start             <= 1'b0;
+            end
+            SERIAL_READ_ENGINE_REQ_START : begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+                serial_read_engine_done              <= 1'b0;
+                serial_read_engine_start             <= 1'b1;
+            end
+            SERIAL_READ_ENGINE_REQ_BUSY : begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+                serial_read_engine_done              <= 1'b0;
+                serial_read_engine_start             <= 1'b1;
+            end
+            SERIAL_READ_ENGINE_REQ_DONE : begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+                serial_read_engine_done              <= 1'b1;
+                serial_read_engine_start             <= 1'b0;
+            end
+        endcase
+    end // always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
 // FIFO Ready

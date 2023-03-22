@@ -31,6 +31,7 @@ glay_cache="cache"
 glay_control="control"
 glay_utils="utils"
 glay_utils_arbiter="arbiter"
+glay_utils_counter="counter"
 glay_utils_include="include"
 
 iob_include="iob_include"
@@ -65,6 +66,8 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FIL
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_include}/ ${CFG_FILE_NAME} "vh" 
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_arbiter}/ ${CFG_FILE_NAME} "sv" 
+
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_counter}/ ${CFG_FILE_NAME} "sv" 
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
 
