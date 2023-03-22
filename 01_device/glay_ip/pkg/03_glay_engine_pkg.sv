@@ -80,7 +80,8 @@ package GLAY_ENGINE_PKG;
         SERIAL_READ_ENGINE_IDLE,
         SERIAL_READ_ENGINE_START,
         SERIAL_READ_ENGINE_BUSY,
-        SERIAL_READ_ENGINE_REQ_DONE
+        SERIAL_READ_ENGINE_PAUSE,
+        SERIAL_READ_ENGINE_DONE
     } serial_read_engine_state;
 
     typedef struct packed{
