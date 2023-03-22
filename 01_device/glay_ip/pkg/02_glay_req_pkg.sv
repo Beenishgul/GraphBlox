@@ -103,7 +103,15 @@ typedef enum int unsigned {
   CMD_PREFETCH_WRITE
 } command_type;
 
+typedef enum int unsigned {
+  CMD_INVALID,
+  CMD_READ,
+  CMD_WRITE,
+  CMD_PREFETCH_READ,
+  CMD_PREFETCH_WRITE
+} structure_type;
 
+// SIZE = 138 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
@@ -121,13 +129,14 @@ typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  logic [  CACHE_FRONTEND_DATA_W-1:0] rdata         ;
+  logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
   command_type                        cmd           ;
+  structure_type                        cmd           ;
 } MemoryResponsePacketPayload;
 
 typedef struct packed{
-  logic                      valid  ;
-  MemoryRequestPacketPayload payload;
+  logic                       valid  ;
+  MemoryResponsePacketPayload payload;
 } MemoryResponsePacket;
 
 
