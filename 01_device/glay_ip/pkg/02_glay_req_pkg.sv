@@ -104,11 +104,16 @@ typedef enum int unsigned {
 } command_type;
 
 typedef enum int unsigned {
-  CMD_INVALID,
-  CMD_READ,
-  CMD_WRITE,
-  CMD_PREFETCH_READ,
-  CMD_PREFETCH_WRITE
+  STRUCT_INVALID,
+  STRUCT_OUT_DEGREE,
+  STRUCT_IN_DEGREE,
+  STRUCT_EDGES_IDX,
+  STRUCT_INV_OUT_DEGREE,
+  STRUCT_INV_IN_DEGREE,
+  STRUCT_INV_EDGES_IDX,
+  STRUCT_AUXILIARY_1_DATA,
+  STRUCT_AUXILIARY_2_DATA,
+  STRUCT_AUXILIARY_3_DATA
 } structure_type;
 
 // SIZE = 138 bits
@@ -116,7 +121,7 @@ typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  command_type                        cmd           ;
+  command_type                        cmd_type      ;
 } MemoryRequestPacketPayload;
 
 typedef struct packed{
@@ -124,14 +129,14 @@ typedef struct packed{
   MemoryRequestPacketPayload payload;
 } MemoryRequestPacket;
 
-
+// SIZE = 654 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
-  command_type                        cmd           ;
-  structure_type                        cmd           ;
+  command_type                        cmd_type      ;
+  structure_type                      struct_type   ;
 } MemoryResponsePacketPayload;
 
 typedef struct packed{
