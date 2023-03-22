@@ -1,6 +1,21 @@
 // This is a generated file. Use and modify at your own risk.
 ////////////////////////////////////////////////////////////////////////////////
+// -----------------------------------------------------------------------------
+//
+//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2023 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : glay_transactions_counter.sv
+// Create : 2023-01-23 16:17:05
+// Revise : 2023-01-23 16:17:05
+// Editor : sublime text4, tab size (4)
+// -----------------------------------------------------------------------------
 
+`timescale 1ns / 1ps
+import GLAY_FUNCTIONS_PKG::*;
 
 module glay_transactions_counter #(
   parameter integer               C_WIDTH = 4              ,
@@ -17,8 +32,8 @@ module glay_transactions_counter #(
   output logic               is_zero
 );
 
-  timeunit 1ps;
-  timeprecision 1ps;
+  // timeunit 1ps;
+  // timeprecision 1ps;
 
 /////////////////////////////////////////////////////////////////////////////
 // Local Parameters
