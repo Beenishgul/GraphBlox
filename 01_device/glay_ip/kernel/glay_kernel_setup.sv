@@ -238,7 +238,7 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_516x32_GlaySetupRequestInterfaceOutput
 // --------------------------------------------------------------------------------------
-    assign req_out_fifo_in_signals_reg.wr_en  = glay_setup_cache_req_in_din.valid;
+    assign req_out_fifo_in_signals_reg.wr_en  = glay_setup_cache_req_out_din.valid;
     assign glay_setup_cache_req_in_dout.valid = req_out_fifo_out_signals_reg.valid;
 
     fifo_516x32 inst_fifo_516x32_GlaySetupRequestInterfaceOutput (
