@@ -41,20 +41,126 @@ module serial_read_engine #(
     parameter ENGINE_ID          = 0
 ) (
     // System Signals
-    input  logic                           ap_clk                  ,
-    input  logic                           areset                  ,
-    input  logic                           enable                  ,
-    input  SerialReadEngineConfiguration   serial_read_config      ,
-    output FIFOStateSignalsOutput          req_in_fifo_out_signals ,
-    input  FIFOStateSignalsInput           req_in_fifo_in_signals  ,
-    output GlayCacheRequestInterfaceInput  glay_setup_cache_req_out,
-    output FIFOStateSignalsOutput          req_out_fifo_out_signals,
-    input  FIFOStateSignalsInput           req_out_fifo_in_signals ,
-    output logic                           fifo_setup_signal
+    input  logic                         ap_clk                    ,
+    input  logic                         areset                    ,
+    input  logic                         enable                    ,
+    input  SerialReadEngineConfiguration serial_read_config        ,
+    output MemoryRequestPacket           serial_read_engine_req_out,
+    output FIFOStateSignalsOutput        req_out_fifo_out_signals  ,
+    input  FIFOStateSignalsInput         req_out_fifo_in_signals   ,
+    output logic                         fifo_setup_signal
 );
 
 
+    logic engine_areset;
+// --------------------------------------------------------------------------------------
+//   Setup state machine signals
+// --------------------------------------------------------------------------------------
+    serial_read_engine_state current_state;
+    serial_read_engine_state next_state   ;
 
+    logic serial_read_engine_done ;
+    logic serial_read_engine_start;
+
+// --------------------------------------------------------------------------------------
+//   Engine FIFO signals
+// --------------------------------------------------------------------------------------
+
+    GlayCacheRequestInterfaceOutput serial_read_engine_req_out_dout;
+    GlayCacheRequestInterfaceOutput serial_read_engine_req_out_din ;
+    FIFOStateSignalsOutput          req_out_fifo_out_signals_reg   ;
+    FIFOStateSignalsInput           req_out_fifo_in_signals_reg    ;
+    logic                           fifo_setup_signal_reg          ;
+
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        engine_areset <= areset;
+    end
+
+// --------------------------------------------------------------------------------------
+// READ GLAY Descriptor
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            glay_descriptor_reg.valid <= 0;
+        end
+        else begin
+            glay_descriptor_reg.valid <= glay_descriptor.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        glay_descriptor_reg.payload <= glay_descriptor.payload;
+    end
+
+// --------------------------------------------------------------------------------------
+// Drive input signals
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            glay_setup_cache_req_in_din.valid <= 0;
+        end
+        else begin
+            glay_setup_cache_req_in_din.valid <= glay_setup_cache_req_in.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        glay_setup_cache_req_in_din.payload <= glay_setup_cache_req_in.payload;
+    end
+
+// --------------------------------------------------------------------------------------
+// Drive output signals
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            fifo_setup_signal              <= 1;
+            glay_setup_cache_req_out.valid <= 0;
+        end
+        else begin
+            fifo_setup_signal              <= fifo_setup_signal_reg;
+            glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        glay_setup_cache_req_out.payload <= glay_setup_cache_req_out_dout.payload;
+    end
+
+// --------------------------------------------------------------------------------------
+// GLAY SETUP State Machine
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+// FIFO cache Ready
+// --------------------------------------------------------------------------------------
+    assign fifo_setup_signal_reg = req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy ;
+
+// --------------------------------------------------------------------------------------
+// FIFO cache requests out fifo_516x32_MemoryRequestPacket
+// --------------------------------------------------------------------------------------
+    assign req_out_fifo_in_signals_reg.wr_en    = serial_read_engine_req_out_din.valid;
+    assign serial_read_engine_req_in_dout.valid = req_out_fifo_out_signals_reg.valid;
+
+    fifo_138x32 inst_fifo_138x32_MemoryRequestPacket (
+        .clk         (ap_clk                                   ),
+        .srst        (engine_areset                            ),
+        .din         (serial_read_engine_req_out_din           ),
+        .wr_en       (req_out_fifo_in_signals_reg.wr_en        ),
+        .rd_en       (req_out_fifo_in_signals_reg.rd_en        ),
+        .dout        (serial_read_engine_req_out_dout          ),
+        .full        (req_out_fifo_out_signals_reg.full        ),
+        .almost_full (req_out_fifo_out_signals_reg.almost_full ),
+        .empty       (req_out_fifo_out_signals_reg.empty       ),
+        .almost_empty(req_out_fifo_out_signals_reg.almost_empty),
+        .valid       (req_out_fifo_out_signals_reg.valid       ),
+        .prog_full   (req_out_fifo_out_signals_reg.prog_full   ),
+        .prog_empty  (req_out_fifo_out_signals_reg.prog_empty  ),
+        .wr_rst_busy (req_out_fifo_out_signals_reg.wr_rst_busy ),
+        .rd_rst_busy (req_out_fifo_out_signals_reg.rd_rst_busy )
+    );
 
 
 endmodule : serial_read_engine
