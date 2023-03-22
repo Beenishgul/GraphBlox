@@ -96,9 +96,13 @@ module glay_kernel_setup #(
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
             glay_setup_cache_req_in_din.valid <= 0;
+            req_in_fifo_in_signals_reg        <= 0;
+            req_out_fifo_in_signals_reg       <= 0;
         end
         else begin
             glay_setup_cache_req_in_din.valid <= glay_setup_cache_req_in.valid;
+            req_in_fifo_in_signals_reg        <= req_in_fifo_in_signals;
+            req_out_fifo_in_signals_reg       <= req_out_fifo_in_signals;
         end
     end
 

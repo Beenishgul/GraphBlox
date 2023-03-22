@@ -62,15 +62,16 @@ module serial_read_engine #(
     logic serial_read_engine_done ;
     logic serial_read_engine_start;
 
+    SerialReadEngineConfiguration serial_read_config_reg;
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
 
-    GlayCacheRequestInterfaceOutput serial_read_engine_req_out_dout;
-    GlayCacheRequestInterfaceOutput serial_read_engine_req_out_din ;
-    FIFOStateSignalsOutput          req_out_fifo_out_signals_reg   ;
-    FIFOStateSignalsInput           req_out_fifo_in_signals_reg    ;
-    logic                           fifo_setup_signal_reg          ;
+    MemoryRequestPacket    serial_read_engine_req_out_dout;
+    MemoryRequestPacket    serial_read_engine_req_out_din ;
+    FIFOStateSignalsOutput req_out_fifo_out_signals_reg   ;
+    FIFOStateSignalsInput  req_out_fifo_in_signals_reg    ;
+    logic                  fifo_setup_signal_reg          ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -83,7 +84,7 @@ module serial_read_engine #(
 // READ GLAY Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (setup_areset) begin
+        if (engine_areset) begin
             glay_descriptor_reg.valid <= 0;
         end
         else begin
@@ -99,34 +100,39 @@ module serial_read_engine #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (setup_areset) begin
-            glay_setup_cache_req_in_din.valid <= 0;
+        if (engine_areset) begin
+            serial_read_config_reg.valid <= 0;
+            req_in_fifo_in_signals_reg   <= 0;
+            req_out_fifo_in_signals_reg  <= 0;
         end
         else begin
-            glay_setup_cache_req_in_din.valid <= glay_setup_cache_req_in.valid;
+            serial_read_config_reg.valid <= serial_read_config_reg.valid;
+            req_out_fifo_in_signals_reg  <= req_out_fifo_in_signals;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        glay_setup_cache_req_in_din.payload <= glay_setup_cache_req_in.payload;
+        serial_read_config_reg.payload <= serial_read_config_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (setup_areset) begin
-            fifo_setup_signal              <= 1;
-            glay_setup_cache_req_out.valid <= 0;
+        if (engine_areset) begin
+            fifo_setup_signal                <= 1;
+            serial_read_engine_req_out.valid <= 0;
+            req_out_fifo_out_signals         <= 0;
         end
         else begin
-            fifo_setup_signal              <= fifo_setup_signal_reg;
-            glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid;
+            fifo_setup_signal                <= fifo_setup_signal_reg;
+            serial_read_engine_req_out.valid <= serial_read_engine_req_out_dout.valid;
+            req_out_fifo_out_signals         <= req_out_fifo_out_signals_reg;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        glay_setup_cache_req_out.payload <= glay_setup_cache_req_out_dout.payload;
+        serial_read_engine_req_out.payload <= serial_read_engine_req_out_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------

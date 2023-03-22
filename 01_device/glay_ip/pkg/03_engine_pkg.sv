@@ -32,6 +32,11 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
+    } StrideIndexGeneratorConfigurationPayload;
+
+    typedef struct packed{
+        logic                                    valid  ;
+        StrideIndexGeneratorConfigurationPayload payload;
     } StrideIndexGeneratorConfiguration;
 
 // CSR\_Index\_Generator
@@ -50,6 +55,11 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] offset       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] degree       ;
+    } CSRIndexGeneratorConfigurationPayload;
+
+    typedef struct packed{
+        logic                                 valid  ;
+        CSRIndexGeneratorConfigurationPayload payload;
     } CSRIndexGeneratorConfiguration;
 
 // Serial\_Read\_Engine
@@ -72,6 +82,11 @@ package GLAY_ENGINE_PKG;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialReadEngineConfigurationPayload;
+
+    typedef struct packed{
+        logic                                valid  ;
+        SerialReadEngineConfigurationPayload payload;
     } SerialReadEngineConfiguration;
 
 
