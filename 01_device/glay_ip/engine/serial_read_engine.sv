@@ -38,7 +38,8 @@ import GLAY_ENGINE_PKG::*;
 module serial_read_engine #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 0
+    parameter ENGINE_ID          = 0              ,
+    parameter C_WIDTH            = 32
 ) (
     // System Signals
     input  logic                         ap_clk                    ,
@@ -51,7 +52,6 @@ module serial_read_engine #(
     output logic                         fifo_setup_signal
 );
 
-
     logic engine_areset;
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -63,10 +63,10 @@ module serial_read_engine #(
     logic serial_read_engine_start;
 
     SerialReadEngineConfiguration serial_read_config_reg;
+
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-
     MemoryRequestPacket    serial_read_engine_req_out_dout;
     MemoryRequestPacket    serial_read_engine_req_out_din ;
     FIFOStateSignalsOutput req_out_fifo_out_signals_reg   ;
@@ -74,28 +74,20 @@ module serial_read_engine #(
     logic                  fifo_setup_signal_reg          ;
 
 // --------------------------------------------------------------------------------------
+//   Transaction Counter Signals
+// --------------------------------------------------------------------------------------
+    logic               load      ;
+    logic               incr      ;
+    logic               decr      ;
+    logic [C_WIDTH-1:0] load_value;
+    logic [C_WIDTH-1:0] count     ;
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         engine_areset <= areset;
     end
-
-// --------------------------------------------------------------------------------------
-// READ GLAY Descriptor
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (engine_areset) begin
-            glay_descriptor_reg.valid <= 0;
-        end
-        else begin
-            glay_descriptor_reg.valid <= glay_descriptor.valid;
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        glay_descriptor_reg.payload <= glay_descriptor.payload;
-    end
-
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
@@ -105,13 +97,13 @@ module serial_read_engine #(
             req_out_fifo_in_signals_reg  <= 0;
         end
         else begin
-            serial_read_config_reg.valid <= serial_read_config_reg.valid;
+            serial_read_config_reg.valid <= serial_read_config.valid;
             req_out_fifo_in_signals_reg  <= req_out_fifo_in_signals;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        serial_read_config_reg.payload <= serial_read_config_reg.payload;
+        serial_read_config_reg.payload <= serial_read_config.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -152,10 +144,13 @@ module serial_read_engine #(
                 next_state = SERIAL_READ_ENGINE_IDLE;
             end
             SERIAL_READ_ENGINE_IDLE : begin
-                if(glay_descriptor_reg.valid)
-                    next_state = SERIAL_READ_ENGINE_START;
+                if(serial_read_config_reg.valid)
+                    next_state = SERIAL_READ_ENGINE_SETUP;
                 else
                     next_state = SERIAL_READ_ENGINE_IDLE;
+            end
+            SERIAL_READ_ENGINE_SETUP : begin
+                next_state = SERIAL_READ_ENGINE_START;
             end
             SERIAL_READ_ENGINE_START : begin
                 next_state = SERIAL_READ_ENGINE_BUSY;
@@ -182,6 +177,10 @@ module serial_read_engine #(
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
             end
+            SERIAL_READ_ENGINE_SETUP : begin
+                serial_read_engine_done  <= 1'b0;
+                serial_read_engine_start <= 1'b1;
+            end
             SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_done  <= 1'b0;
                 serial_read_engine_start <= 1'b1;
@@ -200,7 +199,6 @@ module serial_read_engine #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-
     always_ff @(posedge ap_clk) begin
         if (engine_areset) begin
             serial_read_engine_req_out_din.valid <= 1'b0;
@@ -221,19 +219,20 @@ module serial_read_engine #(
     end
 
 
-    glay_transactions_counter #(
-        .C_WIDTH(C_WIDTH),
-        .C_INIT (C_INIT )
-    ) inst_glay_transactions_counter (
-        .ap_clk    (ap_clk    ),
-        .ap_clken  (ap_clken  ),
-        .areset    (areset    ),
-        .load      (load      ),
-        .incr      (incr      ),
-        .decr      (decr      ),
-        .load_value(load_value),
-        .count     (count     ),
-        .is_zero   (is_zero   )
+    assign load = serial_read_engine_start;
+    assign incr = serial_read_config_reg.payload.increment;
+    assign decr = serial_read_config_reg.payload.decrement;
+
+    glay_transactions_counter #(.C_WIDTH(C_WIDTH)) inst_glay_transactions_counter (
+        .ap_clk    (ap_clk       ),
+        .ap_clken  (ap_clken     ),
+        .areset    (engine_areset),
+        .load      (load         ),
+        .incr      (incr         ),
+        .decr      (decr         ),
+        .load_value(load_value   ),
+        .count     (count        ),
+        .is_zero   (is_zero      )
     );
 
 // --------------------------------------------------------------------------------------

@@ -29,6 +29,8 @@ package GLAY_ENGINE_PKG;
 // (Compute Units) would get eight vertex IDs in chunks.
 
     typedef struct packed{
+        logic                               increment  ;
+        logic                               decrement  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
@@ -78,6 +80,7 @@ package GLAY_ENGINE_PKG;
     typedef enum int unsigned {
         SERIAL_READ_ENGINE_RESET,
         SERIAL_READ_ENGINE_IDLE,
+        SERIAL_READ_ENGINE_SETUP,
         SERIAL_READ_ENGINE_START,
         SERIAL_READ_ENGINE_BUSY,
         SERIAL_READ_ENGINE_PAUSE,
@@ -85,6 +88,8 @@ package GLAY_ENGINE_PKG;
     } serial_read_engine_state;
 
     typedef struct packed{
+        logic                               increment    ;
+        logic                               decrement    ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
@@ -112,6 +117,8 @@ package GLAY_ENGINE_PKG;
 // PageRank.
 
     typedef struct packed{
+        logic                               increment    ;
+        logic                               decrement    ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
