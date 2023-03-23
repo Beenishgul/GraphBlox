@@ -182,11 +182,19 @@ module serial_read_engine #(
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
                 serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= 1'b0;
+                counter_decr             <= 1'b0;
+                counter_load_value       <= 0;
             end
             SERIAL_READ_ENGINE_IDLE : begin
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
                 serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= 1'b0;
+                counter_decr             <= 1'b0;
+                counter_load_value       <= 0;
             end
             SERIAL_READ_ENGINE_SETUP : begin
                 serial_read_engine_done  <= 1'b0;
@@ -225,6 +233,9 @@ module serial_read_engine #(
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
                 serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= 1'b0;
+                counter_decr             <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
