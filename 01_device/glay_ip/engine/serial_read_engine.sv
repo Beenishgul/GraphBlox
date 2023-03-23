@@ -135,10 +135,7 @@ module serial_read_engine #(
     end
 
 // --------------------------------------------------------------------------------------
-// Engine State Machine
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// GLAY SETUP State Machine
+// Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(engine_areset)
@@ -178,32 +175,66 @@ module serial_read_engine #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             SERIAL_READ_ENGINE_RESET : begin
-                serial_read_engine_req_out_din.valid <= 1'b0;
-                serial_read_engine_done              <= 1'b1;
-                serial_read_engine_start             <= 1'b0;
+                serial_read_engine_done  <= 1'b1;
+                serial_read_engine_start <= 1'b0;
             end
             SERIAL_READ_ENGINE_IDLE : begin
-                serial_read_engine_req_out_din.valid <= 1'b0;
-                serial_read_engine_done              <= 1'b0;
-                serial_read_engine_start             <= 1'b0;
+                serial_read_engine_done  <= 1'b1;
+                serial_read_engine_start <= 1'b0;
             end
             SERIAL_READ_ENGINE_START : begin
-                serial_read_engine_req_out_din.valid <= 1'b0;
-                serial_read_engine_done              <= 1'b0;
-                serial_read_engine_start             <= 1'b1;
+                serial_read_engine_done  <= 1'b0;
+                serial_read_engine_start <= 1'b1;
             end
             SERIAL_READ_ENGINE_BUSY : begin
-                serial_read_engine_req_out_din.valid <= 1'b0;
-                serial_read_engine_done              <= 1'b0;
-                serial_read_engine_start             <= 1'b1;
+                serial_read_engine_done  <= 1'b0;
+                serial_read_engine_start <= 1'b1;
             end
             SERIAL_READ_ENGINE_DONE : begin
-                serial_read_engine_req_out_din.valid <= 1'b0;
-                serial_read_engine_done              <= 1'b1;
-                serial_read_engine_start             <= 1'b0;
+                serial_read_engine_done  <= 1'b1;
+                serial_read_engine_start <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
+
+// --------------------------------------------------------------------------------------
+// Serial Read Engine Generate
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        if (engine_areset) begin
+            serial_read_engine_req_out_din.valid <= 1'b0;
+        end
+        else begin
+            if(serial_read_engine_start && !req_out_fifo_out_signals_reg.almost_full) begin
+                serial_read_engine_req_out_din.valid <= 1'b1;
+            end else begin
+                serial_read_engine_req_out_din.valid <= 1'b0;
+            end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if(serial_read_engine_start && !req_out_fifo_out_signals_reg.almost_full) begin
+            serial_read_engine_req_out_din.payload <= 0;
+        end
+    end
+
+
+    glay_transactions_counter #(
+        .C_WIDTH(C_WIDTH),
+        .C_INIT (C_INIT )
+    ) inst_glay_transactions_counter (
+        .ap_clk    (ap_clk    ),
+        .ap_clken  (ap_clken  ),
+        .areset    (areset    ),
+        .load      (load      ),
+        .incr      (incr      ),
+        .decr      (decr      ),
+        .load_value(load_value),
+        .count     (count     ),
+        .is_zero   (is_zero   )
+    );
 
 // --------------------------------------------------------------------------------------
 // FIFO Ready
