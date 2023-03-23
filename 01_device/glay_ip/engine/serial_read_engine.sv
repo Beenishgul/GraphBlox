@@ -39,12 +39,11 @@ module serial_read_engine #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
     parameter ENGINE_ID          = 0              ,
-    parameter C_WIDTH            = 32
+    parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
     input  logic                         ap_clk                    ,
     input  logic                         areset                    ,
-    input  logic                         enable                    ,
     input  SerialReadEngineConfiguration serial_read_config        ,
     output MemoryRequestPacket           serial_read_engine_req_out,
     output FIFOStateSignalsOutput        req_out_fifo_out_signals  ,
@@ -61,6 +60,7 @@ module serial_read_engine #(
 
     logic serial_read_engine_done ;
     logic serial_read_engine_start;
+    logic serial_read_engine_setup;
 
     SerialReadEngineConfiguration serial_read_config_reg;
 
@@ -76,11 +76,12 @@ module serial_read_engine #(
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-    logic               load      ;
-    logic               incr      ;
-    logic               decr      ;
-    logic [C_WIDTH-1:0] load_value;
-    logic [C_WIDTH-1:0] count     ;
+    logic                     counter_load      ;
+    logic                     counter_incr      ;
+    logic                     counter_decr      ;
+    logic                     is_zero           ;
+    logic [COUNTER_WIDTH-1:0] counter_load_value;
+    logic [COUNTER_WIDTH-1:0] counter_count     ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -158,8 +159,16 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_BUSY : begin
                 if (serial_read_engine_done)
                     next_state = SERIAL_READ_ENGINE_DONE;
+                else if (req_out_fifo_out_signals_reg.almost_full)
+                    next_state = SERIAL_READ_ENGINE_PAUSE;
                 else
                     next_state = SERIAL_READ_ENGINE_BUSY;
+            end
+            SERIAL_READ_ENGINE_PAUSE : begin
+                if (!req_out_fifo_out_signals_reg.almost_full)
+                    next_state = SERIAL_READ_ENGINE_BUSY;
+                else
+                    next_state = SERIAL_READ_ENGINE_PAUSE;
             end
             SERIAL_READ_ENGINE_DONE : begin
                 next_state = SERIAL_READ_ENGINE_IDLE;
@@ -172,26 +181,50 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_RESET : begin
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
+                serial_read_engine_setup <= 1'b0;
             end
             SERIAL_READ_ENGINE_IDLE : begin
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
+                serial_read_engine_setup <= 1'b0;
             end
             SERIAL_READ_ENGINE_SETUP : begin
                 serial_read_engine_done  <= 1'b0;
-                serial_read_engine_start <= 1'b1;
+                serial_read_engine_start <= 1'b0;
+                serial_read_engine_setup <= 1'b1;
+                counter_load             <= 1'b1;
+                counter_incr             <= serial_read_config_reg.payload.increment;
+                counter_decr             <= serial_read_config_reg.payload.decrement;
+                counter_load_value       <= serial_read_config_reg.payload.start_read;
             end
             SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_done  <= 1'b0;
                 serial_read_engine_start <= 1'b1;
+                serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= serial_read_config_reg.payload.increment;
+                counter_decr             <= serial_read_config_reg.payload.decrement;
             end
             SERIAL_READ_ENGINE_BUSY : begin
                 serial_read_engine_done  <= 1'b0;
                 serial_read_engine_start <= 1'b1;
+                serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= serial_read_config_reg.payload.increment;
+                counter_decr             <= serial_read_config_reg.payload.decrement;
+            end
+            SERIAL_READ_ENGINE_PAUSE : begin
+                serial_read_engine_done  <= 1'b0;
+                serial_read_engine_start <= 1'b1;
+                serial_read_engine_setup <= 1'b0;
+                counter_load             <= 1'b0;
+                counter_incr             <= 1'b0;
+                counter_decr             <= 1'b0;
             end
             SERIAL_READ_ENGINE_DONE : begin
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
+                serial_read_engine_setup <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -204,7 +237,7 @@ module serial_read_engine #(
             serial_read_engine_req_out_din.valid <= 1'b0;
         end
         else begin
-            if(serial_read_engine_start && !req_out_fifo_out_signals_reg.almost_full) begin
+            if(serial_read_engine_start) begin
                 serial_read_engine_req_out_din.valid <= 1'b1;
             end else begin
                 serial_read_engine_req_out_din.valid <= 1'b0;
@@ -213,26 +246,24 @@ module serial_read_engine #(
     end
 
     always_ff @(posedge ap_clk) begin
-        if(serial_read_engine_start && !req_out_fifo_out_signals_reg.almost_full) begin
-            serial_read_engine_req_out_din.payload <= 0;
+        if(serial_read_engine_start) begin
+            serial_read_engine_req_out_din.payload.cu_id          <= ENGINE_ID;
+            serial_read_engine_req_out_din.payload.base_address   <= serial_read_config_reg.payload.array_pointer;
+            serial_read_engine_req_out_din.payload.address_offset <= counter_count;
+            serial_read_engine_req_out_din.payload.cmd_type       <= CMD_READ;
         end
     end
 
-
-    assign load = serial_read_engine_start;
-    assign incr = serial_read_config_reg.payload.increment;
-    assign decr = serial_read_config_reg.payload.decrement;
-
-    glay_transactions_counter #(.C_WIDTH(C_WIDTH)) inst_glay_transactions_counter (
-        .ap_clk    (ap_clk       ),
-        .ap_clken  (ap_clken     ),
-        .areset    (engine_areset),
-        .load      (load         ),
-        .incr      (incr         ),
-        .decr      (decr         ),
-        .load_value(load_value   ),
-        .count     (count        ),
-        .is_zero   (is_zero      )
+    glay_transactions_counter #(.C_WIDTH(COUNTER_WIDTH)) inst_glay_transactions_counter (
+        .ap_clk    (ap_clk            ),
+        .ap_clken  (ap_clken          ),
+        .areset    (engine_areset     ),
+        .load      (counter_load      ),
+        .incr      (counter_incr      ),
+        .decr      (counter_decr      ),
+        .load_value(counter_load_value),
+        .count     (counter_count     ),
+        .is_zero   (is_zero           )
     );
 
 // --------------------------------------------------------------------------------------
