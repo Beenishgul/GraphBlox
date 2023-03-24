@@ -21,7 +21,9 @@ import GLAY_REQ_PKG::*;
 
 module glay_kernel_setup #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
+    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
+    parameter ENGINE_ID          = 0              ,
+    parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
     input  logic                           ap_clk                  ,
@@ -45,7 +47,7 @@ module glay_kernel_setup #(
     kernel_setup_state current_state;
     kernel_setup_state next_state   ;
 
-    logic kernel_setup_done;
+    logic kernel_setup_done ;
     logic kernel_setup_start;
 
 // --------------------------------------------------------------------------------------
@@ -199,6 +201,28 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Generate Requests Logic
 // --------------------------------------------------------------------------------------
+
+    SerialReadEngineConfiguration serial_read_config        ;
+    MemoryRequestPacket           serial_read_engine_req_out;
+    FIFOStateSignalsOutput        req_out_fifo_out_signals  ;
+    FIFOStateSignalsInput         req_out_fifo_in_signals   ;
+    logic                         fifo_setup_signal         ;
+
+    serial_read_engine #(
+        .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
+        .NUM_GRAPH_PE      (NUM_GRAPH_PE      ),
+        .ENGINE_ID         (ENGINE_ID         ),
+        .COUNTER_WIDTH     (COUNTER_WIDTH     )
+    ) inst_serial_read_engine (
+        .ap_clk                    (ap_clk                    ),
+        .areset                    (setup_areset              ),
+        .serial_read_config        (serial_read_config        ),
+        .serial_read_engine_req_out(serial_read_engine_req_out),
+        .req_out_fifo_out_signals  (req_out_fifo_out_signals  ),
+        .req_out_fifo_in_signals   (req_out_fifo_in_signals   ),
+        .fifo_setup_signal         (fifo_setup_signal         )
+    );
+
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
