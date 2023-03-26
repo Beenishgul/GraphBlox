@@ -208,8 +208,8 @@ module glay_kernel_setup #(
 
     SerialReadEngineConfiguration serial_read_config_reg        ;
     MemoryRequestPacket           serial_read_engine_req_out_reg;
-    FIFOStateSignalsOutput        req_out_fifo_out_signals_reg  ;
-    FIFOStateSignalsInput         req_out_fifo_in_signals_reg   ;
+    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg  ;
+    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg   ;
     logic                         fifo_setup_signal_reg         ;
 
     serial_read_engine #(
@@ -218,13 +218,13 @@ module glay_kernel_setup #(
         .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_serial_read_engine (
-        .ap_clk                    (ap_clk                        ),
-        .areset                    (counter_areset                ),
-        .serial_read_config        (serial_read_config_reg        ),
-        .serial_read_engine_req_out(serial_read_engine_req_out_reg),
-        .req_out_fifo_out_signals  (req_out_fifo_out_signals_reg  ),
-        .req_out_fifo_in_signals   (req_out_fifo_in_signals_reg   ),
-        .fifo_setup_signal         (fifo_setup_signal_reg         )
+        .ap_clk                    (ap_clk                                 ),
+        .areset                    (counter_areset                         ),
+        .serial_read_config        (serial_read_config_reg                 ),
+        .serial_read_engine_req_out(serial_read_engine_req_out_reg         ),
+        .req_out_fifo_out_signals  (serial_read_engine_fifo_out_signals_reg),
+        .req_out_fifo_in_signals   (serial_read_engine_fifo_in_signals_reg ),
+        .fifo_setup_signal         (fifo_setup_signal_reg                  )
     );
 
 // --------------------------------------------------------------------------------------
