@@ -297,7 +297,6 @@ module serial_read_engine #(
 // FIFO cache requests out fifo_516x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
     assign req_out_fifo_in_signals_reg.wr_en    = serial_read_engine_req_out_din.valid;
-    assign serial_read_engine_req_in_dout.valid = req_out_fifo_out_signals_reg.valid;
 
     fifo_138x32 inst_fifo_138x32_MemoryRequestPacket (
         .clk         (ap_clk                                   ),
