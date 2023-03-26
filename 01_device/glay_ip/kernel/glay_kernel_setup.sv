@@ -12,18 +12,19 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-
 import GLAY_AXI4_PKG::*;
 import GLAY_GLOBALS_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 import GLAY_REQ_PKG::*;
+import GLAY_SETUP_PKG::*;
 
 module glay_kernel_setup #(
-    parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 0              ,
-    parameter COUNTER_WIDTH      = 32
+    parameter NUM_GRAPH_CLUSTERS  = CU_COUNT_GLOBAL,
+    parameter NUM_GRAPH_PE        = CU_COUNT_LOCAL ,
+    parameter NUM_SETUP_CACHELINE = 2              ,
+    parameter ENGINE_ID           = 0              ,
+    parameter COUNTER_WIDTH       = 32
 ) (
     // System Signals
     input  logic                           ap_clk                  ,
@@ -206,11 +207,11 @@ module glay_kernel_setup #(
 // Generate Requests Logic
 // --------------------------------------------------------------------------------------
 
-    SerialReadEngineConfiguration serial_read_config_reg        ;
-    MemoryRequestPacket           serial_read_engine_req_out_reg;
-    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg  ;
-    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg   ;
-    logic                         fifo_setup_signal_reg         ;
+    SerialReadEngineConfiguration serial_read_config_reg                 ;
+    MemoryRequestPacket           serial_read_engine_req_out_reg         ;
+    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg;
+    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg ;
+    logic                         fifo_setup_signal_reg                  ;
 
     serial_read_engine #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),

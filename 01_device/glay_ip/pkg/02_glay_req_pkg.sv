@@ -1,3 +1,18 @@
+// -----------------------------------------------------------------------------
+//
+//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : glay_req_pkg.sv
+// Create : 2022-11-29 16:14:59
+// Revise : 2022-11-29 16:14:59
+// Editor : sublime text4, tab size (4)
+// -----------------------------------------------------------------------------
+
+
 `timescale 1 ns / 1 ps
 
 `include "iob_lib.vh"
@@ -78,19 +93,6 @@ typedef struct packed {
   GlayCacheRequestInterfaceOutputPayload payload;
 } GlayCacheRequestInterfaceOutput;
 
-
-// --------------------------------------------------------------------------------------
-//   State Machine Setup Requests
-// --------------------------------------------------------------------------------------
-
-typedef enum int unsigned {
-  SETUP_KERNEL_RESET,
-  SETUP_KERNEL_IDLE,
-  SETUP_KERNEL_REQ_START,
-  SETUP_KERNEL_REQ_BUSY,
-  SETUP_KERNEL_REQ_DONE
-} kernel_setup_state;
-
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
@@ -102,6 +104,10 @@ typedef enum int unsigned {
   CMD_PREFETCH_READ,
   CMD_PREFETCH_WRITE
 } command_type;
+
+// --------------------------------------------------------------------------------------
+//   Graph CSR structure types
+// --------------------------------------------------------------------------------------
 
 typedef enum int unsigned {
   STRUCT_INVALID,
@@ -115,6 +121,10 @@ typedef enum int unsigned {
   STRUCT_AUXILIARY_2_DATA,
   STRUCT_KERNEL_SETUP
 } structure_type;
+
+// --------------------------------------------------------------------------------------
+//   Generic Memory request packet
+// --------------------------------------------------------------------------------------
 
 // SIZE = 138 bits
 typedef struct packed{
