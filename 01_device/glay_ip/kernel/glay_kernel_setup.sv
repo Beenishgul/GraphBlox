@@ -211,27 +211,27 @@ module glay_kernel_setup #(
     MemoryRequestPacket           serial_read_engine_req_out_reg         ;
     FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg;
     FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg ;
-    logic                         fifo_setup_signal_reg     
+    logic                         serial_read_engine_fifo_setup_signal_reg
+
+        always_ff @(posedge ap_clk) begin
+            if (setup_areset) begin
+                serial_read_config_reg.valid <= 0;
+            end
+            else begin
+                serial_read_config_reg.valid <= glay_descriptor_reg.valid;
+            end
+        end
 
     always_ff @(posedge ap_clk) begin
-        if (setup_areset) begin
-            serial_read_config_reg.valid <= 0;
-        end
-        else begin
-            serial_read_config_reg.valid <= glay_descriptor_reg.valid;
-        end
+        serial_read_config_reg.payload.increment     <= 1'b1;
+        serial_read_config_reg.payload.decrement     <= 1'b1;
+        serial_read_config_reg.payload.array_pointer <= glay_descriptor_reg.payload.graph_csr_struct;
+        serial_read_config_reg.payload.array_size    <= 2;
+        serial_read_config_reg.payload.start_read    <= 0;
+        serial_read_config_reg.payload.end_read      <= 2;
+        serial_read_config_reg.payload.stride        <= 1;
+        serial_read_config_reg.payload.granularity   <= 64;
     end
-
-    always_ff @(posedge ap_clk) begin
-        serial_read_config_reg.payload.increment    <=
-        serial_read_config_reg.payload.decrement    <=
-        serial_read_config_reg.payload.array_pointer<=
-        serial_read_config_reg.payload.array_size   <=
-        serial_read_config_reg.payload.start_read   <=
-        serial_read_config_reg.payload.end_read     <=
-        serial_read_config_reg.payload.stride       <=
-        serial_read_config_reg.payload.granularity  <=
-    end             
 
     serial_read_engine #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
@@ -239,19 +239,19 @@ module glay_kernel_setup #(
         .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_serial_read_engine (
-        .ap_clk                    (ap_clk                                 ),
-        .areset                    (counter_areset                         ),
-        .serial_read_config        (serial_read_config_reg                 ),
-        .serial_read_engine_req_out(serial_read_engine_req_out_reg         ),
-        .req_out_fifo_out_signals  (serial_read_engine_fifo_out_signals_reg),
-        .req_out_fifo_in_signals   (serial_read_engine_fifo_in_signals_reg ),
-        .fifo_setup_signal         (fifo_setup_signal_reg                  )
+        .ap_clk                    (ap_clk                                  ),
+        .areset                    (counter_areset                          ),
+        .serial_read_config        (serial_read_config_reg                  ),
+        .serial_read_engine_req_out(serial_read_engine_req_out_reg          ),
+        .req_out_fifo_out_signals  (serial_read_engine_fifo_out_signals_reg ),
+        .req_out_fifo_in_signals   (serial_read_engine_fifo_in_signals_reg  ),
+        .fifo_setup_signal         (serial_read_engine_fifo_setup_signal_reg)
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-    assign fifo_setup_signal_reg = req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | req_in_fifo_out_signals_reg.wr_rst_busy | req_in_fifo_out_signals_reg.rd_rst_busy;
+    assign fifo_setup_signal_reg = serial_read_engine_fifo_setup_signal_reg | req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | req_in_fifo_out_signals_reg.wr_rst_busy | req_in_fifo_out_signals_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x32_GlaySetupRequestInterfaceInput
