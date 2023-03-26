@@ -51,7 +51,10 @@ module serial_read_engine #(
     output logic                         fifo_setup_signal
 );
 
-    logic engine_areset;
+    logic engine_areset ;
+    logic counter_areset;
+    logic fifo_areset   ;
+
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
@@ -88,7 +91,9 @@ module serial_read_engine #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        engine_areset <= areset;
+        engine_areset  <= areset;
+        counter_areset <= areset;
+        fifo_areset    <= areset;
     end
 // --------------------------------------------------------------------------------------
 // Drive input signals
@@ -279,7 +284,7 @@ module serial_read_engine #(
     glay_transactions_counter #(.C_WIDTH(COUNTER_WIDTH)) inst_glay_transactions_counter (
         .ap_clk    (ap_clk            ),
         .ap_clken  (ap_clken          ),
-        .areset    (engine_areset     ),
+        .areset    (counter_areset    ),
         .load      (counter_load      ),
         .incr      (counter_incr      ),
         .decr      (counter_decr      ),
@@ -296,11 +301,11 @@ module serial_read_engine #(
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_516x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
-    assign req_out_fifo_in_signals_reg.wr_en    = serial_read_engine_req_out_din.valid;
+    assign req_out_fifo_in_signals_reg.wr_en = serial_read_engine_req_out_din.valid;
 
     fifo_138x32 inst_fifo_138x32_MemoryRequestPacket (
         .clk         (ap_clk                                   ),
-        .srst        (engine_areset                            ),
+        .srst        (fifo_areset                              ),
         .din         (serial_read_engine_req_out_din           ),
         .wr_en       (req_out_fifo_in_signals_reg.wr_en        ),
         .rd_en       (req_out_fifo_in_signals_reg.rd_en        ),

@@ -113,7 +113,7 @@ typedef enum int unsigned {
   STRUCT_INV_EDGES_IDX,
   STRUCT_AUXILIARY_1_DATA,
   STRUCT_AUXILIARY_2_DATA,
-  STRUCT_AUXILIARY_3_DATA
+  STRUCT_KERNEL_SETUP
 } structure_type;
 
 // SIZE = 138 bits

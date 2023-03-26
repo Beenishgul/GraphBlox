@@ -39,7 +39,9 @@ module glay_kernel_setup #(
     output logic                           fifo_setup_signal
 );
 
-    logic setup_areset;
+    logic setup_areset  ;
+    logic counter_areset;
+    logic fifo_areset   ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -73,7 +75,9 @@ module glay_kernel_setup #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        setup_areset <= areset;
+        setup_areset   <= areset;
+        counter_areset <= areset;
+        fifo_areset    <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -202,11 +206,11 @@ module glay_kernel_setup #(
 // Generate Requests Logic
 // --------------------------------------------------------------------------------------
 
-    SerialReadEngineConfiguration serial_read_config        ;
-    MemoryRequestPacket           serial_read_engine_req_out;
-    FIFOStateSignalsOutput        req_out_fifo_out_signals  ;
-    FIFOStateSignalsInput         req_out_fifo_in_signals   ;
-    logic                         fifo_setup_signal         ;
+    SerialReadEngineConfiguration serial_read_config_reg        ;
+    MemoryRequestPacket           serial_read_engine_req_out_reg;
+    FIFOStateSignalsOutput        req_out_fifo_out_signals_reg  ;
+    FIFOStateSignalsInput         req_out_fifo_in_signals_reg   ;
+    logic                         fifo_setup_signal_reg         ;
 
     serial_read_engine #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
@@ -214,15 +218,14 @@ module glay_kernel_setup #(
         .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_serial_read_engine (
-        .ap_clk                    (ap_clk                    ),
-        .areset                    (setup_areset              ),
-        .serial_read_config        (serial_read_config        ),
-        .serial_read_engine_req_out(serial_read_engine_req_out),
-        .req_out_fifo_out_signals  (req_out_fifo_out_signals  ),
-        .req_out_fifo_in_signals   (req_out_fifo_in_signals   ),
-        .fifo_setup_signal         (fifo_setup_signal         )
+        .ap_clk                    (ap_clk                        ),
+        .areset                    (counter_areset                ),
+        .serial_read_config        (serial_read_config_reg        ),
+        .serial_read_engine_req_out(serial_read_engine_req_out_reg),
+        .req_out_fifo_out_signals  (req_out_fifo_out_signals_reg  ),
+        .req_out_fifo_in_signals   (req_out_fifo_in_signals_reg   ),
+        .fifo_setup_signal         (fifo_setup_signal_reg         )
     );
-
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
@@ -237,7 +240,7 @@ module glay_kernel_setup #(
 
     fifo_638x32 inst_fifo_638x32_GlaySetupRequestInterfaceInput (
         .clk         (ap_clk                                  ),
-        .srst        (setup_areset                            ),
+        .srst        (fifo_areset                             ),
         .din         (glay_setup_cache_req_in_din             ),
         .wr_en       (req_in_fifo_in_signals_reg.wr_en        ),
         .rd_en       (req_in_fifo_in_signals_reg.rd_en        ),
@@ -261,7 +264,7 @@ module glay_kernel_setup #(
 
     fifo_516x32 inst_fifo_516x32_GlaySetupRequestInterfaceOutput (
         .clk         (ap_clk                                   ),
-        .srst        (setup_areset                             ),
+        .srst        (fifo_areset                              ),
         .din         (glay_setup_cache_req_out_din             ),
         .wr_en       (req_out_fifo_in_signals_reg.wr_en        ),
         .rd_en       (req_out_fifo_in_signals_reg.rd_en        ),
