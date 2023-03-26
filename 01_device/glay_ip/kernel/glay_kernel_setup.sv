@@ -207,20 +207,20 @@ module glay_kernel_setup #(
 // Generate Requests Logic
 // --------------------------------------------------------------------------------------
 
-    SerialReadEngineConfiguration serial_read_config_reg                 ;
-    MemoryRequestPacket           serial_read_engine_req_out_reg         ;
-    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg;
-    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg ;
-    logic                         serial_read_engine_fifo_setup_signal_reg
+    SerialReadEngineConfiguration serial_read_config_reg                  ;
+    MemoryRequestPacket           serial_read_engine_req_out_reg          ;
+    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg ;
+    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg  ;
+    logic                         serial_read_engine_fifo_setup_signal_reg;
 
-        always_ff @(posedge ap_clk) begin
-            if (setup_areset) begin
-                serial_read_config_reg.valid <= 0;
-            end
-            else begin
-                serial_read_config_reg.valid <= glay_descriptor_reg.valid;
-            end
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            serial_read_config_reg.valid <= 0;
         end
+        else begin
+            serial_read_config_reg.valid <= glay_descriptor_reg.valid;
+        end
+    end
 
     always_ff @(posedge ap_clk) begin
         serial_read_config_reg.payload.increment     <= 1'b1;

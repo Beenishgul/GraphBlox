@@ -196,7 +196,6 @@ module serial_read_engine #(
                 counter_load_value       <= 0;
                 counter_stride_value     <= 0;
             end
-            end
             SERIAL_READ_ENGINE_IDLE : begin
                 serial_read_engine_done  <= 1'b1;
                 serial_read_engine_start <= 1'b0;
@@ -208,7 +207,6 @@ module serial_read_engine #(
                 counter_load_value       <= 0;
                 counter_stride_value     <= 0;
             end
-            end
             SERIAL_READ_ENGINE_SETUP : begin
                 serial_read_engine_done  <= 1'b0;
                 serial_read_engine_start <= 1'b0;
@@ -219,7 +217,6 @@ module serial_read_engine #(
                 counter_decr             <= serial_read_config_reg.payload.decrement;
                 counter_load_value       <= serial_read_config_reg.payload.start_read;
                 counter_stride_value     <= serial_read_config_reg.payload.stride;
-            end
             end
             SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_done  <= 1'b0;
