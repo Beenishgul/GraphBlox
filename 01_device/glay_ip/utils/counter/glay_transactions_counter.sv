@@ -18,17 +18,19 @@
 import GLAY_FUNCTIONS_PKG::*;
 
 module glay_transactions_counter #(
-  parameter integer               C_WIDTH = 4              ,
-  parameter         [C_WIDTH-1:0] C_INIT  = {C_WIDTH{1'b0}}
+  parameter integer               C_WIDTH = 4                 ,
+  parameter         [C_WIDTH-1:0] C_INIT  = {C_WIDTH{1'b0}}   ,
+  parameter         [C_WIDTH-1:0] S_INIT  = {{C_WIDTH-1{1'b0}}, 1'b1}
 ) (
-  input  logic               ap_clk    ,
-  input  logic               ap_clken  ,
-  input  logic               areset    ,
-  input  logic               load      ,
-  input  logic               incr      ,
-  input  logic               decr      ,
-  input  logic [C_WIDTH-1:0] load_value,
-  output logic [C_WIDTH-1:0] count     ,
+  input  logic               ap_clk      ,
+  input  logic               ap_clken    ,
+  input  logic               areset      ,
+  input  logic               load        ,
+  input  logic               incr        ,
+  input  logic               decr        ,
+  input  logic [C_WIDTH-1:0] load_value  ,
+  input  logic [C_WIDTH-1:0] stride_value,
+  output logic [C_WIDTH-1:0] count       ,
   output logic               is_zero
 );
 
@@ -45,8 +47,9 @@ module glay_transactions_counter #(
 /////////////////////////////////////////////////////////////////////////////
 // Variables
 /////////////////////////////////////////////////////////////////////////////
-  reg [C_WIDTH-1:0] count_r   = C_INIT             ;
-  reg               is_zero_r = (C_INIT == LP_ZERO);
+  logic [C_WIDTH-1:0] count_r   = C_INIT             ;
+  logic [C_WIDTH-1:0] stride_r  = S_INIT             ;
+  logic               is_zero_r = (C_INIT == LP_ZERO);
 
 /////////////////////////////////////////////////////////////////////////////
 // Begin RTL
@@ -55,17 +58,18 @@ module glay_transactions_counter #(
 
   always @(posedge ap_clk) begin
     if (areset) begin
-      count_r <= C_INIT;
+      count_r  <= C_INIT;
+      stride_r <= S_INIT;
     end
     else if (ap_clken) begin
       if (load) begin
         count_r <= load_value;
       end
       else if (incr & ~decr) begin
-        count_r <= count_r + 1'b1;
+        count_r <= count_r + stride_r;
       end
       else if (~incr & decr) begin
-        count_r <= count_r - 1'b1;
+        count_r <= count_r - stride_r;
       end
       else
         count_r <= count_r;

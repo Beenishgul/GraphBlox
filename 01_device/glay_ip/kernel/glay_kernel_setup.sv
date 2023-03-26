@@ -211,7 +211,27 @@ module glay_kernel_setup #(
     MemoryRequestPacket           serial_read_engine_req_out_reg         ;
     FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg;
     FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg ;
-    logic                         fifo_setup_signal_reg                  ;
+    logic                         fifo_setup_signal_reg     
+
+    always_ff @(posedge ap_clk) begin
+        if (setup_areset) begin
+            serial_read_config_reg.valid <= 0;
+        end
+        else begin
+            serial_read_config_reg.valid <= glay_descriptor_reg.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        serial_read_config_reg.payload.increment    <=
+        serial_read_config_reg.payload.decrement    <=
+        serial_read_config_reg.payload.array_pointer<=
+        serial_read_config_reg.payload.array_size   <=
+        serial_read_config_reg.payload.start_read   <=
+        serial_read_config_reg.payload.end_read     <=
+        serial_read_config_reg.payload.stride       <=
+        serial_read_config_reg.payload.granularity  <=
+    end             
 
     serial_read_engine #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),

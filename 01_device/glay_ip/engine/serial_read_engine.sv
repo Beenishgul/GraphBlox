@@ -80,12 +80,13 @@ module serial_read_engine #(
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-    logic                     counter_load      ;
-    logic                     counter_incr      ;
-    logic                     counter_decr      ;
-    logic                     is_zero           ;
-    logic [COUNTER_WIDTH-1:0] counter_load_value;
-    logic [COUNTER_WIDTH-1:0] counter_count     ;
+    logic                     counter_load        ;
+    logic                     counter_incr        ;
+    logic                     counter_decr        ;
+    logic                     is_zero             ;
+    logic [COUNTER_WIDTH-1:0] counter_load_value  ;
+    logic [COUNTER_WIDTH-1:0] counter_stride_value;
+    logic [COUNTER_WIDTH-1:0] counter_count       ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -193,6 +194,8 @@ module serial_read_engine #(
                 counter_incr             <= 1'b0;
                 counter_decr             <= 1'b0;
                 counter_load_value       <= 0;
+                counter_stride_value     <= 0;
+            end
             end
             SERIAL_READ_ENGINE_IDLE : begin
                 serial_read_engine_done  <= 1'b1;
@@ -203,6 +206,8 @@ module serial_read_engine #(
                 counter_incr             <= 1'b0;
                 counter_decr             <= 1'b0;
                 counter_load_value       <= 0;
+                counter_stride_value     <= 0;
+            end
             end
             SERIAL_READ_ENGINE_SETUP : begin
                 serial_read_engine_done  <= 1'b0;
@@ -213,6 +218,8 @@ module serial_read_engine #(
                 counter_incr             <= serial_read_config_reg.payload.increment;
                 counter_decr             <= serial_read_config_reg.payload.decrement;
                 counter_load_value       <= serial_read_config_reg.payload.start_read;
+                counter_stride_value     <= serial_read_config_reg.payload.stride;
+            end
             end
             SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_done  <= 1'b0;
@@ -282,15 +289,16 @@ module serial_read_engine #(
     end
 
     glay_transactions_counter #(.C_WIDTH(COUNTER_WIDTH)) inst_glay_transactions_counter (
-        .ap_clk    (ap_clk            ),
-        .ap_clken  (ap_clken          ),
-        .areset    (counter_areset    ),
-        .load      (counter_load      ),
-        .incr      (counter_incr      ),
-        .decr      (counter_decr      ),
-        .load_value(counter_load_value),
-        .count     (counter_count     ),
-        .is_zero   (is_zero           )
+        .ap_clk      (ap_clk              ),
+        .ap_clken    (ap_clken            ),
+        .areset      (counter_areset      ),
+        .load        (counter_load        ),
+        .incr        (counter_incr        ),
+        .decr        (counter_decr        ),
+        .load_value  (counter_load_value  ),
+        .stride_value(counter_stride_value),
+        .count       (counter_count       ),
+        .is_zero     (is_zero             )
     );
 
 // --------------------------------------------------------------------------------------
