@@ -195,7 +195,6 @@ module glay_kernel_setup #(
                 kernel_setup_done                            <= 1'b0;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
-
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
@@ -233,7 +232,7 @@ module glay_kernel_setup #(
 
     always_ff @(posedge ap_clk) begin
         serial_read_config_reg.payload.increment     <= 1'b1;
-        serial_read_config_reg.payload.decrement     <= 1'b1;
+        serial_read_config_reg.payload.decrement     <= 1'b0;
         serial_read_config_reg.payload.array_pointer <= glay_descriptor_reg.payload.graph_csr_struct;
         serial_read_config_reg.payload.array_size    <= 2;
         serial_read_config_reg.payload.start_read    <= 0;
