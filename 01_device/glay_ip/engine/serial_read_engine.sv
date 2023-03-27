@@ -42,14 +42,16 @@ module serial_read_engine #(
     parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
-    input  logic                         ap_clk                    ,
-    input  logic                         areset                    ,
-    input  SerialReadEngineConfiguration serial_read_config        ,
-    output MemoryRequestPacket           serial_read_engine_req_out,
-    output FIFOStateSignalsOutput        req_out_fifo_out_signals  ,
-    input  FIFOStateSignalsInput         req_out_fifo_in_signals   ,
-    output logic                         fifo_setup_signal         ,
-    output logic                         serial_read_engine_done
+    input  logic                         ap_clk                      ,
+    input  logic                         areset                      ,
+    input  SerialReadEngineConfiguration serial_read_config          ,
+    output MemoryRequestPacket           serial_read_engine_req_out  ,
+    output FIFOStateSignalsOutput        req_out_fifo_out_signals    ,
+    input  FIFOStateSignalsInput         req_out_fifo_in_signals     ,
+    output logic                         fifo_setup_signal           ,
+    input  logic                         serial_read_engine_in_start ,
+    output logic                         serial_read_engine_out_ready,
+    output logic                         serial_read_engine_out_done
 );
 
     logic engine_areset ;
@@ -68,6 +70,11 @@ module serial_read_engine #(
     logic serial_read_engine_pause_reg;
 
     SerialReadEngineConfiguration serial_read_config_reg;
+
+
+    logic serial_read_engine_in_start_reg ;
+    logic serial_read_engine_out_ready_reg;
+    logic serial_read_engine_out_done_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -105,10 +112,12 @@ module serial_read_engine #(
         if (engine_areset) begin
             serial_read_config_reg.valid      <= 0;
             req_out_fifo_in_signals_reg.rd_en <= 0;
+            serial_read_engine_in_start_reg   <= 0;
         end
         else begin
             serial_read_config_reg.valid      <= serial_read_config.valid;
             req_out_fifo_in_signals_reg.rd_en <= req_out_fifo_in_signals.rd_en;
+            serial_read_engine_in_start_reg   <= serial_read_engine_in_start;
         end
     end
 
@@ -125,12 +134,16 @@ module serial_read_engine #(
             serial_read_engine_req_out.valid <= 0;
             req_out_fifo_out_signals         <= 0;
             serial_read_engine_done          <= 0;
+            serial_read_engine_out_ready     <= 0;
+            serial_read_engine_out_done      <= 0;
         end
         else begin
             fifo_setup_signal                <= fifo_setup_signal_reg;
             serial_read_engine_req_out.valid <= serial_read_engine_req_out_dout.valid;
             req_out_fifo_out_signals         <= req_out_fifo_out_signals_reg;
             serial_read_engine_done          <= serial_read_engine_done_reg;
+            serial_read_engine_out_ready     <= serial_read_engine_out_ready_reg;
+            serial_read_engine_out_done      <= serial_read_engine_out_done_reg;
         end
     end
 
@@ -156,7 +169,7 @@ module serial_read_engine #(
                 next_state = SERIAL_READ_ENGINE_IDLE;
             end
             SERIAL_READ_ENGINE_IDLE : begin
-                if(serial_read_config_reg.valid)
+                if(serial_read_config_reg.valid && serial_read_engine_in_start_reg)
                     next_state = SERIAL_READ_ENGINE_SETUP;
                 else
                     next_state = SERIAL_READ_ENGINE_IDLE;
@@ -190,83 +203,101 @@ module serial_read_engine #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             SERIAL_READ_ENGINE_RESET : begin
-                serial_read_engine_done_reg  <= 1'b1;
-                serial_read_engine_start_reg <= 1'b0;
-                serial_read_engine_setup_reg <= 1'b1;
-                serial_read_engine_pause_reg <= 1'b0;
-                counter_enable               <= 1'b0;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= 1'b0;
-                counter_decr                 <= 1'b0;
-                counter_load_value           <= 0;
-                counter_stride_value         <= 0;
+                serial_read_engine_done_reg      <= 1'b1;
+                serial_read_engine_start_reg     <= 1'b0;
+                serial_read_engine_setup_reg     <= 1'b1;
+                serial_read_engine_pause_reg     <= 1'b0;
+                serial_read_engine_out_ready_reg <= 1'b1;
+                serial_read_engine_out_done_reg  <= 1'b1;
+                counter_enable                   <= 1'b0;
+                counter_load                     <= 1'b0;
+                counter_incr                     <= 1'b0;
+                counter_decr                     <= 1'b0;
+                counter_load_value               <= 0;
+                counter_stride_value             <= 0;
             end
             SERIAL_READ_ENGINE_IDLE : begin
-                serial_read_engine_done_reg  <= 1'b1;
-                serial_read_engine_start_reg <= 1'b0;
-                serial_read_engine_setup_reg <= 1'b1;
-                serial_read_engine_pause_reg <= 1'b0;
-                counter_enable               <= 1'b1;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= 1'b0;
-                counter_decr                 <= 1'b0;
-                counter_load_value           <= 0;
-                counter_stride_value         <= 0;
+                serial_read_engine_done_reg      <= 1'b1;
+                serial_read_engine_start_reg     <= 1'b0;
+                serial_read_engine_setup_reg     <= 1'b1;
+                serial_read_engine_pause_reg     <= 1'b0;
+                serial_read_engine_out_ready_reg <= 1'b1;
+                serial_read_engine_out_done_reg  <= 1'b1;
+                counter_enable                   <= 1'b1;
+                counter_load                     <= 1'b0;
+                counter_incr                     <= 1'b0;
+                counter_decr                     <= 1'b0;
+                counter_load_value               <= 0;
+                counter_stride_value             <= 0;
             end
             SERIAL_READ_ENGINE_SETUP : begin
-                serial_read_engine_done_reg  <= 1'b0;
-                serial_read_engine_start_reg <= 1'b0;
-                serial_read_engine_setup_reg <= 1'b1;
-                serial_read_engine_pause_reg <= 1'b0;
-                counter_enable               <= 1'b1;
-                counter_load                 <= 1'b1;
-                counter_incr                 <= serial_read_config_reg.payload.increment;
-                counter_decr                 <= serial_read_config_reg.payload.decrement;
-                counter_load_value           <= serial_read_config_reg.payload.start_read;
-                counter_stride_value         <= serial_read_config_reg.payload.stride;
+                serial_read_engine_done_reg      <= 1'b0;
+                serial_read_engine_start_reg     <= 1'b0;
+                serial_read_engine_setup_reg     <= 1'b1;
+                serial_read_engine_pause_reg     <= 1'b0;
+                serial_read_engine_out_ready_reg <= 1'b0;
+                serial_read_engine_out_done_reg  <= 1'b0;
+                counter_enable                   <= 1'b1;
+                counter_load                     <= 1'b1;
+                counter_incr                     <= serial_read_config_reg.payload.increment;
+                counter_decr                     <= serial_read_config_reg.payload.decrement;
+                counter_load_value               <= serial_read_config_reg.payload.start_read;
+                counter_stride_value             <= serial_read_config_reg.payload.stride;
             end
             SERIAL_READ_ENGINE_START : begin
-                serial_read_engine_done_reg  <= 1'b0;
-                serial_read_engine_start_reg <= 1'b1;
-                serial_read_engine_setup_reg <= 1'b0;
-                serial_read_engine_pause_reg <= 1'b0;
-                counter_enable               <= 1'b1;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= serial_read_config_reg.payload.increment;
-                counter_decr                 <= serial_read_config_reg.payload.decrement;
+                serial_read_engine_done_reg      <= 1'b0;
+                serial_read_engine_start_reg     <= 1'b1;
+                serial_read_engine_setup_reg     <= 1'b0;
+                serial_read_engine_pause_reg     <= 1'b0;
+                serial_read_engine_out_ready_reg <= 1'b0;
+                serial_read_engine_out_done_reg  <= 1'b0;
+                counter_enable                   <= 1'b1;
+                counter_load                     <= 1'b0;
+                counter_incr                     <= serial_read_config_reg.payload.increment;
+                counter_decr                     <= serial_read_config_reg.payload.decrement;
             end
             SERIAL_READ_ENGINE_BUSY : begin
-                if(counter_count == serial_read_config_reg.payload.end_read)
+                if(counter_count == serial_read_config_reg.payload.end_read) begin
                     serial_read_engine_done_reg <= 1'b1;
-                else
+                    counter_incr                <= 1'b0;
+                    counter_decr                <= 1'b0;
+                end
+                else begin
                     serial_read_engine_done_reg <= 1'b0;
-
-                serial_read_engine_start_reg <= 1'b1;
-                serial_read_engine_setup_reg <= 1'b0;
-                serial_read_engine_pause_reg <= 1'b0;
-                counter_enable               <= 1'b1;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= serial_read_config_reg.payload.increment;
-                counter_decr                 <= serial_read_config_reg.payload.decrement;
+                    counter_enable              <= 1'b1;
+                    counter_incr                <= serial_read_config_reg.payload.increment;
+                    counter_decr                <= serial_read_config_reg.payload.decrement;
+                end
+                serial_read_engine_out_ready_reg <= 1'b0;
+                serial_read_engine_out_done_reg  <= 1'b0;
+                counter_enable                   <= 1'b1;
+                serial_read_engine_start_reg     <= 1'b1;
+                serial_read_engine_setup_reg     <= 1'b0;
+                serial_read_engine_pause_reg     <= 1'b0;
+                counter_load                     <= 1'b0;
             end
             SERIAL_READ_ENGINE_PAUSE : begin
-                serial_read_engine_done_reg  <= 1'b0;
-                serial_read_engine_start_reg <= 1'b1;
-                serial_read_engine_setup_reg <= 1'b0;
-                serial_read_engine_pause_reg <= 1'b1;
-                counter_enable               <= 1'b0;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= 1'b0;
-                counter_decr                 <= 1'b0;
+                serial_read_engine_done_reg      <= 1'b1;
+                serial_read_engine_start_reg     <= 1'b1;
+                serial_read_engine_setup_reg     <= 1'b0;
+                serial_read_engine_pause_reg     <= 1'b1;
+                serial_read_engine_out_ready_reg <= 1'b0;
+                serial_read_engine_out_done_reg  <= 1'b0;
+                counter_enable                   <= 1'b0;
+                counter_load                     <= 1'b0;
+                counter_incr                     <= 1'b0;
+                counter_decr                     <= 1'b0;
             end
             SERIAL_READ_ENGINE_DONE : begin
-                serial_read_engine_done_reg  <= 1'b1;
-                serial_read_engine_start_reg <= 1'b0;
-                serial_read_engine_setup_reg <= 1'b0;
-                counter_enable               <= 1'b1;
-                counter_load                 <= 1'b0;
-                counter_incr                 <= 1'b0;
-                counter_decr                 <= 1'b0;
+                serial_read_engine_done_reg      <= 1'b1;
+                serial_read_engine_start_reg     <= 1'b0;
+                serial_read_engine_setup_reg     <= 1'b0;
+                serial_read_engine_out_ready_reg <= 1'b1;
+                serial_read_engine_out_done_reg  <= 1'b1;
+                counter_enable                   <= 1'b1;
+                counter_load                     <= 1'b0;
+                counter_incr                     <= 1'b0;
+                counter_decr                     <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)

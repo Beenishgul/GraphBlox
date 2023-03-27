@@ -54,7 +54,7 @@ module glay_kernel_setup #(
     logic kernel_setup_done ;
     logic kernel_setup_start;
 
-    logic serial_read_engine_done_reg;
+
 
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
@@ -220,6 +220,9 @@ module glay_kernel_setup #(
     FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg ;
     FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg  ;
     logic                         serial_read_engine_fifo_setup_signal_reg;
+    logic                         serial_read_engine_in_start_reg         ;
+    logic                         serial_read_engine_out_ready_reg        ;
+    logic                         serial_read_engine_done_reg             ;
 
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
@@ -247,14 +250,16 @@ module glay_kernel_setup #(
         .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_serial_read_engine (
-        .ap_clk                    (ap_clk                                  ),
-        .areset                    (counter_areset                          ),
-        .serial_read_config        (serial_read_config_reg                  ),
-        .serial_read_engine_req_out(serial_read_engine_req_out_reg          ),
-        .req_out_fifo_out_signals  (serial_read_engine_fifo_out_signals_reg ),
-        .req_out_fifo_in_signals   (serial_read_engine_fifo_in_signals_reg  ),
-        .fifo_setup_signal         (serial_read_engine_fifo_setup_signal_reg),
-        .serial_read_engine_done   (serial_read_engine_done_reg             )
+        .ap_clk                      (ap_clk                                  ),
+        .areset                      (counter_areset                          ),
+        .serial_read_config          (serial_read_config_reg                  ),
+        .serial_read_engine_req_out  (serial_read_engine_req_out_reg          ),
+        .req_out_fifo_out_signals    (serial_read_engine_fifo_out_signals_reg ),
+        .req_out_fifo_in_signals     (serial_read_engine_fifo_in_signals_reg  ),
+        .fifo_setup_signal           (serial_read_engine_fifo_setup_signal_reg),
+        .serial_read_engine_in_start (serial_read_engine_in_start_reg         ),
+        .serial_read_engine_out_ready(serial_read_engine_out_ready_reg        ),
+        .serial_read_engine_done     (serial_read_engine_done_reg             )
     );
 
 // --------------------------------------------------------------------------------------
