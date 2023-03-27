@@ -54,6 +54,8 @@ module glay_kernel_setup #(
     logic kernel_setup_done ;
     logic kernel_setup_start;
 
+    logic serial_read_engine_done_reg;
+
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
@@ -177,29 +179,35 @@ module glay_kernel_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             SETUP_KERNEL_RESET : begin
-                glay_setup_cache_req_out_din.valid <= 1'b0;
-                kernel_setup_done                  <= 1'b1;
-                kernel_setup_start                 <= 1'b0;
+                glay_setup_cache_req_out_din.valid           <= 1'b0;
+                kernel_setup_done                            <= 1'b1;
+                kernel_setup_start                           <= 1'b0;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
             end
             SETUP_KERNEL_IDLE : begin
-                glay_setup_cache_req_out_din.valid <= 1'b0;
-                kernel_setup_done                  <= 1'b0;
-                kernel_setup_start                 <= 1'b0;
+                glay_setup_cache_req_out_din.valid           <= 1'b0;
+                kernel_setup_done                            <= 1'b0;
+                kernel_setup_start                           <= 1'b0;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
             end
             SETUP_KERNEL_REQ_START : begin
-                glay_setup_cache_req_out_din.valid <= 1'b0;
-                kernel_setup_done                  <= 1'b0;
-                kernel_setup_start                 <= 1'b1;
+                glay_setup_cache_req_out_din.valid           <= 1'b0;
+                kernel_setup_done                            <= 1'b0;
+                kernel_setup_start                           <= 1'b1;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
+
             end
             SETUP_KERNEL_REQ_BUSY : begin
-                glay_setup_cache_req_out_din.valid <= 1'b0;
-                kernel_setup_done                  <= 1'b0;
-                kernel_setup_start                 <= 1'b1;
+                glay_setup_cache_req_out_din.valid           <= 1'b0;
+                kernel_setup_done                            <= serial_read_engine_done_reg;
+                kernel_setup_start                           <= 1'b1;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= ~req_out_fifo_out_signals_reg.almost_full && ~serial_read_engine_fifo_out_signals_reg.empty;
             end
             SETUP_KERNEL_REQ_DONE : begin
-                glay_setup_cache_req_out_din.valid <= 1'b0;
-                kernel_setup_done                  <= 1'b1;
-                kernel_setup_start                 <= 1'b0;
+                glay_setup_cache_req_out_din.valid           <= 1'b0;
+                kernel_setup_done                            <= 1'b1;
+                kernel_setup_start                           <= 1'b0;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -246,7 +254,8 @@ module glay_kernel_setup #(
         .serial_read_engine_req_out(serial_read_engine_req_out_reg          ),
         .req_out_fifo_out_signals  (serial_read_engine_fifo_out_signals_reg ),
         .req_out_fifo_in_signals   (serial_read_engine_fifo_in_signals_reg  ),
-        .fifo_setup_signal         (serial_read_engine_fifo_setup_signal_reg)
+        .fifo_setup_signal         (serial_read_engine_fifo_setup_signal_reg),
+        .serial_read_engine_done   (serial_read_engine_done_reg             )
     );
 
 // --------------------------------------------------------------------------------------
