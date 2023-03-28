@@ -89,9 +89,9 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_516x32/fifo_516x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_138x32/fifo_138x32.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_167x32/fifo_167x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_654x32/fifo_654x32.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_711x32/fifo_711x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
