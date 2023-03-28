@@ -162,7 +162,11 @@ module glay_kernel_setup #(
                     next_state = SETUP_KERNEL_IDLE;
             end
             SETUP_KERNEL_REQ_START : begin
-                next_state = SETUP_KERNEL_REQ_BUSY;
+                if(~serial_read_engine_done_reg && ~serial_read_engine_out_ready_reg) begin
+                    next_state = SETUP_KERNEL_REQ_START;
+                end else begin
+                    next_state = SETUP_KERNEL_REQ_BUSY;
+                end
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 if (kernel_setup_done)
@@ -183,30 +187,40 @@ module glay_kernel_setup #(
                 kernel_setup_done                            <= 1'b1;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
+                serial_read_engine_in_start_reg              <= 1'b0;
+                serial_read_config_reg.valid                 <= 1'b0;
             end
             SETUP_KERNEL_IDLE : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
                 kernel_setup_done                            <= 1'b0;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
+                serial_read_engine_in_start_reg              <= 1'b0;
+                serial_read_config_reg.valid                 <= 1'b0;
             end
             SETUP_KERNEL_REQ_START : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
                 kernel_setup_done                            <= 1'b0;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
+                serial_read_engine_in_start_reg              <= 1'b1;
+                serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
                 kernel_setup_done                            <= serial_read_engine_done_reg;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= ~req_out_fifo_out_signals_reg.almost_full && ~serial_read_engine_fifo_out_signals_reg.empty;
+                serial_read_engine_in_start_reg              <= 1'b1;
+                serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_DONE : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
                 kernel_setup_done                            <= 1'b1;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
+                serial_read_engine_in_start_reg              <= 1'b0;
+                serial_read_config_reg.valid                 <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -222,16 +236,7 @@ module glay_kernel_setup #(
     logic                         serial_read_engine_fifo_setup_signal_reg;
     logic                         serial_read_engine_in_start_reg         ;
     logic                         serial_read_engine_out_ready_reg        ;
-    logic                         serial_read_engine_done_reg             ;
-
-    always_ff @(posedge ap_clk) begin
-        if (setup_areset) begin
-            serial_read_config_reg.valid <= 0;
-        end
-        else begin
-            serial_read_config_reg.valid <= glay_descriptor_reg.valid;
-        end
-    end
+    logic                         serial_read_engine_out_done_reg         ;
 
     always_ff @(posedge ap_clk) begin
         serial_read_config_reg.payload.increment     <= 1'b1;
@@ -259,7 +264,7 @@ module glay_kernel_setup #(
         .fifo_setup_signal           (serial_read_engine_fifo_setup_signal_reg),
         .serial_read_engine_in_start (serial_read_engine_in_start_reg         ),
         .serial_read_engine_out_ready(serial_read_engine_out_ready_reg        ),
-        .serial_read_engine_done     (serial_read_engine_done_reg             )
+        .serial_read_engine_out_done (serial_read_engine_out_done_reg         )
     );
 
 // --------------------------------------------------------------------------------------

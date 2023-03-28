@@ -207,7 +207,7 @@ module serial_read_engine #(
                 serial_read_engine_start_reg     <= 1'b0;
                 serial_read_engine_setup_reg     <= 1'b1;
                 serial_read_engine_pause_reg     <= 1'b0;
-                serial_read_engine_out_ready_reg <= 1'b1;
+                serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b1;
                 counter_enable                   <= 1'b0;
                 counter_load                     <= 1'b0;
@@ -292,7 +292,7 @@ module serial_read_engine #(
                 serial_read_engine_done_reg      <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b0;
                 serial_read_engine_setup_reg     <= 1'b0;
-                serial_read_engine_out_ready_reg <= 1'b1;
+                serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b1;
                 counter_enable                   <= 1'b1;
                 counter_load                     <= 1'b0;
