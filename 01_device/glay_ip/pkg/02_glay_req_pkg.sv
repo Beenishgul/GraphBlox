@@ -126,7 +126,7 @@ typedef enum int unsigned {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 
-// SIZE = 138 bits
+// SIZE = 167 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
@@ -139,7 +139,7 @@ typedef struct packed{
   MemoryRequestPacketPayload payload;
 } MemoryRequestPacket;
 
-// SIZE = 654 bits
+// SIZE = 711 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;

@@ -305,9 +305,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_138x32_GlayCacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_138x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_167x32"]" 
 
-set module_name fifo_138x32
+set module_name fifo_167x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -323,9 +323,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {138}                                                     \
+                    CONFIG.Input_Data_Width {167}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {138}                                                    \
+                    CONFIG.Output_Data_Width {167}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
@@ -345,9 +345,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_654x32_GlayCacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_654x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_711x32"]" 
 
-set module_name fifo_654x32
+set module_name fifo_711x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -363,9 +363,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {138}                                                     \
+                    CONFIG.Input_Data_Width {711}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {138}                                                    \
+                    CONFIG.Output_Data_Width {711}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
