@@ -162,7 +162,7 @@ module glay_kernel_setup #(
                     next_state = SETUP_KERNEL_IDLE;
             end
             SETUP_KERNEL_REQ_START : begin
-                if(~serial_read_engine_done_reg && ~serial_read_engine_out_ready_reg) begin
+                if(~serial_read_engine_out_done_reg && ~serial_read_engine_out_ready_reg) begin
                     next_state = SETUP_KERNEL_REQ_START;
                 end else begin
                     next_state = SETUP_KERNEL_REQ_BUSY;
@@ -208,7 +208,7 @@ module glay_kernel_setup #(
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
-                kernel_setup_done                            <= serial_read_engine_done_reg;
+                kernel_setup_done                            <= serial_read_engine_out_done_reg;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= ~req_out_fifo_out_signals_reg.almost_full && ~serial_read_engine_fifo_out_signals_reg.empty;
                 serial_read_engine_in_start_reg              <= 1'b1;
