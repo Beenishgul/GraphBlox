@@ -32,10 +32,10 @@ module glay_kernel_setup #(
     input  logic                           areset                  ,
     input  GlayControlChainInterfaceOutput glay_control_state      ,
     input  GLAYDescriptorInterface         glay_descriptor         ,
-    input  GlayCacheRequestInterfaceOutput glay_setup_cache_req_in ,
+    input  MemoryResponsePacket            glay_setup_cache_resp_in,
     output FIFOStateSignalsOutput          req_in_fifo_out_signals ,
     input  FIFOStateSignalsInput           req_in_fifo_in_signals  ,
-    output GlayCacheRequestInterfaceInput  glay_setup_cache_req_out,
+    output MemoryRequestPacket             glay_setup_cache_req_out,
     output FIFOStateSignalsOutput          req_out_fifo_out_signals,
     input  FIFOStateSignalsInput           req_out_fifo_in_signals ,
     output logic                           fifo_setup_signal
@@ -61,16 +61,16 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     GLAYDescriptorInterface glay_descriptor_reg;
 
-    GlayCacheRequestInterfaceInput glay_setup_cache_req_in_dout;
-    GlayCacheRequestInterfaceInput glay_setup_cache_req_in_din ;
+    MemoryResponsePacket glay_setup_cache_resp_in_dout;
+    MemoryResponsePacket glay_setup_cache_resp_in_din ;
 
-    GlayCacheRequestInterfaceOutput glay_setup_cache_req_out_dout;
-    GlayCacheRequestInterfaceOutput glay_setup_cache_req_out_din ;
+    MemoryRequestPacket glay_setup_cache_req_out_dout;
+    MemoryRequestPacket glay_setup_cache_req_out_din ;
 
-    FIFOStateSignalsOutput req_in_fifo_out_signals_reg ;
+    FIFOStateSignalsOutput resp_in_fifo_out_signals_reg;
     FIFOStateSignalsOutput req_out_fifo_out_signals_reg;
 
-    FIFOStateSignalsInput req_in_fifo_in_signals_reg ;
+    FIFOStateSignalsInput resp_in_fifo_in_signals_reg;
     FIFOStateSignalsInput req_out_fifo_in_signals_reg;
 
     logic fifo_setup_signal_reg;
@@ -105,19 +105,19 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
-            glay_setup_cache_req_in_din.valid <= 0;
-            req_in_fifo_in_signals_reg        <= 0;
-            req_out_fifo_in_signals_reg       <= 0;
+            glay_setup_cache_resp_in_din.valid <= 0;
+            resp_in_fifo_in_signals_reg        <= 0;
+            req_out_fifo_in_signals_reg        <= 0;
         end
         else begin
-            glay_setup_cache_req_in_din.valid <= glay_setup_cache_req_in.valid;
-            req_in_fifo_in_signals_reg        <= req_in_fifo_in_signals;
-            req_out_fifo_in_signals_reg       <= req_out_fifo_in_signals;
+            glay_setup_cache_resp_in_din.valid <= glay_setup_cache_resp_in.valid;
+            resp_in_fifo_in_signals_reg        <= req_in_fifo_in_signals;
+            req_out_fifo_in_signals_reg        <= req_out_fifo_in_signals;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        glay_setup_cache_req_in_din.payload <= glay_setup_cache_req_in.payload;
+        glay_setup_cache_resp_in_din.payload <= glay_setup_cache_resp_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ module glay_kernel_setup #(
                     next_state = SETUP_KERNEL_REQ_BUSY;
             end
             SETUP_KERNEL_REQ_DONE : begin
-                next_state = SETUP_KERNEL_IDLE;
+                next_state = SETUP_KERNEL_REQ_DONE;
             end
         endcase
     end // always_comb
@@ -210,7 +210,7 @@ module glay_kernel_setup #(
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
                 kernel_setup_done                            <= serial_read_engine_out_done_reg;
                 kernel_setup_start                           <= 1'b1;
-                serial_read_engine_fifo_in_signals_reg.rd_en <= ~req_out_fifo_out_signals_reg.almost_full && ~serial_read_engine_fifo_out_signals_reg.empty;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty;
                 serial_read_engine_in_start_reg              <= 1'b1;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
@@ -270,39 +270,39 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-    assign fifo_setup_signal_reg = serial_read_engine_fifo_setup_signal_reg | req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | req_in_fifo_out_signals_reg.wr_rst_busy | req_in_fifo_out_signals_reg.rd_rst_busy;
+    assign fifo_setup_signal_reg = serial_read_engine_fifo_setup_signal_reg | req_out_fifo_out_signals_reg.wr_rst_busy | req_out_fifo_out_signals_reg.rd_rst_busy | resp_in_fifo_out_signals_reg.wr_rst_busy | resp_in_fifo_out_signals_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in fifo_638x32_GlaySetupRequestInterfaceInput
+// FIFO cache requests in inst_fifo_711x32_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
-    assign req_in_fifo_in_signals_reg.wr_en   = glay_setup_cache_req_in_din.valid;
-    assign glay_setup_cache_req_in_dout.valid = req_in_fifo_out_signals_reg.valid;
+    assign resp_in_fifo_in_signals_reg.wr_en   = glay_setup_cache_resp_in_din.valid;
+    assign glay_setup_cache_resp_in_dout.valid = resp_in_fifo_out_signals_reg.valid;
 
-    fifo_638x32 inst_fifo_638x32_GlaySetupRequestInterfaceInput (
-        .clk         (ap_clk                                  ),
-        .srst        (fifo_areset                             ),
-        .din         (glay_setup_cache_req_in_din             ),
-        .wr_en       (req_in_fifo_in_signals_reg.wr_en        ),
-        .rd_en       (req_in_fifo_in_signals_reg.rd_en        ),
-        .dout        (glay_setup_cache_req_in_dout            ),
-        .full        (req_in_fifo_out_signals_reg.full        ),
-        .almost_full (req_in_fifo_out_signals_reg.almost_full ),
-        .empty       (req_in_fifo_out_signals_reg.empty       ),
-        .almost_empty(req_in_fifo_out_signals_reg.almost_empty),
-        .valid       (req_in_fifo_out_signals_reg.valid       ),
-        .prog_full   (req_in_fifo_out_signals_reg.prog_full   ),
-        .prog_empty  (req_in_fifo_out_signals_reg.prog_empty  ),
-        .wr_rst_busy (req_in_fifo_out_signals_reg.wr_rst_busy ),
-        .rd_rst_busy (req_in_fifo_out_signals_reg.rd_rst_busy )
+    fifo_711x32 inst_fifo_711x32_MemoryResponsePacket (
+        .clk         (ap_clk                                   ),
+        .srst        (fifo_areset                              ),
+        .din         (glay_setup_cache_resp_in_din             ),
+        .wr_en       (resp_in_fifo_in_signals_reg.wr_en        ),
+        .rd_en       (resp_in_fifo_in_signals_reg.rd_en        ),
+        .dout        (glay_setup_cache_resp_in_dout            ),
+        .full        (resp_in_fifo_out_signals_reg.full        ),
+        .almost_full (resp_in_fifo_out_signals_reg.almost_full ),
+        .empty       (resp_in_fifo_out_signals_reg.empty       ),
+        .almost_empty(resp_in_fifo_out_signals_reg.almost_empty),
+        .valid       (resp_in_fifo_out_signals_reg.valid       ),
+        .prog_full   (resp_in_fifo_out_signals_reg.prog_full   ),
+        .prog_empty  (resp_in_fifo_out_signals_reg.prog_empty  ),
+        .wr_rst_busy (resp_in_fifo_out_signals_reg.wr_rst_busy ),
+        .rd_rst_busy (resp_in_fifo_out_signals_reg.rd_rst_busy )
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_516x32_GlaySetupRequestInterfaceOutput
+// FIFO cache requests out inst_fifo_167x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
-    assign req_out_fifo_in_signals_reg.wr_en  = glay_setup_cache_req_out_din.valid;
-    assign glay_setup_cache_req_in_dout.valid = req_out_fifo_out_signals_reg.valid;
+    assign req_out_fifo_in_signals_reg.wr_en   = glay_setup_cache_req_out_din.valid;
+    assign glay_setup_cache_resp_in_dout.valid = req_out_fifo_out_signals_reg.valid;
 
-    fifo_516x32 inst_fifo_516x32_GlaySetupRequestInterfaceOutput (
+    fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (
         .clk         (ap_clk                                   ),
         .srst        (fifo_areset                              ),
         .din         (glay_setup_cache_req_out_din             ),

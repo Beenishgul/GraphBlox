@@ -116,7 +116,7 @@ module serial_read_engine #(
         end
         else begin
             serial_read_config_reg.valid      <= serial_read_config.valid;
-            req_out_fifo_in_signals_reg.rd_en <= req_out_fifo_in_signals.rd_en;
+            req_out_fifo_in_signals_reg.rd_en <= req_out_fifo_in_signals.rd_en & ~req_out_fifo_out_signals_reg.empty ;
             serial_read_engine_in_start_reg   <= serial_read_engine_in_start;
         end
     end
@@ -181,13 +181,13 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_BUSY : begin
                 if (serial_read_engine_done_reg)
                     next_state = SERIAL_READ_ENGINE_DONE;
-                else if (req_out_fifo_out_signals_reg.almost_full)
+                else if (req_out_fifo_out_signals_reg.prog_full && ~serial_read_engine_done_reg)
                     next_state = SERIAL_READ_ENGINE_PAUSE;
                 else
                     next_state = SERIAL_READ_ENGINE_BUSY;
             end
             SERIAL_READ_ENGINE_PAUSE : begin
-                if (!req_out_fifo_out_signals_reg.almost_full)
+                if (~req_out_fifo_out_signals_reg.almost_full)
                     next_state = SERIAL_READ_ENGINE_BUSY;
                 else
                     next_state = SERIAL_READ_ENGINE_PAUSE;
@@ -256,10 +256,10 @@ module serial_read_engine #(
                 counter_load                         <= 1'b0;
                 counter_incr                         <= serial_read_config_reg.payload.increment;
                 counter_decr                         <= serial_read_config_reg.payload.decrement;
-                serial_read_engine_req_out_din.valid <= 1'b1;
+                serial_read_engine_req_out_din.valid <= 1'b0;
             end
             SERIAL_READ_ENGINE_BUSY : begin
-                if(counter_count == serial_read_config_reg.payload.end_read) begin
+                if((counter_count >= serial_read_config_reg.payload.end_read)) begin
                     serial_read_engine_done_reg          <= 1'b1;
                     counter_incr                         <= 1'b0;
                     counter_decr                         <= 1'b0;
