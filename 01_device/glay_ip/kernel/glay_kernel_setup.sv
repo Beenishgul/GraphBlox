@@ -33,8 +33,8 @@ module glay_kernel_setup #(
     input  GlayControlChainInterfaceOutput glay_control_state      ,
     input  GLAYDescriptorInterface         glay_descriptor         ,
     input  MemoryResponsePacket            glay_setup_cache_resp_in,
-    output FIFOStateSignalsOutput          req_in_fifo_out_signals ,
-    input  FIFOStateSignalsInput           req_in_fifo_in_signals  ,
+    output FIFOStateSignalsOutput          resp_in_fifo_out_signals,
+    input  FIFOStateSignalsInput           resp_in_fifo_in_signals ,
     output MemoryRequestPacket             glay_setup_cache_req_out,
     output FIFOStateSignalsOutput          req_out_fifo_out_signals,
     input  FIFOStateSignalsInput           req_out_fifo_in_signals ,
@@ -111,7 +111,7 @@ module glay_kernel_setup #(
         end
         else begin
             glay_setup_cache_resp_in_din.valid <= glay_setup_cache_resp_in.valid;
-            resp_in_fifo_in_signals_reg        <= req_in_fifo_in_signals;
+            resp_in_fifo_in_signals_reg        <= resp_in_fifo_in_signals;
             req_out_fifo_in_signals_reg        <= req_out_fifo_in_signals;
         end
     end

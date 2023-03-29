@@ -118,8 +118,8 @@ module glay_kernel_cu #(
   GlayControlChainInterfaceOutput glay_kernel_setup_control_state           ;
   GLAYDescriptorInterface         glay_kernel_setup_descriptor              ;
   MemoryResponsePacket            glay_kernel_setup_cache_resp_in           ;
-  FIFOStateSignalsOutput          glay_kernel_setup_req_in_fifo_out_signals ;
-  FIFOStateSignalsInput           glay_kernel_setup_req_in_fifo_in_signals  ;
+  FIFOStateSignalsOutput          glay_kernel_setup_resp_in_fifo_out_signals;
+  FIFOStateSignalsInput           glay_kernel_setup_resp_in_fifo_in_signals ;
   MemoryRequestPacket             glay_kernel_setup_cache_req_out           ;
   FIFOStateSignalsOutput          glay_kernel_setup_req_out_fifo_out_signals;
   FIFOStateSignalsInput           glay_kernel_setup_req_out_fifo_in_signals ;
@@ -422,7 +422,8 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  assign glay_setup_cache_resp_in = glay_cache_req_out_fifo_dout;
+  assign glay_kernel_setup_cache_resp_in                 = glay_cache_req_out_fifo_dout;
+  assign glay_kernel_setup_req_out_fifo_in_signals.rd_en = ~glay_kernel_setup_req_out_fifo_out_signals.empty;
 
   glay_kernel_setup #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
@@ -433,8 +434,8 @@ module glay_kernel_cu #(
     .glay_control_state      (glay_kernel_setup_control_state           ),
     .glay_descriptor         (glay_kernel_setup_descriptor              ),
     .glay_setup_cache_resp_in(glay_kernel_setup_cache_resp_in           ),
-    .req_in_fifo_out_signals (glay_kernel_setup_req_in_fifo_out_signals ),
-    .req_in_fifo_in_signals  (glay_kernel_setup_req_in_fifo_in_signals  ),
+    .resp_in_fifo_out_signals(glay_kernel_setup_resp_in_fifo_out_signals),
+    .resp_in_fifo_in_signals (glay_kernel_setup_resp_in_fifo_in_signals ),
     .glay_setup_cache_req_out(glay_kernel_setup_cache_req_out           ),
     .req_out_fifo_out_signals(glay_kernel_setup_req_out_fifo_out_signals),
     .req_out_fifo_in_signals (glay_kernel_setup_req_out_fifo_in_signals ),
