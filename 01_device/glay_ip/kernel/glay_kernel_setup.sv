@@ -130,7 +130,7 @@ module glay_kernel_setup #(
         end
         else begin
             fifo_setup_signal              <= fifo_setup_signal_reg;
-            glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid;
+            glay_setup_cache_req_out.valid <= glay_setup_cache_req_out_dout.valid & req_out_fifo_out_signals_reg.valid ;
         end
     end
 
@@ -208,7 +208,7 @@ module glay_kernel_setup #(
             end
             SETUP_KERNEL_REQ_BUSY : begin
                 glay_setup_cache_req_out_din.valid           <= 1'b0;
-                kernel_setup_done                            <= serial_read_engine_out_done_reg;
+                kernel_setup_done                            <= serial_read_engine_out_done_reg & ~serial_read_engine_fifo_out_signals_reg.empty;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty;
                 serial_read_engine_in_start_reg              <= 1'b1;
