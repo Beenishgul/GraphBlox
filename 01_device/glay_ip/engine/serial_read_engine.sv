@@ -138,7 +138,7 @@ module serial_read_engine #(
         end
         else begin
             fifo_setup_signal                <= fifo_setup_signal_reg;
-            serial_read_engine_req_out.valid <= serial_read_engine_req_out_dout.valid;
+            serial_read_engine_req_out.valid <= serial_read_engine_req_out_dout.valid & req_out_fifo_out_signals_reg.valid;
             req_out_fifo_out_signals         <= req_out_fifo_out_signals_reg;
             serial_read_engine_out_ready     <= serial_read_engine_out_ready_reg;
             serial_read_engine_out_done      <= serial_read_engine_out_done_reg;
