@@ -66,7 +66,7 @@ static struct argp_option options[] =
     },
     {
         "algorithm",          'a', "[DEFAULT:[0]-BFS]",      0,
-        "[0]-BFS, [1]-Page-rank, [2]-SSSP-DeltaStepping, [3]-SSSP-BellmanFord, [4]-DFS,[5]-SPMV, [6]-Connected-Components, [7]-Betweenness-Centrality, [8]-Triangle Counting."
+        "[0]-BFS, [1]-Page-rank, [2]-SSSP-DeltaStepping, [3]-SSSP-BellmanFord, [4]-DFS,[5]-SPMV, [6]-Connected-Components, [7]-Betweenness-Centrality, [8]-Triangle Counting, [9]-Clustering."
     },
     {
         "data-structure",     'd', "[DEFAULT:[0]-CSR]",      0,
