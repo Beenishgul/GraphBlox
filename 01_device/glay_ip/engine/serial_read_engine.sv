@@ -193,7 +193,10 @@ module serial_read_engine #(
                     next_state = SERIAL_READ_ENGINE_PAUSE;
             end
             SERIAL_READ_ENGINE_DONE : begin
-                next_state = SERIAL_READ_ENGINE_IDLE;
+                if(serial_read_config_reg.valid && serial_read_engine_in_start_reg)
+                    next_state = SERIAL_READ_ENGINE_DONE;
+                else
+                    next_state = SERIAL_READ_ENGINE_IDLE;
             end
         endcase
     end // always_comb

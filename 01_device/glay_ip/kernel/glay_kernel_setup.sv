@@ -214,7 +214,7 @@ module glay_kernel_setup #(
                 kernel_setup_done                            <= serial_read_engine_out_done_reg & ~serial_read_engine_fifo_out_signals_reg.empty;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty;
-                serial_read_engine_in_start_reg              <= 1'b1;
+                serial_read_engine_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_DONE : begin
