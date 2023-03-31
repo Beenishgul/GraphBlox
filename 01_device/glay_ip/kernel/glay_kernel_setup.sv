@@ -175,7 +175,10 @@ module glay_kernel_setup #(
                     next_state = SETUP_KERNEL_REQ_BUSY;
             end
             SETUP_KERNEL_REQ_DONE : begin
-                next_state = SETUP_KERNEL_REQ_DONE;
+                if (glay_descriptor_reg.valid)
+                    next_state = SETUP_KERNEL_REQ_DONE;
+                else
+                    next_state = SETUP_KERNEL_IDLE;
             end
         endcase
     end // always_comb

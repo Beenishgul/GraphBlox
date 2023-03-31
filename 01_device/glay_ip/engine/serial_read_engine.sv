@@ -187,7 +187,7 @@ module serial_read_engine #(
                     next_state = SERIAL_READ_ENGINE_BUSY;
             end
             SERIAL_READ_ENGINE_PAUSE : begin
-                if (~req_out_fifo_out_signals_reg.almost_full)
+                if (~req_out_fifo_out_signals_reg.prog_full)
                     next_state = SERIAL_READ_ENGINE_BUSY;
                 else
                     next_state = SERIAL_READ_ENGINE_PAUSE;
