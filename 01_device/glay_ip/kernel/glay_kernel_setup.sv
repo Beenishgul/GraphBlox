@@ -188,7 +188,6 @@ module glay_kernel_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             SETUP_KERNEL_RESET : begin
-                glay_setup_mem_req_out_din.valid             <= 1'b0;
                 kernel_setup_done                            <= 1'b1;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
@@ -196,7 +195,6 @@ module glay_kernel_setup #(
                 serial_read_config_reg.valid                 <= 1'b0;
             end
             SETUP_KERNEL_IDLE : begin
-                glay_setup_mem_req_out_din.valid             <= 1'b0;
                 kernel_setup_done                            <= 1'b0;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
@@ -204,7 +202,6 @@ module glay_kernel_setup #(
                 serial_read_config_reg.valid                 <= 1'b0;
             end
             SETUP_KERNEL_REQ_START : begin
-                glay_setup_mem_req_out_din.valid             <= 1'b0;
                 kernel_setup_done                            <= 1'b0;
                 kernel_setup_start                           <= 1'b1;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
@@ -212,7 +209,6 @@ module glay_kernel_setup #(
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_BUSY : begin
-                glay_setup_mem_req_out_din.valid             <= 1'b0;
                 kernel_setup_done                            <= serial_read_engine_out_done_reg & ~serial_read_engine_fifo_out_signals_reg.empty;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty;
@@ -220,7 +216,6 @@ module glay_kernel_setup #(
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_DONE : begin
-                glay_setup_mem_req_out_din.valid             <= 1'b0;
                 kernel_setup_done                            <= 1'b1;
                 kernel_setup_start                           <= 1'b0;
                 serial_read_engine_fifo_in_signals_reg.rd_en <= 1'b0;
@@ -242,6 +237,11 @@ module glay_kernel_setup #(
     logic                         serial_read_engine_in_start_reg         ;
     logic                         serial_read_engine_out_ready_reg        ;
     logic                         serial_read_engine_out_done_reg         ;
+
+
+    // --------------------------------------------------------------------------------------
+// Serial Read Engine Generate
+// --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
         serial_read_config_reg.payload.increment     <= 1'b1;
@@ -306,6 +306,7 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign req_out_fifo_in_signals_reg.wr_en = glay_setup_mem_req_out_din.valid;
     assign glay_setup_mem_resp_in_dout.valid = req_out_fifo_out_signals_reg.valid;
+    assign glay_setup_mem_req_out_din        = serial_read_engine_req_out_reg;
 
     fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (
         .clk         (ap_clk                                   ),
