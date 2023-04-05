@@ -117,10 +117,10 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
   GlayControlChainInterfaceOutput glay_kernel_setup_control_state           ;
   GLAYDescriptorInterface         glay_kernel_setup_descriptor              ;
-  MemoryResponsePacket            glay_kernel_setup_cache_resp_in           ;
+  MemoryResponsePacket            glay_kernel_setup_mem_resp_in             ;
   FIFOStateSignalsOutput          glay_kernel_setup_resp_in_fifo_out_signals;
   FIFOStateSignalsInput           glay_kernel_setup_resp_in_fifo_in_signals ;
-  MemoryRequestPacket             glay_kernel_setup_cache_req_out           ;
+  MemoryRequestPacket             glay_kernel_setup_mem_req_out             ;
   FIFOStateSignalsOutput          glay_kernel_setup_req_out_fifo_out_signals;
   FIFOStateSignalsInput           glay_kernel_setup_req_out_fifo_in_signals ;
   logic                           glay_kernel_setup_fifo_setup_signal       ;
@@ -397,8 +397,8 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for fifo_638x128_GlayCacheRequestInterfaceInput
 // --------------------------------------------------------------------------------------
-  assign bus_in[0] = glay_kernel_setup_cache_req_out;
-  assign req[0]    = glay_kernel_setup_cache_req_out.valid;
+  assign bus_in[0] = glay_kernel_setup_mem_req_out;
+  assign req[0]    = glay_kernel_setup_mem_req_out.valid;
 
   assign bus_in[1] = 0;
   assign req[1]    = 0;
@@ -422,7 +422,7 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  assign glay_kernel_setup_cache_resp_in                 = glay_cache_req_out_fifo_dout;
+  assign glay_kernel_setup_mem_resp_in                   = glay_cache_req_out_fifo_dout;
   assign glay_kernel_setup_req_out_fifo_in_signals.rd_en = ~glay_kernel_setup_req_out_fifo_out_signals.empty;
 
   glay_kernel_setup #(
@@ -433,10 +433,10 @@ module glay_kernel_cu #(
     .areset                  (setup_areset                              ),
     .glay_control_state      (glay_kernel_setup_control_state           ),
     .glay_descriptor         (glay_kernel_setup_descriptor              ),
-    .glay_setup_cache_resp_in(glay_kernel_setup_cache_resp_in           ),
+    .glay_setup_mem_resp_in  (glay_kernel_setup_mem_resp_in             ),
     .resp_in_fifo_out_signals(glay_kernel_setup_resp_in_fifo_out_signals),
     .resp_in_fifo_in_signals (glay_kernel_setup_resp_in_fifo_in_signals ),
-    .glay_setup_cache_req_out(glay_kernel_setup_cache_req_out           ),
+    .glay_setup_mem_req_out  (glay_kernel_setup_mem_req_out             ),
     .req_out_fifo_out_signals(glay_kernel_setup_req_out_fifo_out_signals),
     .req_out_fifo_in_signals (glay_kernel_setup_req_out_fifo_in_signals ),
     .fifo_setup_signal       (glay_kernel_setup_fifo_setup_signal       )
