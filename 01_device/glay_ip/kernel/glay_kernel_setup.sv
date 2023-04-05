@@ -135,6 +135,7 @@ module glay_kernel_setup #(
     end
 
     always_ff @(posedge ap_clk) begin
+        req_out_fifo_out_signals         <= req_out_fifo_out_signals_reg;
         glay_setup_cache_req_out.payload <= glay_setup_cache_req_out_dout.payload;
     end
 
