@@ -245,9 +245,9 @@ module glay_kernel_setup #(
         serial_read_config_reg.payload.increment     <= 1'b1;
         serial_read_config_reg.payload.decrement     <= 1'b0;
         serial_read_config_reg.payload.array_pointer <= glay_descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_reg.payload.array_size    <= 2;
+        serial_read_config_reg.payload.array_size    <= glay_descriptor_reg.payload.auxiliary_2;
         serial_read_config_reg.payload.start_read    <= 0;
-        serial_read_config_reg.payload.end_read      <= 2;
+        serial_read_config_reg.payload.end_read      <= glay_descriptor_reg.payload.auxiliary_2;
         serial_read_config_reg.payload.stride        <= 1;
         serial_read_config_reg.payload.granularity   <= 64;
     end

@@ -219,7 +219,7 @@ export FILE_LABEL = $(GRAPH_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 # ALGORITHM Flow
 # =========================================================
 export PULL_PUSH        = 0
-export ALGORITHMS       = 9
+export ALGORITHMS       = 0
 # =========================================================
 
 # =========================================================
