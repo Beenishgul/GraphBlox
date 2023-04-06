@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : glay_req_pkg.sv
+// File   : glay_memory_pkg.sv
 // Create : 2022-11-29 16:14:59
 // Revise : 2022-11-29 16:14:59
 // Editor : sublime text4, tab size (4)
@@ -18,7 +18,7 @@
 `include "iob_lib.vh"
 `include "iob-cache.vh"
 
-package GLAY_REQ_PKG;
+package GLAY_MEMORY_PKG;
 
 import GLAY_GLOBALS_PKG::*;
 
