@@ -76,6 +76,21 @@ module glay_kernel_setup #(
     logic fifo_setup_signal_reg;
 
 // --------------------------------------------------------------------------------------
+//  Serial Read Engine Signals
+// --------------------------------------------------------------------------------------
+
+    SerialReadEngineConfiguration serial_read_config_reg                  ;
+    MemoryRequestPacket           serial_read_engine_req_out_reg          ;
+    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg ;
+    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg  ;
+    logic                         serial_read_engine_fifo_setup_signal_reg;
+    logic                         serial_read_engine_in_start_reg         ;
+    logic                         serial_read_engine_out_ready_reg        ;
+    logic                         serial_read_engine_out_done_reg         ;
+    logic                         serial_read_engine_out_pause_reg        ;
+
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -209,9 +224,9 @@ module glay_kernel_setup #(
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             SETUP_KERNEL_REQ_BUSY : begin
-                kernel_setup_done                            <= serial_read_engine_out_done_reg & ~serial_read_engine_fifo_out_signals_reg.empty;
+                kernel_setup_done                            <= serial_read_engine_out_done_reg & serial_read_engine_fifo_out_signals_reg.empty;
                 kernel_setup_start                           <= 1'b0;
-                serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty;
+                serial_read_engine_fifo_in_signals_reg.rd_en <= ~serial_read_engine_fifo_out_signals_reg.empty & ~req_out_fifo_out_signals_reg.prog_full;
                 serial_read_engine_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
@@ -229,14 +244,6 @@ module glay_kernel_setup #(
 // Generate Requests Logic
 // --------------------------------------------------------------------------------------
 
-    SerialReadEngineConfiguration serial_read_config_reg                  ;
-    MemoryRequestPacket           serial_read_engine_req_out_reg          ;
-    FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg ;
-    FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg  ;
-    logic                         serial_read_engine_fifo_setup_signal_reg;
-    logic                         serial_read_engine_in_start_reg         ;
-    logic                         serial_read_engine_out_ready_reg        ;
-    logic                         serial_read_engine_out_done_reg         ;
 
 
     // --------------------------------------------------------------------------------------
@@ -269,7 +276,8 @@ module glay_kernel_setup #(
         .fifo_setup_signal           (serial_read_engine_fifo_setup_signal_reg),
         .serial_read_engine_in_start (serial_read_engine_in_start_reg         ),
         .serial_read_engine_out_ready(serial_read_engine_out_ready_reg        ),
-        .serial_read_engine_out_done (serial_read_engine_out_done_reg         )
+        .serial_read_engine_out_done (serial_read_engine_out_done_reg         ),
+        .serial_read_engine_out_pause(serial_read_engine_out_pause_reg        )
     );
 
 // --------------------------------------------------------------------------------------
@@ -305,7 +313,7 @@ module glay_kernel_setup #(
 // FIFO cache requests out inst_fifo_167x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
     assign req_out_fifo_in_signals_reg.wr_en = glay_setup_mem_req_out_din.valid;
-    assign glay_setup_mem_resp_in_dout.valid = req_out_fifo_out_signals_reg.valid;
+    assign glay_setup_mem_req_out_dout.valid = req_out_fifo_out_signals_reg.valid;
     assign glay_setup_mem_req_out_din        = serial_read_engine_req_out_reg;
 
     fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (

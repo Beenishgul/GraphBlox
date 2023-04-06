@@ -51,7 +51,8 @@ module serial_read_engine #(
     output logic                         fifo_setup_signal           ,
     input  logic                         serial_read_engine_in_start ,
     output logic                         serial_read_engine_out_ready,
-    output logic                         serial_read_engine_out_done
+    output logic                         serial_read_engine_out_done ,
+    output logic                         serial_read_engine_out_pause
 );
 
     logic engine_areset ;
@@ -75,6 +76,7 @@ module serial_read_engine #(
     logic serial_read_engine_in_start_reg ;
     logic serial_read_engine_out_ready_reg;
     logic serial_read_engine_out_done_reg ;
+    logic serial_read_engine_out_pause_reg;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -142,6 +144,7 @@ module serial_read_engine #(
             req_out_fifo_out_signals         <= req_out_fifo_out_signals_reg;
             serial_read_engine_out_ready     <= serial_read_engine_out_ready_reg;
             serial_read_engine_out_done      <= serial_read_engine_out_done_reg;
+            serial_read_engine_out_pause     <= serial_read_engine_out_pause_reg;
         end
     end
 
