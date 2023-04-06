@@ -383,6 +383,81 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 
+# ----------------------------------------------------------------------------
+# generate Asymmetric Simple_Dual_Port_RAM asym_bram_64wrtx512rd
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM (64bit write - 512bit read - 32 entries): asym_bram_64wrtx512rdx32"]" 
+
+set module_name asym_bram_64wrtx512rdx32
+create_ip -name blk_mem_gen \
+          -vendor xilinx.com \
+          -library ip \
+          -version 8.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                                \
+                    CONFIG.Memory_Type {Simple_Dual_Port_RAM}                                           \
+                    CONFIG.Assume_Synchronous_Clk {true}                                                \
+                    CONFIG.Write_Width_A {64}                                                           \
+                    CONFIG.Write_Depth_A {256}                                                          \
+                    CONFIG.Read_Width_A {64}                                                            \
+                    CONFIG.Operating_Mode_A {NO_CHANGE}                                                 \
+                    CONFIG.Write_Width_B {512}                                                          \
+                    CONFIG.Read_Width_B {512}                                                           \
+                    CONFIG.Operating_Mode_B {READ_FIRST}                                                \
+                    CONFIG.Enable_B {Use_ENB_Pin}                                                       \
+                    CONFIG.Register_PortA_Output_of_Memory_Primitives {false}                           \
+                    CONFIG.Register_PortB_Output_of_Memory_Primitives {true}                            \
+                    CONFIG.Register_PortB_Output_of_Memory_Core {true}                                  \
+                    CONFIG.Port_B_Clock {100}                                                           \
+                    CONFIG.Port_B_Enable_Rate {100}                                                     \
+                    ] [get_ips ${module_name}]
+
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate Asymmetric Simple_Dual_Port_RAM asym_bram_512wrtx64rdx32
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM (512bit write - 64bit read - 32 entries): asym_bram_512wrtx64rdx32"]" 
+
+
+set module_name asym_bram_512wrtx64rdx32
+create_ip -name blk_mem_gen \
+          -vendor xilinx.com \
+          -library ip \
+          -version 8.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                                \
+                    CONFIG.Memory_Type {Simple_Dual_Port_RAM}                                           \
+                    CONFIG.Assume_Synchronous_Clk {true}                                                \
+                    CONFIG.Write_Width_A {512}                                                          \
+                    CONFIG.Write_Depth_A {32}                                                           \
+                    CONFIG.Read_Width_A {512}                                                           \
+                    CONFIG.Operating_Mode_A {NO_CHANGE}                                                 \
+                    CONFIG.Write_Width_B {64}                                                           \
+                    CONFIG.Read_Width_B {64}                                                            \
+                    CONFIG.Operating_Mode_B {READ_FIRST}                                                \
+                    CONFIG.Enable_B {Use_ENB_Pin}                                                       \
+                    CONFIG.Register_PortA_Output_of_Memory_Primitives {false}                           \
+                    CONFIG.Register_PortB_Output_of_Memory_Primitives {true}                            \
+                    CONFIG.Register_PortB_Output_of_Memory_Core {true}                                  \
+                    CONFIG.Port_B_Clock {100}                                                           \
+                    CONFIG.Port_B_Enable_Rate {100}                                                     \
+                    ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate arb_master_2x1
