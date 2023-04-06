@@ -105,14 +105,14 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
-            glay_setup_mem_resp_in_din.valid <= 0;
-            resp_in_fifo_in_signals_reg      <= 0;
-            req_out_fifo_in_signals_reg      <= 0;
+            glay_setup_mem_resp_in_din.valid  <= 0;
+            resp_in_fifo_in_signals_reg.rd_en <= 0;
+            req_out_fifo_in_signals_reg.rd_en <= 0;
         end
         else begin
-            glay_setup_mem_resp_in_din.valid <= glay_setup_mem_resp_in.valid;
-            resp_in_fifo_in_signals_reg      <= resp_in_fifo_in_signals;
-            req_out_fifo_in_signals_reg      <= req_out_fifo_in_signals;
+            glay_setup_mem_resp_in_din.valid  <= glay_setup_mem_resp_in.valid;
+            resp_in_fifo_in_signals_reg.rd_en <= resp_in_fifo_in_signals.rd_en;
+            req_out_fifo_in_signals_reg.rd_en <= req_out_fifo_in_signals.rd_en;
         end
     end
 
