@@ -128,6 +128,17 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_711x32/sim/fifo_711x32.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
+ewtext=""
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_64wrtx512rdx32/simulation/blk_mem_gen_v8_4.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_64wrtx512rdx32/sim/asym_bram_64wrtx512rdx32.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_512wrtx64rdx32/sim/asym_bram_512wrtx64rdx32.v"
+echo $newtext >> ${CFG_FILE_NAME}
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 

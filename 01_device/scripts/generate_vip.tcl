@@ -386,7 +386,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate Asymmetric Simple_Dual_Port_RAM asym_bram_64wrtx512rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM (64bit write - 512bit read - 32 entries): asym_bram_64wrtx512rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: asym_bram_64wrtx512rdx32"]" 
 
 set module_name asym_bram_64wrtx512rdx32
 create_ip -name blk_mem_gen \
@@ -424,7 +424,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate Asymmetric Simple_Dual_Port_RAM asym_bram_512wrtx64rdx32
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM (512bit write - 64bit read - 32 entries): asym_bram_512wrtx64rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: asym_bram_512wrtx64rdx32"]" 
 
 
 set module_name asym_bram_512wrtx64rdx32

@@ -101,3 +101,9 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_711x32/fifo_711x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_64wrtx512rdx32/asym_bram_64wrtx512rdx32.xci"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_512wrtx64rdx32/asym_bram_512wrtx64rdx32.xci"
+echo $newtext >> ${CFG_FILE_NAME}
+
