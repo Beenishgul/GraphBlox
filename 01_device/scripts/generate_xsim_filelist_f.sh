@@ -30,7 +30,11 @@ glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
 glay_testbench="testbench"
+
+glay_memory="memory"
 glay_cache="cache"
+glay_generator="generator"
+
 glay_control="control"
 glay_utils="utils"
 glay_utils_arbiter="arbiter"
@@ -67,7 +71,9 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_counter}/ ${CFG_FILE_NAME} "sv"  
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_cache}/ ${CFG_FILE_NAME} "v" 
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_generator}/ ${CFG_FILE_NAME} "sv"  
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
 

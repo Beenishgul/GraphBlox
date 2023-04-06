@@ -27,7 +27,11 @@ glay_pkgs="pkg"
 glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
+
+glay_memory="memory"
 glay_cache="cache"
+glay_generator="generator"
+
 glay_control="control"
 glay_utils="utils"
 glay_utils_arbiter="arbiter"
@@ -59,9 +63,11 @@ echo $newtext > ${CFG_FILE_NAME}
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_cache}/ ${CFG_FILE_NAME} "v"  
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_cache}/ ${CFG_FILE_NAME} "v" 
+
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_generator}/ ${CFG_FILE_NAME} "sv"  
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_include}/ ${CFG_FILE_NAME} "vh" 
 
