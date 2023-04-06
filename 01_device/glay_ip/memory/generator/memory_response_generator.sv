@@ -16,7 +16,7 @@ import GLAY_AXI4_PKG::*;
 import GLAY_GLOBALS_PKG::*;
 import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
-import GLAY_REQ_PKG::*;
+import GLAY_MEMORY_PKG::*;
 
 module memory_response_generator #(
   parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
