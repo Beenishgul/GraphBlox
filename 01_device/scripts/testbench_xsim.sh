@@ -29,7 +29,7 @@ ip_directory=$4
 ctrl_mode=$5
 
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f -i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/cache/iob_include -i ${app_directory}/${ip_directory}/cache/iob_include/portmaps -L xilinx_vip --sv"
+xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f -i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps -L xilinx_vip --sv"
 xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
 xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info

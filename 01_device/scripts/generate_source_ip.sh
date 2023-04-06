@@ -26,7 +26,11 @@ glay_pkgs="pkg"
 glay_engine="engine"
 glay_kernel="kernel"
 glay_top="top"
+
+glay_memory="memory"
 glay_cache="cache"
+glay_generator="generator"
+
 glay_testbench="testbench"
 glay_control="control"
 glay_utils="utils"
@@ -39,7 +43,7 @@ mkdir -p ${ACTIVE_IP_DIR}/${glay_pkgs}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_engine}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_kernel}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_top}
-mkdir -p ${ACTIVE_IP_DIR}/${glay_cache}
+mkdir -p ${ACTIVE_IP_DIR}/${glay_memory}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_testbench}/${MODULE}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_control}
 mkdir -p ${ACTIVE_IP_DIR}/${glay_utils}
@@ -49,7 +53,7 @@ cp -r ${ORIGINAL_IP_DIR}/${glay_pkgs}/* ${ACTIVE_IP_DIR}/${glay_pkgs}
 cp -r ${ORIGINAL_IP_DIR}/${glay_engine}/* ${ACTIVE_IP_DIR}/${glay_engine}
 cp -r ${ORIGINAL_IP_DIR}/${glay_kernel}/* ${ACTIVE_IP_DIR}/${glay_kernel}
 cp -r ${ORIGINAL_IP_DIR}/${glay_top}/* ${ACTIVE_IP_DIR}/${glay_top}
-cp -r ${ORIGINAL_IP_DIR}/${glay_cache}/* ${ACTIVE_IP_DIR}/${glay_cache}
+cp -r ${ORIGINAL_IP_DIR}/${glay_memory}/* ${ACTIVE_IP_DIR}/${glay_memory}
 cp -r ${ORIGINAL_IP_DIR}/${glay_utils}/* ${ACTIVE_IP_DIR}/${glay_utils}
 cp -r ${ORIGINAL_IP_DIR}/${glay_testbench}/${MODULE}/* ${ACTIVE_IP_DIR}/${glay_testbench}/${MODULE}
 

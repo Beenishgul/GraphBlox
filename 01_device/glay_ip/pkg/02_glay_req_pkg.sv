@@ -44,6 +44,35 @@ typedef struct packed {
 } FIFOStateSignalsInput;
 
 // --------------------------------------------------------------------------------------
+//   Generic Memory request packet
+// --------------------------------------------------------------------------------------
+
+typedef enum int unsigned {
+  CMD_INVALID,
+  CMD_READ,
+  CMD_WRITE,
+  CMD_PREFETCH_READ,
+  CMD_PREFETCH_WRITE
+} command_type;
+
+// --------------------------------------------------------------------------------------
+//   Graph CSR structure types
+// --------------------------------------------------------------------------------------
+
+typedef enum int unsigned {
+  STRUCT_INVALID,
+  STRUCT_OUT_DEGREE,
+  STRUCT_IN_DEGREE,
+  STRUCT_EDGES_IDX,
+  STRUCT_INV_OUT_DEGREE,
+  STRUCT_INV_IN_DEGREE,
+  STRUCT_INV_EDGES_IDX,
+  STRUCT_AUXILIARY_1_DATA,
+  STRUCT_AUXILIARY_2_DATA,
+  STRUCT_KERNEL_SETUP
+} structure_type;
+
+// --------------------------------------------------------------------------------------
 // Cache requests in GlayCacheRequestInterfaceOutput
 // --------------------------------------------------------------------------------------
 
@@ -92,35 +121,6 @@ typedef struct packed {
   logic                                  valid  ;
   GlayCacheRequestInterfaceOutputPayload payload;
 } GlayCacheRequestInterfaceOutput;
-
-// --------------------------------------------------------------------------------------
-//   Generic Memory request packet
-// --------------------------------------------------------------------------------------
-
-typedef enum int unsigned {
-  CMD_INVALID,
-  CMD_READ,
-  CMD_WRITE,
-  CMD_PREFETCH_READ,
-  CMD_PREFETCH_WRITE
-} command_type;
-
-// --------------------------------------------------------------------------------------
-//   Graph CSR structure types
-// --------------------------------------------------------------------------------------
-
-typedef enum int unsigned {
-  STRUCT_INVALID,
-  STRUCT_OUT_DEGREE,
-  STRUCT_IN_DEGREE,
-  STRUCT_EDGES_IDX,
-  STRUCT_INV_OUT_DEGREE,
-  STRUCT_INV_IN_DEGREE,
-  STRUCT_INV_EDGES_IDX,
-  STRUCT_AUXILIARY_1_DATA,
-  STRUCT_AUXILIARY_2_DATA,
-  STRUCT_KERNEL_SETUP
-} structure_type;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
