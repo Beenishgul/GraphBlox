@@ -145,7 +145,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_638x128_GlayCacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput : fifo_638x128"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_638x128"]" 
 
 set module_name fifo_638x128
 create_ip -name fifo_generator \
@@ -185,7 +185,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_516x128_GlayCacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x128"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheResponse: fifo_516x128"]" 
 
 set module_name fifo_516x128
 create_ip -name fifo_generator \
