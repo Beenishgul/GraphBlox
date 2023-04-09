@@ -111,15 +111,15 @@ module memory_response_generator #(
 // --------------------------------------------------------------------------------------
 // GLay Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
-  GlayControlChainInterfaceOutput glay_kernel_setup_control_state           ;
-  GLAYDescriptorInterface         glay_kernel_setup_descriptor              ;
-  MemoryResponsePacket            glay_kernel_setup_mem_resp_in             ;
-  FIFOStateSignalsOutput          glay_kernel_setup_resp_in_fifo_out_signals;
-  FIFOStateSignalsInput           glay_kernel_setup_resp_in_fifo_in_signals ;
-  MemoryRequestPacket             glay_kernel_setup_mem_req_out             ;
-  FIFOStateSignalsOutput          glay_kernel_setup_req_fifo_out_signals    ;
-  FIFOStateSignalsInput           glay_kernel_setup_req_fifo_in_signals     ;
-  logic                           glay_kernel_setup_fifo_setup_signal       ;
+  GlayControlChainInterfaceOutput glay_kernel_setup_control_state        ;
+  GLAYDescriptorInterface         glay_kernel_setup_descriptor           ;
+  MemoryResponsePacket            glay_kernel_setup_mem_resp_in          ;
+  FIFOStateSignalsOutput          glay_kernel_setup_resp_fifo_out_signals;
+  FIFOStateSignalsInput           glay_kernel_setup_resp_fifo_in_signals ;
+  MemoryRequestPacket             glay_kernel_setup_mem_req_out          ;
+  FIFOStateSignalsOutput          glay_kernel_setup_req_fifo_out_signals ;
+  FIFOStateSignalsInput           glay_kernel_setup_req_fifo_in_signals  ;
+  logic                           glay_kernel_setup_fifo_setup_signal    ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -430,8 +430,8 @@ module memory_response_generator #(
     .glay_control_state           (glay_kernel_setup_control_state           ),
     .glay_descriptor              (glay_kernel_setup_descriptor              ),
     .glay_setup_mem_resp_in       (glay_kernel_setup_mem_resp_in             ),
-    .resp_in_fifo_out_signals     (glay_kernel_setup_resp_in_fifo_out_signals),
-    .resp_in_fifo_in_signals      (glay_kernel_setup_resp_in_fifo_in_signals ),
+    .resp_fifo_out_signals     (glay_kernel_setup_resp_fifo_out_signals),
+    .resp_fifo_in_signals      (glay_kernel_setup_resp_fifo_in_signals ),
     .glay_kernel_setup_mem_req_out(glay_kernel_setup_mem_req_out             ),
     .req_fifo_out_signals         (glay_kernel_setup_req_fifo_out_signals    ),
     .req_fifo_in_signals          (glay_kernel_setup_req_fifo_in_signals     ),
