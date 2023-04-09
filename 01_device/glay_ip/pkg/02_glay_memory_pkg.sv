@@ -73,7 +73,7 @@ typedef enum int unsigned {
 } structure_type;
 
 // --------------------------------------------------------------------------------------
-// Cache requests in GlayCacheRequestInterfaceOutput
+// Cache requests in GlayCacheRequest
 // --------------------------------------------------------------------------------------
 
 // SIZE = 516 bits
@@ -92,17 +92,17 @@ typedef struct packed {
     logic force_inv_in; //force 1'b0 if unused
     logic wtb_empty_in; //force 1'b1 if unused
   `endif
-} GlayCacheRequestInterfaceInputPayload;
+} GlayCacheRequestPayload;
 
 
 // SIZE = 644 - 6(CACHE_FRONTEND_BYTE_W) = 638 bits
 typedef struct packed {
-  logic                                 valid  ;
-  GlayCacheRequestInterfaceInputPayload payload;
-} GlayCacheRequestInterfaceInput;
+  logic                   valid  ;
+  GlayCacheRequestPayload payload;
+} GlayCacheRequest;
 
 // --------------------------------------------------------------------------------------
-// Cache requests out GlayCacheRequestInterfaceOutput
+// Cache response out GlayCacheResponse
 // --------------------------------------------------------------------------------------
 
 typedef struct packed {
@@ -113,14 +113,14 @@ typedef struct packed {
     logic force_inv_out;
     logic wtb_empty_out;
   `endif
-} GlayCacheRequestInterfaceOutputPayload;
+} GlayCacheResponsePayload;
 
 
 // SIZE = 516 bits
 typedef struct packed {
-  logic                                  valid  ;
-  GlayCacheRequestInterfaceOutputPayload payload;
-} GlayCacheRequestInterfaceOutput;
+  logic                    valid  ;
+  GlayCacheResponsePayload payload;
+} GlayCacheResponse;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
@@ -135,7 +135,7 @@ typedef struct packed{
 } MemoryRequestPacketPayload;
 
 typedef struct packed{
-  logic                      valid   ;
+  logic                      valid  ;
   MemoryRequestPacketPayload payload;
 } MemoryRequestPacket;
 
