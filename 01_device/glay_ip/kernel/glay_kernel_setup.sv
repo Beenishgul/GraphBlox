@@ -28,16 +28,16 @@ module glay_kernel_setup #(
     parameter COUNTER_WIDTH       = 32
 ) (
     // System Signals
-    input  logic                           ap_clk                ,
-    input  logic                           areset                ,
-    input  GlayControlChainInterfaceOutput glay_control_state    ,
-    input  GLAYDescriptorInterface         glay_descriptor       ,
-    input  MemoryResponsePacket            glay_setup_mem_resp_in,
-    output FIFOStateSignalsOutput          resp_fifo_out_signals ,
-    input  FIFOStateSignalsInput           resp_fifo_in_signals  ,
-    output MemoryRequestPacket             glay_setup_mem_req_out,
-    output FIFOStateSignalsOutput          req_fifo_out_signals  ,
-    input  FIFOStateSignalsInput           req_fifo_in_signals   ,
+    input  logic                           ap_clk                       ,
+    input  logic                           areset                       ,
+    input  GlayControlChainInterfaceOutput glay_control_state           ,
+    input  GLAYDescriptorInterface         glay_descriptor              ,
+    input  MemoryResponsePacket            glay_setup_mem_resp_in       ,
+    output FIFOStateSignalsOutput          resp_fifo_out_signals        ,
+    input  FIFOStateSignalsInput           resp_fifo_in_signals         ,
+    output MemoryRequestPacket             glay_kernel_setup_mem_req_out,
+    output FIFOStateSignalsOutput          req_fifo_out_signals         ,
+    input  FIFOStateSignalsInput           req_fifo_in_signals          ,
     output logic                           fifo_setup_signal
 );
 
@@ -140,19 +140,19 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (setup_areset) begin
-            fifo_setup_signal            <= 1;
-            glay_setup_mem_req_out.valid <= 0;
+            fifo_setup_signal                   <= 1;
+            glay_kernel_setup_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal            <= fifo_setup_signal_reg;
-            glay_setup_mem_req_out.valid <= glay_setup_mem_req_dout.valid & req_fifo_out_signals_reg.valid ;
+            fifo_setup_signal                   <= fifo_setup_signal_reg;
+            glay_kernel_setup_mem_req_out.valid <= glay_setup_mem_req_dout.valid & req_fifo_out_signals_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        req_fifo_out_signals           <= req_fifo_out_signals_reg;
-        resp_fifo_out_signals          <= resp_fifo_out_signals_reg;
-        glay_setup_mem_req_out.payload <= glay_setup_mem_req_dout.payload;
+        req_fifo_out_signals                  <= req_fifo_out_signals_reg;
+        resp_fifo_out_signals                 <= resp_fifo_out_signals_reg;
+        glay_kernel_setup_mem_req_out.payload <= glay_setup_mem_req_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
