@@ -223,9 +223,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_638x128_GlayCacheRequestInterfaceInput
+# generate fifo_638x128_GlayCacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceInput : fifo_638x32"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_638x32"]" 
 
 set module_name fifo_638x32
 create_ip -name fifo_generator \
@@ -263,9 +263,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_516x32_GlayCacheRequestInterfaceOutput
+# generate fifo_516x32_GlayCacheResponse
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequestInterfaceOutput: fifo_516x32"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheResponse: fifo_516x32"]" 
 
 set module_name fifo_516x32
 create_ip -name fifo_generator \
@@ -303,9 +303,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_138x32_GlayCacheRequestInterfaceOutput
+# generate fifo_167x32_GLayMemoryRequestPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_167x32"]" 
+puts "[color 2 "                        Generate FIFO GLayMemoryRequestPacket: fifo_167x32"]" 
 
 set module_name fifo_167x32
 create_ip -name fifo_generator \
@@ -343,9 +343,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_654x32_GlayCacheRequestInterfaceOutput
+# generate fifo_654x32_MemoryResponsePacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_711x32"]" 
+puts "[color 2 "                        Generate FIFO GLayMemoryResponsePacket: fifo_711x32"]" 
 
 set module_name fifo_711x32
 create_ip -name fifo_generator \
