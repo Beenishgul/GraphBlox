@@ -37,19 +37,13 @@ module cache_request_generator #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic                          m_axi_areset             ;
-  logic                          control_areset           ;
-  logic                          cache_areset             ;
-  logic                          fifo_areset              ;
-  logic                          arbiter_areset           ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] glay_cu_done_reg         ;
-  logic [       NUM_MODULES-1:0] glay_cu_setup_state      ;
-  logic                          fifo_setup_signal_638x128;
-  logic                          fifo_setup_signal_516x128;
+  logic control_areset           ;
+  logic fifo_areset              ;
+  logic arbiter_areset           ;
+  logic fifo_setup_signal_638x128;
 
 
-  GLAYDescriptorInterface      glay_descriptor_in_reg;
-  logic [VERTEX_DATA_BITS-1:0] counter               ;
+  GLAYDescriptorInterface glay_descriptor_in_reg;
 
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals

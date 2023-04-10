@@ -23,13 +23,13 @@ module cache_response_generator #(
   parameter NUM_MODULES        = 3              ,
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
-  input  logic                   ap_clk                       ,
-  input  logic                   areset                       ,
-  input  GLAYDescriptorInterface glay_descriptor_in           ,
-  output MemoryRequestPacket     mem_req_out [NUM_MODULES-1:0],
-  input  GlayCacheRequest        glay_cache_req_in            ,
-  output FIFOStateSignalsOutput  mem_req_fifo_out_signals     ,
-  input  FIFOStateSignalsInput   mem_req_fifo_in_signals      ,
+  input  logic                   ap_clk                                    ,
+  input  logic                   areset                                    ,
+  input  GLAYDescriptorInterface glay_descriptor_in                        ,
+  output MemoryRequestPacket     mem_req_out [NUM_MODULES-1:0]             ,
+  input  GlayCacheRequest        glay_cache_req_in                         ,
+  output FIFOStateSignalsOutput  mem_req_fifo_out_signals [NUM_MODULES-1:0],
+  input  FIFOStateSignalsInput   mem_req_fifo_in_signals  [NUM_MODULES-1:0],
   output logic                   fifo_setup_signal
 );
 
