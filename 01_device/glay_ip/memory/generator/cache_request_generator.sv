@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : memory_response_generator.sv
+// File   : cache_request_generator.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -18,7 +18,7 @@ import GLAY_DESCRIPTOR_PKG::*;
 import GLAY_CONTROL_PKG::*;
 import GLAY_MEMORY_PKG::*;
 
-module memory_response_generator #(
+module cache_request_generator #(
   parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
   parameter NUM_MODULES        = 3              ,
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
@@ -425,17 +425,17 @@ module memory_response_generator #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_glay_kernel_setup (
-    .ap_clk                       (ap_clk                                    ),
-    .areset                       (setup_areset                              ),
-    .glay_control_state           (glay_kernel_setup_control_state           ),
-    .glay_descriptor              (glay_kernel_setup_descriptor              ),
-    .glay_setup_mem_resp_in       (glay_kernel_setup_mem_resp_in             ),
-    .resp_fifo_out_signals     (glay_kernel_setup_resp_fifo_out_signals),
-    .resp_fifo_in_signals      (glay_kernel_setup_resp_fifo_in_signals ),
-    .glay_kernel_setup_mem_req_out(glay_kernel_setup_mem_req_out             ),
-    .req_fifo_out_signals         (glay_kernel_setup_req_fifo_out_signals    ),
-    .req_fifo_in_signals          (glay_kernel_setup_req_fifo_in_signals     ),
-    .fifo_setup_signal            (glay_kernel_setup_fifo_setup_signal       )
+    .ap_clk                       (ap_clk                                 ),
+    .areset                       (setup_areset                           ),
+    .glay_control_state           (glay_kernel_setup_control_state        ),
+    .glay_descriptor              (glay_kernel_setup_descriptor           ),
+    .glay_setup_mem_resp_in       (glay_kernel_setup_mem_resp_in          ),
+    .resp_fifo_out_signals        (glay_kernel_setup_resp_fifo_out_signals),
+    .resp_fifo_in_signals         (glay_kernel_setup_resp_fifo_in_signals ),
+    .glay_kernel_setup_mem_req_out(glay_kernel_setup_mem_req_out          ),
+    .req_fifo_out_signals         (glay_kernel_setup_req_fifo_out_signals ),
+    .req_fifo_in_signals          (glay_kernel_setup_req_fifo_in_signals  ),
+    .fifo_setup_signal            (glay_kernel_setup_fifo_setup_signal    )
   );
 
-endmodule : memory_response_generator
+endmodule : cache_request_generator
