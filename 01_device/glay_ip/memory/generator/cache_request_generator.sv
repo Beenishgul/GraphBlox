@@ -30,9 +30,9 @@ module cache_request_generator #(
   input  GLAYDescriptorInterface glay_descriptor_in          ,
   input  MemoryRequestPacket     mem_req_in [NUM_MODULES-1:0],
   output GlayCacheRequest        glay_cache_req_out          ,
-  output FIFOStateSignalsOutput  mem_req_fifo_out_signals    ,
-  input  FIFOStateSignalsInput   mem_req_fifo_in_signals     ,
-  input  logic                   mem_resp_valid_in           ,
+  output FIFOStateSignalsOutput  cache_req_fifo_out_signals  ,
+  input  FIFOStateSignalsInput   cache_req_fifo_in_signals   ,
+  input  logic                   cache_resp_valid_in         ,
   output logic                   fifo_setup_signal
 );
 
