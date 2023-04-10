@@ -23,7 +23,6 @@ module cache_request_generator #(
   parameter NUM_MODULES        = 3              ,
   parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
-  // System Signals
   input  logic                   ap_clk                      ,
   input  logic                   areset                      ,
   input  GLAYDescriptorInterface glay_descriptor_in          ,
