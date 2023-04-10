@@ -19,9 +19,11 @@ import GLAY_CONTROL_PKG::*;
 import GLAY_MEMORY_PKG::*;
 
 module cache_request_generator #(
-  parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-  parameter NUM_MODULES        = 3              ,
-  parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
+  parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL            ,
+  parameter         NUM_MODULES               = 2                          ,
+  parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL             ,
+  parameter integer OUTSTANDING_COUNTER_MAX   = 16                         ,
+  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(C_MAX_OUTSTANDING+1)
 ) (
   input  logic                   ap_clk                      ,
   input  logic                   areset                      ,
@@ -30,6 +32,7 @@ module cache_request_generator #(
   output GlayCacheRequest        glay_cache_req_out          ,
   output FIFOStateSignalsOutput  mem_req_fifo_out_signals    ,
   input  FIFOStateSignalsInput   mem_req_fifo_in_signals     ,
+  input  logic                   mem_resp_valid_in           ,
   output logic                   fifo_setup_signal
 );
 
@@ -37,18 +40,17 @@ module cache_request_generator #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic control_areset           ;
-  logic fifo_areset              ;
-  logic arbiter_areset           ;
-  logic fifo_setup_signal_638x128;
-
-
-  GLAYDescriptorInterface glay_descriptor_in_reg;
-
+  logic                   control_areset                            ;
+  logic                   fifo_areset                               ;
+  logic                   arbiter_areset                            ;
+  logic                   counter_areset                            ;
+  logic                   fifo_setup_signal_638x128                 ;
+  logic                   mem_resp_valid_reg                        ;
+  GLAYDescriptorInterface glay_descriptor_in_reg                    ;
+  MemoryRequestPacket     mem_req_reg              [NUM_MODULES-1:0];
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
-
   GlayCacheRequest glay_cache_req_fifo_dout;
   GlayCacheRequest glay_cache_req_fifo_din ;
 
@@ -58,16 +60,18 @@ module cache_request_generator #(
 
   FIFOStateSignalsInput cache_req_fifo_in_signals;
 
-  logic force_inv_in;
-  logic wtb_empty_in;
-
-  assign force_inv_in = 1'b0;
-  assign wtb_empty_in = 1'b1;
+// --------------------------------------------------------------------------------------
+//   Transaction Counter Signals
+// --------------------------------------------------------------------------------------
+  logic                                 counter_incr             ;
+  logic                                 counter_decr             ;
+  logic                                 stall                    ;
+  logic [OUTSTANDING_COUNTER_WIDTH-1:0] outstanding_counter_count;
 
 // --------------------------------------------------------------------------------------
 // Bus arbiter Signals fifo_638x128_GlayCacheRequest
 // --------------------------------------------------------------------------------------
-  localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = 2                           ;
+  localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = NUM_MODULES                 ;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(MemoryRequestPacket)  ;
 
@@ -84,24 +88,51 @@ module cache_request_generator #(
     control_areset <= areset;
     fifo_areset    <= areset;
     arbiter_areset <= areset;
+    counter_areset <= areset;
   end
 
 // --------------------------------------------------------------------------------------
-// Done Logic
+// Drive output
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      fifo_setup_signal <= 0;
+      fifo_setup_signal  <= 0;
+      glay_cache_req_out <= 0;
     end
     else begin
-      fifo_setup_signal <= fifo_setup_signal_638x128;
+      fifo_setup_signal        <= fifo_setup_signal_638x128;
+      glay_cache_req_out.valid <= glay_cache_req_fifo_dout.valid;
     end
   end
 
+  always_ff @(posedge ap_clk) begin
+    glay_descriptor_in_reg.payload <= glay_descriptor_in.payload;
+    glay_cache_req_out.payload     <= glay_cache_req_fifo_dout.payload;
+  end
 
 // --------------------------------------------------------------------------------------
-// READ GLAY Descriptor Control
+// Drive input
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      mem_req_reg[0].valid  <= 0;
+      mem_req_reg[1].valid  <= 0;
+      mem_resp_valid_reg <= 0;
+    end
+    else begin
+      mem_req_reg[0].valid  <= mem_req_in[0].valid;
+      mem_req_reg[1].valid  <= mem_req_in[0].valid;
+      mem_resp_valid_reg <= mem_resp_valid_in;
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    mem_req_reg[0].payload  <= mem_req_in[0].payload ;
+    mem_req_reg[1].payload  <= mem_req_in[1].payload ;
+  end
+
+// --------------------------------------------------------------------------------------
+// Control
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
@@ -119,8 +150,10 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign fifo_setup_signal_638x128 = cache_resp_fifo_out_signals.wr_rst_busy | cache_resp_fifo_out_signals.rd_rst_busy ;
-
+  assign fifo_setup_signal_638x128              = cache_resp_fifo_out_signals.wr_rst_busy | cache_resp_fifo_out_signals.rd_rst_busy ;
+  assign cache_req_fifo_in_signals.rd_en        = ~stall;
+  assign glay_cache_req_fifo_dout.valid         = cache_req_fifo_out_signals.valid;
+  assign glay_cache_req_fifo_dout.payload.valid = cache_req_fifo_out_signals.valid;
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_638x128_GlayCacheRequest
 // --------------------------------------------------------------------------------------
@@ -145,20 +178,18 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_638x128_GlayCacheRequest
 // --------------------------------------------------------------------------------------
-  assign bus_in[0] = mem_req_in[0];
-  assign req[0]    = mem_req_in[0].valid;
+  assign bus_in[0] = mem_req_reg[0];
+  assign req[0]    = mem_req_reg[0].valid;
 
-  assign bus_in[1] = mem_req_in[1];
-  assign req[1]    = mem_req_in[1].valid;
-
-  assign glay_cache_req_fifo_din = bus_out;
+  assign bus_in[1] = mem_req_reg[1];
+  assign req[1]    = mem_req_reg[1].valid;
 
   bus_arbiter_N_in_1_out #(
     .WIDTH    (BUS_ARBITER_N_IN_1_OUT_WIDTH    ),
     .BUS_WIDTH(BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH),
     .BUS_NUM  (BUS_ARBITER_N_IN_1_OUT_BUS_NUM  )
   ) inst_bus_arbiter_N_in_1_out (
-    .enable (1'b1          ),
+    .enable (1'db1         ),
     .req    (req           ),
     .bus_in (bus_in        ),
     .grant  (grant         ),
@@ -166,5 +197,60 @@ module cache_request_generator #(
     .ap_clk (ap_clk        ),
     .areset (arbiter_areset)
   );
+
+// --------------------------------------------------------------------------------------
+// Generate Cache requests from generic memory requests
+// --------------------------------------------------------------------------------------
+  assign cache_req_fifo_in_signals.rd_en = glay_cache_req_fifo_din.valid;
+
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      glay_cache_req_fifo_din.valid <= 0;
+    end
+    else begin
+      glay_cache_req_fifo_din.valid <= bus_out.valid;
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    glay_cache_req_fifo_din.payload.addr         <= bus_out.payload.base_address + bus_out.payload.address_offset;
+    glay_cache_req_fifo_din.payload.wdata        <= 0;
+    glay_cache_req_fifo_din.payload.wstrb        <= 0;
+    glay_cache_req_fifo_din.payload.force_inv_in <= 1'b0;
+    glay_cache_req_fifo_din.payload.wtb_empty_in <= 1'b1;
+  end
+
+
+// --------------------------------------------------------------------------------------
+// Keep Track of outstanding transactions
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      counter_incr       <= 0;
+      counter_load_value <= 0;
+    end
+    else begin
+      counter_incr <= mem_resp_valid_reg;
+      counter_decr <= glay_cache_req_fifo_dout.valid;
+    end
+  end
+
+
+  glay_transactions_counter #(
+    .C_WIDTH(OUTSTANDING_COUNTER_WIDTH                            ),
+    .C_INIT (OUTSTANDING_COUNTER_MAX[0+:OUTSTANDING_COUNTER_WIDTH])
+  ) inst_glay_transactions_counter (
+    .ap_clk      (ap_clk                           ),
+    .ap_clken    (1'b1                             ),
+    .areset      (counter_areset                   ),
+    .load        (1'b0                             ),
+    .incr        (counter_incr                     ),
+    .decr        (counter_decr                     ),
+    .load_value  ({OUTSTANDING_COUNTER_WIDTH{1'b0}}),
+    .stride_value(1                                ),
+    .count       (outstanding_counter_count        ),
+    .is_zero     (stall                            )
+  );
+
 
 endmodule : cache_request_generator
