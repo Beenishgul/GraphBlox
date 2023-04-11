@@ -19,11 +19,11 @@ import GLAY_CONTROL_PKG::*;
 import GLAY_MEMORY_PKG::*;
 
 module cache_request_generator #(
-  parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL            ,
-  parameter         NUM_MEMORY_REQUESTOR      = 2                          ,
-  parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL             ,
-  parameter integer OUTSTANDING_COUNTER_MAX   = 16                         ,
-  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(C_MAX_OUTSTANDING+1)
+  parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
+  parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
+  parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
+  parameter integer OUTSTANDING_COUNTER_MAX   = 16                               ,
+  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
 ) (
   input  logic                  ap_clk                               ,
   input  logic                  areset                               ,
@@ -118,8 +118,8 @@ module cache_request_generator #(
     end
     else begin
       mem_req_reg[0].valid  <= mem_req_in[0].valid;
-      mem_req_reg[1].valid  <= mem_req_in[0].valid;
-      mem_resp_valid_reg <= mem_resp_valid_in;
+      mem_req_reg[1].valid  <= mem_req_in[1].valid;
+      mem_resp_valid_reg <= cache_resp_valid_in;
     end
   end
 
@@ -171,7 +171,7 @@ module cache_request_generator #(
     .BUS_WIDTH(BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH),
     .BUS_NUM  (BUS_ARBITER_N_IN_1_OUT_BUS_NUM  )
   ) inst_bus_arbiter_N_in_1_out (
-    .enable (1'db1         ),
+    .enable (1'b1          ),
     .req    (req           ),
     .bus_in (bus_in        ),
     .grant  (grant         ),
@@ -208,8 +208,8 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      counter_incr       <= 0;
-      counter_load_value <= 0;
+      counter_incr <= 0;
+      counter_decr <= 0;
     end
     else begin
       counter_incr <= mem_resp_valid_reg;
