@@ -58,43 +58,74 @@ module bus_arbiter_N_in_1_out #(
     input  logic                 areset
 );
 
-    logic [SELECT_WIDTH-1:0] select    ;
-    logic                    valid     ;
-    logic                    enable_reg;
-    logic [       WIDTH-1:0] grant_reg ;
+    logic                      arbiter_areset             ;
+    logic   [SELECT_WIDTH-1:0] select                     ;
+    logic                      valid                      ;
+    logic                      enable_reg                 ;
+    logic   [       WIDTH-1:0] grant_reg                  ;
+    logic   [   BUS_WIDTH-1:0] bus_reg       [0:BUS_NUM-1];
+    integer                    i                          ;
 
-    arbiter #(
-        .WIDTH       (WIDTH       ),
-        .SELECT_WIDTH(SELECT_WIDTH)
-    ) inst_arbiter (
-        .enable(enable_reg),
-        .req   (req       ),
-        .grant (grant_reg ),
-        .select(select    ),
-        .valid (valid     ),
-        .ap_clk(ap_clk    ),
-        .areset(areset    )
-    );
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        arbiter_areset <= areset;
+    end
 
-    integer i;
+// --------------------------------------------------------------------------------------
+// Drive input
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (arbiter_areset) begin
+            enable_reg <= 0;
+        end
+        else begin
+            enable_reg <= enable;
+        end
+    end
 
     always_ff @(posedge ap_clk) begin
-        if (areset) begin
+        bus_reg <= bus_in;
+    end
+
+// --------------------------------------------------------------------------------------
+// Drive output bus
+// --------------------------------------------------------------------------------------
+
+    always_ff @(posedge ap_clk) begin
+        if (arbiter_areset) begin
             bus_out <= 0;
             grant   <= 0;
         end else begin
             if (enable_reg) begin
                 for ( i = 0; i < BUS_NUM; i++) begin
-                    if (select[i]) begin
-                        bus_out <= bus_in[i];
+                    if (grant_reg[i]) begin
+                        bus_out <= bus_reg[i];
                     end
                     grant <= grant_reg;
                 end
-                if (~(|select)) begin
+                if (~(|grant_reg)) begin
                     bus_out <= 0;
                 end
             end
         end
     end
+
+// --------------------------------------------------------------------------------------
+// Arbiter instance output
+// --------------------------------------------------------------------------------------
+    arbiter #(
+        .WIDTH       (WIDTH       ),
+        .SELECT_WIDTH(SELECT_WIDTH)
+    ) inst_arbiter (
+        .enable(enable_reg    ),
+        .req   (req           ),
+        .grant (grant_reg     ),
+        .select(select        ),
+        .valid (valid         ),
+        .ap_clk(ap_clk        ),
+        .areset(arbiter_areset)
+    );
 
 endmodule : bus_arbiter_N_in_1_out

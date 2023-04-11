@@ -87,6 +87,27 @@ module cache_request_generator #(
   end
 
 // --------------------------------------------------------------------------------------
+// Drive input
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      mem_req_reg[0].valid  <= 0;
+      mem_req_reg[1].valid  <= 0;
+      mem_resp_valid_reg <= 0;
+    end
+    else begin
+      mem_req_reg[0].valid  <= mem_req_in[0].valid;
+      mem_req_reg[1].valid  <= mem_req_in[1].valid;
+      mem_resp_valid_reg <= cache_resp_valid_in;
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    mem_req_reg[0].payload  <= mem_req_in[0].payload ;
+    mem_req_reg[1].payload  <= mem_req_in[1].payload ;
+  end
+
+// --------------------------------------------------------------------------------------
 // Drive output
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -107,26 +128,6 @@ module cache_request_generator #(
     glay_cache_req_out.payload <= glay_cache_req_fifo_dout.payload;
   end
 
-// --------------------------------------------------------------------------------------
-// Drive input
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
-      mem_req_reg[0].valid  <= 0;
-      mem_req_reg[1].valid  <= 0;
-      mem_resp_valid_reg <= 0;
-    end
-    else begin
-      mem_req_reg[0].valid  <= mem_req_in[0].valid;
-      mem_req_reg[1].valid  <= mem_req_in[1].valid;
-      mem_resp_valid_reg <= cache_resp_valid_in;
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    mem_req_reg[0].payload  <= mem_req_in[0].payload ;
-    mem_req_reg[1].payload  <= mem_req_in[1].payload ;
-  end
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
@@ -187,14 +188,17 @@ module cache_request_generator #(
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_cache_req_fifo_din.valid <= 0;
+      glay_cache_req_fifo_din.valid         <= 0;
+      glay_cache_req_fifo_din.payload.valid <= 0;
     end
     else begin
-      glay_cache_req_fifo_din.valid <= bus_out.valid;
+      glay_cache_req_fifo_din.valid         <= bus_out.valid;
+      glay_cache_req_fifo_din.payload.valid <= bus_out.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
+
     glay_cache_req_fifo_din.payload.addr         <= bus_out.payload.base_address + bus_out.payload.address_offset;
     glay_cache_req_fifo_din.payload.wdata        <= 0;
     glay_cache_req_fifo_din.payload.wstrb        <= 0;
