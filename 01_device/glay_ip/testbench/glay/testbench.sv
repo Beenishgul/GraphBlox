@@ -36,7 +36,7 @@ class GraphCSR;
         this.edge_count = 0;
         this.mem512_vertex_count = 0;
         this.mem512_edge_count = 0;
-        this.mem512_csr_struct_count = 2;
+        this.mem512_csr_struct_count = 4;
     endfunction
 
     function void display ();
@@ -742,7 +742,7 @@ module glay_kernel_testbench ();
         edges_array_src_ptr = get_random_ptr();
         edges_array_dest_ptr = get_random_ptr();
         auxiliary_1_ptr = get_random_ptr();
-        auxiliary_2_ptr = $urandom_range(0,128);
+        auxiliary_2_ptr = get_random_ptr();
 
         ///////////////////////////////////////////////////////////////////////////
         //Write ID 0: graph_csr_struct (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -951,6 +951,11 @@ module glay_kernel_testbench ();
     bit [32-1:0] temp_edges_array_dest;
 
     function void read_files_graphCSR();
+
+        graph.csr_struct[0] = 0;
+        graph.csr_struct[1] = 0;
+        graph.csr_struct[2] = 0;
+        graph.csr_struct[3] = 0;
 
         graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
         graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
