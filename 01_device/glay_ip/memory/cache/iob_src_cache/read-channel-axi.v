@@ -61,7 +61,7 @@ module read_channel_axi #(
            assign m_axi_arsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
            assign m_axi_arburst = 2'b01; //incremental burst
            assign m_axi_araddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {replace_addr, {(CACHE_LINE2MEM_W+CACHE_BACKEND_BYTE_W){1'b0}}}; //base address for the burst, with width extension 
-
+           assign m_axi_arqos   = 4'd0;
            
            // Read Line values
            assign read_rdata = m_axi_rdata;

@@ -63,7 +63,7 @@ generate
     assign m_axi_awcache = 4'b0011;
     assign m_axi_awprot  = 3'd0;
     assign m_axi_wlast   = m_axi_wvalid_int;
-
+    assign m_axi_awqos   = 4'd0;
     //AXI Buffer Output signals
     assign m_axi_awaddr = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W], {CACHE_BACKEND_BYTE_W{1'b0}}};
 
@@ -186,7 +186,7 @@ generate
         assign m_axi_wdata = wdata >> (word_counter*CACHE_BACKEND_DATA_W);
         assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
         assign m_axi_wlast = &word_counter;
-
+        assign m_axi_awqos   = 4'd0;
 
         localparam
           idle    = 2'd0,
@@ -292,7 +292,8 @@ generate
         assign m_axi_wdata = wdata;
         assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}}; //uses entire bandwidth
         assign m_axi_wlast = m_axi_wvalid;
-
+        assign m_axi_awqos   = 4'd0;
+        
         localparam
           idle    = 2'd0,
           address = 2'd1,
