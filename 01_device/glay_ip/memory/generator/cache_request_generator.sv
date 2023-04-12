@@ -133,7 +133,7 @@ module cache_request_generator #(
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
   assign fifo_setup_signal_638x128              = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
-  assign cache_req_fifo_in_signals.rd_en        = ~stall & ~cache_req_fifo_out_signals_reg.empty;
+  assign cache_req_fifo_in_signals.rd_en        = ~stall & ~cache_req_fifo_out_signals_reg.empty & ~request_busy;
   assign cache_req_fifo_in_signals.wr_en        = glay_cache_req_fifo_din.valid;
   assign glay_cache_req_fifo_dout.valid         = cache_req_fifo_out_signals_reg.valid;
   assign glay_cache_req_fifo_dout.payload.valid = cache_req_fifo_out_signals_reg.valid;
@@ -157,6 +157,22 @@ module cache_request_generator #(
     .wr_rst_busy (cache_req_fifo_out_signals_reg.wr_rst_busy ),
     .rd_rst_busy (cache_req_fifo_out_signals_reg.rd_rst_busy )
   );
+
+  logic request_busy;
+
+  always_ff @(posedge ap_clk) begin
+    if(control_areset) begin
+      request_busy <= 0;
+    end else begin
+      if(glay_cache_req_fifo_dout.valid) begin
+        request_busy <= 1'b1;
+      end else if (cache_resp_valid_in)  begin
+        request_busy <= 1'b0;
+      end else begin
+        request_busy <= request_busy;
+      end
+    end
+  end
 
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_638x128_GlayCacheRequest
