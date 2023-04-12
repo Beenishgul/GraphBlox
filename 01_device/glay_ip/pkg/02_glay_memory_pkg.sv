@@ -73,6 +73,19 @@ typedef enum int unsigned {
 } structure_type;
 
 // --------------------------------------------------------------------------------------
+//   Cache Requests state machine
+// --------------------------------------------------------------------------------------
+
+typedef enum int unsigned {
+  CACHE_REQUEST_GEN_RESET,
+  CACHE_REQUEST_GEN_IDLE,
+  CACHE_REQUEST_GEN_SEND,
+  CACHE_REQUEST_GEN_BUSY,
+  CACHE_REQUEST_GEN_READY,
+  CACHE_REQUEST_GEN_DONE
+} cache_request_generator_state;
+
+// --------------------------------------------------------------------------------------
 // Cache requests in GlayCacheRequest
 // --------------------------------------------------------------------------------------
 
