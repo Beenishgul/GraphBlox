@@ -82,6 +82,11 @@ module cache_request_generator #(
   cache_request_generator_state current_state;
   cache_request_generator_state next_state   ;
 
+  logic cache_request_generator_done_reg ;
+  logic cache_request_generator_ready_reg;
+  logic cache_request_generator_setup_reg;
+  logic cache_request_generator_pause_reg;
+
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
@@ -152,19 +157,22 @@ module cache_request_generator #(
         next_state = CACHE_REQUEST_GEN_IDLE;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-        if(serial_read_config_reg.valid && serial_read_engine_in_start_reg)
+        if(~cache_request_generator_ready_reg)
           next_state = CACHE_REQUEST_GEN_SEND;
         else
           next_state = SERIAL_READ_ENGINE_IDLE;
       end
-      CACHE_REQUEST_GEN_BUSY : begin
-        next_state = CACHE_REQUEST_GEN_BUSY;
-      end
-      CACHE_REQUEST_GEN_READY : begin
-        next_state = CACHE_REQUEST_GEN_READY;
+      CACHE_REQUEST_GEN_SEND : begin
+        if(glay_cache_req_fifo_dout.valid)
+          next_state = SERIAL_READ_ENGINE_BUSY;
+        else
+          next_state = CACHE_REQUEST_GEN_SEND;
       end
       SERIAL_READ_ENGINE_BUSY : begin
         next_state = SERIAL_READ_ENGINE_BUSY;
+      end
+      CACHE_REQUEST_GEN_READY : begin
+        next_state = CACHE_REQUEST_GEN_READY;
       end
       CACHE_REQUEST_GEN_DONE : begin
         next_state = CACHE_REQUEST_GEN_RESET;
@@ -175,18 +183,30 @@ module cache_request_generator #(
   always_ff @(posedge ap_clk) begin
     case (current_state)
       CACHE_REQUEST_GEN_RESET : begin
-
+        cache_request_generator_done_reg  <= 1'b1;
+        cache_request_generator_ready_reg <= 1'b0;
+        cache_request_generator_setup_reg <= 1'b0;
+        cache_request_generator_pause_reg <= 1'b0;
+        cache_req_fifo_in_signals.rd_en   <= 1'b0;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-
+        cache_request_generator_done_reg  <= 1'b0;
+        cache_request_generator_ready_reg <= 1'b0;
+        cache_request_generator_setup_reg <= 1'b0;
+        cache_request_generator_pause_reg <= 1'b0;
+        cache_req_fifo_in_signals.rd_en   <= 1'b0;
       end
-      CACHE_REQUEST_GEN_BUSY : begin
+      CACHE_REQUEST_GEN_SEND : begin
+        cache_request_generator_done_reg  <= 1'b0;
+        cache_request_generator_ready_reg <= 1'b0;
+        cache_request_generator_setup_reg <= 1'b0;
+        cache_request_generator_pause_reg <= 1'b0;
+        cache_req_fifo_in_signals.rd_en   <= 1'b1;
+      end
+      SERIAL_READ_ENGINE_BUSY : begin
 
       end
       CACHE_REQUEST_GEN_READY : begin
-
-      end
-      SERIAL_READ_ENGINE_BUSY : begin
 
       end
       SERIAL_READ_ENGINE_DONE : begin

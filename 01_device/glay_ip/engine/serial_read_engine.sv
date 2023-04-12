@@ -72,7 +72,6 @@ module serial_read_engine #(
 
     SerialReadEngineConfiguration serial_read_config_reg;
 
-
     logic serial_read_engine_in_start_reg ;
     logic serial_read_engine_out_ready_reg;
     logic serial_read_engine_out_done_reg ;
