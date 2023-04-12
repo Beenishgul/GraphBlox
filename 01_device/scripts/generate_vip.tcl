@@ -143,11 +143,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_638x128_GlayCacheRequestInterfaceInput
+# generate fifo_644x128_GlayCacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_638x128"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_644x128"]" 
 
-set module_name fifo_638x128
+set module_name fifo_644x128
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -163,9 +163,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {638}                                                     \
+                    CONFIG.Input_Data_Width {644}                                                     \
                     CONFIG.Input_Depth {128}                                                          \
-                    CONFIG.Output_Data_Width {638}                                                    \
+                    CONFIG.Output_Data_Width {644}                                                    \
                     CONFIG.Output_Depth {128}                                                         \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {96}                                           \
@@ -223,11 +223,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_638x128_GlayCacheRequest
+# generate fifo_644x128_GlayCacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_638x32"]" 
+puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_644x32"]" 
 
-set module_name fifo_638x32
+set module_name fifo_644x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -243,9 +243,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {638}                                                     \
+                    CONFIG.Input_Data_Width {644}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {638}                                                    \
+                    CONFIG.Output_Data_Width {644}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
