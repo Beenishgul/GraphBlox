@@ -94,6 +94,7 @@ package GLAY_GLOBALS_PKG;
 /*---------------------------------------------------*/
 //Write Policy
 	parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
+	// parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
 /*---------------------------------------------------*/
 //AXI specific parameters
 	parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W ;
