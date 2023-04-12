@@ -76,7 +76,7 @@ typedef enum int unsigned {
 // Cache requests in GlayCacheRequest
 // --------------------------------------------------------------------------------------
 
-// SIZE = 516 bits
+// SIZE = 516 bits + 6
 typedef struct packed {
   logic valid;
   `ifdef WORD_ADDR
