@@ -94,9 +94,9 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay Cache request generator
 // --------------------------------------------------------------------------------------
-  MemoryRequestPacket mem_req_in         [NUM_MEMORY_REQUESTOR-1:0];
-  GlayCacheRequest    glay_cache_req_out                           ;
-  logic               cache_resp_valid_in                          ;
+  MemoryRequestPacket mem_req_in        [NUM_MEMORY_REQUESTOR-1:0];
+  GlayCacheRequest    glay_cache_req_out                          ;
+  logic               cache_resp_ready                            ;
 
 // --------------------------------------------------------------------------------------
 // GLay Signals setup and configuration reading
@@ -360,9 +360,9 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay Cache request generator
 // --------------------------------------------------------------------------------------
-  assign mem_req_in[0]       = glay_kernel_setup_mem_req_out;
-  assign mem_req_in[1]       = 0;
-  assign cache_resp_valid_in = glay_cache_resp_in.valid;
+  assign mem_req_in[0]    = glay_kernel_setup_mem_req_out;
+  assign mem_req_in[1]    = 0;
+  assign cache_resp_ready = glay_cache_resp_in.valid;
 
   cache_request_generator #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
@@ -374,7 +374,7 @@ module glay_kernel_cu #(
     .areset                    (areset                                   ),
     .mem_req_in                (mem_req_in                               ),
     .glay_cache_req_out        (glay_cache_req_out                       ),
-    .cache_resp_valid_in       (cache_resp_valid_in                      ),
+    .cache_resp_ready          (cache_resp_ready                         ),
     .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
     .fifo_setup_signal         (cache_request_generator_fifo_setup_signal)
   );
