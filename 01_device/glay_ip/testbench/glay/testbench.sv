@@ -742,7 +742,7 @@ module glay_kernel_testbench ();
         edges_array_src_ptr = get_random_ptr();
         edges_array_dest_ptr = get_random_ptr();
         auxiliary_1_ptr = get_random_ptr();
-        auxiliary_2_ptr = $urandom_range(1024.256);
+        auxiliary_2_ptr = get_random_ptr();
 
         ///////////////////////////////////////////////////////////////////////////
         //Write ID 0: graph_csr_struct (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
