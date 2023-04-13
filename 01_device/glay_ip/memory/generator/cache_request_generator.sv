@@ -139,7 +139,7 @@ module cache_request_generator #(
 // Cache Request state machine
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if(engine_areset)
+    if(control_areset)
       current_state <= CACHE_REQUEST_GEN_RESET;
     else begin
       current_state <= next_state;
@@ -157,15 +157,15 @@ module cache_request_generator #(
       end
       CACHE_REQUEST_GEN_SEND : begin
         if(glay_cache_req_fifo_dout.valid)
-          next_state = SERIAL_READ_ENGINE_BUSY;
+          next_state = CACHE_REQUEST_GEN_BUSY;
         else
           next_state = CACHE_REQUEST_GEN_SEND;
       end
-      SERIAL_READ_ENGINE_BUSY : begin
+      CACHE_REQUEST_GEN_BUSY : begin
         if(cache_resp_ready)
           next_state = CACHE_REQUEST_GEN_IDLE;
         else
-          next_state = SERIAL_READ_ENGINE_BUSY;
+          next_state = CACHE_REQUEST_GEN_BUSY;
       end
     endcase
   end // always_comb
@@ -184,7 +184,7 @@ module cache_request_generator #(
         cache_req_fifo_in_signals.rd_en <= ~stall & ~cache_req_fifo_out_signals_reg.empty;
         glay_cache_req_out.valid        <= 1'b0;
       end
-      SERIAL_READ_ENGINE_BUSY : begin
+      CACHE_REQUEST_GEN_BUSY : begin
         cache_req_fifo_in_signals.rd_en <= 1'b0;
         if(glay_cache_req_fifo_dout.valid)
           glay_cache_req_out.valid <= 1'b1;
