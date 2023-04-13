@@ -80,7 +80,8 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 
     SerialReadEngineConfiguration serial_read_config_reg                  ;
-    MemoryRequestPacket           serial_read_engine_req_reg              ;
+    SerialReadEngineConfiguration serial_read_config_comb                 ;
+    MemoryRequestPacket           serial_read_engine_req                  ;
     FIFOStateSignalsOutput        serial_read_engine_fifo_out_signals_reg ;
     FIFOStateSignalsInput         serial_read_engine_fifo_in_signals_reg  ;
     logic                         serial_read_engine_fifo_setup_signal_reg;
@@ -244,16 +245,19 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
+    always_comb begin
+        serial_read_config_comb.payload.increment     = 1'b1;
+        serial_read_config_comb.payload.decrement     = 1'b0;
+        serial_read_config_comb.payload.array_pointer = glay_descriptor_reg.payload.graph_csr_struct;
+        serial_read_config_comb.payload.array_size    = glay_descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.start_read    = 0;
+        serial_read_config_comb.payload.end_read      = glay_descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.stride        = 64;
+        serial_read_config_comb.payload.granularity   = 64;
+    end
 
     always_ff @(posedge ap_clk) begin
-        serial_read_config_reg.payload.increment     <= 1'b1;
-        serial_read_config_reg.payload.decrement     <= 1'b0;
-        serial_read_config_reg.payload.array_pointer <= glay_descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_reg.payload.array_size    <= 4;
-        serial_read_config_reg.payload.start_read    <= 0;
-        serial_read_config_reg.payload.end_read      <= 256;
-        serial_read_config_reg.payload.stride        <= 64;
-        serial_read_config_reg.payload.granularity   <= 64;
+        serial_read_config_reg.payload.increment <= serial_read_config_comb.payload;
     end
 
     serial_read_engine #(
@@ -265,7 +269,7 @@ module glay_kernel_setup #(
         .ap_clk                      (ap_clk                                  ),
         .areset                      (counter_areset                          ),
         .serial_read_config          (serial_read_config_reg                  ),
-        .serial_read_engine_req_out  (serial_read_engine_req_reg              ),
+        .serial_read_engine_req_out  (serial_read_engine_req                  ),
         .req_fifo_out_signals        (serial_read_engine_fifo_out_signals_reg ),
         .req_fifo_in_signals         (serial_read_engine_fifo_in_signals_reg  ),
         .fifo_setup_signal           (serial_read_engine_fifo_setup_signal_reg),
@@ -309,7 +313,7 @@ module glay_kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = glay_setup_mem_req_din.valid;
     assign glay_setup_mem_req_dout.valid = req_fifo_out_signals_reg.valid;
-    assign glay_setup_mem_req_din        = serial_read_engine_req_reg;
+    assign glay_setup_mem_req_din        = serial_read_engine_req;
 
     fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (
         .clk         (ap_clk                               ),

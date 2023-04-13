@@ -338,6 +338,7 @@ module glay_kernel_cu #(
   assign fifo_setup_signal_516x128        = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = glay_cache_resp_in.payload.ready;
   assign glay_cache_resp_in.valid         = glay_cache_resp_in.payload.ready;
+  assign glay_cache_req_out.valid         = glay_cache_req_out.valid & ~glay_cache_resp_in.payload.ready;
 
   fifo_516x128 inst_fifo_516x128_GlayCacheResponse (
     .clk         (ap_clk                                  ),
@@ -362,7 +363,7 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
   assign mem_req_in[0]    = glay_kernel_setup_mem_req_out;
   assign mem_req_in[1]    = 0;
-  assign cache_resp_ready = glay_cache_resp_in.valid;
+  assign cache_resp_ready = glay_cache_resp_in.payload.ready;
 
   cache_request_generator #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
