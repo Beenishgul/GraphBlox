@@ -82,11 +82,6 @@ module cache_request_generator #(
   cache_request_generator_state current_state;
   cache_request_generator_state next_state   ;
 
-  logic cache_request_generator_done_reg ;
-  logic cache_request_generator_ready_reg;
-  logic cache_request_generator_setup_reg;
-  logic cache_request_generator_pause_reg;
-
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
@@ -123,20 +118,21 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      fifo_setup_signal          <= 0;
-      glay_cache_req_out         <= 0;
-      cache_req_fifo_out_signals <= 0;
+      fifo_setup_signal          <= 1'b0;
+      cache_req_fifo_out_signals <= 1'b0;
     end
     else begin
       fifo_setup_signal          <= fifo_setup_signal_644x128;
-      glay_cache_req_out.valid   <= glay_cache_req_fifo_dout.valid;
       cache_req_fifo_out_signals <= cache_req_fifo_out_signals_reg;
-
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    glay_cache_req_out.payload <= glay_cache_req_fifo_dout.payload;
+    if(glay_cache_req_fifo_dout.valid) begin
+      glay_cache_req_out.payload <= glay_cache_req_fifo_dout.payload;
+    end else begin
+      glay_cache_req_out.payload <= glay_cache_req_out.payload;
+    end
   end
 
   // --------------------------------------------------------------------------------------
@@ -157,10 +153,7 @@ module cache_request_generator #(
         next_state = CACHE_REQUEST_GEN_IDLE;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-        if(~cache_request_generator_ready_reg)
-          next_state = CACHE_REQUEST_GEN_SEND;
-        else
-          next_state = SERIAL_READ_ENGINE_IDLE;
+        next_state = CACHE_REQUEST_GEN_SEND;
       end
       CACHE_REQUEST_GEN_SEND : begin
         if(glay_cache_req_fifo_dout.valid)
@@ -169,13 +162,10 @@ module cache_request_generator #(
           next_state = CACHE_REQUEST_GEN_SEND;
       end
       SERIAL_READ_ENGINE_BUSY : begin
-        next_state = SERIAL_READ_ENGINE_BUSY;
-      end
-      CACHE_REQUEST_GEN_READY : begin
-        next_state = CACHE_REQUEST_GEN_READY;
-      end
-      CACHE_REQUEST_GEN_DONE : begin
-        next_state = CACHE_REQUEST_GEN_RESET;
+        if(cache_resp_ready)
+          next_state = CACHE_REQUEST_GEN_IDLE;
+        else
+          next_state = SERIAL_READ_ENGINE_BUSY;
       end
     endcase
   end // always_comb
@@ -183,34 +173,23 @@ module cache_request_generator #(
   always_ff @(posedge ap_clk) begin
     case (current_state)
       CACHE_REQUEST_GEN_RESET : begin
-        cache_request_generator_done_reg  <= 1'b1;
-        cache_request_generator_ready_reg <= 1'b0;
-        cache_request_generator_setup_reg <= 1'b0;
-        cache_request_generator_pause_reg <= 1'b0;
-        cache_req_fifo_in_signals.rd_en   <= 1'b0;
+        cache_req_fifo_in_signals.rd_en <= 1'b0;
+        glay_cache_req_out.valid        <= 1'b0;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-        cache_request_generator_done_reg  <= 1'b0;
-        cache_request_generator_ready_reg <= 1'b0;
-        cache_request_generator_setup_reg <= 1'b0;
-        cache_request_generator_pause_reg <= 1'b0;
-        cache_req_fifo_in_signals.rd_en   <= 1'b0;
+        cache_req_fifo_in_signals.rd_en <= 1'b0;
+        glay_cache_req_out.valid        <= 1'b0;
       end
       CACHE_REQUEST_GEN_SEND : begin
-        cache_request_generator_done_reg  <= 1'b0;
-        cache_request_generator_ready_reg <= 1'b0;
-        cache_request_generator_setup_reg <= 1'b0;
-        cache_request_generator_pause_reg <= 1'b0;
-        cache_req_fifo_in_signals.rd_en   <= 1'b1;
+        cache_req_fifo_in_signals.rd_en <= ~stall & ~cache_req_fifo_out_signals_reg.empty;
+        glay_cache_req_out.valid        <= 1'b0;
       end
       SERIAL_READ_ENGINE_BUSY : begin
-
-      end
-      CACHE_REQUEST_GEN_READY : begin
-
-      end
-      SERIAL_READ_ENGINE_DONE : begin
-
+        cache_req_fifo_in_signals.rd_en <= 1'b0;
+        if(glay_cache_req_fifo_dout.valid)
+          glay_cache_req_out.valid <= 1'b1;
+        else
+          glay_cache_req_out.valid <= glay_cache_req_out.valid;
       end
     endcase
   end // always_ff @(posedge ap_clk)
@@ -219,7 +198,6 @@ module cache_request_generator #(
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
   assign fifo_setup_signal_644x128              = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
-  assign cache_req_fifo_in_signals.rd_en        = ~stall & ~cache_req_fifo_out_signals_reg.empty & ~request_busy;
   assign cache_req_fifo_in_signals.wr_en        = glay_cache_req_fifo_din.valid;
   assign glay_cache_req_fifo_dout.valid         = cache_req_fifo_out_signals_reg.valid;
   assign glay_cache_req_fifo_dout.payload.valid = cache_req_fifo_out_signals_reg.valid;
@@ -243,22 +221,6 @@ module cache_request_generator #(
     .wr_rst_busy (cache_req_fifo_out_signals_reg.wr_rst_busy ),
     .rd_rst_busy (cache_req_fifo_out_signals_reg.rd_rst_busy )
   );
-
-  logic request_busy;
-
-  always_ff @(posedge ap_clk) begin
-    if(control_areset) begin
-      request_busy <= 0;
-    end else begin
-      if(glay_cache_req_fifo_dout.valid) begin
-        request_busy <= 1'b1;
-      end else if (cache_resp_ready)  begin
-        request_busy <= 1'b0;
-      end else begin
-        request_busy <= request_busy;
-      end
-    end
-  end
 
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_644x128_GlayCacheRequest
