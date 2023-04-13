@@ -67,8 +67,6 @@ module serial_read_engine #(
 
     logic serial_read_engine_done_reg ;
     logic serial_read_engine_start_reg;
-    logic serial_read_engine_setup_reg;
-    logic serial_read_engine_pause_reg;
 
     SerialReadEngineConfiguration serial_read_config_reg;
 
@@ -208,8 +206,6 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_RESET : begin
                 serial_read_engine_done_reg      <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b0;
-                serial_read_engine_setup_reg     <= 1'b1;
-                serial_read_engine_pause_reg     <= 1'b0;
                 serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b1;
                 counter_enable                   <= 1'b0;
@@ -223,8 +219,6 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_IDLE : begin
                 serial_read_engine_done_reg      <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b0;
-                serial_read_engine_setup_reg     <= 1'b1;
-                serial_read_engine_pause_reg     <= 1'b0;
                 serial_read_engine_out_ready_reg <= 1'b1;
                 serial_read_engine_out_done_reg  <= 1'b1;
                 counter_enable                   <= 1'b1;
@@ -238,8 +232,6 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_SETUP : begin
                 serial_read_engine_done_reg      <= 1'b0;
                 serial_read_engine_start_reg     <= 1'b0;
-                serial_read_engine_setup_reg     <= 1'b1;
-                serial_read_engine_pause_reg     <= 1'b0;
                 serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b1;
@@ -253,8 +245,6 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_START : begin
                 serial_read_engine_done_reg      <= 1'b0;
                 serial_read_engine_start_reg     <= 1'b1;
-                serial_read_engine_setup_reg     <= 1'b0;
-                serial_read_engine_pause_reg     <= 1'b0;
                 serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b1;
@@ -281,15 +271,11 @@ module serial_read_engine #(
                 serial_read_engine_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b1;
-                serial_read_engine_setup_reg     <= 1'b0;
-                serial_read_engine_pause_reg     <= 1'b0;
                 counter_load                     <= 1'b0;
             end
             SERIAL_READ_ENGINE_PAUSE : begin
                 serial_read_engine_done_reg      <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b0;
-                serial_read_engine_setup_reg     <= 1'b0;
-                serial_read_engine_pause_reg     <= 1'b1;
                 serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b0;
@@ -301,7 +287,6 @@ module serial_read_engine #(
             SERIAL_READ_ENGINE_DONE : begin
                 serial_read_engine_done_reg      <= 1'b1;
                 serial_read_engine_start_reg     <= 1'b0;
-                serial_read_engine_setup_reg     <= 1'b0;
                 serial_read_engine_out_ready_reg <= 1'b0;
                 serial_read_engine_out_done_reg  <= 1'b1;
                 counter_enable                   <= 1'b1;

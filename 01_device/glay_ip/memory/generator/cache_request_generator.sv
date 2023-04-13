@@ -153,7 +153,7 @@ module cache_request_generator #(
         next_state = CACHE_REQUEST_GEN_IDLE;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-        next_state = CACHE_REQUEST_GEN_SEND;
+        next_state = CACHE_REQUEST_GEN_SEND_S1;
       end
       CACHE_REQUEST_GEN_SEND_S1 : begin
         if(~stall & ~cache_req_fifo_out_signals_reg.empty)
@@ -186,7 +186,7 @@ module cache_request_generator #(
         cache_req_fifo_in_signals.rd_en <= 1'b0;
         glay_cache_req_out.valid        <= 1'b0;
       end
-      CACHE_REQUEST_GEN_SEND : begin
+      CACHE_REQUEST_GEN_SEND_S1 : begin
         cache_req_fifo_in_signals.rd_en <= ~stall & ~cache_req_fifo_out_signals_reg.empty;
         glay_cache_req_out.valid        <= 1'b0;
       end
@@ -196,7 +196,7 @@ module cache_request_generator #(
       end
       CACHE_REQUEST_GEN_BUSY : begin
         cache_req_fifo_in_signals.rd_en <= 1'b0;
-        
+
         if(glay_cache_req_fifo_dout.valid)
           glay_cache_req_out.valid <= 1'b1;
         else
