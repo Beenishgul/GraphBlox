@@ -42,7 +42,7 @@ module cache_request_generator #(
   logic               fifo_areset                                        ;
   logic               arbiter_areset                                     ;
   logic               counter_areset                                     ;
-  logic               fifo_setup_signal_644x128                          ;
+  logic               fifo_644x128_setup_signal                          ;
   logic               mem_resp_valid_reg                                 ;
   MemoryRequestPacket mem_req_reg              [NUM_MEMORY_REQUESTOR-1:0];
 // --------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ module cache_request_generator #(
       cache_req_fifo_out_signals <= 1'b0;
     end
     else begin
-      fifo_setup_signal          <= fifo_setup_signal_644x128;
+      fifo_setup_signal          <= fifo_644x128_setup_signal;
       cache_req_fifo_out_signals <= cache_req_fifo_out_signals_reg;
     end
   end
@@ -208,7 +208,7 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign fifo_setup_signal_644x128              = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
+  assign fifo_644x128_setup_signal              = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
   assign cache_req_fifo_in_signals.wr_en        = glay_cache_req_fifo_din.valid;
   assign glay_cache_req_fifo_dout.valid         = cache_req_fifo_out_signals_reg.valid;
   assign glay_cache_req_fifo_dout.payload.valid = cache_req_fifo_out_signals_reg.valid;
