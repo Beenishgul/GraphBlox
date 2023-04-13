@@ -317,7 +317,7 @@ module glay_kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
   ) inst_glay_cache_axi (
-    .valid        (glay_cache_req_out.payload.valid),
+    .valid        (glay_cache_req_out.valid),
     .addr         (glay_cache_req_out.payload.addr ),
     .wdata        (glay_cache_req_out.payload.wdata),
     .wstrb        (glay_cache_req_out.payload.wstrb),
