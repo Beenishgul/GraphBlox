@@ -257,7 +257,7 @@ module glay_kernel_setup #(
     end
 
     always_ff @(posedge ap_clk) begin
-        serial_read_config_reg.payload.increment <= serial_read_config_comb.payload;
+        serial_read_config_reg.payload <= serial_read_config_comb.payload;
     end
 
     serial_read_engine #(

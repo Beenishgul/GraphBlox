@@ -169,7 +169,7 @@ module cache_request_generator #(
       end
       CACHE_REQUEST_GEN_BUSY : begin
         if(cache_resp_ready)
-          next_state = CACHE_REQUEST_GEN_IDLE;
+          next_state = CACHE_REQUEST_GEN_SEND_S1;
         else
           next_state = CACHE_REQUEST_GEN_BUSY;
       end
