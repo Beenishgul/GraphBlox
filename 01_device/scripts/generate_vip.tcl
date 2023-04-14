@@ -386,9 +386,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate Asymmetric Simple_Dual_Port_RAM bram_asym_64wrtx512rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_asym_64wrtx512rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_64x256_asym_64wrt_512rd"]" 
 
-set module_name bram_asym_64wrtx512rdx32
+set module_name bram_64x256_asym_64wrt_512rd
 create_ip -name blk_mem_gen \
           -vendor xilinx.com \
           -library ip \
@@ -422,12 +422,12 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate Asymmetric Simple_Dual_Port_RAM bram_asym_512wrtx64rdx32
+# generate Asymmetric Simple_Dual_Port_RAM bram_512x32_asym_512wrt_64rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_asym_512wrtx64rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_512x32_asym_512wrt_64rd"]" 
 
 
-set module_name bram_asym_512wrtx64rdx32
+set module_name bram_512x32_asym_512wrt_64rd
 create_ip -name blk_mem_gen \
           -vendor xilinx.com \
           -library ip \
@@ -460,32 +460,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate arb_master_2x1
+# generate Asymmetric FIFO 512x32_512wrt_64_rd
 # ----------------------------------------------------------------------------
-# puts "[color 2 "                        Generate Arbiter GlayCacheRequestInterfaceInput: arb_slave_2x1"]" 
 
-# set module_name arb_slave_2x1
-# create_ip -name arb_slave          \
-#         -vendor xilinx.com          \
-#         -library ip                 \
-#         -version 1.0                \
-#         -module_name ${module_name} \
-#         -dir ${ip_dir} >> $log_file
-
-# set_property -dict [list                                        \
-#                     CONFIG.C_REQ_WIDTH {2}                      \
-#                     CONFIG.C_HAS_REQ {2}                        \
-#                     CONFIG.C_GNT_WIDTH {2}                      \
-#                     CONFIG.C_HAS_GNT {2}                        \
-#                     CONFIG.C_REL_WIDTH {2}                      \
-#                     CONFIG.C_HAS_REL {2}                        \
-#                     ] [get_ips ${module_name}]
-
-# set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-# generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-# generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-# export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-# export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name fifo_generator_0
+set_property -dict [list CONFIG.Fifo_Implementation {Common_Clock_Block_RAM} CONFIG.asymmetric_port_width {true} CONFIG.Input_Data_Width {512} CONFIG.Input_Depth {32} CONFIG.Output_Data_Width {64} CONFIG.Output_Depth {256} CONFIG.Use_Embedded_Registers {true} CONFIG.Almost_Full_Flag {true} CONFIG.Almost_Empty_Flag {true} CONFIG.Valid_Flag {true} CONFIG.Use_Extra_Logic {true} CONFIG.Data_Count_Width {5} CONFIG.Write_Data_Count_Width {6} CONFIG.Read_Data_Count_Width {9} CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant} CONFIG.Full_Threshold_Assert_Value {24} CONFIG.Full_Threshold_Negate_Value {23} CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant} CONFIG.Empty_Threshold_Assert_Value {8} CONFIG.Empty_Threshold_Negate_Value {9} CONFIG.Output_Register_Type {Embedded_Reg}] [get_ips fifo_generator_0]
 
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
