@@ -384,11 +384,11 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 
 
 # ----------------------------------------------------------------------------
-# generate Asymmetric Simple_Dual_Port_RAM asym_bram_64wrtx512rd
+# generate Asymmetric Simple_Dual_Port_RAM bram_asym_64wrtx512rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: asym_bram_64wrtx512rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_asym_64wrtx512rdx32"]" 
 
-set module_name asym_bram_64wrtx512rdx32
+set module_name bram_asym_64wrtx512rdx32
 create_ip -name blk_mem_gen \
           -vendor xilinx.com \
           -library ip \
@@ -422,12 +422,12 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate Asymmetric Simple_Dual_Port_RAM asym_bram_512wrtx64rdx32
+# generate Asymmetric Simple_Dual_Port_RAM bram_asym_512wrtx64rdx32
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: asym_bram_512wrtx64rdx32"]" 
+puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_asym_512wrtx64rdx32"]" 
 
 
-set module_name asym_bram_512wrtx64rdx32
+set module_name bram_asym_512wrtx64rdx32
 create_ip -name blk_mem_gen \
           -vendor xilinx.com \
           -library ip \
@@ -490,6 +490,11 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
 # ----------------------------------------------------------------------------
+
+# create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name fifo_generator_0
+# set_property -dict [list CONFIG.Fifo_Implementation {Common_Clock_Block_RAM} CONFIG.asymmetric_port_width {true} CONFIG.Input_Data_Width {512} CONFIG.Input_Depth {32} CONFIG.Output_Data_Width {64} CONFIG.Output_Depth {256} CONFIG.Use_Embedded_Registers {true} CONFIG.Almost_Full_Flag {true} CONFIG.Almost_Empty_Flag {true} CONFIG.Valid_Flag {true} CONFIG.Use_Extra_Logic {true} CONFIG.Data_Count_Width {5} CONFIG.Write_Data_Count_Width {6} CONFIG.Read_Data_Count_Width {9} CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant} CONFIG.Full_Threshold_Assert_Value {24} CONFIG.Full_Threshold_Negate_Value {23} CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant} CONFIG.Empty_Threshold_Assert_Value {8} CONFIG.Empty_Threshold_Negate_Value {9} CONFIG.Output_Register_Type {Embedded_Reg}] [get_ips fifo_generator_0]
+# generate_target {instantiation_template} [get_files /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/xilinx_project_glay_kernel_05e1af0/vivado_build_hw_emu/glay_kernel_temp/link/vivado/vpl/prj/prj.srcs/sources_1/ip/fifo_generator_0/fifo_generator_0.xci]
+
 
 puts "========================================================="
 puts "\[[color 4 "Check directory for VIP"]\]"

@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-04-12 17:01:23
+# @Last Modified time: 2023-04-14 18:01:38
 #!/bin/bash
 
 
@@ -105,9 +105,9 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_711x32/fifo_711x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_64wrtx512rdx32/asym_bram_64wrtx512rdx32.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_asym_64wrtx512rdx32/bram_asym_64wrtx512rdx32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/asym_bram_512wrtx64rdx32/asym_bram_512wrtx64rdx32.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_asym_512wrtx64rdx32/bram_asym_512wrtx64rdx32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
