@@ -128,6 +128,9 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_711x32/sim/fifo_711x32.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64_rd/sim/fifo_512x32_asym_512wrt_64_rd.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
 ewtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
