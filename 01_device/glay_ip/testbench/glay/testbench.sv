@@ -952,22 +952,31 @@ module glay_kernel_testbench ();
 
     function void read_files_graphCSR();
 
-        graph.csr_struct[0] = 0;
-        graph.csr_struct[1] = 0;
-        graph.csr_struct[2] = 0;
-        graph.csr_struct[3] = 0;
+        // graph.csr_struct[0] = 0;
+        // graph.csr_struct[1] = 0;
+        // graph.csr_struct[2] = 0;
+        // graph.csr_struct[3] = 0;
 
-        graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
-        graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
-        graph.csr_struct[0][(64)+:64] = vertex_out_degree_ptr;
-        graph.csr_struct[0][(64*2)+:64] = vertex_in_degree_ptr;
-        graph.csr_struct[0][(64*3)+:64] = vertex_edges_idx_ptr;
-        graph.csr_struct[0][(64*4)+:64] = edges_array_src_ptr;
-        graph.csr_struct[0][(64*5)+:64] = edges_array_dest_ptr;
-        graph.csr_struct[0][(64*6)+:64] = edges_array_weight_ptr;
-        graph.csr_struct[0][(64*7)+:64] = auxiliary_1_ptr;
-        graph.csr_struct[1][0+:64] = auxiliary_2_ptr;
-        graph.csr_struct[1][(64)+:64] = 1;
+        // graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
+        // graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
+        // graph.csr_struct[0][(64)+:64] = vertex_out_degree_ptr;
+        // graph.csr_struct[0][(64*2)+:64] = vertex_in_degree_ptr;
+        // graph.csr_struct[0][(64*3)+:64] = vertex_edges_idx_ptr;
+        // graph.csr_struct[0][(64*4)+:64] = edges_array_src_ptr;
+        // graph.csr_struct[0][(64*5)+:64] = edges_array_dest_ptr;
+        // graph.csr_struct[0][(64*6)+:64] = edges_array_weight_ptr;
+        // graph.csr_struct[0][(64*7)+:64] = auxiliary_1_ptr;
+        // graph.csr_struct[1][0+:64] = auxiliary_2_ptr;
+        // graph.csr_struct[1][(64)+:64] = 1;
+
+        realcount = 0;
+
+        for (int i = 0; i < 4; i++) begin
+            for (int j = 0; j < 8; j++) begin
+                graph.csr_struct[i][(64*j)+:64] = realcount;
+                realcount++;
+            end
+        end
 
         realcount = 0;
 
@@ -1029,7 +1038,7 @@ module glay_kernel_testbench ();
 
         graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_csr_struct_count = 2; // cachelines
+        graph.mem512_csr_struct_count = 4; // cachelines
 
         graph.csr_struct = new [graph.mem512_csr_struct_count];
         graph.out_degree = new [graph.mem512_vertex_count];
