@@ -194,10 +194,13 @@ module cache_request_generator #(
       CACHE_REQUEST_GEN_BUSY : begin
         cache_req_fifo_in_signals.rd_en <= 1'b0;
 
-        if(cache_req_fifo_dout.valid)
+        if(cache_req_fifo_dout.valid) begin
           cache_req_reg_S0.valid <= 1'b1;
-        else
+        end else if(cache_req_reg_S1.valid) begin
           cache_req_reg_S0.valid <= cache_req_reg_S0.valid;
+        end else begin
+          cache_req_reg_S0.valid <= 1'b0;
+        end
       end
     endcase
   end // always_ff @(posedge ap_clk)
