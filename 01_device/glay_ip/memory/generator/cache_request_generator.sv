@@ -98,54 +98,6 @@ module cache_request_generator #(
   end
 
 // --------------------------------------------------------------------------------------
-// Back to back cache requests when ready logic
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
-      cache_req_reg_S1 <= 0;
-    end
-    else begin
-      if(~cache_req_reg_S1.valid)begin
-        cache_req_reg_S1 <= cache_req_reg_S0;
-      end else if(~cache_req_reg_S2.valid) begin
-        cache_req_reg_S1 <= 0;
-      end else begin
-        cache_req_reg_S1 <= cache_req_reg_S1;
-      end
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
-      cache_req_reg_S2 <= 0;
-    end
-    else begin
-      if(~cache_req_reg_S2.valid)begin
-        cache_req_reg_S2 <= cache_req_reg_S1;
-      end else if(~glay_cache_req_out.valid) begin
-        cache_req_reg_S2 <= 0;
-      end else begin
-        cache_req_reg_S2 <= cache_req_reg_S2;
-      end
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
-      glay_cache_req_out <= 0;
-    end
-    else begin
-      if(~glay_cache_req_out.valid)begin
-        glay_cache_req_out <= cache_req_reg_S2;
-      end else if(cache_resp_ready) begin
-        glay_cache_req_out <= 0;
-      end else begin
-        glay_cache_req_out <= glay_cache_req_out;
-      end
-    end
-  end
-
-// --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -177,14 +129,6 @@ module cache_request_generator #(
     else begin
       fifo_setup_signal          <= fifo_644x128_setup_signal;
       cache_req_fifo_out_signals <= cache_req_fifo_out_signals_reg;
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    if(cache_req_fifo_dout.valid) begin
-      cache_req_reg_S0.payload <= cache_req_fifo_dout.payload;
-    end else begin
-      cache_req_reg_S0.payload <= cache_req_reg_S0.payload;
     end
   end
 
@@ -257,6 +201,72 @@ module cache_request_generator #(
       end
     endcase
   end // always_ff @(posedge ap_clk)
+
+// --------------------------------------------------------------------------------------
+// Drive instructions and latch if no change
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      cache_req_reg_S0.payload <= 0;
+    end
+    else begin
+      if(cache_req_fifo_dout.valid) begin
+        cache_req_reg_S0.payload <= cache_req_fifo_dout.payload;
+      end else if(cache_req_reg_S1.valid) begin
+        cache_req_reg_S0.payload <= cache_req_reg_S0.payload;
+      end else begin
+        cache_req_reg_S0.payload <= 0;
+      end
+    end
+  end
+
+// --------------------------------------------------------------------------------------
+// Back to back cache requests when ready logic
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      cache_req_reg_S1 <= 0;
+    end
+    else begin
+      if(~cache_req_reg_S1.valid)begin
+        cache_req_reg_S1 <= cache_req_reg_S0;
+      end else if(cache_req_reg_S2.valid) begin
+        cache_req_reg_S1 <= cache_req_reg_S1;
+      end else begin
+        cache_req_reg_S1 <= 0;
+      end
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      cache_req_reg_S2 <= 0;
+    end
+    else begin
+      if(~cache_req_reg_S2.valid)begin
+        cache_req_reg_S2 <= cache_req_reg_S1;
+      end else if(glay_cache_req_out.valid) begin
+        cache_req_reg_S2 <= cache_req_reg_S2;
+      end else begin
+        cache_req_reg_S2 <= 0;
+      end
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    if (control_areset) begin
+      glay_cache_req_out <= 0;
+    end
+    else begin
+      if(~glay_cache_req_out.valid)begin
+        glay_cache_req_out <= cache_req_reg_S2;
+      end else if(~cache_resp_ready) begin
+        glay_cache_req_out <= glay_cache_req_out;
+      end else begin
+        glay_cache_req_out <= 0;
+      end
+    end
+  end
 
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
