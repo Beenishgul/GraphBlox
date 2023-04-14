@@ -464,16 +464,50 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 
 create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name fifo_generator_0
-set_property -dict [list CONFIG.Fifo_Implementation {Common_Clock_Block_RAM} CONFIG.asymmetric_port_width {true} CONFIG.Input_Data_Width {512} CONFIG.Input_Depth {32} CONFIG.Output_Data_Width {64} CONFIG.Output_Depth {256} CONFIG.Use_Embedded_Registers {true} CONFIG.Almost_Full_Flag {true} CONFIG.Almost_Empty_Flag {true} CONFIG.Valid_Flag {true} CONFIG.Use_Extra_Logic {true} CONFIG.Data_Count_Width {5} CONFIG.Write_Data_Count_Width {6} CONFIG.Read_Data_Count_Width {9} CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant} CONFIG.Full_Threshold_Assert_Value {24} CONFIG.Full_Threshold_Negate_Value {23} CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant} CONFIG.Empty_Threshold_Assert_Value {8} CONFIG.Empty_Threshold_Negate_Value {9} CONFIG.Output_Register_Type {Embedded_Reg}] [get_ips fifo_generator_0]
+
+puts "[color 2 "                        Generate FIFO Asymmetric: fifo_512x32_asym_512wrt_64_rd"]" 
+
+set module_name fifo_512x32_asym_512wrt_64_rd
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                            \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                             \
+                    CONFIG.asymmetric_port_width {true}                                             \
+                    CONFIG.Input_Data_Width {512}                                                   \
+                    CONFIG.Input_Depth {32}                                                         \
+                    CONFIG.Output_Data_Width {64}                                                   \
+                    CONFIG.Output_Depth {256}                                                       \
+                    CONFIG.Use_Embedded_Registers {true}                                            \
+                    CONFIG.Almost_Full_Flag {true}                                                  \
+                    CONFIG.Almost_Empty_Flag {true}                                                 \
+                    CONFIG.Valid_Flag {true}                                                        \
+                    CONFIG.Use_Extra_Logic {true}                                                   \
+                    CONFIG.Data_Count_Width {5}                                                     \
+                    CONFIG.Write_Data_Count_Width {6}                                               \
+                    CONFIG.Read_Data_Count_Width {9}                                                \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}     \
+                    CONFIG.Full_Threshold_Assert_Value {24}                                         \
+                    CONFIG.Full_Threshold_Negate_Value {23}                                         \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}   \
+                    CONFIG.Empty_Threshold_Assert_Value {8}                                         \
+                    CONFIG.Empty_Threshold_Negate_Value {9}                                         \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                      \
+                    ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate GLay IPs..... DONE! 
 # ----------------------------------------------------------------------------
-
-# create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name fifo_generator_0
-# set_property -dict [list CONFIG.Fifo_Implementation {Common_Clock_Block_RAM} CONFIG.asymmetric_port_width {true} CONFIG.Input_Data_Width {512} CONFIG.Input_Depth {32} CONFIG.Output_Data_Width {64} CONFIG.Output_Depth {256} CONFIG.Use_Embedded_Registers {true} CONFIG.Almost_Full_Flag {true} CONFIG.Almost_Empty_Flag {true} CONFIG.Valid_Flag {true} CONFIG.Use_Extra_Logic {true} CONFIG.Data_Count_Width {5} CONFIG.Write_Data_Count_Width {6} CONFIG.Read_Data_Count_Width {9} CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant} CONFIG.Full_Threshold_Assert_Value {24} CONFIG.Full_Threshold_Negate_Value {23} CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant} CONFIG.Empty_Threshold_Assert_Value {8} CONFIG.Empty_Threshold_Negate_Value {9} CONFIG.Output_Register_Type {Embedded_Reg}] [get_ips fifo_generator_0]
-# generate_target {instantiation_template} [get_files /home/cmv6ru/Documents/00_github_repos/00_GLay/01_device/xilinx_project_glay_kernel_05e1af0/vivado_build_hw_emu/glay_kernel_temp/link/vivado/vpl/prj/prj.srcs/sources_1/ip/fifo_generator_0/fifo_generator_0.xci]
-
 
 puts "========================================================="
 puts "\[[color 4 "Check directory for VIP"]\]"
