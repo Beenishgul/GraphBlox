@@ -94,9 +94,10 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
 // GLay Cache request generator
 // --------------------------------------------------------------------------------------
-  MemoryRequestPacket mem_req_in        [NUM_MEMORY_REQUESTOR-1:0];
-  GlayCacheRequest    glay_cache_req_out                          ;
-  logic               cache_resp_ready                            ;
+  MemoryRequestPacket mem_req_in              [NUM_MEMORY_REQUESTOR-1:0];
+  GlayCacheRequest    glay_cache_req_out                                ;
+  logic               cache_resp_ready                                  ;
+  logic               glay_cache_req_out_valid                          ;
 
 // --------------------------------------------------------------------------------------
 // GLay Signals setup and configuration reading
@@ -317,7 +318,7 @@ module glay_kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
   ) inst_glay_cache_axi (
-    .valid        (glay_cache_req_out.valid        ),
+    .valid        (glay_cache_req_out_valid),
     .addr         (glay_cache_req_out.payload.addr ),
     .wdata        (glay_cache_req_out.payload.wdata),
     .wstrb        (glay_cache_req_out.payload.wstrb),
@@ -338,6 +339,7 @@ module glay_kernel_cu #(
   assign fifo_516x32_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = glay_cache_resp_in.payload.ready;
   assign glay_cache_resp_in.valid         = glay_cache_resp_in.payload.ready;
+  assign glay_cache_req_out_valid         = glay_cache_req_out.valid & ~glay_cache_resp_in.payload.ready;
 
   fifo_516x32 inst_fifo_516x32_GlayCacheResponse (
     .clk         (ap_clk                                  ),
