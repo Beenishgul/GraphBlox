@@ -386,7 +386,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate Asymmetric Simple_Dual_Port_RAM bram_asym_64wrtx512rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_64x256_asym_64wrt_512rd"]" 
+puts "[color 2 "                        Generate BRAM Simple_Dual_Port_RAM Asymmetric: bram_64x256_asym_64wrt_512rd"]" 
 
 set module_name bram_64x256_asym_64wrt_512rd
 create_ip -name blk_mem_gen \
@@ -424,7 +424,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate Asymmetric Simple_Dual_Port_RAM bram_512x32_asym_512wrt_64rd
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate Asymmetric Simple_Dual_Port_RAM: bram_512x32_asym_512wrt_64rd"]" 
+puts "[color 2 "                        Generate BRAM Simple_Dual_Port_RAM Asymmetric: bram_512x32_asym_512wrt_64rd"]" 
 
 
 set module_name bram_512x32_asym_512wrt_64rd
@@ -468,7 +468,7 @@ create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -mod
 puts "[color 2 "                        Generate FIFO Asymmetric: fifo_512x32_asym_512wrt_64_rd"]" 
 
 set module_name fifo_512x32_asym_512wrt_64_rd
-create_ip -name fifo_generator          \
+create_ip -name fifo_generator \
           -vendor xilinx.com            \
           -library ip                   \
           -version 13.*                 \
