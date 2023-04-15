@@ -325,6 +325,8 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
+
+
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
       cache_req_fifo_din.valid <= 0;

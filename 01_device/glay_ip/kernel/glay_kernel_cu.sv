@@ -76,7 +76,7 @@ module glay_kernel_cu #(
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
   GlayCacheResponse glay_cache_resp_out;
-  GlayCacheResponse glay_cache_resp_in ;
+  GlayCacheResponse cache_resp_in      ;
 
   FIFOStateSignalsOutput cache_req_fifo_out_signals ;
   FIFOStateSignalsOutput cache_resp_fifo_out_signals;
@@ -95,7 +95,7 @@ module glay_kernel_cu #(
 // GLay Cache request generator
 // --------------------------------------------------------------------------------------
   MemoryRequestPacket mem_req_in              [NUM_MEMORY_REQUESTOR-1:0];
-  GlayCacheRequest    glay_cache_req_out                                ;
+  GlayCacheRequest    cache_req_out                                     ;
   logic               cache_resp_ready                                  ;
   logic               glay_cache_req_out_valid                          ;
 
@@ -318,32 +318,32 @@ module glay_kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
   ) inst_glay_cache_axi (
-    .valid        (glay_cache_req_out_valid),
-    .addr         (glay_cache_req_out.payload.addr ),
-    .wdata        (glay_cache_req_out.payload.wdata),
-    .wstrb        (glay_cache_req_out.payload.wstrb),
-    .rdata        (glay_cache_resp_in.payload.rdata),
-    .ready        (glay_cache_resp_in.valid),
-    .force_inv_in (force_inv_in                    ),
-    .force_inv_out(force_inv_out                   ),
-    .wtb_empty_in (wtb_empty_in                    ),
-    .wtb_empty_out(wtb_empty_out                   ),
+    .valid        (cache_req_out.valid        ),
+    .addr         (cache_req_out.payload.addr ),
+    .wdata        (cache_req_out.payload.wdata),
+    .wstrb        (cache_req_out.payload.wstrb),
+    .rdata        (cache_resp_in.payload.rdata),
+    .ready        (cache_resp_in.valid        ),
+    .force_inv_in (force_inv_in               ),
+    .force_inv_out(force_inv_out              ),
+    .wtb_empty_in (wtb_empty_in               ),
+    .wtb_empty_out(wtb_empty_out              ),
     `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk                          ),
-    .reset        (cache_areset                    )
+    .ap_clk       (ap_clk                     ),
+    .reset        (cache_areset               )
   );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache response out fifo_515x32_GlayCacheResponse
 // --------------------------------------------------------------------------------------
   assign fifo_515x32_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
-  assign cache_resp_fifo_in_signals.wr_en = glay_cache_resp_in.valid;
-  assign glay_cache_req_out_valid         = glay_cache_req_out.valid & ~glay_cache_resp_in.valid;
+  assign cache_resp_fifo_in_signals.wr_en = cache_resp_in.valid;
+  assign glay_cache_req_out_valid         = cache_req_out.valid & ~cache_resp_in.valid;
 
   fifo_515x32 inst_fifo_515x32_GlayCacheResponse (
     .clk         (ap_clk                                  ),
     .srst        (fifo_areset                             ),
-    .din         (glay_cache_resp_in.payload              ),
+    .din         (cache_resp_in.payload                   ),
     .wr_en       (cache_resp_fifo_in_signals.wr_en        ),
     .rd_en       (cache_resp_fifo_in_signals.rd_en        ),
     .dout        (glay_cache_resp_out.payload             ),
@@ -363,7 +363,7 @@ module glay_kernel_cu #(
 // --------------------------------------------------------------------------------------
   assign mem_req_in[0]    = glay_kernel_setup_mem_req_out;
   assign mem_req_in[1]    = 0;
-  assign cache_resp_ready = glay_cache_resp_in.valid;
+  assign cache_resp_ready = cache_resp_in.valid;
 
   cache_request_generator #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
@@ -374,7 +374,7 @@ module glay_kernel_cu #(
     .ap_clk                    (ap_clk                                   ),
     .areset                    (areset                                   ),
     .mem_req_in                (mem_req_in                               ),
-    .glay_cache_req_out        (glay_cache_req_out                       ),
+    .cache_req_out             (cache_req_out                            ),
     .cache_resp_ready          (cache_resp_ready                         ),
     .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
     .fifo_setup_signal         (cache_request_generator_fifo_setup_signal)
