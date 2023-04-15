@@ -331,7 +331,7 @@ module serial_read_engine #(
     assign fifo_setup_signal_reg = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy ;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_516x32_MemoryRequestPacket
+// FIFO cache requests out fifo_515x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = serial_read_engine_req_din.valid;
 
