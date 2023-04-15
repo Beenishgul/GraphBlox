@@ -55,6 +55,7 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
   GlayCacheRequest cache_req_fifo_dout;
   GlayCacheRequest cache_req_fifo_din ;
+  GlayCacheRequest cache_req_fifo_comb;
 
 
   FIFOStateSignalsOutput cache_req_fifo_out_signals_reg;
@@ -274,9 +275,9 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign fifo_642x128_setup_signal         = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
-  assign cache_req_fifo_in_signals.wr_en   = cache_req_fifo_din.valid;
-  assign cache_req_fifo_dout.valid         = cache_req_fifo_out_signals_reg.valid;
+  assign fifo_642x128_setup_signal       = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
+  assign cache_req_fifo_in_signals.wr_en = cache_req_fifo_din.valid;
+  assign cache_req_fifo_dout.valid       = cache_req_fifo_out_signals_reg.valid;
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_642x128_GlayCacheRequest
 // --------------------------------------------------------------------------------------
@@ -324,27 +325,27 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
-
-
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      cache_req_fifo_din.valid         <= 0;
-      cache_req_fifo_din.payload.valid <= 0;
+      cache_req_fifo_din.valid <= 0;
     end
     else begin
-      cache_req_fifo_din.valid         <= bus_out.valid;
-      cache_req_fifo_din.payload.valid <= bus_out.valid;
+      cache_req_fifo_din.valid <= bus_out.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    cache_req_fifo_din.payload.addr         <= bus_out.payload.base_address + bus_out.payload.address_offset;
-    cache_req_fifo_din.payload.wdata        <= 0;
-    cache_req_fifo_din.payload.wstrb        <= 0;
-    cache_req_fifo_din.payload.force_inv_in <= 1'b0;
-    cache_req_fifo_din.payload.wtb_empty_in <= 1'b1;
+    cache_req_fifo_din.payload <= cache_req_fifo_comb.payload;
   end
 
+  always_comb begin
+    cache_req_fifo_comb.valid                = 0;
+    cache_req_fifo_comb.payload.addr         = bus_out.payload.base_address + bus_out.payload.address_offset;
+    cache_req_fifo_comb.payload.wdata        = 0;
+    cache_req_fifo_comb.payload.wstrb        = 0;
+    cache_req_fifo_comb.payload.force_inv_in = 1'b0;
+    cache_req_fifo_comb.payload.wtb_empty_in = 1'b1;
+  end
 
 // --------------------------------------------------------------------------------------
 // Keep Track of outstanding transactions
