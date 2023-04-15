@@ -90,9 +90,8 @@ typedef enum int unsigned {
 // Cache requests in GlayCacheRequest
 // --------------------------------------------------------------------------------------
 
-// SIZE = 516 bits + 6
+// SIZE = 515 bits + 6
 typedef struct packed {
-  logic valid;
   `ifdef WORD_ADDR
     logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
   `else
@@ -109,7 +108,7 @@ typedef struct packed {
 } GlayCacheRequestPayload;
 
 
-// SIZE = 644 - 6(CACHE_FRONTEND_BYTE_W) = 638 bits
+// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
 typedef struct packed {
   logic                   valid  ;
   GlayCacheRequestPayload payload;
@@ -121,7 +120,6 @@ typedef struct packed {
 
 typedef struct packed {
   logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
-  logic                             ready;
   `ifdef CTRL_IO
     //control-status io
     logic force_inv_out;
@@ -130,7 +128,7 @@ typedef struct packed {
 } GlayCacheResponsePayload;
 
 
-// SIZE = 516 bits
+// SIZE = 515 bits
 typedef struct packed {
   logic                    valid  ;
   GlayCacheResponsePayload payload;
