@@ -339,19 +339,26 @@ module glay_kernel_cu #(
 // FIFO cache request in fifo_642x32_FWFT_CacheRequest
 // --------------------------------------------------------------------------------------
   FIFOStateSignalsOutput cache_req_fifo_FWFT_out_signals;
-  FIFOStateSignalsInput cache_req_fifo_FWFT_in_signals ;
+  FIFOStateSignalsInput  cache_req_fifo_FWFT_in_signals ;
   GlayCacheRequest       cache_req_out_din              ;
   GlayCacheRequest       cache_req_out_dout             ;
   logic                  fifo_642x32_FWFT_setup_signal  ;
 
-  assign fifo_642x32_FWFT_setup_signal = cache_req_fifo_FWFT_out_signals.wr_rst_busy  | cache_req_fifo_FWFT_out_signals.rd_rst_busy;
+  always_ff @(posedge ap_clk) begin : proc_
+    fifo_642x32_FWFT_setup_signal        <= cache_req_fifo_FWFT_out_signals.wr_rst_busy  | cache_req_fifo_FWFT_out_signals.rd_rst_busy;
+    cache_req_fifo_FWFT_in_signals.rd_en <= cache_resp_in.valid;
+    cache_req_out_dout.valid             <= cache_req_fifo_FWFT_out_signals.valid & ~cache_resp_in.valid & ~cache_req_fifo_FWFT_out_signals.empty;
+    cache_req_fifo_FWFT_in_signals.wr_en <= cache_req_out_din.valid;
+    cache_req_out_din.valid              <= cache_req_out.valid;
+    cache_req_out_din.payload            <= cache_req_out.payload;
+  end
 
-  assign cache_req_fifo_FWFT_in_signals.rd_en = cache_resp_in.valid;
-  assign cache_req_out_dout.valid             = cache_req_fifo_FWFT_out_signals.valid & ~cache_resp_in.valid & ~cache_req_fifo_FWFT_out_signals.empty;
-
-  assign cache_req_fifo_FWFT_in_signals.wr_en = cache_req_out_din.valid;
-  assign cache_req_out_din.valid              = cache_req_out.valid;
-  assign cache_req_out_din.payload            = cache_req_out.payload;
+  // assign fifo_642x32_FWFT_setup_signal        = cache_req_fifo_FWFT_out_signals.wr_rst_busy  | cache_req_fifo_FWFT_out_signals.rd_rst_busy;
+  // assign cache_req_fifo_FWFT_in_signals.rd_en = cache_resp_in.valid;
+  // assign cache_req_out_dout.valid             = cache_req_fifo_FWFT_out_signals.valid & ~cache_resp_in.valid & ~cache_req_fifo_FWFT_out_signals.empty;
+  // assign cache_req_fifo_FWFT_in_signals.wr_en = cache_req_out_din.valid;
+  // assign cache_req_out_din.valid              = cache_req_out.valid;
+  // assign cache_req_out_din.payload            = cache_req_out.payload;
 
   fifo_642x32_FWFT inst_fifo_642x32_FWFT_CacheRequest (
     .clk         (ap_clk                                      ),
