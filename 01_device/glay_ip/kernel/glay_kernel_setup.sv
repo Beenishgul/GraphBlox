@@ -146,7 +146,7 @@ module glay_kernel_setup #(
         end
         else begin
             fifo_setup_signal                   <= fifo_setup_signal_reg;
-            glay_kernel_setup_mem_req_out.valid <= glay_setup_mem_req_dout.valid & req_fifo_out_signals_reg.valid ;
+            glay_kernel_setup_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end
 

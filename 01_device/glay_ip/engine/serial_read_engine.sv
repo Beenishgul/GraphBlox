@@ -137,7 +137,7 @@ module serial_read_engine #(
         end
         else begin
             fifo_setup_signal                <= fifo_setup_signal_reg;
-            serial_read_engine_req_out.valid <= serial_read_engine_req_dout.valid & req_fifo_out_signals_reg.valid;
+            serial_read_engine_req_out.valid <= req_fifo_out_signals_reg.valid;
             req_fifo_out_signals             <= req_fifo_out_signals_reg;
             serial_read_engine_out_ready     <= serial_read_engine_out_ready_reg;
             serial_read_engine_out_done      <= serial_read_engine_out_done_reg;
@@ -338,10 +338,10 @@ module serial_read_engine #(
     fifo_166x32 inst_fifo_166x32_MemoryRequestPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
-        .din         (serial_read_engine_req_din           ),
+        .din         (serial_read_engine_req_din.payload   ),
         .wr_en       (req_fifo_in_signals_reg.wr_en        ),
         .rd_en       (req_fifo_in_signals_reg.rd_en        ),
-        .dout        (serial_read_engine_req_dout          ),
+        .dout        (serial_read_engine_req_dout.payload  ),
         .full        (req_fifo_out_signals_reg.full        ),
         .almost_full (req_fifo_out_signals_reg.almost_full ),
         .empty       (req_fifo_out_signals_reg.empty       ),
