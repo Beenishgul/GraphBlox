@@ -263,6 +263,46 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
+# generate fifo_642x128_GlayCacheRequest
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_642x32_FWFT"]" 
+
+set module_name fifo_642x32_FWFT
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {First_Word_Fall_Through}                              \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {1}                                                              \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width {0}                                                  \
+                    CONFIG.Input_Data_Width {642}                                                     \
+                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Output_Data_Width {642}                                                    \
+                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
+                   ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
 # generate fifo_515x32_GlayCacheResponse
 # ----------------------------------------------------------------------------
 puts "[color 2 "                        Generate FIFO GlayCacheResponse: fifo_515x32"]" 

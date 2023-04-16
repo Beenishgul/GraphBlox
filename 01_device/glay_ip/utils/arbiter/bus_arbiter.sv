@@ -16,7 +16,7 @@
 * Copyright (c) 2008-2009, Kendall Correll
 *
 * Permission to use, copy, modify, and distribute this software for any
-* purpose with or without fee is hereby granted, provided that the above
+* purpose with or without fee is hereby arbiter_granted, provided that the above
 * copyright notice and this permission notice appear in all copies.
 *
 * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -36,7 +36,7 @@
 // propogation delay down the tree grows with log2(WIDTH).
 // The logarithmic delay scaling makes this arbiter suitable
 // for large configurations. This module can take up to three
-// ap_clks to grant the next requestor after its inputs change
+// ap_clks to arbiter_grant the next arbiter_requestor after its inputs change
 // (two ap_clks for the 'arbiter_node' modules and one ap_clk
 // for the output registers).
 
@@ -49,22 +49,22 @@ module bus_arbiter_N_in_1_out #(
     parameter BUS_WIDTH    = 8            ,
     parameter BUS_NUM      = 2
 ) (
-    input  logic                 enable              ,
-    input  logic [    WIDTH-1:0] req                 ,
-    input  logic [BUS_WIDTH-1:0] bus_in [0:BUS_NUM-1],
-    output logic [    WIDTH-1:0] grant               ,
-    output logic [BUS_WIDTH-1:0] bus_out             ,
-    input  logic                 ap_clk              ,
-    input  logic                 areset
+    input  logic                 ap_clk                      ,
+    input  logic                 areset                      ,
+    input  logic                 arbiter_enable              ,
+    input  logic [    WIDTH-1:0] arbiter_req                 ,
+    input  logic [BUS_WIDTH-1:0] arbiter_bus_in [0:BUS_NUM-1],
+    output logic [    WIDTH-1:0] arbiter_grant               ,
+    output logic [BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-    logic                      arbiter_areset             ;
-    logic   [SELECT_WIDTH-1:0] select                     ;
-    logic                      valid                      ;
-    logic                      enable_reg                 ;
-    logic   [       WIDTH-1:0] grant_reg                  ;
-    logic   [   BUS_WIDTH-1:0] bus_reg       [0:BUS_NUM-1];
-    integer                    i                          ;
+    logic                      arbiter_areset                 ;
+    logic   [SELECT_WIDTH-1:0] select                         ;
+    logic                      valid                          ;
+    logic                      arbiter_enable_reg             ;
+    logic   [       WIDTH-1:0] arbiter_grant_reg              ;
+    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg   [0:BUS_NUM-1];
+    integer                    i                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -78,15 +78,15 @@ module bus_arbiter_N_in_1_out #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (arbiter_areset) begin
-            enable_reg <= 0;
+            arbiter_enable_reg <= 0;
         end
         else begin
-            enable_reg <= enable;
+            arbiter_enable_reg <= arbiter_enable;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        bus_reg <= bus_in;
+        arbiter_bus_reg <= arbiter_bus_in;
     end
 
 // --------------------------------------------------------------------------------------
@@ -95,18 +95,18 @@ module bus_arbiter_N_in_1_out #(
 
     always_ff @(posedge ap_clk) begin
         if (arbiter_areset) begin
-            bus_out <= 0;
-            grant   <= 0;
+            arbiter_bus_out <= 0;
+            arbiter_grant   <= 0;
         end else begin
-            if (enable_reg) begin
+            if (arbiter_enable_reg) begin
                 for ( i = 0; i < BUS_NUM; i++) begin
-                    if (grant_reg[i]) begin
-                        bus_out <= bus_reg[i];
+                    if (arbiter_grant_reg[i]) begin
+                        arbiter_bus_out <= arbiter_bus_reg[i];
                     end
-                    grant <= grant_reg;
+                    arbiter_grant <= arbiter_grant_reg;
                 end
-                if (~(|grant_reg)) begin
-                    bus_out <= 0;
+                if (~(|arbiter_grant_reg)) begin
+                    arbiter_bus_out <= 0;
                 end
             end
         end
@@ -119,13 +119,13 @@ module bus_arbiter_N_in_1_out #(
         .WIDTH       (WIDTH       ),
         .SELECT_WIDTH(SELECT_WIDTH)
     ) inst_arbiter (
-        .enable(enable_reg    ),
-        .req   (req           ),
-        .grant (grant_reg     ),
-        .select(select        ),
-        .valid (valid         ),
-        .ap_clk(ap_clk        ),
-        .areset(arbiter_areset)
+        .enable(arbiter_enable_reg),
+        .req   (arbiter_req       ),
+        .grant  (arbiter_grant_reg ),
+        .select(select            ),
+        .valid (valid             ),
+        .ap_clk(ap_clk            ),
+        .areset(arbiter_areset    )
     );
 
 endmodule : bus_arbiter_N_in_1_out

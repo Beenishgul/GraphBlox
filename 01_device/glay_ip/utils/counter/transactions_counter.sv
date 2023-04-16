@@ -8,7 +8,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : glay_transactions_counter.sv
+// File   : transactions_counter.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -17,7 +17,7 @@
 `timescale 1ns / 1ps
 import GLAY_FUNCTIONS_PKG::*;
 
-module glay_transactions_counter #(
+module transactions_counter #(
   parameter integer               C_WIDTH = 4                 ,
   parameter         [C_WIDTH-1:0] C_INIT  = {C_WIDTH{1'b0}}   ,
   parameter         [C_WIDTH-1:0] S_INIT  = {{C_WIDTH-1{1'b0}}, 1'b1}
@@ -100,14 +100,14 @@ module glay_transactions_counter #(
     end
   end
 
-endmodule : glay_transactions_counter
+endmodule : transactions_counter
 
 
 
 // `timescale 1ns / 1ps
 // import GLAY_FUNCTIONS_PKG::*;
 
-// module glay_transactions_counter #(
+// module transactions_counter #(
 //   parameter integer               C_WIDTH = 4,
 //   parameter         [C_WIDTH-1:0] C_INIT  = 1'b0,
 //   parameter         [C_WIDTH-1:0] S_INIT  = {{C_WIDTH-1{1'b0}}, 1'b1}
@@ -146,4 +146,4 @@ endmodule : glay_transactions_counter
 
 //   assign is_zero = is_zero_r;
 
-// endmodule : glay_transactions_counter
+// endmodule : transactions_counter
