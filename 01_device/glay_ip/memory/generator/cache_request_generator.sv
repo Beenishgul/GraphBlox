@@ -28,7 +28,7 @@ module cache_request_generator #(
   input  logic                  ap_clk                               ,
   input  logic                  areset                               ,
   input  MemoryRequestPacket    mem_req_in [NUM_MEMORY_REQUESTOR-1:0],
-  output GlayCacheRequest       glay_cache_req_out                   ,
+  output GlayCacheRequest       cache_req_out                        ,
   input  logic                  cache_resp_ready                     ,
   output FIFOStateSignalsOutput cache_req_fifo_out_signals           ,
   output logic                  fifo_setup_signal
@@ -249,7 +249,7 @@ module cache_request_generator #(
     else begin
       if(~cache_req_reg_S2.valid)begin
         cache_req_reg_S2 <= cache_req_reg_S1;
-      end else if(glay_cache_req_out.valid) begin
+      end else if(cache_req_out.valid) begin
         cache_req_reg_S2 <= cache_req_reg_S2;
       end else begin
         cache_req_reg_S2 <= 0;
@@ -259,15 +259,15 @@ module cache_request_generator #(
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      glay_cache_req_out <= 0;
+      cache_req_out <= 0;
     end
     else begin
-      if(~glay_cache_req_out.valid)begin
-        glay_cache_req_out <= cache_req_reg_S2;
+      if(~cache_req_out.valid)begin
+        cache_req_out <= cache_req_reg_S2;
       end else if(~cache_resp_ready) begin
-        glay_cache_req_out <= glay_cache_req_out;
+        cache_req_out <= cache_req_out;
       end else begin
-        glay_cache_req_out <= 0;
+        cache_req_out <= 0;
       end
     end
   end
