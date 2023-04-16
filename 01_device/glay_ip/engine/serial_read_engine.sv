@@ -312,7 +312,7 @@ module serial_read_engine #(
         end
     end
 
-    glay_transactions_counter #(.C_WIDTH(COUNTER_WIDTH)) inst_glay_transactions_counter (
+    transactions_counter #(.C_WIDTH(COUNTER_WIDTH)) inst_transactions_counter (
         .ap_clk      (ap_clk              ),
         .ap_clken    (counter_enable      ),
         .areset      (counter_areset      ),

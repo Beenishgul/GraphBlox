@@ -76,11 +76,11 @@ module cache_request_generator #(
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(MemoryRequestPacket)  ;
 
-  MemoryRequestPacket bus_out                                    ;
-  MemoryRequestPacket bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
+  MemoryRequestPacket arbiter_bus_out                                    ;
+  MemoryRequestPacket arbiter_bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
 
-  logic [1:0] grant;
-  logic [1:0] req  ;
+  logic [1:0] arbiter_grant;
+  logic [1:0] arbiter_req  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -302,24 +302,24 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_642x128_GlayCacheRequest
 // --------------------------------------------------------------------------------------
-  assign bus_in[0] = mem_req_reg[0];
-  assign req[0]    = mem_req_reg[0].valid;
+  assign arbiter_bus_in[0] = mem_req_reg[0];
+  assign arbiter_req[0]    = mem_req_reg[0].valid;
 
-  assign bus_in[1] = mem_req_reg[1];
-  assign req[1]    = mem_req_reg[1].valid;
+  assign arbiter_bus_in[1] = mem_req_reg[1];
+  assign arbiter_req[1]    = mem_req_reg[1].valid;
 
   bus_arbiter_N_in_1_out #(
     .WIDTH    (BUS_ARBITER_N_IN_1_OUT_WIDTH    ),
     .BUS_WIDTH(BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH),
     .BUS_NUM  (BUS_ARBITER_N_IN_1_OUT_BUS_NUM  )
   ) inst_bus_arbiter_N_in_1_out (
-    .enable (1'b1          ),
-    .req    (req           ),
-    .bus_in (bus_in        ),
-    .grant  (grant         ),
-    .bus_out(bus_out       ),
-    .ap_clk (ap_clk        ),
-    .areset (arbiter_areset)
+    .ap_clk         (ap_clk         ),
+    .areset         (arbiter_areset ),
+    .arbiter_enable (1'b1           ),
+    .arbiter_req    (arbiter_req    ),
+    .arbiter_bus_in (arbiter_bus_in ),
+    .arbiter_grant  (arbiter_grant  ),
+    .arbiter_bus_out(arbiter_bus_out)
   );
 
 // --------------------------------------------------------------------------------------
@@ -332,7 +332,7 @@ module cache_request_generator #(
       cache_req_fifo_din.valid <= 0;
     end
     else begin
-      cache_req_fifo_din.valid <= bus_out.valid;
+      cache_req_fifo_din.valid <= arbiter_bus_out.valid;
     end
   end
 
@@ -342,7 +342,7 @@ module cache_request_generator #(
 
   always_comb begin
     cache_req_fifo_comb.valid                = 0;
-    cache_req_fifo_comb.payload.addr         = bus_out.payload.base_address + bus_out.payload.address_offset;
+    cache_req_fifo_comb.payload.addr         = arbiter_bus_out.payload.base_address + arbiter_bus_out.payload.address_offset;
     cache_req_fifo_comb.payload.wdata        = 0;
     cache_req_fifo_comb.payload.wstrb        = 0;
     cache_req_fifo_comb.payload.force_inv_in = 1'b0;
@@ -364,10 +364,10 @@ module cache_request_generator #(
   end
 
 
-  glay_transactions_counter #(
+  transactions_counter #(
     .C_WIDTH(OUTSTANDING_COUNTER_WIDTH                            ),
     .C_INIT (OUTSTANDING_COUNTER_MAX[0+:OUTSTANDING_COUNTER_WIDTH])
-  ) inst_glay_transactions_counter (
+  ) inst_transactions_counter (
     .ap_clk      (ap_clk                           ),
     .ap_clken    (1'b1                             ),
     .areset      (counter_areset                   ),
