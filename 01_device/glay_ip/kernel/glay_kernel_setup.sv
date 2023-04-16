@@ -285,18 +285,18 @@ module glay_kernel_setup #(
     assign fifo_setup_signal_reg = serial_read_engine_fifo_setup_signal_reg | req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy | resp_fifo_out_signals_reg.wr_rst_busy | resp_fifo_out_signals_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in inst_fifo_711x32_MemoryResponsePacket
+// FIFO cache requests in inst_fifo_710x32_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
     assign resp_fifo_in_signals_reg.wr_en = glay_setup_mem_resp_din.valid;
     assign glay_setup_mem_resp_dout.valid = resp_fifo_out_signals_reg.valid;
 
-    fifo_711x32 inst_fifo_711x32_MemoryResponsePacket (
+    fifo_710x32 inst_fifo_710x32_MemoryResponsePacket (
         .clk         (ap_clk                                ),
         .srst        (fifo_areset                           ),
-        .din         (glay_setup_mem_resp_din               ),
+        .din         (glay_setup_mem_resp_din.payload       ),
         .wr_en       (resp_fifo_in_signals_reg.wr_en        ),
         .rd_en       (resp_fifo_in_signals_reg.rd_en        ),
-        .dout        (glay_setup_mem_resp_dout              ),
+        .dout        (glay_setup_mem_resp_dout.payload      ),
         .full        (resp_fifo_out_signals_reg.full        ),
         .almost_full (resp_fifo_out_signals_reg.almost_full ),
         .empty       (resp_fifo_out_signals_reg.empty       ),
@@ -309,19 +309,19 @@ module glay_kernel_setup #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out inst_fifo_167x32_MemoryRequestPacket
+// FIFO cache requests out inst_fifo_166x32_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = glay_setup_mem_req_din.valid;
     assign glay_setup_mem_req_dout.valid = req_fifo_out_signals_reg.valid;
     assign glay_setup_mem_req_din        = serial_read_engine_req;
 
-    fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (
+    fifo_166x32 inst_fifo_166x32_MemoryRequestPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
-        .din         (glay_setup_mem_req_din               ),
+        .din         (glay_setup_mem_req_din.payload       ),
         .wr_en       (req_fifo_in_signals_reg.wr_en        ),
         .rd_en       (req_fifo_in_signals_reg.rd_en        ),
-        .dout        (glay_setup_mem_req_dout              ),
+        .dout        (glay_setup_mem_req_dout.payload      ),
         .full        (req_fifo_out_signals_reg.full        ),
         .almost_full (req_fifo_out_signals_reg.almost_full ),
         .empty       (req_fifo_out_signals_reg.empty       ),

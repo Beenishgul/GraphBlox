@@ -335,7 +335,7 @@ module serial_read_engine #(
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = serial_read_engine_req_din.valid;
 
-    fifo_167x32 inst_fifo_167x32_MemoryRequestPacket (
+    fifo_166x32 inst_fifo_166x32_MemoryRequestPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (serial_read_engine_req_din           ),

@@ -343,11 +343,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_167x32_GLayMemoryRequestPacket
+# generate fifo_166x32_GLayMemoryRequestPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GLayMemoryRequestPacket: fifo_167x32"]" 
+puts "[color 2 "                        Generate FIFO GLayMemoryRequestPacket: fifo_166x32"]" 
 
-set module_name fifo_167x32
+set module_name fifo_166x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -363,9 +363,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {167}                                                     \
+                    CONFIG.Input_Data_Width {166}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {167}                                                    \
+                    CONFIG.Output_Data_Width {166}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
@@ -385,9 +385,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_654x32_MemoryResponsePacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GLayMemoryResponsePacket: fifo_711x32"]" 
+puts "[color 2 "                        Generate FIFO GLayMemoryResponsePacket: fifo_710x32"]" 
 
-set module_name fifo_711x32
+set module_name fifo_710x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -403,9 +403,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {711}                                                     \
+                    CONFIG.Input_Data_Width {710}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {711}                                                    \
+                    CONFIG.Output_Data_Width {710}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
