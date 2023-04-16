@@ -138,7 +138,7 @@ typedef struct packed {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 
-// SIZE = 167 bits
+// SIZE = 166 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
@@ -151,7 +151,7 @@ typedef struct packed{
   MemoryRequestPacketPayload payload;
 } MemoryRequestPacket;
 
-// SIZE = 711 bits
+// SIZE = 710 bits
 typedef struct packed{
   logic [             CU_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
