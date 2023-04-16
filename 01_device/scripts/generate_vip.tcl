@@ -505,9 +505,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 
 create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name fifo_generator_0
 
-puts "[color 2 "                        Generate FIFO Asymmetric: fifo_512x32_asym_512wrt_64_rd"]" 
+puts "[color 2 "                        Generate FIFO Asymmetric: fifo_512x32_asym_512wrt_64rd"]" 
 
-set module_name fifo_512x32_asym_512wrt_64_rd
+set module_name fifo_512x32_asym_512wrt_64rd
 create_ip -name fifo_generator \
           -vendor xilinx.com            \
           -library ip                   \
