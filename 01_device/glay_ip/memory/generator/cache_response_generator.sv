@@ -19,18 +19,18 @@ import GLAY_CONTROL_PKG::*;
 import GLAY_MEMORY_PKG::*;
 
 module cache_response_generator #(
-  parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-  parameter NUM_MODULES        = 3              ,
-  parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
+  parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
+  parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
+  parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
+  parameter integer OUTSTANDING_COUNTER_MAX   = 16                               ,
+  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
 ) (
-  input  logic                   ap_clk                                    ,
-  input  logic                   areset                                    ,
-  input  GLAYDescriptorInterface glay_descriptor_in                        ,
-  output MemoryRequestPacket     mem_req_out [NUM_MODULES-1:0]             ,
-  input  GlayCacheRequest        glay_cache_req_in                         ,
-  output FIFOStateSignalsOutput  mem_req_fifo_out_signals [NUM_MODULES-1:0],
-  input  FIFOStateSignalsInput   mem_req_fifo_in_signals  [NUM_MODULES-1:0],
-  output logic                   fifo_setup_signal
+  input  logic                  ap_clk                                 ,
+  input  logic                  areset                                 ,
+  output MemoryResponsePacket   mem_resp_out [NUM_MEMORY_REQUESTOR-1:0],
+  input  GlayCacheResponse      cache_resp_gen_out                     ,
+  output FIFOStateSignalsOutput cache_resp_fifo_out_signals            ,
+  output logic                  fifo_setup_signal
 );
 
 
