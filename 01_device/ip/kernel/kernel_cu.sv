@@ -25,15 +25,15 @@ module kernel_cu #(
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                           ap_clk          ,
-  input  logic                           areset          ,
-  input  ControlChainInterfaceInput  control_in ,
-  output ControlChainInterfaceOutput control_out,
-  input  DescriptorInterface         descriptor ,
-  input  AXI4MasterReadInterfaceInput    m_axi_read_in   ,
-  output AXI4MasterReadInterfaceOutput   m_axi_read_out  ,
-  input  AXI4MasterWriteInterfaceInput   m_axi_write_in  ,
-  output AXI4MasterWriteInterfaceOutput  m_axi_write_out
+  input  logic                          ap_clk         ,
+  input  logic                          areset         ,
+  input  ControlChainInterfaceInput     control_in     ,
+  output ControlChainInterfaceOutput    control_out    ,
+  input  DescriptorInterface            descriptor     ,
+  input  AXI4MasterReadInterfaceInput   m_axi_read_in  ,
+  output AXI4MasterReadInterfaceOutput  m_axi_read_out ,
+  input  AXI4MasterWriteInterfaceInput  m_axi_write_in ,
+  output AXI4MasterWriteInterfaceOutput m_axi_write_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -46,8 +46,8 @@ module kernel_cu #(
   logic                          fifo_areset                              ;
   logic                          arbiter_areset                           ;
   logic                          setup_areset                             ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg                         ;
-  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state                      ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg                              ;
+  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state                           ;
   logic                          cache_request_generator_fifo_setup_signal;
   logic                          fifo_515x16_setup_signal                 ;
 
@@ -95,13 +95,13 @@ module kernel_cu #(
 // Cache response generator
 // --------------------------------------------------------------------------------------
   MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest    cache_resp_in                          ;
+  CacheRequest        cache_resp_in                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
   MemoryRequestPacket mem_req_in         [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest    cache_req_out                                ;
+  CacheRequest        cache_req_out                                ;
   logic               cache_resp_ready                             ;
   logic               cache_req_out_valid                          ;
 
@@ -110,13 +110,13 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   ControlChainInterfaceOutput kernel_setup_control_state        ;
   DescriptorInterface         kernel_setup_descriptor           ;
-  MemoryResponsePacket            kernel_setup_mem_resp_in          ;
-  FIFOStateSignalsOutput          kernel_setup_resp_fifo_out_signals;
-  FIFOStateSignalsInput           kernel_setup_resp_fifo_in_signals ;
-  MemoryRequestPacket             kernel_setup_mem_req_out          ;
-  FIFOStateSignalsOutput          kernel_setup_req_fifo_out_signals ;
-  FIFOStateSignalsInput           kernel_setup_req_fifo_in_signals  ;
-  logic                           kernel_setup_fifo_setup_signal    ;
+  MemoryResponsePacket        kernel_setup_mem_resp_in          ;
+  FIFOStateSignalsOutput      kernel_setup_resp_fifo_out_signals;
+  FIFOStateSignalsInput       kernel_setup_resp_fifo_in_signals ;
+  MemoryRequestPacket         kernel_setup_mem_req_out          ;
+  FIFOStateSignalsOutput      kernel_setup_req_fifo_out_signals ;
+  FIFOStateSignalsInput       kernel_setup_req_fifo_in_signals  ;
+  logic                       kernel_setup_fifo_setup_signal    ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -135,21 +135,21 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      counter          <= 0;
+      counter     <= 0;
       cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
       if (descriptor_out_reg.valid) begin
         if(counter > 2000) begin
           cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
-          counter          <= 0;
+          counter     <= 0;
         end
         else begin
           counter <= counter + 1;
         end
       end else begin
         cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-        counter          <= 0;
+        counter     <= 0;
       end
     end
   end
@@ -172,29 +172,29 @@ module kernel_cu #(
     if (control_areset) begin
       control_in_reg.ap_start    <= 1'b0;
       control_in_reg.ap_continue <= 1'b0;
-      control_in_reg.setup  <= 1'b1;
-      control_in_reg.done   <= 1'b0;
+      control_in_reg.setup       <= 1'b1;
+      control_in_reg.done        <= 1'b0;
     end
     else begin
       control_in_reg.ap_start    <= control_in.ap_start ;
       control_in_reg.ap_continue <= control_in.ap_continue;
-      control_in_reg.setup  <= ~|cu_setup_state;
-      control_in_reg.done   <= &cu_done_reg;
+      control_in_reg.setup       <= ~|cu_setup_state;
+      control_in_reg.done        <= &cu_done_reg;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      control_out.ap_ready   <= 1'b0;
-      control_out.ap_done    <= 1'b0;
-      control_out.ap_idle    <= 1'b1;
-      control_out.start <= 1'b0;
+      control_out.ap_ready <= 1'b0;
+      control_out.ap_done  <= 1'b0;
+      control_out.ap_idle  <= 1'b1;
+      control_out.start    <= 1'b0;
     end
     else begin
-      control_out.ap_ready   <= control_out_reg.ap_ready;
-      control_out.ap_idle    <= control_out_reg.ap_idle;
-      control_out.ap_done    <= control_out_reg.ap_done;
-      control_out.start <= control_out_reg.start;
+      control_out.ap_ready <= control_out_reg.ap_ready;
+      control_out.ap_idle  <= control_out_reg.ap_idle;
+      control_out.ap_done  <= control_out_reg.ap_done;
+      control_out.start    <= control_out_reg.start;
     end
   end
 
@@ -202,8 +202,8 @@ module kernel_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_control (
-    .ap_clk             (ap_clk                 ),
-    .areset             (control_areset         ),
+    .ap_clk        (ap_clk            ),
+    .areset        (control_areset    ),
     .control_in    (control_in_reg    ),
     .control_out   (control_out_reg   ),
     .descriptor_in (descriptor_in_reg ),
@@ -366,8 +366,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest    cache_resp_in                          ;
+  // MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
+  // CacheRequest        cache_resp_in                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
@@ -403,17 +403,17 @@ module kernel_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_setup (
-    .ap_clk                       (ap_clk                                 ),
-    .areset                       (setup_areset                           ),
+    .ap_clk                  (ap_clk                            ),
+    .areset                  (setup_areset                      ),
     .control_state           (kernel_setup_control_state        ),
     .descriptor              (kernel_setup_descriptor           ),
     .setup_mem_resp_in       (kernel_setup_mem_resp_in          ),
-    .resp_fifo_out_signals        (kernel_setup_resp_fifo_out_signals),
-    .resp_fifo_in_signals         (kernel_setup_resp_fifo_in_signals ),
+    .resp_fifo_out_signals   (kernel_setup_resp_fifo_out_signals),
+    .resp_fifo_in_signals    (kernel_setup_resp_fifo_in_signals ),
     .kernel_setup_mem_req_out(kernel_setup_mem_req_out          ),
-    .req_fifo_out_signals         (kernel_setup_req_fifo_out_signals ),
-    .req_fifo_in_signals          (kernel_setup_req_fifo_in_signals  ),
-    .fifo_setup_signal            (kernel_setup_fifo_setup_signal    )
+    .req_fifo_out_signals    (kernel_setup_req_fifo_out_signals ),
+    .req_fifo_in_signals     (kernel_setup_req_fifo_in_signals  ),
+    .fifo_setup_signal       (kernel_setup_fifo_setup_signal    )
   );
 
 endmodule : kernel_cu
