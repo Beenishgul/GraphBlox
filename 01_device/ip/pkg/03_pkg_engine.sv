@@ -78,13 +78,13 @@ package PKG_ENGINE;
 // array.
 
     typedef enum int unsigned {
-        SERIAL_READ_ENGINE_RESET,
-        SERIAL_READ_ENGINE_IDLE,
-        SERIAL_READ_ENGINE_SETUP,
-        SERIAL_READ_ENGINE_START,
-        SERIAL_READ_ENGINE_BUSY,
-        SERIAL_READ_ENGINE_PAUSE,
-        SERIAL_READ_ENGINE_DONE
+        ENGINE_SERIAL_READ_RESET,
+        ENGINE_SERIAL_READ_IDLE,
+        ENGINE_SERIAL_READ_SETUP,
+        ENGINE_SERIAL_READ_START,
+        ENGINE_SERIAL_READ_BUSY,
+        ENGINE_SERIAL_READ_PAUSE,
+        ENGINE_SERIAL_READ_DONE
     } engine_serial_read_state;
 
     typedef struct packed{

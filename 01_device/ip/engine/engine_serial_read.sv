@@ -154,7 +154,7 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(engine_areset)
-            current_state <= SERIAL_READ_ENGINE_RESET;
+            current_state <= ENGINE_SERIAL_READ_RESET;
         else begin
             current_state <= next_state;
         end
@@ -163,47 +163,47 @@ module engine_serial_read #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            SERIAL_READ_ENGINE_RESET : begin
-                next_state = SERIAL_READ_ENGINE_IDLE;
+            ENGINE_SERIAL_READ_RESET : begin
+                next_state = ENGINE_SERIAL_READ_IDLE;
             end
-            SERIAL_READ_ENGINE_IDLE : begin
+            ENGINE_SERIAL_READ_IDLE : begin
                 if(serial_read_config_reg.valid && engine_serial_read_in_start_reg)
-                    next_state = SERIAL_READ_ENGINE_SETUP;
+                    next_state = ENGINE_SERIAL_READ_SETUP;
                 else
-                    next_state = SERIAL_READ_ENGINE_IDLE;
+                    next_state = ENGINE_SERIAL_READ_IDLE;
             end
-            SERIAL_READ_ENGINE_SETUP : begin
-                next_state = SERIAL_READ_ENGINE_START;
+            ENGINE_SERIAL_READ_SETUP : begin
+                next_state = ENGINE_SERIAL_READ_START;
             end
-            SERIAL_READ_ENGINE_START : begin
-                next_state = SERIAL_READ_ENGINE_BUSY;
+            ENGINE_SERIAL_READ_START : begin
+                next_state = ENGINE_SERIAL_READ_BUSY;
             end
-            SERIAL_READ_ENGINE_BUSY : begin
+            ENGINE_SERIAL_READ_BUSY : begin
                 if (engine_serial_read_done_reg)
-                    next_state = SERIAL_READ_ENGINE_DONE;
+                    next_state = ENGINE_SERIAL_READ_DONE;
                 else if (req_fifo_out_signals_reg.prog_full && ~engine_serial_read_done_reg)
-                    next_state = SERIAL_READ_ENGINE_PAUSE;
+                    next_state = ENGINE_SERIAL_READ_PAUSE;
                 else
-                    next_state = SERIAL_READ_ENGINE_BUSY;
+                    next_state = ENGINE_SERIAL_READ_BUSY;
             end
-            SERIAL_READ_ENGINE_PAUSE : begin
+            ENGINE_SERIAL_READ_PAUSE : begin
                 if (~req_fifo_out_signals_reg.prog_full)
-                    next_state = SERIAL_READ_ENGINE_BUSY;
+                    next_state = ENGINE_SERIAL_READ_BUSY;
                 else
-                    next_state = SERIAL_READ_ENGINE_PAUSE;
+                    next_state = ENGINE_SERIAL_READ_PAUSE;
             end
-            SERIAL_READ_ENGINE_DONE : begin
+            ENGINE_SERIAL_READ_DONE : begin
                 if(serial_read_config_reg.valid && engine_serial_read_in_start_reg)
-                    next_state = SERIAL_READ_ENGINE_DONE;
+                    next_state = ENGINE_SERIAL_READ_DONE;
                 else
-                    next_state = SERIAL_READ_ENGINE_IDLE;
+                    next_state = ENGINE_SERIAL_READ_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            SERIAL_READ_ENGINE_RESET : begin
+            ENGINE_SERIAL_READ_RESET : begin
                 engine_serial_read_done_reg      <= 1'b1;
                 engine_serial_read_start_reg     <= 1'b0;
                 engine_serial_read_out_ready_reg <= 1'b0;
@@ -216,7 +216,7 @@ module engine_serial_read #(
                 counter_stride_value             <= 0;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
-            SERIAL_READ_ENGINE_IDLE : begin
+            ENGINE_SERIAL_READ_IDLE : begin
                 engine_serial_read_done_reg      <= 1'b1;
                 engine_serial_read_start_reg     <= 1'b0;
                 engine_serial_read_out_ready_reg <= 1'b1;
@@ -229,7 +229,7 @@ module engine_serial_read #(
                 counter_stride_value             <= 0;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
-            SERIAL_READ_ENGINE_SETUP : begin
+            ENGINE_SERIAL_READ_SETUP : begin
                 engine_serial_read_done_reg      <= 1'b0;
                 engine_serial_read_start_reg     <= 1'b0;
                 engine_serial_read_out_ready_reg <= 1'b0;
@@ -242,7 +242,7 @@ module engine_serial_read #(
                 counter_stride_value             <= serial_read_config_reg.payload.stride;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
-            SERIAL_READ_ENGINE_START : begin
+            ENGINE_SERIAL_READ_START : begin
                 engine_serial_read_done_reg      <= 1'b0;
                 engine_serial_read_start_reg     <= 1'b1;
                 engine_serial_read_out_ready_reg <= 1'b0;
@@ -253,7 +253,7 @@ module engine_serial_read #(
                 counter_decr                     <= serial_read_config_reg.payload.decrement;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
-            SERIAL_READ_ENGINE_BUSY : begin
+            ENGINE_SERIAL_READ_BUSY : begin
                 if((counter_count >= serial_read_config_reg.payload.end_read)) begin
                     engine_serial_read_done_reg      <= 1'b1;
                     counter_incr                     <= 1'b0;
@@ -273,7 +273,7 @@ module engine_serial_read #(
                 engine_serial_read_start_reg     <= 1'b1;
                 counter_load                     <= 1'b0;
             end
-            SERIAL_READ_ENGINE_PAUSE : begin
+            ENGINE_SERIAL_READ_PAUSE : begin
                 engine_serial_read_done_reg      <= 1'b1;
                 engine_serial_read_start_reg     <= 1'b0;
                 engine_serial_read_out_ready_reg <= 1'b0;
@@ -284,7 +284,7 @@ module engine_serial_read #(
                 counter_decr                     <= 1'b0;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
-            SERIAL_READ_ENGINE_DONE : begin
+            ENGINE_SERIAL_READ_DONE : begin
                 engine_serial_read_done_reg      <= 1'b1;
                 engine_serial_read_start_reg     <= 1'b0;
                 engine_serial_read_out_ready_reg <= 1'b0;
