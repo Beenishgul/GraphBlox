@@ -104,31 +104,31 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x128/simulation/fifo_generator_vlog_beh.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/simulation/fifo_generator_vlog_beh.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x128/hdl/fifo_generator_v13_2_rfs.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/hdl/fifo_generator_v13_2_rfs.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x128/sim/fifo_642x128.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/sim/fifo_642x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x128/sim/fifo_515x128.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/sim/fifo_515x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x32/sim/fifo_642x32.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/sim/fifo_642x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x32_FWFT/sim/fifo_642x32_FWFT.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16_FWFT/sim/fifo_642x16_FWFT.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x32/sim/fifo_515x32.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/sim/fifo_515x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_166x32/sim/fifo_166x32.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_166x16/sim/fifo_166x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_710x32/sim/fifo_710x32.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_710x16/sim/fifo_710x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/sim/fifo_512x32_asym_512wrt_64rd.v"

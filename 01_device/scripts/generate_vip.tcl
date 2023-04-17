@@ -143,91 +143,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x128_CacheRequestInterfaceInput
+# generate fifo_642x16_CacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x128"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16"]" 
 
-set module_name fifo_642x128
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
-          -dir ${ip_dir} >> $log_file
-
-set_property -dict [list                                                                              \
-                    CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
-                    CONFIG.Performance_Options {Standard_FIFO}                                        \
-                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
-                    CONFIG.Reset_Pin {1}                                                              \
-                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {642}                                                     \
-                    CONFIG.Input_Depth {128}                                                          \
-                    CONFIG.Output_Data_Width {642}                                                    \
-                    CONFIG.Output_Depth {128}                                                         \
-                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {96}                                           \
-                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {32}                                          \
-                    CONFIG.Valid_Flag {1}                                                             \
-                    CONFIG.Almost_Empty_Flag {1}                                                      \
-                    CONFIG.Almost_Full_Flag {1}                                                       \
-                   ] [get_ips ${module_name}]
-
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
-
-# ----------------------------------------------------------------------------
-# generate fifo_515x128_CacheRequestInterfaceOutput
-# ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x128"]" 
-
-set module_name fifo_515x128
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
-          -dir ${ip_dir} >> $log_file
-
-set_property -dict [list                                                                              \
-                    CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
-                    CONFIG.Performance_Options {Standard_FIFO}                                        \
-                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
-                    CONFIG.Reset_Pin {1}                                                              \
-                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
-                    CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {515}                                                     \
-                    CONFIG.Input_Depth {128}                                                          \
-                    CONFIG.Output_Data_Width {515}                                                    \
-                    CONFIG.Output_Depth {128}                                                         \
-                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {96}                                           \
-                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {32}                                          \
-                    CONFIG.Valid_Flag {1}                                                             \
-                    CONFIG.Almost_Empty_Flag {1}                                                      \
-                    CONFIG.Almost_Full_Flag {1}                                                       \
-                   ] [get_ips ${module_name}]
-
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
-
-# ----------------------------------------------------------------------------
-# generate fifo_642x128_CacheRequest
-# ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32"]" 
-
-set module_name fifo_642x32
+set module_name fifo_642x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -263,11 +183,91 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x128_CacheRequest
+# generate fifo_515x16_CacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32_FWFT"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x16"]" 
 
-set module_name fifo_642x32_FWFT
+set module_name fifo_515x16
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {1}                                                              \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width {0}                                                  \
+                    CONFIG.Input_Data_Width {515}                                                     \
+                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Output_Data_Width {515}                                                    \
+                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
+                   ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate fifo_642x16_CacheRequest
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16"]" 
+
+set module_name fifo_642x16
+create_ip -name fifo_generator \
+          -vendor xilinx.com \
+          -library ip \
+          -version 13.* \
+          -module_name ${module_name}  \
+          -dir ${ip_dir} >> $log_file
+
+set_property -dict [list                                                                              \
+                    CONFIG.INTERFACE_TYPE {Native}                                                    \
+                    CONFIG.Fifo_Implementation {Common_Clock_Distributed_RAM}                         \
+                    CONFIG.Performance_Options {Standard_FIFO}                                        \
+                    CONFIG.Output_Register_Type {Embedded_Reg}                                        \
+                    CONFIG.Reset_Pin {1}                                                              \
+                    CONFIG.Reset_Type {Synchronous_Reset}                                             \
+                    CONFIG.asymmetric_port_width {0}                                                  \
+                    CONFIG.Input_Data_Width {642}                                                     \
+                    CONFIG.Input_Depth {16}                                                           \
+                    CONFIG.Output_Data_Width {642}                                                    \
+                    CONFIG.Output_Depth {16}                                                          \
+                    CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
+                    CONFIG.Full_Threshold_Assert_Value {12}                                           \
+                    CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
+                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
+                    CONFIG.Valid_Flag {1}                                                             \
+                    CONFIG.Almost_Empty_Flag {1}                                                      \
+                    CONFIG.Almost_Full_Flag {1}                                                       \
+                   ] [get_ips ${module_name}]
+
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate fifo_642x16_CacheRequest
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16_FWFT"]" 
+
+set module_name fifo_642x16_FWFT
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -284,13 +284,13 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {642}                                                     \
-                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Input_Depth {16}                                                           \
                     CONFIG.Output_Data_Width {642}                                                    \
-                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Full_Threshold_Assert_Value {12}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
                     CONFIG.Valid_Flag {1}                                                             \
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \
@@ -303,11 +303,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_515x32_CacheResponse
+# generate fifo_515x16_CacheResponse
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x32"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x16"]" 
 
-set module_name fifo_515x32
+set module_name fifo_515x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -324,13 +324,13 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {515}                                                     \
-                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Input_Depth {16}                                                           \
                     CONFIG.Output_Data_Width {515}                                                    \
-                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Full_Threshold_Assert_Value {12}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
                     CONFIG.Valid_Flag {1}                                                             \
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \
@@ -343,11 +343,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_166x32_MemoryRequestPacket
+# generate fifo_166x16_MemoryRequestPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_166x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_166x16"]" 
 
-set module_name fifo_166x32
+set module_name fifo_166x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -364,13 +364,13 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {166}                                                     \
-                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Input_Depth {16}                                                           \
                     CONFIG.Output_Data_Width {166}                                                    \
-                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Full_Threshold_Assert_Value {12}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
                     CONFIG.Valid_Flag {1}                                                             \
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \
@@ -385,9 +385,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_654x32_MemoryResponsePacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_710x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_710x16"]" 
 
-set module_name fifo_710x32
+set module_name fifo_710x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -404,13 +404,13 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
                     CONFIG.Input_Data_Width {710}                                                     \
-                    CONFIG.Input_Depth {32}                                                           \
+                    CONFIG.Input_Depth {16}                                                           \
                     CONFIG.Output_Data_Width {710}                                                    \
-                    CONFIG.Output_Depth {32}                                                          \
+                    CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
-                    CONFIG.Full_Threshold_Assert_Value {24}                                           \
+                    CONFIG.Full_Threshold_Assert_Value {12}                                           \
                     CONFIG.Programmable_Empty_Type {Single_Programmable_Empty_Threshold_Constant}     \
-                    CONFIG.Empty_Threshold_Assert_Value {8}                                           \
+                    CONFIG.Empty_Threshold_Assert_Value {4}                                           \
                     CONFIG.Valid_Flag {1}                                                             \
                     CONFIG.Almost_Empty_Flag {1}                                                      \
                     CONFIG.Almost_Full_Flag {1}                                                       \

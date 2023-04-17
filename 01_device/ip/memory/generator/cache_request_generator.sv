@@ -43,7 +43,7 @@ module cache_request_generator #(
   logic arbiter_areset;
   logic counter_areset;
 
-  logic               fifo_642x128_setup_signal                          ;
+  logic               fifo_642x16_setup_signal                          ;
   logic               mem_resp_valid_reg                                 ;
   MemoryRequestPacket mem_req_reg              [NUM_MEMORY_REQUESTOR-1:0];
 
@@ -71,7 +71,7 @@ module cache_request_generator #(
   logic [OUTSTANDING_COUNTER_WIDTH-1:0] outstanding_counter_count;
 
 // --------------------------------------------------------------------------------------
-// Bus arbiter Signals fifo_642x128_CacheRequest
+// Bus arbiter Signals fifo_642x16_CacheRequest
 // --------------------------------------------------------------------------------------
   localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = NUM_MEMORY_REQUESTOR        ;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH;
@@ -129,7 +129,7 @@ module cache_request_generator #(
       cache_req_fifo_out_signals <= 1'b0;
     end
     else begin
-      fifo_setup_signal          <= fifo_642x128_setup_signal;
+      fifo_setup_signal          <= fifo_642x16_setup_signal;
       cache_req_fifo_out_signals <= cache_req_fifo_out_signals_reg;
     end
   end
@@ -276,13 +276,13 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign fifo_642x128_setup_signal       = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
+  assign fifo_642x16_setup_signal       = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
   assign cache_req_fifo_in_signals.wr_en = cache_req_fifo_din.valid;
   assign cache_req_fifo_dout.valid       = cache_req_fifo_out_signals_reg.valid;
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in fifo_642x128_CacheRequest
+// FIFO cache requests in fifo_642x16_CacheRequest
 // --------------------------------------------------------------------------------------
-  fifo_642x128 inst_fifo_642x128_CacheRequest (
+  fifo_642x16 inst_fifo_642x16_CacheRequest (
     .clk         (ap_clk                                     ),
     .srst        (fifo_areset                                ),
     .din         (cache_req_fifo_din.payload                 ),
@@ -301,7 +301,7 @@ module cache_request_generator #(
   );
 
 // --------------------------------------------------------------------------------------
-// Bus arbiter for requests fifo_642x128_CacheRequest
+// Bus arbiter for requests fifo_642x16_CacheRequest
 // --------------------------------------------------------------------------------------
   assign arbiter_bus_in[0] = mem_req_reg[0];
   assign arbiter_req[0]    = mem_req_reg[0].valid;
