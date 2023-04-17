@@ -6,16 +6,16 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_pkg.sv
+// File   : PKG_ENGINE.sv
 // Create : 2022-11-29 16:14:59
 // Revise : 2022-11-29 16:14:59
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
 `timescale 1 ns / 1 ps
-package ENGINE_PKG;
+package PKG_ENGINE;
 
-    import GLOBALS_PKG::*;
+    import PKG_GLOBALS::*;
 
 // Stride\_Index\_Generator
 // ------------------------

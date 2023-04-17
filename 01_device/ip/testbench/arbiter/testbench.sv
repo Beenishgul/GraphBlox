@@ -16,7 +16,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 // This bench simply applies the vectors in the pattern file,
 // and tests that the output matches the expected values. This

@@ -13,12 +13,12 @@
 // -----------------------------------------------------------------------------
 
 
-import AXI4_PKG::*;
-import GLOBALS_PKG::*;
-import DESCRIPTOR_PKG::*;
-import CONTROL_PKG::*;
-import MEMORY_PKG::*;
-import ENGINE_PKG::*;
+import PKG_AXI4::*;
+import PKG_GLOBALS::*;
+import PKG_DESCRIPTOR::*;
+import PKG_CONTROL::*;
+import PKG_MEMORY::*;
+import PKG_ENGINE::*;
 
 // Serial\_Read\_Engine
 // --------------------

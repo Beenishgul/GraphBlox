@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : memory_pkg.sv
+// File   : PKG_MEMORY.sv
 // Create : 2022-11-29 16:14:59
 // Revise : 2022-11-29 16:14:59
 // Editor : sublime text4, tab size (4)
@@ -18,9 +18,9 @@
 `include "iob_lib.vh"
 `include "iob-cache.vh"
 
-package MEMORY_PKG;
+package PKG_MEMORY;
 
-import GLOBALS_PKG::*;
+import PKG_GLOBALS::*;
 
 // --------------------------------------------------------------------------------------
 // FIFO Signals

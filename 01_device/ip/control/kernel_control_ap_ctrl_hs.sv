@@ -13,10 +13,10 @@
 // -----------------------------------------------------------------------------
 
 
-import GLOBALS_PKG::*;
-import AXI4_PKG::*;
-import DESCRIPTOR_PKG::*;
-import CONTROL_PKG::*;
+import PKG_GLOBALS::*;
+import PKG_AXI4::*;
+import PKG_DESCRIPTOR::*;
+import PKG_CONTROL::*;
 
 module kernel_control #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,

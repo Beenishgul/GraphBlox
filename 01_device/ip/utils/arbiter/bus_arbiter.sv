@@ -41,7 +41,7 @@
 // for the output registers).
 
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 module bus_arbiter_N_in_1_out #(
     parameter WIDTH        = 2            ,
