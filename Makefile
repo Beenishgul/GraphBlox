@@ -278,7 +278,7 @@ export MASK_MODE        = 0
 # =========================================================
 export XILINX_DIR         = xilinx_project
 export SCRIPTS_DIR        = scripts
-export IP_DIR             = glay_ip
+export IP_DIR             = ip
 export REPORTS_DIR        = reports
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
@@ -382,7 +382,7 @@ export XILINX_CTRL_MODE     = USER_MANAGED
 # =========================================================
 export TESTBENCH_MODULE     = glay
 # export TESTBENCH_MODULE     = arbiter
-# export TESTBENCH_MODULE     = glay_kernel_setup
+# export TESTBENCH_MODULE     = kernel_setup
 # export TESTBENCH_MODULE     = alu_operations
 # export TESTBENCH_MODULE     = conditional_break
 # export TESTBENCH_MODULE     = conditional_continue

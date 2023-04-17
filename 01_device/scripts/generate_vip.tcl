@@ -37,11 +37,11 @@ proc color {foreground text} {
 }
 
 # ----------------------------------------------------------------------------
-# Generate GLay IPs..... START!
+# Generate ${kernel_name} IPs..... START!
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
-puts "\[[color 2 "Generate GLay IPs....."]\] [color 1 "START!"]"
+puts "\[[color 2 "Generate ${kernel_name} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
@@ -143,9 +143,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x128_GlayCacheRequestInterfaceInput
+# generate fifo_642x128_CacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_642x128"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x128"]" 
 
 set module_name fifo_642x128
 create_ip -name fifo_generator \
@@ -183,9 +183,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_515x128_GlayCacheRequestInterfaceOutput
+# generate fifo_515x128_CacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheResponse: fifo_515x128"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x128"]" 
 
 set module_name fifo_515x128
 create_ip -name fifo_generator \
@@ -223,9 +223,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x128_GlayCacheRequest
+# generate fifo_642x128_CacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_642x32"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32"]" 
 
 set module_name fifo_642x32
 create_ip -name fifo_generator \
@@ -263,9 +263,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x128_GlayCacheRequest
+# generate fifo_642x128_CacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheRequest : fifo_642x32_FWFT"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32_FWFT"]" 
 
 set module_name fifo_642x32_FWFT
 create_ip -name fifo_generator \
@@ -303,9 +303,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_515x32_GlayCacheResponse
+# generate fifo_515x32_CacheResponse
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GlayCacheResponse: fifo_515x32"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x32"]" 
 
 set module_name fifo_515x32
 create_ip -name fifo_generator \
@@ -343,9 +343,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_166x32_GLayMemoryRequestPacket
+# generate fifo_166x32_MemoryRequestPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GLayMemoryRequestPacket: fifo_166x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_166x32"]" 
 
 set module_name fifo_166x32
 create_ip -name fifo_generator \
@@ -385,7 +385,7 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_654x32_MemoryResponsePacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO GLayMemoryResponsePacket: fifo_710x32"]" 
+puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_710x32"]" 
 
 set module_name fifo_710x32
 create_ip -name fifo_generator \
@@ -546,7 +546,7 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# Generate GLay IPs..... DONE! 
+# Generate ${kernel_name} IPs..... DONE! 
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
@@ -559,6 +559,6 @@ puts "========================================================="
 puts "========================================================="
 puts "\[[color 2 [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "Generate GLay IPs....."]\] [color 1 "DONE!"]"
+puts "\[[color 4 "Generate ${kernel_name} IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="
 close_project >> $log_file

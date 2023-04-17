@@ -7,7 +7,7 @@ print_usage () {
   echo ""
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/"
   echo "  SCRIPTS_DIR: 00_GLay"
-  echo "  KERNEL_NAME: glay_kernel"
+  echo "  KERNEL_NAME: kernel"
   echo "  IMPL_STRATEGY: 0"
   echo "  JOBS_STRATEGY: 2"
   echo "  PART: xcu280-fsvh2892-2L-e"
