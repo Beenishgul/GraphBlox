@@ -24,7 +24,7 @@ DEVICE_DIR          ?= 01_device
 
 XILINX_DIR          ?= xilinx_project
 SCRIPTS_DIR         ?= scripts
-IP_DIR              ?= glay_ip
+IP_DIR              ?= ip
 REPORTS_DIR         ?= reports
 
 VIVADO_PACKAGE_DIR  = vivado_package_kernel
@@ -50,7 +50,7 @@ ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 KERNEL_NAME         ?= glay_kernel
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
-GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
+FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280

@@ -46,7 +46,7 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
 
 # =========================================================
 puts "========================================================="
-puts "\[[color 2 "Packaging GLay IPs....."]\] [color 1 "START!"]"
+puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
@@ -230,7 +230,7 @@ puts_reg_info "AP_CONTINUE" "Control signal Register for ap_continue." "0x010" 1
     set_property DESCRIPTION {Reserved.  0s on read.} $field
     set_property READ_ACTION {modify} $field
 
-puts_reg_info "GIER" "Global Interrupt Enable Registe" "0x004" 32
+puts_reg_info "GIER" "Global Interrupt Enable Register" "0x004" 32
   set reg      [::ipx::add_register "GIER" $addr_block]
   set_property description    "Global Interrupt Enable Register"    $reg
   set_property address_offset 0x004 $reg
@@ -394,5 +394,5 @@ puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 2 "Packaging GLay IPs....."]\] [color 1 "DONE!"]"
+puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="

@@ -7,7 +7,7 @@ print_usage () {
   echo ""
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
-  echo "  KERNEL_NAME: glay_kernel"
+  echo "  KERNEL_NAME: kernel"
   echo "  IP_DIR : IP"
   echo "  VIP_DIR: vivado_generated_vip"
   echo "  MODULE : glay|arbiter"
@@ -25,21 +25,21 @@ IP_DIR=$4
 VIP_DIR=$5
 MODULE=$6
 
-glay_pkgs="pkg"
-glay_engine="engine"
-glay_kernel="kernel"
-glay_top="top"
-glay_testbench="testbench"
+pkgs="pkg"
+engine="engine"
+kernel="kernel"
+top="top"
+testbench="testbench"
 
-glay_memory="memory"
-glay_cache="cache"
-glay_generator="generator"
+memory="memory"
+cache="cache"
+generator="generator"
 
-glay_control="control"
-glay_utils="utils"
-glay_utils_arbiter="arbiter"
-glay_utils_counter="counter"
-glay_utils_include="include"
+control="control"
+utils="utils"
+utils_arbiter="arbiter"
+utils_counter="counter"
+utils_include="include"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -65,23 +65,23 @@ generate_xsim_filelist_f () {
 newtext=""
 echo $newtext > ${CFG_FILE_NAME}
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_pkgs}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME} "sv"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_arbiter}/ ${CFG_FILE_NAME} "sv"  
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME} "sv"  
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_utils}/${glay_utils_counter}/ ${CFG_FILE_NAME} "sv"  
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_counter}/ ${CFG_FILE_NAME} "sv"  
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_cache}/ ${CFG_FILE_NAME} "v" 
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${cache}/ ${CFG_FILE_NAME} "v" 
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_memory}/${glay_generator}/ ${CFG_FILE_NAME} "sv"  
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${generator}/ ${CFG_FILE_NAME} "sv"  
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_control}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_engine}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engine}/ ${CFG_FILE_NAME} "sv"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_kernel}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NAME} "sv"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_top}/ ${CFG_FILE_NAME} "v"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME} "v"
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
 echo $newtext >> ${CFG_FILE_NAME}
@@ -146,7 +146,7 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/sim/bram_512x32_asym_512wrt_64rd.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${glay_testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}

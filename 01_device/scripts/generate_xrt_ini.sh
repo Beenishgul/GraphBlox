@@ -7,7 +7,7 @@ print_usage () {
   echo ""
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
-  echo "  KERNEL_NAME: glay_kernel"
+  echo "  KERNEL_NAME: kernel"
   echo "  ctrl_mode  : USER_MANAGED"
   echo "" 
 }
