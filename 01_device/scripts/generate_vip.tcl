@@ -145,9 +145,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_642x16_CacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32"]" 
 
-set module_name fifo_642x16
+set module_name fifo_642x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -185,9 +185,9 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # ----------------------------------------------------------------------------
 # generate fifo_515x16_CacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x16"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x32"]" 
 
-set module_name fifo_515x16
+set module_name fifo_515x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
