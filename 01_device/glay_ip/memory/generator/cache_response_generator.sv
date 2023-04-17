@@ -28,7 +28,7 @@ module cache_response_generator #(
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
   output MemoryResponsePacket   mem_resp_out [NUM_MEMORY_REQUESTOR-1:0],
-  input  GlayCacheResponse      cache_resp_gen_out                     ,
+  input  GlayCacheResponse      cache_resp_in                          ,
   output FIFOStateSignalsOutput cache_resp_fifo_out_signals            ,
   output logic                  fifo_setup_signal
 );
