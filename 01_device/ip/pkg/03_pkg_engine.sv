@@ -85,7 +85,7 @@ package PKG_ENGINE;
         SERIAL_READ_ENGINE_BUSY,
         SERIAL_READ_ENGINE_PAUSE,
         SERIAL_READ_ENGINE_DONE
-    } serial_read_engine_state;
+    } engine_serial_read_state;
 
     typedef struct packed{
         logic                               increment    ;
