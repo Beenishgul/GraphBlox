@@ -29,7 +29,7 @@
 */
 
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 module mux_node (
 	input  logic [1:0] in    ,

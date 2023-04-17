@@ -6,14 +6,14 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : axi4_pkg.sv
+// File   : PKG_AXI4.sv
 // Create : 2022-11-28 16:08:34
 // Revise : 2022-11-28 16:08:34
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `timescale 1 ns / 1 ps
-package AXI4_PKG;
+package PKG_AXI4;
 
   parameter S_AXI_ADDR_WIDTH_BITS = 12;
   parameter S_AXI_DATA_WIDTH      = 32;

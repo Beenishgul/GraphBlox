@@ -12,10 +12,10 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import GLOBALS_PKG::*;
-import AXI4_PKG::*;
-import DESCRIPTOR_PKG::*;
-import CONTROL_PKG::*;
+import PKG_GLOBALS::*;
+import PKG_AXI4::*;
+import PKG_DESCRIPTOR::*;
+import PKG_CONTROL::*;
 
 
 module kernel_afu #(

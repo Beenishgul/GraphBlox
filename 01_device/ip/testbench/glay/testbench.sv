@@ -8,9 +8,9 @@ import slv_m00_axi_vip_pkg::*;
 import control_kernel_vip_pkg::*;
 
 
-import GLOBALS_PKG::*;
-import AXI4_PKG::*;
-import DESCRIPTOR_PKG::*;
+import PKG_GLOBALS::*;
+import PKG_AXI4::*;
+import PKG_DESCRIPTOR::*;
 
 
 class GraphCSR;

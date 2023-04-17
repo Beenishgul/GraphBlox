@@ -29,7 +29,7 @@
 */
 
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 module mux_array #(parameter WIDTH = 8) (
 	input  logic [(2*WIDTH)-1:0] in    ,

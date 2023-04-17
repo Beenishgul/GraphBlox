@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : control_pkg.sv
+// File   : PKG_CONTROL.sv
 // Create : 2022-12-20 21:55:24
 // Revise : 2022-12-20 21:55:24
 // Editor : sublime text4, tab size (4)
@@ -14,9 +14,9 @@
 
 
 `timescale 1 ns / 1 ps
-package CONTROL_PKG;
+package PKG_CONTROL;
 
-    import GLOBALS_PKG::*;
+    import PKG_GLOBALS::*;
 
     typedef struct packed{
         logic ap_start   ;

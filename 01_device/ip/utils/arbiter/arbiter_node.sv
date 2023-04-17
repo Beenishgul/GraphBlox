@@ -35,7 +35,7 @@
 // interconnected nodes to change state on the same ap_clk.
 
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 module arbiter_node (
 	input  logic       enable,

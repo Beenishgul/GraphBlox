@@ -15,7 +15,7 @@
 // -----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-import FUNCTIONS_PKG::*;
+import PKG_FUNCTIONS::*;
 
 module transactions_counter #(
   parameter integer               C_WIDTH = 4                 ,
@@ -105,7 +105,7 @@ endmodule : transactions_counter
 
 
 // `timescale 1ns / 1ps
-// import FUNCTIONS_PKG::*;
+// import PKG_FUNCTIONS::*;
 
 // module transactions_counter #(
 //   parameter integer               C_WIDTH = 4,

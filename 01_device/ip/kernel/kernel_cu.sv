@@ -12,11 +12,11 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import AXI4_PKG::*;
-import GLOBALS_PKG::*;
-import DESCRIPTOR_PKG::*;
-import CONTROL_PKG::*;
-import MEMORY_PKG::*;
+import PKG_AXI4::*;
+import PKG_GLOBALS::*;
+import PKG_DESCRIPTOR::*;
+import PKG_CONTROL::*;
+import PKG_MEMORY::*;
 
 module kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
