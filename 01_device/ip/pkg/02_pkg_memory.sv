@@ -179,10 +179,9 @@ typedef struct packed {
 
 // SIZE = 710 bits
 typedef struct packed{
-  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
   command_type                        cmd_type      ;
   structure_type                      struct_type   ;
   operand_location                    operand_loc   ;
@@ -197,7 +196,7 @@ typedef struct packed{
 
 // SIZE = 166 bits
 typedef struct packed{
-  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   command_type                        cmd_type      ;
@@ -211,7 +210,7 @@ typedef struct packed{
 
 // SIZE = 710 bits
 typedef struct packed{
-  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;

@@ -19,11 +19,13 @@ package PKG_GLOBALS;
 //  COMPUTE UNITS COUNT GLOBALS
 // --------------------------------------------------------------------------------------
 
-	parameter CU_COUNT_GLOBAL     = 1                     ;
-	parameter CU_COUNT_LOCAL      = 1                     ;
-	parameter CU_CACHE_SIZE_BYTES = 32768                 ; // size in Bytes 32KB
-	parameter CU_COUNT_TOTAL      = 64                    ;
-	parameter CU_ID_BITS          = $clog2(CU_COUNT_TOTAL);
+	parameter CU_COUNT_GLOBAL     = 1                                      ;
+	parameter CU_COUNT_LOCAL      = 1                                      ;
+	parameter CU_CACHE_SIZE_BYTES = 32768                                  ; // size in Bytes 32KB
+	parameter CU_CACHE_LINES_NUM  = CU_CACHE_SIZE_BYTES / (M_AXI4_DATA_W/8); // size in lines 512 (cacheline 64Bytes)
+
+	parameter CU_ENGINES_COUNT_TOTAL = 64                            ;
+	parameter CU_ENGINE_ID_BITS      = $clog2(CU_ENGINES_COUNT_TOTAL);
 
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS
