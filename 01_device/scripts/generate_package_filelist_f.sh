@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-04-18 00:39:43
+# @Last Modified time: 2023-04-18 00:43:14
 #!/bin/bash
 
 
@@ -87,10 +87,10 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16/fifo_937x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x32/fifo_937x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/fifo_814x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x32/fifo_814x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16/fifo_937x16.xci"
