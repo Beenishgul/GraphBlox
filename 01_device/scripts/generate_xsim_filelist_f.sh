@@ -125,10 +125,7 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/sim/fifo_515x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_166x16/sim/fifo_166x16.v"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_710x16/sim/fifo_710x16.v"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/sim/fifo_812x16.v"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/sim/fifo_512x32_asym_512wrt_64rd.v"

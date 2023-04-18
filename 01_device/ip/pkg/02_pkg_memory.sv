@@ -97,7 +97,6 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-
 typedef enum int unsigned {
   STRUCT_INVALID,
   STRUCT_OUT_DEGREE,
@@ -114,8 +113,6 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-
-
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
@@ -174,8 +171,6 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
-
-
 typedef struct packed {
   `ifdef WORD_ADDR
     logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
@@ -206,7 +201,6 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
-
 typedef struct packed {
   logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
   `ifdef CTRL_IO
