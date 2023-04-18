@@ -22,6 +22,14 @@ class GraphCSR;
     integer vertex_count           ;
     integer edge_count             ;
 
+    integer file_error               ;
+    integer file_ptr_edges_idx       ;
+    integer file_ptr_in_degree       ;
+    integer file_ptr_out_degree      ;
+    integer file_ptr_edges_array_src ;
+    integer file_ptr_edges_array_dest;
+
+
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] csr_struct[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] out_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] in_degree[];
@@ -32,6 +40,12 @@ class GraphCSR;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
 
     function new ();
+        this.file_error    = 0;
+        this.file_ptr_edges_idx  = 0;
+        this.file_ptr_in_degree  = 0;
+        this.file_ptr_out_degree  = 0;
+        this.file_ptr_edges_array_src  = 0;
+        this.file_ptr_edges_array_dest = 0;
         this.vertex_count = 0;
         this.edge_count = 0;
         this.mem512_vertex_count = 0;
@@ -882,6 +896,122 @@ module kernel_testbench ();
     bit         axis_choose_pressure_type = 0;
     bit [0-1:0] axis_tlast_received          ;
 
+    GraphCSR graph;
+
+    function automatic void read_files_graphCSR(ref GraphCSR graph);
+
+        // graph.csr_struct[0] = 0;
+        // graph.csr_struct[1] = 0;
+        // graph.csr_struct[2] = 0;
+        // graph.csr_struct[3] = 0;
+
+        // graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
+        // graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
+        // graph.csr_struct[0][(64)+:64] = vertex_out_degree_ptr;
+        // graph.csr_struct[0][(64*2)+:64] = vertex_in_degree_ptr;
+        // graph.csr_struct[0][(64*3)+:64] = vertex_edges_idx_ptr;
+        // graph.csr_struct[0][(64*4)+:64] = edges_array_src_ptr;
+        // graph.csr_struct[0][(64*5)+:64] = edges_array_dest_ptr;
+        // graph.csr_struct[0][(64*6)+:64] = edges_array_weight_ptr;
+        // graph.csr_struct[0][(64*7)+:64] = auxiliary_1_ptr;
+        // graph.csr_struct[1][0+:64] = auxiliary_2_ptr;
+        // graph.csr_struct[1][(64)+:64] = 1;
+
+        int          realcount                 = 0;
+        bit [32-1:0] temp_out_degree              ;
+        bit [32-1:0] temp_in_degree               ;
+        bit [32-1:0] temp_edges_idx               ;
+
+        bit [32-1:0] temp_edges_array_src ;
+        bit [32-1:0] temp_edges_array_dest;
+
+        realcount = 0;
+
+        for (int i = 0; i < graph.mem512_csr_struct_count; i++) begin
+            for (int j = 0; j < 8; j++) begin
+                graph.csr_struct[i][(64*j)+:64] = realcount;
+                realcount++;
+            end
+        end
+
+        realcount = 0;
+
+        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
+                graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
+                graph.out_degree[i][j+:VERTEX_DATA_BITS] = temp_out_degree;
+                graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
+                graph.in_degree[i][j+:VERTEX_DATA_BITS] = temp_in_degree;
+                graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
+                graph.edges_idx[i][j+:VERTEX_DATA_BITS] = temp_edges_idx;
+            end
+        end
+
+        realcount = 0;
+
+        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
+            for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
+                graph.edges_array_src[i][j+:VERTEX_DATA_BITS] = temp_edges_array_src;
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
+                graph.edges_array_dest[i][j+:VERTEX_DATA_BITS] = temp_edges_array_dest;
+            end
+        end
+
+    endfunction : read_files_graphCSR
+
+
+    task automatic initalize_graph (ref GraphCSR graph);
+        graph.graph_name = "LAW-amazon-2008";
+
+        graph.file_ptr_edges_array_dest = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_dest", "r");
+        if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
+        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
+
+        graph.file_ptr_edges_array_src = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_src", "r");
+        if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
+        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
+
+        graph.file_ptr_edges_idx = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_idx", "r");
+        if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
+        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
+
+
+        graph.file_ptr_in_degree = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.in_degree", "r");
+        if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
+        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
+
+
+        graph.file_ptr_out_degree = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.out_degree", "r");
+        if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
+        else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
+
+        graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
+        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
+
+        graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_csr_struct_count = int'(auxiliary_2_ptr); // cachelines
+
+        graph.csr_struct = new [graph.mem512_csr_struct_count];
+        graph.out_degree = new [graph.mem512_vertex_count];
+        graph.in_degree  = new [graph.mem512_vertex_count];
+        graph.edges_idx  = new [graph.mem512_vertex_count];
+
+        graph.edges_array_src = new [graph.mem512_edge_count];
+        graph.edges_array_dest= new [graph.mem512_edge_count];
+
+        read_files_graphCSR(graph);
+
+        $fclose(graph.file_ptr_edges_array_dest);
+        $fclose(graph.file_ptr_edges_array_src);
+        $fclose(graph.file_ptr_edges_idx);
+        $fclose(graph.file_ptr_in_degree);
+        $fclose(graph.file_ptr_out_degree);
+
+        graph.display();
+    endtask
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Set up the kernel for operation and set the kernel START bit.
 // The task will poll the DONE bit and check the results when complete.
@@ -906,6 +1036,7 @@ module kernel_testbench ();
 
             set_scalar_registers();
             set_memory_pointers();
+            initalize_graph (graph);
             // backdoor_fill_memories();
             backdoor_buffer_fill_memories(graph);
             // Check that Kernel is IDLE before starting.
@@ -915,7 +1046,7 @@ module kernel_testbench ();
             blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
 
             ctrl.wait_drivers_idle();
-            
+
             poll_ready_register();
 
             poll_done_register();
@@ -935,128 +1066,12 @@ module kernel_testbench ();
         end
     endtask
 
-    GraphCSR     graph                        ;
-    int          file_error                = 0;
-    int          file_ptr_edges_idx           ;
-    int          file_ptr_in_degree           ;
-    int          file_ptr_out_degree          ;
-    int          file_ptr_edges_array_src     ;
-    int          file_ptr_edges_array_dest    ;
-    int          realcount                 = 0;
-    bit [32-1:0] temp_out_degree              ;
-    bit [32-1:0] temp_in_degree               ;
-    bit [32-1:0] temp_edges_idx               ;
-
-    bit [32-1:0] temp_edges_array_src ;
-    bit [32-1:0] temp_edges_array_dest;
-
-    function void read_files_graphCSR();
-
-        // graph.csr_struct[0] = 0;
-        // graph.csr_struct[1] = 0;
-        // graph.csr_struct[2] = 0;
-        // graph.csr_struct[3] = 0;
-
-        // graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
-        // graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
-        // graph.csr_struct[0][(64)+:64] = vertex_out_degree_ptr;
-        // graph.csr_struct[0][(64*2)+:64] = vertex_in_degree_ptr;
-        // graph.csr_struct[0][(64*3)+:64] = vertex_edges_idx_ptr;
-        // graph.csr_struct[0][(64*4)+:64] = edges_array_src_ptr;
-        // graph.csr_struct[0][(64*5)+:64] = edges_array_dest_ptr;
-        // graph.csr_struct[0][(64*6)+:64] = edges_array_weight_ptr;
-        // graph.csr_struct[0][(64*7)+:64] = auxiliary_1_ptr;
-        // graph.csr_struct[1][0+:64] = auxiliary_2_ptr;
-        // graph.csr_struct[1][(64)+:64] = 1;
-
-        realcount = 0;
-
-        for (int i = 0; i < 4; i++) begin
-            for (int j = 0; j < 8; j++) begin
-                graph.csr_struct[i][(64*j)+:64] = realcount;
-                realcount++;
-            end
-        end
-
-        realcount = 0;
-
-        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
-                file_error =  $fscanf(file_ptr_out_degree, "%0d\n",temp_out_degree);
-                graph.out_degree[i][j+:VERTEX_DATA_BITS] = temp_out_degree;
-                file_error =  $fscanf(file_ptr_in_degree, "%0d\n",temp_in_degree);
-                graph.in_degree[i][j+:VERTEX_DATA_BITS] = temp_in_degree;
-                file_error =  $fscanf(file_ptr_edges_idx, "%0d\n",temp_edges_idx);
-                graph.edges_idx[i][j+:VERTEX_DATA_BITS] = temp_edges_idx;
-            end
-        end
-
-        realcount = 0;
-
-        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
-            for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
-                file_error =  $fscanf(file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
-                graph.edges_array_src[i][j+:VERTEX_DATA_BITS] = temp_edges_array_src;
-                file_error =  $fscanf(file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
-                graph.edges_array_dest[i][j+:VERTEX_DATA_BITS] = temp_edges_array_dest;
-            end
-        end
-
-    endfunction : read_files_graphCSR
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
     initial begin : STIMULUS
 
         graph = new();
-        graph.graph_name = "LAW-amazon-2008";
-
-        file_ptr_edges_array_dest = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_dest", "r");
-        if(file_ptr_edges_array_dest) $display("File was opened successfully : %0d",file_ptr_edges_array_dest);
-        else                          $display("File was NOT opened successfully : %0d",file_ptr_edges_array_dest);
-
-        file_ptr_edges_array_src = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_array_src", "r");
-        if(file_ptr_edges_array_src) $display("File was opened successfully : %0d",file_ptr_edges_array_src);
-        else                         $display("File was NOT opened successfully : %0d",file_ptr_edges_array_src);
-
-        file_ptr_edges_idx = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.edges_idx", "r");
-        if(file_ptr_edges_idx) $display("File was opened successfully : %0d",file_ptr_edges_idx);
-        else                   $display("File was NOT opened successfully : %0d",file_ptr_edges_idx);
-
-
-        file_ptr_in_degree = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.in_degree", "r");
-        if(file_ptr_in_degree) $display("File was opened successfully : %0d",file_ptr_in_degree);
-        else                   $display("File was NOT opened successfully : %0d",file_ptr_in_degree);
-
-
-        file_ptr_out_degree = $fopen("../../../03_test_graphs/LAW/LAW-amazon-2008/graph.bin.out_degree", "r");
-        if(file_ptr_out_degree) $display("File was opened successfully : %0d",file_ptr_out_degree);
-        else                    $display("File was NOT opened successfully : %0d",file_ptr_out_degree);
-
-        file_error =      $fscanf(file_ptr_out_degree, "%d\n",graph.vertex_count);
-        file_error =      $fscanf(file_ptr_edges_array_src, "%d\n",graph.edge_count);
-
-        graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_csr_struct_count = 4; // cachelines
-
-        graph.csr_struct = new [graph.mem512_csr_struct_count];
-        graph.out_degree = new [graph.mem512_vertex_count];
-        graph.in_degree  = new [graph.mem512_vertex_count];
-        graph.edges_idx  = new [graph.mem512_vertex_count];
-
-        graph.edges_array_src = new [graph.mem512_edge_count];
-        graph.edges_array_dest= new [graph.mem512_edge_count];
-
-        read_files_graphCSR();
-
-        $fclose(file_ptr_edges_array_dest);
-        $fclose(file_ptr_edges_array_src);
-        $fclose(file_ptr_edges_idx);
-        $fclose(file_ptr_in_degree);
-        $fclose(file_ptr_out_degree);
-
-        graph.display();
 
         #200000;
         start_vips();

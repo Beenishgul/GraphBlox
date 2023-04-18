@@ -32,7 +32,7 @@
 `timescale 1 ns / 1 ps
 package PKG_FUNCTIONS;
 
-	import PKG_AXI4::*;
+	import PKG_GLOBALS::*;
 
 	function integer min (
 			input integer a, b
