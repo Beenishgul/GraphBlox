@@ -45,7 +45,7 @@ module engine_serial_read #(
     input  logic                         ap_clk                      ,
     input  logic                         areset                      ,
     input  SerialReadEngineConfiguration serial_read_config          ,
-    output MemoryRequestPacket           engine_serial_read_req_out  ,
+    output MemoryPacket           engine_serial_read_req_out  ,
     output FIFOStateSignalsOutput        req_fifo_out_signals        ,
     input  FIFOStateSignalsInput         req_fifo_in_signals         ,
     output logic                         fifo_setup_signal           ,
@@ -78,8 +78,8 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryRequestPacket    engine_serial_read_req_dout;
-    MemoryRequestPacket    engine_serial_read_req_din ;
+    MemoryPacket    engine_serial_read_req_dout;
+    MemoryPacket    engine_serial_read_req_din ;
     FIFOStateSignalsOutput req_fifo_out_signals_reg   ;
     FIFOStateSignalsInput  req_fifo_in_signals_reg    ;
     logic                  fifo_setup_signal_reg      ;
@@ -331,11 +331,11 @@ module engine_serial_read #(
     assign fifo_setup_signal_reg = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy ;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_515x16_MemoryRequestPacket
+// FIFO cache requests out fifo_515x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = engine_serial_read_req_din.valid;
 
-    fifo_166x16 inst_fifo_166x16_MemoryRequestPacket (
+    fifo_166x16 inst_fifo_166x16_MemoryPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (engine_serial_read_req_din.payload   ),

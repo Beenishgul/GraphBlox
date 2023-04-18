@@ -112,72 +112,10 @@ typedef enum int unsigned {
 } structure_type;
 
 // --------------------------------------------------------------------------------------
-//   Cache Requests state machine
-// --------------------------------------------------------------------------------------
-
-typedef enum int unsigned {
-  CACHE_REQUEST_GEN_RESET,
-  CACHE_REQUEST_GEN_IDLE,
-  CACHE_REQUEST_GEN_SEND_S1,
-  CACHE_REQUEST_GEN_SEND_S2,
-  CACHE_REQUEST_GEN_BUSY,
-  CACHE_REQUEST_GEN_READY,
-  CACHE_REQUEST_GEN_DONE
-} cache_request_generator_state;
-
-// --------------------------------------------------------------------------------------
-// Cache requests in CacheRequest
-// --------------------------------------------------------------------------------------
-
-
-typedef struct packed {
-  `ifdef WORD_ADDR
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
-  `else
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:0] addr;
-  `endif
-
-  logic [CACHE_FRONTEND_DATA_W-1:0] wdata;
-  logic [CACHE_FRONTEND_NBYTES-1:0] wstrb;
-  `ifdef CTRL_IO
-    //control-status io
-    logic force_inv_in; //force 1'b0 if unused
-    logic wtb_empty_in; //force 1'b1 if unused
-  `endif
-} CacheRequestPayload; // SIZE = 515 bits + 6
-
-
-
-typedef struct packed {
-  logic               valid  ;
-  CacheRequestPayload payload;
-} CacheRequest;// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
-
-// --------------------------------------------------------------------------------------
-// Cache response out CacheResponse
-// --------------------------------------------------------------------------------------
-
-typedef struct packed {
-  logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
-  `ifdef CTRL_IO
-    //control-status io
-    logic force_inv_out;
-    logic wtb_empty_out;
-  `endif
-} CacheResponsePayload; // SIZE = 514 bits
-
-
-
-typedef struct packed {
-  logic                valid  ;
-  CacheResponsePayload payload;
-} CacheResponse;// SIZE = 515 bits
-
-// --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 
-// SIZE = 710 bits
+
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
@@ -199,27 +137,26 @@ typedef struct packed{
   MemoryPacketData data;
 } MemoryPacketPayload;// SIZE = 812 bits
 
-// SIZE = 166 bits
+
 typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
 } MemoryPacket;// SIZE = 813 bits
 
 
-// SIZE = 166 bits
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   command_type                        cmd_type      ;
-} MemoryRequestPacketPayload;
+} MemoryPacketPayload;// SIZE = 166 bits
 
 typedef struct packed{
-  logic                      valid  ;
-  MemoryRequestPacketPayload payload;
-} MemoryRequestPacket;
+  logic               valid  ;
+  MemoryPacketPayload payload;
+} MemoryPacket;// SIZE = 167 bits
 
-// SIZE = 710 bits
+
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
@@ -227,11 +164,82 @@ typedef struct packed{
   logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
   command_type                        cmd_type      ;
   structure_type                      struct_type   ;
-} MemoryResponsePacketPayload;
+} MemoryPacketPayload;// SIZE = 710 bits
 
 typedef struct packed{
-  logic                       valid  ;
-  MemoryResponsePacketPayload payload;
-} MemoryResponsePacket;
+  logic               valid  ;
+  MemoryPacketPayload payload;
+} MemoryPacket;// SIZE = 711 bits
+
+// --------------------------------------------------------------------------------------
+// Cache requests in CacheRequest
+// --------------------------------------------------------------------------------------
+
+
+typedef struct packed {
+  `ifdef WORD_ADDR
+    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
+  `else
+    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:0] addr;
+  `endif
+
+  logic [CACHE_FRONTEND_DATA_W-1:0] wdata;
+  logic [CACHE_FRONTEND_NBYTES-1:0] wstrb;
+  `ifdef CTRL_IO
+    //control-status io
+    logic force_inv_in; //force 1'b0 if unused
+    logic wtb_empty_in; //force 1'b1 if unused
+  `endif
+} CacheRequestIOB; // SIZE = 515 bits + 6
+
+typedef struct packed {
+  CacheRequestIOB  iob ;
+  MemoryPacketMeta meta;
+} CacheRequestPayload;// SIZE = 515 bits + 6
+
+
+typedef struct packed {
+  logic               valid  ;
+  CacheRequestPayload payload;
+} CacheRequest;// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
+
+// --------------------------------------------------------------------------------------
+// Cache response out CacheResponse
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {
+  logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
+  `ifdef CTRL_IO
+    //control-status io
+    logic force_inv_out;
+    logic wtb_empty_out;
+  `endif
+} CacheResponseIOB; // SIZE = 514 bits
+
+typedef struct packed {
+  CacheRequestIOB  iob ;
+  MemoryPacketMeta meta;
+} CacheResponsePayload;// SIZE = 514 bits
+
+typedef struct packed {
+  logic                valid  ;
+  CacheResponsePayload payload;
+} CacheResponse;// SIZE = 515 bits
+
+// --------------------------------------------------------------------------------------
+//   Cache Requests state machine
+// --------------------------------------------------------------------------------------
+
+typedef enum int unsigned {
+  CACHE_REQUEST_GEN_RESET,
+  CACHE_REQUEST_GEN_IDLE,
+  CACHE_REQUEST_GEN_SEND_S1,
+  CACHE_REQUEST_GEN_SEND_S2,
+  CACHE_REQUEST_GEN_BUSY,
+  CACHE_REQUEST_GEN_READY,
+  CACHE_REQUEST_GEN_DONE
+} cache_request_generator_state;
+
+
 
 endpackage
