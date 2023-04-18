@@ -163,9 +163,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {642}                                                     \
+                    CONFIG.Input_Data_Width {937}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {642}                                                    \
+                    CONFIG.Output_Data_Width {937}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
@@ -183,11 +183,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_515x16_CacheRequestInterfaceOutput
+# generate fifo_814x16_CacheRequestInterfaceOutput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x32"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_814x32"]" 
 
-set module_name fifo_515x32
+set module_name fifo_814x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -203,9 +203,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {515}                                                     \
+                    CONFIG.Input_Data_Width {814}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {515}                                                    \
+                    CONFIG.Output_Data_Width {814}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
@@ -243,9 +243,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {642}                                                     \
+                    CONFIG.Input_Data_Width {937}                                                     \
                     CONFIG.Input_Depth {16}                                                           \
-                    CONFIG.Output_Data_Width {642}                                                    \
+                    CONFIG.Output_Data_Width {937}                                                    \
                     CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {12}                                           \
@@ -283,9 +283,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {642}                                                     \
+                    CONFIG.Input_Data_Width {937}                                                     \
                     CONFIG.Input_Depth {16}                                                           \
-                    CONFIG.Output_Data_Width {642}                                                    \
+                    CONFIG.Output_Data_Width {937}                                                    \
                     CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {12}                                           \
@@ -303,11 +303,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_515x16_CacheResponse
+# generate fifo_814x16_CacheResponse
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheResponse: fifo_515x16"]" 
+puts "[color 2 "                        Generate FIFO CacheResponse: fifo_814x16"]" 
 
-set module_name fifo_515x16
+set module_name fifo_814x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -323,9 +323,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {515}                                                     \
+                    CONFIG.Input_Data_Width {814}                                                     \
                     CONFIG.Input_Depth {16}                                                           \
-                    CONFIG.Output_Data_Width {515}                                                    \
+                    CONFIG.Output_Data_Width {814}                                                    \
                     CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {12}                                           \
