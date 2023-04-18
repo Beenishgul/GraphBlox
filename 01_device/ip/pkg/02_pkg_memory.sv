@@ -25,7 +25,6 @@ import PKG_GLOBALS::*;
 // --------------------------------------------------------------------------------------
 // FIFO Signals
 // --------------------------------------------------------------------------------------
-
 typedef struct packed {
   logic full        ;
   logic almost_full ;
@@ -134,12 +133,10 @@ typedef struct packed{
   MemoryPacketData data;
 } MemoryPacketPayload;// SIZE = 812 bits
 
-
 typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
 } MemoryPacket;// SIZE = 813 bits
-
 
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
@@ -152,7 +149,6 @@ typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
 } MemoryPacket;// SIZE = 167 bits
-
 
 typedef struct packed{
   logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
@@ -192,7 +188,6 @@ typedef struct packed {
   MemoryPacketMeta meta;
 } CacheRequestPayload;// SIZE = 515 bits + 6
 
-
 typedef struct packed {
   logic               valid  ;
   CacheRequestPayload payload;
@@ -223,7 +218,6 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Cache Requests state machine
 // --------------------------------------------------------------------------------------
-
 typedef enum int unsigned {
   CACHE_REQUEST_GEN_RESET,
   CACHE_REQUEST_GEN_IDLE,
