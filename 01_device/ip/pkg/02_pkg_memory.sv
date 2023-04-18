@@ -46,7 +46,6 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-
 typedef enum int unsigned {
   CMD_INVALID,
   CMD_READ,
@@ -54,6 +53,46 @@ typedef enum int unsigned {
   CMD_PREFETCH_READ,
   CMD_PREFETCH_WRITE
 } command_type;
+
+// --------------------------------------------------------------------------------------
+//   Generic Memory Operand location
+// --------------------------------------------------------------------------------------
+typedef enum int unsigned {
+  OP_LOCATION_0,
+  OP_LOCATION_1,
+  OP_LOCATION_2,
+  OP_LOCATION_3,
+  OP_LOCATION_4,
+  OP_LOCATION_5,
+  OP_LOCATION_6,
+  OP_LOCATION_7,
+  OP_LOCATION_8
+} operand_location;
+
+// --------------------------------------------------------------------------------------
+//   Generic Memory Filter Type
+// --------------------------------------------------------------------------------------
+typedef enum int unsigned {
+  FILTER_NOP,
+  FILTER_GT,
+  FILTER_LT,
+  FILTER_EQ,
+  FILTER_GT_EQ,
+  FILTER_LT_EQ,
+  FILTER_NOT_EQ
+} filter_operation;
+
+// --------------------------------------------------------------------------------------
+//   Generic Memory Filter Type
+// --------------------------------------------------------------------------------------
+typedef enum int unsigned {
+  ALU_NOP,
+  ALU_ADD,
+  ALU_SUB,
+  ALU_MUL,
+  ALU_ACC,
+  ALU_DIV
+} ALU_operation;
 
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
@@ -110,7 +149,7 @@ typedef struct packed {
 
 // SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
 typedef struct packed {
-  logic                   valid  ;
+  logic               valid  ;
   CacheRequestPayload payload;
 } CacheRequest;
 
@@ -130,13 +169,31 @@ typedef struct packed {
 
 // SIZE = 515 bits
 typedef struct packed {
-  logic                    valid  ;
+  logic                valid  ;
   CacheResponsePayload payload;
 } CacheResponse;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
+
+// SIZE = 710 bits
+typedef struct packed{
+  logic [             CU_ID_BITS-1:0] cu_id         ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
+  logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
+  command_type                        cmd_type      ;
+  structure_type                      struct_type   ;
+  operand_location                    operand_loc   ;
+  filter_operation                    filter_op     ;
+  ALU_operation                       ALU_op        ;
+} MemoryPacketMeta;
+
+// SIZE = 512 bits
+typedef struct packed{
+  logic [CACHE_FRONTEND_DATA_W-1:0] data_field;
+} MemoryPacketData;
 
 // SIZE = 166 bits
 typedef struct packed{
@@ -149,6 +206,7 @@ typedef struct packed{
 typedef struct packed{
   logic                      valid  ;
   MemoryRequestPacketPayload payload;
+  MemoryPacketMeta           meta   ;
 } MemoryRequestPacket;
 
 // SIZE = 710 bits
@@ -164,6 +222,7 @@ typedef struct packed{
 typedef struct packed{
   logic                       valid  ;
   MemoryResponsePacketPayload payload;
+  MemoryPacketMeta            meta   ;
 } MemoryResponsePacket;
 
 
