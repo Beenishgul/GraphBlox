@@ -32,6 +32,8 @@
 `timescale 1 ns / 1 ps
 package PKG_FUNCTIONS;
 
+	import PKG_AXI4::*;
+
 	function integer min (
 			input integer a, b
 		);
@@ -110,5 +112,16 @@ package PKG_FUNCTIONS;
 		end
 	endfunction
 
+	function logic [CACHE_FRONTEND_DATA_W-1:0] swap_endianness_cacheline (logic [CACHE_FRONTEND_DATA_W-1:0] in);
+
+		logic [CACHE_FRONTEND_DATA_W-1:0] out;
+
+		integer i;
+		for ( i = 0; i < CACHE_FRONTEND_NBYTES; i++) begin
+			out[i*8 +: 8] = in[((CACHE_FRONTEND_DATA_W-1)-(i*8)) -:8];
+		end
+
+		return out;
+	endfunction : swap_endianness_cacheline
 
 endpackage
