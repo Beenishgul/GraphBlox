@@ -129,7 +129,7 @@ typedef enum int unsigned {
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
 
-// SIZE = 515 bits + 6
+
 typedef struct packed {
   `ifdef WORD_ADDR
     logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
@@ -144,14 +144,14 @@ typedef struct packed {
     logic force_inv_in; //force 1'b0 if unused
     logic wtb_empty_in; //force 1'b1 if unused
   `endif
-} CacheRequestPayload;
+} CacheRequestPayload; // SIZE = 515 bits + 6
 
 
-// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
+
 typedef struct packed {
   logic               valid  ;
   CacheRequestPayload payload;
-} CacheRequest;
+} CacheRequest;// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
 
 // --------------------------------------------------------------------------------------
 // Cache response out CacheResponse
@@ -164,14 +164,14 @@ typedef struct packed {
     logic force_inv_out;
     logic wtb_empty_out;
   `endif
-} CacheResponsePayload;
+} CacheResponsePayload; // SIZE = 514 bits
 
 
-// SIZE = 515 bits
+
 typedef struct packed {
   logic                valid  ;
   CacheResponsePayload payload;
-} CacheResponse;
+} CacheResponse;// SIZE = 515 bits
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
@@ -179,24 +179,36 @@ typedef struct packed {
 
 // SIZE = 710 bits
 typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  command_type                        cmd_type      ;
-  structure_type                      struct_type   ;
-  operand_location                    operand_loc   ;
-  filter_operation                    filter_op     ;
-  ALU_operation                       ALU_op        ;
-} MemoryPacketMeta;
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ; // SIZE = 64 bits
+  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset; // SIZE = 64 bits
+  command_type                        cmd_type      ; // SIZE = 32 bits
+  structure_type                      struct_type   ; // SIZE = 32 bits
+  operand_location                    operand_loc   ; // SIZE = 32 bits
+  filter_operation                    filter_op     ; // SIZE = 32 bits
+  ALU_operation                       ALU_op        ; // SIZE = 32 bits
+} MemoryPacketMeta;// SIZE = 300 bits
 
-// SIZE = 512 bits
 typedef struct packed{
-  logic [CACHE_FRONTEND_DATA_W-1:0] data_field;
-} MemoryPacketData;
+  logic [CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
+} MemoryPacketData;// SIZE = 512 bits
+
+typedef struct packed{
+  MemoryPacketMeta meta;
+  MemoryPacketData data;
+} MemoryPacketPayload;// SIZE = 812 bits
 
 // SIZE = 166 bits
 typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
+  logic               valid  ;
+  MemoryPacketPayload payload;
+} MemoryPacket;// SIZE = 813 bits
+
+
+// SIZE = 166 bits
+typedef struct packed{
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   command_type                        cmd_type      ;
@@ -205,12 +217,11 @@ typedef struct packed{
 typedef struct packed{
   logic                      valid  ;
   MemoryRequestPacketPayload payload;
-  MemoryPacketMeta           meta   ;
 } MemoryRequestPacket;
 
 // SIZE = 710 bits
 typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_id         ;
+  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
   logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
   logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
@@ -221,9 +232,6 @@ typedef struct packed{
 typedef struct packed{
   logic                       valid  ;
   MemoryResponsePacketPayload payload;
-  MemoryPacketMeta            meta   ;
 } MemoryResponsePacket;
-
-
 
 endpackage
