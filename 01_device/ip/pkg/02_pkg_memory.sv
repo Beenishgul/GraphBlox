@@ -181,17 +181,17 @@ typedef struct packed {
     logic force_inv_in; //force 1'b0 if unused
     logic wtb_empty_in; //force 1'b1 if unused
   `endif
-} CacheRequestIOB; // SIZE = 515 bits + 6
+} CacheRequestIOB; // SIZE = 642
 
 typedef struct packed {
   CacheRequestIOB  iob ;
   MemoryPacketMeta meta;
-} CacheRequestPayload;// SIZE = 515 bits + 6
+} CacheRequestPayload;// SIZE = 942 bits
 
 typedef struct packed {
   logic               valid  ;
   CacheRequestPayload payload;
-} CacheRequest;// SIZE = 643 - 6(CACHE_FRONTEND_BYTE_W) = 637 bits
+} CacheRequest;// SIZE = 943 - 6(CACHE_FRONTEND_BYTE_W) = 937 bits
 
 // --------------------------------------------------------------------------------------
 // Cache response out CacheResponse
