@@ -75,8 +75,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
-  CacheResponse cache_resp_fifo_dout;
-  CacheResponse cache_resp_fifo_din ;
 
   FIFOStateSignalsOutput cache_req_fifo_out_signals ;
   FIFOStateSignalsOutput cache_resp_fifo_out_signals;
@@ -96,6 +94,10 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
   CacheRequest        cache_resp_in                          ;
+  CacheResponse cache_resp_fifo_dout;
+  CacheResponse cache_resp_fifo_din ;
+  CacheResponse cache_resp_out ;
+
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
@@ -328,8 +330,8 @@ module kernel_cu #(
     .addr         (cache_req_out.payload.addr       ),
     .wdata        (cache_req_out.payload.wdata      ),
     .wstrb        (cache_req_out.payload.wstrb      ),
-    .rdata        (cache_resp_fifo_din.payload.rdata),
-    .ready        (cache_resp_fifo_din.valid        ),
+    .rdata        (cache_resp_out.payload.rdata),
+    .ready        (cache_resp_out.valid        ),
     .force_inv_in (force_inv_in                     ),
     .force_inv_out(force_inv_out                    ),
     .wtb_empty_in (wtb_empty_in                     ),
@@ -342,6 +344,10 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO cache response out fifo_515x16_CacheResponse
 // --------------------------------------------------------------------------------------
+  assign cache_resp_fifo_din.valid = cache_resp_out;
+  assign cache_resp_fifo_din.payload.rdata = swap_endianness_cacheline(cache_resp_fifo_din.payload.rdata);
+  assign cache_resp_fifo_din.payload.wtb_empty_out = cache_resp_fifo_din.payload.wtb_empty_out;
+
   assign fifo_515x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
 
