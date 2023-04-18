@@ -163,9 +163,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {937}                                                     \
+                    CONFIG.Input_Data_Width {942}                                                     \
                     CONFIG.Input_Depth {32}                                                           \
-                    CONFIG.Output_Data_Width {937}                                                    \
+                    CONFIG.Output_Data_Width {942}                                                    \
                     CONFIG.Output_Depth {32}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {24}                                           \
@@ -243,9 +243,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {937}                                                     \
+                    CONFIG.Input_Data_Width {942}                                                     \
                     CONFIG.Input_Depth {16}                                                           \
-                    CONFIG.Output_Data_Width {937}                                                    \
+                    CONFIG.Output_Data_Width {942}                                                    \
                     CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {12}                                           \
@@ -283,9 +283,9 @@ set_property -dict [list                                                        
                     CONFIG.Reset_Pin {1}                                                              \
                     CONFIG.Reset_Type {Synchronous_Reset}                                             \
                     CONFIG.asymmetric_port_width {0}                                                  \
-                    CONFIG.Input_Data_Width {937}                                                     \
+                    CONFIG.Input_Data_Width {942}                                                     \
                     CONFIG.Input_Depth {16}                                                           \
-                    CONFIG.Output_Data_Width {937}                                                    \
+                    CONFIG.Output_Data_Width {942}                                                    \
                     CONFIG.Output_Depth {16}                                                          \
                     CONFIG.Programmable_Full_Type {Single_Programmable_Full_Threshold_Constant}       \
                     CONFIG.Full_Threshold_Assert_Value {12}                                           \
