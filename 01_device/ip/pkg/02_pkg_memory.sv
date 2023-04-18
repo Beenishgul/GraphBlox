@@ -138,32 +138,6 @@ typedef struct packed{
   MemoryPacketPayload payload;
 } MemoryPacket;// SIZE = 813 bits
 
-typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  command_type                        cmd_type      ;
-} MemoryPacketPayload;// SIZE = 166 bits
-
-typedef struct packed{
-  logic               valid  ;
-  MemoryPacketPayload payload;
-} MemoryPacket;// SIZE = 167 bits
-
-typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id  ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ;
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset;
-  logic [  CACHE_FRONTEND_DATA_W-1:0] data_field    ;
-  command_type                        cmd_type      ;
-  structure_type                      struct_type   ;
-} MemoryPacketPayload;// SIZE = 710 bits
-
-typedef struct packed{
-  logic               valid  ;
-  MemoryPacketPayload payload;
-} MemoryPacket;// SIZE = 711 bits
-
 // --------------------------------------------------------------------------------------
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
