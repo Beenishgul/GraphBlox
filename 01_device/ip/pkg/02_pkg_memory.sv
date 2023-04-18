@@ -208,12 +208,12 @@ typedef struct packed {
 typedef struct packed {
   CacheRequestIOB  iob ;
   MemoryPacketMeta meta;
-} CacheResponsePayload;// SIZE = 514 bits
+} CacheResponsePayload;// SIZE = 814 bits
 
 typedef struct packed {
   logic                valid  ;
   CacheResponsePayload payload;
-} CacheResponse;// SIZE = 515 bits
+} CacheResponse;// SIZE = 815 bits
 
 // --------------------------------------------------------------------------------------
 //   Cache Requests state machine

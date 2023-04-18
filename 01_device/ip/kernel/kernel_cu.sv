@@ -49,7 +49,7 @@ module kernel_cu #(
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg                              ;
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state                           ;
   logic                          cache_request_generator_fifo_setup_signal;
-  logic                          fifo_515x16_setup_signal                 ;
+  logic                          fifo_814x16_setup_signal                 ;
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -162,7 +162,7 @@ module kernel_cu #(
     end
     else begin
       cu_setup_state[0] <= cache_request_generator_fifo_setup_signal;
-      cu_setup_state[1] <= fifo_515x16_setup_signal;
+      cu_setup_state[1] <= fifo_814x16_setup_signal;
       cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
     end
   end
@@ -342,16 +342,16 @@ module kernel_cu #(
   );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache response out fifo_515x16_CacheResponse
+// FIFO cache response out fifo_814x16_CacheResponse
 // --------------------------------------------------------------------------------------
   assign cache_resp_fifo_din.valid                     = cache_resp_out.valid;
   assign cache_resp_fifo_din.payload.iob.rdata         = swap_endianness_cacheline(cache_resp_out.payload.iob.rdata);
   assign cache_resp_fifo_din.payload.iob.wtb_empty_out = cache_resp_out.payload.iob.wtb_empty_out;
 
-  assign fifo_515x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
+  assign fifo_814x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
 
-  fifo_515x16 inst_fifo_515x16_CacheResponse (
+  fifo_814x16 inst_fifo_814x16_CacheResponse (
     .clk         (ap_clk                                  ),
     .srst        (fifo_areset                             ),
     .din         (cache_resp_fifo_din.payload             ),
