@@ -302,7 +302,6 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-
     always_comb begin
         engine_serial_read_req_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
         engine_serial_read_req_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
