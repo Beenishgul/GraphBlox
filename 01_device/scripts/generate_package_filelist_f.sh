@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-04-17 19:36:27
+# @Last Modified time: 2023-04-18 00:10:59
 #!/bin/bash
 
 
@@ -102,10 +102,7 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/fifo_515x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_166x16/fifo_166x16.xci"
-echo $newtext >> ${CFG_FILE_NAME}
-
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_710x16/fifo_710x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/fifo_812x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/fifo_512x32_asym_512wrt_64rd.xci"

@@ -45,7 +45,7 @@ module engine_serial_read #(
     input  logic                         ap_clk                      ,
     input  logic                         areset                      ,
     input  SerialReadEngineConfiguration serial_read_config          ,
-    output MemoryPacket           engine_serial_read_req_out  ,
+    output MemoryPacket                  engine_serial_read_req_out  ,
     output FIFOStateSignalsOutput        req_fifo_out_signals        ,
     input  FIFOStateSignalsInput         req_fifo_in_signals         ,
     output logic                         fifo_setup_signal           ,
@@ -78,8 +78,8 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacket    engine_serial_read_req_dout;
-    MemoryPacket    engine_serial_read_req_din ;
+    MemoryPacket           engine_serial_read_req_dout;
+    MemoryPacket           engine_serial_read_req_din ;
     FIFOStateSignalsOutput req_fifo_out_signals_reg   ;
     FIFOStateSignalsInput  req_fifo_in_signals_reg    ;
     logic                  fifo_setup_signal_reg      ;
@@ -303,12 +303,17 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(engine_serial_read_start_reg) begin
-            engine_serial_read_req_din.payload.cu_engine_id          <= ENGINE_ID;
-            engine_serial_read_req_din.payload.base_address   <= serial_read_config_reg.payload.array_pointer;
-            engine_serial_read_req_din.payload.address_offset <= counter_count;
-            engine_serial_read_req_din.payload.cmd_type       <= CMD_READ;
+            engine_serial_read_req_din.payload.meta.cu_engine_id_x <= ENGINE_ID;
+            engine_serial_read_req_din.payload.meta.cu_engine_id_y <= ENGINE_ID;
+            engine_serial_read_req_din.payload.meta.base_address   <= serial_read_config_reg.payload.array_pointer;
+            engine_serial_read_req_din.payload.meta.address_offset <= counter_count;
+            engine_serial_read_req_din.payload.meta.cmd_type       <= CMD_READ;
+            engine_serial_read_req_din.payload.meta.struct_type    <= STRUCT_KERNEL_SETUP;
+            engine_serial_read_req_din.payload.meta.operand_loc    <= OP_LOCATION_0;
+            engine_serial_read_req_din.payload.meta.filter_op      <= FILTER_NOP;
+            engine_serial_read_req_din.payload.meta.ALU_op         <= ALU_NOP;
         end else begin
-            engine_serial_read_req_din.payload <= 0;
+            engine_serial_read_req_din.payload.meta <= 0;
         end
     end
 
@@ -335,7 +340,7 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = engine_serial_read_req_din.valid;
 
-    fifo_166x16 inst_fifo_166x16_MemoryPacket (
+    fifo_812x16 inst_fifo_812x16_MemoryPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (engine_serial_read_req_din.payload   ),
