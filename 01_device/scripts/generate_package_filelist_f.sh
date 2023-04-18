@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-04-18 00:10:59
+# @Last Modified time: 2023-04-18 00:35:52
 #!/bin/bash
 
 
@@ -87,16 +87,16 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/fifo_642x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16/fifo_937x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/fifo_515x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16/fifo_642x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16/fifo_937x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_642x16_FWFT/fifo_642x16_FWFT.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16_FWFT/fifo_937x16_FWFT.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_515x16/fifo_515x16.xci"

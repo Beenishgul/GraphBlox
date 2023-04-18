@@ -143,11 +143,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x16_CacheRequestInterfaceInput
+# generate fifo_937x32_CacheRequestInterfaceInput
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x32"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_937x32"]" 
 
-set module_name fifo_642x32
+set module_name fifo_937x32
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -223,11 +223,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x16_CacheRequest
+# generate fifo_937x16_CacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_937x16"]" 
 
-set module_name fifo_642x16
+set module_name fifo_937x16
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \
@@ -263,11 +263,11 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_642x16_CacheRequest
+# generate fifo_937x16_CacheRequest
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO CacheRequest : fifo_642x16_FWFT"]" 
+puts "[color 2 "                        Generate FIFO CacheRequest : fifo_937x16_FWFT"]" 
 
-set module_name fifo_642x16_FWFT
+set module_name fifo_937x16_FWFT
 create_ip -name fifo_generator \
           -vendor xilinx.com \
           -library ip \

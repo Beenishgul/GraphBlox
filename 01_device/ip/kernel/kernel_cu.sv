@@ -327,10 +327,10 @@ module kernel_cu #(
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
   ) inst_cache_axi (
     .valid        (cache_req_out_valid         ),
-    .addr         (cache_req_out.payload.addr  ),
-    .wdata        (cache_req_out.payload.wdata ),
-    .wstrb        (cache_req_out.payload.wstrb ),
-    .rdata        (cache_resp_out.payload.rdata),
+    .addr         (cache_req_out.payload.iob.addr  ),
+    .wdata        (cache_req_out.payload.iob.wdata ),
+    .wstrb        (cache_req_out.payload.iob.wstrb ),
+    .rdata        (cache_resp_out.payload.iob.rdata),
     .ready        (cache_resp_out.valid        ),
     .force_inv_in (force_inv_in                ),
     .force_inv_out(force_inv_out               ),
@@ -344,9 +344,9 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO cache response out fifo_515x16_CacheResponse
 // --------------------------------------------------------------------------------------
-  assign cache_resp_fifo_din.valid                 = cache_resp_out.valid;
-  assign cache_resp_fifo_din.payload.rdata         = swap_endianness_cacheline(cache_resp_out.payload.rdata);
-  assign cache_resp_fifo_din.payload.wtb_empty_out = cache_resp_out.payload.wtb_empty_out;
+  assign cache_resp_fifo_din.valid                     = cache_resp_out.valid;
+  assign cache_resp_fifo_din.payload.iob.rdata         = swap_endianness_cacheline(cache_resp_out.payload.iob.rdata);
+  assign cache_resp_fifo_din.payload.iob.wtb_empty_out = cache_resp_out.payload.iob.wtb_empty_out;
 
   assign fifo_515x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
@@ -397,7 +397,6 @@ module kernel_cu #(
     .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
     .fifo_setup_signal         (cache_request_generator_fifo_setup_signal)
   );
-
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
