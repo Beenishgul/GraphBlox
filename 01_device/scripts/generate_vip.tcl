@@ -343,9 +343,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_166x16_MemoryRequestPacket
+# generate fifo_166x16_MemoryPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryRequestPacket: fifo_166x16"]" 
+puts "[color 2 "                        Generate FIFO MemoryPacket: fifo_166x16"]" 
 
 set module_name fifo_166x16
 create_ip -name fifo_generator \
@@ -383,9 +383,9 @@ export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/$
 export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# generate fifo_654x32_MemoryResponsePacket
+# generate fifo_654x32_MemoryPacket
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO MemoryResponsePacket: fifo_710x16"]" 
+puts "[color 2 "                        Generate FIFO MemoryPacket: fifo_710x16"]" 
 
 set module_name fifo_710x16
 create_ip -name fifo_generator \

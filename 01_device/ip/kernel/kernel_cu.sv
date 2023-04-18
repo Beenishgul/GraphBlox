@@ -92,7 +92,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
   CacheRequest        cache_resp_in                          ;
   CacheResponse cache_resp_fifo_dout;
   CacheResponse cache_resp_fifo_din ;
@@ -102,7 +102,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  MemoryRequestPacket mem_req_in         [NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket mem_req_in         [NUM_MEMORY_REQUESTOR-1:0];
   CacheRequest        cache_req_out                                ;
   logic               cache_resp_ready                             ;
   logic               cache_req_out_valid                          ;
@@ -112,10 +112,10 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   ControlChainInterfaceOutput kernel_setup_control_state        ;
   DescriptorInterface         kernel_setup_descriptor           ;
-  MemoryResponsePacket        kernel_setup_mem_resp_in          ;
+  MemoryPacket        kernel_setup_mem_resp_in          ;
   FIFOStateSignalsOutput      kernel_setup_resp_fifo_out_signals;
   FIFOStateSignalsInput       kernel_setup_resp_fifo_in_signals ;
-  MemoryRequestPacket         kernel_setup_mem_req_out          ;
+  MemoryPacket         kernel_setup_mem_req_out          ;
   FIFOStateSignalsOutput      kernel_setup_req_fifo_out_signals ;
   FIFOStateSignalsInput       kernel_setup_req_fifo_in_signals  ;
   logic                       kernel_setup_fifo_setup_signal    ;
@@ -372,7 +372,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  // MemoryRequestPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
+  // MemoryPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
   // CacheRequest        cache_resp_in                          ;
 
 // --------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@ module cache_request_generator #(
 ) (
   input  logic                  ap_clk                               ,
   input  logic                  areset                               ,
-  input  MemoryRequestPacket    mem_req_in [NUM_MEMORY_REQUESTOR-1:0],
+  input  MemoryPacket    mem_req_in [NUM_MEMORY_REQUESTOR-1:0],
   output CacheRequest           cache_req_gen_out                    ,
   input  logic                  cache_resp_ready                     ,
   output FIFOStateSignalsOutput cache_req_fifo_out_signals           ,
@@ -45,7 +45,7 @@ module cache_request_generator #(
 
   logic               fifo_642x16_setup_signal                          ;
   logic               mem_resp_valid_reg                                ;
-  MemoryRequestPacket mem_req_reg             [NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket mem_req_reg             [NUM_MEMORY_REQUESTOR-1:0];
 
   CacheRequest cache_req_reg_S0;
   CacheRequest cache_req_reg_S1;
@@ -75,10 +75,10 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
   localparam BUS_ARBITER_N_IN_1_OUT_WIDTH     = NUM_MEMORY_REQUESTOR        ;
   localparam BUS_ARBITER_N_IN_1_OUT_BUS_NUM   = BUS_ARBITER_N_IN_1_OUT_WIDTH;
-  localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(MemoryRequestPacket)  ;
+  localparam BUS_ARBITER_N_IN_1_OUT_BUS_WIDTH = $bits(MemoryPacket)  ;
 
-  MemoryRequestPacket arbiter_bus_out                                    ;
-  MemoryRequestPacket arbiter_bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
+  MemoryPacket arbiter_bus_out                                    ;
+  MemoryPacket arbiter_bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
 
   logic [1:0] arbiter_grant;
   logic [1:0] arbiter_req  ;

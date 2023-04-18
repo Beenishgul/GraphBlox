@@ -32,10 +32,10 @@ module kernel_setup #(
     input  logic                           areset                       ,
     input  ControlChainInterfaceOutput control_state           ,
     input  DescriptorInterface         descriptor              ,
-    input  MemoryResponsePacket            setup_mem_resp_in       ,
+    input  MemoryPacket            setup_mem_resp_in       ,
     output FIFOStateSignalsOutput          resp_fifo_out_signals        ,
     input  FIFOStateSignalsInput           resp_fifo_in_signals         ,
-    output MemoryRequestPacket             kernel_setup_mem_req_out,
+    output MemoryPacket             kernel_setup_mem_req_out,
     output FIFOStateSignalsOutput          req_fifo_out_signals         ,
     input  FIFOStateSignalsInput           req_fifo_in_signals          ,
     output logic                           fifo_setup_signal
@@ -61,11 +61,11 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     DescriptorInterface descriptor_reg;
 
-    MemoryResponsePacket setup_mem_resp_dout;
-    MemoryResponsePacket setup_mem_resp_din ;
+    MemoryPacket setup_mem_resp_dout;
+    MemoryPacket setup_mem_resp_din ;
 
-    MemoryRequestPacket setup_mem_req_dout;
-    MemoryRequestPacket setup_mem_req_din ;
+    MemoryPacket setup_mem_req_dout;
+    MemoryPacket setup_mem_req_din ;
 
     FIFOStateSignalsOutput resp_fifo_out_signals_reg;
     FIFOStateSignalsOutput req_fifo_out_signals_reg ;
@@ -81,7 +81,7 @@ module kernel_setup #(
 
     SerialReadEngineConfiguration serial_read_config_reg                  ;
     SerialReadEngineConfiguration serial_read_config_comb                 ;
-    MemoryRequestPacket           engine_serial_read_req                  ;
+    MemoryPacket           engine_serial_read_req                  ;
     FIFOStateSignalsOutput        engine_serial_read_fifo_out_signals_reg ;
     FIFOStateSignalsInput         engine_serial_read_fifo_in_signals_reg  ;
     logic                         engine_serial_read_fifo_setup_signal_reg;
@@ -285,12 +285,12 @@ module kernel_setup #(
     assign fifo_setup_signal_reg = engine_serial_read_fifo_setup_signal_reg | req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy | resp_fifo_out_signals_reg.wr_rst_busy | resp_fifo_out_signals_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in inst_fifo_710x16_MemoryResponsePacket
+// FIFO cache requests in inst_fifo_710x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign resp_fifo_in_signals_reg.wr_en = setup_mem_resp_din.valid;
     assign setup_mem_resp_dout.valid = resp_fifo_out_signals_reg.valid;
 
-    fifo_710x16 inst_fifo_710x16_MemoryResponsePacket (
+    fifo_710x16 inst_fifo_710x16_MemoryPacket (
         .clk         (ap_clk                                ),
         .srst        (fifo_areset                           ),
         .din         (setup_mem_resp_din.payload       ),
@@ -309,13 +309,13 @@ module kernel_setup #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out inst_fifo_166x16_MemoryRequestPacket
+// FIFO cache requests out inst_fifo_166x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = setup_mem_req_din.valid;
     assign setup_mem_req_dout.valid = req_fifo_out_signals_reg.valid;
     assign setup_mem_req_din        = engine_serial_read_req;
 
-    fifo_166x16 inst_fifo_166x16_MemoryRequestPacket (
+    fifo_166x16 inst_fifo_166x16_MemoryPacket (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (setup_mem_req_din.payload       ),
