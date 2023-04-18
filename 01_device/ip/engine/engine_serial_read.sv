@@ -80,6 +80,7 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     MemoryPacket           engine_serial_read_req_dout;
     MemoryPacket           engine_serial_read_req_din ;
+    MemoryPacket           engine_serial_read_req_comb;
     FIFOStateSignalsOutput req_fifo_out_signals_reg   ;
     FIFOStateSignalsInput  req_fifo_in_signals_reg    ;
     logic                  fifo_setup_signal_reg      ;
@@ -301,17 +302,22 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
+
+    always_comb begin
+        engine_serial_read_req_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
+        engine_serial_read_req_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
+        engine_serial_read_req_comb.payload.meta.base_address   = serial_read_config_reg.payload.array_pointer;
+        engine_serial_read_req_comb.payload.meta.address_offset = counter_count;
+        engine_serial_read_req_comb.payload.meta.cmd_type       = CMD_READ;
+        engine_serial_read_req_comb.payload.meta.struct_type    = STRUCT_KERNEL_SETUP;
+        engine_serial_read_req_comb.payload.meta.operand_loc    = OP_LOCATION_0;
+        engine_serial_read_req_comb.payload.meta.filter_op      = FILTER_NOP;
+        engine_serial_read_req_comb.payload.meta.ALU_op         = ALU_NOP;
+    end
+
     always_ff @(posedge ap_clk) begin
         if(engine_serial_read_start_reg) begin
-            engine_serial_read_req_din.payload.meta.cu_engine_id_x <= ENGINE_ID;
-            engine_serial_read_req_din.payload.meta.cu_engine_id_y <= ENGINE_ID;
-            engine_serial_read_req_din.payload.meta.base_address   <= serial_read_config_reg.payload.array_pointer;
-            engine_serial_read_req_din.payload.meta.address_offset <= counter_count;
-            engine_serial_read_req_din.payload.meta.cmd_type       <= CMD_READ;
-            engine_serial_read_req_din.payload.meta.struct_type    <= STRUCT_KERNEL_SETUP;
-            engine_serial_read_req_din.payload.meta.operand_loc    <= OP_LOCATION_0;
-            engine_serial_read_req_din.payload.meta.filter_op      <= FILTER_NOP;
-            engine_serial_read_req_din.payload.meta.ALU_op         <= ALU_NOP;
+            engine_serial_read_req_din.payload.meta <= engine_serial_read_req_comb.payload.meta;
         end else begin
             engine_serial_read_req_din.payload.meta <= 0;
         end
