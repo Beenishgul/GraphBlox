@@ -87,16 +87,16 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME} "v"
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x32/fifo_937x32.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/fifo_942x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x32/fifo_814x32.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16/fifo_937x16.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16/fifo_942x16.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_937x16_FWFT/fifo_937x16_FWFT.xci"
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16_FWFT/fifo_942x16_FWFT.xci"
 echo $newtext >> ${CFG_FILE_NAME}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/fifo_814x16.xci"

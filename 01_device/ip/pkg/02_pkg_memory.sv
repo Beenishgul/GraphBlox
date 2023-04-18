@@ -180,7 +180,7 @@ typedef struct packed {
 } CacheResponseIOB; // SIZE = 514 bits
 
 typedef struct packed {
-  CacheRequestIOB  iob ;
+  CacheResponseIOB iob ;
   MemoryPacketMeta meta;
 } CacheResponsePayload;// SIZE = 814 bits
 
