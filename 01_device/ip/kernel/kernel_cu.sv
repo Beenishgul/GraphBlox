@@ -353,7 +353,7 @@ module kernel_cu #(
 
   assign fifo_814x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
-
+  assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
   fifo_814x16 inst_fifo_814x16_CacheResponse (
     .clk         (ap_clk                                  ),
     .srst        (fifo_areset                             ),

@@ -148,16 +148,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO CacheRequest : fifo_942x32"]" 
 
 set module_name fifo_942x32
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -188,16 +188,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO CacheResponse: fifo_814x32"]" 
 
 set module_name fifo_814x32
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -228,16 +228,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO CacheRequest : fifo_942x16"]" 
 
 set module_name fifo_942x16
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -268,16 +268,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO CacheRequest : fifo_942x16_FWFT"]" 
 
 set module_name fifo_942x16_FWFT
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {First_Word_Fall_Through}                              \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -308,16 +308,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO CacheResponse: fifo_814x16"]" 
 
 set module_name fifo_814x16
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -348,16 +348,16 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate FIFO MemoryPacket: fifo_812x16"]" 
 
 set module_name fifo_812x16
-create_ip -name fifo_generator \
-          -vendor xilinx.com \
-          -library ip \
-          -version 13.* \
-          -module_name ${module_name}  \
+create_ip -name fifo_generator          \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 13.*                 \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                              \
                     CONFIG.INTERFACE_TYPE {Native}                                                    \
-                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                         \
+                    CONFIG.Fifo_Implementation {Common_Clock_Block_RAM}                               \
                     CONFIG.Performance_Options {Standard_FIFO}                                        \
                     CONFIG.Output_Register_Type {Embedded_Reg}                                        \
                     CONFIG.Reset_Pin {1}                                                              \
@@ -391,7 +391,7 @@ create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -mod
 puts "[color 2 "                        Generate FIFO Asymmetric: fifo_512x32_asym_512wrt_64rd"]" 
 
 set module_name fifo_512x32_asym_512wrt_64rd
-create_ip -name fifo_generator \
+create_ip -name fifo_generator          \
           -vendor xilinx.com            \
           -library ip                   \
           -version 13.*                 \
@@ -435,11 +435,11 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 puts "[color 2 "                        Generate BRAM Simple_Dual_Port_RAM Asymmetric: bram_64x256_asym_64wrt_512rd"]" 
 
 set module_name bram_64x256_asym_64wrt_512rd
-create_ip -name blk_mem_gen \
-          -vendor xilinx.com \
-          -library ip \
-          -version 8.* \
-          -module_name ${module_name}  \
+create_ip -name blk_mem_gen             \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 8.*                  \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                                \
@@ -474,11 +474,11 @@ puts "[color 2 "                        Generate BRAM Simple_Dual_Port_RAM Asymm
 
 
 set module_name bram_512x32_asym_512wrt_64rd
-create_ip -name blk_mem_gen \
-          -vendor xilinx.com \
-          -library ip \
-          -version 8.* \
-          -module_name ${module_name}  \
+create_ip -name blk_mem_gen             \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 8.*                  \
+          -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
 set_property -dict [list                                                                                \
