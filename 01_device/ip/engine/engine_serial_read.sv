@@ -303,7 +303,7 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(engine_serial_read_start_reg) begin
-            engine_serial_read_req_din.payload.cu_id          <= ENGINE_ID;
+            engine_serial_read_req_din.payload.cu_engine_id          <= ENGINE_ID;
             engine_serial_read_req_din.payload.base_address   <= serial_read_config_reg.payload.array_pointer;
             engine_serial_read_req_din.payload.address_offset <= counter_count;
             engine_serial_read_req_din.payload.cmd_type       <= CMD_READ;
