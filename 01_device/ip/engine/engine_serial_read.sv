@@ -78,12 +78,12 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacket           engine_serial_read_req_dout;
-    MemoryPacket           engine_serial_read_req_din ;
-    MemoryPacket           engine_serial_read_req_comb;
-    FIFOStateSignalsOutput req_fifo_out_signals_reg   ;
-    FIFOStateSignalsInput  req_fifo_in_signals_reg    ;
-    logic                  fifo_setup_signal_reg      ;
+    MemoryPacket           engine_serial_read_req_dout          ;
+    MemoryPacket           engine_serial_read_req_din           ;
+    MemoryPacket           engine_serial_read_req_comb          ;
+    FIFOStateSignalsOutput req_fifo_out_signals_reg             ;
+    FIFOStateSignalsInput  req_fifo_in_signals_reg              ;
+    logic                  fifo_MemoryPacketRequest_setup_signal;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -92,7 +92,7 @@ module engine_serial_read #(
     logic                     counter_load        ;
     logic                     counter_incr        ;
     logic                     counter_decr        ;
-    logic                     is_zero             ;
+    logic                     counter_is_zero     ;
     logic [COUNTER_WIDTH-1:0] counter_load_value  ;
     logic [COUNTER_WIDTH-1:0] counter_stride_value;
     logic [COUNTER_WIDTH-1:0] counter_count       ;
@@ -137,7 +137,7 @@ module engine_serial_read #(
             engine_serial_read_out_done      <= 0;
         end
         else begin
-            fifo_setup_signal                <= fifo_setup_signal_reg;
+            fifo_setup_signal                <= fifo_MemoryPacketRequest_setup_signal;
             engine_serial_read_req_out.valid <= req_fifo_out_signals_reg.valid;
             req_fifo_out_signals             <= req_fifo_out_signals_reg;
             engine_serial_read_out_ready     <= engine_serial_read_out_ready_reg;
@@ -332,13 +332,13 @@ module engine_serial_read #(
         .load_value  (counter_load_value  ),
         .stride_value(counter_stride_value),
         .count       (counter_count       ),
-        .is_zero     (is_zero             )
+        .is_zero     (counter_is_zero     )
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO Ready
 // --------------------------------------------------------------------------------------
-    assign fifo_setup_signal_reg = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy ;
+    assign fifo_MemoryPacketRequest_setup_signal = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy ;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_814x16_MemoryPacket
