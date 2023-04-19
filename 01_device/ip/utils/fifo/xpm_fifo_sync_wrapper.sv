@@ -35,8 +35,27 @@ module xpm_fifo_sync_wrapper #(
   output logic rd_rst_busy
 );
 
+  // localparam                      XPM_FIFO_SYNC_PROG_FULL  = ALMFUL_HI_THRESHOLD - 1;
+  // localparam                      XPM_FIFO_SYNC_PROG_EMPTY = ALMFUL_LO_THRESHOLD - 2;
+  // localparam                      RD_DATA_COUNT_WIDTH      = $clog2(DEPTH)          ;
+  // localparam                      WR_DATA_COUNT_WIDTH      = $clog2(DEPTH)          ;
+  // logic [RD_DATA_COUNT_WIDTH-1:0] rd_data_count                                     ;
+  // logic [WR_DATA_COUNT_WIDTH-1:0] wr_data_count                                     ;
+  // logic                           prog_full, prog_empty;
+  // logic                           rd_rst_busy, wr_rst_busy;
+  // if (2**$clog2(FIFO_WRITE_DEPTH) != FIFO_WRITE_DEPTH)
+  //   $error("DEPTH: %d has to be power of 2", DEPTH);
+  // if (FIFO_WRITE_DEPTH < 16 || FIFO_WRITE_DEPTH > 4194304)
+  //   $error("FIFO_WRITE_DEPTH %d, has to be 16 - 4194304");
+  // if (XPM_FIFO_SYNC_PROG_FULL > FIFO_WRITE_DEPTH - 3 - 2 || XPM_FIFO_SYNC_PROG_FULL < 3 + 2)
+  //   $error("ALMFUL_HI out of range : threshold %d, FIFO_WRITE_DEPTH: %d",
+  //     ALMFUL_HI_THRESHOLD, FIFO_WRITE_DEPTH);
+  // if (XPM_FIFO_SYNC_PROG_EMPTY > FIFO_WRITE_DEPTH - 3 - 2 || XPM_FIFO_SYNC_PROG_EMPTY < 3 + 2)
+  //   $error("ALMFUL_LO_THRESHOLD out of range : threshold %d, DEPTH: %d",
+  //     ALMFUL_LO_THRESHOLD, FIFO_WRITE_DEPTH);
+
 // xpm_fifo_sync: Synchronous FIFO
-// Xilinx Parameterized Macro, Version 2017.4
+// Xilinx Parameterized Macro
   xpm_fifo_sync #(
     .FIFO_MEMORY_TYPE   ("auto"                        ), //string; "auto", "block", "distributed", or "ultra";
     .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
@@ -45,7 +64,7 @@ module xpm_fifo_sync_wrapper #(
     .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
     .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
     .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
-    .USE_ADV_FEATURES   ("0707"                        ), //string; "0000" to "1F1F";
+    .USE_ADV_FEATURES   ("1A0A"                        ), //string; "0000" to "1F1F";
     .READ_MODE          ("std"                         ), //string; "std" or "fwft";
     .FIFO_READ_LATENCY  (1                             ), //positive integer;
     .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
