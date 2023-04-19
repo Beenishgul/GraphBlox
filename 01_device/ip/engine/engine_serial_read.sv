@@ -345,7 +345,12 @@ module engine_serial_read #(
 // --------------------------------------------------------------------------------------
     assign req_fifo_in_signals_reg.wr_en = engine_serial_read_req_din.valid;
 
-    fifo_812x16 inst_fifo_812x16_MemoryPacket (
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(32                        ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (8                         )
+    ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (engine_serial_read_req_din.payload   ),
