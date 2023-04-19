@@ -77,18 +77,15 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 //  Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-
     SerialReadEngineConfiguration serial_read_config_reg                 ;
     SerialReadEngineConfiguration serial_read_config_comb                ;
     MemoryPacket                  engine_serial_read_req                 ;
     FIFOStateSignalsOutput        engine_serial_read_fifo_out_signals_reg;
     FIFOStateSignalsInput         engine_serial_read_fifo_in_signals_reg ;
-    logic                         engine_serial_read_fifo_setup_signag   ;
     logic                         engine_serial_read_in_start_reg        ;
     logic                         engine_serial_read_out_ready_reg       ;
     logic                         engine_serial_read_out_done_reg        ;
     logic                         engine_serial_read_out_pause_reg       ;
-
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -283,8 +280,6 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     assign fifo_MemoryPacketRequest_setup_signal  = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy;
     assign fifo_MemoryPacketResponse_setup_signal = resp_fifo_out_signals_reg.wr_rst_busy | resp_fifo_out_signals_reg.rd_rst_busy;
-
-
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in inst_fifo_812x16_MemoryPacket
