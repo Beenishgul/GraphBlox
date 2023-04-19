@@ -290,7 +290,12 @@ module kernel_setup #(
     assign resp_fifo_in_signals_reg.wr_en = setup_mem_resp_din.valid;
     assign setup_mem_resp_dout.valid      = resp_fifo_out_signals_reg.valid;
 
-    fifo_812x16 inst_fifo_812x16_MemoryPacketResponse (
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(16                        ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (4                         )
+    ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                ),
         .srst        (fifo_areset                           ),
         .din         (setup_mem_resp_din.payload            ),
@@ -315,7 +320,12 @@ module kernel_setup #(
     assign setup_mem_req_dout.valid      = req_fifo_out_signals_reg.valid;
     assign setup_mem_req_din             = engine_serial_read_req;
 
-    fifo_812x16 inst_fifo_812x16_MemoryPacketRequest (
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(16                        ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (4                         )
+    ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                               ),
         .srst        (fifo_areset                          ),
         .din         (setup_mem_req_din.payload            ),

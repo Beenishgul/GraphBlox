@@ -354,7 +354,13 @@ module kernel_cu #(
   assign fifo_814x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
   assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
   assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
-  fifo_814x16 inst_fifo_814x16_CacheResponse (
+
+  xpm_fifo_sync_wrapper #(
+    .FIFO_WRITE_DEPTH(32                         ),
+    .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
+    .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
+    .PROG_THRESH     (8                          )
+  ) inst_fifo_CacheResponse (
     .clk         (ap_clk                                  ),
     .srst        (fifo_areset                             ),
     .din         (cache_resp_fifo_din.payload             ),

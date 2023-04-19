@@ -287,7 +287,7 @@ module cache_request_generator #(
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
     .PROG_THRESH     (8                         )
-  ) inst_fifo_942x16_CacheRequest (
+  ) inst_fifo_942x32_CacheRequest (
     .clk         (ap_clk                                     ),
     .srst        (fifo_areset                                ),
     .din         (cache_req_fifo_din.payload                 ),
