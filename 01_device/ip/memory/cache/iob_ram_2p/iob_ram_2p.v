@@ -60,7 +60,7 @@ module iob_ram_2p #(
   //read port
   input                   r_en  ,
   input      [ADDR_W-1:0] r_addr,
-  output reg [DATA_W-1:0] r_data
+  output     [DATA_W-1:0] r_data
 );
 
   //this allows ISE 14.7 to work; do not remove
