@@ -23,8 +23,8 @@ module kernel_control #(
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
 ) (
     // System Signals
-    input  logic                           ap_clk             ,
-    input  logic                           areset             ,
+    input  logic                       ap_clk        ,
+    input  logic                       areset        ,
     input  ControlChainInterfaceInput  control_in    ,
     output ControlChainInterfaceOutput control_out   ,
     input  DescriptorInterface         descriptor_in ,
@@ -32,15 +32,15 @@ module kernel_control #(
 );
 
     logic descriptor_valid_reg;
-    logic control_areset           ;
+    logic areset_control      ;
     logic cu_done_reg         ;
     logic cu_setup_reg        ;
 
-    logic start_reg;
-    logic ap_start_reg  ;
-    logic ap_ready_reg  ;
-    logic ap_idle_reg   ;
-    logic ap_done_reg   ;
+    logic start_reg   ;
+    logic ap_start_reg;
+    logic ap_ready_reg;
+    logic ap_idle_reg ;
+    logic ap_done_reg ;
 
     logic ap_continue_reg;
 
@@ -53,14 +53,14 @@ module kernel_control #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        control_areset <= areset;
+        areset_control <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 //   Reset internal registers
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (control_areset) begin
+        if (areset_control) begin
             cu_done_reg  <= 0;
             cu_setup_reg <= 1;
         end
@@ -74,11 +74,11 @@ module kernel_control #(
 //   Reset output registers
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (control_areset) begin
-            control_out.ap_ready   <= 1'b0;
-            control_out.ap_done    <= 1'b0;
-            control_out.ap_idle    <= 1'b1;
-            control_out.start <= 1'b0;
+        if (areset_control) begin
+            control_out.ap_ready <= 1'b0;
+            control_out.ap_done  <= 1'b0;
+            control_out.ap_idle  <= 1'b1;
+            control_out.start    <= 1'b0;
         end
         else begin
             control_out <= control_out_reg;
@@ -86,17 +86,17 @@ module kernel_control #(
     end
 
     always_ff @(posedge ap_clk) begin
-        if (control_areset) begin
-            control_out_reg.ap_ready   <= 1'b0;
-            control_out_reg.ap_done    <= 1'b0;
-            control_out_reg.ap_idle    <= 1'b1;
-            control_out_reg.start <= 1'b0;
+        if (areset_control) begin
+            control_out_reg.ap_ready <= 1'b0;
+            control_out_reg.ap_done  <= 1'b0;
+            control_out_reg.ap_idle  <= 1'b1;
+            control_out_reg.start    <= 1'b0;
         end
         else begin
-            control_out_reg.ap_ready   <= ap_ready_reg;
-            control_out_reg.ap_done    <= ap_done_reg;
-            control_out_reg.ap_idle    <= ap_idle_reg;
-            control_out_reg.start <= start_reg;
+            control_out_reg.ap_ready <= ap_ready_reg;
+            control_out_reg.ap_done  <= ap_done_reg;
+            control_out_reg.ap_idle  <= ap_idle_reg;
+            control_out_reg.start    <= start_reg;
         end
     end
 
@@ -104,7 +104,7 @@ module kernel_control #(
 //   Reset input registers
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (control_areset) begin
+        if (areset_control) begin
             ap_start_reg    <= 0;
             ap_continue_reg <= 0;
         end
@@ -118,7 +118,7 @@ module kernel_control #(
 //   Descriptor LOGIC
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (control_areset) begin
+        if (areset_control) begin
             descriptor_out.valid <= 1'b0;
         end
         else begin
@@ -134,7 +134,7 @@ module kernel_control #(
 //   State Machine AP_CTRL_CHAIN sync
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(control_areset)
+        if(areset_control)
             current_state <= CTRL_CHAIN_SYNC_RESET;
         else begin
             current_state <= next_state;
@@ -183,51 +183,51 @@ module kernel_control #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             CTRL_CHAIN_SYNC_RESET : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b1;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b1;
                 descriptor_valid_reg <= 1'b0;
                 start_reg            <= 1'b0;
             end
             CTRL_CHAIN_SYNC_IDLE : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b1;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b1;
                 descriptor_valid_reg <= 1'b0;
                 start_reg            <= 1'b0;
             end
             CTRL_CHAIN_SYNC_SETUP : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b1;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b1;
                 descriptor_valid_reg <= 1'b0;
                 start_reg            <= 1'b1;
             end
             CTRL_CHAIN_SYNC_READY : begin
-                ap_ready_reg              <= 1'b1;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b0;
+                ap_ready_reg         <= 1'b1;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b0;
                 descriptor_valid_reg <= 1'b0;
                 start_reg            <= 1'b1;
             end
             CTRL_CHAIN_SYNC_START : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b0;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b0;
                 descriptor_valid_reg <= 1'b1;
                 start_reg            <= 1'b1;
             end
             CTRL_CHAIN_SYNC_BUSY : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b0;
-                ap_idle_reg               <= 1'b0;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b0;
+                ap_idle_reg          <= 1'b0;
                 descriptor_valid_reg <= 1'b1;
                 start_reg            <= 1'b1;
             end
             CTRL_CHAIN_SYNC_DONE : begin
-                ap_ready_reg              <= 1'b0;
-                ap_done_reg               <= 1'b1;
-                ap_idle_reg               <= 1'b1;
+                ap_ready_reg         <= 1'b0;
+                ap_done_reg          <= 1'b1;
+                ap_idle_reg          <= 1'b1;
                 descriptor_valid_reg <= 1'b0;
                 start_reg            <= 1'b0;
             end

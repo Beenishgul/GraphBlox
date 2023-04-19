@@ -40,12 +40,13 @@ module kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic                          m_axi_areset  ;
-  logic                          control_areset;
-  logic                          cache_areset  ;
-  logic                          fifo_areset   ;
-  logic                          arbiter_areset;
-  logic                          setup_areset  ;
+  logic areset_m_axi  ;
+  logic areset_control;
+  logic areset_cache  ;
+  logic areset_fifo   ;
+  logic areset_arbiter;
+  logic areset_setup  ;
+
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
   logic [  VERTEX_DATA_BITS-1:0] counter       ;
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state;
@@ -72,8 +73,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  FIFOStateSignalsOutput cache_resp_fifo_out_signals                                        ;
-  FIFOStateSignalsInput  cache_resp_fifo_in_signals                                         ;
+  FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
+  FIFOStateSignalsInput  cache_fifo_response_in_signals                                     ;
   MemoryPacket           mem_resp_out                             [NUM_MEMORY_REQUESTOR-1:0]; ;
   CacheResponse          cache_resp_out                                                     ;
   logic                  cache_generator_request_fifo_setup_signal                          ;
@@ -81,8 +82,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  FIFOStateSignalsOutput cache_req_fifo_out_signals                                          ;
-  FIFOStateSignalsInput  cache_req_fifo_in_signals                                           ;
+  FIFOStateSignalsOutput cache_fifo_request_signals_out                                      ;
+  FIFOStateSignalsInput  cache_fifo_request_signals_in                                       ;
   MemoryPacket           mem_req_in                                [NUM_MEMORY_REQUESTOR-1:0];
   CacheRequest           cache_req_out                                                       ;
   logic                  cache_resp_ready                                                    ;
@@ -92,47 +93,47 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput kernel_setup_control_state        ;
-  DescriptorInterface         kernel_setup_descriptor           ;
-  MemoryPacket                kernel_setup_mem_resp_in          ;
-  FIFOStateSignalsOutput      kernel_setup_resp_fifo_out_signals;
-  FIFOStateSignalsInput       kernel_setup_resp_fifo_in_signals ;
-  MemoryPacket                kernel_setup_mem_req_out          ;
-  FIFOStateSignalsOutput      kernel_setup_req_fifo_out_signals ;
-  FIFOStateSignalsInput       kernel_setup_req_fifo_in_signals  ;
-  logic                       kernel_setup_fifo_setup_signal    ;
+  ControlChainInterfaceOutput kernel_setup_control_state            ;
+  DescriptorInterface         kernel_setup_descriptor               ;
+  MemoryPacket                kernel_setup_mem_resp_in              ;
+  FIFOStateSignalsOutput      kernel_setup_fifo_response_signals_out;
+  FIFOStateSignalsInput       kernel_setup_fifo_response_in_signals ;
+  MemoryPacket                kernel_setup_mem_req_out              ;
+  FIFOStateSignalsOutput      kernel_setup_fifo_request_signals_out ;
+  FIFOStateSignalsInput       kernel_setup_fifo_request_signals_in  ;
+  logic                       kernel_setup_fifo_setup_signal        ;
 
 // --------------------------------------------------------------------------------------
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput vertex_cu_control_state        ;
-  DescriptorInterface         vertex_cu_descriptor           ;
-  MemoryPacket                vertex_cu_mem_resp_in          ;
-  FIFOStateSignalsOutput      vertex_cu_resp_fifo_out_signals;
-  FIFOStateSignalsInput       vertex_cu_resp_fifo_in_signals ;
-  MemoryPacket                vertex_cu_mem_req_out          ;
-  FIFOStateSignalsOutput      vertex_cu_req_fifo_out_signals ;
-  FIFOStateSignalsInput       vertex_cu_req_fifo_in_signals  ;
-  logic                       vertex_cu_fifo_setup_signal    ;
+  ControlChainInterfaceOutput vertex_cu_control_state            ;
+  DescriptorInterface         vertex_cu_descriptor               ;
+  MemoryPacket                vertex_cu_mem_resp_in              ;
+  FIFOStateSignalsOutput      vertex_cu_fifo_response_signals_out;
+  FIFOStateSignalsInput       vertex_cu_fifo_response_in_signals ;
+  MemoryPacket                vertex_cu_mem_req_out              ;
+  FIFOStateSignalsOutput      vertex_cu_fifo_request_signals_out ;
+  FIFOStateSignalsInput       vertex_cu_fifo_request_signals_in  ;
+  logic                       vertex_cu_fifo_setup_signal        ;
 
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    m_axi_areset   <= areset;
-    control_areset <= areset;
-    cache_areset   <= areset;
-    fifo_areset    <= areset;
-    arbiter_areset <= areset;
-    setup_areset   <= areset;
+    areset_m_axi   <= areset;
+    areset_control <= areset;
+    areset_cache   <= areset;
+    areset_fifo    <= areset;
+    areset_arbiter <= areset;
+    areset_setup   <= areset;
   end
 
 // --------------------------------------------------------------------------------------
 // Done Logic
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
+    if (areset_control) begin
       counter     <= 0;
       cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
@@ -153,7 +154,7 @@ module kernel_cu #(
   end
 
   // always_ff @(posedge ap_clk) begin
-  //   if (control_areset) begin
+  //   if (areset_control) begin
   //     counter     <= 0;
   //     cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
   //   end
@@ -174,7 +175,7 @@ module kernel_cu #(
   // end
 
   always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
+    if (areset_control) begin
       cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
     end
     else begin
@@ -188,7 +189,7 @@ module kernel_cu #(
 // Control signals
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
+    if (areset_control) begin
       control_in_reg.ap_start    <= 1'b0;
       control_in_reg.ap_continue <= 1'b0;
       control_in_reg.setup       <= 1'b1;
@@ -203,7 +204,7 @@ module kernel_cu #(
   end
 
   always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
+    if (areset_control) begin
       control_out.ap_ready <= 1'b0;
       control_out.ap_done  <= 1'b0;
       control_out.ap_idle  <= 1'b1;
@@ -222,7 +223,7 @@ module kernel_cu #(
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_control (
     .ap_clk        (ap_clk            ),
-    .areset        (control_areset    ),
+    .areset        (areset_control    ),
     .control_in    (control_in_reg    ),
     .control_out   (control_out_reg   ),
     .descriptor_in (descriptor_in_reg ),
@@ -233,7 +234,7 @@ module kernel_cu #(
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (m_axi_areset) begin
+    if (areset_m_axi) begin
       m_axi_write.in <= 0;
     end
     else begin
@@ -245,7 +246,7 @@ module kernel_cu #(
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (m_axi_areset) begin
+    if (areset_m_axi) begin
       m_axi_read.in <= 0;
     end
     else begin
@@ -257,7 +258,7 @@ module kernel_cu #(
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (m_axi_areset) begin
+    if (areset_m_axi) begin
       m_axi_write_out <= 0;
     end
     else begin
@@ -269,7 +270,7 @@ module kernel_cu #(
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (m_axi_areset) begin
+    if (areset_m_axi) begin
       m_axi_read_out <= 0;
     end
     else begin
@@ -281,7 +282,7 @@ module kernel_cu #(
 // READ Descriptor Control
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (control_areset) begin
+    if (areset_control) begin
       descriptor_in_reg.valid <= 0;
     end
     else begin
@@ -297,7 +298,7 @@ module kernel_cu #(
 // Drive descriptor signals to other modules
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    if (setup_areset) begin
+    if (areset_setup) begin
       kernel_setup_descriptor.valid <= 0;
       vertex_cu_descriptor.valid    <= 0;
     end
@@ -358,28 +359,28 @@ module kernel_cu #(
     .wtb_empty_out(wtb_empty_out                   ),
     `include "m_axi_portmap_glay.vh"
     .ap_clk       (ap_clk                          ),
-    .reset        (cache_areset                    )
+    .reset        (areset_cache                    )
   );
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  assign cache_resp_out.payload.meta      = cache_req_out.payload.meta;
-  assign cache_req_fifo_in_signals        = ~cache_resp_fifo_out_signals.prog_full;
-  assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
+  assign cache_resp_out.payload.meta          = cache_req_out.payload.meta;
+  assign cache_fifo_request_signals_in        = ~cache_fifo_response_signals_out.prog_full;
+  assign cache_fifo_response_in_signals.rd_en = ~cache_fifo_response_signals_out.empty;
 
   cache_generator_response #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
     .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR),
     .NUM_GRAPH_PE        (NUM_GRAPH_PE        )
   ) inst_cache_generator_response (
-    .ap_clk                     (ap_clk                                    ),
-    .areset                     (areset                                    ),
-    .mem_resp_out               (mem_resp_out                              ),
-    .cache_resp_in              (cache_resp_out                            ),
-    .cache_resp_fifo_in_signals (cache_resp_fifo_in_signals                ),
-    .cache_resp_fifo_out_signals(cache_resp_fifo_out_signals               ),
-    .fifo_setup_signal          (cache_generator_response_fifo_setup_signal)
+    .ap_clk                   (ap_clk                                    ),
+    .areset                   (areset                                    ),
+    .mem_resp_out             (mem_resp_out                              ),
+    .cache_resp_in            (cache_resp_out                            ),
+    .fifo_response_in_signals (cache_fifo_response_in_signals            ),
+    .fifo_response_signals_out(cache_fifo_response_signals_out           ),
+    .fifo_setup_signal        (cache_generator_response_fifo_setup_signal)
   );
 
 // --------------------------------------------------------------------------------------
@@ -388,9 +389,9 @@ module kernel_cu #(
   assign mem_req_in[0] = kernel_setup_mem_req_out;
   assign mem_req_in[1] = vertex_cu_mem_req_out;
 
-  assign cache_resp_ready                = cache_resp_out.valid;
-  assign cache_req_out_valid             = cache_req_out.valid & ~cache_resp_out.valid;
-  assign cache_req_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.prog_full;
+  assign cache_resp_ready                    = cache_resp_out.valid;
+  assign cache_req_out_valid                 = cache_req_out.valid & ~cache_resp_out.valid;
+  assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
 
   cache_generator_request #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
@@ -398,61 +399,60 @@ module kernel_cu #(
     .NUM_GRAPH_PE           (NUM_GRAPH_PE        ),
     .OUTSTANDING_COUNTER_MAX(32                  )
   ) inst_cache_generator_request (
-    .ap_clk                    (ap_clk                                   ),
-    .areset                    (areset                                   ),
-    .mem_req_in                (mem_req_in                               ),
-    .cache_req_gen_out         (cache_req_out                            ),
-    .cache_resp_ready          (cache_resp_ready                         ),
-    .cache_req_fifo_in_signals (cache_req_fifo_in_signals                ),
-    .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
-    .fifo_setup_signal         (cache_generator_request_fifo_setup_signal)
+    .ap_clk                  (ap_clk                                   ),
+    .areset                  (areset                                   ),
+    .mem_req_in              (mem_req_in                               ),
+    .cache_req_gen_out       (cache_req_out                            ),
+    .cache_resp_ready        (cache_resp_ready                         ),
+    .fifo_request_signals_in (cache_fifo_request_signals_in            ),
+    .fifo_request_signals_out(cache_fifo_request_signals_out           ),
+    .fifo_setup_signal       (cache_generator_request_fifo_setup_signal)
   );
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  assign kernel_setup_mem_resp_in               = mem_resp_out[0];
-  assign kernel_setup_req_fifo_in_signals.rd_en = ~kernel_setup_req_fifo_out_signals.empty & ~cache_req_fifo_out_signals.prog_full;
+  assign kernel_setup_mem_resp_in                   = mem_resp_out[0];
+  assign kernel_setup_fifo_request_signals_in.rd_en = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
 
   kernel_setup #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_setup (
-    .ap_clk                  (ap_clk                            ),
-    .areset                  (setup_areset                      ),
-    .control_state           (kernel_setup_control_state        ),
-    .descriptor              (kernel_setup_descriptor           ),
-    .kernel_setup_mem_resp_in(kernel_setup_mem_resp_in          ),
-    .resp_fifo_out_signals   (kernel_setup_resp_fifo_out_signals),
-    .resp_fifo_in_signals    (kernel_setup_resp_fifo_in_signals ),
-    .kernel_setup_mem_req_out(kernel_setup_mem_req_out          ),
-    .req_fifo_out_signals    (kernel_setup_req_fifo_out_signals ),
-    .req_fifo_in_signals     (kernel_setup_req_fifo_in_signals  ),
-    .fifo_setup_signal       (kernel_setup_fifo_setup_signal    )
+    .ap_clk                   (ap_clk                                ),
+    .areset                   (areset_setup                          ),
+    .control_state            (kernel_setup_control_state            ),
+    .descriptor               (kernel_setup_descriptor               ),
+    .kernel_setup_mem_resp_in (kernel_setup_mem_resp_in              ),
+    .fifo_response_signals_out(kernel_setup_fifo_response_signals_out),
+    .fifo_response_in_signals (kernel_setup_fifo_response_in_signals ),
+    .kernel_setup_mem_req_out (kernel_setup_mem_req_out              ),
+    .fifo_request_signals_out (kernel_setup_fifo_request_signals_out ),
+    .fifo_request_signals_in  (kernel_setup_fifo_request_signals_in  ),
+    .fifo_setup_signal        (kernel_setup_fifo_setup_signal        )
   );
 
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-
-  assign vertex_cu_mem_resp_in               = mem_resp_out[1];
-  assign vertex_cu_req_fifo_in_signals.rd_en = ~vertex_cu_req_fifo_out_signals.empty & ~cache_req_fifo_out_signals.prog_full;
+  assign vertex_cu_mem_resp_in                   = mem_resp_out[1];
+  assign vertex_cu_fifo_request_signals_in.rd_en = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
 
   vertex_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_vertex_cu (
-    .ap_clk               (ap_clk                         ),
-    .areset               (setup_areset                   ),
-    .control_state        (vertex_cu_control_state        ),
-    .descriptor           (vertex_cu_descriptor           ),
-    .vertex_cu_mem_resp_in(vertex_cu_mem_resp_in          ),
-    .resp_fifo_out_signals(vertex_cu_resp_fifo_out_signals),
-    .resp_fifo_in_signals (vertex_cu_resp_fifo_in_signals ),
-    .vertex_cu_mem_req_out(vertex_cu_mem_req_out          ),
-    .req_fifo_out_signals (vertex_cu_req_fifo_out_signals ),
-    .req_fifo_in_signals  (vertex_cu_req_fifo_in_signals  ),
-    .fifo_setup_signal    (vertex_cu_fifo_setup_signal    )
+    .ap_clk                   (ap_clk                             ),
+    .areset                   (areset_setup                       ),
+    .control_state            (vertex_cu_control_state            ),
+    .descriptor               (vertex_cu_descriptor               ),
+    .vertex_cu_mem_resp_in    (vertex_cu_mem_resp_in              ),
+    .fifo_response_signals_out(vertex_cu_fifo_response_signals_out),
+    .fifo_response_in_signals (vertex_cu_fifo_response_in_signals ),
+    .vertex_cu_mem_req_out    (vertex_cu_mem_req_out              ),
+    .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
+    .fifo_request_signals_in  (vertex_cu_fifo_request_signals_in  ),
+    .fifo_setup_signal        (vertex_cu_fifo_setup_signal        )
   );
 
 endmodule : kernel_cu
