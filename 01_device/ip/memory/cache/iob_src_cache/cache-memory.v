@@ -119,6 +119,7 @@ generate
       .ADDR_W(FIFO_ADDR_W)
     ) iob_ram_2p0 (
       .ap_clk   (ap_clk       ),
+      .rstb     (reset),
       
       .w_en  (mem_w_en  ),
       .w_addr(mem_w_addr),
@@ -341,6 +342,7 @@ generate
             tag_memory
               (
                 .ap_clk (ap_clk                           ),
+                .rsta  (reset),
                 .en  (valid                         ),
                 .we  (way_select[k] & replace_valid),
                 .addr(index                        ),
@@ -446,6 +448,7 @@ generate
           tag_memory
             (
               .ap_clk (ap_clk),
+              .rsta  (reset),
               .en  (valid),
               .we  (replace_valid),
               .addr(index),
@@ -522,6 +525,7 @@ module iob_gen_sp_ram #(
               iob_cache_mem
                 (
                   .ap_clk (ap_clk),
+                  .rsta  (reset),
                   .en  (en),
                   .we  (we[i]),
                   .addr(addr),
