@@ -84,7 +84,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   FIFOStateSignalsOutput cache_fifo_request_signals_out                                      ;
   FIFOStateSignalsInput  cache_fifo_request_signals_in                                       ;
-  MemoryPacket           mem_req_in                                [NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket           cache_mem_req_in                          [NUM_MEMORY_REQUESTOR-1:0];
   CacheRequest           cache_req_out                                                       ;
   logic                  cache_resp_ready                                                    ;
   logic                  cache_req_out_valid                                                 ;
@@ -386,8 +386,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  assign mem_req_in[0] = kernel_setup_mem_req_out;
-  assign mem_req_in[1] = vertex_cu_mem_req_out;
+  assign cache_mem_req_in[0] = kernel_setup_mem_req_out;
+  assign cache_mem_req_in[1] = vertex_cu_mem_req_out;
 
   assign cache_resp_ready                    = cache_resp_out.valid;
   assign cache_req_out_valid                 = cache_req_out.valid & ~cache_resp_out.valid;
@@ -401,8 +401,8 @@ module kernel_cu #(
   ) inst_cache_generator_request (
     .ap_clk                  (ap_clk                                   ),
     .areset                  (areset                                   ),
-    .mem_req_in              (mem_req_in                               ),
-    .cache_req_gen_out       (cache_req_out                            ),
+    .mem_req_in              (cache_mem_req_in                         ),
+    .cache_req_out           (cache_req_out                            ),
     .cache_resp_ready        (cache_resp_ready                         ),
     .fifo_request_signals_in (cache_fifo_request_signals_in            ),
     .fifo_request_signals_out(cache_fifo_request_signals_out           ),
