@@ -44,7 +44,7 @@ module iob_ram_sp #(
   input                     en    ,
   input                     we    ,
   input      [(ADDR_W-1):0] addr  ,
-  output reg [(DATA_W-1):0] dout  ,
+  output     [(DATA_W-1):0] dout  ,
   input      [(DATA_W-1):0] din
 );
 
