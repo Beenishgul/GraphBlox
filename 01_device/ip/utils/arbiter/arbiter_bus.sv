@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : bus_arbiter.sv
+// File   : arbiter_bus.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -43,7 +43,7 @@
 `timescale 1ns / 1ps
 import PKG_FUNCTIONS::*;
 
-module bus_arbiter_N_in_1_out #(
+module arbiter_bus_N_in_1_out #(
     parameter WIDTH        = 2            ,
     parameter SELECT_WIDTH = $clog2(WIDTH),
     parameter BUS_WIDTH    = 8            ,
@@ -58,7 +58,7 @@ module bus_arbiter_N_in_1_out #(
     output logic [BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-    logic                      arbiter_areset                 ;
+    logic                      areset_arbiter                 ;
     logic   [SELECT_WIDTH-1:0] select                         ;
     logic                      valid                          ;
     logic                      arbiter_enable_reg             ;
@@ -70,14 +70,14 @@ module bus_arbiter_N_in_1_out #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        arbiter_areset <= areset;
+        areset_arbiter <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (arbiter_areset) begin
+        if (areset_arbiter) begin
             arbiter_enable_reg <= 0;
         end
         else begin
@@ -94,7 +94,7 @@ module bus_arbiter_N_in_1_out #(
 // --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
-        if (arbiter_areset) begin
+        if (areset_arbiter) begin
             arbiter_bus_out <= 0;
             arbiter_grant   <= 0;
         end else begin
@@ -121,11 +121,11 @@ module bus_arbiter_N_in_1_out #(
     ) inst_arbiter (
         .enable(arbiter_enable_reg),
         .req   (arbiter_req       ),
-        .grant  (arbiter_grant_reg ),
+        .grant (arbiter_grant_reg ),
         .select(select            ),
         .valid (valid             ),
         .ap_clk(ap_clk            ),
-        .areset(arbiter_areset    )
+        .areset(areset_arbiter    )
     );
 
-endmodule : bus_arbiter_N_in_1_out
+endmodule : arbiter_bus_N_in_1_out

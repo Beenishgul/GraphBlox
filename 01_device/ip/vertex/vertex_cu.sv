@@ -28,22 +28,22 @@ module vertex_cu #(
     parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
-    input  logic                       ap_clk               ,
-    input  logic                       areset               ,
-    input  ControlChainInterfaceOutput control_state        ,
-    input  DescriptorInterface         descriptor           ,
-    input  MemoryPacket                vertex_cu_mem_resp_in,
-    output FIFOStateSignalsOutput      resp_fifo_out_signals,
-    input  FIFOStateSignalsInput       resp_fifo_in_signals ,
-    output MemoryPacket                vertex_cu_mem_req_out,
-    output FIFOStateSignalsOutput      req_fifo_out_signals ,
-    input  FIFOStateSignalsInput       req_fifo_in_signals  ,
+    input  logic                       ap_clk                   ,
+    input  logic                       areset                   ,
+    input  ControlChainInterfaceOutput control_state            ,
+    input  DescriptorInterface         descriptor               ,
+    input  MemoryPacket                vertex_cu_mem_resp_in    ,
+    output FIFOStateSignalsOutput      fifo_response_signals_out,
+    input  FIFOStateSignalsInput       resp_fifo_in_signals     ,
+    output MemoryPacket                vertex_cu_mem_req_out    ,
+    output FIFOStateSignalsOutput      fifo_request_signals_out ,
+    input  FIFOStateSignalsInput       fifo_request_signals_in  ,
     output logic                       fifo_setup_signal
 );
 
     logic vertex_cu_areset;
-    logic counter_areset  ;
-    logic fifo_areset     ;
+    logic areset_counter  ;
+    logic areset_fifo     ;
 
 // --------------------------------------------------------------------------------------
 //   vertex_cu state machine signals
@@ -59,17 +59,17 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     DescriptorInterface descriptor_reg;
 
-    MemoryPacket vertex_cu_mem_resp_dout;
-    MemoryPacket vertex_cu_mem_resp_din ;
+    MemoryPacket fifo_response_dout;
+    MemoryPacket fifo_response_din ;
 
-    MemoryPacket vertex_cu_mem_req_dout;
-    MemoryPacket vertex_cu_mem_req_din ;
+    MemoryPacket fifo_request_dout;
+    MemoryPacket fifo_request_din ;
 
-    FIFOStateSignalsOutput resp_fifo_out_signals_reg;
-    FIFOStateSignalsOutput req_fifo_out_signals_reg ;
+    FIFOStateSignalsOutput fifo_response_signals_out_reg;
+    FIFOStateSignalsOutput fifo_request_signals_out_reg ;
 
-    FIFOStateSignalsInput resp_fifo_in_signals_reg;
-    FIFOStateSignalsInput req_fifo_in_signals_reg ;
+    FIFOStateSignalsInput resp_fifo_in_signals_reg   ;
+    FIFOStateSignalsInput fifo_request_signals_in_reg;
 
     logic fifo_MemoryPacketResponse_vertex_cu_signal;
     logic fifo_MemoryPacketRequest_vertex_cu_signal ;
@@ -93,8 +93,8 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         vertex_cu_areset <= areset;
-        counter_areset   <= areset;
-        fifo_areset      <= areset;
+        areset_counter   <= areset;
+        areset_fifo      <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -118,19 +118,19 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (vertex_cu_areset) begin
-            vertex_cu_mem_resp_din.valid   <= 0;
-            resp_fifo_in_signals_reg.rd_en <= 0;
-            req_fifo_in_signals_reg.rd_en  <= 0;
+            fifo_response_din.valid           <= 0;
+            resp_fifo_in_signals_reg.rd_en    <= 0;
+            fifo_request_signals_in_reg.rd_en <= 0;
         end
         else begin
-            vertex_cu_mem_resp_din.valid   <= vertex_cu_mem_resp_in.valid;
-            resp_fifo_in_signals_reg.rd_en <= resp_fifo_in_signals.rd_en;
-            req_fifo_in_signals_reg.rd_en  <= req_fifo_in_signals.rd_en;
+            fifo_response_din.valid           <= vertex_cu_mem_resp_in.valid;
+            resp_fifo_in_signals_reg.rd_en    <= resp_fifo_in_signals.rd_en;
+            fifo_request_signals_in_reg.rd_en <= fifo_request_signals_in.rd_en;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        vertex_cu_mem_resp_din.payload <= vertex_cu_mem_resp_in.payload;
+        fifo_response_din.payload <= vertex_cu_mem_resp_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -143,14 +143,14 @@ module vertex_cu #(
         end
         else begin
             fifo_setup_signal           <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
-            vertex_cu_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
+            vertex_cu_mem_req_out.valid <= fifo_request_signals_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        req_fifo_out_signals          <= req_fifo_out_signals_reg;
-        resp_fifo_out_signals         <= resp_fifo_out_signals_reg;
-        vertex_cu_mem_req_out.payload <= vertex_cu_mem_req_dout.payload;
+        fifo_request_signals_out      <= fifo_request_signals_out_reg;
+        fifo_response_signals_out     <= fifo_response_signals_out_reg;
+        vertex_cu_mem_req_out.payload <= fifo_request_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ module vertex_cu #(
             VERTEX_CU_REQ_BUSY : begin
                 vertex_cu_done                               <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
                 vertex_cu_start                              <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~req_fifo_out_signals_reg.prog_full;
+                engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~fifo_request_signals_out_reg.prog_full;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
@@ -264,11 +264,11 @@ module vertex_cu #(
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_engine_serial_read (
         .ap_clk                      (ap_clk                                 ),
-        .areset                      (counter_areset                         ),
+        .areset                      (areset_counter                         ),
         .serial_read_config          (serial_read_config_reg                 ),
         .engine_serial_read_req_out  (engine_serial_read_req                 ),
-        .req_fifo_out_signals        (engine_serial_read_fifo_out_signals_reg),
-        .req_fifo_in_signals         (engine_serial_read_fifo_in_signals_reg ),
+        .fifo_request_signals_out    (engine_serial_read_fifo_out_signals_reg),
+        .fifo_request_signals_in     (engine_serial_read_fifo_in_signals_reg ),
         .fifo_setup_signal           (engine_serial_read_fifo_setup_signal   ),
         .engine_serial_read_in_start (engine_serial_read_in_start_reg        ),
         .engine_serial_read_out_ready(engine_serial_read_out_ready_reg       ),
@@ -279,14 +279,14 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-    assign fifo_MemoryPacketRequest_vertex_cu_signal  = req_fifo_out_signals_reg.wr_rst_busy | req_fifo_out_signals_reg.rd_rst_busy;
-    assign fifo_MemoryPacketResponse_vertex_cu_signal = resp_fifo_out_signals_reg.wr_rst_busy | resp_fifo_out_signals_reg.rd_rst_busy;
+    assign fifo_MemoryPacketRequest_vertex_cu_signal  = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+    assign fifo_MemoryPacketResponse_vertex_cu_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in inst_fifo_812x16_MemoryPacket
 // --------------------------------------------------------------------------------------
-    assign resp_fifo_in_signals_reg.wr_en = vertex_cu_mem_resp_din.valid;
-    assign vertex_cu_mem_resp_dout.valid  = resp_fifo_out_signals_reg.valid;
+    assign resp_fifo_in_signals_reg.wr_en = fifo_response_din.valid;
+    assign fifo_response_dout.valid       = fifo_response_signals_out_reg.valid;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(16                        ),
@@ -294,29 +294,29 @@ module vertex_cu #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (4                         )
     ) inst_fifo_MemoryPacketResponse (
-        .clk         (ap_clk                                ),
-        .srst        (fifo_areset                           ),
-        .din         (vertex_cu_mem_resp_din.payload        ),
-        .wr_en       (resp_fifo_in_signals_reg.wr_en        ),
-        .rd_en       (resp_fifo_in_signals_reg.rd_en        ),
-        .dout        (vertex_cu_mem_resp_dout.payload       ),
-        .full        (resp_fifo_out_signals_reg.full        ),
-        .almost_full (resp_fifo_out_signals_reg.almost_full ),
-        .empty       (resp_fifo_out_signals_reg.empty       ),
-        .almost_empty(resp_fifo_out_signals_reg.almost_empty),
-        .valid       (resp_fifo_out_signals_reg.valid       ),
-        .prog_full   (resp_fifo_out_signals_reg.prog_full   ),
-        .prog_empty  (resp_fifo_out_signals_reg.prog_empty  ),
-        .wr_rst_busy (resp_fifo_out_signals_reg.wr_rst_busy ),
-        .rd_rst_busy (resp_fifo_out_signals_reg.rd_rst_busy )
+        .clk         (ap_clk                                    ),
+        .srst        (areset_fifo                               ),
+        .din         (fifo_response_din.payload                 ),
+        .wr_en       (resp_fifo_in_signals_reg.wr_en            ),
+        .rd_en       (resp_fifo_in_signals_reg.rd_en            ),
+        .dout        (fifo_response_dout.payload                ),
+        .full        (fifo_response_signals_out_reg.full        ),
+        .almost_full (fifo_response_signals_out_reg.almost_full ),
+        .empty       (fifo_response_signals_out_reg.empty       ),
+        .almost_empty(fifo_response_signals_out_reg.almost_empty),
+        .valid       (fifo_response_signals_out_reg.valid       ),
+        .prog_full   (fifo_response_signals_out_reg.prog_full   ),
+        .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
+        .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
+        .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out inst_fifo_812x16_MemoryPacket
 // --------------------------------------------------------------------------------------
-    assign req_fifo_in_signals_reg.wr_en = vertex_cu_mem_req_din.valid;
-    assign vertex_cu_mem_req_dout.valid  = req_fifo_out_signals_reg.valid;
-    assign vertex_cu_mem_req_din         = engine_serial_read_req;
+    assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
+    assign fifo_request_dout.valid           = fifo_request_signals_out_reg.valid;
+    assign fifo_request_din                  = engine_serial_read_req;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(16                        ),
@@ -324,21 +324,21 @@ module vertex_cu #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (4                         )
     ) inst_fifo_MemoryPacketRequest (
-        .clk         (ap_clk                               ),
-        .srst        (fifo_areset                          ),
-        .din         (vertex_cu_mem_req_din.payload        ),
-        .wr_en       (req_fifo_in_signals_reg.wr_en        ),
-        .rd_en       (req_fifo_in_signals_reg.rd_en        ),
-        .dout        (vertex_cu_mem_req_dout.payload       ),
-        .full        (req_fifo_out_signals_reg.full        ),
-        .almost_full (req_fifo_out_signals_reg.almost_full ),
-        .empty       (req_fifo_out_signals_reg.empty       ),
-        .almost_empty(req_fifo_out_signals_reg.almost_empty),
-        .valid       (req_fifo_out_signals_reg.valid       ),
-        .prog_full   (req_fifo_out_signals_reg.prog_full   ),
-        .prog_empty  (req_fifo_out_signals_reg.prog_empty  ),
-        .wr_rst_busy (req_fifo_out_signals_reg.wr_rst_busy ),
-        .rd_rst_busy (req_fifo_out_signals_reg.rd_rst_busy )
+        .clk         (ap_clk                                   ),
+        .srst        (areset_fifo                              ),
+        .din         (fifo_request_din.payload                 ),
+        .wr_en       (fifo_request_signals_in_reg.wr_en        ),
+        .rd_en       (fifo_request_signals_in_reg.rd_en        ),
+        .dout        (fifo_request_dout.payload                ),
+        .full        (fifo_request_signals_out_reg.full        ),
+        .almost_full (fifo_request_signals_out_reg.almost_full ),
+        .empty       (fifo_request_signals_out_reg.empty       ),
+        .almost_empty(fifo_request_signals_out_reg.almost_empty),
+        .valid       (fifo_request_signals_out_reg.valid       ),
+        .prog_full   (fifo_request_signals_out_reg.prog_full   ),
+        .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
+        .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
+        .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
     );
 
 endmodule : vertex_cu
