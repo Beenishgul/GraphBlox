@@ -30,6 +30,7 @@ module cache_request_generator #(
   input  MemoryPacket           mem_req_in [NUM_MEMORY_REQUESTOR-1:0],
   output CacheRequest           cache_req_gen_out                    ,
   input  logic                  cache_resp_ready                     ,
+  input  FIFOStateSignalsInput  cache_req_fifo_in_signals            ,
   output FIFOStateSignalsOutput cache_req_fifo_out_signals           ,
   output logic                  fifo_setup_signal
 );
@@ -50,9 +51,9 @@ module cache_request_generator #(
   logic arbiter_areset;
   logic counter_areset;
 
-  logic        fifo_942x16_setup_signal                          ;
-  logic        mem_resp_valid_reg                                ;
-  MemoryPacket mem_req_reg             [NUM_MEMORY_REQUESTOR-1:0];
+  logic        fifo_CacheRequest_setup_signal                          ;
+  logic        mem_resp_valid_reg                                      ;
+  MemoryPacket mem_req_reg                   [NUM_MEMORY_REQUESTOR-1:0];
 
   CacheRequest cache_req_reg_S0;
   CacheRequest cache_req_reg_S1;
@@ -67,7 +68,7 @@ module cache_request_generator #(
 
 
   FIFOStateSignalsOutput cache_req_fifo_out_signals_reg;
-  FIFOStateSignalsInput  cache_req_fifo_in_signals     ;
+  FIFOStateSignalsInput  cache_req_fifo_in_signals_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -125,11 +126,11 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
-      fifo_setup_signal          <= 1'b0;
+      fifo_setup_signal          <= 1'b1;
       cache_req_fifo_out_signals <= 1'b0;
     end
     else begin
-      fifo_setup_signal          <= fifo_942x16_setup_signal;
+      fifo_setup_signal          <= fifo_CacheRequest_setup_signal;
       cache_req_fifo_out_signals <= cache_req_fifo_out_signals_reg;
     end
   end
@@ -178,23 +179,23 @@ module cache_request_generator #(
   always_ff @(posedge ap_clk) begin
     case (current_state)
       CACHE_REQUEST_GEN_RESET : begin
-        cache_req_fifo_in_signals.rd_en <= 1'b0;
-        cache_req_reg_S0.valid          <= 1'b0;
+        cache_req_fifo_in_signals_reg.rd_en <= 1'b0;
+        cache_req_reg_S0.valid              <= 1'b0;
       end
       CACHE_REQUEST_GEN_IDLE : begin
-        cache_req_fifo_in_signals.rd_en <= 1'b0;
-        cache_req_reg_S0.valid          <= 1'b0;
+        cache_req_fifo_in_signals_reg.rd_en <= 1'b0;
+        cache_req_reg_S0.valid              <= 1'b0;
       end
       CACHE_REQUEST_GEN_SEND_S1 : begin
-        cache_req_fifo_in_signals.rd_en <= ~counter_stall & ~cache_req_fifo_out_signals_reg.empty;
-        cache_req_reg_S0.valid          <= 1'b0;
+        cache_req_fifo_in_signals_reg.rd_en <= ~counter_stall & ~cache_req_fifo_out_signals_reg.empty & cache_req_fifo_in_signals.rd_en;
+        cache_req_reg_S0.valid              <= 1'b0;
       end
       CACHE_REQUEST_GEN_SEND_S2 : begin
-        cache_req_fifo_in_signals.rd_en <= 1'b0;
-        cache_req_reg_S0.valid          <= cache_req_fifo_dout.valid;
+        cache_req_fifo_in_signals_reg.rd_en <= 1'b0;
+        cache_req_reg_S0.valid              <= cache_req_fifo_dout.valid;
       end
       CACHE_REQUEST_GEN_BUSY : begin
-        cache_req_fifo_in_signals.rd_en <= 1'b0;
+        cache_req_fifo_in_signals_reg.rd_en <= 1'b0;
 
         if(cache_req_fifo_dout.valid) begin
           cache_req_reg_S0.valid <= 1'b1;
@@ -276,9 +277,9 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-  assign fifo_942x16_setup_signal        = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
-  assign cache_req_fifo_in_signals.wr_en = cache_req_fifo_din.valid;
-  assign cache_req_fifo_dout.valid       = cache_req_fifo_out_signals_reg.valid;
+  assign fifo_CacheRequest_setup_signal      = cache_req_fifo_out_signals_reg.wr_rst_busy | cache_req_fifo_out_signals_reg.rd_rst_busy;
+  assign cache_req_fifo_in_signals_reg.wr_en = cache_req_fifo_din.valid;
+  assign cache_req_fifo_dout.valid           = cache_req_fifo_out_signals_reg.valid;
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in fifo_942x16_CacheRequest
 // --------------------------------------------------------------------------------------
@@ -287,12 +288,12 @@ module cache_request_generator #(
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
     .PROG_THRESH     (8                         )
-  ) inst_fifo_942x32_CacheRequest (
+  ) inst_fifo_CacheRequest (
     .clk         (ap_clk                                     ),
     .srst        (fifo_areset                                ),
     .din         (cache_req_fifo_din.payload                 ),
-    .wr_en       (cache_req_fifo_in_signals.wr_en            ),
-    .rd_en       (cache_req_fifo_in_signals.rd_en            ),
+    .wr_en       (cache_req_fifo_in_signals_reg.wr_en        ),
+    .rd_en       (cache_req_fifo_in_signals_reg.rd_en        ),
     .dout        (cache_req_fifo_dout.payload                ),
     .full        (cache_req_fifo_out_signals_reg.full        ),
     .almost_full (cache_req_fifo_out_signals_reg.almost_full ),

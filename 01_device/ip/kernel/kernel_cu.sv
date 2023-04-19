@@ -40,16 +40,16 @@ module kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic                          m_axi_areset                             ;
-  logic                          control_areset                           ;
-  logic                          cache_areset                             ;
-  logic                          fifo_areset                              ;
-  logic                          arbiter_areset                           ;
-  logic                          setup_areset                             ;
-  logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg                              ;
-  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state                           ;
-  logic                          cache_request_generator_fifo_setup_signal;
-  logic                          fifo_814x16_setup_signal                 ;
+  logic                          m_axi_areset                              ;
+  logic                          control_areset                            ;
+  logic                          cache_areset                              ;
+  logic                          fifo_areset                               ;
+  logic                          arbiter_areset                            ;
+  logic                          setup_areset                              ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg                               ;
+  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state                            ;
+  logic                          cache_request_generator_fifo_setup_signal ;
+  logic                          cache_response_generator_fifo_setup_signal;
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -60,26 +60,13 @@ module kernel_cu #(
   DescriptorInterface         descriptor_out_reg;
 
 
-  // assign m_axi_write.out = 0;
-  // assign m_axi_read.out  = 0;
-
-  // assign m_axi_write.out.awburst = M_AXI4_BURST_INCR;
-  // assign m_axi_read.out.arburst  = M_AXI4_BURST_INCR;
-  // assign m_axi_write.out.awsize  = M_AXI4_SIZE_64B;
-  // assign m_axi_read.out.arsize   = M_AXI4_SIZE_64B;
-  // assign m_axi_write.out.awcache = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
-  // assign m_axi_read.out.arcache  = M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE;
-
   logic [VERTEX_DATA_BITS-1:0] counter;
 
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
 
-  FIFOStateSignalsOutput cache_req_fifo_out_signals ;
-  FIFOStateSignalsOutput cache_resp_fifo_out_signals;
 
-  FIFOStateSignalsInput cache_resp_fifo_in_signals;
 
   logic force_inv_in ;
   logic force_inv_out;
@@ -92,20 +79,23 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  MemoryPacket  mem_resp_out        [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest  cache_resp_in                                 ;
-  CacheResponse cache_resp_fifo_dout                          ;
-  CacheResponse cache_resp_fifo_din                           ;
-  CacheResponse cache_resp_out                                ;
+  FIFOStateSignalsOutput cache_resp_fifo_out_signals                          ;
+  FIFOStateSignalsInput  cache_resp_fifo_in_signals                           ;
+  MemoryPacket           mem_resp_out               [NUM_MEMORY_REQUESTOR-1:0];
+  CacheResponse          cache_resp_fifo_dout                                 ;
+  CacheResponse          cache_resp_fifo_din                                  ;
+  CacheResponse          cache_resp_out                                       ;
 
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  MemoryPacket mem_req_in         [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest cache_req_out                                ;
-  logic        cache_resp_ready                             ;
-  logic        cache_req_out_valid                          ;
+  FIFOStateSignalsOutput cache_req_fifo_out_signals                          ;
+  FIFOStateSignalsInput  cache_req_fifo_in_signals                           ;
+  MemoryPacket           mem_req_in                [NUM_MEMORY_REQUESTOR-1:0];
+  CacheRequest           cache_req_out                                       ;
+  logic                  cache_resp_ready                                    ;
+  logic                  cache_req_out_valid                                 ;
 
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
@@ -162,7 +152,7 @@ module kernel_cu #(
     end
     else begin
       cu_setup_state[0] <= cache_request_generator_fifo_setup_signal;
-      cu_setup_state[1] <= fifo_814x16_setup_signal;
+      cu_setup_state[1] <= cache_response_generator_fifo_setup_signal;
       cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
     end
   end
@@ -341,56 +331,31 @@ module kernel_cu #(
     .reset        (cache_areset                    )
   );
 
-// --------------------------------------------------------------------------------------
-// FIFO cache response out fifo_814x16_CacheResponse
-// --------------------------------------------------------------------------------------
-  assign cache_resp_out.payload.meta = cache_req_out.payload.meta;
-
-  assign cache_resp_fifo_din.valid                     = cache_resp_out.valid;
-  assign cache_resp_fifo_din.payload.iob.rdata         = swap_endianness_cacheline(cache_resp_out.payload.iob.rdata);
-  assign cache_resp_fifo_din.payload.iob.wtb_empty_out = cache_resp_out.payload.iob.wtb_empty_out;
-  assign cache_resp_fifo_din.payload.meta              = cache_resp_out.payload.meta;
-
-  assign fifo_814x16_setup_signal         = cache_resp_fifo_out_signals.wr_rst_busy  | cache_resp_fifo_out_signals.rd_rst_busy;
-  assign cache_resp_fifo_in_signals.wr_en = cache_resp_fifo_din.valid;
-  assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
-
-  xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                         ),
-    .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
-    .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
-    .PROG_THRESH     (8                          )
-  ) inst_fifo_CacheResponse (
-    .clk         (ap_clk                                  ),
-    .srst        (fifo_areset                             ),
-    .din         (cache_resp_fifo_din.payload             ),
-    .wr_en       (cache_resp_fifo_in_signals.wr_en        ),
-    .rd_en       (cache_resp_fifo_in_signals.rd_en        ),
-    .dout        (cache_resp_fifo_dout.payload            ),
-    .full        (cache_resp_fifo_out_signals.full        ),
-    .almost_full (cache_resp_fifo_out_signals.almost_full ),
-    .empty       (cache_resp_fifo_out_signals.empty       ),
-    .almost_empty(cache_resp_fifo_out_signals.almost_empty),
-    .valid       (cache_resp_fifo_out_signals.valid       ),
-    .prog_full   (cache_resp_fifo_out_signals.prog_full   ),
-    .prog_empty  (cache_resp_fifo_out_signals.prog_empty  ),
-    .wr_rst_busy (cache_resp_fifo_out_signals.wr_rst_busy ),
-    .rd_rst_busy (cache_resp_fifo_out_signals.rd_rst_busy )
-  );
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  // MemoryPacket mem_resp_out [NUM_MEMORY_REQUESTOR-1:0];
-  // CacheRequest        cache_resp_in                          ;
+  cache_response_generator #(
+    .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
+    .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR),
+    .NUM_GRAPH_PE        (NUM_GRAPH_PE        )
+  ) inst_cache_response_generator (
+    .ap_clk                     (ap_clk                                    ),
+    .areset                     (areset                                    ),
+    .mem_resp_out               (mem_resp_out                              ),
+    .cache_resp_in              (cache_resp_out                            ),
+    .cache_resp_fifo_in_signals (cache_resp_fifo_in_signals                ),
+    .cache_resp_fifo_out_signals(cache_resp_fifo_out_signals               ),
+    .fifo_setup_signal          (cache_response_generator_fifo_setup_signal)
+  );
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
   assign mem_req_in[0]       = kernel_setup_mem_req_out;
   assign mem_req_in[1]       = 0;
-  assign cache_resp_ready    = cache_resp_fifo_din.valid;
-  assign cache_req_out_valid = cache_req_out.valid & ~cache_resp_fifo_din.valid;
+  assign cache_resp_ready    = cache_resp_out.valid;
+  assign cache_req_out_valid = cache_req_out.valid & ~cache_resp_out.valid;
 
   cache_request_generator #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
@@ -403,6 +368,7 @@ module kernel_cu #(
     .mem_req_in                (mem_req_in                               ),
     .cache_req_gen_out         (cache_req_out                            ),
     .cache_resp_ready          (cache_resp_ready                         ),
+    .cache_req_fifo_in_signals (cache_req_fifo_in_signals                ),
     .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
     .fifo_setup_signal         (cache_request_generator_fifo_setup_signal)
   );
