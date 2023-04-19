@@ -27,7 +27,6 @@ module cache_response_generator #(
   input  logic                  areset                                 ,
   output MemoryPacket           mem_resp_out [NUM_MEMORY_REQUESTOR-1:0],
   input  CacheResponse          cache_resp_in                          ,
-  input  CacheResponse          cache_resp_in                          ,
   output FIFOStateSignalsInput  cache_resp_fifo_in_signals             ,
   output FIFOStateSignalsOutput cache_resp_fifo_out_signals            ,
   output logic                  fifo_setup_signal
@@ -83,19 +82,23 @@ module cache_response_generator #(
     end
   end
 
-  always_ff @(posedge ap_clk ) begin
-    if(control_areset) begin
-      mem_resp_out[0].valid <= 0;
-      mem_resp_out[1].valid <= 0;
-    end else begin
-      mem_resp_out[0].valid <= mem_resp_reg[0].valid;
-      mem_resp_out[1].valid <= mem_resp_reg[1].valid;
-    end
-  end
 
-  always_ff @(posedge ap_clk) begin
-    mem_resp_out <= mem_resp_reg;
-  end
+  genvar i;
+  generate
+    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      always_ff @(posedge ap_clk ) begin
+        if(control_areset) begin
+          mem_resp_out[i].valid <= 0;
+        end else begin
+          mem_resp_out[i].valid <= mem_resp_reg[i].valid;
+        end
+      end
+
+      always_ff @(posedge ap_clk) begin
+        mem_resp_out[i].payload <= mem_resp_reg[i].payload;
+      end
+    end
+  endgenerate
 
   assign mem_resp_reg[0].valid   = cache_resp_fifo_out_signals_reg.valid;
   assign mem_resp_reg[0].payload = cache_resp_fifo_dout.payload;
@@ -106,8 +109,6 @@ module cache_response_generator #(
 // --------------------------------------------------------------------------------------
 // FIFO cache response out fifo_814x16_CacheResponse
 // --------------------------------------------------------------------------------------
-  assign cache_resp_reg.payload.meta = cache_req_out.payload.meta;
-
   assign cache_resp_fifo_din.valid                     = cache_resp_reg.valid;
   assign cache_resp_fifo_din.payload.iob.rdata         = swap_endianness_cacheline(cache_resp_reg.payload.iob.rdata);
   assign cache_resp_fifo_din.payload.iob.wtb_empty_out = cache_resp_reg.payload.iob.wtb_empty_out;

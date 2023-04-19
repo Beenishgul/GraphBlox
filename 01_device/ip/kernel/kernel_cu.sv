@@ -83,7 +83,7 @@ module kernel_cu #(
   FIFOStateSignalsInput  cache_resp_fifo_in_signals                           ;
   MemoryPacket           mem_resp_out               [NUM_MEMORY_REQUESTOR-1:0];
   CacheResponse          cache_resp_fifo_dout                                 ;
-  CacheResponse          cache_resp_fifo_din                                  ;
+  CacheResponse cache_resp_fifo_din;
   CacheResponse          cache_resp_out                                       ;
 
 
@@ -335,6 +335,10 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
+  assign cache_resp_out.payload.meta = cache_req_out.payload.meta;
+  assign cache_req_fifo_in_signals = ~cache_resp_fifo_out_signals.prog_full;
+  assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
+
   cache_response_generator #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
     .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR),
@@ -356,6 +360,7 @@ module kernel_cu #(
   assign mem_req_in[1]       = 0;
   assign cache_resp_ready    = cache_resp_out.valid;
   assign cache_req_out_valid = cache_req_out.valid & ~cache_resp_out.valid;
+  assign cache_req_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.prog_full;
 
   cache_request_generator #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
