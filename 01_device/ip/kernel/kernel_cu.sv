@@ -103,6 +103,20 @@ module kernel_cu #(
   logic                       kernel_setup_fifo_setup_signal    ;
 
 // --------------------------------------------------------------------------------------
+// Signals for Vertex CU
+// --------------------------------------------------------------------------------------
+  ControlChainInterfaceOutput vertex_cu_control_state        ;
+  DescriptorInterface         vertex_cu_descriptor           ;
+  MemoryPacket                vertex_cu_mem_resp_in          ;
+  FIFOStateSignalsOutput      vertex_cu_resp_fifo_out_signals;
+  FIFOStateSignalsInput       vertex_cu_resp_fifo_in_signals ;
+  MemoryPacket                vertex_cu_mem_req_out          ;
+  FIFOStateSignalsOutput      vertex_cu_req_fifo_out_signals ;
+  FIFOStateSignalsInput       vertex_cu_req_fifo_in_signals  ;
+  logic                       vertex_cu_fifo_setup_signal    ;
+
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -368,8 +382,9 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  assign mem_req_in[0]                   = kernel_setup_mem_req_out;
-  assign mem_req_in[1]                   = 0;
+  assign mem_req_in[0] = kernel_setup_mem_req_out;
+  assign mem_req_in[1] = vertex_cu_mem_req_out;
+
   assign cache_resp_ready                = cache_resp_out.valid;
   assign cache_req_out_valid             = cache_req_out.valid & ~cache_resp_out.valid;
   assign cache_req_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.prog_full;
@@ -416,5 +431,25 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
+
+  assign vertex_cu_mem_resp_in               = mem_resp_out[1];
+  assign vertex_cu_req_fifo_in_signals.rd_en = ~vertex_cu_req_fifo_out_signals.empty & ~cache_req_fifo_out_signals.prog_full;
+
+  vertex_cu #(
+    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
+    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
+  ) inst_vertex_cu (
+    .ap_clk               (ap_clk                         ),
+    .areset               (setup_areset                   ),
+    .control_state        (vertex_cu_control_state        ),
+    .descriptor           (vertex_cu_descriptor           ),
+    .vertex_cu_mem_resp_in(vertex_cu_mem_resp_in          ),
+    .resp_fifo_out_signals(vertex_cu_resp_fifo_out_signals),
+    .resp_fifo_in_signals (vertex_cu_resp_fifo_in_signals ),
+    .vertex_cu_mem_req_out(vertex_cu_mem_req_out          ),
+    .req_fifo_out_signals (vertex_cu_req_fifo_out_signals ),
+    .req_fifo_in_signals  (vertex_cu_req_fifo_in_signals  ),
+    .fifo_setup_signal    (vertex_cu_fifo_setup_signal    )
+  );
 
 endmodule : kernel_cu

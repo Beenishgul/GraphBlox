@@ -137,18 +137,18 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (kernel_setup_areset) begin
-            fifo_setup_signal                     <= 1;
+            fifo_setup_signal              <= 1;
             kernel_setup_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal                     <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal |fifo_MemoryPacketResponse_kernel_setup_signal;
+            fifo_setup_signal              <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal |fifo_MemoryPacketResponse_kernel_setup_signal;
             kernel_setup_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        req_fifo_out_signals                    <= req_fifo_out_signals_reg;
-        resp_fifo_out_signals                   <= resp_fifo_out_signals_reg;
+        req_fifo_out_signals             <= req_fifo_out_signals_reg;
+        resp_fifo_out_signals            <= resp_fifo_out_signals_reg;
         kernel_setup_mem_req_out.payload <= kernel_setup_mem_req_dout.payload;
     end
 
@@ -200,36 +200,36 @@ module kernel_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             KERNEL_SETUP_RESET : begin
-                kernel_setup_done                     <= 1'b1;
-                kernel_setup_start                    <= 1'b0;
+                kernel_setup_done                            <= 1'b1;
+                kernel_setup_start                           <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
             KERNEL_SETUP_IDLE : begin
-                kernel_setup_done                     <= 1'b0;
-                kernel_setup_start                    <= 1'b0;
+                kernel_setup_done                            <= 1'b0;
+                kernel_setup_start                           <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
             KERNEL_SETUP_REQ_START : begin
-                kernel_setup_done                     <= 1'b0;
-                kernel_setup_start                    <= 1'b1;
+                kernel_setup_done                            <= 1'b0;
+                kernel_setup_start                           <= 1'b1;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b1;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             KERNEL_SETUP_REQ_BUSY : begin
-                kernel_setup_done                     <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
-                kernel_setup_start                    <= 1'b0;
+                kernel_setup_done                            <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
+                kernel_setup_start                           <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~req_fifo_out_signals_reg.prog_full;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
             KERNEL_SETUP_REQ_DONE : begin
-                kernel_setup_done                     <= 1'b1;
-                kernel_setup_start                    <= 1'b0;
+                kernel_setup_done                            <= 1'b1;
+                kernel_setup_start                           <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
