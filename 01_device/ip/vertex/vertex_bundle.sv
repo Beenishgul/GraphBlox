@@ -37,7 +37,7 @@ module vertex_bundle #(
     output MemoryPacket                vertex_bundle_mem_req_out,
     output FIFOStateSignalsOutput      req_fifo_out_signals     ,
     input  FIFOStateSignalsInput       req_fifo_in_signals      ,
-    output logic                       fifo_vertex_bundle_signal
+    output logic                       fifo_setup_signal
 );
 
     logic vertex_bundle_areset;
@@ -137,11 +137,11 @@ module vertex_bundle #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (vertex_bundle_areset) begin
-            fifo_vertex_bundle_signal       <= 1;
+            fifo_setup_signal               <= 1;
             vertex_bundle_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_vertex_bundle_signal       <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_bundle_signal |fifo_MemoryPacketResponse_vertex_bundle_signal;
+            fifo_setup_signal               <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_bundle_signal |fifo_MemoryPacketResponse_vertex_bundle_signal;
             vertex_bundle_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end
@@ -157,7 +157,7 @@ module vertex_bundle #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(vertex_bundle_areset)
-            current_state <= VERTEX_bundle_RESET;
+            current_state <= VERTEX_BUNDLE_RESET;
         else begin
             current_state <= next_state;
         end
@@ -166,68 +166,68 @@ module vertex_bundle #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            VERTEX_bundle_RESET : begin
-                next_state = VERTEX_bundle_IDLE;
+            VERTEX_BUNDLE_RESET : begin
+                next_state = VERTEX_BUNDLE_IDLE;
             end
-            VERTEX_bundle_IDLE : begin
+            VERTEX_BUNDLE_IDLE : begin
                 if(descriptor_reg.valid && engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg)
-                    next_state = VERTEX_bundle_REQ_START;
+                    next_state = VERTEX_BUNDLE_REQ_START;
                 else
-                    next_state = VERTEX_bundle_IDLE;
+                    next_state = VERTEX_BUNDLE_IDLE;
             end
-            VERTEX_bundle_REQ_START : begin
+            VERTEX_BUNDLE_REQ_START : begin
                 if(engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg) begin
-                    next_state = VERTEX_bundle_REQ_START;
+                    next_state = VERTEX_BUNDLE_REQ_START;
                 end else begin
-                    next_state = VERTEX_bundle_REQ_BUSY;
+                    next_state = VERTEX_BUNDLE_REQ_BUSY;
                 end
             end
-            VERTEX_bundle_REQ_BUSY : begin
+            VERTEX_BUNDLE_REQ_BUSY : begin
                 if (vertex_bundle_done)
-                    next_state = VERTEX_bundle_REQ_DONE;
+                    next_state = VERTEX_BUNDLE_REQ_DONE;
                 else
-                    next_state = VERTEX_bundle_REQ_BUSY;
+                    next_state = VERTEX_BUNDLE_REQ_BUSY;
             end
-            VERTEX_bundle_REQ_DONE : begin
+            VERTEX_BUNDLE_REQ_DONE : begin
                 if (descriptor_reg.valid)
-                    next_state = VERTEX_bundle_REQ_DONE;
+                    next_state = VERTEX_BUNDLE_REQ_DONE;
                 else
-                    next_state = VERTEX_bundle_IDLE;
+                    next_state = VERTEX_BUNDLE_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            VERTEX_bundle_RESET : begin
+            VERTEX_BUNDLE_RESET : begin
                 vertex_bundle_done                           <= 1'b1;
                 vertex_bundle_start                          <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
-            VERTEX_bundle_IDLE : begin
+            VERTEX_BUNDLE_IDLE : begin
                 vertex_bundle_done                           <= 1'b0;
                 vertex_bundle_start                          <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
-            VERTEX_bundle_REQ_START : begin
+            VERTEX_BUNDLE_REQ_START : begin
                 vertex_bundle_done                           <= 1'b0;
                 vertex_bundle_start                          <= 1'b1;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b1;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
-            VERTEX_bundle_REQ_BUSY : begin
+            VERTEX_BUNDLE_REQ_BUSY : begin
                 vertex_bundle_done                           <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
                 vertex_bundle_start                          <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~req_fifo_out_signals_reg.prog_full;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
-            VERTEX_bundle_REQ_DONE : begin
+            VERTEX_BUNDLE_REQ_DONE : begin
                 vertex_bundle_done                           <= 1'b1;
                 vertex_bundle_start                          <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;

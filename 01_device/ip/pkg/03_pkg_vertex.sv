@@ -1,4 +1,4 @@
-/ -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : PKG_GLOBALS.sv
+// File   : PKG_VERTEX.sv
 // Create : 2022-11-16 19:43:34
 // Revise : 2022-11-16 19:43:34
 // Editor : sublime text4, tab size (4)
