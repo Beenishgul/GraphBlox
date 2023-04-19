@@ -16,23 +16,23 @@ module xpm_fifo_sync_wrapper #(
   parameter FIFO_WRITE_DEPTH = 16,
   parameter WRITE_DATA_WIDTH = 32,
   parameter READ_DATA_WIDTH  = 32,
-  parameter PROG_THRESH      = 4
+  parameter PROG_THRESH      = 6
 ) (
-  input  logic clk         ,
-  input  logic srst        ,
-  input  logic din         ,
-  input  logic wr_en       ,
-  input  logic rd_en       ,
-  output logic dout        ,
-  output logic full        ,
-  output logic almost_full ,
-  output logic empty       ,
-  output logic almost_empty,
-  output logic valid       ,
-  output logic prog_full   ,
-  output logic prog_empty  ,
-  output logic wr_rst_busy ,
-  output logic rd_rst_busy
+  input  logic                        clk         ,
+  input  logic                        srst        ,
+  input  logic [WRITE_DATA_WIDTH-1:0] din         ,
+  input  logic                        wr_en       ,
+  input  logic                        rd_en       ,
+  output logic [ READ_DATA_WIDTH-1:0] dout        ,
+  output logic                        full        ,
+  output logic                        almost_full ,
+  output logic                        empty       ,
+  output logic                        almost_empty,
+  output logic                        valid       ,
+  output logic                        prog_full   ,
+  output logic                        prog_empty  ,
+  output logic                        wr_rst_busy ,
+  output logic                        rd_rst_busy
 );
 
   // localparam                      XPM_FIFO_SYNC_PROG_FULL  = ALMFUL_HI_THRESHOLD - 1;
@@ -82,7 +82,7 @@ module xpm_fifo_sync_wrapper #(
     .overflow     (            ),
     .prog_full    (prog_full   ),
     .wr_data_count(            ),
-    .almost_full  (            ),
+    .almost_full  (almost_full ),
     .wr_ack       (            ),
     .wr_rst_busy  (wr_rst_busy ),
     .rd_en        (rd_en       ),
