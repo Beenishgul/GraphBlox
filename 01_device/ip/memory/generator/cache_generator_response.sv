@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : cache_response_generator.sv
+// File   : cache_generator_response.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -18,7 +18,7 @@ import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 
-module cache_response_generator #(
+module cache_generator_response #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
   parameter NUM_MEMORY_REQUESTOR = 2              ,
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
@@ -142,4 +142,4 @@ module cache_response_generator #(
   );
 
 
-endmodule : cache_response_generator
+endmodule : cache_generator_response
