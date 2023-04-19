@@ -100,7 +100,8 @@ module cache_response_generator #(
   endgenerate
 
   assign mem_resp_reg[0].valid   = cache_resp_fifo_out_signals_reg.valid;
-  assign mem_resp_reg[0].payload = cache_resp_fifo_dout.payload;
+  assign mem_resp_reg[0].payload.meta = cache_resp_fifo_dout.payload.meta;
+  assign mem_resp_reg[0].payload.data.field = cache_resp_fifo_dout.payload.iob.rdata;
 
   assign mem_resp_reg[1].valid   = 0;
   assign mem_resp_reg[1].payload = 0;
