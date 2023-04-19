@@ -36,6 +36,7 @@ cache="cache"
 generator="generator"
 
 control="control"
+vertex="vertex"
 utils="utils"
 utils_arbiter="arbiter"
 utils_fifo="fifo"
@@ -77,6 +78,8 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_fifo}/ ${C
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${cache}/ ${CFG_FILE_NAME} "v" 
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${generator}/ ${CFG_FILE_NAME} "sv"  
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME} "sv"
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
