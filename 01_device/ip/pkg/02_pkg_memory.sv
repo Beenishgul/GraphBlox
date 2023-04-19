@@ -200,7 +200,7 @@ typedef enum int unsigned {
   CACHE_REQUEST_GEN_BUSY,
   CACHE_REQUEST_GEN_READY,
   CACHE_REQUEST_GEN_DONE
-} cache_request_generator_state;
+} cache_generator_request_state;
 
 
 

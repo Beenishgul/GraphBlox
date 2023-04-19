@@ -76,7 +76,7 @@ module kernel_cu #(
   FIFOStateSignalsInput  cache_resp_fifo_in_signals                                         ;
   MemoryPacket           mem_resp_out                             [NUM_MEMORY_REQUESTOR-1:0]; ;
   CacheResponse          cache_resp_out                                                     ;
-  logic                  cache_request_generator_fifo_setup_signal                          ;
+  logic                  cache_generator_request_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
@@ -87,7 +87,7 @@ module kernel_cu #(
   CacheRequest           cache_req_out                                                       ;
   logic                  cache_resp_ready                                                    ;
   logic                  cache_req_out_valid                                                 ;
-  logic                  cache_response_generator_fifo_setup_signal                          ;
+  logic                  cache_generator_response_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
@@ -178,8 +178,8 @@ module kernel_cu #(
       cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
     end
     else begin
-      cu_setup_state[0] <= cache_request_generator_fifo_setup_signal;
-      cu_setup_state[1] <= cache_response_generator_fifo_setup_signal;
+      cu_setup_state[0] <= cache_generator_request_fifo_setup_signal;
+      cu_setup_state[1] <= cache_generator_response_fifo_setup_signal;
       cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
     end
   end
@@ -365,18 +365,18 @@ module kernel_cu #(
   assign cache_req_fifo_in_signals        = ~cache_resp_fifo_out_signals.prog_full;
   assign cache_resp_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.empty;
 
-  cache_response_generator #(
+  cache_generator_response #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
     .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR),
     .NUM_GRAPH_PE        (NUM_GRAPH_PE        )
-  ) inst_cache_response_generator (
+  ) inst_cache_generator_response (
     .ap_clk                     (ap_clk                                    ),
     .areset                     (areset                                    ),
     .mem_resp_out               (mem_resp_out                              ),
     .cache_resp_in              (cache_resp_out                            ),
     .cache_resp_fifo_in_signals (cache_resp_fifo_in_signals                ),
     .cache_resp_fifo_out_signals(cache_resp_fifo_out_signals               ),
-    .fifo_setup_signal          (cache_response_generator_fifo_setup_signal)
+    .fifo_setup_signal          (cache_generator_response_fifo_setup_signal)
   );
 
 // --------------------------------------------------------------------------------------
@@ -389,12 +389,12 @@ module kernel_cu #(
   assign cache_req_out_valid             = cache_req_out.valid & ~cache_resp_out.valid;
   assign cache_req_fifo_in_signals.rd_en = ~cache_resp_fifo_out_signals.prog_full;
 
-  cache_request_generator #(
+  cache_generator_request #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
     .NUM_MEMORY_REQUESTOR   (NUM_MEMORY_REQUESTOR),
     .NUM_GRAPH_PE           (NUM_GRAPH_PE        ),
     .OUTSTANDING_COUNTER_MAX(32                  )
-  ) inst_cache_request_generator (
+  ) inst_cache_generator_request (
     .ap_clk                    (ap_clk                                   ),
     .areset                    (areset                                   ),
     .mem_req_in                (mem_req_in                               ),
@@ -402,7 +402,7 @@ module kernel_cu #(
     .cache_resp_ready          (cache_resp_ready                         ),
     .cache_req_fifo_in_signals (cache_req_fifo_in_signals                ),
     .cache_req_fifo_out_signals(cache_req_fifo_out_signals               ),
-    .fifo_setup_signal         (cache_request_generator_fifo_setup_signal)
+    .fifo_setup_signal         (cache_generator_request_fifo_setup_signal)
   );
 
 // --------------------------------------------------------------------------------------

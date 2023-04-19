@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : cache_request_generator.sv
+// File   : cache_generator_request.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -18,7 +18,7 @@ import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 
-module cache_request_generator #(
+module cache_generator_request #(
   parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
   parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
   parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
@@ -87,8 +87,8 @@ module cache_request_generator #(
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-  cache_request_generator_state current_state;
-  cache_request_generator_state next_state   ;
+  cache_generator_request_state current_state;
+  cache_generator_request_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -386,4 +386,4 @@ module cache_request_generator #(
     .is_zero     (counter_stall                    )
   );
 
-endmodule : cache_request_generator
+endmodule : cache_generator_request
