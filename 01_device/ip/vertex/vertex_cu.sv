@@ -38,7 +38,7 @@ module vertex_cu #(
     output MemoryPacket                vertex_cu_mem_req_out,
     output FIFOStateSignalsOutput      req_fifo_out_signals ,
     input  FIFOStateSignalsInput       req_fifo_in_signals  ,
-    output logic                       fifo_vertex_cu_signal
+    output logic                       fifo_setup_signal
 );
 
     logic vertex_cu_areset;
@@ -138,11 +138,11 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (vertex_cu_areset) begin
-            fifo_vertex_cu_signal       <= 1;
+            fifo_setup_signal           <= 1;
             vertex_cu_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_vertex_cu_signal       <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
+            fifo_setup_signal           <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
             vertex_cu_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end

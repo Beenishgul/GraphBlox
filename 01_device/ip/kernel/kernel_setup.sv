@@ -37,7 +37,7 @@ module kernel_setup #(
     output MemoryPacket                kernel_setup_mem_req_out,
     output FIFOStateSignalsOutput      req_fifo_out_signals    ,
     input  FIFOStateSignalsInput       req_fifo_in_signals     ,
-    output logic                       fifo_kernel_setup_signal
+    output logic                       fifo_setup_signal
 );
 
     logic kernel_setup_areset;
@@ -47,11 +47,11 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    kernel_kernel_setup_state current_state;
-    kernel_kernel_setup_state next_state   ;
+    kernel_setup_state current_state;
+    kernel_setup_state next_state   ;
 
-    logic kernel_kernel_setup_done ;
-    logic kernel_kernel_setup_start;
+    logic kernel_setup_done ;
+    logic kernel_setup_start;
 
 // --------------------------------------------------------------------------------------
 //   FIFO signals
@@ -137,19 +137,19 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (kernel_setup_areset) begin
-            fifo_kernel_setup_signal              <= 1;
-            kernel_kernel_setup_mem_req_out.valid <= 0;
+            fifo_setup_signal                     <= 1;
+            kernel_setup_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_kernel_setup_signal              <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal |fifo_MemoryPacketResponse_kernel_setup_signal;
-            kernel_kernel_setup_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
+            fifo_setup_signal                     <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal |fifo_MemoryPacketResponse_kernel_setup_signal;
+            kernel_setup_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         req_fifo_out_signals                    <= req_fifo_out_signals_reg;
         resp_fifo_out_signals                   <= resp_fifo_out_signals_reg;
-        kernel_kernel_setup_mem_req_out.payload <= kernel_setup_mem_req_dout.payload;
+        kernel_setup_mem_req_out.payload <= kernel_setup_mem_req_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(kernel_setup_areset)
-            current_state <= KERNEL_kernel_SETUP_RESET;
+            current_state <= KERNEL_SETUP_RESET;
         else begin
             current_state <= next_state;
         end
@@ -166,70 +166,70 @@ module kernel_setup #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            KERNEL_kernel_SETUP_RESET : begin
-                next_state = KERNEL_kernel_SETUP_IDLE;
+            KERNEL_SETUP_RESET : begin
+                next_state = KERNEL_SETUP_IDLE;
             end
-            KERNEL_kernel_SETUP_IDLE : begin
+            KERNEL_SETUP_IDLE : begin
                 if(descriptor_reg.valid && engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg)
-                    next_state = KERNEL_kernel_SETUP_REQ_START;
+                    next_state = KERNEL_SETUP_REQ_START;
                 else
-                    next_state = KERNEL_kernel_SETUP_IDLE;
+                    next_state = KERNEL_SETUP_IDLE;
             end
-            KERNEL_kernel_SETUP_REQ_START : begin
+            KERNEL_SETUP_REQ_START : begin
                 if(engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg) begin
-                    next_state = KERNEL_kernel_SETUP_REQ_START;
+                    next_state = KERNEL_SETUP_REQ_START;
                 end else begin
-                    next_state = KERNEL_kernel_SETUP_REQ_BUSY;
+                    next_state = KERNEL_SETUP_REQ_BUSY;
                 end
             end
-            KERNEL_kernel_SETUP_REQ_BUSY : begin
-                if (kernel_kernel_setup_done)
-                    next_state = KERNEL_kernel_SETUP_REQ_DONE;
+            KERNEL_SETUP_REQ_BUSY : begin
+                if (kernel_setup_done)
+                    next_state = KERNEL_SETUP_REQ_DONE;
                 else
-                    next_state = KERNEL_kernel_SETUP_REQ_BUSY;
+                    next_state = KERNEL_SETUP_REQ_BUSY;
             end
-            KERNEL_kernel_SETUP_REQ_DONE : begin
+            KERNEL_SETUP_REQ_DONE : begin
                 if (descriptor_reg.valid)
-                    next_state = KERNEL_kernel_SETUP_REQ_DONE;
+                    next_state = KERNEL_SETUP_REQ_DONE;
                 else
-                    next_state = KERNEL_kernel_SETUP_IDLE;
+                    next_state = KERNEL_SETUP_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            KERNEL_kernel_SETUP_RESET : begin
-                kernel_kernel_setup_done                     <= 1'b1;
-                kernel_kernel_setup_start                    <= 1'b0;
+            KERNEL_SETUP_RESET : begin
+                kernel_setup_done                     <= 1'b1;
+                kernel_setup_start                    <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
-            KERNEL_kernel_SETUP_IDLE : begin
-                kernel_kernel_setup_done                     <= 1'b0;
-                kernel_kernel_setup_start                    <= 1'b0;
+            KERNEL_SETUP_IDLE : begin
+                kernel_setup_done                     <= 1'b0;
+                kernel_setup_start                    <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
             end
-            KERNEL_kernel_SETUP_REQ_START : begin
-                kernel_kernel_setup_done                     <= 1'b0;
-                kernel_kernel_setup_start                    <= 1'b1;
+            KERNEL_SETUP_REQ_START : begin
+                kernel_setup_done                     <= 1'b0;
+                kernel_setup_start                    <= 1'b1;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b1;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
-            KERNEL_kernel_SETUP_REQ_BUSY : begin
-                kernel_kernel_setup_done                     <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
-                kernel_kernel_setup_start                    <= 1'b0;
+            KERNEL_SETUP_REQ_BUSY : begin
+                kernel_setup_done                     <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
+                kernel_setup_start                    <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~req_fifo_out_signals_reg.prog_full;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
-            KERNEL_kernel_SETUP_REQ_DONE : begin
-                kernel_kernel_setup_done                     <= 1'b1;
-                kernel_kernel_setup_start                    <= 1'b0;
+            KERNEL_SETUP_REQ_DONE : begin
+                kernel_setup_done                     <= 1'b1;
+                kernel_setup_start                    <= 1'b0;
                 engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b0;
