@@ -82,7 +82,6 @@ module cache_response_generator #(
     end
   end
 
-
   genvar i;
   generate
     for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin

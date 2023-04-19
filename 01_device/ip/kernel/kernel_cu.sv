@@ -47,8 +47,8 @@ module kernel_cu #(
   logic                          arbiter_areset;
   logic                          setup_areset  ;
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
+  logic [  VERTEX_DATA_BITS-1:0] counter       ;
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state;
-
 
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
@@ -57,9 +57,6 @@ module kernel_cu #(
   ControlChainInterfaceOutput control_out_reg   ;
   DescriptorInterface         descriptor_in_reg ;
   DescriptorInterface         descriptor_out_reg;
-
-
-  logic [VERTEX_DATA_BITS-1:0] counter;
 
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
@@ -127,12 +124,12 @@ module kernel_cu #(
     end
     else begin
       if (descriptor_out_reg.valid) begin
-        if(counter >= descriptor_out_reg.payload.auxiliary_2) begin
+        if(counter >= (descriptor_out_reg.payload.auxiliary_2 -1)) begin
           cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
           counter     <= 0;
         end
         else begin
-          counter <= counter + kernel_setup_mem_resp_in.valid;
+          counter <= counter + (kernel_setup_mem_resp_in.valid << 6);
         end
       end else begin
         cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
@@ -140,6 +137,27 @@ module kernel_cu #(
       end
     end
   end
+
+  // always_ff @(posedge ap_clk) begin
+  //   if (control_areset) begin
+  //     counter     <= 0;
+  //     cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+  //   end
+  //   else begin
+  //     if (descriptor_out_reg.valid) begin
+  //       if(counter > 2000) begin
+  //         cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+  //         counter     <= 0;
+  //       end
+  //       else begin
+  //         counter <= counter + 1;
+  //       end
+  //     end else begin
+  //       cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+  //       counter     <= 0;
+  //     end
+  //   end
+  // end
 
   always_ff @(posedge ap_clk) begin
     if (control_areset) begin
