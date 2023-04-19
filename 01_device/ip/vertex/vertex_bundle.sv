@@ -85,6 +85,7 @@ module vertex_bundle #(
     logic                         engine_serial_read_out_ready_reg       ;
     logic                         engine_serial_read_out_done_reg        ;
     logic                         engine_serial_read_out_pause_reg       ;
+    logic                         engine_serial_read_fifo_setup_signal   ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -140,7 +141,7 @@ module vertex_bundle #(
             vertex_bundle_mem_req_out.valid <= 0;
         end
         else begin
-            fifo_vertex_bundle_signal       <= engine_serial_read_fifo_vertex_bundle_signal | fifo_MemoryPacketRequest_vertex_bundle_signal |fifo_MemoryPacketResponse_vertex_bundle_signal;
+            fifo_vertex_bundle_signal       <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_bundle_signal |fifo_MemoryPacketResponse_vertex_bundle_signal;
             vertex_bundle_mem_req_out.valid <= req_fifo_out_signals_reg.valid ;
         end
     end
@@ -261,17 +262,17 @@ module vertex_bundle #(
         .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_engine_serial_read (
-        .ap_clk                      (ap_clk                                      ),
-        .areset                      (counter_areset                              ),
-        .serial_read_config          (serial_read_config_reg                      ),
-        .engine_serial_read_req_out  (engine_serial_read_req                      ),
-        .req_fifo_out_signals        (engine_serial_read_fifo_out_signals_reg     ),
-        .req_fifo_in_signals         (engine_serial_read_fifo_in_signals_reg      ),
-        .fifo_vertex_bundle_signal   (engine_serial_read_fifo_vertex_bundle_signal),
-        .engine_serial_read_in_start (engine_serial_read_in_start_reg             ),
-        .engine_serial_read_out_ready(engine_serial_read_out_ready_reg            ),
-        .engine_serial_read_out_done (engine_serial_read_out_done_reg             ),
-        .engine_serial_read_out_pause(engine_serial_read_out_pause_reg            )
+        .ap_clk                      (ap_clk                                 ),
+        .areset                      (counter_areset                         ),
+        .serial_read_config          (serial_read_config_reg                 ),
+        .engine_serial_read_req_out  (engine_serial_read_req                 ),
+        .req_fifo_out_signals        (engine_serial_read_fifo_out_signals_reg),
+        .req_fifo_in_signals         (engine_serial_read_fifo_in_signals_reg ),
+        .fifo_setup_signal           (engine_serial_read_fifo_setup_signal   ),
+        .engine_serial_read_in_start (engine_serial_read_in_start_reg        ),
+        .engine_serial_read_out_ready(engine_serial_read_out_ready_reg       ),
+        .engine_serial_read_out_done (engine_serial_read_out_done_reg        ),
+        .engine_serial_read_out_pause(engine_serial_read_out_pause_reg       )
     );
 
 // --------------------------------------------------------------------------------------

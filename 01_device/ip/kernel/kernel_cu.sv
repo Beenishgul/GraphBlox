@@ -404,7 +404,7 @@ module kernel_cu #(
     .areset                  (setup_areset                      ),
     .control_state           (kernel_setup_control_state        ),
     .descriptor              (kernel_setup_descriptor           ),
-    .setup_mem_resp_in       (kernel_setup_mem_resp_in          ),
+    .kernel_setup_mem_resp_in(kernel_setup_mem_resp_in          ),
     .resp_fifo_out_signals   (kernel_setup_resp_fifo_out_signals),
     .resp_fifo_in_signals    (kernel_setup_resp_fifo_in_signals ),
     .kernel_setup_mem_req_out(kernel_setup_mem_req_out          ),
