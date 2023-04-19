@@ -294,19 +294,22 @@ module kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
-// Drive Setup signals to other modules
+// Drive descriptor signals to other modules
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (setup_areset) begin
       kernel_setup_descriptor.valid <= 0;
+      vertex_cu_descriptor.valid    <= 0;
     end
     else begin
       kernel_setup_descriptor.valid <= descriptor_out_reg.valid;
+      vertex_cu_descriptor.valid    <= descriptor_out_reg.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     kernel_setup_descriptor.payload <= descriptor_out_reg.payload;
+    vertex_cu_descriptor.payload    <= descriptor_out_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
