@@ -310,7 +310,7 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
-    int bank_grp_idx = 1;
+    int bank_grp_idx = 0;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
     arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->kernel_name, 0);
