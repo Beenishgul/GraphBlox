@@ -56,7 +56,7 @@ module iob_ram_sp #(
   xpm_memory_spram #(
     // Common module parameters
     .MEMORY_SIZE        (MEMORY_SIZE      ), //positive integer
-    .MEMORY_PRIMITIVE   ("auto"           ), //string; "auto", "distributed", "block" or "ultra";
+    .MEMORY_PRIMITIVE   ("ultra"          ), //string; "auto", "distributed", "block" or "ultra";
     .MEMORY_INIT_FILE   (mem_init_file_int), //string; "none" or "<filename>.mem"
     .MEMORY_INIT_PARAM  (""               ), //string;
     .USE_MEM_INIT       (1                ), //integer; 0,1

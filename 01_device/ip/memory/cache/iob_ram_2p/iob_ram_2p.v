@@ -81,7 +81,7 @@ module iob_ram_2p #(
     .MEMORY_INIT_FILE       (mem_init_file_int), // String
     .MEMORY_INIT_PARAM      ("0"              ), // String
     .MEMORY_OPTIMIZATION    ("true"           ), // String
-    .MEMORY_PRIMITIVE       ("auto"           ), // String
+    .MEMORY_PRIMITIVE       ("ultra"          ), // String
     .MEMORY_SIZE            (MEMORY_SIZE      ), // DECIMAL
     .MESSAGE_CONTROL        (0                ), // DECIMAL
     .READ_DATA_WIDTH_B      (DATA_W           ), // DECIMAL
