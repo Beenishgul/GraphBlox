@@ -23,11 +23,11 @@ import PKG_GLOBALS::*;
 // --------------------------------------------------------------------------------------
 
 typedef enum int unsigned {
-  SETUP_KERNEL_RESET,
-  SETUP_KERNEL_IDLE,
-  SETUP_KERNEL_REQ_START,
-  SETUP_KERNEL_REQ_BUSY,
-  SETUP_KERNEL_REQ_DONE
+  KERNEL_SETUP_RESET,
+  KERNEL_SETUP_IDLE,
+  KERNEL_SETUP_REQ_START,
+  KERNEL_SETUP_REQ_BUSY,
+  KERNEL_SETUP_REQ_DONE
 } kernel_setup_state;
 
 
