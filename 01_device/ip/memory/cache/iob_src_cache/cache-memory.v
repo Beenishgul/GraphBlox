@@ -103,7 +103,7 @@ generate
   if(CACHE_WRITE_POL == `WRITE_THROUGH) begin
 
     localparam FIFO_DATA_W = CACHE_FRONTEND_ADDR_W-CACHE_FRONTEND_BYTE_W + CACHE_FRONTEND_DATA_W + CACHE_FRONTEND_NBYTES;
-    localparam FIFO_ADDR_W = CACHE_WTBUF_DEPTH_W                              ;
+    localparam FIFO_ADDR_W = CACHE_WTBUF_DEPTH_W                                                                        ;
 
     wire                   mem_w_en  ;
     wire [FIFO_ADDR_W-1:0] mem_w_addr;
@@ -118,8 +118,8 @@ generate
       .DATA_W(FIFO_DATA_W),
       .ADDR_W(FIFO_ADDR_W)
     ) iob_ram_2p0 (
-      .ap_clk   (ap_clk       ),
-      .rstb     (reset),
+      .ap_clk(ap_clk    ),
+      .rstb  (reset     ),
       
       .w_en  (mem_w_en  ),
       .w_addr(mem_w_addr),
@@ -135,7 +135,7 @@ generate
       .W_DATA_W(FIFO_DATA_W),
       .ADDR_W  (FIFO_ADDR_W)
     ) write_throught_buffer (
-      .ap_clk           (ap_clk                           ),
+      .ap_clk        (ap_clk                        ),
       .rst           (reset                         ),
       .arst          (reset                         ),
       
@@ -200,8 +200,8 @@ endgenerate
 //////////////////////////////////////////////////////
 // Read-After-Write (RAW) Hazard (pipeline) control
 //////////////////////////////////////////////////////
-wire                  raw           ;
-reg                   write_hit_prev;
+wire                        raw           ;
+reg                         write_hit_prev;
 reg  [CACHE_WORD_OFF_W-1:0] offset_prev   ;
 reg  [    CACHE_N_WAYS-1:0] way_hit_prev  ;
 
@@ -279,6 +279,7 @@ generate
             .ADDR_W(CACHE_LINE_OFF_W)
           ) cache_memory (
             .ap_clk (ap_clk),
+            .reset(reset),
             .en  (valid),
             .we ({CACHE_FRONTEND_NBYTES{way_hit[k]}} & line_wstrb[(j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_NBYTES +: CACHE_FRONTEND_NBYTES]),
             .addr((write_access & way_hit[k] & ((j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i) == offset))? index_reg : index),
@@ -314,7 +315,7 @@ generate
 
         wire [CACHE_NWAY_W-1:0] way_hit_bin, way_select_bin; //reason for the 2 generates for single vs multiple ways
         //valid-memory
-        always @ (posedge ap_clk, posedge reset) begin
+        always @ (posedge ap_clk) begin
           if (reset)
             v_reg <= 0;
           else if (invalidate)
@@ -388,7 +389,7 @@ generate
         //dirty-memory
         if(CACHE_WRITE_POL == `WRITE_BACK)
           begin
-            always @ (posedge ap_clk, posedge reset) begin
+            always @ (posedge ap_clk) begin
               if (reset)
                 dirty_reg <= 0;
               else if(write_valid)
@@ -420,7 +421,7 @@ generate
     else // (CACHE_N_WAYS = 1)
       begin
         //valid-memory
-        always @ (posedge ap_clk, posedge reset)
+        always @ (posedge ap_clk)
         begin
           if (reset)
             v_reg <= 0;
@@ -467,7 +468,7 @@ generate
         if(CACHE_WRITE_POL == `WRITE_BACK)
           begin
             //dirty-memory
-            always @ (posedge ap_clk, posedge reset) begin
+            always @ (posedge ap_clk) begin
               if (reset)
                 dirty_reg <= 0;
               else if(write_valid)
@@ -505,7 +506,8 @@ module iob_gen_sp_ram #(
   parameter DATA_W = 32,
   parameter ADDR_W = 10
 ) (
-  input                 ap_clk     ,
+  input                 ap_clk  ,
+  input                 reset   ,
   input                 en      ,
   input  [DATA_W/8-1:0] we      ,
   input  [  ADDR_W-1:0] addr    ,
