@@ -46,25 +46,26 @@ import PKG_FUNCTIONS::*;
 module arbiter_bus_N_in_1_out #(
     parameter WIDTH        = 2            ,
     parameter SELECT_WIDTH = $clog2(WIDTH),
-    parameter BUS_WIDTH    = 8            ,
-    parameter BUS_NUM      = 2
+    parameter BUS_WIDTH    = 8
 ) (
-    input  logic                 ap_clk                      ,
-    input  logic                 areset                      ,
-    input  logic                 arbiter_enable              ,
-    input  logic [    WIDTH-1:0] arbiter_req                 ,
-    input  logic [BUS_WIDTH-1:0] arbiter_bus_in [0:BUS_NUM-1],
-    output logic [    WIDTH-1:0] arbiter_grant               ,
+    input  logic                 ap_clk                    ,
+    input  logic                 areset                    ,
+    input  logic                 arbiter_enable            ,
+    input  logic [    WIDTH-1:0] arbiter_req               ,
+    input  logic [    WIDTH-1:0] arbiter_bus_valid         ,
+    input  logic [BUS_WIDTH-1:0] arbiter_bus_in [0:WIDTH-1],
+    output logic [    WIDTH-1:0] arbiter_grant             ,
     output logic [BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-    logic                      areset_arbiter                 ;
-    logic   [SELECT_WIDTH-1:0] select                         ;
-    logic                      valid                          ;
-    logic                      arbiter_enable_reg             ;
-    logic   [       WIDTH-1:0] arbiter_grant_reg              ;
-    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg   [0:BUS_NUM-1];
-    integer                    i                              ;
+    logic                      areset_arbiter               ;
+    logic   [SELECT_WIDTH-1:0] select                       ;
+    logic                      valid                        ;
+    logic                      arbiter_enable_reg           ;
+    logic   [       WIDTH-1:0] arbiter_grant_reg            ;
+    logic   [       WIDTH-1:0] arbiter_bus_valid            ;
+    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg   [0:WIDTH-1];
+    integer                    i                            ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -78,10 +79,12 @@ module arbiter_bus_N_in_1_out #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_arbiter) begin
-            arbiter_enable_reg <= 0;
+            arbiter_enable_reg    <= 0;
+            arbiter_bus_valid_reg <= 0;
         end
         else begin
-            arbiter_enable_reg <= arbiter_enable;
+            arbiter_enable_reg    <= arbiter_enable;
+            arbiter_bus_valid_reg <= arbiter_bus_valid;
         end
     end
 
@@ -99,13 +102,13 @@ module arbiter_bus_N_in_1_out #(
             arbiter_grant   <= 0;
         end else begin
             if (arbiter_enable_reg) begin
-                for ( i = 0; i < BUS_NUM; i++) begin
-                    if (arbiter_grant_reg[i]) begin
+                for ( i = 0; i < WIDTH; i++) begin
+                    if (arbiter_bus_valid_reg[i]) begin
                         arbiter_bus_out <= arbiter_bus_reg[i];
                     end
                     arbiter_grant <= arbiter_grant_reg;
                 end
-                if (~(|arbiter_grant_reg)) begin
+                if (~(|arbiter_bus_valid)) begin
                     arbiter_bus_out <= 0;
                 end
             end
