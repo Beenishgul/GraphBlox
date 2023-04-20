@@ -366,8 +366,7 @@ module kernel_cu #(
 // Cache response generator
 // --------------------------------------------------------------------------------------
   assign cache_response_out.payload.meta      = cache_request_out.payload.meta;
-  assign cache_fifo_response_signals_in       = ~cache_fifo_response_signals_out.prog_full;
-  assign cache_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.empty;
+  assign cache_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.empty & ~vertex_cu_fifo_response_signals_out.prog_full;
 
   cache_generator_response #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
@@ -391,7 +390,7 @@ module kernel_cu #(
 
   assign cache_response_ready                = cache_response_out.valid;
   assign cache_request_out_valid             = cache_request_out.valid & ~cache_response_out.valid;
-  assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
+  assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_request_signals_out.empty & ~cache_fifo_response_signals_out.prog_full;
 
   cache_generator_request #(
     .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
