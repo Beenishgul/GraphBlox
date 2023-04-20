@@ -82,14 +82,15 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  FIFOStateSignalsOutput cache_fifo_request_signals_out                          ;
-  FIFOStateSignalsInput  cache_fifo_request_signals_in                           ;
-  MemoryPacket           cache_memory_request_in       [NUM_MEMORY_REQUESTOR-1:0];
-  logic                 cache_memory_request_grant_out [NUM_MEMORY_REQUESTOR-1:0],
-    CacheRequest cache_request_out;
-  logic cache_response_ready                      ;
-  logic cache_request_out_valid                   ;
-  logic cache_generator_response_fifo_setup_signal;
+  FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
+  FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
+  MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
+  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_grant_out                                             ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_request_in                                            ;
+  CacheRequest                     cache_request_out                                                   ;
+  logic                            cache_response_ready                                                ;
+  logic                            cache_request_out_valid                                             ;
+  logic                            cache_generator_response_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
@@ -403,7 +404,8 @@ module kernel_cu #(
     .ap_clk                  (ap_clk                                   ),
     .areset                  (areset                                   ),
     .memory_request_in       (cache_memory_request_in                  ),
-    .memory_request_grant_out(cache_memory_request_grant_out           ),
+    .arbiter_request_in      (cache_arbiter_request_in                 ),
+    .arbiter_grant_out       (cache_arbiter_grant_out                  ),
     .cache_request_out       (cache_request_out                        ),
     .cache_response_ready    (cache_response_ready                     ),
     .fifo_request_signals_in (cache_fifo_request_signals_in            ),
@@ -415,7 +417,9 @@ module kernel_cu #(
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
   assign kernel_setup_memory_response_in            = memory_response_out[0];
-  assign kernel_setup_fifo_request_signals_in.rd_en = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full & cache_memory_request_grant_out[0];
+  assign kernel_setup_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[0];
+
+  assign cache_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
 
   kernel_setup #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
@@ -438,7 +442,10 @@ module kernel_cu #(
 // Vertex CU
 // --------------------------------------------------------------------------------------
   assign vertex_cu_memory_response_in            = memory_response_out[1];
-  assign vertex_cu_fifo_request_signals_in.rd_en = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full & cache_memory_request_grant_out[1];
+  assign vertex_cu_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[1];
+
+  assign cache_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
+
 
   vertex_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
