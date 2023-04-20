@@ -58,14 +58,14 @@ module arbiter_bus_N_in_1_out #(
     output logic [BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-    logic                      areset_arbiter               ;
-    logic   [SELECT_WIDTH-1:0] select                       ;
-    logic                      valid                        ;
-    logic                      arbiter_enable_reg           ;
-    logic   [       WIDTH-1:0] arbiter_grant_reg            ;
-    logic   [       WIDTH-1:0] arbiter_bus_valid            ;
-    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg   [0:WIDTH-1];
-    integer                    i                            ;
+    logic                      areset_arbiter                  ;
+    logic   [SELECT_WIDTH-1:0] select                          ;
+    logic                      valid                           ;
+    logic                      arbiter_enable_reg              ;
+    logic   [       WIDTH-1:0] arbiter_grant_reg               ;
+    logic   [       WIDTH-1:0] arbiter_bus_valid_reg           ;
+    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg      [0:WIDTH-1];
+    integer                    i                               ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
