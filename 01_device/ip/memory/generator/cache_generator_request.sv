@@ -19,19 +19,20 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 
 module cache_generator_request #(
-  parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
-  parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
-  parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
-  parameter         OUTSTANDING_COUNTER_MAX   = 16                               ,
-  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
+  parameter NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
+  parameter NUM_MEMORY_REQUESTOR      = 2                                ,
+  parameter NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
+  parameter OUTSTANDING_COUNTER_MAX   = 16                               ,
+  parameter OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
 ) (
-  input  logic                  ap_clk                                      ,
-  input  logic                  areset                                      ,
-  input  MemoryPacket           memory_request_in [NUM_MEMORY_REQUESTOR-1:0],
-  output CacheRequest           cache_request_out                           ,
-  input  logic                  cache_response_ready                        ,
-  input  FIFOStateSignalsInput  fifo_request_signals_in                     ,
-  output FIFOStateSignalsOutput fifo_request_signals_out                    ,
+  input  logic                  ap_clk                                             ,
+  input  logic                  areset                                             ,
+  input  MemoryPacket           memory_request_in [NUM_MEMORY_REQUESTOR-1:0]       ,
+  output logic                  memory_request_grant_out [NUM_MEMORY_REQUESTOR-1:0],
+  output CacheRequest           cache_request_out                                  ,
+  input  logic                  cache_response_ready                               ,
+  input  FIFOStateSignalsInput  fifo_request_signals_in                            ,
+  output FIFOStateSignalsOutput fifo_request_signals_out                           ,
   output logic                  fifo_setup_signal
 );
 
@@ -72,10 +73,10 @@ module cache_generator_request #(
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-  logic                                 counter_incr ;
-  logic                                 counter_decr ;
-  logic                                 counter_stall;
-  logic [OUTSTANDING_COUNTER_WIDTH-1:0] counter_count;
+  logic                                 counter_incr  ;
+  logic                                 counter_decr  ;
+  logic                                 counter_stall ;
+  logic [OUTSTANDING_COUNTER_WIDTH-1:0] counter_count ;
   logic [OUTSTANDING_COUNTER_WIDTH-1:0] counter_stride;
 
   MemoryPacket arbiter_bus_out                                    ;
@@ -128,10 +129,12 @@ module cache_generator_request #(
     if (areset_control) begin
       fifo_setup_signal        <= 1'b1;
       fifo_request_signals_out <= 1'b0;
+      memory_request_grant_out <= 0;
     end
     else begin
       fifo_setup_signal        <= fifo_request_setup_signal;
       fifo_request_signals_out <= fifo_request_signals_out_reg;
+      memory_request_grant_out <= arbiter_grant;
     end
   end
 
