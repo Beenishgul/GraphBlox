@@ -366,7 +366,7 @@ module kernel_cu #(
 // Cache response generator
 // --------------------------------------------------------------------------------------
   assign cache_response_out.payload.meta      = cache_request_out.payload.meta;
-  assign cache_fifo_request_signals_in        = ~cache_fifo_response_signals_out.prog_full;
+  assign cache_fifo_response_signals_in       = ~cache_fifo_response_signals_out.prog_full;
   assign cache_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.empty;
 
   cache_generator_response #(

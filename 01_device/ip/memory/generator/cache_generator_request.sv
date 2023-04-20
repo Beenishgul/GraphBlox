@@ -22,8 +22,8 @@ module cache_generator_request #(
   parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
   parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
   parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
-  parameter integer OUTSTANDING_COUNTER_MAX   = 16                               ,
-  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
+  parameter         OUTSTANDING_COUNTER_MAX   = 16                               ,
+  parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX)
 ) (
   input  logic                  ap_clk                                      ,
   input  logic                  areset                                      ,
