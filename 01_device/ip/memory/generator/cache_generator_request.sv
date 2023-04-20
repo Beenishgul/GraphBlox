@@ -22,7 +22,7 @@ module cache_generator_request #(
   parameter         NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
   parameter         NUM_MEMORY_REQUESTOR      = 2                                ,
   parameter         NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
-  parameter integer OUTSTANDING_COUNTER_MAX   = 16                               ,
+  parameter         OUTSTANDING_COUNTER_MAX   = 16                               ,
   parameter         OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
 ) (
   input  logic                  ap_clk                                      ,
@@ -76,6 +76,7 @@ module cache_generator_request #(
   logic                                 counter_decr ;
   logic                                 counter_stall;
   logic [OUTSTANDING_COUNTER_WIDTH-1:0] counter_count;
+  logic [OUTSTANDING_COUNTER_WIDTH-1:0] counter_stride;
 
   MemoryPacket arbiter_bus_out                                    ;
   MemoryPacket arbiter_bus_in [0:BUS_ARBITER_N_IN_1_OUT_BUS_NUM-1];
@@ -368,6 +369,7 @@ module cache_generator_request #(
     end
   end
 
+  assign counter_stride = 1;
 
   transactions_counter #(
     .C_WIDTH(OUTSTANDING_COUNTER_WIDTH                            ),
@@ -380,7 +382,7 @@ module cache_generator_request #(
     .incr        (counter_incr                     ),
     .decr        (counter_decr                     ),
     .load_value  ({OUTSTANDING_COUNTER_WIDTH{1'b0}}),
-    .stride_value(1                                ),
+    .stride_value(counter_stride                   ),
     .count       (counter_count                    ),
     .is_zero     (counter_stall                    )
   );
