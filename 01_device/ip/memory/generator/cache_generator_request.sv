@@ -167,7 +167,7 @@ module cache_generator_request #(
         next_state = CACHE_REQUEST_GEN_SEND_S1;
       end
       CACHE_REQUEST_GEN_SEND_S1 : begin
-        if(~counter_stall & ~fifo_request_signals_out_reg.empty)
+        if(~counter_stall & ~fifo_request_signals_out_reg.empty & fifo_request_signals_in.rd_en)
           next_state = CACHE_REQUEST_GEN_SEND_S2;
         else
           next_state = CACHE_REQUEST_GEN_SEND_S1;

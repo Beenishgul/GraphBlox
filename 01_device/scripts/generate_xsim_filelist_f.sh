@@ -110,44 +110,44 @@ echo $newtext >> ${CFG_FILE_NAME}
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/simulation/fifo_generator_vlog_beh.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/simulation/fifo_generator_vlog_beh.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/hdl/fifo_generator_v13_2_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/hdl/fifo_generator_v13_2_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/sim/fifo_942x32.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/sim/fifo_942x32.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16/sim/fifo_942x16.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16/sim/fifo_942x16.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16_FWFT/sim/fifo_942x16_FWFT.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16_FWFT/sim/fifo_942x16_FWFT.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/sim/fifo_812x16.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/sim/fifo_812x16.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/sim/fifo_512x32_asym_512wrt_64rd.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/sim/fifo_512x32_asym_512wrt_64rd.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext=""
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/simulation/blk_mem_gen_v8_4.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/simulation/blk_mem_gen_v8_4.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/sim/bram_64x256_asym_64wrt_512rd.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/sim/bram_64x256_asym_64wrt_512rd.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/sim/bram_512x32_asym_512wrt_64rd.v"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/sim/bram_512x32_asym_512wrt_64rd.v"
+# echo $newtext >> ${CFG_FILE_NAME}
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 
