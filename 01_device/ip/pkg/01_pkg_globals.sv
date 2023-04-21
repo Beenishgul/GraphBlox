@@ -73,12 +73,11 @@ package PKG_GLOBALS;
 	parameter CACHE_WRITE_THROUGH = 0; //write-through not allocate: implements a write-through buffer
 	parameter CACHE_WRITE_BACK    = 1; //write-back allocate: implemented a dirty-memory
 
-	parameter CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH                               ; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-	parameter CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS                                      ; //Data width - word size used for the cache
-	parameter CACHE_N_WAYS          = 1                                                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 15                                                    ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter CACHE_WORD_OFF_W      = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W) + 1; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-	parameter CACHE_WTBUF_DEPTH_W   = 8                                                    ; //Depth Width of Write-Through Buffer
+	parameter CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+	parameter CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS       ; //Data width - word size used for the cache
+	parameter CACHE_N_WAYS          = 1                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter CACHE_LINE_OFF_W      = 13                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_WTBUF_DEPTH_W   = 8                      ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
@@ -92,7 +91,10 @@ package PKG_GLOBALS;
 	parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8      ; //Number of bytes
 	parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
+	parameter CACHE_WORD_OFF_W = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+1; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
 	parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W); //Logarithm Ratio between the size of the cache-line and the BACKEND's data width
+
+	
 /*---------------------------------------------------*/
 //Write Policy
 	parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
