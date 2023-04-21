@@ -112,7 +112,7 @@ module cache_generator_response #(
 // FIFO cache response out fifo_814x16_CacheResponse
 // --------------------------------------------------------------------------------------
   assign fifo_response_din.valid                     = cache_resp_reg.valid;
-  assign fifo_response_din.payload.iob.rdata         = swap_endianness_cacheline(cache_resp_reg.payload.iob.rdata);
+  assign fifo_response_din.payload.iob.rdata         = cache_resp_reg.payload.iob.rdata;
   assign fifo_response_din.payload.iob.wtb_empty_out = cache_resp_reg.payload.iob.wtb_empty_out;
   assign fifo_response_din.payload.meta              = cache_resp_reg.payload.meta;
 

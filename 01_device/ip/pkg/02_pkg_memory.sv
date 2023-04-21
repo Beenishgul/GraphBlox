@@ -113,15 +113,15 @@ typedef enum int unsigned {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
-  logic [      CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] base_address  ; // SIZE = 64 bits
-  logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] address_offset; // SIZE = 64 bits
-  command_type                        cmd_type      ; // SIZE = 32 bits
-  structure_type                      struct_type   ; // SIZE = 32 bits
-  operand_location                    operand_loc   ; // SIZE = 32 bits
-  filter_operation                    filter_op     ; // SIZE = 32 bits
-  ALU_operation                       ALU_op        ; // SIZE = 32 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
+  logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
+  logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
+  command_type                      cmd_type      ; // SIZE = 32 bits
+  structure_type                    struct_type   ; // SIZE = 32 bits
+  operand_location                  operand_loc   ; // SIZE = 32 bits
+  filter_operation                  filter_op     ; // SIZE = 32 bits
+  ALU_operation                     ALU_op        ; // SIZE = 32 bits
 } MemoryPacketMeta;// SIZE = 300 bits
 
 typedef struct packed{

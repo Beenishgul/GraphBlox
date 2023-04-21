@@ -249,8 +249,8 @@ module vertex_cu #(
         serial_read_config_comb.payload.array_size    = descriptor_reg.payload.auxiliary_2;
         serial_read_config_comb.payload.start_read    = 0;
         serial_read_config_comb.payload.end_read      = descriptor_reg.payload.auxiliary_2;
-        serial_read_config_comb.payload.stride        = 64;
-        serial_read_config_comb.payload.granularity   = 64;
+        serial_read_config_comb.payload.stride        = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.granularity   = CACHE_FRONTEND_DATA_W/8;
     end
 
     always_ff @(posedge ap_clk) begin

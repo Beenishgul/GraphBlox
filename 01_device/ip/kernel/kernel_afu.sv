@@ -160,7 +160,7 @@ module kernel_afu #(
       m_axi_read.in.rvalid  <= m00_axi_rvalid ; // Read channel valid
       m_axi_read.in.arready <= m00_axi_arready; // Address read channel ready
       m_axi_read.in.rlast   <= m00_axi_rlast  ; // Read channel last word
-      m_axi_read.in.rdata   <= m00_axi_rdata  ; // Read channel data
+      m_axi_read.in.rdata   <= swap_endianness_cacheline(m00_axi_rdata)  ; // Read channel data
       m_axi_read.in.rid     <= m00_axi_rid    ; // Read channel ID
       m_axi_read.in.rresp   <= m00_axi_rresp  ; // Read channel response
     end
@@ -249,7 +249,7 @@ module kernel_afu #(
       m00_axi_awcache <= m_axi_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
       m00_axi_awprot  <= m_axi_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       m00_axi_awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
-      m00_axi_wdata   <= m_axi_write.out.wdata  ; // Write channel data
+      m00_axi_wdata   <= swap_endianness_cacheline(m_axi_write.out.wdata)  ; // Write channel data
       m00_axi_wstrb   <= m_axi_write.out.wstrb  ; // Write channel write strobe
       m00_axi_wlast   <= m_axi_write.out.wlast  ; // Write channel last word flag
       m00_axi_wvalid  <= m_axi_write.out.wvalid ; // Write channel valid
