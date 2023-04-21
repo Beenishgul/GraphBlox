@@ -73,21 +73,21 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
+  CacheResponse          cache_response_out                                                 ;
   FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
   FIFOStateSignalsInput  cache_fifo_response_signals_in                                     ;
-  MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0]; ;
-  CacheResponse          cache_response_out                                                 ;
+  MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0]; 
   logic                  cache_generator_request_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
+  CacheRequest                     cache_request_out                                                   ;
   FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
   FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
   MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_grant_out                                             ;
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_request_in                                            ;
-  CacheRequest                     cache_request_out                                                   ;
   logic                            cache_response_ready                                                ;
   logic                            cache_request_out_valid                                             ;
   logic                            cache_generator_response_fifo_setup_signal                          ;
