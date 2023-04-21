@@ -114,7 +114,7 @@ module cache_memory #(
       wire [FIFO_DATA_W-1:0] mem_r_data;
 
       // FIFO memory
-      xpm_memory_sdpram_wrapper #(
+      xpm_memory_sdpram #(
         .DATA_W(FIFO_DATA_W),
         .ADDR_W(FIFO_ADDR_W)
       ) iob_ram_2p0 (
