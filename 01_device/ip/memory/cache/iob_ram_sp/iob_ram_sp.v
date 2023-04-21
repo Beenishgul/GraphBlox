@@ -39,13 +39,13 @@ module iob_ram_sp #(
   parameter DATA_W  = 8     ,
   parameter ADDR_W  = 14
 ) (
-  input                     ap_clk,
-  input                     rsta  ,
-  input                     en    ,
-  input                     we    ,
-  input      [(ADDR_W-1):0] addr  ,
-  output     [(DATA_W-1):0] dout  ,
-  input      [(DATA_W-1):0] din
+  input                 ap_clk,
+  input                 rsta  ,
+  input                 en    ,
+  input                 we    ,
+  input  [(ADDR_W-1):0] addr  ,
+  output [(DATA_W-1):0] dout  ,
+  input  [(DATA_W-1):0] din
 );
 
   localparam MEMORY_SIZE       = DATA_W * (2**ADDR_W);
@@ -94,5 +94,304 @@ module iob_ram_sp #(
 endmodule
 
 
+module iob_ram_sp_dual #(
+  parameter HEXFILE = "none",
+  parameter DATA_W  = 8     ,
+  parameter ADDR_W  = 14
+) (
+  input                     ap_clk,
+  input                     rsta  ,
+  input  reg                en    ,
+  input  reg                we    ,
+  input  reg [(ADDR_W-1):0] addr  ,
+  output reg [(DATA_W-1):0] dout  ,
+  input  reg [(DATA_W-1):0] din
+);
 
+  localparam MEMORY_SIZE       = DATA_W * (2**ADDR_W);
+  localparam mem_init_file_int = HEXFILE             ;
+
+  localparam ADDRESS_RANGE_VALUE = (2**ADDR_W)            ;
+  localparam ADDRESS_RANGE_CHUNK = ADDRESS_RANGE_VALUE / 2;
+
+  reg                en_0  ;
+  reg                we_0  ;
+  reg [(ADDR_W-2):0] addr_0;
+  reg [(DATA_W-1):0] dout_0;
+  reg [(DATA_W-1):0] din_0 ;
+
+  reg                en_1  ;
+  reg                we_1  ;
+  reg [(ADDR_W-2):0] addr_1;
+  reg [(DATA_W-1):0] dout_1;
+  reg [(DATA_W-1):0] din_1 ;
+
+  reg en_0_reg;
+  reg en_1_reg;
+
+  always @(*)begin
+    if(addr[ADDR_W-1]) begin
+      en_1   = en;
+      we_1   = we;
+      addr_1 = addr[(ADDR_W-2):0];
+      din_1  = din;
+      en_0   = 0;
+      we_0   = 0;
+      addr_0 = 0;
+      din_0  = 0;
+    end else begin
+      en_1   = 0;
+      we_1   = 0;
+      addr_1 = 0;
+      din_1  = 0;
+      en_0   = en;
+      we_0   = we;
+      addr_0 = addr[(ADDR_W-2):0];
+      din_0  = din;
+    end
+  end
+
+  always @(posedge ap_clk) begin
+    if(rsta) begin
+      en_0_reg <= 0;
+      en_1_reg <= 0;
+    end else begin
+      en_0_reg <= en_0;
+      en_1_reg <= en_1;
+    end
+  end
+
+  always @(*)begin
+    if(en_0_reg) begin
+      dout = dout_0;
+    end else if (en_1_reg) begin
+      dout = dout_1;
+    end else begin
+      dout = 0;
+    end
+  end
+
+  iob_ram_sp #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_0 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_0  ),
+    .we    (we_0  ),
+    .addr  (addr_0),
+    .dout  (dout_0),
+    .din   (din_0 )
+  );
+
+  iob_ram_sp #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_1 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_1  ),
+    .we    (we_1  ),
+    .addr  (addr_1),
+    .dout  (dout_1),
+    .din   (din_1 )
+  );
+
+endmodule
+
+module iob_ram_sp_parent #(
+  parameter HEXFILE = "none",
+  parameter DATA_W  = 8     ,
+  parameter ADDR_W  = 14
+) (
+  input                     ap_clk,
+  input                     rsta  ,
+  input  reg                en    ,
+  input  reg                we    ,
+  input  reg [(ADDR_W-1):0] addr  ,
+  output reg [(DATA_W-1):0] dout  ,
+  input  reg [(DATA_W-1):0] din
+);
+
+  localparam MEMORY_SIZE       = DATA_W * (2**ADDR_W);
+  localparam mem_init_file_int = HEXFILE             ;
+
+  localparam ADDRESS_RANGE_VALUE = (2**ADDR_W)            ;
+  localparam ADDRESS_RANGE_CHUNK = ADDRESS_RANGE_VALUE / 2;
+
+  reg                en_0  ;
+  reg                we_0  ;
+  reg [(ADDR_W-2):0] addr_0;
+  reg [(DATA_W-1):0] dout_0;
+  reg [(DATA_W-1):0] din_0 ;
+
+  reg                en_1  ;
+  reg                we_1  ;
+  reg [(ADDR_W-2):0] addr_1;
+  reg [(DATA_W-1):0] dout_1;
+  reg [(DATA_W-1):0] din_1 ;
+
+  reg en_0_reg;
+  reg en_1_reg;
+
+  always @(*)begin
+    if(addr[ADDR_W-1]) begin
+      en_1   = en;
+      we_1   = we;
+      addr_1 = addr[(ADDR_W-2):0];
+      din_1  = din;
+      en_0   = 0;
+      we_0   = 0;
+      addr_0 = 0;
+      din_0  = 0;
+    end else begin
+      en_1   = 0;
+      we_1   = 0;
+      addr_1 = 0;
+      din_1  = 0;
+      en_0   = en;
+      we_0   = we;
+      addr_0 = addr[(ADDR_W-2):0];
+      din_0  = din;
+    end
+  end
+
+  always @(posedge ap_clk) begin
+    if(rsta) begin
+      en_0_reg <= 0;
+      en_1_reg <= 0;
+    end else begin
+      en_0_reg <= en_0;
+      en_1_reg <= en_1;
+    end
+  end
+
+  always @(*)begin
+    if(en_0_reg) begin
+      dout = dout_0;
+    end else if (en_1_reg) begin
+      dout = dout_1;
+    end else begin
+      dout = 0;
+    end
+  end
+
+  iob_ram_sp_child #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_0 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_0  ),
+    .we    (we_0  ),
+    .addr  (addr_0),
+    .dout  (dout_0),
+    .din   (din_0 )
+  );
+
+  iob_ram_sp_child #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_1 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_1  ),
+    .we    (we_1  ),
+    .addr  (addr_1),
+    .dout  (dout_1),
+    .din   (din_1 )
+  );
+
+endmodule
+
+
+module iob_ram_sp_child #(
+  parameter HEXFILE = "none",
+  parameter DATA_W  = 8     ,
+  parameter ADDR_W  = 14
+) (
+  input                     ap_clk,
+  input                     rsta  ,
+  input  reg                en    ,
+  input  reg                we    ,
+  input  reg [(ADDR_W-1):0] addr  ,
+  output reg [(DATA_W-1):0] dout  ,
+  input  reg [(DATA_W-1):0] din
+);
+
+  localparam MEMORY_SIZE       = DATA_W * (2**ADDR_W);
+  localparam mem_init_file_int = HEXFILE             ;
+
+  localparam ADDRESS_RANGE_VALUE = (2**ADDR_W)            ;
+  localparam ADDRESS_RANGE_CHUNK = ADDRESS_RANGE_VALUE / 2;
+
+  reg                en_0  ;
+  reg                we_0  ;
+  reg [(ADDR_W-2):0] addr_0;
+  reg [(DATA_W-1):0] dout_0;
+  reg [(DATA_W-1):0] din_0 ;
+
+  reg                en_1  ;
+  reg                we_1  ;
+  reg [(ADDR_W-2):0] addr_1;
+  reg [(DATA_W-1):0] dout_1;
+  reg [(DATA_W-1):0] din_1 ;
+
+  always @(*) begin
+    if(addr[ADDR_W-1]) begin
+      en_1   = en;
+      we_1   = we;
+      addr_1 = addr[(ADDR_W-2):0];
+      din_1  = din;
+      en_0   = 0;
+      we_0   = 0;
+      addr_0 = 0;
+      din_0  = 0;
+      dout   = dout_1;
+    end else begin
+      en_1   = 0;
+      we_1   = 0;
+      addr_1 = 0;
+      din_1  = 0;
+      en_0   = en;
+      we_0   = we;
+      addr_0 = addr[(ADDR_W-2):0];
+      din_0  = din;
+      dout   = dout_0;
+    end
+  end
+
+  iob_ram_sp #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_0 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_0  ),
+    .we    (we_0  ),
+    .addr  (addr_0),
+    .dout  (dout_0),
+    .din   (din_0 )
+  );
+
+  iob_ram_sp #(
+    .HEXFILE(HEXFILE ),
+    .DATA_W (DATA_W  ),
+    .ADDR_W (ADDR_W-1)
+  ) inst_iob_ram_sp_1 (
+    .ap_clk(ap_clk),
+    .rsta  (rsta  ),
+    .en    (en_1  ),
+    .we    (we_1  ),
+    .addr  (addr_1),
+    .dout  (dout_1),
+    .din   (din_1 )
+  );
+
+endmodule
 
