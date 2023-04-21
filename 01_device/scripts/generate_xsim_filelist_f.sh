@@ -32,8 +32,9 @@ top="top"
 testbench="testbench"
 
 memory="memory"
-cache="cache"
-generator="generator"
+memory_cache="cache"
+memory_generator="generator"
+memory_ram="ram"
 
 control="control"
 vertex="vertex"
@@ -75,9 +76,11 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_counter}/ 
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME} "sv" 
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${cache}/ ${CFG_FILE_NAME} "v" 
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"  
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${generator}/ ${CFG_FILE_NAME} "sv"  
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v" 
+
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_generator}/ ${CFG_FILE_NAME} "sv"  
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME} "sv"
 

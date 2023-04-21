@@ -33,8 +33,10 @@ kernel="kernel"
 top="top"
 
 memory="memory"
-cache="cache"
-generator="generator"
+memory_cache="cache"
+memory_generator="generator"
+memory_ram="ram"
+
 control="control"
 vertex="vertex"
 
@@ -69,11 +71,13 @@ echo $newtext > ${CFG_FILE_NAME}
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${cache}/ ${CFG_FILE_NAME} "v" 
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"  
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${generator}/ ${CFG_FILE_NAME} "sv"  
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v" 
+
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_generator}/ ${CFG_FILE_NAME} "sv"  
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_include}/ ${CFG_FILE_NAME} "vh" 
 
