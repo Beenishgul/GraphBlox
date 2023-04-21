@@ -1,66 +1,34 @@
-`timescale 1ns/1ps
-
-// module iob_ram_2p
-//   #(
-//      parameter HEXFILE = "none",
-//      parameter DATA_W = 0,
-//      parameter ADDR_W = 0
-//      )
-//    (
-//     input                   ap_clk,
-
-//     //write port
-//     input                   w_en,
-//     input [ADDR_W-1:0]      w_addr,
-//     input [DATA_W-1:0]      w_data,
-
-//     //read port
-//     input                   r_en,
-//     input [ADDR_W-1:0]      r_addr,
-//     output reg [DATA_W-1:0] r_data
-//     );
-
-//    //this allows ISE 14.7 to work; do not remove
-//    localparam mem_init_file_int = HEXFILE;
-
-//    // Declare the RAM
-//    reg [DATA_W-1:0]         mem [(2**ADDR_W)-1:0];
-
-//    // Initialize the RAM
-//    initial
-//      if(mem_init_file_int != "none")
-//        $readmemh(mem_init_file_int, mem, 0, (2**ADDR_W) - 1);
-
-//    //read port
-//    always @(posedge ap_clk)
-//       if(r_en)
-//         r_data <= mem[r_addr];
-
-//    //write port
-//    always @(posedge ap_clk)
-//      if(w_en)
-//        mem[w_addr] <= w_data;
-
-// endmodule
-
+// -----------------------------------------------------------------------------
+//
+//    "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2023 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : xpm_memory_sdpram_wrapper.sv
+// Create : 2023-01-11 23:47:45
+// Revise : 2023-01-11 23:47:45
+// Editor : sublime text4, tab size (2)
+// -----------------------------------------------------------------------------
 
 `timescale 1ns/1ps
 
-module iob_ram_2p #(
+module xpm_memory_sdpram_wrapper #(
   parameter HEXFILE = "none",
   parameter DATA_W  = 8     ,
   parameter ADDR_W  = 14
 ) (
-  input                   ap_clk,
-  input                   rstb  ,
+  input  logic              ap_clk,
+  input  logic              rstb  ,
   //write port
-  input                   w_en  ,
-  input      [ADDR_W-1:0] w_addr,
-  input      [DATA_W-1:0] w_data,
+  input  logic              w_en  ,
+  input  logic [ADDR_W-1:0] w_addr,
+  input  logic [DATA_W-1:0] w_data,
   //read port
-  input                   r_en  ,
-  input      [ADDR_W-1:0] r_addr,
-  output     [DATA_W-1:0] r_data
+  input  logic              r_en  ,
+  input  logic [ADDR_W-1:0] r_addr,
+  output logic [DATA_W-1:0] r_data
 );
 
   //this allows ISE 14.7 to work; do not remove
@@ -81,7 +49,7 @@ module iob_ram_2p #(
     .MEMORY_INIT_FILE       (mem_init_file_int), // String
     .MEMORY_INIT_PARAM      ("0"              ), // String
     .MEMORY_OPTIMIZATION    ("true"           ), // String
-    .MEMORY_PRIMITIVE       ("auto"          ), // String
+    .MEMORY_PRIMITIVE       ("auto"           ), // String
     .MEMORY_SIZE            (MEMORY_SIZE      ), // DECIMAL
     .MESSAGE_CONTROL        (0                ), // DECIMAL
     .READ_DATA_WIDTH_B      (DATA_W           ), // DECIMAL
@@ -137,7 +105,7 @@ module iob_ram_2p #(
     // parameter READ_RESET_VALUE_B.
     
     .sleep         (1'b0  ), // 1-bit input: sleep signal to enable the dynamic power saving feature.
-    .wea           (1'b1  ) // WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A-bit input: Write enable vector
+    .wea           (1'b1  ), // WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A-bit input: Write enable vector
     // for port A input data port dina. 1 bit wide when word-wide writes are
     // used. In byte-wide write configurations, each bit controls the
     // writing one byte of dina to address addra. For example, to
@@ -148,5 +116,3 @@ module iob_ram_2p #(
 // End of xpm_memory_sdpram_inst instantiation
 
 endmodule
-
-

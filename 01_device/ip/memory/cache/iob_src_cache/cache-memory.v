@@ -114,7 +114,7 @@ module cache_memory #(
       wire [FIFO_DATA_W-1:0] mem_r_data;
 
       // FIFO memory
-      iob_ram_2p #(
+      xpm_memory_sdpram_wrapper #(
         .DATA_W(FIFO_DATA_W),
         .ADDR_W(FIFO_ADDR_W)
       ) iob_ram_2p0 (
@@ -335,7 +335,7 @@ module cache_memory #(
               v[k] <= v_reg [(2**CACHE_LINE_OFF_W)*k + index];
 
             //tag-memory
-            iob_ram_sp_dual
+            xpm_memory_spram_dual
               #(
                 .DATA_W(TAG_W),
                 .ADDR_W(CACHE_LINE_OFF_W)
@@ -441,7 +441,7 @@ module cache_memory #(
             v <= v_reg [index];
 
           //tag-memory
-          iob_ram_sp_dual
+          xpm_memory_spram_dual
             #(
               .DATA_W(TAG_W),
               .ADDR_W(CACHE_LINE_OFF_W)
@@ -540,7 +540,7 @@ module iob_gen_sp_ram #(
   wire we_internal;
   assign we_internal = (|we);
 
-  iob_ram_sp #(
+  xpm_memory_spram_wrapper #(
     .DATA_W(DATA_W),
     .ADDR_W(ADDR_W)
   ) iob_cache_mem (
