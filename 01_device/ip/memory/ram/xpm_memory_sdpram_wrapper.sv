@@ -105,7 +105,7 @@ module xpm_memory_sdpram_wrapper #(
     // parameter READ_RESET_VALUE_B.
     
     .sleep         (1'b0  ), // 1-bit input: sleep signal to enable the dynamic power saving feature.
-    .wea           (1'b1  ), // WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A-bit input: Write enable vector
+    .wea           (1'b1  )  // WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A-bit input: Write enable vector
     // for port A input data port dina. 1 bit wide when word-wide writes are
     // used. In byte-wide write configurations, each bit controls the
     // writing one byte of dina to address addra. For example, to
@@ -115,4 +115,4 @@ module xpm_memory_sdpram_wrapper #(
 
 // End of xpm_memory_sdpram_inst instantiation
 
-endmodule
+endmodule : xpm_memory_sdpram_wrapper

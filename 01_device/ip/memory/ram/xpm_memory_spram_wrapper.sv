@@ -60,7 +60,7 @@ module xpm_memory_spram_wrapper #(
     .clka          (ap_clk),
     .rsta          (rsta  ),
     .ena           (en    ),
-    .logiccea      (1'b0  ),
+    .regcea        (1'b0  ),
     .wea           (we    ),
     .addra         (addr  ),
     .dina          (din   ),
