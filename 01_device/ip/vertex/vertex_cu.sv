@@ -24,7 +24,7 @@ import PKG_VERTEX::*;
 module vertex_cu #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 0              ,
+    parameter ENGINE_ID          = 1              ,
     parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
@@ -243,14 +243,24 @@ module vertex_cu #(
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        serial_read_config_comb.payload.increment     = 1'b1;
-        serial_read_config_comb.payload.decrement     = 1'b0;
-        serial_read_config_comb.payload.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.array_size    = descriptor_reg.payload.auxiliary_2;
-        serial_read_config_comb.payload.start_read    = 0;
-        serial_read_config_comb.payload.end_read      = descriptor_reg.payload.auxiliary_2;
-        serial_read_config_comb.payload.stride        = CACHE_FRONTEND_DATA_W/8;
-        serial_read_config_comb.payload.granularity   = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.increment     = 1'b1;
+        serial_read_config_comb.payload.param.decrement     = 1'b0;
+        serial_read_config_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
+        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.start_read    = 0;
+        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
+
+        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
+        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
+        serial_read_config_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
+        serial_read_config_comb.payload.meta.address_offset = 0;
+        serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
+        serial_read_config_comb.payload.meta.struct_type    = STRUCT_INVALID;
+        serial_read_config_comb.payload.meta.operand_loc    = OP_LOCATION_0;
+        serial_read_config_comb.payload.meta.filter_op      = FILTER_NOP;
+        serial_read_config_comb.payload.meta.ALU_op         = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin

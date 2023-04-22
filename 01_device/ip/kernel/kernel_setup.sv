@@ -250,6 +250,16 @@ module kernel_setup #(
         serial_read_config_comb.payload.end_read      = descriptor_reg.payload.auxiliary_2;
         serial_read_config_comb.payload.stride        = CACHE_FRONTEND_DATA_W/8;
         serial_read_config_comb.payload.granularity   = CACHE_FRONTEND_DATA_W/8;
+
+        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
+        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
+        serial_read_config_comb.payload.meta.base_address   = serial_read_config_reg.payload.array_pointer;
+        serial_read_config_comb.payload.meta.address_offset = 0;
+        serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
+        serial_read_config_comb.payload.meta.struct_type    = STRUCT_KERNEL_SETUP;
+        serial_read_config_comb.payload.meta.operand_loc    = OP_LOCATION_0;
+        serial_read_config_comb.payload.meta.filter_op      = FILTER_NOP;
+        serial_read_config_comb.payload.meta.ALU_op         = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
