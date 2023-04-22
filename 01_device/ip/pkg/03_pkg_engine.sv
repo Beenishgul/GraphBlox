@@ -38,8 +38,8 @@ package PKG_ENGINE;
     } StrideIndexGeneratorConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
+        StrideIndexGeneratorConfigurationParameters param;
+        MemoryPacketMeta                            meta ;
     } StrideIndexGeneratorConfigurationPayload;
 
     typedef struct packed{
@@ -66,8 +66,8 @@ package PKG_ENGINE;
     } CSRIndexGeneratorConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
+        CSRIndexGeneratorConfigurationParameters param;
+        MemoryPacketMeta                         meta ;
     } CSRIndexGeneratorConfigurationPayload;
 
     typedef struct packed{
@@ -143,8 +143,8 @@ package PKG_ENGINE;
     } SerialWriteEngineConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
+        SerialWriteEngineConfigurationParameters param;
+        MemoryPacketMeta                         meta ;
     } SerialWriteEngineConfigurationPayload;
 
     typedef struct packed{
@@ -172,7 +172,7 @@ package PKG_ENGINE;
     } RandomReadEngineConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
+        RandomReadEngineConfigurationParameters param;
         MemoryPacketMeta                        meta ;
     } RandomReadEngineConfigurationPayload;
 
@@ -201,8 +201,8 @@ package PKG_ENGINE;
     } RandomWriteEngineConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
+        RandomWriteEngineConfigurationParameters param;
+        MemoryPacketMeta                         meta ;
     } RandomWriteEngineConfigurationPayload;
 
     typedef struct packed{
