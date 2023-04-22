@@ -15,9 +15,10 @@
 `timescale 1ns/1ps
 
 module xpm_memory_spram_wrapper #(
-  parameter HEXFILE = "none",
-  parameter DATA_W  = 8     ,
-  parameter ADDR_W  = 14
+  parameter HEXFILE          = "none" ,
+  parameter DATA_W           = 8      ,
+  parameter ADDR_W           = 14     ,
+  parameter MEMORY_PRIMITIVE = "ultra"
 ) (
   input  logic                ap_clk,
   input  logic                rsta  ,
@@ -36,7 +37,7 @@ module xpm_memory_spram_wrapper #(
   xpm_memory_spram #(
     // Common module parameters
     .MEMORY_SIZE        (MEMORY_SIZE      ), //positive integer
-    .MEMORY_PRIMITIVE   ("ultra"          ), //string; "auto", "distributed", "block" or "ultra";
+    .MEMORY_PRIMITIVE   (MEMORY_PRIMITIVE ), //string; "auto", "distributed", "block" or "ultra";
     .MEMORY_INIT_FILE   (mem_init_file_int), //string; "none" or "<filename>.mem"
     .MEMORY_INIT_PARAM  (""               ), //string;
     .USE_MEM_INIT       (1                ), //integer; 0,1
