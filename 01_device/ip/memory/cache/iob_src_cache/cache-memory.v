@@ -335,7 +335,7 @@ module cache_memory #(
               v[k] <= v_reg [(2**CACHE_LINE_OFF_W)*k + index];
 
             //tag-memory
-            xpm_memory_spram_dual
+            xpm_memory_spram_parent
               #(
                 .DATA_W(TAG_W),
                 .ADDR_W(CACHE_LINE_OFF_W)
@@ -441,7 +441,7 @@ module cache_memory #(
             v <= v_reg [index];
 
           //tag-memory
-          xpm_memory_spram_dual
+          xpm_memory_spram_parent
             #(
               .DATA_W(TAG_W),
               .ADDR_W(CACHE_LINE_OFF_W)
@@ -540,7 +540,7 @@ module iob_gen_sp_ram #(
   wire we_internal;
   assign we_internal = (|we);
 
-  xpm_memory_spram_wrapper #(
+  xpm_memory_spram_parent #(
     .DATA_W(DATA_W),
     .ADDR_W(ADDR_W)
   ) iob_cache_mem (

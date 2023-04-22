@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : xpm_memory_spram_child.sv
+// File   : xpm_memory_spram_parent.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -14,10 +14,11 @@
 
 `timescale 1ns/1ps
 
-module xpm_memory_spram_child #(
-	parameter HEXFILE = "none",
-	parameter DATA_W  = 8     ,
-	parameter ADDR_W  = 14
+module xpm_memory_spram_parent #(
+	parameter HEXFILE          = "none" ,
+	parameter DATA_W           = 8      ,
+	parameter ADDR_W           = 14     ,
+	parameter MEMORY_PRIMITIVE = "ultra"
 ) (
 	input                       ap_clk,
 	input                       rsta  ,
@@ -46,6 +47,9 @@ module xpm_memory_spram_child #(
 	logic [(DATA_W-1):0] dout_1;
 	logic [(DATA_W-1):0] din_1 ;
 
+	logic en_0_reg;
+	logic en_1_reg;
+
 	always_comb begin
 		if(addr[ADDR_W-1]) begin
 			en_1   = en;
@@ -56,7 +60,6 @@ module xpm_memory_spram_child #(
 			we_0   = 0;
 			addr_0 = 0;
 			din_0  = 0;
-			dout   = dout_1;
 		end else begin
 			en_1   = 0;
 			we_1   = 0;
@@ -66,14 +69,34 @@ module xpm_memory_spram_child #(
 			we_0   = we;
 			addr_0 = addr[(ADDR_W-2):0];
 			din_0  = din;
-			dout   = dout_0;
 		end
 	end
 
-	xpm_memory_spram_wrapper #(
-		.HEXFILE(HEXFILE ),
-		.DATA_W (DATA_W  ),
-		.ADDR_W (ADDR_W-1)
+	always_ff @(posedge ap_clk) begin
+		if(rsta) begin
+			en_0_reg <= 0;
+			en_1_reg <= 0;
+		end else begin
+			en_0_reg <= en_0;
+			en_1_reg <= en_1;
+		end
+	end
+
+	always_comb begin
+		if(en_0_reg) begin
+			dout = dout_0;
+		end else if (en_1_reg) begin
+			dout = dout_1;
+		end else begin
+			dout = 0;
+		end
+	end
+
+	xpm_memory_spram_child #(
+		.HEXFILE         (HEXFILE         ),
+		.DATA_W          (DATA_W          ),
+		.ADDR_W          (ADDR_W-1        ),
+		.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE)
 	) inst_xpm_memory_spram_wrapper_0 (
 		.ap_clk(ap_clk),
 		.rsta  (rsta  ),
@@ -84,10 +107,11 @@ module xpm_memory_spram_child #(
 		.din   (din_0 )
 	);
 
-	xpm_memory_spram_wrapper #(
-		.HEXFILE(HEXFILE ),
-		.DATA_W (DATA_W  ),
-		.ADDR_W (ADDR_W-1)
+	xpm_memory_spram_child #(
+		.HEXFILE         (HEXFILE         ),
+		.DATA_W          (DATA_W          ),
+		.ADDR_W          (ADDR_W-1        ),
+		.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE)
 	) inst_xpm_memory_spram_wrapper_1 (
 		.ap_clk(ap_clk),
 		.rsta  (rsta  ),
@@ -98,4 +122,4 @@ module xpm_memory_spram_child #(
 		.din   (din_1 )
 	);
 
-endmodule : xpm_memory_spram_child
+endmodule : xpm_memory_spram_parent

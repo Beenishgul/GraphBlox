@@ -246,9 +246,9 @@ module vertex_cu #(
         serial_read_config_comb.payload.param.increment     = 1'b1;
         serial_read_config_comb.payload.param.decrement     = 1'b0;
         serial_read_config_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
         serial_read_config_comb.payload.param.start_read    = 0;
-        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
         serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
