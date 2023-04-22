@@ -16,6 +16,7 @@
 package PKG_ENGINE;
 
     import PKG_GLOBALS::*;
+    import PKG_MEMORY::*;
 
 // Stride\_Index\_Generator
 // ------------------------
@@ -34,6 +35,11 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
+    } StrideIndexGeneratorConfigurationParameters;
+
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
     } StrideIndexGeneratorConfigurationPayload;
 
     typedef struct packed{
@@ -57,6 +63,11 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] offset       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] degree       ;
+    } CSRIndexGeneratorConfigurationParameters;
+
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
     } CSRIndexGeneratorConfigurationPayload;
 
     typedef struct packed{
@@ -96,7 +107,13 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialReadEngineConfigurationParameters;
+
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
     } SerialReadEngineConfigurationPayload;
+
 
     typedef struct packed{
         logic                                valid  ;
@@ -123,6 +140,11 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } SerialWriteEngineConfigurationParameters;
+
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
     } SerialWriteEngineConfigurationPayload;
 
     typedef struct packed{
@@ -147,6 +169,11 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } RandomReadEngineConfigurationParameters;
+
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
     } RandomReadEngineConfigurationPayload;
 
     typedef struct packed{
@@ -171,8 +198,12 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } RandomWriteEngineConfigurationPayload;
+    } RandomWriteEngineConfigurationParameters;
 
+    typedef struct packed{
+        SerialReadEngineConfigurationParameters param;
+        MemoryPacketMeta                        meta ;
+    } RandomWriteEngineConfigurationPayload;
 
     typedef struct packed{
         logic                                 valid  ;

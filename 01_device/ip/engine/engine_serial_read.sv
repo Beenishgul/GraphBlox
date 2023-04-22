@@ -303,15 +303,15 @@ module engine_serial_read #(
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        engine_serial_read_req_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
-        engine_serial_read_req_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
-        engine_serial_read_req_comb.payload.meta.base_address   = serial_read_config_reg.payload.array_pointer;
+        engine_serial_read_req_comb.payload.meta.cu_engine_id_x = serial_read_config_reg.payload.meta.cu_engine_id_x;
+        engine_serial_read_req_comb.payload.meta.cu_engine_id_y = serial_read_config_reg.payload.meta.cu_engine_id_x;
+        engine_serial_read_req_comb.payload.meta.base_address   = serial_read_config_reg.payload.param.array_pointer;
         engine_serial_read_req_comb.payload.meta.address_offset = counter_count;
-        engine_serial_read_req_comb.payload.meta.cmd_type       = CMD_READ;
-        engine_serial_read_req_comb.payload.meta.struct_type    = STRUCT_KERNEL_SETUP;
-        engine_serial_read_req_comb.payload.meta.operand_loc    = OP_LOCATION_0;
-        engine_serial_read_req_comb.payload.meta.filter_op      = FILTER_NOP;
-        engine_serial_read_req_comb.payload.meta.ALU_op         = ALU_NOP;
+        engine_serial_read_req_comb.payload.meta.cmd_type       = serial_read_config_reg.payload.meta.cmd_type;
+        engine_serial_read_req_comb.payload.meta.struct_type    = serial_read_config_reg.payload.meta.struct_type;
+        engine_serial_read_req_comb.payload.meta.operand_loc    = serial_read_config_reg.payload.meta.operand_loc ;
+        engine_serial_read_req_comb.payload.meta.filter_op      = serial_read_config_reg.payload.meta.filter_op;
+        engine_serial_read_req_comb.payload.meta.ALU_op         = serial_read_config_reg.payload.meta.ALU_op;
     end
 
     always_ff @(posedge ap_clk) begin
