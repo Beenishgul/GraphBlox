@@ -928,8 +928,8 @@ module kernel_testbench ();
         realcount = 0;
 
         for (int i = 0; i < graph.mem512_csr_struct_count; i++) begin
-            for (int j = 0; j < 16; j++) begin
-                graph.csr_struct[i][(32*j)+:32] = realcount;
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/VERTEX_DATA_BITS); j++) begin
+                graph.csr_struct[i][(VERTEX_DATA_BITS*j)+:VERTEX_DATA_BITS] = realcount;
                 realcount++;
             end
         end
