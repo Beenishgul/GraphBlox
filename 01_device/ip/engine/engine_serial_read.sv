@@ -237,10 +237,10 @@ module engine_serial_read #(
                 engine_serial_read_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b1;
                 counter_load                     <= 1'b1;
-                counter_incr                     <= serial_read_config_reg.payload.increment;
-                counter_decr                     <= serial_read_config_reg.payload.decrement;
-                counter_load_value               <= serial_read_config_reg.payload.start_read;
-                counter_stride_value             <= serial_read_config_reg.payload.stride;
+                counter_incr                     <= serial_read_config_reg.payload.param.increment;
+                counter_decr                     <= serial_read_config_reg.payload.param.decrement;
+                counter_load_value               <= serial_read_config_reg.payload.param.start_read;
+                counter_stride_value             <= serial_read_config_reg.payload.param.stride;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_START : begin
@@ -250,12 +250,12 @@ module engine_serial_read #(
                 engine_serial_read_out_done_reg  <= 1'b0;
                 counter_enable                   <= 1'b1;
                 counter_load                     <= 1'b0;
-                counter_incr                     <= serial_read_config_reg.payload.increment;
-                counter_decr                     <= serial_read_config_reg.payload.decrement;
+                counter_incr                     <= serial_read_config_reg.payload.param.increment;
+                counter_decr                     <= serial_read_config_reg.payload.param.decrement;
                 engine_serial_read_req_din.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_BUSY : begin
-                if((counter_count >= serial_read_config_reg.payload.end_read)) begin
+                if((counter_count >= serial_read_config_reg.payload.param.end_read)) begin
                     engine_serial_read_done_reg      <= 1'b1;
                     counter_incr                     <= 1'b0;
                     counter_decr                     <= 1'b0;
@@ -264,8 +264,8 @@ module engine_serial_read #(
                 else begin
                     engine_serial_read_done_reg      <= 1'b0;
                     counter_enable                   <= 1'b1;
-                    counter_incr                     <= serial_read_config_reg.payload.increment;
-                    counter_decr                     <= serial_read_config_reg.payload.decrement;
+                    counter_incr                     <= serial_read_config_reg.payload.param.increment;
+                    counter_decr                     <= serial_read_config_reg.payload.param.decrement;
                     engine_serial_read_req_din.valid <= 1'b1;
                 end
                 engine_serial_read_out_ready_reg <= 1'b0;

@@ -242,18 +242,18 @@ module kernel_setup #(
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        serial_read_config_comb.payload.increment     = 1'b1;
-        serial_read_config_comb.payload.decrement     = 1'b0;
-        serial_read_config_comb.payload.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.array_size    = descriptor_reg.payload.auxiliary_2;
-        serial_read_config_comb.payload.start_read    = 0;
-        serial_read_config_comb.payload.end_read      = descriptor_reg.payload.auxiliary_2;
-        serial_read_config_comb.payload.stride        = CACHE_FRONTEND_DATA_W/8;
-        serial_read_config_comb.payload.granularity   = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.increment     = 1'b1;
+        serial_read_config_comb.payload.param.decrement     = 1'b0;
+        serial_read_config_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
+        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.start_read    = 0;
+        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2;
+        serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
         serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
         serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
-        serial_read_config_comb.payload.meta.base_address   = serial_read_config_reg.payload.array_pointer;
+        serial_read_config_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
         serial_read_config_comb.payload.meta.address_offset = 0;
         serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
         serial_read_config_comb.payload.meta.struct_type    = STRUCT_KERNEL_SETUP;
