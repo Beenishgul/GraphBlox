@@ -18,15 +18,16 @@ module xpm_memory_spram_child #(
 	parameter HEXFILE          = "none" ,
 	parameter DATA_W           = 8      ,
 	parameter ADDR_W           = 14     ,
-	parameter MEMORY_PRIMITIVE = "ultra"
+	parameter MEMORY_PRIMITIVE = "ultra",
+	parameter BYTE_WRITE_W     = DATA_W
 ) (
-	input                       ap_clk,
-	input                       rsta  ,
-	input  logic                en    ,
-	input  logic                we    ,
-	input  logic [(ADDR_W-1):0] addr  ,
-	output logic [(DATA_W-1):0] dout  ,
-	input  logic [(DATA_W-1):0] din
+	input                                  ap_clk,
+	input                                  rsta  ,
+	input  logic                           en    ,
+	input  logic [DATA_W/BYTE_WRITE_W-1:0] we    ,
+	input  logic [           (ADDR_W-1):0] addr  ,
+	output logic [           (DATA_W-1):0] dout  ,
+	input  logic [           (DATA_W-1):0] din
 );
 
 	localparam BLOCK_TOTAL_SIZE_BITS = DATA_W * (2**ADDR_W);
@@ -52,17 +53,17 @@ module xpm_memory_spram_child #(
 	if(DATA_DEPTH > (4*1024))
 		begin
 
-			logic                en_0  ;
-			logic                we_0  ;
-			logic [(ADDR_W-2):0] addr_0;
-			logic [(DATA_W-1):0] dout_0;
-			logic [(DATA_W-1):0] din_0 ;
+			logic                           en_0  ;
+			logic [DATA_W/BYTE_WRITE_W-1:0] we_0  ;
+			logic [           (ADDR_W-2):0] addr_0;
+			logic [           (DATA_W-1):0] dout_0;
+			logic [           (DATA_W-1):0] din_0 ;
 
-			logic                en_1  ;
-			logic                we_1  ;
-			logic [(ADDR_W-2):0] addr_1;
-			logic [(DATA_W-1):0] dout_1;
-			logic [(DATA_W-1):0] din_1 ;
+			logic                           en_1  ;
+			logic [DATA_W/BYTE_WRITE_W-1:0] we_1  ;
+			logic [           (ADDR_W-2):0] addr_1;
+			logic [           (DATA_W-1):0] dout_1;
+			logic [           (DATA_W-1):0] din_1 ;
 
 			always_comb begin
 				if(addr[ADDR_W-1]) begin
@@ -92,7 +93,8 @@ module xpm_memory_spram_child #(
 				.HEXFILE         (HEXFILE         ),
 				.DATA_W          (DATA_W          ),
 				.ADDR_W          (ADDR_W-1        ),
-				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE)
+				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
+				.BYTE_WRITE_W(BYTE_WRITE_W)
 			) inst_xpm_memory_spram_wrapper_0 (
 				.ap_clk(ap_clk),
 				.rsta  (rsta  ),
@@ -107,7 +109,8 @@ module xpm_memory_spram_child #(
 				.HEXFILE         (HEXFILE         ),
 				.DATA_W          (DATA_W          ),
 				.ADDR_W          (ADDR_W-1        ),
-				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE)
+				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
+				.BYTE_WRITE_W(BYTE_WRITE_W)
 			) inst_xpm_memory_spram_wrapper_1 (
 				.ap_clk(ap_clk),
 				.rsta  (rsta  ),
@@ -124,7 +127,8 @@ module xpm_memory_spram_child #(
 				.HEXFILE         (HEXFILE         ),
 				.DATA_W          (DATA_W          ),
 				.ADDR_W          (ADDR_W          ),
-				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE)
+				.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
+				.BYTE_WRITE_W(BYTE_WRITE_W)
 			) inst_xpm_memory_spram_wrapper_0 (
 				.ap_clk(ap_clk),
 				.rsta  (rsta  ),
