@@ -41,12 +41,13 @@ module kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic areset_m_axi  ;
-  logic areset_control;
-  logic areset_cache  ;
-  logic areset_fifo   ;
-  logic areset_arbiter;
-  logic areset_setup  ;
+  logic areset_m_axi   ;
+  logic areset_control ;
+  logic areset_L2_cache;
+  logic areset_L1_cache;
+  logic areset_fifo    ;
+  logic areset_arbiter ;
+  logic areset_setup   ;
 
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
   logic [  VERTEX_DATA_BITS-1:0] counter       ;
@@ -63,13 +64,13 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 //   AXI Cache FIFO signals
 // --------------------------------------------------------------------------------------
-  logic force_inv_in ;
-  logic force_inv_out;
-  logic wtb_empty_in ;
-  logic wtb_empty_out;
+  // logic force_inv_in ;
+  logic L2_force_inv_out;
+  logic L2_wtb_empty_in ;
+  logic L2_wtb_empty_out;
 
-  assign force_inv_in = 1'b0;
-  assign wtb_empty_in = 1'b1;
+  // assign force_inv_in = 1'b0;
+  assign L2_wtb_empty_in = 1'b1;
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
@@ -124,12 +125,13 @@ module kernel_cu #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi   <= areset;
-    areset_control <= areset;
-    areset_cache   <= areset;
-    areset_fifo    <= areset;
-    areset_arbiter <= areset;
-    areset_setup   <= areset;
+    areset_m_axi    <= areset;
+    areset_control  <= areset;
+    areset_L2_cache <= areset;
+    areset_L1_cache <= areset;
+    areset_fifo     <= areset;
+    areset_arbiter  <= areset;
+    areset_setup    <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -147,7 +149,13 @@ module kernel_cu #(
           counter     <= 0;
         end
         else begin
-          counter <= counter + (kernel_setup_memory_response_in.valid << 6);
+          if(kernel_setup_memory_response_in.valid) begin
+            $display("counter: %d >= %d", counter, descriptor_out_reg.payload.auxiliary_2);
+            counter <= counter + 4;
+          end
+          else begin
+            counter <= counter;
+          end
         end
       end else begin
         cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
@@ -317,52 +325,110 @@ module kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
-// AXI port cache
+// AXI port cache L1
 // --------------------------------------------------------------------------------------
-  iob_cache_axi #(
-    .CACHE_FRONTEND_ADDR_W(L2_CACHE_FRONTEND_ADDR_W),
-    .CACHE_FRONTEND_DATA_W(L2_CACHE_FRONTEND_DATA_W),
-    .CACHE_N_WAYS         (L2_CACHE_N_WAYS         ),
-    .CACHE_LINE_OFF_W     (L2_CACHE_LINE_OFF_W     ),
-    .CACHE_WORD_OFF_W     (L2_CACHE_WORD_OFF_W     ),
-    .CACHE_WTBUF_DEPTH_W  (L2_CACHE_WTBUF_DEPTH_W  ),
-    .CACHE_REP_POLICY     (L2_CACHE_REP_POLICY     ),
-    .CACHE_NWAY_W         (L2_CACHE_NWAY_W         ),
-    .CACHE_FRONTEND_NBYTES(L2_CACHE_FRONTEND_NBYTES),
-    .CACHE_FRONTEND_BYTE_W(L2_CACHE_FRONTEND_BYTE_W),
-    .CACHE_BACKEND_ADDR_W (L2_CACHE_BACKEND_ADDR_W ),
-    .CACHE_BACKEND_DATA_W (L2_CACHE_BACKEND_DATA_W ),
-    .CACHE_BACKEND_NBYTES (L2_CACHE_BACKEND_NBYTES ),
-    .CACHE_BACKEND_BYTE_W (L2_CACHE_BACKEND_BYTE_W ),
-    .CACHE_LINE2MEM_W     (L2_CACHE_LINE2MEM_W     ),
-    .CACHE_WRITE_POL      (L2_CACHE_WRITE_POL      ),
-    .CACHE_CTRL_CACHE     (L2_CACHE_CTRL_CACHE     ),
-    .CACHE_CTRL_CNT       (L2_CACHE_CTRL_CNT       ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W        ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W        ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W          ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W         ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID            ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W        ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W       ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W        ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W         ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W       ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W        )
-  ) inst_cache_axi (
+
+  logic                               mem_valid       ;
+  logic [L1_CACHE_BACKEND_ADDR_W-1:0] mem_addr        ;
+  logic [L1_CACHE_BACKEND_DATA_W-1:0] mem_wdata       ;
+  logic [L1_CACHE_BACKEND_NBYTES-1:0] mem_wstrb       ;
+  logic [L1_CACHE_BACKEND_DATA_W-1:0] mem_rdata       ;
+  logic                               mem_ready       ;
+  logic                               L1_wtb_empty_in ;
+  logic                               L1_wtb_empty_out;
+  logic                               L1_force_inv_in ;
+  logic                               L1_force_inv_out;
+
+  assign L1_force_inv_in = 0;
+
+  iob_cache #(
+    .CACHE_FRONTEND_ADDR_W(L1_CACHE_FRONTEND_ADDR_W),
+    .CACHE_FRONTEND_DATA_W(L1_CACHE_FRONTEND_DATA_W),
+    .CACHE_N_WAYS         (L1_CACHE_N_WAYS         ),
+    .CACHE_LINE_OFF_W     (L1_CACHE_LINE_OFF_W     ),
+    .CACHE_WORD_OFF_W     (L1_CACHE_WORD_OFF_W     ),
+    .CACHE_WTBUF_DEPTH_W  (L1_CACHE_WTBUF_DEPTH_W  ),
+    .CACHE_REP_POLICY     (L1_CACHE_REP_POLICY     ),
+    .CACHE_NWAY_W         (L1_CACHE_NWAY_W         ),
+    .CACHE_FRONTEND_NBYTES(L1_CACHE_FRONTEND_NBYTES),
+    .CACHE_FRONTEND_BYTE_W(L1_CACHE_FRONTEND_BYTE_W),
+    .CACHE_BACKEND_ADDR_W (L1_CACHE_BACKEND_ADDR_W ),
+    .CACHE_BACKEND_DATA_W (L1_CACHE_BACKEND_DATA_W ),
+    .CACHE_BACKEND_NBYTES (L1_CACHE_BACKEND_NBYTES ),
+    .CACHE_BACKEND_BYTE_W (L1_CACHE_BACKEND_BYTE_W ),
+    .CACHE_LINE2MEM_W     (L1_CACHE_LINE2MEM_W     ),
+    .CACHE_WRITE_POL      (L1_CACHE_WRITE_POL      ),
+    .CACHE_CTRL_CACHE     (L1_CACHE_CTRL_CACHE     ),
+    .CACHE_CTRL_CNT       (L1_CACHE_CTRL_CNT       )
+  ) inst_L1_cache_native (
+    .ap_clk       (ap_clk                              ),
+    .reset        (areset_L1_cache                     ),
     .valid        (cache_request_out_valid             ),
     .addr         (cache_request_out.payload.iob.addr  ),
     .wdata        (cache_request_out.payload.iob.wdata ),
     .wstrb        (cache_request_out.payload.iob.wstrb ),
     .rdata        (cache_response_out.payload.iob.rdata),
     .ready        (cache_response_out.valid            ),
-    .force_inv_in (force_inv_in                        ),
-    .force_inv_out(force_inv_out                       ),
-    .wtb_empty_in (wtb_empty_in                        ),
-    .wtb_empty_out(wtb_empty_out                       ),
+    .force_inv_in (L1_force_inv_in                     ),
+    .force_inv_out(L1_force_inv_out                    ),
+    .wtb_empty_in (L2_wtb_empty_out                    ),
+    .wtb_empty_out(L1_wtb_empty_out                    ),
+    .mem_valid    (mem_valid                           ),
+    .mem_addr     (mem_addr                            ),
+    .mem_wdata    (mem_wdata                           ),
+    .mem_wstrb    (mem_wstrb                           ),
+    .mem_rdata    (mem_rdata                           ),
+    .mem_ready    (mem_ready                           )
+  );
+
+
+// --------------------------------------------------------------------------------------
+// AXI port cache L2
+// --------------------------------------------------------------------------------------
+  iob_cache_axi #(
+    .CACHE_FRONTEND_ADDR_W(L1_CACHE_BACKEND_ADDR_W),
+    .CACHE_FRONTEND_DATA_W(L1_CACHE_BACKEND_DATA_W),
+    .CACHE_N_WAYS         (L2_CACHE_N_WAYS        ),
+    .CACHE_LINE_OFF_W     (L2_CACHE_LINE_OFF_W    ),
+    .CACHE_WORD_OFF_W     (L2_CACHE_WORD_OFF_W    ),
+    .CACHE_WTBUF_DEPTH_W  (L2_CACHE_WTBUF_DEPTH_W ),
+    .CACHE_REP_POLICY     (L2_CACHE_REP_POLICY    ),
+    .CACHE_NWAY_W         (L2_CACHE_NWAY_W        ),
+    .CACHE_FRONTEND_NBYTES(L1_CACHE_BACKEND_NBYTES),
+    .CACHE_FRONTEND_BYTE_W(L1_CACHE_BACKEND_BYTE_W),
+    .CACHE_BACKEND_ADDR_W (L2_CACHE_BACKEND_ADDR_W),
+    .CACHE_BACKEND_DATA_W (L2_CACHE_BACKEND_DATA_W),
+    .CACHE_BACKEND_NBYTES (L2_CACHE_BACKEND_NBYTES),
+    .CACHE_BACKEND_BYTE_W (L2_CACHE_BACKEND_BYTE_W),
+    .CACHE_LINE2MEM_W     (L2_CACHE_LINE2MEM_W    ),
+    .CACHE_WRITE_POL      (L2_CACHE_WRITE_POL     ),
+    .CACHE_CTRL_CACHE     (L2_CACHE_CTRL_CACHE    ),
+    .CACHE_CTRL_CNT       (L2_CACHE_CTRL_CNT      ),
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W       ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W       ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W         ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W        ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID           ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W       ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W      ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W       ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W        ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
+  ) inst_L2_cache_axi (
+    .valid        (mem_valid       ),
+    .addr         (mem_addr        ),
+    .wdata        (mem_wdata       ),
+    .wstrb        (mem_wstrb       ),
+    .rdata        (mem_rdata       ),
+    .ready        (mem_ready       ),
+    .force_inv_in (L1_force_inv_out),
+    .force_inv_out(L2_force_inv_out),
+    .wtb_empty_in (wtb_empty_in    ),
+    .wtb_empty_out(L2_wtb_empty_out),
     `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk                              ),
-    .reset        (areset_cache                        )
+    .ap_clk       (ap_clk          ),
+    .reset        (areset_L2_cache )
   );
 
 // --------------------------------------------------------------------------------------
@@ -445,8 +511,8 @@ module kernel_cu #(
   assign vertex_cu_memory_response_in            = memory_response_out[1];
   assign vertex_cu_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[1];
 
-  assign cache_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
-
+  // assign cache_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
+  assign cache_arbiter_request_in[1] = 0 ;
 
   vertex_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),

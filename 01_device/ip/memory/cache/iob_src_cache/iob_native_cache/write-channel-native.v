@@ -17,7 +17,7 @@ module write_channel_native
     parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W) //burst offset based on the cache and memory word size
     )
    (
-    input                                                                   clk,
+    input                                                                   ap_clk,
     input                                                                   reset,
 
     input                                                                   valid,
@@ -72,7 +72,7 @@ module write_channel_native
             end // always @ *
           end
 
-          always @(posedge clk, posedge reset) begin
+          always @(posedge ap_clk, posedge reset) begin
             if(reset)
               state <= idle;
             else
@@ -94,7 +94,7 @@ module write_channel_native
                       state <= write;
                 end
               endcase // case (state)
-          end // always @ (posedge clk, posedge reset)
+          end // always @ (posedge ap_clk, posedge reset)
 
          always @*
            begin
@@ -118,7 +118,7 @@ module write_channel_native
          if (CACHE_LINE2MEM_W > 0) begin
 
             reg [CACHE_LINE2MEM_W-1:0] word_counter, word_counter_reg;
-            always @(posedge clk) word_counter_reg <= word_counter;
+            always @(posedge ap_clk) word_counter_reg <= word_counter;
 
             // memory address
             assign mem_addr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr[CACHE_FRONTEND_ADDR_W-1: CACHE_BACKEND_BYTE_W + CACHE_LINE2MEM_W], word_counter, {CACHE_BACKEND_BYTE_W{1'b0}}};
@@ -131,7 +131,7 @@ module write_channel_native
 
             reg [0:0]            state;
 
-            always @(posedge clk, posedge reset)
+            always @(posedge ap_clk, posedge reset)
               begin
                  if(reset)
                    state <= idle;
@@ -155,7 +155,7 @@ module write_channel_native
                             state <= write;
                        end
                    endcase // case (state)
-              end // always @ (posedge clk, posedge reset)
+              end // always @ (posedge ap_clk, posedge reset)
 
             always @*
               begin
@@ -197,7 +197,7 @@ module write_channel_native
 
             reg [0:0]            state;
 
-            always @(posedge clk, posedge reset)
+            always @(posedge ap_clk, posedge reset)
               begin
                  if(reset)
                    state <= idle;
@@ -221,7 +221,7 @@ module write_channel_native
                             state <= write;
                        end
                    endcase // case (state)
-              end // always @ (posedge clk, posedge reset)
+              end // always @ (posedge ap_clk, posedge reset)
 
             always @*
               begin

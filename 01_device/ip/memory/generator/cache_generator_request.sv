@@ -296,7 +296,7 @@ module cache_generator_request #(
 // FIFO cache requests in fifo_942x16_CacheRequest
 // --------------------------------------------------------------------------------------
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(64                        ),
+    .FIFO_WRITE_DEPTH(256                       ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
     .PROG_THRESH     (32                        )
