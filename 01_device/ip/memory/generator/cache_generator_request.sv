@@ -350,11 +350,16 @@ module cache_generator_request #(
   always_comb begin
     fifo_request_comb.valid                    = 0;
     fifo_request_comb.payload.iob.addr         = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
-    fifo_request_comb.payload.iob.wdata        = 0;
-    fifo_request_comb.payload.iob.wstrb        = 0;
     fifo_request_comb.payload.iob.force_inv_in = 1'b0;
     fifo_request_comb.payload.iob.wtb_empty_in = 1'b1;
-    fifo_request_comb.payload.meta             = arbiter_bus_out.payload.meta;
+
+    if(arbiter_bus_out.payload.meta.cmd_type == CMD_WRITE)
+      fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
+    else
+      fifo_request_comb.payload.iob.wstrb = 0;
+
+    fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field;
+    fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
   end
 
   always_ff @(posedge ap_clk) begin
