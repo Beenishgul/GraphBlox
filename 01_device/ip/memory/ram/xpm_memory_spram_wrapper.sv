@@ -18,15 +18,16 @@ module xpm_memory_spram_wrapper #(
   parameter HEXFILE          = "none" ,
   parameter DATA_W           = 8      ,
   parameter ADDR_W           = 14     ,
-  parameter MEMORY_PRIMITIVE = "ultra"
+  parameter MEMORY_PRIMITIVE = "ultra",
+  parameter BYTE_WRITE_W     = DATA_W
 ) (
-  input  logic                ap_clk,
-  input  logic                rsta  ,
-  input  logic                en    ,
-  input  logic                we    ,
-  input  logic [(ADDR_W-1):0] addr  ,
-  output logic [(DATA_W-1):0] dout  ,
-  input  logic [(DATA_W-1):0] din
+  input  logic                           ap_clk,
+  input  logic                           rsta  ,
+  input  logic                           en    ,
+  input  logic [DATA_W/BYTE_WRITE_W-1:0] we    ,
+  input  logic [           (ADDR_W-1):0] addr  ,
+  output logic [           (DATA_W-1):0] dout  ,
+  input  logic [           (DATA_W-1):0] din
 );
 
   localparam MEMORY_SIZE       = DATA_W * (2**ADDR_W);
@@ -47,7 +48,7 @@ module xpm_memory_spram_wrapper #(
     // Port A module parameters
     .WRITE_DATA_WIDTH_A (DATA_W           ), //positive integer
     .READ_DATA_WIDTH_A  (DATA_W           ), //positive integer
-    .BYTE_WRITE_WIDTH_A (DATA_W           ), //integer; 8, 9, or WRITE_DATA_WIDTH_A value
+    .BYTE_WRITE_WIDTH_A (BYTE_WRITE_W     ), //integer; 8, 9, or WRITE_DATA_WIDTH_A value
     .ADDR_WIDTH_A       (ADDR_W           ), //positive integer
     .READ_RESET_VALUE_A ("0"              ), //string
     .ECC_MODE           ("no_ecc"         ), //string; "no_ecc", "encode_only", "decode_only" or "both_encode_and_decode"
