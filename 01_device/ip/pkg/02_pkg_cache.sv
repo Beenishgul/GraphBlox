@@ -39,9 +39,9 @@ package PKG_CACHE;
 // --------------------------------------------------------------------------------------
 	parameter L1_CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter L1_CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS       ; //Data width - word size used for the cache
-	parameter L1_CACHE_N_WAYS          = 2                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter L1_CACHE_N_WAYS          = 8                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
 	parameter L1_CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter L1_CACHE_WTBUF_DEPTH_W   = 8                      ; //Depth Width of Write-Through Buffer
+	parameter L1_CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter L1_CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
@@ -74,8 +74,8 @@ package PKG_CACHE;
 	parameter L2_CACHE_FRONTEND_ADDR_W = L1_CACHE_BACKEND_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter L2_CACHE_FRONTEND_DATA_W = L1_CACHE_BACKEND_DATA_W; //Data width - word size used for the cache
 	parameter L2_CACHE_N_WAYS          = 1                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter L2_CACHE_LINE_OFF_W      = 13                     ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter L2_CACHE_WTBUF_DEPTH_W   = 8                      ; //Depth Width of Write-Through Buffer
+	parameter L2_CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter L2_CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter L2_CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency

@@ -150,7 +150,7 @@ module kernel_cu #(
         end
         else begin
           if(kernel_setup_memory_response_in.valid) begin
-            $display("counter: %d >= %d", counter, descriptor_out_reg.payload.auxiliary_2);
+            // $display("counter: %d >= %d", counter, descriptor_out_reg.payload.auxiliary_2);
             counter <= counter + 4;
           end
           else begin
