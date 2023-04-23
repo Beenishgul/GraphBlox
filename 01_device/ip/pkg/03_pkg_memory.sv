@@ -21,6 +21,7 @@
 package PKG_MEMORY;
 
 import PKG_GLOBALS::*;
+import PKG_CACHE::*;
 
 // --------------------------------------------------------------------------------------
 // FIFO Signals
@@ -113,19 +114,19 @@ typedef enum int unsigned {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
-  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
-  logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
-  logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
-  command_type                      cmd_type      ; // SIZE = 32 bits
-  structure_type                    struct_type   ; // SIZE = 32 bits
-  operand_location                  operand_loc   ; // SIZE = 32 bits
-  filter_operation                  filter_op     ; // SIZE = 32 bits
-  ALU_operation                     ALU_op        ; // SIZE = 32 bits
+  logic [       CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
+  logic [       CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
+  logic [L1_CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
+  logic [L1_CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
+  command_type                         cmd_type      ; // SIZE = 32 bits
+  structure_type                       struct_type   ; // SIZE = 32 bits
+  operand_location                     operand_loc   ; // SIZE = 32 bits
+  filter_operation                     filter_op     ; // SIZE = 32 bits
+  ALU_operation                        ALU_op        ; // SIZE = 32 bits
 } MemoryPacketMeta;// SIZE = 300 bits
 
 typedef struct packed{
-  logic [CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
+  logic [L1_CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
 } MemoryPacketData;// SIZE = 512 bits
 
 typedef struct packed{
@@ -143,13 +144,13 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 typedef struct packed {
   `ifdef WORD_ADDR
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
+    logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:L1_CACHE_FRONTEND_BYTE_W] addr;
   `else
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:0] addr;
+    logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:0] addr;
   `endif
 
-  logic [CACHE_FRONTEND_DATA_W-1:0] wdata;
-  logic [CACHE_FRONTEND_NBYTES-1:0] wstrb;
+  logic [L1_CACHE_FRONTEND_DATA_W-1:0] wdata;
+  logic [L1_CACHE_FRONTEND_NBYTES-1:0] wstrb;
   `ifdef CTRL_IO
     //control-status io
     logic force_inv_in; //force 1'b0 if unused
@@ -171,7 +172,7 @@ typedef struct packed {
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-  logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
+  logic [L1_CACHE_FRONTEND_DATA_W-1:0] rdata;
   `ifdef CTRL_IO
     //control-status io
     logic force_inv_out;

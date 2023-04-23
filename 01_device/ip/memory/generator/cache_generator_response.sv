@@ -17,6 +17,7 @@ import PKG_GLOBALS::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
+import PKG_CACHE::*;
 
 module cache_generator_response #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,

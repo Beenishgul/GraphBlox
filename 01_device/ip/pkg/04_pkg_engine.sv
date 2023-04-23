@@ -17,6 +17,7 @@ package PKG_ENGINE;
 
     import PKG_GLOBALS::*;
     import PKG_MEMORY::*;
+    import PKG_CACHE::*;
 
 // Stride\_Index\_Generator
 // ------------------------

@@ -150,4 +150,17 @@ package PKG_AXI4;
     AXI4MasterWriteInterfaceOutput out;
   } AXI4MasterWriteInterface;
 
+
+  function logic [M_AXI4_DATA_W-1:0] swap_endianness_cacheline_axi (logic [M_AXI4_DATA_W-1:0] in);
+
+    logic [M_AXI4_DATA_W-1:0] out;
+
+    integer i;
+    for ( i = 0; i < M_AXI4_STRB_W; i++) begin
+      out[i*8 +: 8] = in[((M_AXI4_DATA_W-1)-(i*8)) -:8];
+    end
+
+    return out;
+  endfunction : swap_endianness_cacheline_axi
+
 endpackage

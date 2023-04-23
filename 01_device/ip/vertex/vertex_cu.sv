@@ -20,6 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_VERTEX::*;
+import PKG_CACHE::*;
 
 module vertex_cu #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
@@ -246,11 +247,11 @@ module vertex_cu #(
         serial_read_config_comb.payload.param.increment     = 1'b1;
         serial_read_config_comb.payload.param.decrement     = 1'b0;
         serial_read_config_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
+        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(L2_CACHE_BACKEND_DATA_W/8);
         serial_read_config_comb.payload.param.start_read    = 0;
-        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
-        serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(L2_CACHE_BACKEND_DATA_W/8);
+        serial_read_config_comb.payload.param.stride        = L1_CACHE_FRONTEND_DATA_W/8;
+        serial_read_config_comb.payload.param.granularity   = L1_CACHE_FRONTEND_DATA_W/8;
 
         serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
         serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;

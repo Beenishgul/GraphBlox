@@ -17,6 +17,7 @@ import PKG_GLOBALS::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
+import PKG_CACHE::*;
 
 module cache_generator_request #(
   parameter NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
@@ -354,7 +355,7 @@ module cache_generator_request #(
     fifo_request_comb.payload.iob.wtb_empty_in = 1'b1;
 
     if(arbiter_bus_out.payload.meta.cmd_type == CMD_WRITE)
-      fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
+      fifo_request_comb.payload.iob.wstrb = {L1_CACHE_FRONTEND_NBYTES{1'b1}};
     else
       fifo_request_comb.payload.iob.wstrb = 0;
 
