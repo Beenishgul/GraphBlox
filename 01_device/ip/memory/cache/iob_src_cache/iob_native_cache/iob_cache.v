@@ -37,7 +37,7 @@ module iob_cache #(
   parameter CACHE_CTRL_CNT        = 0                                                                    //PARAM & ? & ? & Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 ) (
   //START_IO_TABLE gen
-  input                                                                       clk          , //System clock input
+  input                                                                       ap_clk       , //System clock input
   input                                                                       reset        , //System reset, asynchronous and active high
   //Master i/f
   //START_IO_TABLE iob_m
@@ -120,7 +120,7 @@ module iob_cache #(
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
     .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     )
   ) front_end (
-    .clk           (clk           ),
+    .ap_clk        (ap_clk        ),
     .reset         (reset         ),
     //front-end port
     .valid         (valid         ),
@@ -162,7 +162,7 @@ module iob_cache #(
     .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
     .CACHE_WRITE_POL      (CACHE_WRITE_POL      )
   ) cache_memory (
-    .clk          (clk                                                                       ),
+    .ap_clk       (ap_clk                                                                    ),
     .reset        (reset                                                                     ),
     //front-end
     //internal data signals
@@ -214,7 +214,7 @@ module iob_cache #(
     .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
     .CACHE_WRITE_POL      (CACHE_WRITE_POL      )
   ) back_end (
-    .clk          (clk          ),
+    .ap_clk       (ap_clk       ),
     .reset        (reset        ),
     //write-through-buffer (write-channel)
     .write_valid  (write_valid  ),
@@ -250,7 +250,7 @@ module iob_cache #(
         )
         cache_control
           (
-            .clk   (clk),
+            .ap_clk   (ap_clk),
             .reset (reset),
             //control's signals
             .valid (ctrl_valid),
