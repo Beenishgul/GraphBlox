@@ -17,6 +17,7 @@ import PKG_GLOBALS::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
+import PKG_CACHE::*;
 
 module kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
@@ -76,7 +77,7 @@ module kernel_cu #(
   CacheResponse          cache_response_out                                                 ;
   FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
   FIFOStateSignalsInput  cache_fifo_response_signals_in                                     ;
-  MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0]; 
+  MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0];
   logic                  cache_generator_request_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
@@ -319,35 +320,35 @@ module kernel_cu #(
 // AXI port cache
 // --------------------------------------------------------------------------------------
   iob_cache_axi #(
-    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
-    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
-    .CACHE_N_WAYS         (CACHE_N_WAYS         ),
-    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W     ),
-    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
-    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W  ),
-    .CACHE_REP_POLICY     (CACHE_REP_POLICY     ),
-    .CACHE_NWAY_W         (CACHE_NWAY_W         ),
-    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES),
-    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W),
-    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
-    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W ),
-    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES ),
-    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W ),
-    .CACHE_LINE2MEM_W     (CACHE_LINE2MEM_W     ),
-    .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W     ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W     ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W       ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W      ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID         ),
-    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     ),
-    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W     ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W    ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W     ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
+    .CACHE_FRONTEND_ADDR_W(L2_CACHE_FRONTEND_ADDR_W),
+    .CACHE_FRONTEND_DATA_W(L2_CACHE_FRONTEND_DATA_W),
+    .CACHE_N_WAYS         (L2_CACHE_N_WAYS         ),
+    .CACHE_LINE_OFF_W     (L2_CACHE_LINE_OFF_W     ),
+    .CACHE_WORD_OFF_W     (L2_CACHE_WORD_OFF_W     ),
+    .CACHE_WTBUF_DEPTH_W  (L2_CACHE_WTBUF_DEPTH_W  ),
+    .CACHE_REP_POLICY     (L2_CACHE_REP_POLICY     ),
+    .CACHE_NWAY_W         (L2_CACHE_NWAY_W         ),
+    .CACHE_FRONTEND_NBYTES(L2_CACHE_FRONTEND_NBYTES),
+    .CACHE_FRONTEND_BYTE_W(L2_CACHE_FRONTEND_BYTE_W),
+    .CACHE_BACKEND_ADDR_W (L2_CACHE_BACKEND_ADDR_W ),
+    .CACHE_BACKEND_DATA_W (L2_CACHE_BACKEND_DATA_W ),
+    .CACHE_BACKEND_NBYTES (L2_CACHE_BACKEND_NBYTES ),
+    .CACHE_BACKEND_BYTE_W (L2_CACHE_BACKEND_BYTE_W ),
+    .CACHE_LINE2MEM_W     (L2_CACHE_LINE2MEM_W     ),
+    .CACHE_WRITE_POL      (L2_CACHE_WRITE_POL      ),
+    .CACHE_CTRL_CACHE     (L2_CACHE_CTRL_CACHE     ),
+    .CACHE_CTRL_CNT       (L2_CACHE_CTRL_CNT       ),
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W        ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W        ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W          ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W         ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID            ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W        ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W       ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W        ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W         ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W       ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W        )
   ) inst_cache_axi (
     .valid        (cache_request_out_valid             ),
     .addr         (cache_request_out.payload.iob.addr  ),

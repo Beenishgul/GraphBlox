@@ -19,6 +19,7 @@ import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_ENGINE::*;
+import PKG_CACHE::*;
 
 // Serial\_Read\_Engine
 // --------------------
