@@ -497,7 +497,7 @@ module kernel_cache #(
   );
 
 // --------------------------------------------------------------------------------------
-// Cache response generator
+// Cache response FIFO
 // --------------------------------------------------------------------------------------
   assign L1_cache_response_out.valid            = L1_cache_response_out.payload.iob.ready;
   assign L1_cache_response_out.payload.meta     = L1_cache_request_in.payload.meta;
@@ -520,7 +520,7 @@ module kernel_cache #(
   );
 
 // --------------------------------------------------------------------------------------
-// Cache request generator
+// Cache request FIFO
 // --------------------------------------------------------------------------------------
   always_comb begin
     L1_cache_request_in                   = cache_request_out;
