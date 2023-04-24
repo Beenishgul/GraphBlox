@@ -51,7 +51,7 @@ package PKG_CACHE;
 /*---------------------------------------------------*/
 //Higher hierarchy memory (slave) interface parameters
 	parameter L1_CACHE_BACKEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH        ; //Address width of the higher hierarchy memory
-	parameter L1_CACHE_BACKEND_DATA_W = VERTEX_DATA_BITS               ; //Data width of the memory
+	parameter L1_CACHE_BACKEND_DATA_W = L1_CACHE_FRONTEND_DATA_W       ; //Data width of the memory
 	parameter L1_CACHE_BACKEND_NBYTES = L1_CACHE_BACKEND_DATA_W/8      ; //Number of bytes
 	parameter L1_CACHE_BACKEND_BYTE_W = $clog2(L1_CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
