@@ -323,6 +323,48 @@ module kernel_cu #(
     kernel_setup_descriptor.payload <= descriptor_out_reg.payload;
     vertex_cu_descriptor.payload    <= descriptor_out_reg.payload;
   end
+// --------------------------------------------------------------------------------------
+// Cache L1 <-> L1 Pipeline logic
+// --------------------------------------------------------------------------------------
+  localparam DEPTH = 8;
+
+  CacheRequestIOB   L1_cache_request_S      [0:DEPTH-1];
+  CacheResponseIOB  L2_cache_response_S     [0:DEPTH-1];
+  logic [DEPTH-1:0] L1_cache_request_pending           ;
+
+  assign L1_cache_request_S[0]       = L1_cache_request_mem;
+  assign L1_cache_request_S[0].valid = L1_cache_request_mem.valid & ~L2_cache_response_mem.ready;
+  assign L2_cache_response_S[0]      = L2_cache_response_mem;
+  assign L1_cache_request_pending[0] = L2_cache_response_S[0].ready;
+
+  always_ff @(posedge ap_clk ) begin
+    if (areset_setup) begin
+      for (int i = 0; i < DEPTH; i++) begin
+        L1_cache_request_S[i].valid <= 0;
+        L1_cache_request_pending[i] <= 0;
+      end
+    end
+    else begin
+      for (int i = 1; i < DEPTH; i++) begin
+        if(|L1_cache_request_pending) begin
+          L1_cache_request_S[i].valid <= 0;
+          L1_cache_request_pending[i] <= L1_cache_request_pending[i-1];
+        end else begin
+          L1_cache_request_S[i].valid <= L1_cache_request_S[i-1].valid;
+          L1_cache_request_pending[i] <= 0;
+        end
+      end
+    end
+  end
+
+  always_ff @(posedge ap_clk ) begin
+    for (int i = 1; i < DEPTH; i++) begin
+      L1_cache_request_S[i].addr <= L1_cache_request_S[i-1].addr;
+      L1_cache_request_S[i].wdata<= L1_cache_request_S[i-1].wdata;
+      L1_cache_request_S[i].wstrb<= L1_cache_request_S[i-1].wstrb;
+      L2_cache_response_S[i] <= L2_cache_response_S[i-1];
+    end
+  end
 
 // --------------------------------------------------------------------------------------
 // AXI port cache L1
@@ -368,14 +410,9 @@ module kernel_cu #(
     .mem_addr     (L1_cache_request_mem.addr              ),
     .mem_wdata    (L1_cache_request_mem.wdata             ),
     .mem_wstrb    (L1_cache_request_mem.wstrb             ),
-    .mem_rdata    (L2_cache_response_mem.rdata            ),
-    .mem_ready    (L2_cache_response_mem.ready            )
+    .mem_rdata    (L2_cache_response_S[DEPTH-1].rdata            ),
+    .mem_ready    (L2_cache_response_S[DEPTH-1].ready            )
   );
-// --------------------------------------------------------------------------------------
-// Cache L1 <-> L1 buffering logic
-// --------------------------------------------------------------------------------------
-
-
 
 // --------------------------------------------------------------------------------------
 // AXI port cache L2
@@ -414,10 +451,10 @@ module kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
   ) inst_L2_cache_axi (
-    .valid        (L1_cache_request_mem.valid ),
-    .addr         (L1_cache_request_mem.addr  ),
-    .wdata        (L1_cache_request_mem.wdata ),
-    .wstrb        (L1_cache_request_mem.wstrb ),
+    .valid        (L1_cache_request_S[DEPTH-1].valid ),
+    .addr         (L1_cache_request_S[DEPTH-1].addr  ),
+    .wdata        (L1_cache_request_S[DEPTH-1].wdata ),
+    .wstrb        (L1_cache_request_S[DEPTH-1].wstrb ),
     .rdata        (L2_cache_response_mem.rdata),
     .ready        (L2_cache_response_mem.ready),
     `ifdef CTRL_IO
