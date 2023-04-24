@@ -79,10 +79,11 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-
+   JOBS_STRATEGY=$(grep -c ^processor /proc/cpuinfo)
    config+="\n[vivado]\n"
    config+="impl.strategies=Performance_Explore,Area_Explore\n"
    config+="impl.jobs=${JOBS_STRATEGY}\n"
+   config+="synth.jobs=${JOBS_STRATEGY}\n"
 
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 2 ]]
