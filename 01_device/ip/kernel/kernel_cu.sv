@@ -341,6 +341,9 @@ module kernel_cu #(
 
   assign L1_force_inv_in = 0;
 
+  CacheRequestIOB   L1_cache_request;
+  CacheResponseIOB  L2_cache_response;
+
   iob_cache #(
     .CACHE_FRONTEND_ADDR_W(L1_CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(L1_CACHE_FRONTEND_DATA_W),

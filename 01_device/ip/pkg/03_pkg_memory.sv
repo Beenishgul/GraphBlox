@@ -123,7 +123,7 @@ typedef struct packed{
   operand_location                     operand_loc   ; // SIZE = 32 bits
   filter_operation                     filter_op     ; // SIZE = 32 bits
   ALU_operation                        ALU_op        ; // SIZE = 32 bits
-} MemoryPacketMeta;// SIZE = 300 bits
+} MemoryPacketMeta;
 
 typedef struct packed{
   logic [L1_CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
@@ -132,12 +132,30 @@ typedef struct packed{
 typedef struct packed{
   MemoryPacketMeta meta;
   MemoryPacketData data;
-} MemoryPacketPayload;// SIZE = 812 bits
+} MemoryPacketPayload;
 
 typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
-} MemoryPacket;// SIZE = 813 bits
+} MemoryPacket;
+
+// --------------------------------------------------------------------------------------
+// Cache Control Signals
+// --------------------------------------------------------------------------------------
+typedef struct packed {
+  logic force_inv; //force 1'b0 if unused
+  logic wtb_empty; //force 1'b1 if unused
+} CacheControlIOBInput;
+
+typedef struct packed {
+  logic force_inv;
+  logic wtb_empty;
+} CacheControlIOBOutput;
+
+typedef struct packed {
+  CacheControlIOBInput  in ; //force 1'b0 if unused
+  CacheControlIOBOutput out;
+} CacheControlIOB;
 
 // --------------------------------------------------------------------------------------
 // Cache requests in CacheRequest
@@ -148,47 +166,38 @@ typedef struct packed {
   `else
     logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:0] addr;
   `endif
-
   logic [L1_CACHE_FRONTEND_DATA_W-1:0] wdata;
   logic [L1_CACHE_FRONTEND_NBYTES-1:0] wstrb;
-  `ifdef CTRL_IO
-    //control-status io
-    logic force_inv_in; //force 1'b0 if unused
-    logic wtb_empty_in; //force 1'b1 if unused
-  `endif
-} CacheRequestIOB; // SIZE = 642
+} CacheRequestIOB;
 
 typedef struct packed {
   CacheRequestIOB  iob ;
+  CacheControlIOB  ctrl;
   MemoryPacketMeta meta;
-} CacheRequestPayload;// SIZE = 942 bits
+} CacheRequestPayload;
 
 typedef struct packed {
   logic               valid  ;
   CacheRequestPayload payload;
-} CacheRequest;// SIZE = 943 - 6(CACHE_FRONTEND_BYTE_W) = 937 bits
+} CacheRequest;
 
 // --------------------------------------------------------------------------------------
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
   logic [L1_CACHE_FRONTEND_DATA_W-1:0] rdata;
-  `ifdef CTRL_IO
-    //control-status io
-    logic force_inv_out;
-    logic wtb_empty_out;
-  `endif
-} CacheResponseIOB; // SIZE = 514 bits
+} CacheResponseIOB;
 
 typedef struct packed {
   CacheResponseIOB iob ;
+  CacheControlIOB  ctrl;
   MemoryPacketMeta meta;
-} CacheResponsePayload;// SIZE = 814 bits
+} CacheResponsePayload;
 
 typedef struct packed {
   logic                valid  ;
   CacheResponsePayload payload;
-} CacheResponse;// SIZE = 815 bits
+} CacheResponse;
 
 // --------------------------------------------------------------------------------------
 //   Cache Requests state machine
@@ -202,7 +211,6 @@ typedef enum int unsigned {
   CACHE_REQUEST_GEN_READY,
   CACHE_REQUEST_GEN_DONE
 } cache_generator_request_state;
-
 
 
 endpackage

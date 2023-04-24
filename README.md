@@ -7,10 +7,26 @@ GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
 Abstract
 --------
 
-FPGA reconfiguration time for accelerated graph processing algorithms has become a top priority requirement. It is essential to rethink the design of today's graph algorithm acceleration on FPGAs to achieve faster reconfiguration times between algorithms while maintaining execution performance and custom memory optimizations. For instance, reconfiguring the FPGA for different graph processing algorithms can cause substantial pauses that affect the algorithm's critical path and performance. This paradigm is prevalent in virtual systems that require generic support for graph processing to cover a wide range of use cases while being efficiently managed by the hypervisor.
-This work proposes a coarse-grain overlay for graph processing called GLay. This overlay identifies typical access patterns in many graph algorithms and abstracts them into interconnected domain-specific graph Processing Elements (PE). Compared to classical FPGA reconfiguration times, GLay achieves reconfiguration times of nanoseconds to microseconds between graph algorithms while maintaining the performance and power optimizations that an FPGA provides.
+GLay is a vertex-centric reconfigurable graph processing overlay for FPGAs. It is designed to address the challenges of graph processing on FPGAs, such as long reconfiguration time, limited memory bandwidth, and high power consumption.
 
-![Figure 1: Graph Overlay (GLay) Contributions](./02_slides_figures_docs/fig/glay_gist.png "FFigure 1: Graph Overlay (GLay) Contributions")
+* GLay achieves its performance and efficiency by:
+  * Abstracting common access patterns in graph algorithms into engines for faster programmability.
+  * Providing a scalable and flexible architecture that can be customized to the specific needs of a graph algorithm.
+  * Using a high-performance memory system that can efficiently access large graphs.
+  * Implementing efficient dataflow and control flow mechanisms.
+
+GLay has been evaluated on a variety of graph algorithms, including breadth-first search (BFS), depth-first search (DFS), and single source shortest path (SSSP). It has shown significant performance improvements over state-of-the-art FPGA-based graph processing systems.
+
+* The following are some of the key features of GLay:
+  * Vertex-centric programming model: GLay uses a vertex-centric programming model, which is a natural fit for many graph algorithms. In this model, each vertex is processed independently, and the results of processing one vertex are used to process the next vertex.
+  * Reconfigurable engines: GLay provides a set of reconfigurable engines that can be used to implement the common access patterns in graph algorithms. This allows GLay to be quickly and easily reconfigured for different graph algorithms.
+  * Scalable architecture: GLay is designed to be scalable to large graphs. It can be easily scaled up by adding more processing elements.
+  * High-performance memory system: GLay uses a high-performance memory system that can efficiently access large graphs. This is achieved by using a distributed memory system with a high bandwidth interconnect.
+  * Efficient dataflow and control flow mechanisms: GLay uses efficient dataflow and control flow mechanisms to minimize the overhead of processing graphs. This is achieved by using a pipelined execution model and by avoiding unnecessary data movement.
+
+GLay is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
+
+![Figure 1: Graph Overlay (GLay) Contributions](./02_slides_figures_docs/fig/glay_gist.png "Figure 1: Graph Overlay (GLay) Contributions")
 
 # GLay Benchmark Suite
 
@@ -32,6 +48,7 @@ This work proposes a coarse-grain overlay for graph processing called GLay. This
         * [[Ref](https://github.com/sbeamer/gapbs)]: Scott Beamer, Krste Asanović, David Patterson. [The GAP Benchmark Suite](http://arxiv.org/abs/1508.03619). arXiv:1508.03619 [cs.DC], 2015.
     2. [[Page-Rank (PR) example](./02_slides_figures_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
+
 
 # Installation and Dependencies
 
