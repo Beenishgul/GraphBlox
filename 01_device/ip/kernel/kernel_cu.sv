@@ -344,6 +344,22 @@ module kernel_cu #(
   CacheRequestIOB   L1_cache_request;
   CacheResponseIOB  L2_cache_response;
 
+  L1_cache_request.wtb_empty_in;
+  L1_cache_request.wstrb
+  L1_cache_request.wdata
+  L1_cache_request.addr
+
+
+
+  assign L1_cache_request.force_inv_in = 0;
+  L1_cache_request.wtb_empty_in;
+
+
+  L2_cache_response.force_inv_out;
+  L2_cache_response.wtb_empty_out;
+  L2_cache_response.rdata;
+
+
   iob_cache #(
     .CACHE_FRONTEND_ADDR_W(L1_CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(L1_CACHE_FRONTEND_DATA_W),
@@ -372,11 +388,13 @@ module kernel_cu #(
     .wstrb        (cache_request_out.payload.iob.wstrb ),
     .rdata        (cache_response_out.payload.iob.rdata),
     .ready        (cache_response_out.valid            ),
-    .force_inv_in (L1_force_inv_in                     ),
+     `ifdef CTRL_IO
+    .force_inv_in (L1_cache_request.force_inv_in                     ),
     .force_inv_out(L1_force_inv_out                    ),
-    .wtb_empty_in (L2_wtb_empty_out                    ),
-    .wtb_empty_out(L1_wtb_empty_out                    ),
+    .wtb_empty_in (L2_cache_response.wtb_empty_out                    ),
+    .wtb_empty_out(                                    ),
     .mem_valid    (mem_valid                           ),
+     `endif
     .mem_addr     (mem_addr                            ),
     .mem_wdata    (mem_wdata                           ),
     .mem_wstrb    (mem_wstrb                           ),
@@ -425,10 +443,12 @@ module kernel_cu #(
     .wstrb        (mem_wstrb       ),
     .rdata        (mem_rdata       ),
     .ready        (mem_ready       ),
+     `endif
     .force_inv_in (L1_force_inv_out),
     .force_inv_out(L2_force_inv_out),
-    .wtb_empty_in (wtb_empty_in    ),
-    .wtb_empty_out(L2_wtb_empty_out),
+    .wtb_empty_in (L2_wtb_empty_in    ),
+    .wtb_empty_out(L2_cache_response.wtb_empty_out),
+        `endif
     `include "m_axi_portmap_glay.vh"
     .ap_clk       (ap_clk          ),
     .reset        (areset_L2_cache )

@@ -18,11 +18,11 @@ GLay is a vertex-centric reconfigurable graph processing overlay for FPGAs. It i
 GLay has been evaluated on a variety of graph algorithms, including breadth-first search (BFS), depth-first search (DFS), and single source shortest path (SSSP). It has shown significant performance improvements over state-of-the-art FPGA-based graph processing systems.
 
 * The following are some of the key features of GLay:
-  * Vertex-centric programming model: GLay uses a vertex-centric programming model, which is a natural fit for many graph algorithms. In this model, each vertex is processed independently, and the results of processing one vertex are used to process the next vertex.
-  * Reconfigurable engines: GLay provides a set of reconfigurable engines that can be used to implement the common access patterns in graph algorithms. This allows GLay to be quickly and easily reconfigured for different graph algorithms.
-  * Scalable architecture: GLay is designed to be scalable to large graphs. It can be easily scaled up by adding more processing elements.
-  * High-performance memory system: GLay uses a high-performance memory system that can efficiently access large graphs. This is achieved by using a distributed memory system with a high bandwidth interconnect.
-  * Efficient dataflow and control flow mechanisms: GLay uses efficient dataflow and control flow mechanisms to minimize the overhead of processing graphs. This is achieved by using a pipelined execution model and by avoiding unnecessary data movement.
+  * **Vertex-centric programming model**: GLay uses a vertex-centric programming model, which is a natural fit for many graph algorithms. In this model, each vertex is processed independently, and the results of processing one vertex are used to process the next vertex.
+  * **Reconfigurable engines**: GLay provides a set of reconfigurable engines that can be used to implement the common access patterns in graph algorithms. This allows GLay to be quickly and easily reconfigured for different graph algorithms.
+  * **Scalable architecture**: GLay is designed to be scalable to large graphs. It can be easily scaled up by adding more processing elements.
+  * **High-performance memory system**: GLay uses a high-performance memory system that can efficiently access large graphs. This is achieved by using a distributed memory system with a high bandwidth interconnect HBM.
+  * **Efficient dataflow and control flow mechanisms**: GLay uses efficient dataflow and control flow mechanisms to minimize the overhead of processing graphs. This is achieved by using a pipelined execution model and by avoiding unnecessary data movement.
 
 GLay is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
 
