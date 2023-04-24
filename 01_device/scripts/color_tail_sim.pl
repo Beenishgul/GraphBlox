@@ -143,6 +143,36 @@ sub sub_print_info {
  
 }
 
+sub sub_print_info_s {
+ my $line = $_;
+ $time_flag = 0;
+ my @fields_i2 = split ':', $line;
+ my @fields_i = split '.', $fields_i2[1];
+
+
+ print ' ' x 24;
+ print "[", BLUE, $fields_i2[0], RESET, "] "; 
+ shift(@fields_i2);
+ # print GREEN, @fields_i2, RESET;
+ print GREEN, wrap('', ' ' x 32, $fields_i2[0]), RESET, "\n";   
+ 
+}
+
+sub sub_print_time_s {
+ my $line = $_;
+ $time_flag = 0;
+ my @fields_i2 = split ':', $line;
+ my @fields_i = split '/', $fields_i2[1];
+
+
+ print ' ' x 24;
+ print "[", BLUE, $fields_i2[0], RESET, "] "; 
+ shift(@fields_i2);
+ # print GREEN, @fields_i2, RESET;
+ print GREEN, wrap('', ' ' x 32, $fields_i[0]), RESET, "\n";    
+ 
+}
+
 sub sub_print_finished {
  my $line = $_;
  $time_flag = 0;
@@ -273,9 +303,8 @@ while(<STDIN>) {
     my $step_15 = "Starting";
     my $step_16 = "Starting:";
     my $step_17 = "MSG:";
-    
   
-    # my $vpl = \[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\];
+    # my $vpl = \[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\];sub_print_time_s
 
         if (@fields_s) {
             if ($fields_s[0] ne "")
@@ -298,7 +327,9 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^$step_10$/ )  { sub_print_step($line);}
                 elsif ($fields_s[0] =~ /^$step_11$/ )  { sub_print_finished($line);}
                 elsif ($fields_s[0] =~ /^$step_13$/ )  { sub_print_compiling($line);}
-                elsif ($fields_s[0] =~ /^INFO:/   )    { if($time_flag == 1){sub_print_info($line);} }
+                elsif ($fields_s[0] =~ /^Time:/   )    { sub_print_time_s($line); }
+                elsif ($fields_s[0] =~ /^Info:/   )    { sub_print_info_s($line); }
+                elsif ($fields_s[0] =~ /^INFO:/   )    { sub_print_info($line); }
                 elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_error ($line);}
                 elsif ($fields_s[0] =~ /^WARNING:/)    { sub_print_warning ($line);}
                 elsif ($line =~ /$step_12/    )        { sub_print_time ($line);}
