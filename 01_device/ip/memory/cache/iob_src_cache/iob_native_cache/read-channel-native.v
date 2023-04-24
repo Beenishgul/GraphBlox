@@ -53,7 +53,7 @@ module read_channel_native
            
            reg [1:0]            state;
 
-           always @(posedge ap_clk, posedge reset)
+           always @(posedge ap_clk)
              begin
                 if(reset)
                   begin
@@ -141,7 +141,7 @@ module read_channel_native
            
            reg [1:0]                                  state;
 
-           always @(posedge ap_clk, posedge reset)
+           always @(posedge ap_clk)
              begin
                 if(reset)
                   state <= idle;
