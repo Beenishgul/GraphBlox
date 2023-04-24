@@ -66,6 +66,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   CacheRequest         L1_cache_request_in ;
   CacheRequestIOB      L1_cache_request_mem;
+  CacheRequestIOB      L1_cache_request_end;
   CacheControlIOBInput L1_cache_ctrl_in    ;
   CacheControlIOBInput L1_cache_ctrl_out   ;
 
@@ -332,8 +333,11 @@ module kernel_cu #(
   CacheResponseIOB  L2_cache_response_S     [0:DEPTH-1];
   logic [DEPTH-1:0] L1_cache_request_pending           ;
 
-  assign L1_cache_request_S[0]       = L1_cache_request_mem;
-  assign L1_cache_request_S[0].valid = L1_cache_request_mem.valid & ~L2_cache_response_mem.ready;
+  assign L1_cache_request_S[0].addr  = L1_cache_request_mem.addr ;
+  assign L1_cache_request_S[0].wdata = L1_cache_request_mem.wdata;
+  assign L1_cache_request_S[0].wstrb = L1_cache_request_mem.wstrb;
+  assign L1_cache_request_S[0].valid = L1_cache_request_mem.valid & ~(|L1_cache_request_pending);
+
   assign L2_cache_response_S[0]      = L2_cache_response_mem;
   assign L1_cache_request_pending[0] = L2_cache_response_S[0].ready;
 
@@ -350,7 +354,7 @@ module kernel_cu #(
           L1_cache_request_S[i].valid <= 0;
           L1_cache_request_pending[i] <= L1_cache_request_pending[i-1];
         end else begin
-          L1_cache_request_S[i].valid <= L1_cache_request_S[i-1].valid;
+          L1_cache_request_S[i].valid <= L1_cache_request_S[i-1].valid & ~(|L1_cache_request_pending);
           L1_cache_request_pending[i] <= 0;
         end
       end
@@ -365,6 +369,11 @@ module kernel_cu #(
       L2_cache_response_S[i] <= L2_cache_response_S[i-1];
     end
   end
+
+  assign L1_cache_request_end.addr  = L1_cache_request_S[DEPTH-1].addr;
+  assign L1_cache_request_end.wdata = L1_cache_request_S[DEPTH-1].wdata;
+  assign L1_cache_request_end.wstrb = L1_cache_request_S[DEPTH-1].wstrb;
+  assign L1_cache_request_end.valid = L1_cache_request_S[DEPTH-1].valid & ~(|L1_cache_request_pending);
 
 // --------------------------------------------------------------------------------------
 // AXI port cache L1
@@ -451,10 +460,10 @@ module kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
   ) inst_L2_cache_axi (
-    .valid        (L1_cache_request_S[DEPTH-1].valid ),
-    .addr         (L1_cache_request_S[DEPTH-1].addr  ),
-    .wdata        (L1_cache_request_S[DEPTH-1].wdata ),
-    .wstrb        (L1_cache_request_S[DEPTH-1].wstrb ),
+    .valid        (L1_cache_request_end.valid ),
+    .addr         (L1_cache_request_end.addr  ),
+    .wdata        (L1_cache_request_end.wdata ),
+    .wstrb        (L1_cache_request_end.wstrb ),
     .rdata        (L2_cache_response_mem.rdata),
     .ready        (L2_cache_response_mem.ready),
     `ifdef CTRL_IO
