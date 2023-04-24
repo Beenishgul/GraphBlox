@@ -64,14 +64,14 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-  CacheRequest         L1_cache_request_in;
-  CacheRequestIOB      L1_cache_request   ;
-  CacheControlIOBInput L1_cache_ctrl_in   ;
-  CacheControlIOBInput L1_cache_ctrl_out  ;
+  CacheRequest         L1_cache_request_in ;
+  CacheRequestIOB      L1_cache_request_mem;
+  CacheControlIOBInput L1_cache_ctrl_in    ;
+  CacheControlIOBInput L1_cache_ctrl_out   ;
 
-  CacheResponseIOB      L2_cache_response;
-  CacheControlIOBOutput L2_cache_ctrl_in ;
-  CacheControlIOBOutput L2_cache_ctrl_out;
+  CacheResponseIOB      L2_cache_response_mem;
+  CacheControlIOBOutput L2_cache_ctrl_in     ;
+  CacheControlIOBOutput L2_cache_ctrl_out    ;
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  CacheRequest                     cache_request_out                                                ;
+  CacheRequest                     cache_request_out                                                   ;
   FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
   FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
   MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
@@ -364,12 +364,12 @@ module kernel_cu #(
     .wtb_empty_in (L1_cache_ctrl_in.wtb_empty             ),
     .wtb_empty_out(L1_cache_ctrl_out.wtb_empty            ), // floating Z
     `endif
-    .mem_valid    (L1_cache_request.valid                 ),
-    .mem_addr     (L1_cache_request.addr                  ),
-    .mem_wdata    (L1_cache_request.wdata                 ),
-    .mem_wstrb    (L1_cache_request.wstrb                 ),
-    .mem_rdata    (L2_cache_response.rdata                ),
-    .mem_ready    (L2_cache_response.ready                )
+    .mem_valid    (L1_cache_request_mem.valid             ),
+    .mem_addr     (L1_cache_request_mem.addr              ),
+    .mem_wdata    (L1_cache_request_mem.wdata             ),
+    .mem_wstrb    (L1_cache_request_mem.wstrb             ),
+    .mem_rdata    (L2_cache_response_mem.rdata            ),
+    .mem_ready    (L2_cache_response_mem.ready            )
   );
 
 
@@ -410,12 +410,12 @@ module kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
   ) inst_L2_cache_axi (
-    .valid        (L1_cache_request.valid     ),
-    .addr         (L1_cache_request.addr      ),
-    .wdata        (L1_cache_request.wdata     ),
-    .wstrb        (L1_cache_request.wstrb     ),
-    .rdata        (L2_cache_response.rdata    ),
-    .ready        (L2_cache_response.ready    ),
+    .valid        (L1_cache_request_mem.valid ),
+    .addr         (L1_cache_request_mem.addr  ),
+    .wdata        (L1_cache_request_mem.wdata ),
+    .wstrb        (L1_cache_request_mem.wstrb ),
+    .rdata        (L2_cache_response_mem.rdata),
+    .ready        (L2_cache_response_mem.ready),
     `ifdef CTRL_IO
     .force_inv_in (L2_cache_ctrl_in.force_inv ),
     .force_inv_out(L2_cache_ctrl_out.force_inv), // floating
