@@ -43,11 +43,11 @@ module kernel_cu #(
 // AXI write master stage
   logic areset_m_axi   ;
   logic areset_control ;
-  logic areset_L2_cache;
-  logic areset_L1_cache;
   logic areset_fifo    ;
   logic areset_arbiter ;
   logic areset_setup   ;
+  logic areset_L2_cache;
+  logic areset_L1_cache;
 
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
   logic [  VERTEX_DATA_BITS-1:0] counter       ;
@@ -62,20 +62,20 @@ module kernel_cu #(
   DescriptorInterface         descriptor_out_reg;
 
 // --------------------------------------------------------------------------------------
-//   AXI Cache FIFO signals
+//   Cache signals
 // --------------------------------------------------------------------------------------
-  // logic force_inv_in ;
-  logic L2_force_inv_out;
-  logic L2_wtb_empty_in ;
-  logic L2_wtb_empty_out;
+  CacheRequest         L1_cache_request_in;
+  CacheRequestIOB      L1_cache_request   ;
+  CacheControlIOBInput L1_cache_ctrl_in   ;
+  CacheControlIOBInput L1_cache_ctrl_out  ;
 
-  // assign force_inv_in = 1'b0;
-  assign L2_wtb_empty_in = 1'b1;
-
+  CacheResponseIOB      L2_cache_response;
+  CacheControlIOBOutput L2_cache_ctrl_in ;
+  CacheControlIOBOutput L2_cache_ctrl_out;
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  CacheResponse          cache_response_out                                                 ;
+  CacheResponse          L1_cache_response_out                                              ;
   FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
   FIFOStateSignalsInput  cache_fifo_response_signals_in                                     ;
   MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0];
@@ -84,7 +84,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  CacheRequest                     cache_request_out                                                   ;
+  CacheRequest                     cache_request_out                                                ;
   FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
   FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
   MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
@@ -327,38 +327,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // AXI port cache L1
 // --------------------------------------------------------------------------------------
-
-  logic                               mem_valid       ;
-  logic [L1_CACHE_BACKEND_ADDR_W-1:0] mem_addr        ;
-  logic [L1_CACHE_BACKEND_DATA_W-1:0] mem_wdata       ;
-  logic [L1_CACHE_BACKEND_NBYTES-1:0] mem_wstrb       ;
-  logic [L1_CACHE_BACKEND_DATA_W-1:0] mem_rdata       ;
-  logic                               mem_ready       ;
-  logic                               L1_wtb_empty_in ;
-  logic                               L1_wtb_empty_out;
-  logic                               L1_force_inv_in ;
-  logic                               L1_force_inv_out;
-
-  assign L1_force_inv_in = 0;
-
-  CacheRequestIOB   L1_cache_request;
-  CacheResponseIOB  L2_cache_response;
-
-  L1_cache_request.wtb_empty_in;
-  L1_cache_request.wstrb
-  L1_cache_request.wdata
-  L1_cache_request.addr
-
-
-
-  assign L1_cache_request.force_inv_in = 0;
-  L1_cache_request.wtb_empty_in;
-
-
-  L2_cache_response.force_inv_out;
-  L2_cache_response.wtb_empty_out;
-  L2_cache_response.rdata;
-
+  assign L1_cache_ctrl_in.force_inv = 1'b0;
+  assign L1_cache_ctrl_in.wtb_empty = L2_cache_ctrl_out.wtb_empty;
 
   iob_cache #(
     .CACHE_FRONTEND_ADDR_W(L1_CACHE_FRONTEND_ADDR_W),
@@ -380,32 +350,35 @@ module kernel_cu #(
     .CACHE_CTRL_CACHE     (L1_CACHE_CTRL_CACHE     ),
     .CACHE_CTRL_CNT       (L1_CACHE_CTRL_CNT       )
   ) inst_L1_cache_native (
-    .ap_clk       (ap_clk                              ),
-    .reset        (areset_L1_cache                     ),
-    .valid        (cache_request_out_valid             ),
-    .addr         (cache_request_out.payload.iob.addr  ),
-    .wdata        (cache_request_out.payload.iob.wdata ),
-    .wstrb        (cache_request_out.payload.iob.wstrb ),
-    .rdata        (cache_response_out.payload.iob.rdata),
-    .ready        (cache_response_out.valid            ),
-     `ifdef CTRL_IO
-    .force_inv_in (L1_cache_request.force_inv_in                     ),
-    .force_inv_out(L1_force_inv_out                    ),
-    .wtb_empty_in (L2_cache_response.wtb_empty_out                    ),
-    .wtb_empty_out(                                    ),
-    .mem_valid    (mem_valid                           ),
-     `endif
-    .mem_addr     (mem_addr                            ),
-    .mem_wdata    (mem_wdata                           ),
-    .mem_wstrb    (mem_wstrb                           ),
-    .mem_rdata    (mem_rdata                           ),
-    .mem_ready    (mem_ready                           )
+    .ap_clk       (ap_clk                                 ),
+    .reset        (areset_L1_cache                        ),
+    .valid        (L1_cache_request_in.payload.iob.valid  ),
+    .addr         (L1_cache_request_in.payload.iob.addr   ),
+    .wdata        (L1_cache_request_in.payload.iob.wdata  ),
+    .wstrb        (L1_cache_request_in.payload.iob.wstrb  ),
+    .rdata        (L1_cache_response_out.payload.iob.rdata),
+    .ready        (L1_cache_response_out.payload.iob.ready),
+    `ifdef CTRL_IO
+    .force_inv_in (L1_cache_ctrl_in.force_inv             ), // force 0
+    .force_inv_out(L1_cache_ctrl_out.force_inv            ),
+    .wtb_empty_in (L1_cache_ctrl_in.wtb_empty             ),
+    .wtb_empty_out(L1_cache_ctrl_out.wtb_empty            ), // floating Z
+    `endif
+    .mem_valid    (L1_cache_request.valid                 ),
+    .mem_addr     (L1_cache_request.addr                  ),
+    .mem_wdata    (L1_cache_request.wdata                 ),
+    .mem_wstrb    (L1_cache_request.wstrb                 ),
+    .mem_rdata    (L2_cache_response.rdata                ),
+    .mem_ready    (L2_cache_response.ready                )
   );
 
 
 // --------------------------------------------------------------------------------------
 // AXI port cache L2
 // --------------------------------------------------------------------------------------
+  assign L2_cache_ctrl_in.force_inv = L1_cache_ctrl_out.force_inv;
+  assign L2_cache_ctrl_in.wtb_empty = 1'b1;
+
   iob_cache_axi #(
     .CACHE_FRONTEND_ADDR_W(L1_CACHE_BACKEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(L1_CACHE_BACKEND_DATA_W),
@@ -437,28 +410,31 @@ module kernel_cu #(
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
   ) inst_L2_cache_axi (
-    .valid        (mem_valid       ),
-    .addr         (mem_addr        ),
-    .wdata        (mem_wdata       ),
-    .wstrb        (mem_wstrb       ),
-    .rdata        (mem_rdata       ),
-    .ready        (mem_ready       ),
-     `endif
-    .force_inv_in (L1_force_inv_out),
-    .force_inv_out(L2_force_inv_out),
-    .wtb_empty_in (L2_wtb_empty_in    ),
-    .wtb_empty_out(L2_cache_response.wtb_empty_out),
-        `endif
+    .valid        (L1_cache_request.valid     ),
+    .addr         (L1_cache_request.addr      ),
+    .wdata        (L1_cache_request.wdata     ),
+    .wstrb        (L1_cache_request.wstrb     ),
+    .rdata        (L2_cache_response.rdata    ),
+    .ready        (L2_cache_response.ready    ),
+    `ifdef CTRL_IO
+    .force_inv_in (L2_cache_ctrl_in.force_inv ),
+    .force_inv_out(L2_cache_ctrl_out.force_inv), // floating
+    .wtb_empty_in (L2_cache_ctrl_in.wtb_empty ),
+    .wtb_empty_out(L2_cache_ctrl_out.wtb_empty),
+    `endif
     `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk          ),
-    .reset        (areset_L2_cache )
+    .ap_clk       (ap_clk                     ),
+    .reset        (areset_L2_cache            )
   );
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  assign cache_response_out.payload.meta      = cache_request_out.payload.meta;
-  assign cache_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.empty;
+  assign L1_cache_response_out.valid            = L1_cache_response_out.payload.iob.ready;
+  assign L1_cache_response_out.payload.meta     = L1_cache_request_in.payload.meta;
+  assign L1_cache_response_out.payload.ctrl.out = L1_cache_ctrl_out;
+  assign L1_cache_response_out.payload.ctrl.in  = L1_cache_ctrl_in;
+  assign cache_fifo_response_signals_in.rd_en   = ~cache_fifo_response_signals_out.empty;
 
   cache_generator_response #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
@@ -468,7 +444,7 @@ module kernel_cu #(
     .ap_clk                   (ap_clk                                    ),
     .areset                   (areset                                    ),
     .memory_response_out      (memory_response_out                       ),
-    .cache_resp_in            (cache_response_out                        ),
+    .cache_resp_in            (L1_cache_response_out                     ),
     .fifo_response_signals_in (cache_fifo_response_signals_in            ),
     .fifo_response_signals_out(cache_fifo_response_signals_out           ),
     .fifo_setup_signal        (cache_generator_response_fifo_setup_signal)
@@ -477,12 +453,17 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
+  always_comb begin
+    L1_cache_request_in                   = cache_request_out;
+    L1_cache_request_in.payload.iob.valid = cache_request_out.valid & ~L1_cache_response_out.valid;
+  end
+
 
   assign cache_memory_request_in[0] = kernel_setup_memory_request_out;
   assign cache_memory_request_in[1] = vertex_cu_memory_request_out;
 
-  assign cache_response_ready                = cache_response_out.valid;
-  assign cache_request_out_valid             = cache_request_out.valid & ~cache_response_out.valid;
+  assign cache_response_ready = L1_cache_response_out.payload.iob.ready;
+  // assign cache_request_out.payload.iob.valid = cache_request_out.payload.iob.valid | (cache_request_out.valid & ~L1_cache_response_out.valid);
   assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
 
   cache_generator_request #(

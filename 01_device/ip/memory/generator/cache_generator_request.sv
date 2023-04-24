@@ -349,9 +349,10 @@ module cache_generator_request #(
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
   always_comb begin
-    fifo_request_comb.valid            = 0;
-    fifo_request_comb.payload.iob.addr = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
-    fifo_request_comb.payload.ctrl     = 0;
+    fifo_request_comb.valid             = 0;
+    fifo_request_comb.payload.iob.valid = 0;
+    fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
+    fifo_request_comb.payload.ctrl      = 0;
 
     if(arbiter_bus_out.payload.meta.cmd_type == CMD_WRITE)
       fifo_request_comb.payload.iob.wstrb = {L1_CACHE_FRONTEND_NBYTES{1'b1}};
