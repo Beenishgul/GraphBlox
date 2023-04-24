@@ -132,7 +132,7 @@ sub sub_print_info {
  my $line = $_;
  $time_flag = 0;
  my @fields_i2 = split ':', $line;
- my @fields_i = split '/', $fields_i2[1];
+ my @fields_i = split '\/', $fields_i2[1];
 
 
  print ' ' x 24;
@@ -147,14 +147,14 @@ sub sub_print_info_s {
  my $line = $_;
  $time_flag = 0;
  my @fields_i2 = split ':', $line;
- my @fields_i = split '.', $fields_i2[1];
+ my @fields_i = split '\.', $fields_i2[1];
 
 
  print ' ' x 24;
  print "[", BLUE, $fields_i2[0], RESET, "] "; 
  shift(@fields_i2);
  # print GREEN, @fields_i2, RESET;
- print GREEN, wrap('', ' ' x 32, $fields_i2[0]), RESET, "\n";   
+ print GREEN, wrap('', ' ' x 32, $fields_i[0]), RESET, "\n";   
  
 }
 
@@ -162,7 +162,7 @@ sub sub_print_time_s {
  my $line = $_;
  $time_flag = 0;
  my @fields_i2 = split ':', $line;
- my @fields_i = split '/', $fields_i2[1];
+ my @fields_i = split '\/', $fields_i2[1];
 
 
  print ' ' x 24;
