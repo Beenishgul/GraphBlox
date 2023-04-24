@@ -161,6 +161,7 @@ typedef struct packed {
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
 typedef struct packed {
+  logic valid;
   `ifdef WORD_ADDR
     logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:L1_CACHE_FRONTEND_BYTE_W] addr;
   `else
@@ -185,6 +186,7 @@ typedef struct packed {
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
+  logic                                ready;
   logic [L1_CACHE_FRONTEND_DATA_W-1:0] rdata;
 } CacheResponseIOB;
 
