@@ -72,7 +72,7 @@ module write_channel_native
             end // always @ *
           end
 
-          always @(posedge ap_clk, posedge reset) begin
+          always @(posedge ap_clk) begin
             if(reset)
               state <= idle;
             else
@@ -94,7 +94,7 @@ module write_channel_native
                       state <= write;
                 end
               endcase // case (state)
-          end // always @ (posedge ap_clk, posedge reset)
+          end // always @ (posedge ap_clk)
 
          always @*
            begin
@@ -131,7 +131,7 @@ module write_channel_native
 
             reg [0:0]            state;
 
-            always @(posedge ap_clk, posedge reset)
+            always @(posedge ap_clk)
               begin
                  if(reset)
                    state <= idle;
@@ -155,7 +155,7 @@ module write_channel_native
                             state <= write;
                        end
                    endcase // case (state)
-              end // always @ (posedge ap_clk, posedge reset)
+              end // always @ (posedge ap_clk)
 
             always @*
               begin
@@ -197,7 +197,7 @@ module write_channel_native
 
             reg [0:0]            state;
 
-            always @(posedge ap_clk, posedge reset)
+            always @(posedge ap_clk)
               begin
                  if(reset)
                    state <= idle;
@@ -221,7 +221,7 @@ module write_channel_native
                             state <= write;
                        end
                    endcase // case (state)
-              end // always @ (posedge ap_clk, posedge reset)
+              end // always @ (posedge ap_clk)
 
             always @*
               begin

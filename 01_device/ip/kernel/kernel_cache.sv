@@ -429,7 +429,7 @@ module kernel_cache #(
 
   logic invalidate     = L1_cache_ctrl_out.force_inv;
   logic invalidate_reg                              ;
-  logic l2_valid       = L1_cache_request_mem.valid ;
+  logic l2_valid       = L1_cache_request_end.valid ;
 
   assign L2_cache_ctrl_in.force_inv = invalidate_reg & ~l2_valid;
   assign L2_cache_ctrl_in.wtb_empty = 1'b1;
