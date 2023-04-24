@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_cu.sv
+// File   : kernel_cache.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -19,7 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(
+module kernel_cache #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
   parameter NUM_SETUP_MODULES    = 3              ,
   parameter NUM_MEMORY_REQUESTOR = 2              ,
@@ -604,4 +604,4 @@ module kernel_cu #(
     .fifo_setup_signal        (vertex_cu_fifo_setup_signal        )
   );
 
-endmodule : kernel_cu
+endmodule : kernel_cache
