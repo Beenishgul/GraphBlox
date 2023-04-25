@@ -279,7 +279,7 @@ module kernel_cache #(
 
 
   assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
-  fifo_request_signals_in_reg.wr_en = fifo_response_din.valid;
+  fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
