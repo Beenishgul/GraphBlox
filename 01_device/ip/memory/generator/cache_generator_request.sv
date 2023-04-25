@@ -352,7 +352,6 @@ module cache_generator_request #(
     fifo_request_comb.valid             = 0;
     fifo_request_comb.payload.iob.valid = 0;
     fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
-    fifo_request_comb.payload.ctrl      = 0;
 
     if(arbiter_bus_out.payload.meta.cmd_type == CMD_WRITE)
       fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};

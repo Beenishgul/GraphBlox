@@ -501,8 +501,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   assign cache_response_out.valid            = cache_response_out.payload.iob.ready;
   assign cache_response_out.payload.meta     = cache_request_in.payload.meta;
-  assign cache_response_out.payload.ctrl.out = cache_ctrl_out;
-  assign cache_response_out.payload.ctrl.in  = cache_ctrl_in;
   assign cache_fifo_response_signals_in.rd_en   = ~cache_fifo_response_signals_out.empty;
 
   cache_generator_response #(

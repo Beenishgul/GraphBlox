@@ -114,7 +114,6 @@ module cache_generator_response #(
 // --------------------------------------------------------------------------------------
   assign fifo_response_din.valid        = cache_resp_reg.valid;
   assign fifo_response_din.payload.iob  = cache_resp_reg.payload.iob;
-  assign fifo_response_din.payload.ctrl = cache_resp_reg.payload.ctrl;
   assign fifo_response_din.payload.meta = cache_resp_reg.payload.meta;
 
   assign fifo_response_setup_signal         = fifo_response_signals_out_reg.wr_rst_busy  | fifo_response_signals_out_reg.rd_rst_busy;

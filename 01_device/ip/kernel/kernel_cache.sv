@@ -44,12 +44,11 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
-//
-  logic areset_m_axi   ;
-  logic areset_fifo    ;
-  logic areset_arbiter ;
-  logic areset_setup   ;
-  logic areset_cache;
+  logic areset_m_axi  ;
+  logic areset_fifo   ;
+  logic areset_arbiter;
+  logic areset_setup  ;
+  logic areset_cache  ;
 
   CacheRequest  kernel_cache_request_reg ;
   CacheResponse kernel_cache_response_reg;
@@ -63,8 +62,8 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-  CacheRequestIOB       cache_request_mem ;
-  CacheResponseIOB      cache_response_mem;
+  CacheRequestPayload   cache_request_mem ;
+  CacheRequestPayload   cache_response_mem;
   CacheControlIOBOutput cache_ctrl_in     ;
   CacheControlIOBOutput cache_ctrl_out    ;
 
@@ -185,6 +184,12 @@ module kernel_cache #(
   assign cache_ctrl_in.force_inv = 1'b0;
   assign cache_ctrl_in.wtb_empty = 1'b1;
 
+  assign cache_request_mem.iob.valid = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
+  assign cache_request_mem.iob.addr  = fifo_request_dout.iob.addr;
+  assign cache_request_mem.iob.wdata = fifo_request_dout.iob.wdata;
+  assign cache_request_mem.iob.wstrb = fifo_request_dout.iob.wstrb;
+  assign cache_request_mem.meta      = fifo_request_dout.meta;
+
   iob_cache_axi #(
     .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
@@ -204,47 +209,43 @@ module kernel_cache #(
     .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
     .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     ),
     .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W        ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W        ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W          ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W         ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID            ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W        ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W       ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W        ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W         ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W       ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W        )
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W     ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W     ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W       ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W      ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID         ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W     ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W    ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W     ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
   ) inst_cache_axi (
-    .valid        (cache_request_mem.valid ),
-    .addr         (cache_request_mem.addr  ),
-    .wdata        (cache_request_mem.wdata ),
-    .wstrb        (cache_request_mem.wstrb ),
-    .rdata        (cache_response_mem.rdata),
-    .ready        (cache_response_mem.ready),
+    .valid        (cache_request_mem.iob.valid ),
+    .addr         (cache_request_mem.iob.addr  ),
+    .wdata        (cache_request_mem.iob.wdata ),
+    .wstrb        (cache_request_mem.iob.wstrb ),
+    .rdata        (cache_response_mem.iob.rdata),
+    .ready        (cache_response_mem.iob.ready),
     `ifdef CTRL_IO
-    .force_inv_in (cache_ctrl_in.force_inv ),
-    .force_inv_out(cache_ctrl_out.force_inv), // floating
-    .wtb_empty_in (cache_ctrl_in.wtb_empty ),
-    .wtb_empty_out(cache_ctrl_out.wtb_empty),
+    .force_inv_in (cache_ctrl_in.force_inv     ),
+    .force_inv_out(cache_ctrl_out.force_inv    ), // floating
+    .wtb_empty_in (cache_ctrl_in.wtb_empty     ),
+    .wtb_empty_out(cache_ctrl_out.wtb_empty    ),
     `endif
     `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk                     ),
-    .reset        (areset_cache            )
+    .ap_clk       (ap_clk                      ),
+    .reset        (areset_cache                )
   );
-
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_request_din            ;
-  CacheResponsePayload   fifo_request_dout           ;
-  FIFOStateSignalsOutput fifo_request_signals_out_reg;
-  FIFOStateSignalsInput  fifo_request_signals_in_reg ;
+  assign fifo_request_setup_signal         = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+  assign fifo_request_signals_in_reg.wr_en = kernel_cache_request_reg.valid;
+  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready;
 
-  assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
-  fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
-  
+  assign fifo_request_din = kernel_cache_request_reg.payload;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -273,14 +274,15 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_response_din            ;
-  CacheResponsePayload   fifo_response_dout           ;
-  FIFOStateSignalsOutput fifo_response_signals_out_reg;
-  FIFOStateSignalsInput  fifo_response_signals_in_reg ;
+  assign fifo_response_setup_signal         = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+  assign fifo_response_signals_in_reg.wr_en = cache_response_mem.iob.ready;
+  assign fifo_response_signals_in_reg.rd_en = ~cache_fifo_response_signals_out.empty;
 
+  assign fifo_response_din.iob  = cache_response_mem.iob;
+  assign fifo_response_din.meta = cache_request_mem.meta;
 
-  assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
-  fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
+  assign kernel_cache_response_reg.valid   = fifo_response_signals_out_reg.valid;
+  assign kernel_cache_response_reg.payload = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
