@@ -116,8 +116,8 @@ typedef enum int unsigned {
 typedef struct packed{
   logic [       CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
   logic [       CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
-  logic [L1_CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
-  logic [L1_CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
+  logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
+  logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
   command_type                         cmd_type      ; // SIZE = 32 bits
   structure_type                       struct_type   ; // SIZE = 32 bits
   operand_location                     operand_loc   ; // SIZE = 32 bits
@@ -126,7 +126,7 @@ typedef struct packed{
 } MemoryPacketMeta;
 
 typedef struct packed{
-  logic [L1_CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
+  logic [CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
 } MemoryPacketData;// SIZE = 512 bits
 
 typedef struct packed{
@@ -163,12 +163,12 @@ typedef struct packed {
 typedef struct packed {
   logic valid;
   `ifdef WORD_ADDR
-    logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:L1_CACHE_FRONTEND_BYTE_W] addr;
+    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
   `else
-    logic [L1_CACHE_CTRL_CNT+L1_CACHE_FRONTEND_ADDR_W-1:0] addr;
+    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:0] addr;
   `endif
-  logic [L1_CACHE_FRONTEND_DATA_W-1:0] wdata;
-  logic [L1_CACHE_FRONTEND_NBYTES-1:0] wstrb;
+  logic [CACHE_FRONTEND_DATA_W-1:0] wdata;
+  logic [CACHE_FRONTEND_NBYTES-1:0] wstrb;
 } CacheRequestIOB;
 
 typedef struct packed {
@@ -187,7 +187,7 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 typedef struct packed {
   logic                                ready;
-  logic [L1_CACHE_FRONTEND_DATA_W-1:0] rdata;
+  logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
 } CacheResponseIOB;
 
 typedef struct packed {

@@ -31,78 +31,44 @@ package PKG_CACHE;
 //Write Policy
 	parameter CACHE_WRITE_THROUGH = 0; //write-through not allocate: implements a write-through buffer
 	parameter CACHE_WRITE_BACK    = 1; //write-back allocate: implemented a dirty-memory
-
+	
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// CACHE PARAMETERS L1
+// CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-	parameter L1_CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-	parameter L1_CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS       ; //Data width - word size used for the cache
-	parameter L1_CACHE_N_WAYS          = 4                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter L1_CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter L1_CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
+	parameter CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+	parameter CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS; //Data width - word size used for the cache
+	parameter CACHE_N_WAYS          = 2                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
-	parameter L1_CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
+	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
-	parameter L1_CACHE_NWAY_W          = $clog2(L1_CACHE_N_WAYS)         ; //Cache Ways Width
-	parameter L1_CACHE_FRONTEND_NBYTES = L1_CACHE_FRONTEND_DATA_W/8      ; //Number of Bytes per Word
-	parameter L1_CACHE_FRONTEND_BYTE_W = $clog2(L1_CACHE_FRONTEND_NBYTES); //Byte Offset
+	parameter CACHE_NWAY_W          = $clog2(CACHE_N_WAYS)         ; //Cache Ways Width
+	parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8      ; //Number of Bytes per Word
+	parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES); //Byte Offset
 /*---------------------------------------------------*/
 //Higher hierarchy memory (slave) interface parameters
-	parameter L1_CACHE_BACKEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH        ; //Address width of the higher hierarchy memory
-	parameter L1_CACHE_BACKEND_DATA_W = L1_CACHE_FRONTEND_DATA_W       ; //Data width of the memory
-	parameter L1_CACHE_BACKEND_NBYTES = L1_CACHE_BACKEND_DATA_W/8      ; //Number of bytes
-	parameter L1_CACHE_BACKEND_BYTE_W = $clog2(L1_CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
+	parameter CACHE_BACKEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH        ; //Address width of the higher hierarchy memory
+	parameter CACHE_BACKEND_DATA_W = M_AXI_MEMORY_DATA_WIDTH_BITS   ; //Data width of the memory
+	parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8      ; //Number of bytes
+	parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
-	parameter L1_CACHE_WORD_OFF_W = $clog2(L1_CACHE_BACKEND_DATA_W/L1_CACHE_FRONTEND_DATA_W)+1                  ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-	parameter L1_CACHE_LINE2MEM_W = L1_CACHE_WORD_OFF_W-$clog2(L1_CACHE_BACKEND_DATA_W/L1_CACHE_FRONTEND_DATA_W); //Logarithm Ratio between the size of the cache-line and the BACKEND's data width
+	parameter CACHE_WORD_OFF_W = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+1                  ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
+	parameter CACHE_LINE2MEM_W = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W); //Logarithm Ratio between the size of the cache-line and the BACKEND's data width
 /*---------------------------------------------------*/
 //Write Policy
-	parameter L1_CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
-	// parameter L1_CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
-/*---------------------------------------------------*/
+	parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
+	// parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
 //Controller's options
-	parameter L1_CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-	parameter L1_CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
-
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// CACHE PARAMETERS L2-AXI
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-	parameter L2_CACHE_FRONTEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-	parameter L2_CACHE_FRONTEND_DATA_W = VERTEX_DATA_BITS; //Data width - word size used for the cache
-	parameter L2_CACHE_N_WAYS          = 2                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter L2_CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter L2_CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
-//Replacement policy (CACHE_N_WAYS > 1)
-	parameter L2_CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
-//Do NOT change - memory cache's parameters - dependency
-	parameter L2_CACHE_NWAY_W          = $clog2(L2_CACHE_N_WAYS)         ; //Cache Ways Width
-	parameter L2_CACHE_FRONTEND_NBYTES = L2_CACHE_FRONTEND_DATA_W/8      ; //Number of Bytes per Word
-	parameter L2_CACHE_FRONTEND_BYTE_W = $clog2(L2_CACHE_FRONTEND_NBYTES); //Byte Offset
-/*---------------------------------------------------*/
-//Higher hierarchy memory (slave) interface parameters
-	parameter L2_CACHE_BACKEND_ADDR_W = M_AXI_MEMORY_ADDR_WIDTH        ; //Address width of the higher hierarchy memory
-	parameter L2_CACHE_BACKEND_DATA_W = M_AXI_MEMORY_DATA_WIDTH_BITS   ; //Data width of the memory
-	parameter L2_CACHE_BACKEND_NBYTES = L2_CACHE_BACKEND_DATA_W/8      ; //Number of bytes
-	parameter L2_CACHE_BACKEND_BYTE_W = $clog2(L2_CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
-//Cache-Memory base Offset
-	parameter L2_CACHE_WORD_OFF_W = $clog2(L2_CACHE_BACKEND_DATA_W/L2_CACHE_FRONTEND_DATA_W)+1                  ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-	parameter L2_CACHE_LINE2MEM_W = L2_CACHE_WORD_OFF_W-$clog2(L2_CACHE_BACKEND_DATA_W/L2_CACHE_FRONTEND_DATA_W); //Logarithm Ratio between the size of the cache-line and the BACKEND's data width
-/*---------------------------------------------------*/
-//Write Policy
-	parameter L2_CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
-	// parameter L2_CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
-//Controller's options
-	parameter L2_CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-	parameter L2_CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
+	parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
+	parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
 /*---------------------------------------------------*/
 //AXI specific parameters
-	parameter                      CACHE_AXI_ADDR_W  = L2_CACHE_BACKEND_ADDR_W;
-	parameter                      CACHE_AXI_DATA_W  = L2_CACHE_BACKEND_DATA_W;
+	parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W;
+	parameter                      CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W;
 	parameter                      CACHE_AXI_ID_W    = M_AXI_MEMORY_ID_WIDTH  ; //AXI ID (identification) width
 	parameter                      CACHE_AXI_LEN_W   = M_AXI_MEMORY_LEN_W     ; //AXI ID burst length (log2)
 	parameter                      CACHE_AXI_LOCK_W  = M_AXI_MEMORY_LOCK_W    ;
