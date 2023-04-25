@@ -37,18 +37,22 @@ module kernel_cache #(
   input  AXI4MasterReadInterfaceInput   m_axi_read_in            ,
   output AXI4MasterReadInterfaceOutput  m_axi_read_out           ,
   input  AXI4MasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out
+  output AXI4MasterWriteInterfaceOutput m_axi_write_out          ,
+  output logic                          fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
-// Wires and Variables
+// Module Wires and Variables
 // --------------------------------------------------------------------------------------
-// AXI write master stage
+//
   logic areset_m_axi   ;
   logic areset_fifo    ;
   logic areset_arbiter ;
   logic areset_setup   ;
   logic areset_L2_cache;
+
+  CacheRequest  kernel_cache_request_reg ;
+  CacheResponse kernel_cache_response_reg;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -88,6 +92,43 @@ module kernel_cache #(
     areset_fifo    <= areset;
     areset_arbiter <= areset;
     areset_setup   <= areset;
+  end
+
+// --------------------------------------------------------------------------------------
+// Drive input
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (areset_control) begin
+      kernel_cache_request_reg.valid <= 1'b0;
+    end
+    else begin
+      kernel_cache_request_reg.valid <= kernel_cache_request_in.valid;
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    kernel_cache_request_reg.payload <= kernel_cache_request_in.payload;
+  end
+// --------------------------------------------------------------------------------------
+// Drive output
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if (areset_control) begin
+      fifo_setup_signal               <= 1'b1;
+      fifo_request_signals_out        <= 0;
+      fifo_response_signals_out       <= 0;
+      kernel_cache_response_out.valid <= 1'b0;
+    end
+    else begin
+      fifo_setup_signal               <= fifo_request_setup_signal | fifo_response_setup_signal;
+      fifo_request_signals_out        <= fifo_request_signals_reg;
+      fifo_response_signals_out       <= fifo_response_signals_reg;
+      kernel_cache_response_out.valid <= kernel_cache_response_reg.valid;
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    kernel_cache_response_out.payload <= kernel_cache_response_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -201,6 +242,9 @@ module kernel_cache #(
   FIFOStateSignalsOutput fifo_request_signals_out_reg;
   FIFOStateSignalsInput  fifo_request_signals_in_reg ;
 
+  assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+  fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
+
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
@@ -232,6 +276,10 @@ module kernel_cache #(
   CacheResponsePayload   fifo_response_dout           ;
   FIFOStateSignalsOutput fifo_response_signals_out_reg;
   FIFOStateSignalsInput  fifo_response_signals_in_reg ;
+
+
+  assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+  fifo_request_signals_in_reg.wr_en = fifo_response_din.valid;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
