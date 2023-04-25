@@ -110,7 +110,7 @@ module cache_generator_response #(
   assign mem_resp_reg[1].payload = 0;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache response out fifo_814x16_CacheResponse
+// FIFO cache response out fifo CacheResponse
 // --------------------------------------------------------------------------------------
   assign fifo_response_din.valid        = cache_resp_reg.valid;
   assign fifo_response_din.payload.iob  = cache_resp_reg.payload.iob;

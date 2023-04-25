@@ -13,10 +13,11 @@
 // -----------------------------------------------------------------------------
 
 module xpm_fifo_sync_wrapper #(
-  parameter FIFO_WRITE_DEPTH = 16,
-  parameter WRITE_DATA_WIDTH = 32,
-  parameter READ_DATA_WIDTH  = 32,
-  parameter PROG_THRESH      = 6
+  parameter FIFO_WRITE_DEPTH = 16   ,
+  parameter WRITE_DATA_WIDTH = 32   ,
+  parameter READ_DATA_WIDTH  = 32   ,
+  parameter PROG_THRESH      = 6    ,
+  parameter READ_MODE        = "std"
 ) (
   input  logic                        clk         ,
   input  logic                        srst        ,
@@ -46,7 +47,7 @@ module xpm_fifo_sync_wrapper #(
     .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
     .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
     .USE_ADV_FEATURES   ("1A0A"                        ), //string; "0000" to "1F1F";
-    .READ_MODE          ("std"                         ), //string; "std" or "fwft";
+    .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
     .FIFO_READ_LATENCY  (1                             ), //positive integer;
     .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
     .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
