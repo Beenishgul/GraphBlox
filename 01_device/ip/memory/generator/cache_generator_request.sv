@@ -293,7 +293,7 @@ module cache_generator_request #(
   assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
   assign fifo_request_dout.valid           = fifo_request_signals_out_reg.valid;
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in fifo_942x16_CacheRequest
+// FIFO cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(256                       ),
