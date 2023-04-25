@@ -173,7 +173,6 @@ typedef struct packed {
 
 typedef struct packed {
   CacheRequestIOB  iob ;
-  CacheControlIOB  ctrl;
   MemoryPacketMeta meta;
 } CacheRequestPayload;
 
@@ -192,7 +191,6 @@ typedef struct packed {
 
 typedef struct packed {
   CacheResponseIOB iob ;
-  CacheControlIOB  ctrl;
   MemoryPacketMeta meta;
 } CacheResponsePayload;
 
