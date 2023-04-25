@@ -41,13 +41,13 @@ module kernel_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic areset_m_axi   ;
-  logic areset_control ;
-  logic areset_fifo    ;
-  logic areset_arbiter ;
-  logic areset_setup   ;
-  logic areset_cache;
-  logic areset_cache;
+  logic areset_m_axi  ;
+  logic areset_control;
+  logic areset_fifo   ;
+  logic areset_arbiter;
+  logic areset_setup  ;
+  logic areset_cache  ;
+  logic areset_cache  ;
 
   logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
   logic [  VERTEX_DATA_BITS-1:0] counter       ;
@@ -76,7 +76,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  CacheResponse          cache_response_out                                              ;
+  CacheResponse          cache_response_out                                                 ;
   FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
   FIFOStateSignalsInput  cache_fifo_response_signals_in                                     ;
   MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0];
@@ -126,13 +126,11 @@ module kernel_cu #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi    <= areset;
-    areset_control  <= areset;
-    areset_cache <= areset;
-    areset_cache <= areset;
-    areset_fifo     <= areset;
-    areset_arbiter  <= areset;
-    areset_setup    <= areset;
+    areset_m_axi   <= areset;
+    areset_control <= areset;
+    areset_fifo    <= areset;
+    areset_arbiter <= areset;
+    areset_setup   <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -243,54 +241,6 @@ module kernel_cu #(
   );
 
 // --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_m_axi) begin
-      m_axi_write.in <= 0;
-    end
-    else begin
-      m_axi_write.in <= m_axi_write_in;
-    end
-  end
-
-// --------------------------------------------------------------------------------------
-// READ AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_m_axi) begin
-      m_axi_read.in <= 0;
-    end
-    else begin
-      m_axi_read.in <= m_axi_read_in;
-    end
-  end
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_m_axi) begin
-      m_axi_write_out <= 0;
-    end
-    else begin
-      m_axi_write_out <= m_axi_write.out;
-    end
-  end
-
-// --------------------------------------------------------------------------------------
-// READ AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_m_axi) begin
-      m_axi_read_out <= 0;
-    end
-    else begin
-      m_axi_read_out <= m_axi_read.out;
-    end
-  end
-
-// --------------------------------------------------------------------------------------
 // READ Descriptor Control
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -324,184 +274,13 @@ module kernel_cu #(
     kernel_setup_descriptor.payload <= descriptor_out_reg.payload;
     vertex_cu_descriptor.payload    <= descriptor_out_reg.payload;
   end
-// --------------------------------------------------------------------------------------
-// Cache L1 <-> L2 Pipeline logic
-// --------------------------------------------------------------------------------------
-  localparam DEPTH = 8;
-
-  CacheRequestIOB   cache_request_S      [0:DEPTH-1];
-  CacheResponseIOB  cache_response_S     [0:DEPTH-1];
-  logic [DEPTH-1:0] cache_request_pending           ;
-
-  assign cache_request_S[0].addr  = cache_request_mem.addr ;
-  assign cache_request_S[0].wdata = cache_request_mem.wdata;
-  assign cache_request_S[0].wstrb = cache_request_mem.wstrb;
-  assign cache_request_S[0].valid = cache_request_mem.valid & ~(|cache_request_pending);
-
-  assign cache_response_S[0]      = cache_response_mem;
-  assign cache_request_pending[0] = cache_response_S[0].ready;
-
-  always_ff @(posedge ap_clk ) begin
-    if (areset_setup) begin
-      for (int i = 0; i < DEPTH; i++) begin
-        cache_request_S[i].valid <= 0;
-        cache_request_pending[i] <= 0;
-      end
-    end
-    else begin
-      for (int i = 1; i < DEPTH; i++) begin
-        if(|cache_request_pending) begin
-          cache_request_S[i].valid <= 0;
-          cache_request_pending[i] <= cache_request_pending[i-1];
-        end else begin
-          cache_request_S[i].valid <= cache_request_S[i-1].valid & ~(|cache_request_pending);
-          cache_request_pending[i] <= 0;
-        end
-      end
-    end
-  end
-
-  always_ff @(posedge ap_clk ) begin
-    for (int i = 1; i < DEPTH; i++) begin
-      cache_request_S[i].addr <= cache_request_S[i-1].addr;
-      cache_request_S[i].wdata<= cache_request_S[i-1].wdata;
-      cache_request_S[i].wstrb<= cache_request_S[i-1].wstrb;
-      cache_response_S[i] <= cache_response_S[i-1];
-    end
-  end
-
-  assign cache_request_end.addr  = cache_request_S[DEPTH-1].addr;
-  assign cache_request_end.wdata = cache_request_S[DEPTH-1].wdata;
-  assign cache_request_end.wstrb = cache_request_S[DEPTH-1].wstrb;
-  assign cache_request_end.valid = cache_request_S[DEPTH-1].valid & ~(|cache_request_pending);
-
-// --------------------------------------------------------------------------------------
-// AXI port cache L1
-// --------------------------------------------------------------------------------------
-  assign cache_ctrl_in.force_inv = 1'b0;
-  assign cache_ctrl_in.wtb_empty = cache_ctrl_out.wtb_empty;
-
-  iob_cache #(
-    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
-    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
-    .CACHE_N_WAYS         (CACHE_N_WAYS         ),
-    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W     ),
-    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
-    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W  ),
-    .CACHE_REP_POLICY     (CACHE_REP_POLICY     ),
-    .CACHE_NWAY_W         (CACHE_NWAY_W         ),
-    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES),
-    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W),
-    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
-    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W ),
-    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES ),
-    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W ),
-    .CACHE_LINE2MEM_W     (CACHE_LINE2MEM_W     ),
-    .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
-    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     ),
-    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       )
-  ) inst_cache_native (
-    .ap_clk       (ap_clk                                 ),
-    .reset        (areset_cache                        ),
-    .valid        (cache_request_in.payload.iob.valid  ),
-    .addr         (cache_request_in.payload.iob.addr   ),
-    .wdata        (cache_request_in.payload.iob.wdata  ),
-    .wstrb        (cache_request_in.payload.iob.wstrb  ),
-    .rdata        (cache_response_out.payload.iob.rdata),
-    .ready        (cache_response_out.payload.iob.ready),
-    `ifdef CTRL_IO
-    .force_inv_in (cache_ctrl_in.force_inv             ), // force 0
-    .force_inv_out(cache_ctrl_out.force_inv            ),
-    .wtb_empty_in (cache_ctrl_in.wtb_empty             ),
-    .wtb_empty_out(cache_ctrl_out.wtb_empty            ), // floating Z
-    `endif
-    .mem_valid    (cache_request_mem.valid             ),
-    .mem_addr     (cache_request_mem.addr              ),
-    .mem_wdata    (cache_request_mem.wdata             ),
-    .mem_wstrb    (cache_request_mem.wstrb             ),
-    .mem_rdata    (cache_response_S[DEPTH-1].rdata     ),
-    .mem_ready    (cache_response_S[DEPTH-1].ready     )
-  );
-
-// --------------------------------------------------------------------------------------
-// AXI port cache L2
-// --------------------------------------------------------------------------------------
-
-  logic invalidate     = cache_ctrl_out.force_inv;
-  logic invalidate_reg                              ;
-  logic l2_valid       = cache_request_mem.valid ;
-
-  assign cache_ctrl_in.force_inv = invalidate_reg & ~l2_valid;
-  assign cache_ctrl_in.wtb_empty = 1'b1;
-
-  always @(posedge ap_clk) begin
-    if (areset_cache)
-      invalidate_reg <= 1'b0;
-    else
-      if (invalidate)
-        invalidate_reg <= 1'b1;
-    else
-      if(~l2_valid)
-        invalidate_reg <= 1'b0;
-    else
-      invalidate_reg <= invalidate_reg;
-  end
-
-
-  iob_cache_axi #(
-    .CACHE_FRONTEND_ADDR_W(CACHE_BACKEND_ADDR_W),
-    .CACHE_FRONTEND_DATA_W(CACHE_BACKEND_DATA_W),
-    .CACHE_N_WAYS         (CACHE_N_WAYS        ),
-    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W    ),
-    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W    ),
-    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W ),
-    .CACHE_REP_POLICY     (CACHE_REP_POLICY    ),
-    .CACHE_NWAY_W         (CACHE_NWAY_W        ),
-    .CACHE_FRONTEND_NBYTES(CACHE_BACKEND_NBYTES),
-    .CACHE_FRONTEND_BYTE_W(CACHE_BACKEND_BYTE_W),
-    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W),
-    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W),
-    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES),
-    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W),
-    .CACHE_LINE2MEM_W     (CACHE_LINE2MEM_W    ),
-    .CACHE_WRITE_POL      (CACHE_WRITE_POL     ),
-    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE    ),
-    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT      ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W       ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W       ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W         ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W        ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID           ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W       ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W      ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W       ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W        ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W      ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W       )
-  ) inst_cache_axi (
-    .valid        (cache_request_S[DEPTH-1].valid),
-    .addr         (cache_request_S[DEPTH-1].addr ),
-    .wdata        (cache_request_S[DEPTH-1].wdata),
-    .wstrb        (cache_request_S[DEPTH-1].wstrb),
-    .rdata        (cache_response_mem.rdata      ),
-    .ready        (cache_response_mem.ready      ),
-    `ifdef CTRL_IO
-    .force_inv_in (cache_ctrl_in.force_inv       ),
-    .force_inv_out(cache_ctrl_out.force_inv      ), // floating
-    .wtb_empty_in (cache_ctrl_in.wtb_empty       ),
-    .wtb_empty_out(cache_ctrl_out.wtb_empty      ),
-    `endif
-    `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk                           ),
-    .reset        (areset_cache                  )
-  );
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
-  assign cache_response_out.valid            = cache_response_out.payload.iob.ready;
-  assign cache_response_out.payload.meta     = cache_request_in.payload.meta;
-  assign cache_fifo_response_signals_in.rd_en   = ~cache_fifo_response_signals_out.empty;
+  assign cache_response_out.valid             = cache_response_out.payload.iob.ready;
+  assign cache_response_out.payload.meta      = cache_request_in.payload.meta;
+  assign cache_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.empty;
 
   cache_generator_response #(
     .NUM_GRAPH_CLUSTERS  (NUM_GRAPH_CLUSTERS  ),
@@ -511,7 +290,7 @@ module kernel_cu #(
     .ap_clk                   (ap_clk                                    ),
     .areset                   (areset                                    ),
     .memory_response_out      (memory_response_out                       ),
-    .cache_resp_in            (cache_response_out                     ),
+    .cache_resp_in            (cache_response_out                        ),
     .fifo_response_signals_in (cache_fifo_response_signals_in            ),
     .fifo_response_signals_out(cache_fifo_response_signals_out           ),
     .fifo_setup_signal        (cache_generator_response_fifo_setup_signal)
@@ -524,7 +303,6 @@ module kernel_cu #(
     cache_request_in                   = cache_request_out;
     cache_request_in.payload.iob.valid = cache_request_out.valid & ~cache_response_out.valid;
   end
-
 
   assign cache_memory_request_in[0] = kernel_setup_memory_request_out;
   assign cache_memory_request_in[1] = vertex_cu_memory_request_out;
@@ -545,7 +323,6 @@ module kernel_cu #(
     .arbiter_request_in      (cache_arbiter_request_in                 ),
     .arbiter_grant_out       (cache_arbiter_grant_out                  ),
     .cache_request_out       (cache_request_out                        ),
-    .cache_response_ready    (cache_response_ready                     ),
     .fifo_request_signals_in (cache_fifo_request_signals_in            ),
     .fifo_request_signals_out(cache_fifo_request_signals_out           ),
     .fifo_setup_signal       (cache_generator_request_fifo_setup_signal)

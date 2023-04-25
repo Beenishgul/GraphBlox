@@ -32,7 +32,6 @@ module cache_generator_request #(
   input  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request_in                          ,
   output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                           ,
   output CacheRequest                     cache_request_out                           ,
-  input  logic                            cache_response_ready                        ,
   input  FIFOStateSignalsInput            fifo_request_signals_in                     ,
   output FIFOStateSignalsOutput           fifo_request_signals_out                    ,
   output logic                            fifo_setup_signal
@@ -52,9 +51,7 @@ module cache_generator_request #(
   logic        memory_response_valid_reg                          ;
   MemoryPacket memory_request_reg       [NUM_MEMORY_REQUESTOR-1:0];
 
-  CacheRequest cache_request_reg_S0;
-  CacheRequest cache_request_reg_S1;
-  CacheRequest cache_request_reg_S2;
+  CacheRequest cache_request_reg;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
@@ -82,12 +79,6 @@ module cache_generator_request #(
   logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request    ;
   logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request_reg;
   logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_bus_valid  ;
-
-// --------------------------------------------------------------------------------------
-//   Setup state machine signals
-// --------------------------------------------------------------------------------------
-  cache_generator_request_state current_state;
-  cache_generator_request_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -148,153 +139,12 @@ module cache_generator_request #(
   end
 
 // --------------------------------------------------------------------------------------
-// Cache Request state machine
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if(areset_control)
-      current_state <= CACHE_REQUEST_GEN_RESET;
-    else begin
-      current_state <= next_state;
-    end
-  end // always_ff @(posedge ap_clk)
-
-  always_comb begin
-    next_state = current_state;
-    case (current_state)
-      CACHE_REQUEST_GEN_RESET : begin
-        next_state = CACHE_REQUEST_GEN_IDLE;
-      end
-      CACHE_REQUEST_GEN_IDLE : begin
-        next_state = CACHE_REQUEST_GEN_SEND_S1;
-      end
-      CACHE_REQUEST_GEN_SEND_S1 : begin
-        if(~counter_stall & ~fifo_request_signals_out_reg.empty & fifo_request_signals_in.rd_en)
-          next_state = CACHE_REQUEST_GEN_SEND_S2;
-        else
-          next_state = CACHE_REQUEST_GEN_SEND_S1;
-      end
-      CACHE_REQUEST_GEN_SEND_S2 : begin
-        if(fifo_request_dout.valid)
-          next_state = CACHE_REQUEST_GEN_BUSY;
-        else
-          next_state = CACHE_REQUEST_GEN_SEND_S2;
-      end
-      CACHE_REQUEST_GEN_BUSY : begin
-        if(~cache_request_reg_S1.valid)
-          next_state = CACHE_REQUEST_GEN_SEND_S1;
-        else
-          next_state = CACHE_REQUEST_GEN_BUSY;
-      end
-    endcase
-  end // always_comb
-
-  always_ff @(posedge ap_clk) begin
-    case (current_state)
-      CACHE_REQUEST_GEN_RESET : begin
-        fifo_request_signals_in_reg.rd_en <= 1'b0;
-        cache_request_reg_S0.valid        <= 1'b0;
-      end
-      CACHE_REQUEST_GEN_IDLE : begin
-        fifo_request_signals_in_reg.rd_en <= 1'b0;
-        cache_request_reg_S0.valid        <= 1'b0;
-      end
-      CACHE_REQUEST_GEN_SEND_S1 : begin
-        fifo_request_signals_in_reg.rd_en <= ~counter_stall & ~fifo_request_signals_out_reg.empty & fifo_request_signals_in.rd_en;
-        cache_request_reg_S0.valid        <= 1'b0;
-      end
-      CACHE_REQUEST_GEN_SEND_S2 : begin
-        fifo_request_signals_in_reg.rd_en <= 1'b0;
-        cache_request_reg_S0.valid        <= fifo_request_dout.valid;
-      end
-      CACHE_REQUEST_GEN_BUSY : begin
-        fifo_request_signals_in_reg.rd_en <= 1'b0;
-
-        if(fifo_request_dout.valid) begin
-          cache_request_reg_S0.valid <= 1'b1;
-        end else if(cache_request_reg_S1.valid) begin
-          cache_request_reg_S0.valid <= cache_request_reg_S0.valid;
-        end else begin
-          cache_request_reg_S0.valid <= 1'b0;
-        end
-      end
-    endcase
-  end // always_ff @(posedge ap_clk)
-
-// --------------------------------------------------------------------------------------
-// Drive instructions and latch if no change
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      cache_request_reg_S0.payload <= 0;
-    end
-    else begin
-      if(fifo_request_dout.valid) begin
-        cache_request_reg_S0.payload <= fifo_request_dout.payload;
-      end else if(cache_request_reg_S1.valid) begin
-        cache_request_reg_S0.payload <= cache_request_reg_S0.payload;
-      end else begin
-        cache_request_reg_S0.payload <= 0;
-      end
-    end
-  end
-
-// --------------------------------------------------------------------------------------
-// Back to back cache requests when ready logic
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      cache_request_reg_S1 <= 0;
-    end
-    else begin
-      if(~cache_request_reg_S1.valid)begin
-        cache_request_reg_S1 <= cache_request_reg_S0;
-      end else if(cache_request_reg_S2.valid) begin
-        cache_request_reg_S1 <= cache_request_reg_S1;
-      end else begin
-        cache_request_reg_S1 <= 0;
-      end
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      cache_request_reg_S2 <= 0;
-    end
-    else begin
-      if(~cache_request_reg_S2.valid)begin
-        cache_request_reg_S2 <= cache_request_reg_S1;
-      end else if(cache_request_out.valid) begin
-        cache_request_reg_S2 <= cache_request_reg_S2;
-      end else begin
-        cache_request_reg_S2 <= 0;
-      end
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      cache_request_out <= 0;
-    end
-    else begin
-      if(~cache_request_out.valid)begin
-        cache_request_out <= cache_request_reg_S2;
-      end else if(~cache_response_ready) begin
-        cache_request_out <= cache_request_out;
-      end else begin
-        cache_request_out <= 0;
-      end
-    end
-  end
-
-// --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
   assign fifo_request_setup_signal         = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
   assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
   assign fifo_request_dout.valid           = fifo_request_signals_out_reg.valid;
-// --------------------------------------------------------------------------------------
-// FIFO cache requests in CacheRequest
-// --------------------------------------------------------------------------------------
+
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(256                       ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
@@ -349,8 +199,8 @@ module cache_generator_request #(
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
   always_comb begin
-    fifo_request_comb.valid             = 0;
-    fifo_request_comb.payload.iob.valid = 0;
+    fifo_request_comb.valid             = arbiter_bus_out.valid;
+    fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
     fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
 
     if(arbiter_bus_out.payload.meta.cmd_type == CMD_WRITE)
@@ -367,44 +217,12 @@ module cache_generator_request #(
       fifo_request_din.valid <= 0;
     end
     else begin
-      fifo_request_din.valid <= arbiter_bus_out.valid;
+      fifo_request_din.valid <= fifo_request_comb.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     fifo_request_din.payload <= fifo_request_comb.payload;
   end
-
-// --------------------------------------------------------------------------------------
-// Keep Track of outstanding transactions
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      counter_incr <= 0;
-      counter_decr <= 0;
-    end
-    else begin
-      counter_incr <= memory_response_valid_reg;
-      counter_decr <= fifo_request_dout.valid;
-    end
-  end
-
-  assign counter_stride = 1;
-
-  transactions_counter #(
-    .C_WIDTH(OUTSTANDING_COUNTER_WIDTH                            ),
-    .C_INIT (OUTSTANDING_COUNTER_MAX[0+:OUTSTANDING_COUNTER_WIDTH])
-  ) inst_transactions_counter (
-    .ap_clk      (ap_clk                           ),
-    .ap_clken    (1'b1                             ),
-    .areset      (areset_counter                   ),
-    .load        (1'b0                             ),
-    .incr        (counter_incr                     ),
-    .decr        (counter_decr                     ),
-    .load_value  ({OUTSTANDING_COUNTER_WIDTH{1'b0}}),
-    .stride_value(counter_stride                   ),
-    .count       (counter_count                    ),
-    .is_zero     (counter_stall                    )
-  );
 
 endmodule : cache_generator_request
