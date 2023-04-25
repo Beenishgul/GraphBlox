@@ -299,10 +299,10 @@ module kernel_cache #(
   ) inst_fifo_CacheResponse (
     .clk         (ap_clk                                    ),
     .srst        (areset_fifo                               ),
-    .din         (fifo_response_din.payload                 ),
+    .din         (fifo_response_din                         ),
     .wr_en       (fifo_response_signals_in_reg.wr_en        ),
     .rd_en       (fifo_response_signals_in_reg.rd_en        ),
-    .dout        (fifo_response_dout.payload                ),
+    .dout        (fifo_response_dout                        ),
     .full        (fifo_response_signals_out_reg.full        ),
     .almost_full (fifo_response_signals_out_reg.almost_full ),
     .empty       (fifo_response_signals_out_reg.empty       ),
