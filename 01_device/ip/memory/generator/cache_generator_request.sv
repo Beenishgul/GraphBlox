@@ -137,7 +137,7 @@ module cache_generator_request #(
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
       fifo_setup_signal        <= 1'b1;
-      fifo_request_signals_out <= 1'b0;
+      fifo_request_signals_out <= 0;
       arbiter_grant_out        <= 0;
     end
     else begin

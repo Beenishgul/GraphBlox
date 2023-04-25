@@ -142,7 +142,7 @@ module kernel_setup #(
             memory_request_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal        <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal |fifo_MemoryPacketResponse_kernel_setup_signal;
+            fifo_setup_signal        <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal | fifo_MemoryPacketResponse_kernel_setup_signal;
             memory_request_out.valid <= fifo_request_signals_out_reg.valid ;
         end
     end
