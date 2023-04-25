@@ -256,7 +256,8 @@ module kernel_cache #(
     .FIFO_WRITE_DEPTH(32                        ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
-    .PROG_THRESH     (8                         )
+    .PROG_THRESH     (8                         ),
+    .READ_MODE       ("fwft"                    )
   ) inst_fifo_CacheRequest (
     .clk         (ap_clk                                   ),
     .srst        (areset_fifo                              ),
