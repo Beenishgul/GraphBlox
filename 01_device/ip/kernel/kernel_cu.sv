@@ -26,15 +26,13 @@ module kernel_cu #(
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                          ap_clk         ,
-  input  logic                          areset         ,
-  input  ControlChainInterfaceInput     control_in     ,
-  output ControlChainInterfaceOutput    control_out    ,
-  input  DescriptorInterface            descriptor     ,
-  input  AXI4MasterReadInterfaceInput   m_axi_read_in  ,
-  output AXI4MasterReadInterfaceOutput  m_axi_read_out ,
-  input  AXI4MasterWriteInterfaceInput  m_axi_write_in ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out
+  input  logic                       ap_clk               ,
+  input  logic                       areset               ,
+  input  ControlChainInterfaceInput  control_in           ,
+  output ControlChainInterfaceOutput control_out          ,
+  input  DescriptorInterface         descriptor           ,
+  output CacheRequest                kernel_cu_request out,
+  input  CacheResponse               kernel_cu_response_in
 );
 
 // --------------------------------------------------------------------------------------
@@ -53,8 +51,6 @@ module kernel_cu #(
   logic [  VERTEX_DATA_BITS-1:0] counter       ;
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state;
 
-  AXI4MasterReadInterface  m_axi_read ;
-  AXI4MasterWriteInterface m_axi_write;
 
   ControlChainInterfaceInput  control_in_reg    ;
   ControlChainInterfaceOutput control_out_reg   ;
@@ -65,14 +61,7 @@ module kernel_cu #(
 //   Cache signals
 // --------------------------------------------------------------------------------------
   CacheRequest         cache_request_in ;
-  CacheRequestIOB      cache_request_mem;
-  CacheRequestIOB      cache_request_end;
-  CacheControlIOBInput cache_ctrl_in    ;
-  CacheControlIOBInput cache_ctrl_out   ;
 
-  CacheResponseIOB      cache_response_mem;
-  CacheControlIOBOutput cache_ctrl_in     ;
-  CacheControlIOBOutput cache_ctrl_out    ;
 // --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
@@ -92,7 +81,6 @@ module kernel_cu #(
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_grant_out                                             ;
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_request_in                                            ;
   logic                            cache_response_ready                                                ;
-  logic                            cache_request_out_valid                                             ;
   logic                            cache_generator_response_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
