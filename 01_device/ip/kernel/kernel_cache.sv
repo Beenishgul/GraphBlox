@@ -29,7 +29,11 @@ module kernel_cache #(
   input  logic                          ap_clk                   ,
   input  logic                          areset                   ,
   input  CacheRequest                   kernel_cache_request_in  ,
+  output FIFOStateSignalsOutput         fifo_request_signals_out ,
+  input  FIFOStateSignalsInput          fifo_request_signals_in  ,
   output CacheResponse                  kernel_cache_response_out,
+  output FIFOStateSignalsOutput         fifo_response_signals_out,
+  input  FIFOStateSignalsInput          fifo_response_signals_in ,
   input  AXI4MasterReadInterfaceInput   m_axi_read_in            ,
   output AXI4MasterReadInterfaceOutput  m_axi_read_out           ,
   input  AXI4MasterWriteInterfaceInput  m_axi_write_in           ,
@@ -59,51 +63,22 @@ module kernel_cache #(
   CacheResponseIOB      L2_cache_response_mem;
   CacheControlIOBOutput L2_cache_ctrl_in     ;
   CacheControlIOBOutput L2_cache_ctrl_out    ;
-// --------------------------------------------------------------------------------------
-// Cache response generator
-// --------------------------------------------------------------------------------------
-  FIFOStateSignalsOutput cache_fifo_response_signals_out                                    ;
-  FIFOStateSignalsInput  cache_fifo_response_signals_in                                     ;
-  MemoryPacket           memory_response_out                      [NUM_MEMORY_REQUESTOR-1:0];
-  logic                  cache_generator_request_fifo_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
-// Cache request generator
+// Cache response FIFO
 // --------------------------------------------------------------------------------------
-  CacheRequest                     cache_request_out                                                   ;
-  FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
-  FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
-  MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
-  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_grant_out                                             ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_request_in                                            ;
-  logic                            cache_response_ready                                                ;
-  logic                            cache_generator_response_fifo_setup_signal                          ;
+  CacheResponsePayload   fifo_response_din            ;
+  CacheResponsePayload   fifo_response_dout           ;
+  FIFOStateSignalsOutput fifo_response_signals_out_reg;
+  FIFOStateSignalsInput  fifo_response_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
-// Signals setup and configuration reading
+// Cache request FIFO
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput kernel_setup_control_state            ;
-  DescriptorInterface         kernel_setup_descriptor               ;
-  MemoryPacket                kernel_setup_memory_response_in       ;
-  FIFOStateSignalsOutput      kernel_setup_fifo_response_signals_out;
-  FIFOStateSignalsInput       kernel_setup_fifo_response_signals_in ;
-  MemoryPacket                kernel_setup_memory_request_out       ;
-  FIFOStateSignalsOutput      kernel_setup_fifo_request_signals_out ;
-  FIFOStateSignalsInput       kernel_setup_fifo_request_signals_in  ;
-  logic                       kernel_setup_fifo_setup_signal        ;
-
-// --------------------------------------------------------------------------------------
-// Signals for Vertex CU
-// --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput vertex_cu_control_state            ;
-  DescriptorInterface         vertex_cu_descriptor               ;
-  MemoryPacket                vertex_cu_memory_response_in       ;
-  FIFOStateSignalsOutput      vertex_cu_fifo_response_signals_out;
-  FIFOStateSignalsInput       vertex_cu_fifo_response_signals_in ;
-  MemoryPacket                vertex_cu_memory_request_out       ;
-  FIFOStateSignalsOutput      vertex_cu_fifo_request_signals_out ;
-  FIFOStateSignalsInput       vertex_cu_fifo_request_signals_in  ;
-  logic                       vertex_cu_fifo_setup_signal        ;
+  CacheResponsePayload   fifo_request_din            ;
+  CacheResponsePayload   fifo_request_dout           ;
+  FIFOStateSignalsOutput fifo_request_signals_out_reg;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -166,27 +141,8 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // AXI port cache
 // --------------------------------------------------------------------------------------
-
-  logic invalidate     = L1_cache_ctrl_out.force_inv;
-  logic invalidate_reg                              ;
-  logic l2_valid       = L1_cache_request_end.valid ;
-
-  assign L2_cache_ctrl_in.force_inv = invalidate_reg & ~l2_valid;
+  assign L2_cache_ctrl_in.force_inv = 1'b0;
   assign L2_cache_ctrl_in.wtb_empty = 1'b1;
-
-  always @(posedge ap_clk) begin
-    if (areset_L2_cache)
-      invalidate_reg <= 1'b0;
-    else
-      if (invalidate)
-        invalidate_reg <= 1'b1;
-    else
-      if(~l2_valid)
-        invalidate_reg <= 1'b0;
-    else
-      invalidate_reg <= invalidate_reg;
-  end
-
 
   iob_cache_axi #(
     .CACHE_FRONTEND_ADDR_W(L2_CACHE_FRONTEND_ADDR_W),
@@ -240,17 +196,10 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  always_comb begin
-    L1_cache_request_in                   = cache_request_out;
-    L1_cache_request_in.payload.iob.valid = cache_request_out.valid & ~L1_cache_response_out.valid;
-  end
-
-  assign cache_memory_request_in[0] = kernel_setup_memory_request_out;
-  assign cache_memory_request_in[1] = vertex_cu_memory_request_out;
-
-  assign cache_response_ready = L1_cache_response_out.payload.iob.ready;
-  // assign cache_request_out.payload.iob.valid = cache_request_out.payload.iob.valid | (cache_request_out.valid & ~L1_cache_response_out.valid);
-  assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
+  CacheResponsePayload   fifo_request_din            ;
+  CacheResponsePayload   fifo_request_dout           ;
+  FIFOStateSignalsOutput fifo_request_signals_out_reg;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg ;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -279,11 +228,10 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-  assign L1_cache_response_out.valid            = L1_cache_response_out.payload.iob.ready;
-  assign L1_cache_response_out.payload.meta     = L1_cache_request_in.payload.meta;
-  assign L1_cache_response_out.payload.ctrl.out = L1_cache_ctrl_out;
-  assign L1_cache_response_out.payload.ctrl.in  = L1_cache_ctrl_in;
-  assign cache_fifo_response_signals_in.rd_en   = ~cache_fifo_response_signals_out.empty;
+  CacheResponsePayload   fifo_response_din            ;
+  CacheResponsePayload   fifo_response_dout           ;
+  FIFOStateSignalsOutput fifo_response_signals_out_reg;
+  FIFOStateSignalsInput  fifo_response_signals_in_reg ;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
