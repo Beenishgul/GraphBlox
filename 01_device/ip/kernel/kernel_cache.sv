@@ -184,12 +184,6 @@ module kernel_cache #(
   assign cache_ctrl_in.force_inv = 1'b0;
   assign cache_ctrl_in.wtb_empty = 1'b1;
 
-  assign cache_request_mem.iob.valid = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
-  assign cache_request_mem.iob.addr  = fifo_request_dout.iob.addr;
-  assign cache_request_mem.iob.wdata = fifo_request_dout.iob.wdata;
-  assign cache_request_mem.iob.wstrb = fifo_request_dout.iob.wstrb;
-  assign cache_request_mem.meta      = fifo_request_dout.meta;
-
   iob_cache_axi #(
     .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
@@ -241,11 +235,21 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  assign fifo_request_setup_signal         = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
-  assign fifo_request_signals_in_reg.wr_en = kernel_cache_request_reg.valid;
-  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready;
+  // FIFO is reseting
+  assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
 
-  assign fifo_request_din = kernel_cache_request_reg.payload;
+  // Push
+  assign fifo_request_signals_in_reg.wr_en = kernel_cache_request_reg.valid;
+  assign fifo_request_din.iob              = kernel_cache_request_reg.iob;
+  assign fifo_request_din.meta             = kernel_cache_request_reg.meta;
+
+  // Pop
+  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready;
+  assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
+  assign cache_request_mem.iob.addr        = fifo_request_dout.iob.addr;
+  assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
+  assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
+  assign cache_request_mem.meta            = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -274,15 +278,18 @@ module kernel_cache #(
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-  assign fifo_response_setup_signal         = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+  // FIFO is reseting
+  assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+
+  // Push
   assign fifo_response_signals_in_reg.wr_en = cache_response_mem.iob.ready;
+  assign fifo_response_din.iob              = cache_response_mem.iob;
+  assign fifo_response_din.meta             = cache_request_mem.meta;
+
+  // Pop
   assign fifo_response_signals_in_reg.rd_en = ~cache_fifo_response_signals_out.empty;
-
-  assign fifo_response_din.iob  = cache_response_mem.iob;
-  assign fifo_response_din.meta = cache_request_mem.meta;
-
-  assign kernel_cache_response_reg.valid   = fifo_response_signals_out_reg.valid;
-  assign kernel_cache_response_reg.payload = fifo_response_dout;
+  assign kernel_cache_response_reg.valid    = fifo_response_signals_out_reg.valid;
+  assign kernel_cache_response_reg.payload  = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
