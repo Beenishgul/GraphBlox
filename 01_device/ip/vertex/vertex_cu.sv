@@ -301,10 +301,10 @@ module vertex_cu #(
     assign fifo_response_dout.valid           = fifo_response_signals_out_reg.valid;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (4                         )
+        .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
@@ -331,10 +331,10 @@ module vertex_cu #(
     assign fifo_request_din                  = engine_serial_read_req;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (4                         )
+        .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),

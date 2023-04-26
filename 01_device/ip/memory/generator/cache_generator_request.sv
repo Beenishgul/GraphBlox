@@ -45,13 +45,13 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-  CacheRequestPayload    fifo_request_dout               ;
   CacheRequestPayload    fifo_request_din                ;
   CacheRequest           fifo_request_din_reg            ;
   CacheRequest           fifo_request_comb               ;
-  FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
+  CacheRequestPayload    fifo_request_dout               ;
   FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
   FIFOStateSignalsInput  fifo_request_signals_in_internal;
+  FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
   logic                  fifo_request_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
