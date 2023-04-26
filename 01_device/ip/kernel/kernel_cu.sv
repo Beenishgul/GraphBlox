@@ -118,8 +118,8 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      counter         <= 0;
       done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+      counter         <= 0;
     end
     else begin
       if (descriptor_in_reg.valid) begin
@@ -128,12 +128,7 @@ module kernel_cu #(
           counter         <= 0;
         end
         else begin
-          if(kernel_setup_response_in.valid) begin
-            counter <= counter + 4;
-          end
-          else begin
-            counter <= counter;
-          end
+          counter <= counter + 1;
         end
       end else begin
         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
