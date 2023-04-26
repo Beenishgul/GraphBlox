@@ -19,14 +19,14 @@ module demux_bus #(
 ) (
   input  logic                  ap_clk                      ,
   input  logic                  areset                      ,
-  input  logic [ SEL_WIDTH-1:0] sel_in                      ,
+  input  logic [ BUS_WIDTH-1:0] sel_in                      ,
   input  logic [DATA_WIDTH-1:0] data_in                     ,
   output logic [DATA_WIDTH-1:0] data_out [BUS_WIDTH-1]      ,
   output logic                  data_out_valid [BUS_WIDTH-1]
 );
 
   logic [DATA_WIDTH-1:0] data_in_internal                    ;
-  logic [ SEL_WIDTH-1:0] sel_in_internal                     ;
+  logic [ BUS_WIDTH-1:0] sel_in_internal                     ;
   logic [DATA_WIDTH-1:0] data_out_internal      [BUS_WIDTH-1];
   logic                  data_out_valid_internal[BUS_WIDTH-1];
   logic [DATA_WIDTH-1:0] data_out_reg           [BUS_WIDTH-1];
@@ -40,7 +40,7 @@ module demux_bus #(
   always_ff @(posedge ap_clk) begin
     if (areset) begin
       data_in_internal <= 0;
-      sel_in_internal  <= 0;
+      mux_sel          <= 0;
     end else begin
       data_in_internal <= data_in;
       sel_in_internal  <= sel_in;
@@ -71,7 +71,7 @@ module demux_bus #(
   // Use parallelization in the demux logic.
   generate
     for (genvar i = 0; i < BUS_WIDTH; i++) begin : generate_demux
-      assign data_out_valid_internal[i] = (sel_in_internal == i);
+      assign data_out_valid_internal[i] = (sel_in_internal == 1);
       assign data_out_internal[i]       = data_in_internal;
     end
   endgenerate
