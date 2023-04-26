@@ -52,13 +52,9 @@ module kernel_cu #(
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state              ;
   DescriptorInterface            descriptor_in_reg           ;
   CacheResponse                  response_in_reg             ;
+  CacheRequest                   request_out_reg             ;
   FIFOStateSignalsInput          fifo_response_signals_in_reg;
   FIFOStateSignalsInput          fifo_request_signals_in_reg ;
-
-// --------------------------------------------------------------------------------------
-//   Cache signals
-// --------------------------------------------------------------------------------------
-  CacheRequest cache_request_in;
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
@@ -78,7 +74,6 @@ module kernel_cu #(
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_request_in                                 ;
   logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_grant_out                                  ;
   CacheRequest                     cache_generator_request_out                                        ;
-  CacheRequest                     cache_generator_request_reg                                        ;
   logic                            cache_generator_fifo_request_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------

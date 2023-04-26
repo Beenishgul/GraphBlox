@@ -65,12 +65,16 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      response_in_reg              <= 0;
+      response_in_reg.valid        <= 0;
       fifo_response_signals_in_reg <= 0;
     end else begin
-      response_in_reg                    <= response_in;
+      response_in_reg.valid              <= response_in.valid;
       fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
     end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    response_in_reg.payload <= response_in.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -108,7 +112,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 
 // Might needs optimizing!!
   always_comb begin
-    case (fifo_response_dout_reg.meta.struct_type)
+    case (fifo_response_dout_reg.payload.meta.struct_type)
       STRUCT_KERNEL_SETUP : begin
         response_out_reg[0] = fifo_response_dout_reg;
         response_out_reg[1] = 0;
@@ -127,7 +131,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy  | fifo_response_signals_out_reg.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_internal.wr_en = fifo_response_din.valid;
+  assign fifo_response_signals_in_internal.wr_en = response_in_reg.valid;
   assign fifo_response_din.iob                   = response_in_reg.payload.iob;
   assign fifo_response_din.meta                  = response_in_reg.payload.meta;
 
