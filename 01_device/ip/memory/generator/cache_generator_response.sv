@@ -110,8 +110,19 @@ module cache_generator_response #(
     end
   endgenerate
 
-  assign response_out_reg[0] = fifo_response_dout_reg;
-  assign response_out_reg[1] = 0;
+// needs optimizing!!
+  always_comb begin
+    case (fifo_response_dout_reg.meta.struct_type)
+      STRUCT_KERNEL_SETUP : begin
+        response_out_reg[0] = fifo_response_dout_reg;
+        response_out_reg[1] = 0;
+      end
+      default : begin
+        response_out_reg[0] = 0;
+        response_out_reg[1] = fifo_response_dout_reg;
+      end
+    endcase
+  end
 
 // --------------------------------------------------------------------------------------
 // FIFO cache response out fifo CacheResponse
