@@ -21,7 +21,7 @@ import PKG_CACHE::*;
 
 module kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
-  parameter NUM_SETUP_MODULES    = 3              ,
+  parameter NUM_SETUP_MODULES    = 4              ,
   parameter NUM_MEMORY_REQUESTOR = 2              ,
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
@@ -69,14 +69,13 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-  CacheRequest                     cache_request_out                                                   ;
-  FIFOStateSignalsOutput           cache_fifo_request_signals_out                                      ;
-  FIFOStateSignalsInput            cache_fifo_request_signals_in                                       ;
-  MemoryPacket                     cache_memory_request_in                   [NUM_MEMORY_REQUESTOR-1:0];
-  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_grant_out                                             ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] cache_arbiter_request_in                                            ;
-  logic                            cache_response_ready                                                ;
-  logic                            cache_generator_response_fifo_setup_signal                          ;
+  MemoryPacket                     cache_generator_request_in               [NUM_MEMORY_REQUESTOR-1:0];
+  FIFOStateSignalsInput            cache_generator_fifo_request_signals_in                            ;
+  FIFOStateSignalsOutput           cache_generator_fifo_request_signals_out                           ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_request_in                                 ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_grant_out                                  ;
+  CacheRequest                     cache_generator_request_out                                        ;
+  logic                            cache_generator_fifo_request_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
@@ -116,7 +115,7 @@ module kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
-// Done Logic
+// Done Logic (DUMMY)
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
@@ -131,7 +130,6 @@ module kernel_cu #(
         end
         else begin
           if(kernel_setup_memory_response_in.valid) begin
-            // $display("counter: %d >= %d", counter, descriptor_in_reg.payload.auxiliary_2);
             counter <= counter + 4;
           end
           else begin
@@ -153,9 +151,10 @@ module kernel_cu #(
       cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
     end
     else begin
-      cu_setup_state[0] <= cache_generator_request_fifo_setup_signal;
-      cu_setup_state[1] <= cache_generator_response_fifo_setup_signal;
+      cu_setup_state[0] <= cache_generator_fifo_request_setup_signal;
+      cu_setup_state[1] <= cache_generator_fifo_response_setup_signal;
       cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
+      cu_setup_state[3] <= vertex_cu_fifo_setup_signal;
     end
   end
 
@@ -193,6 +192,48 @@ module kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
+// Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+// Arbiter Signals: Cache Request Generator
+// --------------------------------------------------------------------------------------
+  // kernel_setup
+  assign kernel_setup_memory_response_in            = memory_response_out[0];
+  assign kernel_setup_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[0];
+  assign cache_generator_request_in[0]              = kernel_setup_memory_request_out;
+  assign cache_arbiter_request_in[0]                = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
+
+  // vertex_cu
+  assign vertex_cu_memory_response_in            = memory_response_out[1];
+  assign vertex_cu_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[1];
+  assign cache_generator_request_in[1]           = vertex_cu_memory_request_out;
+  assign cache_arbiter_request_in[1]             = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+
+// --------------------------------------------------------------------------------------
+// Cache request generator
+// --------------------------------------------------------------------------------------
+  always_comb begin
+    cache_request_in                   = cache_generator_request_out;
+    cache_request_in.payload.iob.valid = cache_generator_request_out.valid & ~cache_response_out.valid;
+  end
+
+  // assign cache_generator_request_out.payload.iob.valid = cache_generator_request_out.payload.iob.valid | (cache_generator_request_out.valid & ~cache_response_out.valid);
+  assign cache_generator_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
+
+  cache_generator_request #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_request (
+    .ap_clk                  (ap_clk                                   ),
+    .areset                  (areset_generator                         ),
+    .request_in              (cache_generator_request_in               ),
+    .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
+    .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
+    .arbiter_request_in      (cache_generator_arbiter_request_in       ),
+    .arbiter_grant_out       (cache_generator_arbiter_grant_out        ),
+    .request_out             (cache_generator_request_out              ),
+    .fifo_setup_signal       (cache_generator_fifo_request_setup_signal)
+  );
+
+// --------------------------------------------------------------------------------------
 // Cache response generator
 // --------------------------------------------------------------------------------------
   assign cache_response_out.valid             = cache_response_out.payload.iob.ready;
@@ -210,52 +251,27 @@ module kernel_cu #(
     .cache_resp_in            (cache_response_out                        ),
     .fifo_response_signals_in (cache_fifo_response_signals_in            ),
     .fifo_response_signals_out(cache_fifo_response_signals_out           ),
-    .fifo_setup_signal        (cache_generator_response_fifo_setup_signal)
+    .fifo_setup_signal        (cache_generator_fifo_response_setup_signal)
   );
 
-// --------------------------------------------------------------------------------------
-// Arbiter Signals: Cache Request Generator
-// --------------------------------------------------------------------------------------
-  // kernel_setup
-  assign kernel_setup_memory_response_in            = memory_response_out[0];
-  assign kernel_setup_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[0];
-  assign cache_memory_request_in[0]                 = kernel_setup_memory_request_out;
-  assign cache_arbiter_request_in[0]                = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
 
-  // vertex_cu
-  assign vertex_cu_memory_response_in            = memory_response_out[1];
-  assign vertex_cu_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[1];
-  assign cache_memory_request_in[1]              = vertex_cu_memory_request_out;
-  assign cache_arbiter_request_in[1]             = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
+  CacheResponse          cache_generator_response_in                                         ;
+  FIFOStateSignalsInput  cache_generator_fifo_response_signals_in                            ;
+  FIFOStateSignalsOutput cache_generator_fifo_response_signals_out                           ;
+  MemoryPacket           cache_generator_response_out              [NUM_MEMORY_REQUESTOR-1:0];
+  logic                  cache_generator_fifo_response_setup_signal                          ;
 
-// --------------------------------------------------------------------------------------
-// Cache request generator
-// --------------------------------------------------------------------------------------
-  always_comb begin
-    cache_request_in                   = cache_request_out;
-    cache_request_in.payload.iob.valid = cache_request_out.valid & ~cache_response_out.valid;
-  end
 
-  assign cache_response_ready = cache_response_out.payload.iob.ready;
-  // assign cache_request_out.payload.iob.valid = cache_request_out.payload.iob.valid | (cache_request_out.valid & ~cache_response_out.valid);
-  assign cache_fifo_request_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
-
-  cache_generator_request #(
-    .NUM_GRAPH_CLUSTERS     (NUM_GRAPH_CLUSTERS  ),
-    .NUM_MEMORY_REQUESTOR   (NUM_MEMORY_REQUESTOR),
-    .NUM_GRAPH_PE           (NUM_GRAPH_PE        ),
-    .OUTSTANDING_COUNTER_MAX(32                  )
-  ) inst_cache_generator_request (
-    .ap_clk                  (ap_clk                                   ),
-    .areset                  (areset_generator                         ),
-    .memory_request_in       (cache_memory_request_in                  ),
-    .arbiter_request_in      (cache_arbiter_request_in                 ),
-    .arbiter_grant_out       (cache_arbiter_grant_out                  ),
-    .cache_request_out       (cache_request_out                        ),
-    .fifo_request_signals_in (cache_fifo_request_signals_in            ),
-    .fifo_request_signals_out(cache_fifo_request_signals_out           ),
-    .fifo_setup_signal       (cache_generator_request_fifo_setup_signal)
+  cache_generator_response #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_response (
+    .ap_clk                   (ap_clk                                   ),
+    .areset                   (areset                                   ),
+    .response_in              (cache_generator_response_in              ),
+    .fifo_response_signals_in (cache_generator_fifo_response_signals_in ),
+    .fifo_response_signals_out(cache_generator_fifo_response_signals_out),
+    .response_out             (response_out                             ),
+    .fifo_setup_signal        (fifo_setup_signal                        )
   );
+
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
@@ -267,33 +283,30 @@ module kernel_cu #(
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
     .control_state            (kernel_setup_control_state            ),
-    .descriptor               (kernel_setup_descriptor               ),
+    .descriptor_in               (kernel_setup_descriptor               ),
     .memory_response_in       (kernel_setup_memory_response_in       ),
-    .fifo_response_signals_out(kernel_setup_fifo_response_signals_out),
     .fifo_response_signals_in (kernel_setup_fifo_response_signals_in ),
+    .fifo_response_signals_out(kernel_setup_fifo_response_signals_out),
     .memory_request_out       (kernel_setup_memory_request_out       ),
-    .fifo_request_signals_out (kernel_setup_fifo_request_signals_out ),
     .fifo_request_signals_in  (kernel_setup_fifo_request_signals_in  ),
+    .fifo_request_signals_out (kernel_setup_fifo_request_signals_out ),
     .fifo_setup_signal        (kernel_setup_fifo_setup_signal        )
   );
 
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-  vertex_cu #(
-    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-  ) inst_vertex_cu (
+  vertex_cu #() inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .control_state            (vertex_cu_control_state            ),
-    .descriptor               (vertex_cu_descriptor               ),
+    .descriptor_in               (vertex_cu_descriptor               ),
     .memory_response_in       (vertex_cu_memory_response_in       ),
-    .fifo_response_signals_out(vertex_cu_fifo_response_signals_out),
     .fifo_response_signals_in (vertex_cu_fifo_response_signals_in ),
+    .fifo_response_signals_out(vertex_cu_fifo_response_signals_out),
     .memory_request_out       (vertex_cu_memory_request_out       ),
-    .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
     .fifo_request_signals_in  (vertex_cu_fifo_request_signals_in  ),
+    .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
     .fifo_setup_signal        (vertex_cu_fifo_setup_signal        )
   );
 

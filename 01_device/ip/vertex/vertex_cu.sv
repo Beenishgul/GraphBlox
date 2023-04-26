@@ -25,7 +25,8 @@ import PKG_CACHE::*;
 module vertex_cu #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 1              ,
+    parameter ENGINE_ID_X        = 1              ,
+    parameter ENGINE_ID_Y        = 1              ,
     parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
@@ -34,11 +35,11 @@ module vertex_cu #(
     input  ControlChainInterfaceOutput control_state            ,
     input  DescriptorInterface         descriptor_in            ,
     input  MemoryPacket                response_in              ,
-    output FIFOStateSignalsOutput      fifo_response_signals_out,
     input  FIFOStateSignalsInput       fifo_response_signals_in ,
+    output FIFOStateSignalsOutput      fifo_response_signals_out,
     output MemoryPacket                request_out              ,
-    output FIFOStateSignalsOutput      fifo_request_signals_out ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput      fifo_request_signals_out ,
     output logic                       fifo_setup_signal
 );
 
@@ -253,8 +254,8 @@ module vertex_cu #(
         serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
-        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
-        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
+        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID_X;
+        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID_Y;
         serial_read_config_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
         serial_read_config_comb.payload.meta.address_offset = 0;
         serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
@@ -294,7 +295,7 @@ module vertex_cu #(
     assign fifo_MemoryPacketResponse_vertex_cu_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests in inst_fifo_812x16_MemoryPacket
+// FIFO cache requests in inst_fifo_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
     assign fifo_response_dout.valid           = fifo_response_signals_out_reg.valid;
@@ -323,7 +324,7 @@ module vertex_cu #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out inst_fifo_812x16_MemoryPacket
+// FIFO cache requests out inst_fifo_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
     assign fifo_request_dout.valid           = fifo_request_signals_out_reg.valid;

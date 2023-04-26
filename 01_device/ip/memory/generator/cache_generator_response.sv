@@ -19,11 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module cache_generator_response #(
-  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
-  parameter NUM_MEMORY_REQUESTOR = 2              ,
-  parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
-) (
+module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
   input  CacheResponse          response_in                            ,
