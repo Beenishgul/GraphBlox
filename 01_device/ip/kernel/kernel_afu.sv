@@ -92,17 +92,17 @@ module kernel_afu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
   (* KEEP = "yes" *)
-  logic                    areset_m_axi   = 1'b0;
-  logic                    areset_cu      = 1'b0;
-  logic                    areset_control = 1'b0;
-  logic                    areset_cache   = 1'b0;
+  logic areset_m_axi   = 1'b0;
+  logic areset_cu      = 1'b0;
+  logic areset_control = 1'b0;
+  logic areset_cache   = 1'b0;
 
 
 // --------------------------------------------------------------------------------------
 // AXI
 // --------------------------------------------------------------------------------------
-  AXI4MasterReadInterface  m_axi_read           ;
-  AXI4MasterWriteInterface m_axi_write          ;
+  AXI4MasterReadInterface  m_axi_read ;
+  AXI4MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control
@@ -319,14 +319,14 @@ module kernel_afu #(
   // kernel_cache
   assign kernel_cache_request_in                     = kernel_cu_request_out;
   assign kernel_cache_fifo_request_signals_in.wr_en  = 0;
-  assign kernel_cache_fifo_request_signals_in.rd_en  = 0;
+  assign kernel_cache_fifo_request_signals_in.rd_en  = ~(kernel_cu_fifo_response_signals_out.prog_full);
   assign kernel_cache_fifo_response_signals_in.wr_en = 0;
-  assign kernel_cache_fifo_response_signals_in.rd_en = 0;
+  assign kernel_cache_fifo_response_signals_in.rd_en = ~(kernel_cu_fifo_response_signals_out.prog_full);
 
   // kernel_cu
   assign kernel_cu_response_in                    = kernel_cache_response_out;
   assign kernel_cu_fifo_request_signals_in.wr_en  = 0;
-  assign kernel_cu_fifo_request_signals_in.rd_en  = 0;
+  assign kernel_cu_fifo_request_signals_in.rd_en  = ~(kernel_cache_fifo_request_signals_out.prog_full | kernel_cache_fifo_response_signals_out.prog_full);
   assign kernel_cu_fifo_response_signals_in.wr_en = 0;
   assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
