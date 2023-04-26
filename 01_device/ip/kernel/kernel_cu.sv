@@ -25,17 +25,17 @@ module kernel_cu #(
   parameter NUM_MEMORY_REQUESTOR = 2              ,
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
-  input  logic                       ap_clk                   ,
-  input  logic                       areset                   ,
-  input  DescriptorInterface         descriptor_in            ,
-  output CacheRequest                request_out              ,
-  output FIFOStateSignalsOutput      fifo_request_signals_out ,
-  input  FIFOStateSignalsInput       fifo_request_signals_in  ,
-  input  CacheResponse               response_in              ,
-  output FIFOStateSignalsOutput      fifo_response_signals_out,
-  input  FIFOStateSignalsInput       fifo_response_signals_in ,
-  output logic                       done_signal              ,
-  output logic                       fifo_setup_signal
+  input  logic                  ap_clk                   ,
+  input  logic                  areset                   ,
+  input  DescriptorInterface    descriptor_in            ,
+  output CacheRequest           request_out              ,
+  output FIFOStateSignalsOutput fifo_request_signals_out ,
+  input  FIFOStateSignalsInput  fifo_request_signals_in  ,
+  input  CacheResponse          response_in              ,
+  output FIFOStateSignalsOutput fifo_response_signals_out,
+  input  FIFOStateSignalsInput  fifo_response_signals_in ,
+  output logic                  done_signal              ,
+  output logic                  fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
@@ -145,27 +145,9 @@ module kernel_cu #(
     end
   end
 
-  // always_ff @(posedge ap_clk) begin
-  //   if (areset_control) begin
-  //     counter     <= 0;
-  //     done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-  //   end
-  //   else begin
-  //     if (descriptor_in_reg.valid) begin
-  //       if(counter > 2000) begin
-  //         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
-  //         counter     <= 0;
-  //       end
-  //       else begin
-  //         counter <= counter + 1;
-  //       end
-  //     end else begin
-  //       done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-  //       counter     <= 0;
-  //     end
-  //   end
-  // end
-
+// --------------------------------------------------------------------------------------
+// Control signals
+// --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
       cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
@@ -177,9 +159,6 @@ module kernel_cu #(
     end
   end
 
-// --------------------------------------------------------------------------------------
-// Control signals
-// --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
       fifo_setup_signal <= 1'b1;
@@ -192,36 +171,23 @@ module kernel_cu #(
   end
 
 // --------------------------------------------------------------------------------------
-// READ Descriptor Control
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      descriptor_in_reg.valid <= 0;
-    end
-    else begin
-      descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
-  end
-
-// --------------------------------------------------------------------------------------
-// Drive descriptor signals to other modules
+// READ Descriptor Control and Drive signals to other modules
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_setup) begin
+      descriptor_in_reg.valid       <= 0;
       kernel_setup_descriptor.valid <= 0;
       vertex_cu_descriptor.valid    <= 0;
     end
     else begin
+      descriptor_in_reg.valid       <= descriptor_in.valid;
       kernel_setup_descriptor.valid <= descriptor_in_reg.valid;
       vertex_cu_descriptor.valid    <= descriptor_in_reg.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
+    descriptor_in_reg.payload       <= descriptor_in.payload;
     kernel_setup_descriptor.payload <= descriptor_in_reg.payload;
     vertex_cu_descriptor.payload    <= descriptor_in_reg.payload;
   end

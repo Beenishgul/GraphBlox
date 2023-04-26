@@ -235,7 +235,7 @@ module kernel_cache (
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  // FIFO is reseting
+  // FIFO is resetting
   assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
 
   // Push
@@ -244,7 +244,7 @@ module kernel_cache (
   assign fifo_request_din.meta             = kernel_cache_request_reg.meta;
 
   // Pop
-  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready;
+  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
   assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
   assign cache_request_mem.iob.addr        = fifo_request_dout.iob.addr;
   assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
