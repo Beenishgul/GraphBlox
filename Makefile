@@ -426,6 +426,10 @@ gen-ip-dir:
 run-sim:
 	-@$(MAKE) run-sim $(MAKE_DEVICE)
 
+.PHONY: run-sim-gui
+run-sim-gui:
+	-@$(MAKE) run-sim-gui $(MAKE_DEVICE)
+
 .PHONY: run-sim-noclean
 run-sim-noclean:
 	-@$(MAKE) run-sim-noclean $(MAKE_DEVICE)

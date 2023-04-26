@@ -88,8 +88,16 @@ simulate()
 {
   echo "Starting Simulate [xsim]"
   echo "MSG: Arg: $xsim_opts"
-  xsim  $xsim_opts -log simulate.log
+  xsim $xsim_opts -log simulate.log
 }
+
+simulate_gui()
+{
+  echo "Starting Simulate [xsim]"
+  echo "MSG: Arg: $xsim_opts"
+  xsim  --gui $xsim_opts -log simulate.log
+}
+
 
 # RUN_STEP: <GUI wave>
 wave_run()
@@ -111,6 +119,13 @@ setup()
         echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
         exit 1
       fi
+    ;;
+    "-sim_gui" )
+      compile
+      elaborate
+      simulate_gui
+      exit 0
+      # do not remove previous data
     ;;
     "-reset_run" )
       reset_run
@@ -160,7 +175,7 @@ check_args()
 {
   echo "check_args $1"
   echo "check_args $2"
-  if [[ ($1 == 6 ) && ($2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
+  if [[ ($1 == 6 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
     echo -e "ERROR: Unknown option specified '$2' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
