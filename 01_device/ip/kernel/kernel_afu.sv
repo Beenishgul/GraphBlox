@@ -344,14 +344,19 @@ module kernel_afu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_cu (
-    .ap_clk     (ap_clk               ),
-    .areset     (areset_cu            ),
-    .control_in (kernel_cu_control_in ),
-    .control_out(kernel_cu_control_out),
-    .descriptor (kernel_cu_descriptor ),
-    .request_out(kernel_cu_request_out),
-    .response_in(kernel_cu_response_in)
+    .ap_clk                   (ap_clk                             ),
+    .areset                   (areset_cu                          ),
+    .control_in               (kernel_cu_control_in               ),
+    .control_out              (kernel_cu_control_out              ),
+    .descriptor               (kernel_cu_descriptor               ),
+    .request_out              (kernel_cu_request_out              ),
+    .fifo_request_signals_out (kernel_cu_fifo_request_signals_out ),
+    .fifo_request_signals_in  (kernel_cu_fifo_request_signals_in  ),
+    .response_in              (kernel_cu_response_in              ),
+    .fifo_response_signals_out(kernel_cu_fifo_response_signals_out),
+    .fifo_response_signals_in (kernel_cu_fifo_response_signals_in )
   );
+
 
 endmodule : kernel_afu
 
