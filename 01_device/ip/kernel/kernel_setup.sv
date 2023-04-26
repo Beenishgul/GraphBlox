@@ -22,22 +22,21 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module kernel_setup #(
-    parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 0              ,
-    parameter COUNTER_WIDTH      = 32
+    parameter ENGINE_ID_X   = 0 ,
+    parameter ENGINE_ID_Y   = 0 ,
+    parameter COUNTER_WIDTH = 32
 ) (
     // System Signals
     input  logic                       ap_clk                   ,
     input  logic                       areset                   ,
     input  ControlChainInterfaceOutput control_state            ,
-    input  DescriptorInterface         descriptor               ,
+    input  DescriptorInterface         descriptor_in               ,
     input  MemoryPacket                memory_response_in       ,
-    output FIFOStateSignalsOutput      fifo_response_signals_out,
     input  FIFOStateSignalsInput       fifo_response_signals_in ,
+    output FIFOStateSignalsOutput      fifo_response_signals_out,
     output MemoryPacket                memory_request_out       ,
-    output FIFOStateSignalsOutput      fifo_request_signals_out ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput      fifo_request_signals_out ,
     output logic                       fifo_setup_signal
 );
 
@@ -105,12 +104,12 @@ module kernel_setup #(
             descriptor_reg.valid <= 0;
         end
         else begin
-            descriptor_reg.valid <= descriptor.valid;
+            descriptor_reg.valid <= descriptor_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        descriptor_reg.payload <= descriptor.payload;
+        descriptor_reg.payload <= descriptor_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -252,8 +251,8 @@ module kernel_setup #(
         serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
-        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID;
-        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID;
+        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID_X;
+        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID_Y;
         serial_read_config_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
         serial_read_config_comb.payload.meta.address_offset = 0;
         serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
@@ -302,7 +301,7 @@ module kernel_setup #(
         .FIFO_WRITE_DEPTH(64                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
@@ -332,7 +331,7 @@ module kernel_setup #(
         .FIFO_WRITE_DEPTH(64                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),

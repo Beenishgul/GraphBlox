@@ -314,7 +314,7 @@ module kernel_afu #(
 
 
 // --------------------------------------------------------------------------------------
-// Assign Kernel Cache <-> CU Signals <-> Setup
+// Assign Kernel Cache <-> CU Signals
 // --------------------------------------------------------------------------------------
   // kernel_cache
   assign kernel_cache_request_in                     = kernel_cu_request_out;

@@ -19,13 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module cache_generator_request #(
-  parameter NUM_GRAPH_CLUSTERS        = CU_COUNT_GLOBAL                  ,
-  parameter NUM_MEMORY_REQUESTOR      = 2                                ,
-  parameter NUM_GRAPH_PE              = CU_COUNT_LOCAL                   ,
-  parameter OUTSTANDING_COUNTER_MAX   = 16                               ,
-  parameter OUTSTANDING_COUNTER_WIDTH = $clog2(OUTSTANDING_COUNTER_MAX+1)
-) (
+module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
   input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
