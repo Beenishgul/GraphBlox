@@ -84,11 +84,6 @@ module kernel_afu #(
 );
 
 // --------------------------------------------------------------------------------------
-// Local Parameters
-// --------------------------------------------------------------------------------------
-
-
-// --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
   (* KEEP = "yes" *)
@@ -96,7 +91,6 @@ module kernel_afu #(
   logic areset_cu      = 1'b0;
   logic areset_control = 1'b0;
   logic areset_cache   = 1'b0;
-
 
 // --------------------------------------------------------------------------------------
 // AXI
@@ -183,13 +177,8 @@ module kernel_afu #(
   end
 
 // --------------------------------------------------------------------------------------
-// DRIVE AXI4 SIGNALS
-// --------------------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (areset_m_axi) begin
       m_axi_read.in <= 0;
@@ -207,7 +196,6 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (areset_m_axi) begin
       m00_axi_arvalid <= 0; // Address read channel valid
@@ -240,7 +228,6 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (areset_m_axi) begin
       m_axi_write.in <= 0;
@@ -257,7 +244,6 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     if (areset_m_axi) begin
       m00_axi_awvalid <= 0;// Address write channel valid
@@ -298,7 +284,6 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // DRIVE DESCRIPTOR
 // --------------------------------------------------------------------------------------
-
   always_ff @(posedge ap_clk) begin
     kernel_control_descriptor_in.valid                      <= 0;
     kernel_control_descriptor_in.payload.graph_csr_struct   <= graph_csr_struct  ;
@@ -311,7 +296,6 @@ module kernel_afu #(
     kernel_control_descriptor_in.payload.auxiliary_1        <= auxiliary_1       ;
     kernel_control_descriptor_in.payload.auxiliary_2        <= auxiliary_2       ;
   end
-
 
 // --------------------------------------------------------------------------------------
 // Assign Kernel Cache <-> CU Signals

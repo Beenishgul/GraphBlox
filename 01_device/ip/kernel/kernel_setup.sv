@@ -294,9 +294,11 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+
     // Push
     assign fifo_request_signals_in_internal.wr_en = fifo_request_din.valid;
     assign fifo_request_din                       = engine_serial_read_request_out;
+
     // Pop
     assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
     assign fifo_request_dout.valid                = fifo_request_signals_out_reg.valid;
@@ -329,8 +331,10 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+
     // Push
-    assign fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
+    assign fifo_response_signals_in_internal.wr_en = fifo_response_din.valid;
+
     // Pop
     assign fifo_response_dout.valid = fifo_response_signals_out_reg.valid;
 
@@ -343,8 +347,8 @@ module kernel_setup #(
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
         .din         (fifo_response_din.payload                 ),
-        .wr_en       (fifo_response_signals_in_reg.wr_en        ),
-        .rd_en       (fifo_response_signals_in_reg.rd_en        ),
+        .wr_en       (fifo_response_signals_in_internal.wr_en        ),
+        .rd_en       (fifo_response_signals_in_internal.rd_en        ),
         .dout        (fifo_response_dout.payload                ),
         .full        (fifo_response_signals_out_reg.full        ),
         .almost_full (fifo_response_signals_out_reg.almost_full ),

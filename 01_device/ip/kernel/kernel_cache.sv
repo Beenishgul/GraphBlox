@@ -240,7 +240,7 @@ module kernel_cache (
   );
 
 // --------------------------------------------------------------------------------------
-// Cache request FIFO
+// Cache request FIFO FWFT
 // --------------------------------------------------------------------------------------
   // FIFO is resetting
   assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;

@@ -29,7 +29,6 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   output logic                  fifo_setup_signal
 );
 
-
 // --------------------------------------------------------------------------------------
 // Cache response variables
 // --------------------------------------------------------------------------------------
