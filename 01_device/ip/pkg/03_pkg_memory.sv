@@ -65,8 +65,7 @@ typedef enum int unsigned {
   OP_LOCATION_4,
   OP_LOCATION_5,
   OP_LOCATION_6,
-  OP_LOCATION_7,
-  OP_LOCATION_8
+  OP_LOCATION_7
 } operand_location;
 
 // --------------------------------------------------------------------------------------
