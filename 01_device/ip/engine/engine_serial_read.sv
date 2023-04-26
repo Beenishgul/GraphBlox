@@ -36,11 +36,7 @@ import PKG_CACHE::*;
 
 // uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity)
 
-module engine_serial_read #(
-    parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter COUNTER_WIDTH      = 32
-) (
+module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
     input  logic                         ap_clk                      ,
     input  logic                         areset                      ,

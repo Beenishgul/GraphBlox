@@ -242,13 +242,13 @@ module kernel_cu #(
   assign kernel_setup_response_in                   = cache_generator_response_out[0];
   assign kernel_setup_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[0];
   assign cache_generator_request_in[0]              = kernel_setup_request_out;
-  assign cache_arbiter_request_in[0]                = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
+  assign cache_generator_arbiter_request_in[0]      = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
   // vertex_cu
   assign vertex_cu_response_in                   = cache_generator_response_out[1];
   assign vertex_cu_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[1];
   assign cache_generator_request_in[1]           = vertex_cu_request_out;
-  assign cache_arbiter_request_in[1]             = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+  assign cache_generator_arbiter_request_in[1]   = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator

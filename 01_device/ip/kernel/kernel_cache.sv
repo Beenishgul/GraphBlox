@@ -16,8 +16,9 @@ import PKG_AXI4::*;
 import PKG_GLOBALS::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
-import PKG_MEMORY::*;
 import PKG_CACHE::*;
+import PKG_MEMORY::*;
+
 
 module kernel_cache (
   // System Signals
@@ -44,6 +45,7 @@ module kernel_cache (
   logic areset_arbiter;
   logic areset_setup  ;
   logic areset_cache  ;
+  logic areset_control;
 
   CacheRequest  kernel_cache_request_reg ;
   CacheResponse kernel_cache_response_reg;
@@ -58,7 +60,7 @@ module kernel_cache (
 //   Cache signals
 // --------------------------------------------------------------------------------------
   CacheRequestPayload   cache_request_mem ;
-  CacheRequestPayload   cache_response_mem;
+  CacheResponsePayload  cache_response_mem;
   CacheControlIOBOutput cache_ctrl_in     ;
   CacheControlIOBOutput cache_ctrl_out    ;
 // --------------------------------------------------------------------------------------
@@ -90,6 +92,7 @@ module kernel_cache (
     areset_fifo    <= areset;
     areset_arbiter <= areset;
     areset_setup   <= areset;
+    areset_control <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -243,8 +246,8 @@ module kernel_cache (
 
   // Push
   assign fifo_request_signals_in_reg.wr_en = kernel_cache_request_reg.valid;
-  assign fifo_request_din.iob              = kernel_cache_request_reg.iob;
-  assign fifo_request_din.meta             = kernel_cache_request_reg.meta;
+  assign fifo_request_din.iob              = kernel_cache_request_reg.payload.iob;
+  assign fifo_request_din.meta             = kernel_cache_request_reg.payload.meta;
 
   // Pop
   assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
@@ -290,7 +293,7 @@ module kernel_cache (
   assign fifo_response_din.meta                  = cache_request_mem.meta;
 
   // Pop
-  assign fifo_response_signals_in_internal.rd_en = ~cache_fifo_response_signals_out.empty & fifo_request_signals_in_reg.rd_en;
+  assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
   assign kernel_cache_response_reg.valid         = fifo_response_signals_out_reg.valid;
   assign kernel_cache_response_reg.payload       = fifo_response_dout;
 

@@ -63,7 +63,7 @@ module vertex_cu #(
 
     MemoryPacket fifo_response_din ;
     MemoryPacket fifo_response_dout;
-    
+
 
     MemoryPacket fifo_request_dout;
     MemoryPacket fifo_request_din ;
@@ -270,11 +270,7 @@ module vertex_cu #(
         serial_read_config_reg.payload <= serial_read_config_comb.payload;
     end
 
-    engine_serial_read #(
-        .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-        .NUM_GRAPH_PE      (NUM_GRAPH_PE      ),
-        .COUNTER_WIDTH     (COUNTER_WIDTH     )
-    ) inst_engine_serial_read (
+    engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
         .ap_clk                      (ap_clk                                 ),
         .areset                      (areset_counter                         ),
         .serial_read_config          (serial_read_config_reg                 ),
