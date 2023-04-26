@@ -178,7 +178,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
             ENGINE_SERIAL_READ_BUSY : begin
                 if (engine_serial_read_done_reg)
                     next_state = ENGINE_SERIAL_READ_DONE;
-                else if (fifo_request_signals_out_reg.prog_full && ~engine_serial_read_done_reg)
+                else if (fifo_request_signals_out_reg.prog_full)
                     next_state = ENGINE_SERIAL_READ_PAUSE;
                 else
                     next_state = ENGINE_SERIAL_READ_BUSY;
@@ -190,7 +190,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                     next_state = ENGINE_SERIAL_READ_PAUSE;
             end
             ENGINE_SERIAL_READ_DONE : begin
-                if(serial_read_config_reg.valid && engine_serial_read_in_start_reg)
+                if(serial_read_config_reg.valid & engine_serial_read_in_start_reg)
                     next_state = ENGINE_SERIAL_READ_DONE;
                 else
                     next_state = ENGINE_SERIAL_READ_IDLE;

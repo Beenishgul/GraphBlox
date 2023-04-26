@@ -166,7 +166,7 @@ module kernel_cu #(
       request_out.valid <= 1'b0;
     end
     else begin
-      fifo_setup_signal <= ~|cu_setup_state;
+      fifo_setup_signal <= |cu_setup_state;
       done_signal       <= &done_signal_reg;
       request_out.valid <= request_out_reg.valid ;
     end

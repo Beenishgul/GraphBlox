@@ -93,6 +93,7 @@ module kernel_cache (
     areset_arbiter <= areset;
     areset_setup   <= areset;
     areset_control <= areset;
+    areset_cache   <= areset;
   end
 
 // --------------------------------------------------------------------------------------
