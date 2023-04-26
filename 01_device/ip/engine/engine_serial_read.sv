@@ -51,9 +51,15 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     output logic                         pause_out
 );
 
+// --------------------------------------------------------------------------------------
+// Wires and Variables
+// --------------------------------------------------------------------------------------
     logic areset_engine ;
     logic areset_counter;
     logic areset_fifo   ;
+
+    SerialReadEngineConfiguration configuration_reg;
+    MemoryPacket                  request_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -61,26 +67,23 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     engine_serial_read_state current_state;
     engine_serial_read_state next_state   ;
 
-    logic done_reg ;
-    logic start_reg;
-
-    SerialReadEngineConfiguration configuration_reg;
-
-    logic start_reg;
-    logic ready_reg;
-    logic done_reg ;
-    logic pause_reg;
+    logic done_internal_reg;
+    logic start_in_reg     ;
+    logic ready_out_reg    ;
+    logic done_out_reg     ;
+    logic pause_out_reg    ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacket           fifo_request_din            ;
-    MemoryPacket           fifo_request_dout           ;
-    MemoryPacket           fifo_request_comb           ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg ;
-    FIFOStateSignalsOutput fifo_request_signals_out_reg;
-
-    logic fifo_request_setup_signal;
+    MemoryPacketPayload    fifo_request_din               ;
+    MemoryPacket           fifo_request_din_reg           ;
+    MemoryPacketPayload    fifo_request_dout              ;
+    MemoryPacket           fifo_request_comb              ;
+    FIFOStateSignalsInput  fifo_request_signals_in_reg    ;
+    FIFOStateSignalsInput  fifo_request_signals_in_inernal;
+    FIFOStateSignalsOutput fifo_request_signals_out_reg   ;
+    logic                  fifo_request_setup_signal      ;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -107,14 +110,14 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
-            configuration_reg.valid           <= 0;
-            fifo_request_signals_in_reg.rd_en <= 0;
-            start_reg                         <= 0;
+            fifo_request_signals_in_reg <= 0;
+            start_in_reg                <= 0;
+            configuration_reg.valid     <= 0;
         end
         else begin
-            configuration_reg.valid           <= configuration_in.valid;
-            fifo_request_signals_in_reg.rd_en <= fifo_request_signals_in.rd_en & ~fifo_request_signals_out_reg.empty ;
-            start_reg                         <= start_in;
+            fifo_request_signals_in_reg <= fifo_request_signals_in ;
+            start_in_reg                <= start_in;
+            configuration_reg.valid     <= configuration_in.valid;
         end
     end
 
@@ -136,15 +139,15 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
         else begin
             fifo_setup_signal        <= fifo_request_setup_signal;
             fifo_request_signals_out <= fifo_request_signals_out_reg;
-            ready_out                <= ready_reg;
-            done_out                 <= done_reg;
-            pause_out                <= pause_reg;
-            request_out.valid        <= fifo_request_signals_out_reg.valid;
+            ready_out                <= ready_out_reg;
+            done_out                 <= done_out_reg;
+            pause_out                <= pause_out_reg;
+            request_out.valid        <= request_out_reg.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        request_out.payload <= fifo_request_dout.payload;
+        request_out.payload <= request_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -165,7 +168,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 next_state = ENGINE_SERIAL_READ_IDLE;
             end
             ENGINE_SERIAL_READ_IDLE : begin
-                if(configuration_reg.valid && start_reg)
+                if(configuration_reg.valid && start_in_reg)
                     next_state = ENGINE_SERIAL_READ_SETUP;
                 else
                     next_state = ENGINE_SERIAL_READ_IDLE;
@@ -177,7 +180,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 next_state = ENGINE_SERIAL_READ_BUSY;
             end
             ENGINE_SERIAL_READ_BUSY : begin
-                if (done_reg)
+                if (done_internal_reg)
                     next_state = ENGINE_SERIAL_READ_DONE;
                 else if (fifo_request_signals_out_reg.prog_full)
                     next_state = ENGINE_SERIAL_READ_PAUSE;
@@ -191,7 +194,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                     next_state = ENGINE_SERIAL_READ_PAUSE;
             end
             ENGINE_SERIAL_READ_DONE : begin
-                if(configuration_reg.valid & start_reg)
+                if(configuration_reg.valid & start_in_reg)
                     next_state = ENGINE_SERIAL_READ_DONE;
                 else
                     next_state = ENGINE_SERIAL_READ_IDLE;
@@ -202,96 +205,96 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_SERIAL_READ_RESET : begin
-                done_reg               <= 1'b1;
-                start_reg              <= 1'b0;
-                ready_reg              <= 1'b0;
-                done_reg               <= 1'b1;
-                counter_enable         <= 1'b0;
-                counter_load           <= 1'b0;
-                counter_incr           <= 1'b0;
-                counter_decr           <= 1'b0;
-                counter_load_value     <= 0;
-                counter_stride_value   <= 0;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b1;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b1;
+                pause_out_reg              <= 1'b0;
+                counter_enable             <= 1'b0;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_IDLE : begin
-                done_reg               <= 1'b1;
-                start_reg              <= 1'b0;
-                ready_reg              <= 1'b1;
-                done_reg               <= 1'b1;
-                counter_enable         <= 1'b1;
-                counter_load           <= 1'b0;
-                counter_incr           <= 1'b0;
-                counter_decr           <= 1'b0;
-                counter_load_value     <= 0;
-                counter_stride_value   <= 0;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b1;
+                ready_out_reg              <= 1'b1;
+                done_out_reg               <= 1'b1;
+                pause_out_reg              <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_SETUP : begin
-                done_reg               <= 1'b0;
-                start_reg              <= 1'b0;
-                ready_reg              <= 1'b0;
-                done_reg               <= 1'b0;
-                counter_enable         <= 1'b1;
-                counter_load           <= 1'b1;
-                counter_incr           <= configuration_reg.payload.param.increment;
-                counter_decr           <= configuration_reg.payload.param.decrement;
-                counter_load_value     <= configuration_reg.payload.param.start_read;
-                counter_stride_value   <= configuration_reg.payload.param.stride;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b0;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b0;
+                pause_out_reg              <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b1;
+                counter_incr               <= configuration_reg.payload.param.increment;
+                counter_decr               <= configuration_reg.payload.param.decrement;
+                counter_load_value         <= configuration_reg.payload.param.start_read;
+                counter_stride_value       <= configuration_reg.payload.param.stride;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_START : begin
-                done_reg               <= 1'b0;
-                start_reg              <= 1'b1;
-                ready_reg              <= 1'b0;
-                done_reg               <= 1'b0;
-                counter_enable         <= 1'b1;
-                counter_load           <= 1'b0;
-                counter_incr           <= configuration_reg.payload.param.increment;
-                counter_decr           <= configuration_reg.payload.param.decrement;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b0;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b0;
+                pause_out_reg              <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                counter_incr               <= configuration_reg.payload.param.increment;
+                counter_decr               <= configuration_reg.payload.param.decrement;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_BUSY : begin
                 if((counter_count >= configuration_reg.payload.param.end_read)) begin
-                    done_reg               <= 1'b1;
-                    counter_incr           <= 1'b0;
-                    counter_decr           <= 1'b0;
-                    fifo_request_din.valid <= 1'b0;
+                    done_internal_reg          <= 1'b1;
+                    counter_incr               <= 1'b0;
+                    counter_decr               <= 1'b0;
+                    fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
-                    done_reg               <= 1'b0;
-                    counter_enable         <= 1'b1;
-                    counter_incr           <= configuration_reg.payload.param.increment;
-                    counter_decr           <= configuration_reg.payload.param.decrement;
-                    fifo_request_din.valid <= 1'b1;
+                    done_internal_reg          <= 1'b0;
+                    counter_enable             <= 1'b1;
+                    counter_incr               <= configuration_reg.payload.param.increment;
+                    counter_decr               <= configuration_reg.payload.param.decrement;
+                    fifo_request_din_reg.valid <= 1'b1;
                 end
-                ready_reg      <= 1'b0;
-                done_reg       <= 1'b0;
+                ready_out_reg  <= 1'b0;
+                done_out_reg   <= 1'b0;
+                pause_out_reg  <= 1'b0;
                 counter_enable <= 1'b1;
-                start_reg      <= 1'b1;
                 counter_load   <= 1'b0;
             end
             ENGINE_SERIAL_READ_PAUSE : begin
-                done_reg               <= 1'b1;
-                start_reg              <= 1'b0;
-                ready_reg              <= 1'b0;
-                done_reg               <= 1'b0;
-                counter_enable         <= 1'b0;
-                counter_load           <= 1'b0;
-                counter_incr           <= 1'b0;
-                counter_decr           <= 1'b0;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b1;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b0;
+                pause_out_reg              <= 1'b1;
+                counter_enable             <= 1'b0;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_SERIAL_READ_DONE : begin
-                done_reg               <= 1'b1;
-                start_reg              <= 1'b0;
-                ready_reg              <= 1'b0;
-                done_reg               <= 1'b1;
-                counter_enable         <= 1'b1;
-                counter_load           <= 1'b0;
-                counter_incr           <= 1'b0;
-                counter_decr           <= 1'b0;
-                fifo_request_din.valid <= 1'b0;
+                done_internal_reg          <= 1'b1;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b1;
+                pause_out_reg              <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -312,11 +315,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     end
 
     always_ff @(posedge ap_clk) begin
-        if(start_reg) begin
-            fifo_request_din.payload.meta <= fifo_request_comb.payload.meta;
-        end else begin
-            fifo_request_din.payload.meta <= 0;
-        end
+        fifo_request_din_reg.payload.meta <= fifo_request_comb.payload.meta;
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (
@@ -337,9 +336,15 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy ;
+
     // Push
-    assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
+    assign fifo_request_signals_in_inernal.wr_en = fifo_request_din_reg.valid;
+    assign fifo_request_din                      = fifo_request_din_reg.payload;
+
     // Pop
+    assign fifo_request_signals_in_inernal.rd_en <= ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_reg.valid   <= fifo_request_signals_out_reg.valid;
+    assign request_out_reg.payload <= fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -349,10 +354,10 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),
-        .din         (fifo_request_din.payload                 ),
-        .wr_en       (fifo_request_signals_in_reg.wr_en        ),
-        .rd_en       (fifo_request_signals_in_reg.rd_en        ),
-        .dout        (fifo_request_dout.payload                ),
+        .din         (fifo_request_din                         ),
+        .wr_en       (fifo_request_signals_in_inernal.wr_en    ),
+        .rd_en       (fifo_request_signals_in_inernal.rd_en    ),
+        .dout        (fifo_request_dout                        ),
         .full        (fifo_request_signals_out_reg.full        ),
         .almost_full (fifo_request_signals_out_reg.almost_full ),
         .empty       (fifo_request_signals_out_reg.empty       ),

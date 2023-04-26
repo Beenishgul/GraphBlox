@@ -333,10 +333,12 @@ module kernel_setup #(
     assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_internal.wr_en = fifo_response_din.valid;
+    assign fifo_response_signals_in_internal.wr_en = fifo_response_din_reg.valid;
+    assign fifo_response_din = fifo_response_din_reg.payload;
 
     // Pop
-    assign fifo_response_dout.valid = fifo_response_signals_out_reg.valid;
+    assign fifo_response_signals_in_internal.wr_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
+    
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -346,10 +348,10 @@ module kernel_setup #(
     ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
-        .din         (fifo_response_din.payload                 ),
+        .din         (fifo_response_din                 ),
         .wr_en       (fifo_response_signals_in_internal.wr_en        ),
         .rd_en       (fifo_response_signals_in_internal.rd_en        ),
-        .dout        (fifo_response_dout.payload                ),
+        .dout        (fifo_response_dout                ),
         .full        (fifo_response_signals_out_reg.full        ),
         .almost_full (fifo_response_signals_out_reg.almost_full ),
         .empty       (fifo_response_signals_out_reg.empty       ),
