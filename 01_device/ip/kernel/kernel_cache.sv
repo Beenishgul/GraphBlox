@@ -19,26 +19,21 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cache #(
-  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
-  parameter NUM_SETUP_MODULES    = 3              ,
-  parameter NUM_MEMORY_REQUESTOR = 2              ,
-  parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
-) (
+module kernel_cache (
   // System Signals
   input  logic                          ap_clk                   ,
   input  logic                          areset                   ,
-  input  CacheRequest                   kernel_cache_request_in  ,
+  input  CacheRequest                   request_in               ,
   output FIFOStateSignalsOutput         fifo_request_signals_out ,
   input  FIFOStateSignalsInput          fifo_request_signals_in  ,
-  output CacheResponse                  kernel_cache_response_out,
+  output CacheResponse                  response_out             ,
   output FIFOStateSignalsOutput         fifo_response_signals_out,
   input  FIFOStateSignalsInput          fifo_response_signals_in ,
+  output logic                          fifo_setup_signal        ,
   input  AXI4MasterReadInterfaceInput   m_axi_read_in            ,
   output AXI4MasterReadInterfaceOutput  m_axi_read_out           ,
   input  AXI4MasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out          ,
-  output logic                          fifo_setup_signal
+  output AXI4MasterWriteInterfaceOutput m_axi_write_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -101,33 +96,33 @@ module kernel_cache #(
       kernel_cache_request_reg.valid <= 1'b0;
     end
     else begin
-      kernel_cache_request_reg.valid <= kernel_cache_request_in.valid;
+      kernel_cache_request_reg.valid <= request_in.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    kernel_cache_request_reg.payload <= kernel_cache_request_in.payload;
+    kernel_cache_request_reg.payload <= request_in.payload;
   end
 // --------------------------------------------------------------------------------------
 // Drive output
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      fifo_setup_signal               <= 1'b1;
-      fifo_request_signals_out        <= 0;
-      fifo_response_signals_out       <= 0;
-      kernel_cache_response_out.valid <= 1'b0;
+      fifo_setup_signal         <= 1'b1;
+      fifo_request_signals_out  <= 0;
+      fifo_response_signals_out <= 0;
+      response_out.valid        <= 1'b0;
     end
     else begin
-      fifo_setup_signal               <= fifo_request_setup_signal | fifo_response_setup_signal;
-      fifo_request_signals_out        <= fifo_request_signals_reg;
-      fifo_response_signals_out       <= fifo_response_signals_reg;
-      kernel_cache_response_out.valid <= kernel_cache_response_reg.valid;
+      fifo_setup_signal         <= fifo_request_setup_signal | fifo_response_setup_signal;
+      fifo_request_signals_out  <= fifo_request_signals_reg;
+      fifo_response_signals_out <= fifo_response_signals_reg;
+      response_out.valid        <= kernel_cache_response_reg.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    kernel_cache_response_out.payload <= kernel_cache_response_reg.payload;
+    response_out.payload <= kernel_cache_response_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
