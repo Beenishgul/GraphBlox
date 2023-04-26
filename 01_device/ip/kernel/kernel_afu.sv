@@ -355,10 +355,7 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // CU -> Caches/PEs
 // --------------------------------------------------------------------------------------
-  kernel_cu #(
-    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-  ) inst_kernel_cu (
+  kernel_cu #(.NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS)) inst_kernel_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .descriptor_in            (kernel_cu_descriptor_in            ),
@@ -375,10 +372,7 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control
 // --------------------------------------------------------------------------------------
-  kernel_control #(
-    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-  ) inst_kernel_control (
+  kernel_control inst_kernel_control (
     .ap_clk        (ap_clk                       ),
     .areset        (areset_control               ),
     .control_in    (kernel_control_in            ),

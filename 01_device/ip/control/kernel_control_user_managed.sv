@@ -17,11 +17,7 @@ import PKG_AXI4::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CONTROL::*;
 
-module kernel_control #(
-    parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL
-) (
-    // System Signals
+module kernel_control (
     input  logic                       ap_clk        ,
     input  logic                       areset        ,
     input  ControlChainInterfaceInput  control_in    ,
