@@ -69,6 +69,8 @@ module kernel_cache (
   FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
   FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
   FIFOStateSignalsInput  fifo_request_signals_in_internal;
+  logic                  fifo_request_setup_signal       ;
+
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
@@ -78,6 +80,7 @@ module kernel_cache (
   FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
   FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
   FIFOStateSignalsInput  fifo_response_signals_in_internal;
+  logic                  fifo_response_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -287,9 +290,9 @@ module kernel_cache (
   assign fifo_response_din.meta                  = cache_request_mem.meta;
 
   // Pop
-  assign fifo_response_signals_in_internal.rd_en = ~cache_fifo_response_signals_out.empty & fifo_request_signals_in_reg.rd_en
-    assign kernel_cache_response_reg.valid = fifo_response_signals_out_reg.valid;
-  assign kernel_cache_response_reg.payload = fifo_response_dout;
+  assign fifo_response_signals_in_internal.rd_en = ~cache_fifo_response_signals_out.empty & fifo_request_signals_in_reg.rd_en;
+  assign kernel_cache_response_reg.valid         = fifo_response_signals_out_reg.valid;
+  assign kernel_cache_response_reg.payload       = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),

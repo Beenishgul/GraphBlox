@@ -32,11 +32,11 @@ module vertex_cu #(
     input  logic                       ap_clk                   ,
     input  logic                       areset                   ,
     input  ControlChainInterfaceOutput control_state            ,
-    input  DescriptorInterface         descriptor               ,
-    input  MemoryPacket                memory_response_in       ,
+    input  DescriptorInterface         descriptor_in            ,
+    input  MemoryPacket                response_in              ,
     output FIFOStateSignalsOutput      fifo_response_signals_out,
     input  FIFOStateSignalsInput       fifo_response_signals_in ,
-    output MemoryPacket                memory_request_out       ,
+    output MemoryPacket                request_out              ,
     output FIFOStateSignalsOutput      fifo_request_signals_out ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
     output logic                       fifo_setup_signal
@@ -106,12 +106,12 @@ module vertex_cu #(
             descriptor_reg.valid <= 0;
         end
         else begin
-            descriptor_reg.valid <= descriptor.valid;
+            descriptor_reg.valid <= descriptor_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        descriptor_reg.payload <= descriptor.payload;
+        descriptor_reg.payload <= descriptor_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -124,14 +124,14 @@ module vertex_cu #(
             fifo_request_signals_in_reg.rd_en  <= 0;
         end
         else begin
-            fifo_response_din.valid            <= memory_response_in.valid;
+            fifo_response_din.valid            <= response_in.valid;
             fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
             fifo_request_signals_in_reg.rd_en  <= fifo_request_signals_in.rd_en;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_din.payload <= memory_response_in.payload;
+        fifo_response_din.payload <= response_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -139,19 +139,19 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (vertex_cu_areset) begin
-            fifo_setup_signal        <= 1;
-            memory_request_out.valid <= 0;
+            fifo_setup_signal <= 1;
+            request_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal        <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
-            memory_request_out.valid <= fifo_request_signals_out_reg.valid ;
+            fifo_setup_signal <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
+            request_out.valid <= fifo_request_signals_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out   <= fifo_request_signals_out_reg;
-        fifo_response_signals_out  <= fifo_response_signals_out_reg;
-        memory_request_out.payload <= fifo_request_dout.payload;
+        fifo_request_signals_out  <= fifo_request_signals_out_reg;
+        fifo_response_signals_out <= fifo_response_signals_out_reg;
+        request_out.payload       <= fifo_request_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
