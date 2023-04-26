@@ -58,8 +58,9 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     DescriptorInterface descriptor_reg;
 
-    MemoryPacket fifo_response_dout;
     MemoryPacket fifo_response_din ;
+    MemoryPacket fifo_response_dout;
+
 
     MemoryPacket kernel_setup_mem_req_dout;
     MemoryPacket kernel_setup_mem_req_din ;
@@ -266,11 +267,7 @@ module kernel_setup #(
         serial_read_config_reg.payload <= serial_read_config_comb.payload;
     end
 
-    engine_serial_read #(
-        .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-        .NUM_GRAPH_PE      (NUM_GRAPH_PE      ),
-        .COUNTER_WIDTH     (COUNTER_WIDTH     )
-    ) inst_engine_serial_read (
+    engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
         .ap_clk                      (ap_clk                                 ),
         .areset                      (areset_counter                         ),
         .serial_read_config          (serial_read_config_reg                 ),

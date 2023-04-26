@@ -17,20 +17,20 @@ module demux_bus #(
   parameter BUS_WIDTH  = 8                ,
   parameter SEL_WIDTH  = $clog2(BUS_WIDTH)
 ) (
-  input  logic                  ap_clk                      ,
-  input  logic                  areset                      ,
-  input  logic [ BUS_WIDTH-1:0] sel_in                      ,
-  input  logic [DATA_WIDTH-1:0] data_in                     ,
-  output logic [DATA_WIDTH-1:0] data_out [BUS_WIDTH-1]      ,
-  output logic                  data_out_valid [BUS_WIDTH-1]
+  input  logic                  ap_clk                  ,
+  input  logic                  areset                  ,
+  input  logic [ BUS_WIDTH-1:0] sel_in                  ,
+  input  logic [DATA_WIDTH-1:0] data_in                 ,
+  output logic [DATA_WIDTH-1:0] data_out [BUS_WIDTH-1:0],
+  output logic [ BUS_WIDTH-1:0] data_out_valid
 );
 
-  logic [DATA_WIDTH-1:0] data_in_internal                    ;
-  logic [ BUS_WIDTH-1:0] sel_in_internal                     ;
-  logic [DATA_WIDTH-1:0] data_out_internal      [BUS_WIDTH-1];
-  logic                  data_out_valid_internal[BUS_WIDTH-1];
-  logic [DATA_WIDTH-1:0] data_out_reg           [BUS_WIDTH-1];
-  logic                  data_out_valid_reg     [BUS_WIDTH-1];
+  logic [DATA_WIDTH-1:0] data_in_internal                      ;
+  logic [ BUS_WIDTH-1:0] sel_in_internal                       ;
+  logic [DATA_WIDTH-1:0] data_out_internal      [BUS_WIDTH-1:0];
+  logic [ BUS_WIDTH-1:0] data_out_valid_internal               ;
+  logic [DATA_WIDTH-1:0] data_out_reg           [BUS_WIDTH-1:0];
+  logic [ BUS_WIDTH-1:0] data_out_valid_reg                    ;
 
 
 // --------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ module demux_bus #(
   always_ff @(posedge ap_clk) begin
     if (areset) begin
       data_in_internal <= 0;
-      mux_sel          <= 0;
+      sel_in_internal  <= 0;
     end else begin
       data_in_internal <= data_in;
       sel_in_internal  <= sel_in;
@@ -59,7 +59,7 @@ module demux_bus #(
   end
 
   always_ff @(posedge ap_clk) begin
-    data_out <= data_out_valid_reg;
+    data_out <= data_out_reg;
   end
 
 // --------------------------------------------------------------------------------------
