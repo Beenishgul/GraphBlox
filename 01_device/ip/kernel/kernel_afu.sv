@@ -96,13 +96,14 @@ module kernel_afu #(
   logic areset_m_axi     = 1'b0;
   logic areset_kernel_cu = 1'b0;
   logic areset_control   = 1'b0;
+  logic areset_cache     = 1'b0;
 
-  ControlChainInterfaceInput  control_in ;
-  ControlChainInterfaceOutput control_out;
+  ControlChainInterfaceInput  kernel_cu_control_in ;
+  ControlChainInterfaceOutput kernel_cu_control_out;
 
-  DescriptorInterface      descriptor ;
-  AXI4MasterReadInterface  m_axi_read ;
-  AXI4MasterWriteInterface m_axi_write;
+  DescriptorInterface      kernel_cu_descriptor;
+  AXI4MasterReadInterface  m_axi_read          ;
+  AXI4MasterWriteInterface m_axi_write         ;
 
 
 // --------------------------------------------------------------------------------------
@@ -114,6 +115,7 @@ module kernel_afu #(
     areset_m_axi     <= ~ap_rst_n;
     areset_kernel_cu <= ~ap_rst_n;
     areset_control   <= ~ap_rst_n;
+    areset_cache     <= ~ap_rst_n;
   end
 
 // --------------------------------------------------------------------------------------
@@ -122,12 +124,12 @@ module kernel_afu #(
 
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      control_in.ap_start    <= 1'b0;
-      control_in.ap_continue <= 1'b0;
+      kernel_cu_control_in.ap_start    <= 1'b0;
+      kernel_cu_control_in.ap_continue <= 1'b0;
     end
     else begin
-      control_in.ap_start    <= ap_start;
-      control_in.ap_continue <= ap_continue;
+      kernel_cu_control_in.ap_start    <= ap_start;
+      kernel_cu_control_in.ap_continue <= ap_continue;
     end
   end
 
@@ -138,9 +140,9 @@ module kernel_afu #(
       ap_idle  <= 1'b1;
     end
     else begin
-      ap_done  <= control_out.ap_done;
-      ap_ready <= control_out.ap_ready;
-      ap_idle  <= control_out.ap_idle;
+      ap_done  <= kernel_cu_control_out.ap_done;
+      ap_ready <= kernel_cu_control_out.ap_ready;
+      ap_idle  <= kernel_cu_control_out.ap_idle;
     end
   end
 
@@ -262,42 +264,74 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 
   always_ff @(posedge ap_clk) begin
-    descriptor.valid                      <= 0;
-    descriptor.payload.graph_csr_struct   <= graph_csr_struct  ;
-    descriptor.payload.vertex_out_degree  <= vertex_out_degree ;
-    descriptor.payload.vertex_in_degree   <= vertex_in_degree  ;
-    descriptor.payload.vertex_edges_idx   <= vertex_edges_idx  ;
-    descriptor.payload.edges_array_weight <= edges_array_weight;
-    descriptor.payload.edges_array_src    <= edges_array_src   ;
-    descriptor.payload.edges_array_dest   <= edges_array_dest  ;
-    descriptor.payload.auxiliary_1        <= auxiliary_1       ;
-    descriptor.payload.auxiliary_2        <= auxiliary_2       ;
+    kernel_cu_descriptor.valid                      <= 0;
+    kernel_cu_descriptor.payload.graph_csr_struct   <= graph_csr_struct  ;
+    kernel_cu_descriptor.payload.vertex_out_degree  <= vertex_out_degree ;
+    kernel_cu_descriptor.payload.vertex_in_degree   <= vertex_in_degree  ;
+    kernel_cu_descriptor.payload.vertex_edges_idx   <= vertex_edges_idx  ;
+    kernel_cu_descriptor.payload.edges_array_weight <= edges_array_weight;
+    kernel_cu_descriptor.payload.edges_array_src    <= edges_array_src   ;
+    kernel_cu_descriptor.payload.edges_array_dest   <= edges_array_dest  ;
+    kernel_cu_descriptor.payload.auxiliary_1        <= auxiliary_1       ;
+    kernel_cu_descriptor.payload.auxiliary_2        <= auxiliary_2       ;
   end
 
 
 // --------------------------------------------------------------------------------------
 // Cache -> AXI and Logic here.
 // --------------------------------------------------------------------------------------
+  CacheRequest           kernel_cache_request_in              ;
+  FIFOStateSignalsOutput kernel_cache_fifo_request_signals_out;
+  FIFOStateSignalsInput  kernel_cache_fifo_request_signals_in ;
+
+  CacheResponse          kernel_cache_response_out             ;
+  FIFOStateSignalsOutput kernel_cache_fifo_response_signals_out;
+  FIFOStateSignalsInput  kernel_cache_fifo_response_signals_in ;
+  logic                  kernel_cache_fifo_setup_signal        ;
+
+  kernel_cache inst_kernel_cache (
+    .ap_clk                   (ap_clk                                ),
+    .areset                   (areset_cache                          ),
+    .request_in               (kernel_cache_request_in               ),
+    .fifo_request_signals_out (kernel_cache_fifo_request_signals_out ),
+    .fifo_request_signals_in  (kernel_cache_fifo_request_signals_in  ),
+    .response_out             (kernel_cache_response_out             ),
+    .fifo_response_signals_out(kernel_cache_fifo_response_signals_out),
+    .fifo_response_signals_in (kernel_cache_fifo_response_signals_in ),
+    .fifo_setup_signal        (kernel_cache_fifo_setup_signal        ),
+    .m_axi_read_in            (m_axi_read.in                         ),
+    .m_axi_read_out           (m_axi_read.out                        ),
+    .m_axi_write_in           (m_axi_write.in                        ),
+    .m_axi_write_out          (m_axi_write.out                       )
+  );
 
 // --------------------------------------------------------------------------------------
 // CU -> Caches/PEs and Logic here.
 // --------------------------------------------------------------------------------------
+  ControlChainInterfaceInput  kernel_cu_control_in ;
+  ControlChainInterfaceOutput kernel_cu_control_out;
+  DescriptorInterface         kernel_cu_descriptor ;
+
+  CacheRequest           kernel_cu_request_out             ;
+  FIFOStateSignalsOutput kernel_cu_fifo_request_signals_out;
+  FIFOStateSignalsInput  kernel_cu_fifo_request_signals_in ;
+
+  CacheResponse          kernel_cu_response_in              ;
+  FIFOStateSignalsOutput kernel_cu_fifo_response_signals_out;
+  FIFOStateSignalsInput  kernel_cu_fifo_response_signals_in ;
 
   kernel_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_cu (
-    .ap_clk         (ap_clk          ),
-    .areset         (areset_kernel_cu),
-    .control_in     (control_in      ),
-    .control_out    (control_out     ),
-    .descriptor     (descriptor      ),
-    .m_axi_read_in  (m_axi_read.in   ),
-    .m_axi_read_out (m_axi_read.out  ),
-    .m_axi_write_in (m_axi_write.in  ),
-    .m_axi_write_out(m_axi_write.out )
+    .ap_clk     (ap_clk               ),
+    .areset     (areset               ),
+    .control_in (kernel_cu_control_in ),
+    .control_out(kernel_cu_control_out),
+    .descriptor (kernel_cu_descriptor ),
+    .request_out(kernel_cu_request_out),
+    .response_in(kernel_cu_response_in)
   );
-
 
 endmodule : kernel_afu
 

@@ -25,14 +25,17 @@ module kernel_cu #(
   parameter NUM_MEMORY_REQUESTOR = 2              ,
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
-  // System Signals
-  input  logic                       ap_clk               ,
-  input  logic                       areset               ,
-  input  ControlChainInterfaceInput  control_in           ,
-  output ControlChainInterfaceOutput control_out          ,
-  input  DescriptorInterface         descriptor           ,
-  output CacheRequest                kernel_cu_request out,
-  input  CacheResponse               kernel_cu_response_in
+  input  logic                       ap_clk                   ,
+  input  logic                       areset                   ,
+  input  ControlChainInterfaceInput  control_in               ,
+  output ControlChainInterfaceOutput control_out              ,
+  input  DescriptorInterface         descriptor               ,
+  output CacheRequest                request_out              ,
+  output FIFOStateSignalsOutput      fifo_request_signals_out ,
+  input  FIFOStateSignalsInput       fifo_request_signals_in  ,
+  input  CacheResponse               response_in              ,
+  output FIFOStateSignalsOutput      fifo_response_signals_out,
+  input  FIFOStateSignalsInput       fifo_response_signals_in
 );
 
 // --------------------------------------------------------------------------------------
@@ -60,7 +63,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-  CacheRequest         cache_request_in ;
+  CacheRequest cache_request_in;
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
