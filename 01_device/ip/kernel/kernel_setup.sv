@@ -58,8 +58,8 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     DescriptorInterface descriptor_reg;
 
-    MemoryPacket kernel_setup_mem_resp_dout;
-    MemoryPacket kernel_setup_mem_resp_din ;
+    MemoryPacket fifo_response_dout;
+    MemoryPacket fifo_response_din ;
 
     MemoryPacket kernel_setup_mem_req_dout;
     MemoryPacket kernel_setup_mem_req_din ;
@@ -117,19 +117,19 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (kernel_setup_areset) begin
-            kernel_setup_mem_resp_din.valid    <= 0;
+            fifo_response_din.valid            <= 0;
             fifo_response_signals_in_reg.rd_en <= 0;
             fifo_request_signals_in_reg.rd_en  <= 0;
         end
         else begin
-            kernel_setup_mem_resp_din.valid    <= response_in.valid;
+            fifo_response_din.valid            <= response_in.valid;
             fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
             fifo_request_signals_in_reg.rd_en  <= fifo_request_signals_in.rd_en;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        kernel_setup_mem_resp_din.payload <= response_in.payload;
+        fifo_response_din.payload <= response_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -269,7 +269,6 @@ module kernel_setup #(
     engine_serial_read #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      ),
-        .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_engine_serial_read (
         .ap_clk                      (ap_clk                                 ),
@@ -294,8 +293,8 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in inst_fifo_812x16_MemoryPacket
 // --------------------------------------------------------------------------------------
-    assign fifo_response_signals_in_reg.wr_en = kernel_setup_mem_resp_din.valid;
-    assign kernel_setup_mem_resp_dout.valid   = fifo_response_signals_out_reg.valid;
+    assign fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
+    assign fifo_response_dout.valid           = fifo_response_signals_out_reg.valid;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -305,10 +304,10 @@ module kernel_setup #(
     ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
-        .din         (kernel_setup_mem_resp_din.payload         ),
+        .din         (fifo_response_din.payload                 ),
         .wr_en       (fifo_response_signals_in_reg.wr_en        ),
         .rd_en       (fifo_response_signals_in_reg.rd_en        ),
-        .dout        (kernel_setup_mem_resp_dout.payload        ),
+        .dout        (fifo_response_dout.payload                ),
         .full        (fifo_response_signals_out_reg.full        ),
         .almost_full (fifo_response_signals_out_reg.almost_full ),
         .empty       (fifo_response_signals_out_reg.empty       ),
