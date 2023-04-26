@@ -61,22 +61,23 @@ module kernel_cache (
   CacheRequestPayload   cache_response_mem;
   CacheControlIOBOutput cache_ctrl_in     ;
   CacheControlIOBOutput cache_ctrl_out    ;
+// --------------------------------------------------------------------------------------
+// Cache request FIFO
+// --------------------------------------------------------------------------------------
+  CacheResponsePayload   fifo_request_din                ;
+  CacheResponsePayload   fifo_request_dout               ;
+  FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
+  FIFOStateSignalsInput  fifo_request_signals_in_internal;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_response_din            ;
-  CacheResponsePayload   fifo_response_dout           ;
-  FIFOStateSignalsOutput fifo_response_signals_out_reg;
-  FIFOStateSignalsInput  fifo_response_signals_in_reg ;
-
-// --------------------------------------------------------------------------------------
-// Cache request FIFO
-// --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_request_din            ;
-  CacheResponsePayload   fifo_request_dout           ;
-  FIFOStateSignalsOutput fifo_request_signals_out_reg;
-  FIFOStateSignalsInput  fifo_request_signals_in_reg ;
+  CacheResponsePayload   fifo_response_din                ;
+  CacheResponsePayload   fifo_response_dout               ;
+  FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
+  FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
+  FIFOStateSignalsInput  fifo_response_signals_in_internal;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -94,9 +95,13 @@ module kernel_cache (
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
       kernel_cache_request_reg.valid <= 1'b0;
+      fifo_response_signals_in_reg   <= 0;
+      fifo_request_signals_in_reg    <= 0;
     end
     else begin
       kernel_cache_request_reg.valid <= request_in.valid;
+      fifo_response_signals_in_reg   <= fifo_response_signals_in;
+      fifo_request_signals_in_reg    <= fifo_request_signals_in;
     end
   end
 
@@ -115,8 +120,8 @@ module kernel_cache (
     end
     else begin
       fifo_setup_signal         <= fifo_request_setup_signal | fifo_response_setup_signal;
-      fifo_request_signals_out  <= fifo_request_signals_reg;
-      fifo_response_signals_out <= fifo_response_signals_reg;
+      fifo_request_signals_out  <= fifo_request_signals_out_reg;
+      fifo_response_signals_out <= fifo_response_signals_out_reg;
       response_out.valid        <= kernel_cache_response_reg.valid;
     end
   end
@@ -256,8 +261,8 @@ module kernel_cache (
     .clk         (ap_clk                                   ),
     .srst        (areset_fifo                              ),
     .din         (fifo_request_din                         ),
-    .wr_en       (fifo_request_signals_in_reg.wr_en        ),
-    .rd_en       (fifo_request_signals_in_reg.rd_en        ),
+    .wr_en       (fifo_request_signals_in_internal.wr_en   ),
+    .rd_en       (fifo_request_signals_in_internal.rd_en   ),
     .dout        (fifo_request_dout                        ),
     .full        (fifo_request_signals_out_reg.full        ),
     .almost_full (fifo_request_signals_out_reg.almost_full ),
@@ -277,14 +282,14 @@ module kernel_cache (
   assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_reg.wr_en = cache_response_mem.iob.ready;
-  assign fifo_response_din.iob              = cache_response_mem.iob;
-  assign fifo_response_din.meta             = cache_request_mem.meta;
+  assign fifo_response_signals_in_internal.wr_en = cache_response_mem.iob.ready;
+  assign fifo_response_din.iob                   = cache_response_mem.iob;
+  assign fifo_response_din.meta                  = cache_request_mem.meta;
 
   // Pop
-  assign fifo_response_signals_in_reg.rd_en = ~cache_fifo_response_signals_out.empty;
-  assign kernel_cache_response_reg.valid    = fifo_response_signals_out_reg.valid;
-  assign kernel_cache_response_reg.payload  = fifo_response_dout;
+  assign fifo_response_signals_in_internal.rd_en = ~cache_fifo_response_signals_out.empty & fifo_request_signals_in_reg.rd_en
+    assign kernel_cache_response_reg.valid = fifo_response_signals_out_reg.valid;
+  assign kernel_cache_response_reg.payload = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
@@ -295,8 +300,8 @@ module kernel_cache (
     .clk         (ap_clk                                    ),
     .srst        (areset_fifo                               ),
     .din         (fifo_response_din                         ),
-    .wr_en       (fifo_response_signals_in_reg.wr_en        ),
-    .rd_en       (fifo_response_signals_in_reg.rd_en        ),
+    .wr_en       (fifo_response_signals_in_internal.wr_en   ),
+    .rd_en       (fifo_response_signals_in_internal.rd_en   ),
     .dout        (fifo_response_dout                        ),
     .full        (fifo_response_signals_out_reg.full        ),
     .almost_full (fifo_response_signals_out_reg.almost_full ),
