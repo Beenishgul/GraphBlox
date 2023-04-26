@@ -66,8 +66,8 @@ module kernel_cache (
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_request_din                ;
-  CacheResponsePayload   fifo_request_dout               ;
+  CacheRequestPayload    fifo_request_din                ;
+  CacheRequestPayload    fifo_request_dout               ;
   FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
   FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
   FIFOStateSignalsInput  fifo_request_signals_in_internal;
