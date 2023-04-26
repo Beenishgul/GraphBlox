@@ -40,44 +40,50 @@ module kernel_setup #(
     output logic                       fifo_setup_signal
 );
 
-    logic kernel_setup_areset;
+// --------------------------------------------------------------------------------------
+// Wires and Variables
+// --------------------------------------------------------------------------------------
+    logic areset_kernel_setup;
     logic areset_serial_read ;
     logic areset_fifo        ;
 
+    DescriptorInterface descriptor_reg;
 // --------------------------------------------------------------------------------------
-//   Setup state machine signals
+// Setup state machine signals
 // --------------------------------------------------------------------------------------
     kernel_setup_state current_state;
     kernel_setup_state next_state   ;
 
-    logic kernel_setup_done ;
-    logic kernel_setup_start;
+    logic done_reg ;
+    logic start_reg;
 
 // --------------------------------------------------------------------------------------
-//   FIFO signals
+// Request FIFO
 // --------------------------------------------------------------------------------------
-    DescriptorInterface descriptor_reg;
-
-    MemoryPacket fifo_response_din ;
-    MemoryPacket fifo_response_dout;
-
-
-    MemoryPacket fifo_request_dout;
-    MemoryPacket fifo_request_din ;
-
-    FIFOStateSignalsOutput fifo_response_signals_out_reg;
-    FIFOStateSignalsInput  fifo_response_signals_in_reg ;
-    logic                  fifo_response_setup_signal   ;
-
+    MemoryPacket           fifo_request_din                ;
+    MemoryPacket           fifo_request_dout               ;
+    MemoryPacket           fifo_request_din_reg            ;
+    MemoryPacket           fifo_request_dout_reg           ;
     FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
     FIFOStateSignalsInput  fifo_request_signals_in_internal;
     FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
     logic                  fifo_request_setup_signal       ;
 
+// --------------------------------------------------------------------------------------
+// Response FIFO
+// --------------------------------------------------------------------------------------
 
+    MemoryPacketPayload    fifo_response_din                ;
+    MemoryPacketPayload    fifo_response_dout               ;
+    MemoryPacket           fifo_response_din_reg            ;
+    MemoryPacket           fifo_response_dout_reg           ;
+    FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
+    FIFOStateSignalsInput  fifo_response_signals_in_internal;
+    FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
+    logic                  fifo_response_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
-//  Serial Read Engine Signals
+// Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
     SerialReadEngineConfiguration engine_serial_read_configuration_in        ;
     SerialReadEngineConfiguration configuration_comb                         ;
@@ -91,10 +97,10 @@ module kernel_setup #(
     logic                         engine_serial_read_fifo_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
-//   Register reset signal
+// Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        kernel_setup_areset <= areset;
+        areset_kernel_setup <= areset;
         areset_serial_read  <= areset;
         areset_fifo         <= areset;
     end
@@ -103,7 +109,7 @@ module kernel_setup #(
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (kernel_setup_areset) begin
+        if (areset_kernel_setup) begin
             descriptor_reg.valid <= 0;
         end
         else begin
@@ -119,7 +125,7 @@ module kernel_setup #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (kernel_setup_areset) begin
+        if (areset_kernel_setup) begin
             fifo_response_din.valid            <= 0;
             fifo_response_signals_in_reg.rd_en <= 0;
             fifo_request_signals_in_reg.rd_en  <= 0;
@@ -139,27 +145,29 @@ module kernel_setup #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (kernel_setup_areset) begin
-            fifo_setup_signal <= 1;
-            request_out.valid <= 0;
+        if (areset_kernel_setup) begin
+            fifo_setup_signal         <= 1;
+            fifo_response_signals_out <= 0;
+            request_out.valid         <= 0;
         end
         else begin
-            fifo_setup_signal <= engine_serial_read_fifo_setup_signal | fifo_request_setup_signal | fifo_response_setup_signal;
-            request_out.valid <= fifo_request_signals_out_reg.valid ;
+            fifo_setup_signal         <= engine_serial_read_fifo_setup_signal | fifo_request_setup_signal | fifo_response_setup_signal;
+            fifo_response_signals_out <= fifo_response_signals_out_reg;
+            request_out.valid         <= fifo_request_signals_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out  <= fifo_request_signals_out_reg;
-        fifo_response_signals_out <= fifo_response_signals_out_reg;
-        request_out.payload       <= fifo_request_dout.payload;
+        fifo_request_signals_out <= fifo_request_signals_out_reg;
+
+        request_out.payload <= fifo_request_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
 // SETUP State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(kernel_setup_areset)
+        if(areset_kernel_setup)
             current_state <= KERNEL_SETUP_RESET;
         else begin
             current_state <= next_state;
@@ -186,7 +194,7 @@ module kernel_setup #(
                 end
             end
             KERNEL_SETUP_REQ_BUSY : begin
-                if (kernel_setup_done)
+                if (done_reg)
                     next_state = KERNEL_SETUP_REQ_DONE;
                 else
                     next_state = KERNEL_SETUP_REQ_BUSY;
@@ -203,36 +211,36 @@ module kernel_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             KERNEL_SETUP_RESET : begin
-                kernel_setup_done                                <= 1'b1;
-                kernel_setup_start                               <= 1'b0;
+                done_reg                                         <= 1'b1;
+                start_reg                                        <= 1'b0;
                 engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
                 engine_serial_read_start_in                      <= 1'b0;
                 engine_serial_read_configuration_in.valid        <= 1'b0;
             end
             KERNEL_SETUP_IDLE : begin
-                kernel_setup_done                                <= 1'b0;
-                kernel_setup_start                               <= 1'b0;
+                done_reg                                         <= 1'b0;
+                start_reg                                        <= 1'b0;
                 engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
                 engine_serial_read_start_in                      <= 1'b0;
                 engine_serial_read_configuration_in.valid        <= 1'b0;
             end
             KERNEL_SETUP_REQ_START : begin
-                kernel_setup_done                                <= 1'b0;
-                kernel_setup_start                               <= 1'b1;
+                done_reg                                         <= 1'b0;
+                start_reg                                        <= 1'b1;
                 engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
                 engine_serial_read_start_in                      <= 1'b1;
                 engine_serial_read_configuration_in.valid        <= 1'b1;
             end
             KERNEL_SETUP_REQ_BUSY : begin
-                kernel_setup_done                                <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty;
-                kernel_setup_start                               <= 1'b0;
+                done_reg                                         <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty;
+                start_reg                                        <= 1'b0;
                 engine_serial_read_fifo_request_signals_in.rd_en <= ~engine_serial_read_fifo_request_signals_out.empty & ~fifo_request_signals_out_reg.prog_full;
                 engine_serial_read_start_in                      <= 1'b0;
                 engine_serial_read_configuration_in.valid        <= 1'b1;
             end
             KERNEL_SETUP_REQ_DONE : begin
-                kernel_setup_done                                <= 1'b1;
-                kernel_setup_start                               <= 1'b0;
+                done_reg                                         <= 1'b1;
+                start_reg                                        <= 1'b0;
                 engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
                 engine_serial_read_start_in                      <= 1'b0;
                 engine_serial_read_configuration_in.valid        <= 1'b0;
@@ -272,7 +280,6 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-
     engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
         .ap_clk                  (ap_clk                                     ),
         .areset                  (areset_serial_read                         ),
@@ -286,7 +293,6 @@ module kernel_setup #(
         .done_out                (engine_serial_read_done_out                ),
         .pause_out               (engine_serial_read_pause_out               )
     );
-
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out MemoryPacket
