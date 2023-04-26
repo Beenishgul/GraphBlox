@@ -22,8 +22,7 @@ import PKG_CACHE::*;
 module kernel_cu #(
   parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
   parameter NUM_SETUP_MODULES    = 4              ,
-  parameter NUM_MEMORY_REQUESTOR = 2              ,
-  parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
+  parameter NUM_MEMORY_REQUESTOR = 2
 ) (
   input  logic                  ap_clk                   ,
   input  logic                  areset                   ,

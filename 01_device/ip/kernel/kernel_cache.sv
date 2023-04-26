@@ -245,17 +245,17 @@ module kernel_cache (
   assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
 
   // Push
-  assign fifo_request_signals_in_reg.wr_en = kernel_cache_request_reg.valid;
-  assign fifo_request_din.iob              = kernel_cache_request_reg.payload.iob;
-  assign fifo_request_din.meta             = kernel_cache_request_reg.payload.meta;
+  assign fifo_request_signals_in_internal.wr_en = kernel_cache_request_reg.valid;
+  assign fifo_request_din.iob                   = kernel_cache_request_reg.payload.iob;
+  assign fifo_request_din.meta                  = kernel_cache_request_reg.payload.meta;
 
   // Pop
-  assign fifo_request_signals_in_reg.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
-  assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
-  assign cache_request_mem.iob.addr        = fifo_request_dout.iob.addr;
-  assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
-  assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
-  assign cache_request_mem.meta            = fifo_request_dout.meta;
+  assign fifo_request_signals_in_internal.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
+  assign cache_request_mem.iob.valid            = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
+  assign cache_request_mem.iob.addr             = fifo_request_dout.iob.addr;
+  assign cache_request_mem.iob.wdata            = fifo_request_dout.iob.wdata;
+  assign cache_request_mem.iob.wstrb            = fifo_request_dout.iob.wstrb;
+  assign cache_request_mem.meta                 = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -293,7 +293,7 @@ module kernel_cache (
   assign fifo_response_din.meta                  = cache_request_mem.meta;
 
   // Pop
-  assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
+  assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;
   assign kernel_cache_response_reg.valid         = fifo_response_signals_out_reg.valid;
   assign kernel_cache_response_reg.payload       = fifo_response_dout;
 
