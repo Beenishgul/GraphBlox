@@ -288,15 +288,27 @@ module kernel_cu #(
   );
 
 // --------------------------------------------------------------------------------------
+// Arbiter Signals: Cache Request Generator
+// --------------------------------------------------------------------------------------
+  // kernel_setup
+  assign kernel_setup_memory_response_in            = memory_response_out[0];
+  assign kernel_setup_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[0];
+  assign cache_memory_request_in[0]                 = kernel_setup_memory_request_out;
+  assign cache_arbiter_request_in[0]                = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
+
+  // vertex_cu
+  assign vertex_cu_memory_response_in            = memory_response_out[1];
+  assign vertex_cu_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[1];
+  assign cache_memory_request_in[1]              = vertex_cu_memory_request_out;
+  assign cache_arbiter_request_in[1]             = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
+
+// --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
   always_comb begin
     cache_request_in                   = cache_request_out;
     cache_request_in.payload.iob.valid = cache_request_out.valid & ~cache_response_out.valid;
   end
-
-  assign cache_memory_request_in[0] = kernel_setup_memory_request_out;
-  assign cache_memory_request_in[1] = vertex_cu_memory_request_out;
 
   assign cache_response_ready = cache_response_out.payload.iob.ready;
   // assign cache_request_out.payload.iob.valid = cache_request_out.payload.iob.valid | (cache_request_out.valid & ~cache_response_out.valid);
@@ -322,11 +334,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  assign kernel_setup_memory_response_in            = memory_response_out[0];
-  assign kernel_setup_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[0];
-
-  assign cache_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full;
-
   kernel_setup #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
@@ -347,12 +354,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-  assign vertex_cu_memory_response_in            = memory_response_out[1];
-  assign vertex_cu_fifo_request_signals_in.rd_en = cache_arbiter_grant_out[1];
-
-  // assign cache_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_fifo_request_signals_out.prog_full ;
-  assign cache_arbiter_request_in[1] = 0 ;
-
   vertex_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )

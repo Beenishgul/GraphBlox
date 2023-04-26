@@ -92,11 +92,10 @@ module kernel_afu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
   (* KEEP = "yes" *)
-  logic areset           = 1'b0;
-  logic areset_m_axi     = 1'b0;
-  logic areset_kernel_cu = 1'b0;
-  logic areset_control   = 1'b0;
-  logic areset_cache     = 1'b0;
+  logic areset_m_axi   = 1'b0;
+  logic areset_cu      = 1'b0;
+  logic areset_control = 1'b0;
+  logic areset_cache   = 1'b0;
 
   ControlChainInterfaceInput  kernel_cu_control_in ;
   ControlChainInterfaceOutput kernel_cu_control_out;
@@ -105,17 +104,42 @@ module kernel_afu #(
   AXI4MasterReadInterface  m_axi_read          ;
   AXI4MasterWriteInterface m_axi_write         ;
 
+// --------------------------------------------------------------------------------------
+// Cache -> AXI
+// --------------------------------------------------------------------------------------
+  CacheRequest           kernel_cache_request_in              ;
+  FIFOStateSignalsOutput kernel_cache_fifo_request_signals_out;
+  FIFOStateSignalsInput  kernel_cache_fifo_request_signals_in ;
+
+  CacheResponse          kernel_cache_response_out             ;
+  FIFOStateSignalsOutput kernel_cache_fifo_response_signals_out;
+  FIFOStateSignalsInput  kernel_cache_fifo_response_signals_in ;
+  logic                  kernel_cache_fifo_setup_signal        ;
+
+  // --------------------------------------------------------------------------------------
+// CU -> Caches/PEs
+// --------------------------------------------------------------------------------------
+  ControlChainInterfaceInput  kernel_cu_control_in ;
+  ControlChainInterfaceOutput kernel_cu_control_out;
+  DescriptorInterface         kernel_cu_descriptor ;
+
+  CacheRequest           kernel_cu_request_out             ;
+  FIFOStateSignalsOutput kernel_cu_fifo_request_signals_out;
+  FIFOStateSignalsInput  kernel_cu_fifo_request_signals_in ;
+
+  CacheResponse          kernel_cu_response_in              ;
+  FIFOStateSignalsOutput kernel_cu_fifo_response_signals_out;
+  FIFOStateSignalsInput  kernel_cu_fifo_response_signals_in ;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
 
   always_ff @(posedge ap_clk) begin
-    areset           <= ~ap_rst_n;
-    areset_m_axi     <= ~ap_rst_n;
-    areset_kernel_cu <= ~ap_rst_n;
-    areset_control   <= ~ap_rst_n;
-    areset_cache     <= ~ap_rst_n;
+    areset_m_axi   <= ~ap_rst_n;
+    areset_cu      <= ~ap_rst_n;
+    areset_control <= ~ap_rst_n;
+    areset_cache   <= ~ap_rst_n;
   end
 
 // --------------------------------------------------------------------------------------
@@ -278,17 +302,25 @@ module kernel_afu #(
 
 
 // --------------------------------------------------------------------------------------
-// Cache -> AXI and Logic here.
+// Assign Kernel Cache <-CU Signals
 // --------------------------------------------------------------------------------------
-  CacheRequest           kernel_cache_request_in              ;
-  FIFOStateSignalsOutput kernel_cache_fifo_request_signals_out;
-  FIFOStateSignalsInput  kernel_cache_fifo_request_signals_in ;
+  // kernel_cache
+  assign kernel_cache_request_in                     = kernel_cu_request_out;
+  assign kernel_cache_fifo_request_signals_in.wr_en  = 0;
+  assign kernel_cache_fifo_request_signals_in.rd_en  = 0;
+  assign kernel_cache_fifo_response_signals_in.wr_en = 0;
+  assign kernel_cache_fifo_response_signals_in.rd_en = 0;
 
-  CacheResponse          kernel_cache_response_out             ;
-  FIFOStateSignalsOutput kernel_cache_fifo_response_signals_out;
-  FIFOStateSignalsInput  kernel_cache_fifo_response_signals_in ;
-  logic                  kernel_cache_fifo_setup_signal        ;
+  // kernel_cu
+  assign kernel_cu_response_in                    = kernel_cache_response_out;
+  assign kernel_cu_fifo_request_signals_in.wr_en  = 0;
+  assign kernel_cu_fifo_request_signals_in.rd_en  = 0;
+  assign kernel_cu_fifo_response_signals_in.wr_en = 0;
+  assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
+// --------------------------------------------------------------------------------------
+// Cache -> AXI
+// --------------------------------------------------------------------------------------
   kernel_cache inst_kernel_cache (
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_cache                          ),
@@ -306,26 +338,14 @@ module kernel_afu #(
   );
 
 // --------------------------------------------------------------------------------------
-// CU -> Caches/PEs and Logic here.
+// CU -> Caches/PEs
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceInput  kernel_cu_control_in ;
-  ControlChainInterfaceOutput kernel_cu_control_out;
-  DescriptorInterface         kernel_cu_descriptor ;
-
-  CacheRequest           kernel_cu_request_out             ;
-  FIFOStateSignalsOutput kernel_cu_fifo_request_signals_out;
-  FIFOStateSignalsInput  kernel_cu_fifo_request_signals_in ;
-
-  CacheResponse          kernel_cu_response_in              ;
-  FIFOStateSignalsOutput kernel_cu_fifo_response_signals_out;
-  FIFOStateSignalsInput  kernel_cu_fifo_response_signals_in ;
-
   kernel_cu #(
     .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_kernel_cu (
     .ap_clk     (ap_clk               ),
-    .areset     (areset               ),
+    .areset     (areset_cu            ),
     .control_in (kernel_cu_control_in ),
     .control_out(kernel_cu_control_out),
     .descriptor (kernel_cu_descriptor ),
