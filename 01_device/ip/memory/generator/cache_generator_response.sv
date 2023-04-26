@@ -39,6 +39,7 @@ module cache_generator_response #(
 // --------------------------------------------------------------------------------------
   logic areset_control;
   logic areset_fifo   ;
+  logic areset_demux  ;
 
   MemoryPacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
   CacheResponse response_in_reg                           ;
@@ -60,6 +61,7 @@ module cache_generator_response #(
   always_ff @(posedge ap_clk) begin
     areset_control <= areset;
     areset_fifo    <= areset;
+    areset_demux   <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -89,7 +91,7 @@ module cache_generator_response #(
   end
 
 // --------------------------------------------------------------------------------------
-// Arbitrate responses
+// drive Responses
 // --------------------------------------------------------------------------------------
   genvar i;
   generate
@@ -150,6 +152,5 @@ module cache_generator_response #(
     .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
     .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
   );
-
 
 endmodule : cache_generator_response
