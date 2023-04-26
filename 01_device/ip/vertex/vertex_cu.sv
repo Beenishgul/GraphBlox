@@ -272,7 +272,6 @@ module vertex_cu #(
     engine_serial_read #(
         .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
         .NUM_GRAPH_PE      (NUM_GRAPH_PE      ),
-        .ENGINE_ID         (ENGINE_ID         ),
         .COUNTER_WIDTH     (COUNTER_WIDTH     )
     ) inst_engine_serial_read (
         .ap_clk                      (ap_clk                                 ),

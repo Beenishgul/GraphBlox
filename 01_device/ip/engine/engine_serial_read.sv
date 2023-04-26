@@ -39,7 +39,6 @@ import PKG_CACHE::*;
 module engine_serial_read #(
     parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
     parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID          = 0              ,
     parameter COUNTER_WIDTH      = 32
 ) (
     // System Signals
