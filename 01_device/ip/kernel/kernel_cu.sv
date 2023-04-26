@@ -202,17 +202,6 @@ module kernel_cu #(
     end
   end
 
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      fifo_setup_signal <= 1'b1;
-      done_signal       <= 1'b0;
-    end
-    else begin
-      fifo_setup_signal <= ~|cu_setup_state;
-      done_signal       <= &done_signal_reg;
-    end
-  end
-
 // --------------------------------------------------------------------------------------
 // READ Descriptor Control and Drive signals to other modules
 // --------------------------------------------------------------------------------------
@@ -297,10 +286,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  kernel_setup #(
-    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-  ) inst_kernel_setup (
+  kernel_setup inst_kernel_setup (
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
     .control_state            (kernel_setup_control_state            ),
