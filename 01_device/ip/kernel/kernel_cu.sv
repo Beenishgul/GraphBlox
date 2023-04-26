@@ -27,38 +27,30 @@ module kernel_cu #(
 ) (
   input  logic                       ap_clk                   ,
   input  logic                       areset                   ,
-  input  ControlChainInterfaceInput  control_in               ,
-  output ControlChainInterfaceOutput control_out              ,
-  input  DescriptorInterface         descriptor               ,
+  input  DescriptorInterface         descriptor_in            ,
   output CacheRequest                request_out              ,
   output FIFOStateSignalsOutput      fifo_request_signals_out ,
   input  FIFOStateSignalsInput       fifo_request_signals_in  ,
   input  CacheResponse               response_in              ,
   output FIFOStateSignalsOutput      fifo_response_signals_out,
-  input  FIFOStateSignalsInput       fifo_response_signals_in
+  input  FIFOStateSignalsInput       fifo_response_signals_in ,
+  output logic                       done_signal              ,
+  output logic                       fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 // AXI write master stage
-  logic areset_m_axi  ;
-  logic areset_control;
-  logic areset_fifo   ;
-  logic areset_arbiter;
-  logic areset_setup  ;
-  logic areset_cache  ;
-  logic areset_cache  ;
+  logic areset_control  ;
+  logic areset_generator;
+  logic areset_setup    ;
+  logic areset_cu       ;
 
-  logic [NUM_GRAPH_CLUSTERS-1:0] cu_done_reg   ;
-  logic [  VERTEX_DATA_BITS-1:0] counter       ;
-  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state;
-
-
-  ControlChainInterfaceInput  control_in_reg    ;
-  ControlChainInterfaceOutput control_out_reg   ;
-  DescriptorInterface         descriptor_in_reg ;
-  DescriptorInterface         descriptor_out_reg;
+  logic [NUM_GRAPH_CLUSTERS-1:0] done_signal_reg  ;
+  logic [  VERTEX_DATA_BITS-1:0] counter          ;
+  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state   ;
+  DescriptorInterface            descriptor_in_reg;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -117,11 +109,10 @@ module kernel_cu #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi   <= areset;
-    areset_control <= areset;
-    areset_fifo    <= areset;
-    areset_arbiter <= areset;
-    areset_setup   <= areset;
+    areset_control   <= areset;
+    areset_setup     <= areset;
+    areset_generator <= areset;
+    areset_cu        <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -129,18 +120,18 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      counter     <= 0;
-      cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+      counter         <= 0;
+      done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
     end
     else begin
-      if (descriptor_out_reg.valid) begin
-        if(counter >= (descriptor_out_reg.payload.auxiliary_2 -1)) begin
-          cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
-          counter     <= 0;
+      if (descriptor_in_reg.valid) begin
+        if(counter >= (descriptor_in_reg.payload.auxiliary_2 -1)) begin
+          done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+          counter         <= 0;
         end
         else begin
           if(kernel_setup_memory_response_in.valid) begin
-            // $display("counter: %d >= %d", counter, descriptor_out_reg.payload.auxiliary_2);
+            // $display("counter: %d >= %d", counter, descriptor_in_reg.payload.auxiliary_2);
             counter <= counter + 4;
           end
           else begin
@@ -148,8 +139,8 @@ module kernel_cu #(
           end
         end
       end else begin
-        cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-        counter     <= 0;
+        done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+        counter         <= 0;
       end
     end
   end
@@ -157,19 +148,19 @@ module kernel_cu #(
   // always_ff @(posedge ap_clk) begin
   //   if (areset_control) begin
   //     counter     <= 0;
-  //     cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+  //     done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
   //   end
   //   else begin
-  //     if (descriptor_out_reg.valid) begin
+  //     if (descriptor_in_reg.valid) begin
   //       if(counter > 2000) begin
-  //         cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
+  //         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
   //         counter     <= 0;
   //       end
   //       else begin
   //         counter <= counter + 1;
   //       end
   //     end else begin
-  //       cu_done_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
+  //       done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
   //       counter     <= 0;
   //     end
   //   end
@@ -191,45 +182,14 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      control_in_reg.ap_start    <= 1'b0;
-      control_in_reg.ap_continue <= 1'b0;
-      control_in_reg.setup       <= 1'b1;
-      control_in_reg.done        <= 1'b0;
+      fifo_setup_signal <= 1'b1;
+      done_signal       <= 1'b0;
     end
     else begin
-      control_in_reg.ap_start    <= control_in.ap_start ;
-      control_in_reg.ap_continue <= control_in.ap_continue;
-      control_in_reg.setup       <= ~|cu_setup_state;
-      control_in_reg.done        <= &cu_done_reg;
+      fifo_setup_signal <= ~|cu_setup_state;
+      done_signal       <= &done_signal_reg;
     end
   end
-
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      control_out.ap_ready <= 1'b0;
-      control_out.ap_done  <= 1'b0;
-      control_out.ap_idle  <= 1'b1;
-      control_out.start    <= 1'b0;
-    end
-    else begin
-      control_out.ap_ready <= control_out_reg.ap_ready;
-      control_out.ap_idle  <= control_out_reg.ap_idle;
-      control_out.ap_done  <= control_out_reg.ap_done;
-      control_out.start    <= control_out_reg.start;
-    end
-  end
-
-  kernel_control #(
-    .NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS),
-    .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
-  ) inst_kernel_control (
-    .ap_clk        (ap_clk            ),
-    .areset        (areset_control    ),
-    .control_in    (control_in_reg    ),
-    .control_out   (control_out_reg   ),
-    .descriptor_in (descriptor_in_reg ),
-    .descriptor_out(descriptor_out_reg)
-  );
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor Control
@@ -239,12 +199,12 @@ module kernel_cu #(
       descriptor_in_reg.valid <= 0;
     end
     else begin
-      descriptor_in_reg.valid <= descriptor.valid;
+      descriptor_in_reg.valid <= descriptor_in.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor.payload;
+    descriptor_in_reg.payload <= descriptor_in.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -256,14 +216,14 @@ module kernel_cu #(
       vertex_cu_descriptor.valid    <= 0;
     end
     else begin
-      kernel_setup_descriptor.valid <= descriptor_out_reg.valid;
-      vertex_cu_descriptor.valid    <= descriptor_out_reg.valid;
+      kernel_setup_descriptor.valid <= descriptor_in_reg.valid;
+      vertex_cu_descriptor.valid    <= descriptor_in_reg.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    kernel_setup_descriptor.payload <= descriptor_out_reg.payload;
-    vertex_cu_descriptor.payload    <= descriptor_out_reg.payload;
+    kernel_setup_descriptor.payload <= descriptor_in_reg.payload;
+    vertex_cu_descriptor.payload    <= descriptor_in_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -321,7 +281,7 @@ module kernel_cu #(
     .OUTSTANDING_COUNTER_MAX(32                  )
   ) inst_cache_generator_request (
     .ap_clk                  (ap_clk                                   ),
-    .areset                  (areset                                   ),
+    .areset                  (areset_generator                         ),
     .memory_request_in       (cache_memory_request_in                  ),
     .arbiter_request_in      (cache_arbiter_request_in                 ),
     .arbiter_grant_out       (cache_arbiter_grant_out                  ),
@@ -359,7 +319,7 @@ module kernel_cu #(
     .NUM_GRAPH_PE      (NUM_GRAPH_PE      )
   ) inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
-    .areset                   (areset_setup                       ),
+    .areset                   (areset_cu                          ),
     .control_state            (vertex_cu_control_state            ),
     .descriptor               (vertex_cu_descriptor               ),
     .memory_response_in       (vertex_cu_memory_response_in       ),
