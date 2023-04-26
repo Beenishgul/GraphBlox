@@ -110,7 +110,7 @@ module cache_generator_response #(
     end
   endgenerate
 
-// needs optimizing!!
+// Might needs optimizing!!
   always_comb begin
     case (fifo_response_dout_reg.meta.struct_type)
       STRUCT_KERNEL_SETUP : begin
