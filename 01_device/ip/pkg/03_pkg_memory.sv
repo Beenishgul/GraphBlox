@@ -126,8 +126,8 @@ typedef struct packed{
 } MemoryPacketMeta;
 
 typedef struct packed{
-  logic [CACHE_FRONTEND_DATA_W-1:0] field; // SIZE = 512 bits
-} MemoryPacketData;// SIZE = 512 bits
+  logic [CACHE_FRONTEND_DATA_W-1:0] field;
+} MemoryPacketData;
 
 typedef struct packed{
   MemoryPacketMeta meta;
