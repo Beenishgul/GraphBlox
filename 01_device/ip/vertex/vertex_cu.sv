@@ -61,8 +61,9 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
     DescriptorInterface descriptor_reg;
 
-    MemoryPacket fifo_response_dout;
     MemoryPacket fifo_response_din ;
+    MemoryPacket fifo_response_dout;
+    
 
     MemoryPacket fifo_request_dout;
     MemoryPacket fifo_request_din ;
