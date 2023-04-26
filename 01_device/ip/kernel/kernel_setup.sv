@@ -30,11 +30,11 @@ module kernel_setup #(
     input  logic                       ap_clk                   ,
     input  logic                       areset                   ,
     input  ControlChainInterfaceOutput control_state            ,
-    input  DescriptorInterface         descriptor_in               ,
-    input  MemoryPacket                memory_response_in       ,
+    input  DescriptorInterface         descriptor_in            ,
+    input  MemoryPacket                response_in              ,
     input  FIFOStateSignalsInput       fifo_response_signals_in ,
     output FIFOStateSignalsOutput      fifo_response_signals_out,
-    output MemoryPacket                memory_request_out       ,
+    output MemoryPacket                request_out              ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
     output FIFOStateSignalsOutput      fifo_request_signals_out ,
     output logic                       fifo_setup_signal
@@ -122,14 +122,14 @@ module kernel_setup #(
             fifo_request_signals_in_reg.rd_en  <= 0;
         end
         else begin
-            kernel_setup_mem_resp_din.valid    <= memory_response_in.valid;
+            kernel_setup_mem_resp_din.valid    <= response_in.valid;
             fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
             fifo_request_signals_in_reg.rd_en  <= fifo_request_signals_in.rd_en;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        kernel_setup_mem_resp_din.payload <= memory_response_in.payload;
+        kernel_setup_mem_resp_din.payload <= response_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -137,19 +137,19 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (kernel_setup_areset) begin
-            fifo_setup_signal        <= 1;
-            memory_request_out.valid <= 0;
+            fifo_setup_signal <= 1;
+            request_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal        <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal | fifo_MemoryPacketResponse_kernel_setup_signal;
-            memory_request_out.valid <= fifo_request_signals_out_reg.valid ;
+            fifo_setup_signal <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_kernel_setup_signal | fifo_MemoryPacketResponse_kernel_setup_signal;
+            request_out.valid <= fifo_request_signals_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out   <= fifo_request_signals_out_reg;
-        fifo_response_signals_out  <= fifo_response_signals_out_reg;
-        memory_request_out.payload <= kernel_setup_mem_req_dout.payload;
+        fifo_request_signals_out  <= fifo_request_signals_out_reg;
+        fifo_response_signals_out <= fifo_response_signals_out_reg;
+        request_out.payload       <= kernel_setup_mem_req_dout.payload;
     end
 
 // --------------------------------------------------------------------------------------
