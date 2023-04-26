@@ -43,12 +43,12 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
+  CacheResponsePayload   fifo_response_din                ;
   MemoryPacket           fifo_response_dout_reg           ;
   CacheResponsePayload   fifo_response_dout               ;
-  CacheResponsePayload   fifo_response_din                ;
-  FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
   FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
   FIFOStateSignalsInput  fifo_response_signals_in_internal;
+  FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
   logic                  fifo_response_setup_signal       ;
 
 // --------------------------------------------------------------------------------------

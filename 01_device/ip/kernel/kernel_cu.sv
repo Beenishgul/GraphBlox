@@ -47,11 +47,13 @@ module kernel_cu #(
   logic areset_setup    ;
   logic areset_cu       ;
 
-  logic [NUM_GRAPH_CLUSTERS-1:0] done_signal_reg  ;
-  logic [  VERTEX_DATA_BITS-1:0] counter          ;
-  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state   ;
-  DescriptorInterface            descriptor_in_reg;
-  CacheResponse                  response_in_reg  ;
+  logic [NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
+  logic [  VERTEX_DATA_BITS-1:0] counter                     ;
+  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state              ;
+  DescriptorInterface            descriptor_in_reg           ;
+  CacheResponse                  response_in_reg             ;
+  FIFOStateSignalsInput          fifo_response_signals_in_reg;
+  FIFOStateSignalsInput          fifo_request_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -227,14 +229,14 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU
 // --------------------------------------------------------------------------------------
-  assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_fifo_response_signals_out.prog_full;
-  assign cache_generator_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
+  assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_response_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
+  assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out) & fifo_response_signals_in_reg.rd_en;
 
-  assign kernel_setup_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
-  assign kernel_setup_fifo_request_signals_in.rd_en  = ~cache_fifo_response_signals_out.prog_full;
+  assign kernel_setup_fifo_response_signals_in.rd_en = ~kernel_setup_fifo_response_signals_out.prog_full;
+  assign kernel_setup_fifo_request_signals_in.rd_en  = ~kernel_setup_fifo_request_signals_out.prog_full;
 
-  assign vertex_cu_fifo_response_signals_in.rd_en = ~cache_fifo_response_signals_out.prog_full;
-  assign vertex_cu_fifo_request_signals_in.rd_en  = ~cache_fifo_response_signals_out.prog_full;
+  assign vertex_cu_fifo_response_signals_in.rd_en = ~vertex_cu_fifo_response_signals_out.prog_full;
+  assign vertex_cu_fifo_request_signals_in.rd_en  = ~vertex_cu_fifo_request_signals_out.prog_full;
 
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Cache Request Generator
