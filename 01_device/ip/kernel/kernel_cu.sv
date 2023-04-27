@@ -226,7 +226,7 @@ module kernel_cu #(
 
   assign vertex_cu_fifo_request_signals_in.rd_en    = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
   assign vertex_cu_fifo_response_signals_in.rd_en = 1;
-  
+
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Cache Request Generator
 // --------------------------------------------------------------------------------------
@@ -307,6 +307,5 @@ module kernel_cu #(
     .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
     .fifo_setup_signal        (vertex_cu_fifo_setup_signal        )
   );
-
 
 endmodule : kernel_cu

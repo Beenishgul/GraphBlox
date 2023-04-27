@@ -47,9 +47,10 @@ module kernel_setup #(
     logic areset_serial_read ;
     logic areset_fifo        ;
 
-    DescriptorInterface descriptor_reg ;
-    MemoryPacket        response_in_reg;
-    MemoryPacket        request_out_reg;
+    DescriptorInterface descriptor_reg  ;
+    MemoryPacket        response_in_reg ;
+    MemoryPacket        response_out_reg;
+    MemoryPacket        request_out_reg ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -309,8 +310,8 @@ module kernel_setup #(
     assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
 
     // Push
-    assign fifo_request_signals_in_internal.wr_en = fifo_request_din.valid;
-    assign fifo_request_din                       = engine_serial_read_request_out;
+    assign fifo_request_signals_in_internal.wr_en = engine_serial_read_request_out.valid;
+    assign fifo_request_din                       = engine_serial_read_request_out.payload;
 
     // Pop
     assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
@@ -352,8 +353,8 @@ module kernel_setup #(
 
     // Pop
     assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
-    assign request_out_reg.valid                   = fifo_response_signals_out_reg.valid;
-    assign request_out_reg.payload                 = fifo_response_dout;
+    assign response_out_reg.valid                  = fifo_response_signals_out_reg.valid;
+    assign response_out_reg.payload                = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
