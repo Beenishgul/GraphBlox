@@ -34,77 +34,83 @@ module vertex_cu #(
     input  logic                       areset                   ,
     input  ControlChainInterfaceOutput control_state            ,
     input  DescriptorInterface         descriptor_in            ,
-    input  MemoryPacket                response_in              ,
-    input  FIFOStateSignalsInput       fifo_response_signals_in ,
-    output FIFOStateSignalsOutput      fifo_response_signals_out,
     output MemoryPacket                request_out              ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
     output FIFOStateSignalsOutput      fifo_request_signals_out ,
+    input  MemoryPacket                response_in              ,
+    input  FIFOStateSignalsInput       fifo_response_signals_in ,
+    output FIFOStateSignalsOutput      fifo_response_signals_out,
     output logic                       fifo_setup_signal
 );
 
-    logic vertex_cu_areset;
-    logic areset_counter  ;
-    logic areset_fifo     ;
+// --------------------------------------------------------------------------------------
+// Wires and Variables
+// --------------------------------------------------------------------------------------
+    logic areset_vertex_cu  ;
+    logic areset_serial_read;
+    logic areset_fifo       ;
+
+    DescriptorInterface descriptor_reg  ;
+    MemoryPacket        response_in_reg ;
+    MemoryPacket        response_out_reg;
+    MemoryPacket        request_out_reg ;
 
 // --------------------------------------------------------------------------------------
-//   vertex_cu state machine signals
+// Setup state machine signals
 // --------------------------------------------------------------------------------------
-    vertex_cu_state current_state;
-    vertex_cu_state next_state   ;
-
-    logic vertex_cu_done ;
-    logic vertex_cu_start;
+    logic           done_internal_reg;
+    vertex_cu_state current_state    ;
+    vertex_cu_state next_state       ;
 
 // --------------------------------------------------------------------------------------
-//   FIFO signals
+// Request FIFO
 // --------------------------------------------------------------------------------------
-    DescriptorInterface descriptor_reg;
-
-    MemoryPacket fifo_response_din ;
-    MemoryPacket fifo_response_dout;
-
-
-    MemoryPacket fifo_request_dout;
-    MemoryPacket fifo_request_din ;
-
-    FIFOStateSignalsOutput fifo_response_signals_out_reg;
-    FIFOStateSignalsOutput fifo_request_signals_out_reg ;
-
-    FIFOStateSignalsInput fifo_response_signals_in_reg;
-    FIFOStateSignalsInput fifo_request_signals_in_reg ;
-
-    logic fifo_MemoryPacketResponse_vertex_cu_signal;
-    logic fifo_MemoryPacketRequest_vertex_cu_signal ;
+    MemoryPacketPayload    fifo_request_din                ;
+    MemoryPacketPayload    fifo_request_dout               ;
+    FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
+    FIFOStateSignalsInput  fifo_request_signals_in_internal;
+    FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
+    logic                  fifo_request_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
-//  Serial Read Engine Signals
+// Response FIFO
 // --------------------------------------------------------------------------------------
-    SerialReadEngineConfiguration serial_read_config_reg                 ;
-    SerialReadEngineConfiguration serial_read_config_comb                ;
-    MemoryPacket                  engine_serial_read_req                 ;
-    FIFOStateSignalsOutput        engine_serial_read_fifo_out_signals_reg;
-    FIFOStateSignalsInput         engine_serial_read_fifo_in_signals_reg ;
-    logic                         engine_serial_read_in_start_reg        ;
-    logic                         engine_serial_read_out_ready_reg       ;
-    logic                         engine_serial_read_out_done_reg        ;
-    logic                         engine_serial_read_out_pause_reg       ;
-    logic                         engine_serial_read_fifo_setup_signal   ;
+    MemoryPacketPayload    fifo_response_din                ;
+    MemoryPacketPayload    fifo_response_dout               ;
+    FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
+    FIFOStateSignalsInput  fifo_response_signals_in_internal;
+    FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
+    logic                  fifo_response_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
-//   Register reset signal
+// Serial Read Engine Signals
+// --------------------------------------------------------------------------------------
+    SerialReadEngineConfiguration engine_serial_read_configuration_in        ;
+    SerialReadEngineConfiguration configuration_comb                         ;
+    MemoryPacket                  engine_serial_read_request_out             ;
+    FIFOStateSignalsOutput        engine_serial_read_fifo_request_signals_out;
+    FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_in ;
+    FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_reg;
+    logic                         engine_serial_read_start_in                ;
+    logic                         engine_serial_read_ready_out               ;
+    logic                         engine_serial_read_done_out                ;
+    logic                         engine_serial_read_pause_out               ;
+    logic                         engine_serial_read_fifo_setup_signal       ;
+
+// --------------------------------------------------------------------------------------
+// Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        vertex_cu_areset <= areset;
-        areset_counter   <= areset;
-        areset_fifo      <= areset;
+        areset_vertex_cu   <= areset;
+        areset_serial_read <= areset;
+        areset_fifo        <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (vertex_cu_areset) begin
+        if (areset_vertex_cu) begin
             descriptor_reg.valid <= 0;
         end
         else begin
@@ -120,47 +126,49 @@ module vertex_cu #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (vertex_cu_areset) begin
-            fifo_response_din.valid            <= 0;
-            fifo_response_signals_in_reg.rd_en <= 0;
-            fifo_request_signals_in_reg.rd_en  <= 0;
+        if (areset_vertex_cu) begin
+            fifo_response_signals_in_reg <= 0;
+            fifo_request_signals_in_reg  <= 0;
+            response_in_reg.valid        <= 0;
         end
         else begin
-            fifo_response_din.valid            <= response_in.valid;
-            fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
-            fifo_request_signals_in_reg.rd_en  <= fifo_request_signals_in.rd_en;
+            fifo_response_signals_in_reg <= fifo_response_signals_in;
+            fifo_request_signals_in_reg  <= fifo_request_signals_in;
+            response_in_reg.valid        <= response_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_din.payload <= response_in.payload;
+        response_in_reg.payload <= response_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (vertex_cu_areset) begin
-            fifo_setup_signal <= 1;
-            request_out.valid <= 0;
+        if (areset_vertex_cu) begin
+            fifo_setup_signal         <= 1;
+            fifo_response_signals_out <= 0;
+            fifo_request_signals_out  <= 0;
+            request_out.valid         <= 0;
         end
         else begin
-            fifo_setup_signal <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_cu_signal |fifo_MemoryPacketResponse_vertex_cu_signal;
-            request_out.valid <= fifo_request_signals_out_reg.valid ;
+            fifo_setup_signal         <= engine_serial_read_fifo_setup_signal | fifo_request_setup_signal | fifo_response_setup_signal;
+            fifo_response_signals_out <= fifo_response_signals_out_reg;
+            fifo_request_signals_out  <= fifo_request_signals_out_reg;
+            request_out.valid         <= request_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out  <= fifo_request_signals_out_reg;
-        fifo_response_signals_out <= fifo_response_signals_out_reg;
-        request_out.payload       <= fifo_request_dout.payload;
+        request_out.payload <= request_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
-// vertex_cu State Machine
+// SETUP State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(vertex_cu_areset)
+        if(areset_vertex_cu)
             current_state <= VERTEX_CU_RESET;
         else begin
             current_state <= next_state;
@@ -174,23 +182,31 @@ module vertex_cu #(
                 next_state = VERTEX_CU_IDLE;
             end
             VERTEX_CU_IDLE : begin
-                if(descriptor_reg.valid && engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg)
+                if(descriptor_reg.valid & engine_serial_read_done_out & engine_serial_read_ready_out)
                     next_state = VERTEX_CU_REQ_START;
                 else
                     next_state = VERTEX_CU_IDLE;
             end
             VERTEX_CU_REQ_START : begin
-                if(engine_serial_read_out_done_reg && engine_serial_read_out_ready_reg) begin
+                if(engine_serial_read_done_out & engine_serial_read_ready_out) begin
                     next_state = VERTEX_CU_REQ_START;
                 end else begin
                     next_state = VERTEX_CU_REQ_BUSY;
                 end
             end
             VERTEX_CU_REQ_BUSY : begin
-                if (vertex_cu_done)
+                if (done_internal_reg)
                     next_state = VERTEX_CU_REQ_DONE;
+                else if (fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full)
+                    next_state = VERTEX_CU_REQ_PAUSE;
                 else
                     next_state = VERTEX_CU_REQ_BUSY;
+            end
+            VERTEX_CU_REQ_PAUSE : begin
+                if (~(fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full))
+                    next_state = VERTEX_CU_REQ_BUSY;
+                else
+                    next_state = VERTEX_CU_REQ_PAUSE;
             end
             VERTEX_CU_REQ_DONE : begin
                 if (descriptor_reg.valid)
@@ -204,127 +220,106 @@ module vertex_cu #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             VERTEX_CU_RESET : begin
-                vertex_cu_done                               <= 1'b1;
-                vertex_cu_start                              <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_in_start_reg              <= 1'b0;
-                serial_read_config_reg.valid                 <= 1'b0;
+                done_internal_reg                                 <= 1'b1;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_IDLE : begin
-                vertex_cu_done                               <= 1'b0;
-                vertex_cu_start                              <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_in_start_reg              <= 1'b0;
-                serial_read_config_reg.valid                 <= 1'b0;
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_REQ_START : begin
-                vertex_cu_done                               <= 1'b0;
-                vertex_cu_start                              <= 1'b1;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_in_start_reg              <= 1'b1;
-                serial_read_config_reg.valid                 <= 1'b1;
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b1;
+                engine_serial_read_configuration_in.valid         <= 1'b1;
             end
             VERTEX_CU_REQ_BUSY : begin
-                vertex_cu_done                               <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
-                vertex_cu_start                              <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~fifo_request_signals_out_reg.prog_full;
-                engine_serial_read_in_start_reg              <= 1'b0;
-                serial_read_config_reg.valid                 <= 1'b1;
+                done_internal_reg                                 <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty & fifo_request_signals_out_reg.empty;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_reg.prog_full;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b1;
+            end
+            VERTEX_CU_REQ_PAUSE : begin
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_REQ_DONE : begin
-                vertex_cu_done                               <= 1'b1;
-                vertex_cu_start                              <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_in_start_reg              <= 1'b0;
-                serial_read_config_reg.valid                 <= 1'b0;
+                done_internal_reg                                 <= 1'b1;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
 
 
 // --------------------------------------------------------------------------------------
-// Serial Read Engine Generate
+// Create Configuration Packet
 // --------------------------------------------------------------------------------------
     always_comb begin
-        serial_read_config_comb.payload.param.increment     = 1'b1;
-        serial_read_config_comb.payload.param.decrement     = 1'b0;
-        serial_read_config_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        serial_read_config_comb.payload.param.start_read    = 0;
-        serial_read_config_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        serial_read_config_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
-        serial_read_config_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
+        configuration_comb.payload.param.increment     = 1'b1;
+        configuration_comb.payload.param.decrement     = 1'b0;
+        configuration_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
+        configuration_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
+        configuration_comb.payload.param.start_read    = 0;
+        configuration_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
+        configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
+        configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
-        serial_read_config_comb.payload.meta.cu_engine_id_x = ENGINE_ID_X;
-        serial_read_config_comb.payload.meta.cu_engine_id_y = ENGINE_ID_Y;
-        serial_read_config_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
-        serial_read_config_comb.payload.meta.address_offset = 0;
-        serial_read_config_comb.payload.meta.cmd_type       = CMD_READ;
-        serial_read_config_comb.payload.meta.struct_type    = STRUCT_INVALID;
-        serial_read_config_comb.payload.meta.operand_loc    = OP_LOCATION_0;
-        serial_read_config_comb.payload.meta.filter_op      = FILTER_NOP;
-        serial_read_config_comb.payload.meta.ALU_op         = ALU_NOP;
+        configuration_comb.payload.meta.cu_engine_id_x = ENGINE_ID_X;
+        configuration_comb.payload.meta.cu_engine_id_y = ENGINE_ID_Y;
+        configuration_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
+        configuration_comb.payload.meta.address_offset = 0;
+        configuration_comb.payload.meta.cmd_type       = CMD_READ;
+        configuration_comb.payload.meta.struct_type    = STRUCT_VERTEX_CU;
+        configuration_comb.payload.meta.operand_loc    = OP_LOCATION_0;
+        configuration_comb.payload.meta.filter_op      = FILTER_NOP;
+        configuration_comb.payload.meta.ALU_op         = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
-        serial_read_config_reg.payload <= serial_read_config_comb.payload;
+        engine_serial_read_configuration_in.payload <= configuration_comb.payload;
     end
 
+// --------------------------------------------------------------------------------------
+// Serial Read Engine Generate
+// --------------------------------------------------------------------------------------
+    assign engine_serial_read_fifo_request_signals_in = engine_serial_read_fifo_request_signals_reg;
+
     engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
-        .ap_clk                      (ap_clk                                 ),
-        .areset                      (areset_counter                         ),
-        .serial_read_config          (serial_read_config_reg                 ),
-        .engine_serial_read_req_out  (engine_serial_read_req                 ),
-        .fifo_request_signals_out    (engine_serial_read_fifo_out_signals_reg),
-        .fifo_request_signals_in     (engine_serial_read_fifo_in_signals_reg ),
-        .fifo_setup_signal           (engine_serial_read_fifo_setup_signal   ),
-        .engine_serial_read_in_start (engine_serial_read_in_start_reg        ),
-        .engine_serial_read_out_ready(engine_serial_read_out_ready_reg       ),
-        .engine_serial_read_out_done (engine_serial_read_out_done_reg        ),
-        .engine_serial_read_out_pause(engine_serial_read_out_pause_reg       )
+        .ap_clk                  (ap_clk                                     ),
+        .areset                  (areset_serial_read                         ),
+        .configuration_in        (engine_serial_read_configuration_in        ),
+        .request_out             (engine_serial_read_request_out             ),
+        .fifo_request_signals_in (engine_serial_read_fifo_request_signals_in ),
+        .fifo_request_signals_out(engine_serial_read_fifo_request_signals_out),
+        .fifo_setup_signal       (engine_serial_read_fifo_setup_signal       ),
+        .start_in                (engine_serial_read_start_in                ),
+        .ready_out               (engine_serial_read_ready_out               ),
+        .done_out                (engine_serial_read_done_out                ),
+        .pause_out               (engine_serial_read_pause_out               )
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache Ready
+// FIFO cache requests out MemoryPacket
 // --------------------------------------------------------------------------------------
-    assign fifo_MemoryPacketRequest_vertex_cu_signal  = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
-    assign fifo_MemoryPacketResponse_vertex_cu_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+    // FIFO is resetting
+    assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
 
-// --------------------------------------------------------------------------------------
-// FIFO cache requests in inst_fifo_MemoryPacket
-// --------------------------------------------------------------------------------------
-    assign fifo_response_signals_in_reg.wr_en = fifo_response_din.valid;
-    assign fifo_response_dout.valid           = fifo_response_signals_out_reg.valid;
+    // Push
+    assign fifo_request_signals_in_internal.wr_en = engine_serial_read_request_out.valid;
+    assign fifo_request_din                       = engine_serial_read_request_out.payload;
 
-    xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacketResponse (
-        .clk         (ap_clk                                    ),
-        .srst        (areset_fifo                               ),
-        .din         (fifo_response_din.payload                 ),
-        .wr_en       (fifo_response_signals_in_reg.wr_en        ),
-        .rd_en       (fifo_response_signals_in_reg.rd_en        ),
-        .dout        (fifo_response_dout.payload                ),
-        .full        (fifo_response_signals_out_reg.full        ),
-        .almost_full (fifo_response_signals_out_reg.almost_full ),
-        .empty       (fifo_response_signals_out_reg.empty       ),
-        .almost_empty(fifo_response_signals_out_reg.almost_empty),
-        .valid       (fifo_response_signals_out_reg.valid       ),
-        .prog_full   (fifo_response_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
-    );
-
-// --------------------------------------------------------------------------------------
-// FIFO cache requests out inst_fifo_MemoryPacket
-// --------------------------------------------------------------------------------------
-    assign fifo_request_signals_in_reg.wr_en = fifo_request_din.valid;
-    assign fifo_request_dout.valid           = fifo_request_signals_out_reg.valid;
-    assign fifo_request_din                  = engine_serial_read_req;
+    // Pop
+    assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_reg.valid                  = fifo_request_signals_out_reg.valid;
+    assign request_out_reg.payload                = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -334,10 +329,10 @@ module vertex_cu #(
     ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),
-        .din         (fifo_request_din.payload                 ),
-        .wr_en       (fifo_request_signals_in_reg.wr_en        ),
-        .rd_en       (fifo_request_signals_in_reg.rd_en        ),
-        .dout        (fifo_request_dout.payload                ),
+        .din         (fifo_request_din                         ),
+        .wr_en       (fifo_request_signals_in_internal.wr_en   ),
+        .rd_en       (fifo_request_signals_in_internal.rd_en   ),
+        .dout        (fifo_request_dout                        ),
         .full        (fifo_request_signals_out_reg.full        ),
         .almost_full (fifo_request_signals_out_reg.almost_full ),
         .empty       (fifo_request_signals_out_reg.empty       ),
@@ -347,6 +342,44 @@ module vertex_cu #(
         .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
         .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
         .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO cache response MemoryPacket
+// --------------------------------------------------------------------------------------
+    // FIFO is resetting
+    assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+
+    // Push
+    assign fifo_response_signals_in_internal.wr_en = response_in_reg.valid;
+    assign fifo_response_din                       = response_in_reg.payload;
+
+    // Pop
+    assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
+    assign response_out_reg.valid                  = fifo_response_signals_out_reg.valid;
+    assign response_out_reg.payload                = fifo_response_dout;
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(32                        ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (8                         )
+    ) inst_fifo_MemoryPacketResponse (
+        .clk         (ap_clk                                    ),
+        .srst        (areset_fifo                               ),
+        .din         (fifo_response_din                         ),
+        .wr_en       (fifo_response_signals_in_internal.wr_en   ),
+        .rd_en       (fifo_response_signals_in_internal.rd_en   ),
+        .dout        (fifo_response_dout                        ),
+        .full        (fifo_response_signals_out_reg.full        ),
+        .almost_full (fifo_response_signals_out_reg.almost_full ),
+        .empty       (fifo_response_signals_out_reg.empty       ),
+        .almost_empty(fifo_response_signals_out_reg.almost_empty),
+        .valid       (fifo_response_signals_out_reg.valid       ),
+        .prog_full   (fifo_response_signals_out_reg.prog_full   ),
+        .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
+        .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
+        .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
     );
 
 endmodule : vertex_cu

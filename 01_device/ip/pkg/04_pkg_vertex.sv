@@ -11,10 +11,10 @@
 // Revise : 2022-11-16 19:43:34
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
-    `timescale 1 ns / 1 ps
+`timescale 1 ns / 1 ps
 package PKG_VERTEX;
 
-   import PKG_GLOBALS::*;
+  import PKG_GLOBALS::*;
 
 // --------------------------------------------------------------------------------------
 //   State Machine Vertex CU
@@ -24,6 +24,7 @@ package PKG_VERTEX;
     VERTEX_CU_IDLE,
     VERTEX_CU_REQ_START,
     VERTEX_CU_REQ_BUSY,
+    VERTEX_CU_REQ_PAUSE,
     VERTEX_CU_REQ_DONE
   } vertex_cu_state;
 
@@ -35,6 +36,7 @@ package PKG_VERTEX;
     VERTEX_BUNDLE_IDLE,
     VERTEX_BUNDLE_REQ_START,
     VERTEX_BUNDLE_REQ_BUSY,
+    VERTEX_BUNDLE_REQ_PAUSE,
     VERTEX_BUNDLE_REQ_DONE
   } vertex_bundle_state;
 

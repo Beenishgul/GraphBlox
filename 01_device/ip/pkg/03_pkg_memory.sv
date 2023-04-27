@@ -106,7 +106,8 @@ typedef enum int unsigned {
   STRUCT_INV_EDGES_IDX,
   STRUCT_AUXILIARY_1_DATA,
   STRUCT_AUXILIARY_2_DATA,
-  STRUCT_KERNEL_SETUP
+  STRUCT_KERNEL_SETUP,
+  STRUCT_VERTEX_CU
 } structure_type;
 
 // --------------------------------------------------------------------------------------
