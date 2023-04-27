@@ -50,13 +50,13 @@ module kernel_setup #(
     DescriptorInterface descriptor_reg ;
     MemoryPacket        response_in_reg;
     MemoryPacket        request_out_reg;
+
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
 // --------------------------------------------------------------------------------------
-    logic              done_reg     ;
-    logic              start_reg    ;
-    kernel_setup_state current_state;
-    kernel_setup_state next_state   ;
+    logic              done_internal_reg;
+    kernel_setup_state current_state    ;
+    kernel_setup_state next_state       ;
 
 // --------------------------------------------------------------------------------------
 // Request FIFO
@@ -86,6 +86,7 @@ module kernel_setup #(
     MemoryPacket                  engine_serial_read_request_out             ;
     FIFOStateSignalsOutput        engine_serial_read_fifo_request_signals_out;
     FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_in ;
+    FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_reg;
     logic                         engine_serial_read_start_in                ;
     logic                         engine_serial_read_ready_out               ;
     logic                         engine_serial_read_done_out                ;
@@ -124,17 +125,17 @@ module kernel_setup #(
         if (areset_kernel_setup) begin
             fifo_response_signals_in_reg <= 0;
             fifo_request_signals_in_reg  <= 0;
-            fifo_response_din_reg.valid  <= 0;
+            response_in_reg.valid        <= 0;
         end
         else begin
             fifo_response_signals_in_reg <= fifo_response_signals_in;
             fifo_request_signals_in_reg  <= fifo_request_signals_in;
-            fifo_response_din_reg.valid  <= response_in.valid;
+            response_in_reg.valid        <= response_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_din_reg.payload <= response_in.payload;
+        response_in_reg.payload <= response_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -144,18 +145,19 @@ module kernel_setup #(
         if (areset_kernel_setup) begin
             fifo_setup_signal         <= 1;
             fifo_response_signals_out <= 0;
+            fifo_request_signals_out  <= 0;
             request_out.valid         <= 0;
         end
         else begin
             fifo_setup_signal         <= engine_serial_read_fifo_setup_signal | fifo_request_setup_signal | fifo_response_setup_signal;
             fifo_response_signals_out <= fifo_response_signals_out_reg;
-            request_out.valid         <= fifo_request_signals_out_reg.valid ;
+            fifo_request_signals_out  <= fifo_request_signals_out_reg;
+            request_out.valid         <= request_out_reg.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out <= fifo_request_signals_out_reg;
-        request_out.payload      <= fifo_request_dout.payload;
+        request_out.payload <= request_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -189,10 +191,18 @@ module kernel_setup #(
                 end
             end
             KERNEL_SETUP_REQ_BUSY : begin
-                if (done_reg)
+                if (done_internal_reg)
                     next_state = KERNEL_SETUP_REQ_DONE;
+                else if (fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full)
+                    next_state = KERNEL_SETUP_REQ_PAUSE;
                 else
                     next_state = KERNEL_SETUP_REQ_BUSY;
+            end
+            KERNEL_SETUP_REQ_PAUSE : begin
+                if (~(fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full))
+                    next_state = KERNEL_SETUP_REQ_BUSY;
+                else
+                    next_state = KERNEL_SETUP_REQ_PAUSE;
             end
             KERNEL_SETUP_REQ_DONE : begin
                 if (descriptor_reg.valid)
@@ -206,39 +216,40 @@ module kernel_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             KERNEL_SETUP_RESET : begin
-                done_reg                                         <= 1'b1;
-                start_reg                                        <= 1'b0;
-                engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
-                engine_serial_read_start_in                      <= 1'b0;
-                engine_serial_read_configuration_in.valid        <= 1'b0;
+                done_internal_reg                                 <= 1'b1;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_IDLE : begin
-                done_reg                                         <= 1'b0;
-                start_reg                                        <= 1'b0;
-                engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
-                engine_serial_read_start_in                      <= 1'b0;
-                engine_serial_read_configuration_in.valid        <= 1'b0;
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_REQ_START : begin
-                done_reg                                         <= 1'b0;
-                start_reg                                        <= 1'b1;
-                engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
-                engine_serial_read_start_in                      <= 1'b1;
-                engine_serial_read_configuration_in.valid        <= 1'b1;
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b1;
+                engine_serial_read_configuration_in.valid         <= 1'b1;
             end
             KERNEL_SETUP_REQ_BUSY : begin
-                done_reg                                         <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty;
-                start_reg                                        <= 1'b0;
-                engine_serial_read_fifo_request_signals_in.rd_en <= ~engine_serial_read_fifo_request_signals_out.empty & ~fifo_request_signals_out_reg.prog_full;
-                engine_serial_read_start_in                      <= 1'b0;
-                engine_serial_read_configuration_in.valid        <= 1'b1;
+                done_internal_reg                                 <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty & fifo_request_signals_out_reg.empty;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_reg.prog_full;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b1;
+            end
+            KERNEL_SETUP_REQ_PAUSE : begin
+                done_internal_reg                                 <= 1'b0;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_REQ_DONE : begin
-                done_reg                                         <= 1'b1;
-                start_reg                                        <= 1'b0;
-                engine_serial_read_fifo_request_signals_in.rd_en <= 1'b0;
-                engine_serial_read_start_in                      <= 1'b0;
-                engine_serial_read_configuration_in.valid        <= 1'b0;
+                done_internal_reg                                 <= 1'b1;
+                engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
+                engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_configuration_in.valid         <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -275,6 +286,8 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
+    assign engine_serial_read_fifo_request_signals_in = engine_serial_read_fifo_request_signals_reg;
+
     engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
         .ap_clk                  (ap_clk                                     ),
         .areset                  (areset_serial_read                         ),
@@ -301,7 +314,8 @@ module kernel_setup #(
 
     // Pop
     assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-    assign fifo_request_dout.valid                = fifo_request_signals_out_reg.valid;
+    assign request_out_reg.valid                  = fifo_request_signals_out_reg.valid;
+    assign request_out_reg.payload                = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -311,10 +325,10 @@ module kernel_setup #(
     ) inst_fifo_MemoryPacketRequest (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),
-        .din         (fifo_request_din.payload                 ),
+        .din         (fifo_request_din                         ),
         .wr_en       (fifo_request_signals_in_internal.wr_en   ),
         .rd_en       (fifo_request_signals_in_internal.rd_en   ),
-        .dout        (fifo_request_dout.payload                ),
+        .dout        (fifo_request_dout                        ),
         .full        (fifo_request_signals_out_reg.full        ),
         .almost_full (fifo_request_signals_out_reg.almost_full ),
         .empty       (fifo_request_signals_out_reg.empty       ),
@@ -333,12 +347,13 @@ module kernel_setup #(
     assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_internal.wr_en = fifo_response_din_reg.valid;
-    assign fifo_response_din = fifo_response_din_reg.payload;
+    assign fifo_response_signals_in_internal.wr_en = response_in_reg.valid;
+    assign fifo_response_din                       = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_signals_in_internal.wr_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
-    
+    assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
+    assign request_out_reg.valid                   = fifo_response_signals_out_reg.valid;
+    assign request_out_reg.payload                 = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -348,10 +363,10 @@ module kernel_setup #(
     ) inst_fifo_MemoryPacketResponse (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
-        .din         (fifo_response_din                 ),
-        .wr_en       (fifo_response_signals_in_internal.wr_en        ),
-        .rd_en       (fifo_response_signals_in_internal.rd_en        ),
-        .dout        (fifo_response_dout                ),
+        .din         (fifo_response_din                         ),
+        .wr_en       (fifo_response_signals_in_internal.wr_en   ),
+        .rd_en       (fifo_response_signals_in_internal.rd_en   ),
+        .dout        (fifo_response_dout                        ),
         .full        (fifo_response_signals_out_reg.full        ),
         .almost_full (fifo_response_signals_out_reg.almost_full ),
         .empty       (fifo_response_signals_out_reg.empty       ),

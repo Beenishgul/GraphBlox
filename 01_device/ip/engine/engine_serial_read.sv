@@ -275,7 +275,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 counter_load   <= 1'b0;
             end
             ENGINE_SERIAL_READ_PAUSE : begin
-                done_internal_reg          <= 1'b1;
+                done_internal_reg          <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 pause_out_reg              <= 1'b1;
