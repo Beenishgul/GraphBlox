@@ -27,6 +27,7 @@ typedef enum int unsigned {
   KERNEL_SETUP_IDLE,
   KERNEL_SETUP_REQ_START,
   KERNEL_SETUP_REQ_BUSY,
+  KERNEL_SETUP_REQ_PAUSE.
   KERNEL_SETUP_REQ_DONE
 } kernel_setup_state;
 
