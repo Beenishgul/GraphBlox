@@ -30,11 +30,8 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS
 // --------------------------------------------------------------------------------------
-
-	parameter VERTEX_ADDRESS_BITS = 64;
-	parameter EDGE_ADDRESS_BITS   = 64;
-	parameter VERTEX_DATA_BITS    = 32;
-	parameter EDGE_DATA_BITS      = 32;
+	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
+	parameter GLOBAL_DATA_WIDTH_BITS = 64;
 
 // --------------------------------------------------------------------------------------
 // AXI4 PARAMETERS
@@ -62,15 +59,15 @@ package PKG_GLOBALS;
 // ***************                  MMIO/Scalar General                          **************
 // ********************************************************************************************
 
-	parameter GRAPH_CSR_STRUCT_OFFSET   = 7'h10;
-	parameter VERTEX_OUT_DEGREE_OFFSET  = 7'h1c;
-	parameter VERTEX_IN_DEGREE_OFFSET   = 7'h28;
-	parameter VERTEX_EDGES_IDX_OFFSET   = 7'h34;
-	parameter EDGES_ARRAY_WEIGHT_OFFSET = 7'h40;
-	parameter EDGES_ARRAY_SRC_OFFSET    = 7'h4c;
-	parameter EDGES_ARRAY_DEST_OFFSET   = 7'h58;
-	parameter AUXILIARY_1_OFFSET        = 7'h64;
-	parameter AUXILIARY_2_OFFSET        = 7'h70;
+	parameter BUFFER_1_OFFSET = 7'h10; // GRAPH_CSR_STRUCT_OFFSET
+	parameter BUFFER_2_OFFSET = 7'h1c; // VERTEX_OUT_DEGREE_OFFSET
+	parameter BUFFER_3_OFFSET = 7'h28; // VERTEX_IN_DEGREE_OFFSET
+	parameter BUFFER_4_OFFSET = 7'h34; // VERTEX_EDGES_IDX_OFFSET
+	parameter BUFFER_5_OFFSET = 7'h40; // EDGES_ARRAY_WEIGHT_OFFSET
+	parameter BUFFER_6_OFFSET = 7'h4c; // EDGES_ARRAY_SRC_OFFSET
+	parameter BUFFER_7_OFFSET = 7'h58; // EDGES_ARRAY_DEST_OFFSET
+	parameter BUFFER_8_OFFSET = 7'h64; // AUXILIARY_1_OFFSET
+	parameter BUFFER_9_OFFSET = 7'h70; // AUXILIARY_2_OFFSET
 
 // ********************************************************************************************
 // ***************                  GLOBAL MEMORY(DDR4/HBM)                      **************
