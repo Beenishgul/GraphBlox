@@ -905,8 +905,8 @@ module kernel_testbench ();
         // graph.csr_struct[2] = 0;
         // graph.csr_struct[3] = 0;
 
-        // graph.csr_struct[0][0+:VERTEX_DATA_BITS] = graph.edge_count;
-        // graph.csr_struct[0][VERTEX_DATA_BITS+:VERTEX_DATA_BITS] = graph.vertex_count;
+        // graph.csr_struct[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count;
+        // graph.csr_struct[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
         // graph.csr_struct[0][(64)+:64] = vertex_out_degree_ptr;
         // graph.csr_struct[0][(64*2)+:64] = vertex_in_degree_ptr;
         // graph.csr_struct[0][(64*3)+:64] = vertex_edges_idx_ptr;
@@ -928,8 +928,8 @@ module kernel_testbench ();
         realcount = 0;
 
         for (int i = 0; i < graph.mem512_csr_struct_count; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/VERTEX_DATA_BITS); j++) begin
-                graph.csr_struct[i][(VERTEX_DATA_BITS*j)+:VERTEX_DATA_BITS] = realcount;
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
+                graph.csr_struct[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
                 realcount++;
             end
         end
@@ -939,11 +939,11 @@ module kernel_testbench ();
         for (int i = 0; i < graph.mem512_vertex_count; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
-                graph.out_degree[i][j+:VERTEX_DATA_BITS] = temp_out_degree;
+                graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_out_degree;
                 graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
-                graph.in_degree[i][j+:VERTEX_DATA_BITS] = temp_in_degree;
+                graph.in_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_in_degree;
                 graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
-                graph.edges_idx[i][j+:VERTEX_DATA_BITS] = temp_edges_idx;
+                graph.edges_idx[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_idx;
             end
         end
 
@@ -952,9 +952,9 @@ module kernel_testbench ();
         for (int i = 0; i < graph.mem512_vertex_count; i++) begin
             for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
-                graph.edges_array_src[i][j+:VERTEX_DATA_BITS] = temp_edges_array_src;
+                graph.edges_array_src[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_src;
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
-                graph.edges_array_dest[i][j+:VERTEX_DATA_BITS] = temp_edges_array_dest;
+                graph.edges_array_dest[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_dest;
             end
         end
 

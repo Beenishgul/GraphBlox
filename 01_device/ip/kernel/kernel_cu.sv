@@ -47,7 +47,7 @@ module kernel_cu #(
   logic areset_cu       ;
 
   logic [NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
-  logic [  VERTEX_DATA_BITS-1:0] counter                     ;
+  logic [  GLOBAL_DATA_WIDTH_BITS-1:0] counter                     ;
   logic [ NUM_SETUP_MODULES-1:0] cu_setup_state              ;
   DescriptorInterface            descriptor_in_reg           ;
   CacheResponse                  response_in_reg             ;
@@ -266,7 +266,7 @@ module kernel_cu #(
 
   cache_generator_response #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_response (
     .ap_clk                   (ap_clk                                    ),
-    .areset                   (areset                                    ),
+    .areset                   (areset_generator                          ),
     .response_in              (cache_generator_response_in               ),
     .fifo_response_signals_in (cache_generator_fifo_response_signals_in  ),
     .fifo_response_signals_out(cache_generator_fifo_response_signals_out ),
