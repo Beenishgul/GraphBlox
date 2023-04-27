@@ -342,9 +342,9 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     assign fifo_request_din                      = fifo_request_din_reg.payload;
 
     // Pop
-    assign fifo_request_signals_in_inernal.rd_en <= ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid   <= fifo_request_signals_out_reg.valid;
-    assign request_out_reg.payload <= fifo_request_dout;
+    assign fifo_request_signals_in_inernal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_reg.valid                 = fifo_request_signals_out_reg.valid;
+    assign request_out_reg.payload               = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
