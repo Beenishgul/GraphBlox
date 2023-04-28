@@ -114,7 +114,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
     case (fifo_response_dout_reg.payload.meta.struct_type)
       STRUCT_KERNEL_SETUP : begin
         response_out_reg[0] = fifo_response_dout_reg;
-        response_out_reg[1] = 0;
+        response_out_reg[1] = fifo_response_dout_reg;
       end
       default : begin
         response_out_reg[0] = 0;
