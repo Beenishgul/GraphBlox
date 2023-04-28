@@ -21,22 +21,22 @@ package PKG_CONTROL;
     typedef struct packed{
         logic ap_start   ;
         logic ap_continue;
-        logic setup ;
-        logic done  ;
+        logic setup      ;
+        logic done       ;
     } ControlChainInterfaceInput;
 
     typedef struct packed{
-        logic ap_ready  ;
-        logic ap_done   ;
-        logic ap_idle   ;
-        logic start;
+        logic ap_ready;
+        logic ap_done ;
+        logic ap_idle ;
+        logic start   ;
     } ControlChainInterfaceOutput;
 
 // --------------------------------------------------------------------------------------
 //   State Machine USER_MANAGED input sync
 // --------------------------------------------------------------------------------------
 
-    typedef enum int unsigned {
+    typedef enum logic[6:0] {
         USER_MANAGED_SYNC_RESET,
         USER_MANAGED_SYNC_IDLE,
         USER_MANAGED_SYNC_SETUP,
@@ -50,7 +50,7 @@ package PKG_CONTROL;
 //   State Machine AP_CTRL_CHAIN input sync
 // --------------------------------------------------------------------------------------
 
-    typedef enum int unsigned {
+    typedef enum logic[6:0] {
         CTRL_CHAIN_SYNC_RESET,
         CTRL_CHAIN_SYNC_IDLE,
         CTRL_CHAIN_SYNC_SETUP,
@@ -65,7 +65,7 @@ package PKG_CONTROL;
 //   State Machine AP_CTRL_HS input sync
 // --------------------------------------------------------------------------------------
 
-    typedef enum int unsigned {
+    typedef enum logic[6:0] {
         CTRL_HS_SYNC_RESET,
         CTRL_HS_SYNC_IDLE,
         CTRL_HS_SYNC_SETUP,

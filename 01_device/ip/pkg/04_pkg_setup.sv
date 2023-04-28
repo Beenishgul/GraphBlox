@@ -16,20 +16,20 @@
 `timescale 1 ns / 1 ps
 package PKG_SETUP;
 
-import PKG_GLOBALS::*;
+  import PKG_GLOBALS::*;
 
 // --------------------------------------------------------------------------------------
 //   State Machine Setup Requests
 // --------------------------------------------------------------------------------------
 
-typedef enum int unsigned {
-  KERNEL_SETUP_RESET,
-  KERNEL_SETUP_IDLE,
-  KERNEL_SETUP_REQ_START,
-  KERNEL_SETUP_REQ_BUSY,
-  KERNEL_SETUP_REQ_PAUSE,
-  KERNEL_SETUP_REQ_DONE
-} kernel_setup_state;
+  typedef enum logic[5:0] {
+    KERNEL_SETUP_RESET,
+    KERNEL_SETUP_IDLE,
+    KERNEL_SETUP_REQ_START,
+    KERNEL_SETUP_REQ_BUSY,
+    KERNEL_SETUP_REQ_PAUSE,
+    KERNEL_SETUP_REQ_DONE
+  } kernel_setup_state;
 
 
 endpackage

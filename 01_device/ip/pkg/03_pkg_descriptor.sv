@@ -17,7 +17,7 @@ package PKG_DESCRIPTOR;
 
     import PKG_GLOBALS::*;
 
-    typedef enum int unsigned {
+    typedef enum logic[5:0] {
         RESET,
         IDLE,
         REQ,
@@ -27,20 +27,20 @@ package PKG_DESCRIPTOR;
     } descriptor_state;
 
     typedef struct packed{
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   graph_csr_struct  ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_out_degree ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_in_degree  ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   vertex_edges_idx  ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_weight;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_src   ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   edges_array_dest  ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   auxiliary_1       ;
-        logic   [M_AXI_MEMORY_ADDR_WIDTH-1:0]   auxiliary_2       ; // reads the next number of cache lines if set
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] graph_csr_struct  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] vertex_out_degree ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] vertex_in_degree  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] vertex_edges_idx  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] edges_array_weight;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] edges_array_src   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] edges_array_dest  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] auxiliary_1       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] auxiliary_2       ; // reads the next number of cache lines if set
     } descriptor_request;
 
 
     typedef struct packed{
-        logic                   valid  ;
+        logic              valid  ;
         descriptor_request payload;
     } DescriptorInterface;
 
