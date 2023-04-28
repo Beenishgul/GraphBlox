@@ -89,10 +89,11 @@ module kernel_setup #(
     FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_in ;
     FIFOStateSignalsInput         engine_serial_read_fifo_request_signals_reg;
     logic                         engine_serial_read_start_in                ;
+    logic                         engine_serial_read_pause_in                ;
     logic                         engine_serial_read_ready_out               ;
     logic                         engine_serial_read_done_out                ;
-    logic                         engine_serial_read_pause_out               ;
-    logic                         engine_serial_read_fifo_setup_signal       ;
+
+    logic engine_serial_read_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -220,36 +221,42 @@ module kernel_setup #(
                 done_internal_reg                                 <= 1'b1;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_pause_in                       <= 1'b0;
                 engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_IDLE : begin
                 done_internal_reg                                 <= 1'b0;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_pause_in                       <= 1'b0;
                 engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_REQ_START : begin
                 done_internal_reg                                 <= 1'b0;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_start_in                       <= 1'b1;
+                engine_serial_read_pause_in                       <= 1'b0;
                 engine_serial_read_configuration_in.valid         <= 1'b1;
             end
             KERNEL_SETUP_REQ_BUSY : begin
                 done_internal_reg                                 <= engine_serial_read_done_out & engine_serial_read_fifo_request_signals_out.empty & fifo_request_signals_out_reg.empty;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_reg.prog_full;
                 engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_pause_in                       <= 1'b0;
                 engine_serial_read_configuration_in.valid         <= 1'b1;
             end
             KERNEL_SETUP_REQ_PAUSE : begin
                 done_internal_reg                                 <= 1'b0;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_pause_in                       <= 1'b1;
                 engine_serial_read_configuration_in.valid         <= 1'b0;
             end
             KERNEL_SETUP_REQ_DONE : begin
                 done_internal_reg                                 <= 1'b1;
                 engine_serial_read_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_serial_read_start_in                       <= 1'b0;
+                engine_serial_read_pause_in                       <= 1'b0;
                 engine_serial_read_configuration_in.valid         <= 1'b0;
             end
         endcase
@@ -298,9 +305,9 @@ module kernel_setup #(
         .fifo_request_signals_out(engine_serial_read_fifo_request_signals_out),
         .fifo_setup_signal       (engine_serial_read_fifo_setup_signal       ),
         .start_in                (engine_serial_read_start_in                ),
+        .pause_in                (engine_serial_read_pause_in                ),
         .ready_out               (engine_serial_read_ready_out               ),
-        .done_out                (engine_serial_read_done_out                ),
-        .pause_out               (engine_serial_read_pause_out               )
+        .done_out                (engine_serial_read_done_out                )
     );
 
 // --------------------------------------------------------------------------------------
@@ -378,5 +385,6 @@ module kernel_setup #(
         .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
         .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
     );
+
 
 endmodule : kernel_setup

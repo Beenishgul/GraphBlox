@@ -221,10 +221,10 @@ module kernel_cu #(
   assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_response_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
   assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out);
 
-  assign kernel_setup_fifo_request_signals_in.rd_en = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
+  assign kernel_setup_fifo_request_signals_in.rd_en = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
   assign kernel_setup_fifo_response_signals_in.rd_en = 1;
 
-  assign vertex_cu_fifo_request_signals_in.rd_en    = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
+  assign vertex_cu_fifo_request_signals_in.rd_en    = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
   assign vertex_cu_fifo_response_signals_in.rd_en = 1;
 
 // --------------------------------------------------------------------------------------
@@ -232,13 +232,11 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   // kernel_setup
   assign kernel_setup_response_in                   = cache_generator_response_out[0];
-  assign kernel_setup_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[0];
   assign cache_generator_request_in[0]              = kernel_setup_request_out;
   assign cache_generator_arbiter_request_in[0]      = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
   // vertex_cu
   assign vertex_cu_response_in                   = cache_generator_response_out[1];
-  assign vertex_cu_fifo_request_signals_in.rd_en = cache_generator_arbiter_grant_out[1];
   assign cache_generator_request_in[1]           = vertex_cu_request_out;
   assign cache_generator_arbiter_request_in[1]   = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
 
