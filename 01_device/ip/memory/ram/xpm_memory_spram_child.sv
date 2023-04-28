@@ -31,10 +31,6 @@ module xpm_memory_spram_child #(
 	input  logic [           (DATA_W-1):0] din
 );
 
-	localparam BLOCK_TOTAL_SIZE_BITS = DATA_W * (2**ADDR_W);
-	localparam BLOCK_ADDR_W          = ADDR_W              ;
-	localparam BLOCK_DATA_DEPTH      = 2**ADDR_W           ;
-	localparam BLOCK_DATA_W          = DATA_W              ;
 	localparam DATA_DEPTH            = 2**ADDR_W           ;
 
 	// if(MEMORY_PRIMITIVE == "ultra")
