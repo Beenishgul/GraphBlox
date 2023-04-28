@@ -19,7 +19,7 @@ package PKG_VERTEX;
 // --------------------------------------------------------------------------------------
 //   State Machine Vertex CU
 // --------------------------------------------------------------------------------------
-  typedef enum int unsigned {
+  typedef enum logic[5:0] {
     VERTEX_CU_RESET,
     VERTEX_CU_IDLE,
     VERTEX_CU_REQ_START,
@@ -31,7 +31,7 @@ package PKG_VERTEX;
 // --------------------------------------------------------------------------------------
 //   State Machine Vertex Bundle
 // --------------------------------------------------------------------------------------
-  typedef enum int unsigned {
+  typedef enum logic[5:0] {
     VERTEX_BUNDLE_RESET,
     VERTEX_BUNDLE_IDLE,
     VERTEX_BUNDLE_REQ_START,

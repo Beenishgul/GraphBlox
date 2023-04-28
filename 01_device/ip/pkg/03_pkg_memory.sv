@@ -46,7 +46,7 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[4:0] {
   CMD_INVALID,
   CMD_READ,
   CMD_WRITE,
@@ -57,7 +57,7 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Generic Memory Operand location
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[7:0] {
   OP_LOCATION_0,
   OP_LOCATION_1,
   OP_LOCATION_2,
@@ -71,7 +71,7 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[6:0]{
   FILTER_NOP,
   FILTER_GT,
   FILTER_LT,
@@ -84,7 +84,7 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[5:0] {
   ALU_NOP,
   ALU_ADD,
   ALU_SUB,
@@ -96,7 +96,7 @@ typedef enum int unsigned {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[10:0]{
   STRUCT_INVALID,
   STRUCT_OUT_DEGREE,
   STRUCT_IN_DEGREE,
@@ -202,7 +202,7 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Cache Requests state machine
 // --------------------------------------------------------------------------------------
-typedef enum int unsigned {
+typedef enum logic[6:0] {
   CACHE_REQUEST_GEN_RESET,
   CACHE_REQUEST_GEN_IDLE,
   CACHE_REQUEST_GEN_SEND_S1,
