@@ -118,11 +118,11 @@ typedef struct packed{
   logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
   logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
   logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
-  command_type                      cmd_type      ; // SIZE = 32 bits
-  structure_type                    struct_type   ; // SIZE = 32 bits
-  operand_location                  operand_loc   ; // SIZE = 32 bits
-  filter_operation                  filter_op     ; // SIZE = 32 bits
-  ALU_operation                     ALU_op        ; // SIZE = 32 bits
+  command_type                      cmd_type      ; // SIZE = 5 bits
+  structure_type                    struct_type   ; // SIZE = 11 bits
+  operand_location                  operand_loc   ; // SIZE = 6 bits
+  filter_operation                  filter_op     ; // SIZE = 6 bits
+  ALU_operation                     ALU_op        ; // SIZE = 6 bits
 } MemoryPacketMeta;
 
 typedef struct packed{
