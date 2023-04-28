@@ -32,7 +32,7 @@ module cache_memory #(
   input                                                                                                                  reset        ,
   //front-end
   input                                                                                                                  valid        ,
-  input  [                                                CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W] addr         ,
+  input  [                                                                  CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W] addr         ,
   output [                                                                                    CACHE_FRONTEND_DATA_W-1:0] rdata        ,
   output                                                                                                                 ready        ,
   //stored input value
@@ -48,10 +48,9 @@ module cache_memory #(
   input                                                                                                                  write_ready  ,
   //back-end read-channel
   output                                                                                                                 replace_valid,
-  output [                                                CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W] replace_addr ,
+  output [                                                                 CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W] replace_addr ,
   input                                                                                                                  replace      ,
   input                                                                                                                  read_valid   ,
-  input  [                                                                                         CACHE_LINE2MEM_W-1:0] read_addr    ,
   input  [                                                                                     CACHE_BACKEND_DATA_W-1:0] read_rdata   ,
   //cache-control
   input                                                                                                                  invalidate   ,
@@ -171,7 +170,7 @@ generate
 
     //back-end read channel
     assign replace_valid = (~hit & read_access & ~replace) & (buffer_empty & write_ready);
-    assign replace_addr  = addr[CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W];
+    assign replace_addr  = addr[CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W];
 
   end
   else begin // if (CACHE_WRITE_POL == WRITE_BACK)
@@ -182,7 +181,7 @@ generate
 
     //back-end read channel
     assign replace_valid = (~|way_hit) & (write_ready) & valid_reg & ~replace;
-    assign replace_addr  = addr[CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W+CACHE_LINE2MEM_W];
+    assign replace_addr  = addr[CACHE_FRONTEND_ADDR_W -1:CACHE_BACKEND_BYTE_W];
 
     //buffer status (non-existant)
     `ifdef CTRL_IO
@@ -271,7 +270,7 @@ generate
 
   //Data-Memory
   for (k = 0; k < CACHE_N_WAYS; k=k+1) begin : n_ways_block
-    for(j = 0; j < 2**CACHE_LINE2MEM_W; j=j+1) begin : line2mem_block
+    for(j = 0; j < 1; j=j+1) begin : line2mem_block
       for(i = 0; i < CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W; i=i+1) begin : BE_FE_block
         iob_gen_sp_ram
           #(
@@ -290,24 +289,13 @@ generate
     end
   end
 
-  //Cache Line Write Strobe
-  if(CACHE_LINE2MEM_W > 0)
-    begin
-      always @*
-        if(replace)
-          line_wstrb = {CACHE_BACKEND_NBYTES{read_valid}} << (read_addr*CACHE_BACKEND_NBYTES); //line-replacement: read_addr indexes the words in cache-line
-        else
-          line_wstrb = (wstrb_reg & {CACHE_FRONTEND_NBYTES{write_access}}) << (offset*CACHE_FRONTEND_NBYTES);
-      end
-    else
-      begin
+ 
         always @*
         if(replace)
           line_wstrb = {CACHE_BACKEND_NBYTES{read_valid}}; //line-replacement: mem's word replaces entire line
         else
           line_wstrb = (wstrb_reg & {CACHE_FRONTEND_NBYTES{write_access}}) << (offset*CACHE_FRONTEND_NBYTES);
-      end // else: !if(CACHE_LINE2MEM_W > 0)
-
+     
 
     // Valid-Tag memories & replacement-policy
     if(CACHE_N_WAYS > 1)
