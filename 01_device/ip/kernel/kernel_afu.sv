@@ -140,7 +140,7 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     areset_m_axi   <= ~ap_rst_n;
-    areset_cu      <= ~ap_rst_n;
+    areset_cu      <= ~ap_rst_n | ap_done;
     areset_control <= ~ap_rst_n;
     areset_cache   <= ~ap_rst_n;
   end
