@@ -46,9 +46,9 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     output FIFOStateSignalsOutput        fifo_request_signals_out,
     output logic                         fifo_setup_signal       ,
     input  logic                         start_in                ,
+    input  logic                         pause_in                ,
     output logic                         ready_out               ,
-    output logic                         done_out                ,
-    output logic                         pause_out
+    output logic                         done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -69,9 +69,10 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
 
     logic done_internal_reg;
     logic start_in_reg     ;
+    logic pause_in_reg     ;
     logic ready_out_reg    ;
     logic done_out_reg     ;
-    logic pause_out_reg    ;
+
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -113,10 +114,12 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
             fifo_request_signals_in_reg <= 0;
             start_in_reg                <= 0;
             configuration_reg.valid     <= 0;
+            pause_in_reg                <= 0;
         end
         else begin
             fifo_request_signals_in_reg <= fifo_request_signals_in ;
             start_in_reg                <= start_in;
+            pause_in_reg                <= pause_in;
             configuration_reg.valid     <= configuration_in.valid;
         end
     end
@@ -141,7 +144,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
             fifo_request_signals_out <= fifo_request_signals_out_reg;
             ready_out                <= ready_out_reg;
             done_out                 <= done_out_reg;
-            pause_out                <= pause_out_reg;
             request_out.valid        <= request_out_reg.valid;
         end
     end
@@ -179,17 +181,23 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
             ENGINE_SERIAL_READ_START : begin
                 next_state = ENGINE_SERIAL_READ_BUSY;
             end
+            ENGINE_SERIAL_READ_BUSY_TRANS : begin
+                next_state = ENGINE_SERIAL_READ_BUSY;
+            end
             ENGINE_SERIAL_READ_BUSY : begin
                 if (done_internal_reg)
                     next_state = ENGINE_SERIAL_READ_DONE;
-                else if (fifo_request_signals_out_reg.prog_full)
-                    next_state = ENGINE_SERIAL_READ_PAUSE;
+                else if (fifo_request_signals_out_reg.prog_full | pause_in_reg)
+                    next_state = ENGINE_SERIAL_READ_PAUSE_TRANS;
                 else
                     next_state = ENGINE_SERIAL_READ_BUSY;
             end
+            ENGINE_SERIAL_READ_PAUSE_TRANS : begin
+                next_state = ENGINE_SERIAL_READ_PAUSE;
+            end
             ENGINE_SERIAL_READ_PAUSE : begin
-                if (~fifo_request_signals_out_reg.prog_full)
-                    next_state = ENGINE_SERIAL_READ_BUSY;
+                if (~fifo_request_signals_out_reg.prog_full & ~pause_in_reg)
+                    next_state = ENGINE_SERIAL_READ_BUSY_TRANS;
                 else
                     next_state = ENGINE_SERIAL_READ_PAUSE;
             end
@@ -208,7 +216,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
-                pause_out_reg              <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
@@ -221,7 +228,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b1;
                 ready_out_reg              <= 1'b1;
                 done_out_reg               <= 1'b1;
-                pause_out_reg              <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
@@ -234,7 +240,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
-                pause_out_reg              <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b1;
                 counter_incr               <= configuration_reg.payload.param.increment;
@@ -247,12 +252,21 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
-                pause_out_reg              <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
                 counter_incr               <= configuration_reg.payload.param.increment;
                 counter_decr               <= configuration_reg.payload.param.decrement;
                 fifo_request_din_reg.valid <= 1'b0;
+            end
+            ENGINE_SERIAL_READ_PAUSE_TRANS : begin
+                done_internal_reg          <= 1'b0;
+                ready_out_reg              <= 1'b0;
+                done_out_reg               <= 1'b0;
+                counter_enable             <= 1'b0;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b1;
             end
             ENGINE_SERIAL_READ_BUSY : begin
                 if((counter_count >= configuration_reg.payload.param.end_read)) begin
@@ -270,7 +284,25 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 end
                 ready_out_reg  <= 1'b0;
                 done_out_reg   <= 1'b0;
-                pause_out_reg  <= 1'b0;
+                counter_enable <= 1'b1;
+                counter_load   <= 1'b0;
+            end
+            ENGINE_SERIAL_READ_BUSY_TRANS : begin
+                if((counter_count >= configuration_reg.payload.param.end_read)) begin
+                    done_internal_reg          <= 1'b1;
+                    counter_incr               <= 1'b0;
+                    counter_decr               <= 1'b0;
+                    fifo_request_din_reg.valid <= 1'b0;
+                end
+                else begin
+                    done_internal_reg          <= 1'b0;
+                    counter_enable             <= 1'b1;
+                    counter_incr               <= configuration_reg.payload.param.increment;
+                    counter_decr               <= configuration_reg.payload.param.decrement;
+                    fifo_request_din_reg.valid <= 1'b0;
+                end
+                ready_out_reg  <= 1'b0;
+                done_out_reg   <= 1'b0;
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
@@ -278,7 +310,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
-                pause_out_reg              <= 1'b1;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
@@ -289,7 +320,6 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
                 done_internal_reg          <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
-                pause_out_reg              <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;

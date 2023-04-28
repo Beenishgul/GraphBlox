@@ -53,7 +53,7 @@ module arbiter_bus_N_in_1_out #(
     input  logic                 arbiter_enable            ,
     input  logic [    WIDTH-1:0] arbiter_req               ,
     input  logic [    WIDTH-1:0] arbiter_bus_valid         ,
-    input  logic [BUS_WIDTH-1:0] arbiter_bus_in [0:WIDTH-1],
+    input  logic [BUS_WIDTH-1:0] arbiter_bus_in [WIDTH-1:0],
     output logic [    WIDTH-1:0] arbiter_grant             ,
     output logic [BUS_WIDTH-1:0] arbiter_bus_out
 );
@@ -64,7 +64,7 @@ module arbiter_bus_N_in_1_out #(
     logic                      arbiter_enable_reg              ;
     logic   [       WIDTH-1:0] arbiter_grant_reg               ;
     logic   [       WIDTH-1:0] arbiter_bus_valid_reg           ;
-    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg      [0:WIDTH-1];
+    logic   [   BUS_WIDTH-1:0] arbiter_bus_reg      [WIDTH-1:0];
     integer                    i                               ;
 
 // --------------------------------------------------------------------------------------

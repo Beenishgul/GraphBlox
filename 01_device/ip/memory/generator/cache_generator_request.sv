@@ -58,7 +58,7 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
   MemoryPacket arbiter_bus_out                          ;
-  MemoryPacket arbiter_bus_in [0:NUM_MEMORY_REQUESTOR-1];
+  MemoryPacket arbiter_bus_in [NUM_MEMORY_REQUESTOR-1:0];
 
   logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant      ;
   logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request    ;
@@ -175,7 +175,7 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
   assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
   assign request_out_reg.valid                  = fifo_request_signals_out_reg.valid;
   assign request_out_reg.payload.iob            = fifo_request_dout.iob;
-  assign request_out_reg.payload.meta           = fifo_request_dout.meta ;
+  assign request_out_reg.payload.meta           = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),

@@ -89,12 +89,14 @@ package PKG_ENGINE;
 // related to reading CSR structure data, for example, reading the offsets
 // array.
 
-    typedef enum logic[6:0] {
+    typedef enum logic[8:0] {
         ENGINE_SERIAL_READ_RESET,
         ENGINE_SERIAL_READ_IDLE,
         ENGINE_SERIAL_READ_SETUP,
         ENGINE_SERIAL_READ_START,
+        ENGINE_SERIAL_READ_BUSY_TRANS,
         ENGINE_SERIAL_READ_BUSY,
+        ENGINE_SERIAL_READ_PAUSE_TRANS,
         ENGINE_SERIAL_READ_PAUSE,
         ENGINE_SERIAL_READ_DONE
     } engine_serial_read_state;
