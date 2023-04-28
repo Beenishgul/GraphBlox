@@ -18,7 +18,6 @@ module write_channel_axi #(
   // Write-Policy
   parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH                                                     , //write policy: write-through (0), write-back (1)
   parameter                      CACHE_WORD_OFF_W      = 3                                                                  , //required for write-back
-  parameter                      CACHE_LINE2MEM_W      = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W), //burst offset based on the cache and memory word size
   parameter                      CACHE_AXI_LOCK_W      = 1                                                                  ,
   parameter                      CACHE_AXI_CACHE_W     = 4                                                                  ,
   parameter                      CACHE_AXI_PROT_W      = 3                                                                  ,
@@ -165,208 +164,98 @@ generate
     end
     else begin // if (CACHE_WRITE_POL == `WRITE_BACK)
 
-      if(CACHE_LINE2MEM_W > 0) begin
+      //Constant AXI signals
+      assign m_axi_awid    = CACHE_AXI_ID;
+      assign m_axi_awlock  = 1'b0;
+      assign m_axi_awcache = 4'b0011;
+      assign m_axi_awprot  = 3'd0;
 
-        //Constant AXI signals
-        assign m_axi_awid    = CACHE_AXI_ID;
-        assign m_axi_awlock  = 1'b0;
-        assign m_axi_awcache = 4'b0011;
-        assign m_axi_awprot  = 3'd0;
+      //Burst parameters - single
+      assign m_axi_awlen   = 8'd0; //A single burst of Memory data width word
+      assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
+      assign m_axi_awburst = 2'b00;
 
-        //Burst parameters
-        assign m_axi_awlen   = 2**CACHE_LINE2MEM_W -1; //will choose the burst lenght depending on the cache's and slave's data width
-        assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
-        assign m_axi_awburst = 2'b01; //incremental burst
+      //memory address
+      assign m_axi_awaddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr, {CACHE_BACKEND_BYTE_W{1'b0}}}; //base address for the burst, with width extension
 
-        //memory address
-        assign m_axi_awaddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr, {(CACHE_FRONTEND_BYTE_W+CACHE_WORD_OFF_W){1'b0}}}; //base address for the burst, with width extension
+      //memory write-data
+      assign m_axi_wdata = wdata;
+      assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}}; //uses entire bandwidth
+      assign m_axi_wlast = m_axi_wvalid;
+      assign m_axi_awqos   = 4'd0;
 
-        // memory write-data
-        reg [CACHE_LINE2MEM_W-1:0] word_counter;
-        assign m_axi_wdata = wdata >> (word_counter*CACHE_BACKEND_DATA_W);
-        assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}};
-        assign m_axi_wlast = &word_counter;
-        assign m_axi_awqos   = 4'd0;
+      localparam
+        idle    = 2'd0,
+        address = 2'd1,
+        write   = 2'd2,
+        verif   = 2'd3;
 
-        localparam
-          idle    = 2'd0,
-          address = 2'd1,
-          write   = 2'd2,
-          verif   = 2'd3;
+      reg [1:0]                           state;
 
-        reg [1:0]            state;
+      always @(posedge ap_clk, posedge reset)
+      begin
+        if(reset)
+          state <= idle;
+        else
+          case (state)
 
-        always @(posedge ap_clk, posedge reset)
-        begin
-          if(reset) begin
-            state <= idle;
-            word_counter <= 0;
-          end
-          else begin
-            word_counter <= 0;
-            case(state)
-
-              idle:
-                if(valid)
-                  state <= address;
-              else
-                state <= idle;
-
-              address:
-                if(m_axi_awready)
-                  state <= write;
-              else
-                state <= address;
-
-              write:
-                if(m_axi_wready & (&word_counter)) //last word written
-                  state <= verif;
-              else
-                if(m_axi_wready & ~(&word_counter)) begin//word still available
-                  state <= write;
-                  word_counter <= word_counter+1;
-                end
-              else begin //waiting for handshake
-                state <= write;
-                word_counter <= word_counter;
-              end
-
-              verif:
-                if(m_axi_bvalid & (m_axi_bresp == 2'b00))
-                  state <= idle; // write transfer completed
-              else
-                if (m_axi_bvalid & ~(m_axi_bresp == 2'b00))
-                  state <= address; // error, requires re-transfer
-              else
-                state <= verif; //still waiting for response
-
-              default:;
-            endcase
-          end // else: !if(reset)
-        end // always @ (posedge ap_clk, posedge reset)
-
-        always @*
-        begin
-          ready       = 1'b0;
-          m_axi_awvalid_int = 1'b0;
-          m_axi_wvalid_int  = 1'b0;
-          m_axi_bready_int  = 1'b0;
-
-          case(state)
             idle:
-              ready = ~valid;
+              if(valid)
+                state <= address;
+            else
+              state <= idle;
 
             address:
-              m_axi_awvalid_int = 1'b1;
+              if(m_axi_awready)
+                state <= write;
+            else
+              state <= address;
 
             write:
-              m_axi_wvalid_int  = 1'b1;
+              if (m_axi_wready)
+                state <= verif;
+            else
+              state <= write;
 
             //verif:
             default:
-              begin
-                m_axi_bready_int = 1'b1;
-                ready      = m_axi_bvalid & ~(|m_axi_bresp);
-              end
+              if(m_axi_bvalid & (m_axi_bresp == 2'b00))
+                state <= idle; // write transfer completed
+            else
+              if (m_axi_bvalid & ~(m_axi_bresp == 2'b00))
+                state <= address; // error, requires re-transfer
+            else
+              state <= verif; //still waiting for response
           endcase
-        end // always @ *
-
-      end // if (CACHE_LINE2MEM_W > 0)
-      else  begin // if (CACHE_LINE2MEM_W == 0)
-
-        //Constant AXI signals
-        assign m_axi_awid    = CACHE_AXI_ID;
-        assign m_axi_awlock  = 1'b0;
-        assign m_axi_awcache = 4'b0011;
-        assign m_axi_awprot  = 3'd0;
-
-        //Burst parameters - single
-        assign m_axi_awlen   = 8'd0; //A single burst of Memory data width word
-        assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; //each word will be the width of the memory for maximum bandwidth
-        assign m_axi_awburst = 2'b00;
-
-        //memory address
-        assign m_axi_awaddr  = {CACHE_BACKEND_ADDR_W{1'b0}} + {addr, {CACHE_BACKEND_BYTE_W{1'b0}}}; //base address for the burst, with width extension
-
-        //memory write-data
-        assign m_axi_wdata = wdata;
-        assign m_axi_wstrb = {CACHE_BACKEND_NBYTES{1'b1}}; //uses entire bandwidth
-        assign m_axi_wlast = m_axi_wvalid;
-        assign m_axi_awqos   = 4'd0;
-        
-        localparam
-          idle    = 2'd0,
-          address = 2'd1,
-          write   = 2'd2,
-          verif   = 2'd3;
-
-        reg [1:0]                           state;
-
-        always @(posedge ap_clk, posedge reset)
-        begin
-          if(reset)
-            state <= idle;
-          else
-            case (state)
-
-              idle:
-                if(valid)
-                  state <= address;
-              else
-                state <= idle;
-
-              address:
-                if(m_axi_awready)
-                  state <= write;
-              else
-                state <= address;
-
-              write:
-                if (m_axi_wready)
-                  state <= verif;
-              else
-                state <= write;
-
-              //verif:
-              default:
-                if(m_axi_bvalid & (m_axi_bresp == 2'b00))
-                  state <= idle; // write transfer completed
-              else
-                if (m_axi_bvalid & ~(m_axi_bresp == 2'b00))
-                  state <= address; // error, requires re-transfer
-              else
-                state <= verif; //still waiting for response
-            endcase
-        end
+      end
 
 
-        always @*
-        begin
-          ready       = 1'b0;
-          m_axi_awvalid_int = 1'b0;
-          m_axi_wvalid_int  = 1'b0;
-          m_axi_bready_int  = 1'b0;
+      always @*
+      begin
+        ready       = 1'b0;
+        m_axi_awvalid_int = 1'b0;
+        m_axi_wvalid_int  = 1'b0;
+        m_axi_bready_int  = 1'b0;
 
-          case(state)
-            idle:
-              ready = ~valid;
+        case(state)
+          idle:
+            ready = ~valid;
 
-            address:
-              m_axi_awvalid_int = 1'b1;
+          address:
+            m_axi_awvalid_int = 1'b1;
 
-            write:
-              m_axi_wvalid_int  = 1'b1;
+          write:
+            m_axi_wvalid_int  = 1'b1;
 
-            //verif:
-            default:
-              begin
-                m_axi_bready_int = 1'b1;
-                ready      = m_axi_bvalid & ~(|m_axi_bresp);
-              end
-          endcase
-        end // always @ *
+          //verif:
+          default:
+            begin
+              m_axi_bready_int = 1'b1;
+              ready      = m_axi_bvalid & ~(|m_axi_bresp);
+            end
+        endcase
+      end // always @ *
 
-      end // else: !if(CACHE_LINE2MEM_W > 0)
     end // else: !if(CACHE_WRITE_POL == `WRITE_THROUGH)
   endgenerate
 

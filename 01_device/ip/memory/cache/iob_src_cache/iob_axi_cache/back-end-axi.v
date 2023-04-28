@@ -15,9 +15,7 @@ module back_end_axi #(
   //Higher hierarchy memory (slave) interface parameters
   parameter                      CACHE_BACKEND_NBYTES  = CACHE_BACKEND_DATA_W/8                                             , //Number of bytes
   parameter                      CACHE_BACKEND_BYTE_W  = $clog2(CACHE_BACKEND_NBYTES)                                       , //Offset of Number of Bytes
-  //Cache-Memory base Offset
-  parameter                      CACHE_LINE2MEM_W      = CACHE_WORD_OFF_W-$clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W),
-  // Write-Policy
+ // Write-Policy
   parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH                                                     , //write policy: write-through (0), write-back (1)
   //AXI specific parameters
   parameter                      CACHE_AXI_ADDR_W      = CACHE_BACKEND_ADDR_W                                               ,
@@ -44,7 +42,6 @@ module back_end_axi #(
   input  [                                               CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W+CACHE_WORD_OFF_W] replace_addr ,
   output                                                                                                                 replace      ,
   output                                                                                                                 read_valid   ,
-  output [                                                                                         CACHE_LINE2MEM_W-1:0] read_addr    ,
   output [                                                                                     CACHE_BACKEND_DATA_W-1:0] read_rdata   ,
   //AXI master backend interface
   `include "m_axi_m_port.vh"
@@ -77,7 +74,6 @@ read_channel_axi #(
   .replace_addr (replace_addr ),
   .replace      (replace      ),
   .read_valid   (read_valid   ),
-  .read_addr    (read_addr    ),
   .read_rdata   (read_rdata   ),
   `include "m_axi_read_portmap.vh"
   .ap_clk          (ap_clk          ),
