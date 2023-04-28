@@ -108,7 +108,7 @@ module arbiter_bus_N_in_1_out #(
                     end
                     arbiter_grant <= arbiter_grant_reg;
                 end
-                if (~(|arbiter_bus_valid)) begin
+                if (~(|arbiter_bus_valid_reg)) begin
                     arbiter_bus_out <= 0;
                 end
             end
