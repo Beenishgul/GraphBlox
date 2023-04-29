@@ -389,4 +389,8 @@ module vertex_cu #(
         .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
     );
 
+// --------------------------------------------------------------------------------------
+// FIFO cache response MemoryPacket
+// --------------------------------------------------------------------------------------
+
 endmodule : vertex_cu

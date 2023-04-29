@@ -115,6 +115,7 @@ typedef enum logic[10:0]{
 // --------------------------------------------------------------------------------------
 typedef struct packed{
   logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
   logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
   logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
   logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
