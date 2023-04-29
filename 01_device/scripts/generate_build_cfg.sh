@@ -97,7 +97,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
 
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
-   config+="impl.jobs=$((${JOBS_STRATEGY} / 4))\n"
+   config+="impl.jobs=${JOBS_STRATEGY}\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
    # config+="prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/opt_pre.tcl}"
 
