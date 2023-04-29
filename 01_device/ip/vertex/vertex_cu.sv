@@ -279,15 +279,16 @@ module vertex_cu #(
         configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
-        configuration_comb.payload.meta.cu_engine_id_x = ENGINE_ID_X;
-        configuration_comb.payload.meta.cu_engine_id_y = ENGINE_ID_Y;
-        configuration_comb.payload.meta.base_address   = descriptor_reg.payload.graph_csr_struct;
+        configuration_comb.payload.meta.id_vertex      = ENGINE_ID_X;
+        configuration_comb.payload.meta.id_bundle      = ENGINE_ID_X;
+        configuration_comb.payload.meta.id_engine      = ENGINE_ID_Y;
+        configuration_comb.payload.meta.address_base   = descriptor_reg.payload.graph_csr_struct;
         configuration_comb.payload.meta.address_offset = 0;
-        configuration_comb.payload.meta.cmd_type       = CMD_READ;
-        configuration_comb.payload.meta.struct_type    = STRUCT_VERTEX_CU;
-        configuration_comb.payload.meta.operand_loc    = OP_LOCATION_0;
-        configuration_comb.payload.meta.filter_op      = FILTER_NOP;
-        configuration_comb.payload.meta.ALU_op         = ALU_NOP;
+        configuration_comb.payload.meta.type_cmd       = CMD_READ;
+        configuration_comb.payload.meta.type_struct    = STRUCT_VERTEX_CU;
+        configuration_comb.payload.meta.type_operand   = OP_LOCATION_0;
+        configuration_comb.payload.meta.type_filter    = FILTER_NOP;
+        configuration_comb.payload.meta.type_ALU       = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin

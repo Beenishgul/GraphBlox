@@ -52,7 +52,7 @@ typedef enum logic[4:0] {
   CMD_WRITE,
   CMD_PREFETCH_READ,
   CMD_PREFETCH_WRITE
-} command_type;
+} type_kernel_cmd;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Operand location
@@ -66,7 +66,7 @@ typedef enum logic[7:0] {
   OP_LOCATION_5,
   OP_LOCATION_6,
   OP_LOCATION_7
-} operand_location;
+} type_engine_operand;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
@@ -79,7 +79,7 @@ typedef enum logic[6:0]{
   FILTER_GT_EQ,
   FILTER_LT_EQ,
   FILTER_NOT_EQ
-} filter_operation;
+} type_filter_operation;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
@@ -91,7 +91,7 @@ typedef enum logic[5:0] {
   ALU_MUL,
   ALU_ACC,
   ALU_DIV
-} ALU_operation;
+} type_ALU_operation;
 
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
@@ -108,22 +108,22 @@ typedef enum logic[10:0]{
   STRUCT_AUXILIARY_2_DATA,
   STRUCT_KERNEL_SETUP,
   STRUCT_VERTEX_CU
-} structure_type;
+} type_data_structure;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
-  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_x; // SIZE = 6 bits
-  logic [    CU_ENGINE_ID_BITS-1:0] cu_engine_id_y; // SIZE = 6 bits
-  logic [CACHE_FRONTEND_ADDR_W-1:0] base_address  ; // SIZE = 64 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] id_vertex     ; // SIZE = 6 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] id_bundle     ; // SIZE = 6 bits
+  logic [    CU_ENGINE_ID_BITS-1:0] id_engine     ; // SIZE = 6 bits
+  logic [CACHE_FRONTEND_ADDR_W-1:0] address_base  ; // SIZE = 64 bits
   logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
-  command_type                      cmd_type      ; // SIZE = 5 bits
-  structure_type                    struct_type   ; // SIZE = 11 bits
-  operand_location                  operand_loc   ; // SIZE = 6 bits
-  filter_operation                  filter_op     ; // SIZE = 6 bits
-  ALU_operation                     ALU_op        ; // SIZE = 6 bits
+  type_kernel_cmd                   type_cmd      ; // SIZE = 5 bits
+  type_data_structure               type_struct   ; // SIZE = 11 bits
+  type_engine_operand               type_operand  ; // SIZE = 6 bits
+  type_filter_operation             type_filter   ; // SIZE = 6 bits
+  type_ALU_operation                type_ALU      ; // SIZE = 6 bits
 } MemoryPacketMeta;
 
 typedef struct packed{

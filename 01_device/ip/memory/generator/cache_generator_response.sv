@@ -111,7 +111,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 
 // Might needs optimizing!!
   always_comb begin
-    case (fifo_response_dout_reg.payload.meta.struct_type)
+    case (fifo_response_dout_reg.payload.meta.type_struct)
       STRUCT_KERNEL_SETUP : begin
         response_out_reg[0] = fifo_response_dout_reg;
         response_out_reg[1] = fifo_response_dout_reg;
