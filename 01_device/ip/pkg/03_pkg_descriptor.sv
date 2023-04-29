@@ -36,12 +36,12 @@ package PKG_DESCRIPTOR;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] edges_array_dest  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] auxiliary_1       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] auxiliary_2       ; // reads the next number of cache lines if set
-    } descriptor_request;
+    } KernelDescriptorPayload;
 
 
     typedef struct packed{
-        logic              valid  ;
-        descriptor_request payload;
-    } DescriptorInterface;
+        logic                   valid  ;
+        KernelDescriptorPayload payload;
+    } KernelDescriptor;
 
 endpackage

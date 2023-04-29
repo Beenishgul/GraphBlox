@@ -97,6 +97,7 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
   AXI4MasterReadInterface  m_axi_read ;
   AXI4MasterWriteInterface m_axi_write;
+  logic                    endian_reg ;
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control
@@ -104,8 +105,8 @@ module kernel_afu #(
   ControlChainInterfaceInput  kernel_control_in ;
   ControlChainInterfaceOutput kernel_control_out;
 
-  DescriptorInterface kernel_control_descriptor_in ;
-  DescriptorInterface kernel_control_descriptor_out;
+  KernelDescriptorPayload kernel_control_descriptor_in ;
+  KernelDescriptor        kernel_control_descriptor_out;
 
 // --------------------------------------------------------------------------------------
 // Cache -> AXI
@@ -122,7 +123,7 @@ module kernel_afu #(
   // --------------------------------------------------------------------------------------
 // CU -> PEs
 // --------------------------------------------------------------------------------------
-  DescriptorInterface kernel_cu_descriptor_in;
+  KernelDescriptor kernel_cu_descriptor_in;
 
   CacheRequest           kernel_cu_request_out             ;
   FIFOStateSignalsOutput kernel_cu_fifo_request_signals_out;
@@ -165,14 +166,16 @@ module kernel_afu #(
 
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      ap_ready <= 1'b0;
-      ap_done  <= 1'b0;
-      ap_idle  <= 1'b1;
+      ap_ready   <= 1'b0;
+      ap_done    <= 1'b0;
+      ap_idle    <= 1'b1;
+      endian_reg <= 1'b0;
     end
     else begin
-      ap_done  <= kernel_control_out.ap_done;
-      ap_ready <= kernel_control_out.ap_ready;
-      ap_idle  <= kernel_control_out.ap_idle;
+      ap_done    <= kernel_control_out.ap_done;
+      ap_ready   <= kernel_control_out.ap_ready;
+      ap_idle    <= kernel_control_out.ap_idle;
+      endian_reg <= kernel_control_out.endian;
     end
   end
 
@@ -187,7 +190,7 @@ module kernel_afu #(
       m_axi_read.in.rvalid  <= m00_axi_rvalid ; // Read channel valid
       m_axi_read.in.arready <= m00_axi_arready; // Address read channel ready
       m_axi_read.in.rlast   <= m00_axi_rlast  ; // Read channel last word
-      m_axi_read.in.rdata   <= swap_endianness_cacheline_axi(m00_axi_rdata)  ; // Read channel data
+      m_axi_read.in.rdata   <= swap_endianness_cacheline_axi(m00_axi_rdata, endian_reg)  ; // Read channel data
       m_axi_read.in.rid     <= m00_axi_rid    ; // Read channel ID
       m_axi_read.in.rresp   <= m00_axi_rresp  ; // Read channel response
     end
@@ -273,7 +276,7 @@ module kernel_afu #(
       m00_axi_awcache <= m_axi_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
       m00_axi_awprot  <= m_axi_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       m00_axi_awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
-      m00_axi_wdata   <= swap_endianness_cacheline_axi(m_axi_write.out.wdata)  ; // Write channel data
+      m00_axi_wdata   <= swap_endianness_cacheline_axi(m_axi_write.out.wdata, endian_reg)  ; // Write channel data
       m00_axi_wstrb   <= m_axi_write.out.wstrb  ; // Write channel write strobe
       m00_axi_wlast   <= m_axi_write.out.wlast  ; // Write channel last word flag
       m00_axi_wvalid  <= m_axi_write.out.wvalid ; // Write channel valid
@@ -285,16 +288,15 @@ module kernel_afu #(
 // DRIVE DESCRIPTOR
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    kernel_control_descriptor_in.valid                      <= 0;
-    kernel_control_descriptor_in.payload.graph_csr_struct   <= graph_csr_struct  ;
-    kernel_control_descriptor_in.payload.vertex_out_degree  <= vertex_out_degree ;
-    kernel_control_descriptor_in.payload.vertex_in_degree   <= vertex_in_degree  ;
-    kernel_control_descriptor_in.payload.vertex_edges_idx   <= vertex_edges_idx  ;
-    kernel_control_descriptor_in.payload.edges_array_weight <= edges_array_weight;
-    kernel_control_descriptor_in.payload.edges_array_src    <= edges_array_src   ;
-    kernel_control_descriptor_in.payload.edges_array_dest   <= edges_array_dest  ;
-    kernel_control_descriptor_in.payload.auxiliary_1        <= auxiliary_1       ;
-    kernel_control_descriptor_in.payload.auxiliary_2        <= auxiliary_2       ;
+    kernel_control_descriptor_in.graph_csr_struct   <= graph_csr_struct  ;
+    kernel_control_descriptor_in.vertex_out_degree  <= vertex_out_degree ;
+    kernel_control_descriptor_in.vertex_in_degree   <= vertex_in_degree  ;
+    kernel_control_descriptor_in.vertex_edges_idx   <= vertex_edges_idx  ;
+    kernel_control_descriptor_in.edges_array_weight <= edges_array_weight;
+    kernel_control_descriptor_in.edges_array_src    <= edges_array_src   ;
+    kernel_control_descriptor_in.edges_array_dest   <= edges_array_dest  ;
+    kernel_control_descriptor_in.auxiliary_1        <= auxiliary_1       ;
+    kernel_control_descriptor_in.auxiliary_2        <= auxiliary_2       ;
   end
 
 // --------------------------------------------------------------------------------------

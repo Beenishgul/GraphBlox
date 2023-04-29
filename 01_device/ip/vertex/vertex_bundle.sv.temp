@@ -30,7 +30,7 @@ module vertex_bundle #(
     input  logic                       ap_clk,
     input  logic                       areset,
     input  ControlChainInterfaceOutput control_state,
-    input  DescriptorInterface         descriptor,
+    input  KernelDescriptor         descriptor,
     input  MemoryPacket                vertex_bundle_memory_response_in,
     output FIFOStateSignalsOutput      fifo_response_signals_out,
     input  FIFOStateSignalsInput       resp_fifo_in_signals,
@@ -56,7 +56,7 @@ module vertex_bundle #(
 // --------------------------------------------------------------------------------------
 //   FIFO signals
 // --------------------------------------------------------------------------------------
-    DescriptorInterface descriptor_reg;
+    KernelDescriptor descriptor_reg;
 
     MemoryPacket vertex_bundle_mem_resp_dout;
     MemoryPacket vertex_bundle_mem_resp_din;

@@ -30,7 +30,7 @@ module kernel_setup #(
     input  logic                       ap_clk                   ,
     input  logic                       areset                   ,
     input  ControlChainInterfaceOutput control_state            ,
-    input  DescriptorInterface         descriptor_in            ,
+    input  KernelDescriptor            descriptor_in            ,
     output MemoryPacket                request_out              ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
     output FIFOStateSignalsOutput      fifo_request_signals_out ,
@@ -47,10 +47,10 @@ module kernel_setup #(
     logic areset_serial_read ;
     logic areset_fifo        ;
 
-    DescriptorInterface descriptor_reg  ;
-    MemoryPacket        response_in_reg ;
-    MemoryPacket        response_out_reg;
-    MemoryPacket        request_out_reg ;
+    KernelDescriptor descriptor_reg  ;
+    MemoryPacket     response_in_reg ;
+    MemoryPacket     response_out_reg;
+    MemoryPacket     request_out_reg ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
