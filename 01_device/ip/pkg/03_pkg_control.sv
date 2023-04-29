@@ -30,6 +30,7 @@ package PKG_CONTROL;
         logic ap_done ;
         logic ap_idle ;
         logic start   ;
+        logic endian  ;
     } ControlChainInterfaceOutput;
 
 // --------------------------------------------------------------------------------------

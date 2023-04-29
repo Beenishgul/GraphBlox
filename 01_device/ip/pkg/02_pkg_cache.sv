@@ -37,11 +37,11 @@ package PKG_CACHE;
 // CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-	parameter CACHE_FRONTEND_ADDR_W = GLOBAL_ADDR_WIDTH_BITS ; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-	parameter CACHE_FRONTEND_DATA_W = GLOBAL_DATA_WIDTH_BITS ; //Data width - word size used for the cache
-	parameter CACHE_N_WAYS          = 2                      ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 12                     ; //Line-Offset Width - 2**NLINE_W total cache lines
-	parameter CACHE_WTBUF_DEPTH_W   = 32                     ; //Depth Width of Write-Through Buffer
+	parameter CACHE_FRONTEND_ADDR_W = GLOBAL_ADDR_WIDTH_BITS; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+	parameter CACHE_FRONTEND_DATA_W = GLOBAL_DATA_WIDTH_BITS; //Data width - word size used for the cache
+	parameter CACHE_N_WAYS          = 2                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter CACHE_LINE_OFF_W      = 12                    ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_WTBUF_DEPTH_W   = 32                    ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
@@ -55,7 +55,7 @@ package PKG_CACHE;
 	parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8      ; //Number of bytes
 	parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
-	parameter CACHE_WORD_OFF_W = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)                 ; //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
+	parameter CACHE_WORD_OFF_W = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W); //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
 /*---------------------------------------------------*/
 //Write Policy
 	parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)

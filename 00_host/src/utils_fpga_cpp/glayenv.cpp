@@ -127,7 +127,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 #if WEIGHTED
     buf_addr[6] = edges_array_weight_buffer.address();
 #endif
-    buf_addr[7] = 0;
+    buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
     buf_addr[8] = graph_buffer_size_in_bytes; // not passing an address but number of cachelines to read from graph_csr_struct
 
 }

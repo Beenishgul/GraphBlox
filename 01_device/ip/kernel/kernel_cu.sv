@@ -26,7 +26,7 @@ module kernel_cu #(
 ) (
   input  logic                  ap_clk                   ,
   input  logic                  areset                   ,
-  input  DescriptorInterface    descriptor_in            ,
+  input  KernelDescriptor       descriptor_in            ,
   output CacheRequest           request_out              ,
   output FIFOStateSignalsOutput fifo_request_signals_out ,
   input  FIFOStateSignalsInput  fifo_request_signals_in  ,
@@ -49,7 +49,7 @@ module kernel_cu #(
   logic [    NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
   logic [GLOBAL_DATA_WIDTH_BITS-1:0] counter                     ;
   logic [     NUM_SETUP_MODULES-1:0] cu_setup_state              ;
-  DescriptorInterface                descriptor_in_reg           ;
+  KernelDescriptor                   descriptor_in_reg           ;
   CacheResponse                      response_in_reg             ;
   CacheRequest                       request_out_reg             ;
   FIFOStateSignalsInput              fifo_response_signals_in_reg;
@@ -79,7 +79,7 @@ module kernel_cu #(
 // Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
   ControlChainInterfaceOutput kernel_setup_control_state            ;
-  DescriptorInterface         kernel_setup_descriptor               ;
+  KernelDescriptor            kernel_setup_descriptor               ;
   MemoryPacket                kernel_setup_response_in              ;
   FIFOStateSignalsOutput      kernel_setup_fifo_response_signals_out;
   FIFOStateSignalsInput       kernel_setup_fifo_response_signals_in ;
@@ -92,7 +92,7 @@ module kernel_cu #(
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
   ControlChainInterfaceOutput vertex_cu_control_state            ;
-  DescriptorInterface         vertex_cu_descriptor               ;
+  KernelDescriptor            vertex_cu_descriptor               ;
   MemoryPacket                vertex_cu_response_in              ;
   FIFOStateSignalsOutput      vertex_cu_fifo_response_signals_out;
   FIFOStateSignalsInput       vertex_cu_fifo_response_signals_in ;
@@ -127,10 +127,10 @@ module kernel_cu #(
           counter         <= 0;
         end
         else begin
-          // if(vertex_cu_response_in.valid)
-          // counter <= vertex_cu_response_in.payload.meta.address_offset;
-          // else
-          counter <= counter+(CACHE_FRONTEND_DATA_W/8);
+          if(vertex_cu_response_in.valid)
+            counter <= vertex_cu_response_in.payload.meta.address_offset;
+          else
+            counter <= counter;
         end
       end else begin
         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
