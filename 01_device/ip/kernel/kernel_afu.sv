@@ -153,7 +153,7 @@ module kernel_afu #(
     if (areset_control) begin
       kernel_control_in.ap_start    <= 1'b0;
       kernel_control_in.ap_continue <= 1'b0;
-      kernel_control_in.setup       <= 1'b1;
+      kernel_control_in.setup       <= 1'b0;
       kernel_control_in.done        <= 1'b0;
     end
     else begin

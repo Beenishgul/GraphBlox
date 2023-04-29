@@ -128,7 +128,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     buf_addr[6] = edges_array_weight_buffer.address();
 #endif
     buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
-    buf_addr[8] = graph_buffer_size_in_bytes; // not passing an address but number of cachelines to read from graph_csr_struct
+    buf_addr[8] = graph_buffer_size_in_bytes/64; // not passing an address but number of cachelines to read from graph_csr_struct
 
 }
 
@@ -290,11 +290,11 @@ void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 
 void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
 {
-    uint32_t glay_control_write = 0;
+    // uint32_t glay_control_write = 0;
     uint32_t glay_control_read  = 0;
-    glay_control_write = CONTROL_START;
+    // glay_control_write = CONTROL_START;
 
-    glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+    // glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
 
     do
     {
