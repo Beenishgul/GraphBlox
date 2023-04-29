@@ -46,14 +46,14 @@ module kernel_cu #(
   logic areset_setup    ;
   logic areset_cu       ;
 
-  logic [NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
-  logic [  GLOBAL_DATA_WIDTH_BITS-1:0] counter                     ;
-  logic [ NUM_SETUP_MODULES-1:0] cu_setup_state              ;
-  DescriptorInterface            descriptor_in_reg           ;
-  CacheResponse                  response_in_reg             ;
-  CacheRequest                   request_out_reg             ;
-  FIFOStateSignalsInput          fifo_response_signals_in_reg;
-  FIFOStateSignalsInput          fifo_request_signals_in_reg ;
+  logic [    NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
+  logic [GLOBAL_DATA_WIDTH_BITS-1:0] counter                     ;
+  logic [     NUM_SETUP_MODULES-1:0] cu_setup_state              ;
+  DescriptorInterface                descriptor_in_reg           ;
+  CacheResponse                      response_in_reg             ;
+  CacheRequest                       request_out_reg             ;
+  FIFOStateSignalsInput              fifo_response_signals_in_reg;
+  FIFOStateSignalsInput              fifo_request_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
@@ -122,12 +122,15 @@ module kernel_cu #(
     end
     else begin
       if (descriptor_in_reg.valid) begin
-        if(counter >= (descriptor_in_reg.payload.auxiliary_2 -1)) begin
+        if(counter >= ((descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8))-8)) begin
           done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
           counter         <= 0;
         end
         else begin
-          counter <= counter + 1;
+          if(vertex_cu_response_in.valid)
+            counter <= vertex_cu_response_in.payload.meta.address_offset;
+          else
+            counter <= counter;
         end
       end else begin
         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
@@ -221,24 +224,24 @@ module kernel_cu #(
   assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_response_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
   assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out);
 
-  assign kernel_setup_fifo_request_signals_in.rd_en = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
+  assign kernel_setup_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
   assign kernel_setup_fifo_response_signals_in.rd_en = 1;
 
-  assign vertex_cu_fifo_request_signals_in.rd_en    = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
+  assign vertex_cu_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
   assign vertex_cu_fifo_response_signals_in.rd_en = 1;
 
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Cache Request Generator
 // --------------------------------------------------------------------------------------
   // kernel_setup
-  assign kernel_setup_response_in                   = cache_generator_response_out[0];
-  assign cache_generator_request_in[0]              = kernel_setup_request_out;
-  assign cache_generator_arbiter_request_in[0]      = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
+  assign kernel_setup_response_in              = cache_generator_response_out[0];
+  assign cache_generator_request_in[0]         = kernel_setup_request_out;
+  assign cache_generator_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
   // vertex_cu
-  assign vertex_cu_response_in                   = cache_generator_response_out[1];
-  assign cache_generator_request_in[1]           = vertex_cu_request_out;
-  assign cache_generator_arbiter_request_in[1]   = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+  assign vertex_cu_response_in                 = cache_generator_response_out[1];
+  assign cache_generator_request_in[1]         = vertex_cu_request_out;
+  assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
