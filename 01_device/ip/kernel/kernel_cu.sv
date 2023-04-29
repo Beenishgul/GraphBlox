@@ -127,10 +127,10 @@ module kernel_cu #(
           counter         <= 0;
         end
         else begin
-          if(vertex_cu_response_in.valid)
-            counter <= vertex_cu_response_in.payload.meta.address_offset;
-          else
-            counter <= counter;
+          // if(vertex_cu_response_in.valid)
+          // counter <= vertex_cu_response_in.payload.meta.address_offset;
+          // else
+          counter <= counter+(CACHE_FRONTEND_DATA_W/8);
         end
       end else begin
         done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
