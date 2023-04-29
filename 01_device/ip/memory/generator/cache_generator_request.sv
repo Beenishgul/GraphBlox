@@ -135,10 +135,10 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
     fifo_request_comb.valid             = arbiter_bus_out.valid;
     fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
     fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
-    fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.base_address + arbiter_bus_out.payload.meta.address_offset;
+    fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address_base + arbiter_bus_out.payload.meta.address_offset;
     fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field;
 
-    case (arbiter_bus_out.payload.meta.cmd_type)
+    case (arbiter_bus_out.payload.meta.type_cmd)
       CMD_WRITE : begin
         fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
       end

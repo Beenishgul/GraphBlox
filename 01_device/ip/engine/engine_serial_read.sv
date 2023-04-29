@@ -333,15 +333,15 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.cu_engine_id_x = configuration_reg.payload.meta.cu_engine_id_x;
-        fifo_request_comb.payload.meta.cu_engine_id_y = configuration_reg.payload.meta.cu_engine_id_x;
-        fifo_request_comb.payload.meta.base_address   = configuration_reg.payload.param.array_pointer;
+        fifo_request_comb.payload.meta.id_bundle      = configuration_reg.payload.meta.id_bundle;
+        fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_bundle;
+        fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.array_pointer;
         fifo_request_comb.payload.meta.address_offset = counter_count;
-        fifo_request_comb.payload.meta.cmd_type       = configuration_reg.payload.meta.cmd_type;
-        fifo_request_comb.payload.meta.struct_type    = configuration_reg.payload.meta.struct_type;
-        fifo_request_comb.payload.meta.operand_loc    = configuration_reg.payload.meta.operand_loc ;
-        fifo_request_comb.payload.meta.filter_op      = configuration_reg.payload.meta.filter_op;
-        fifo_request_comb.payload.meta.ALU_op         = configuration_reg.payload.meta.ALU_op;
+        fifo_request_comb.payload.meta.type_cmd       = configuration_reg.payload.meta.type_cmd;
+        fifo_request_comb.payload.meta.type_struct    = configuration_reg.payload.meta.type_struct;
+        fifo_request_comb.payload.meta.type_operand   = configuration_reg.payload.meta.type_operand ;
+        fifo_request_comb.payload.meta.type_filter    = configuration_reg.payload.meta.type_filter;
+        fifo_request_comb.payload.meta.type_ALU       = configuration_reg.payload.meta.type_ALU;
     end
 
     always_ff @(posedge ap_clk) begin
