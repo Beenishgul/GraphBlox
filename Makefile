@@ -355,12 +355,12 @@ export XILINX_IMPL_STRATEGY = 2
 # =========================================================
 # Enabling parallel Strategies For Synth/Impl TARGET=hw
 # =========================================================
-# How many parallel jobs works for [0-1] 
-# For [2-7] the number of jobs is 
-# Synth -> max_cores 
-# Impl  -> max_cores / 4 (too intensive!)
+# How many parallel jobs works for [0-7] 
+# For number of jobs is XILINX_JOBS_STRATEGY=2
+# Synth -> 2 parallel synths 
+# Impl  -> 2 parallel implementations  
 # =========================================================
-export XILINX_JOBS_STRATEGY = 4
+export XILINX_JOBS_STRATEGY = 2
 # =========================================================
 
 # =========================================================
