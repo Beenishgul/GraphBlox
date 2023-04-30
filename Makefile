@@ -361,6 +361,7 @@ export XILINX_IMPL_STRATEGY = 2
 # Impl  -> 2 parallel implementations  
 # =========================================================
 export XILINX_JOBS_STRATEGY = 2
+export XILINX_MAX_THREADS   = 8
 # =========================================================
 
 # =========================================================
