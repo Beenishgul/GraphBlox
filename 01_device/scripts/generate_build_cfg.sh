@@ -24,6 +24,7 @@ KERNEL_NAME=$3
 IMPL_STRATEGY=$4
 JOBS_STRATEGY=$5
 PART=$6
+MAX_THREADS=$7
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
  
@@ -82,6 +83,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=Performance_Explore,Area_Explore\n"
    config+="impl.jobs=${JOBS_STRATEGY}\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
 
    echo -e "${config}" >> ${CFG_FILE_NAME}
@@ -96,6 +98,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY}\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
    # config+="prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/opt_pre.tcl}"
 
    echo -e "${config}" >> ${CFG_FILE_NAME}
@@ -110,6 +113,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    config+="param=project.writeIntermediateCheckpoints=1\n"
    config+="prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore\n"
@@ -134,6 +138,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
@@ -156,6 +161,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithRemap}\n"
@@ -177,6 +183,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
@@ -198,6 +205,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
    config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
