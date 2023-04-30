@@ -89,6 +89,7 @@ TARGET   ?= hw_emu
 # Enabling Multiple Strategies For Closing Timing
 XILINX_IMPL_STRATEGY ?= 0
 XILINX_JOBS_STRATEGY ?= 2
+XILINX_MAX_THREADS   ?= 8
 XILINX_CTRL_MODE     ?= USER_MANAGED
 # XILINX_CTRL_MODE     ?= AP_CTRL_HS
 # XILINX_CTRL_MODE     ?= AP_CTRL_CHAIN
@@ -246,9 +247,10 @@ XOCCLFLAGS  = 	--link --optimize 3
 VPPCONFLAGS = 	--config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg \
 				--temp_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp \
 				--log_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_log \
-				--report_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_report 
+				--report_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_report \
+				--vivado.param general.maxThreads=$(XILINX_MAX_THREADS)
 		
-				
+
 
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
