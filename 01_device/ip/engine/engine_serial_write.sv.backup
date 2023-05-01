@@ -334,8 +334,9 @@ module engine_serial_write #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
+        fifo_request_comb.payload.meta.id_vertex      = configuration_reg.payload.meta.id_vertex;
         fifo_request_comb.payload.meta.id_bundle      = configuration_reg.payload.meta.id_bundle;
-        fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_bundle;
+        fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_engine;
         fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.array_pointer;
         fifo_request_comb.payload.meta.address_offset = counter_count;
         fifo_request_comb.payload.meta.type_cmd       = configuration_reg.payload.meta.type_cmd;
