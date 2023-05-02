@@ -360,7 +360,7 @@ export XILINX_IMPL_STRATEGY = 0
 # Synth -> 2 parallel synths 
 # Impl  -> 2 parallel implementations  
 # =========================================================
-export XILINX_JOBS_STRATEGY = 16
+export XILINX_JOBS_STRATEGY = 8
 export XILINX_MAX_THREADS   = $(shell grep -c ^processor /proc/cpuinfo)
 # =========================================================
 
