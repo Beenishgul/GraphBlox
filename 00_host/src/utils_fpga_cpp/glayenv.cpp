@@ -128,17 +128,17 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     buf_addr[6] = edges_array_weight_buffer.address();
 #endif
     buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
-    buf_addr[8] = graph_buffer_size_in_bytes/64; // not passing an address but number of cachelines to read from graph_csr_struct
+    buf_addr[8] = graph_buffer_size_in_bytes / 64; // not passing an address but number of cachelines to read from graph_csr_struct
 
 }
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
 
-    
-    uint64_t *overlay = (uint64_t *) malloc(graph_buffer_size_in_bytes);
 
-    for (int i = 0; i < (graph_buffer_size_in_bytes/sizeof(uint64_t)); ++i)
+    uint32_t *overlay = (uint32_t *) malloc(graph_buffer_size_in_bytes);
+
+    for (uint32_t i = 0; i < (graph_buffer_size_in_bytes / sizeof(uint32_t)); ++i)
     {
         overlay[i] = i;
     }
