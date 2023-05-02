@@ -18,8 +18,8 @@ module xpm_memory_spram_parent #(
 	parameter HEXFILE          = "none"  ,
 	parameter DATA_W           = 8       ,
 	parameter ADDR_W           = 14      ,
-	parameter MEMORY_PRIMITIVE = "ultra" ,
-	parameter BLOCK_DATA_DEPTH = (4*1024),
+	parameter MEMORY_PRIMITIVE = "block" ,
+	parameter BLOCK_DATA_DEPTH = (1024),
 	parameter BYTE_WRITE_W     = DATA_W
 ) (
 	input                                  ap_clk,
