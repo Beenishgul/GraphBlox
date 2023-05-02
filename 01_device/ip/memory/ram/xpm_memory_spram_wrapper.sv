@@ -18,7 +18,7 @@ module xpm_memory_spram_wrapper #(
   parameter HEXFILE          = "none" ,
   parameter DATA_W           = 8      ,
   parameter ADDR_W           = 14     ,
-  parameter MEMORY_PRIMITIVE = "ultra",
+  parameter MEMORY_PRIMITIVE = "block",
   parameter BYTE_WRITE_W     = DATA_W
 ) (
   input  logic                           ap_clk,

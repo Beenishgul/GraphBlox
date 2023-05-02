@@ -31,7 +31,7 @@ package PKG_GLOBALS;
 //  GLay COMMON graph GLOBALS
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
-	parameter GLOBAL_DATA_WIDTH_BITS = 64;
+	parameter GLOBAL_DATA_WIDTH_BITS = 32;
 
 // --------------------------------------------------------------------------------------
 // AXI4 PARAMETERS
