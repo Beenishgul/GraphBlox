@@ -139,8 +139,6 @@ module iob_cache_axi #(
     .ctrl_ready    (ctrl_ready    )
   );
 
-
-   
   cache_memory #(
     .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
@@ -196,8 +194,6 @@ module iob_cache_axi #(
     `endif
   );
 
-
-
   back_end_axi #(
     .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
     .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
@@ -234,7 +230,6 @@ module iob_cache_axi #(
     .ap_clk       (ap_clk       ),
     .reset        (reset        )
   );
-
 
   generate
     if (CACHE_CTRL_CACHE)

@@ -32,7 +32,7 @@ module cache_memory #(
   input                                                                                                                  reset        ,
   //front-end
   input                                                                                                                  valid        ,
-  input  [                                                                  CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W] addr         ,
+  input  [                                                                 CACHE_FRONTEND_ADDR_W-1:CACHE_BACKEND_BYTE_W] addr         ,
   output [                                                                                    CACHE_FRONTEND_DATA_W-1:0] rdata        ,
   output                                                                                                                 ready        ,
   //stored input value
@@ -62,7 +62,6 @@ module cache_memory #(
   output                                                                                                                 read_miss
 );
 
-
 localparam TAG_W = CACHE_FRONTEND_ADDR_W - (CACHE_FRONTEND_BYTE_W + CACHE_WORD_OFF_W + CACHE_LINE_OFF_W);
 
 wire hit;
@@ -70,24 +69,43 @@ wire hit;
 //cache-memory internal signals
 wire [CACHE_N_WAYS-1:0] way_hit, way_select;
 
-wire [           TAG_W-1:0] tag       = addr_reg[CACHE_FRONTEND_ADDR_W-1       -:TAG_W     ]      ; //so the tag doesnt update during ready on a read-access, losing the current hit status (can take the 1 clock-cycle delay)
+wire [           TAG_W-1:0] tag       = addr_reg[CACHE_FRONTEND_ADDR_W-1       -:TAG_W]           ; //so the tag doesnt update during ready on a read-access, losing the current hit status (can take the 1 clock-cycle delay)
 wire [CACHE_LINE_OFF_W-1:0] index     = addr    [CACHE_FRONTEND_ADDR_W-TAG_W-1 -:CACHE_LINE_OFF_W]; //cant wait, doesnt update during a write-access
 wire [CACHE_LINE_OFF_W-1:0] index_reg = addr_reg[CACHE_FRONTEND_ADDR_W-TAG_W-1 -:CACHE_LINE_OFF_W]; //cant wait, doesnt update during a write-access
 wire [CACHE_WORD_OFF_W-1:0] offset    = addr_reg[CACHE_FRONTEND_BYTE_W         +:CACHE_WORD_OFF_W]; //so the offset doesnt update during ready on a read-access (can take the 1 clock-cycle delay)
-
 
 wire [CACHE_N_WAYS*(2**CACHE_WORD_OFF_W)*CACHE_FRONTEND_DATA_W-1:0] line_rdata;
 wire [                                      CACHE_N_WAYS*TAG_W-1:0] line_tag  ;
 reg  [                      CACHE_N_WAYS*(2**CACHE_LINE_OFF_W)-1:0] v_reg     ;
 reg  [                                            CACHE_N_WAYS-1:0] v         ;
 
-
-
 reg [(2**CACHE_WORD_OFF_W)*CACHE_FRONTEND_NBYTES-1:0] line_wstrb;
 
-wire write_access = |wstrb_reg & valid_reg ;
-wire read_access  = ~|wstrb_reg & valid_reg; //signal mantains the access 1 addition clock-cycle after ready is asserted
+// wire write_access =  |wstrb_reg & valid_reg;
+// wire read_access  = ~|wstrb_reg & valid_reg; //signal mantains the access 1 addition clock-cycle after ready is asserted
 
+wire write_access_pipe = |wstrb_reg & valid_reg ;
+wire read_access_pipe  = ~|wstrb_reg & valid_reg;
+
+hyper_pipeline #(
+  .stages(4),
+  .width (1)
+) inst_hyper_pipeline_write_access (
+  .ap_clk(ap_clk           ),
+  .areset(areset           ),
+  .din   (write_access_pipe),
+  .dout  (write_access     )
+);
+
+hyper_pipeline #(
+  .stages(4),
+  .width (1)
+) inst_hyper_pipeline_read_access (
+  .ap_clk(ap_clk          ),
+  .areset(areset          ),
+  .din   (read_access_pipe),
+  .dout  (read_access     )
+);
 
 //back-end write channel
 wire                                                                                                   buffer_empty, buffer_full;
@@ -96,7 +114,6 @@ wire [CACHE_FRONTEND_NBYTES+(CACHE_FRONTEND_ADDR_W-CACHE_FRONTEND_BYTE_W)+(CACHE
 //for write-back write-allocate only
 reg [                      CACHE_N_WAYS-1:0] dirty    ;
 reg [CACHE_N_WAYS*(2**CACHE_LINE_OFF_W)-1:0] dirty_reg;
-
 
 generate
   if(CACHE_WRITE_POL == `WRITE_THROUGH) begin
@@ -164,8 +181,8 @@ generate
     //back-end write channel
     assign write_valid = ~buffer_empty;
     assign write_addr  = buffer_dout[CACHE_FRONTEND_NBYTES + CACHE_FRONTEND_DATA_W +: CACHE_FRONTEND_ADDR_W - CACHE_FRONTEND_BYTE_W];
-    assign write_wdata = buffer_dout[CACHE_FRONTEND_NBYTES             +: CACHE_FRONTEND_DATA_W            ];
-    assign write_wstrb = buffer_dout[0                     +: CACHE_FRONTEND_NBYTES            ];
+    assign write_wdata = buffer_dout[CACHE_FRONTEND_NBYTES +: CACHE_FRONTEND_DATA_W];
+    assign write_wstrb = buffer_dout[0                     +: CACHE_FRONTEND_NBYTES];
 
 
     //back-end read channel
@@ -194,7 +211,6 @@ generate
 
   end
 endgenerate
-
 
 //////////////////////////////////////////////////////
 // Read-After-Write (RAW) Hazard (pipeline) control
@@ -225,12 +241,10 @@ generate
   end
 endgenerate
 
-
 ///////////////////////////////////////////////////////////////
 // Hit signal: data available and in the memory's output
 ///////////////////////////////////////////////////////////////
 assign hit = |way_hit & ~replace & (~raw);
-
 
 /////////////////////////////////
 //front-end READY signal
@@ -261,7 +275,6 @@ generate
     end // else: !if(CACHE_CTRL & CACHE_CTRL_CNT)
 endgenerate
 
-
 ////////////////////////////////////////
 //Memories implementation configurations
 ////////////////////////////////////////
@@ -272,30 +285,27 @@ generate
   for (k = 0; k < CACHE_N_WAYS; k=k+1) begin : n_ways_block
     for(j = 0; j < 1; j=j+1) begin : line2mem_block
       for(i = 0; i < CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W; i=i+1) begin : BE_FE_block
-        iob_gen_sp_ram
-          #(
-            .DATA_W(CACHE_FRONTEND_DATA_W),
-            .ADDR_W(CACHE_LINE_OFF_W)
-          ) cache_memory (
-            .ap_clk (ap_clk),
-            .reset(reset),
-            .en  (valid),
-            .we ({CACHE_FRONTEND_NBYTES{way_hit[k]}} & line_wstrb[(j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_NBYTES +: CACHE_FRONTEND_NBYTES]),
-            .addr((write_access & way_hit[k] & ((j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i) == offset))? index_reg : index),
-            .data_in ((replace)? read_rdata[i*CACHE_FRONTEND_DATA_W +: CACHE_FRONTEND_DATA_W] : wdata_reg),
-            .data_out(line_rdata[(k*(2**CACHE_WORD_OFF_W)+j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_DATA_W +: CACHE_FRONTEND_DATA_W])
-          );
+        iob_gen_sp_ram #(
+          .DATA_W(CACHE_FRONTEND_DATA_W),
+          .ADDR_W(CACHE_LINE_OFF_W     )
+        ) cache_memory (
+          .ap_clk  (ap_clk                                                                                                                                             ),
+          .reset   (reset                                                                                                                                              ),
+          .en      (valid                                                                                                                                              ),
+          .we      ({CACHE_FRONTEND_NBYTES{way_hit[k]}} & line_wstrb[(j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_NBYTES +: CACHE_FRONTEND_NBYTES]),
+          .addr    ((write_access & way_hit[k] & ((j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i) == offset))? index_reg : index                                    ),
+          .data_in ((replace)? read_rdata[i*CACHE_FRONTEND_DATA_W +: CACHE_FRONTEND_DATA_W] : wdata_reg                                                                ),
+          .data_out(line_rdata[(k*(2**CACHE_WORD_OFF_W)+j*(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W)+i)*CACHE_FRONTEND_DATA_W +: CACHE_FRONTEND_DATA_W]              )
+        );
       end
     end
   end
 
- 
-        always @*
-        if(replace)
-          line_wstrb = {CACHE_BACKEND_NBYTES{read_valid}}; //line-replacement: mem's word replaces entire line
-        else
-          line_wstrb = (wstrb_reg & {CACHE_FRONTEND_NBYTES{write_access}}) << (offset*CACHE_FRONTEND_NBYTES);
-     
+  always @*
+    if(replace)
+      line_wstrb = {CACHE_BACKEND_NBYTES{read_valid}}; //line-replacement: mem's word replaces entire line
+    else
+      line_wstrb = (wstrb_reg & {CACHE_FRONTEND_NBYTES{write_access}}) << (offset*CACHE_FRONTEND_NBYTES);
 
     // Valid-Tag memories & replacement-policy
     if(CACHE_N_WAYS > 1)
@@ -323,21 +333,18 @@ generate
             v[k] <= v_reg [(2**CACHE_LINE_OFF_W)*k + index];
 
           //tag-memory
-          xpm_memory_spram_parent
-            #(
-              .DATA_W(TAG_W),
-              .ADDR_W(CACHE_LINE_OFF_W)
-            )
-            tag_memory
-              (
-                .ap_clk (ap_clk                           ),
-                .rsta  (reset),
-                .en  (valid                         ),
-                .we  (way_select[k] & replace_valid),
-                .addr(index                        ),
-                .din (tag                       ),
-                .dout(line_tag[TAG_W*k +: TAG_W])
-              );
+          xpm_memory_spram_parent #(
+            .DATA_W(TAG_W           ),
+            .ADDR_W(CACHE_LINE_OFF_W)
+          ) tag_memory (
+            .ap_clk(ap_clk                       ),
+            .rsta  (reset                        ),
+            .en    (valid                        ),
+            .we    (way_select[k] & replace_valid),
+            .addr  (index                        ),
+            .din   (tag                          ),
+            .dout  (line_tag[TAG_W*k +: TAG_W]   )
+          );
 
 
           //Way hit signal - hit or replacement
@@ -355,7 +362,7 @@ generate
         )
         replacement_policy_algorithm
           (
-            .ap_clk       (ap_clk             ),
+            .ap_clk    (ap_clk          ),
             .reset     (reset|invalidate),
             .write_en  (ready           ),
             .way_hit   (way_hit         ),
@@ -394,14 +401,11 @@ generate
               dirty[k] <= dirty_reg [(2**CACHE_LINE_OFF_W)*k + index];
             end
 
-
             //flush line
             assign write_valid = valid_reg & ~(|way_hit) & (way_select == dirty); //flush if there is not a hit, and the way selected is dirty
             wire [TAG_W-1:0] tag_flush = line_tag >> (way_select_bin*TAG_W);      //auxiliary wire
             assign write_addr  = {tag_flush, index_reg};                          //the position of the current block in cache (not of the access)
             assign write_wdata = line_rdata >> (way_select_bin*CACHE_FRONTEND_DATA_W*(2**CACHE_WORD_OFF_W));
-
-
 
           end // if (CACHE_WRITE_POL == WRITE_BACK)
 
@@ -445,7 +449,6 @@ generate
               .dout(line_tag)
             );
 
-
         //Cache hit signal that indicates which way has had the hit (also during replacement)
         assign way_hit = (tag == line_tag) & v;
 
@@ -481,7 +484,6 @@ generate
   endgenerate
 
   endmodule // cache_memory
-
 
 /*---------------------------------*/
 /* Byte-width generable iob-sp-ram */
