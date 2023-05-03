@@ -16,23 +16,22 @@ module hyper_pipeline #(
     parameter stages = 1 ,
     parameter width  = 32
 ) (
-    input              ap_clk,
-    input              areset,
-    input  [width-1:0] din   ,
-    output [width-1:0] dout
+    input  logic             ap_clk,
+    input  logic             areset,
+    input  logic [width-1:0] din   ,
+    output logic [width-1:0] dout
 );
 
-    reg [width-1:0] d[stages-1:0];
-    genvar          i            ;
+    logic [width-1:0] d[stages-1:0];
 
-    always @(posedge ap_clk) begin
+    always_ff @(posedge ap_clk) begin
         if (areset) begin
-            for (i = 0; i < stages; i++) begin
+            for (int i = 0; i < stages; i++) begin
                 d[i] <= 0;
             end
         end else begin
             d[0] <= din;
-            for (i = 1; i < stages; i++) begin
+            for (int i = 1; i < stages; i++) begin
                 d[i] <= d[i-1];
             end
         end

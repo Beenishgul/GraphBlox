@@ -15,11 +15,12 @@
 `timescale 1ns/1ps
 
 module xpm_memory_spram_child #(
-	parameter HEXFILE          = "none"  ,
-	parameter DATA_W           = 8       ,
-	parameter ADDR_W           = 14      ,
-	parameter MEMORY_PRIMITIVE = "block" ,
-	parameter BLOCK_DATA_DEPTH = (1024),
+	parameter HEXFILE          = "none" ,
+	parameter DATA_W           = 8      ,
+	parameter ADDR_W           = 14     ,
+	parameter MEMORY_PRIMITIVE = "block",
+	parameter BLOCK_DATA_DEPTH = (1024) ,
+	parameter READ_LATENCY_A   = 1      ,
 	parameter BYTE_WRITE_W     = DATA_W
 ) (
 	input                                  ap_clk,
@@ -31,7 +32,7 @@ module xpm_memory_spram_child #(
 	input  logic [           (DATA_W-1):0] din
 );
 
-	localparam DATA_DEPTH            = 2**ADDR_W           ;
+	localparam DATA_DEPTH = 2**ADDR_W;
 
 	// if(MEMORY_PRIMITIVE == "ultra")
 	// 	begin
@@ -93,6 +94,7 @@ module xpm_memory_spram_child #(
 					.ADDR_W          (ADDR_W-1        ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
 					.BLOCK_DATA_DEPTH(BLOCK_DATA_DEPTH),
+					.READ_LATENCY_A  (READ_LATENCY_A),
 					.BYTE_WRITE_W(BYTE_WRITE_W)
 				) inst_xpm_memory_spram_wrapper_0 (
 					.ap_clk(ap_clk),
@@ -110,6 +112,7 @@ module xpm_memory_spram_child #(
 					.ADDR_W          (ADDR_W-1        ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
 					.BLOCK_DATA_DEPTH(BLOCK_DATA_DEPTH),
+					.READ_LATENCY_A  (READ_LATENCY_A),
 					.BYTE_WRITE_W(BYTE_WRITE_W)
 				) inst_xpm_memory_spram_wrapper_1 (
 					.ap_clk(ap_clk),
@@ -128,6 +131,7 @@ module xpm_memory_spram_child #(
 					.DATA_W          (DATA_W          ),
 					.ADDR_W          (ADDR_W          ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
+					.READ_LATENCY_A  (READ_LATENCY_A),
 					.BYTE_WRITE_W(BYTE_WRITE_W)
 				) inst_xpm_memory_spram_wrapper_0 (
 					.ap_clk(ap_clk),

@@ -15,11 +15,12 @@
 `timescale 1ns/1ps
 
 module xpm_memory_spram_parent #(
-	parameter HEXFILE          = "none"  ,
-	parameter DATA_W           = 8       ,
-	parameter ADDR_W           = 14      ,
-	parameter MEMORY_PRIMITIVE = "block" ,
-	parameter BLOCK_DATA_DEPTH = (1024),
+	parameter HEXFILE          = "none" ,
+	parameter DATA_W           = 8      ,
+	parameter ADDR_W           = 14     ,
+	parameter MEMORY_PRIMITIVE = "block",
+	parameter BLOCK_DATA_DEPTH = (1024) ,
+	parameter READ_LATENCY_A   = 1      ,
 	parameter BYTE_WRITE_W     = DATA_W
 ) (
 	input                                  ap_clk,
@@ -31,7 +32,7 @@ module xpm_memory_spram_parent #(
 	input  logic [           (DATA_W-1):0] din
 );
 
-	localparam DATA_DEPTH            = 2**ADDR_W           ;
+	localparam DATA_DEPTH = 2**ADDR_W;
 
 	// if(MEMORY_PRIMITIVE == "ultra")
 	// 	begin
@@ -114,6 +115,7 @@ module xpm_memory_spram_parent #(
 					.ADDR_W          (ADDR_W-1        ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
 					.BLOCK_DATA_DEPTH(BLOCK_DATA_DEPTH),
+					.READ_LATENCY_A  (READ_LATENCY_A  ),
 					.BYTE_WRITE_W    (BYTE_WRITE_W    )
 				) inst_xpm_memory_spram_wrapper_0 (
 					.ap_clk(ap_clk),
@@ -131,6 +133,7 @@ module xpm_memory_spram_parent #(
 					.ADDR_W          (ADDR_W-1        ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
 					.BLOCK_DATA_DEPTH(BLOCK_DATA_DEPTH),
+					.READ_LATENCY_A  (READ_LATENCY_A  ),
 					.BYTE_WRITE_W    (BYTE_WRITE_W    )
 				) inst_xpm_memory_spram_wrapper_1 (
 					.ap_clk(ap_clk),
@@ -141,7 +144,7 @@ module xpm_memory_spram_parent #(
 					.dout  (dout_1),
 					.din   (din_1 )
 				);
-			end
+				end
 		else
 			begin
 				xpm_memory_spram_wrapper #(
@@ -149,15 +152,16 @@ module xpm_memory_spram_parent #(
 					.DATA_W          (DATA_W          ),
 					.ADDR_W          (ADDR_W          ),
 					.MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
-					.BYTE_WRITE_W(BYTE_WRITE_W)
+					.READ_LATENCY_A  (READ_LATENCY_A  ),
+					.BYTE_WRITE_W    (BYTE_WRITE_W    )
 				) inst_xpm_memory_spram_wrapper_0 (
 					.ap_clk(ap_clk),
 					.rsta  (rsta  ),
-					.en    (en  ),
-					.we    (we  ),
-					.addr  (addr),
-					.dout  (dout),
-					.din   (din )
+					.en    (en    ),
+					.we    (we    ),
+					.addr  (addr  ),
+					.dout  (dout  ),
+					.din   (din   )
 				);
 			end
 	endgenerate
