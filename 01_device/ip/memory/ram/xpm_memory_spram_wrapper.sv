@@ -19,6 +19,7 @@ module xpm_memory_spram_wrapper #(
   parameter DATA_W           = 8      ,
   parameter ADDR_W           = 14     ,
   parameter MEMORY_PRIMITIVE = "block",
+  parameter READ_LATENCY_A   = 1      ,
   parameter BYTE_WRITE_W     = DATA_W
 ) (
   input  logic                           ap_clk,
@@ -53,7 +54,7 @@ module xpm_memory_spram_wrapper #(
     .READ_RESET_VALUE_A ("0"              ), //string
     .ECC_MODE           ("no_ecc"         ), //string; "no_ecc", "encode_only", "decode_only" or "both_encode_and_decode"
     .AUTO_SLEEP_TIME    (0                ), //Do not Change
-    .READ_LATENCY_A     (1                ), //non-negative integer
+    .READ_LATENCY_A     (READ_LATENCY_A   ), //non-negative integer
     .WRITE_MODE_A       ("write_first"    )  //string; "write_first", "read_first", "no_change"
   ) xpm_memory_spram_inst (
     // Common module ports
@@ -62,7 +63,7 @@ module xpm_memory_spram_wrapper #(
     .clka          (ap_clk),
     .rsta          (rsta  ),
     .ena           (en    ),
-    .regcea        (1'b0  ),
+    .regcea        (1'b1  ),
     .wea           (we    ),
     .addra         (addr  ),
     .dina          (din   ),

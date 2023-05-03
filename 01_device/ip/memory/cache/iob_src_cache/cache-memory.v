@@ -87,6 +87,9 @@ reg [(2**CACHE_WORD_OFF_W)*CACHE_FRONTEND_NBYTES-1:0] line_wstrb;
 wire write_access_pipe = |wstrb_reg & valid_reg ;
 wire read_access_pipe  = ~|wstrb_reg & valid_reg;
 
+wire write_access;
+wire write_access;
+
 hyper_pipeline #(
   .stages(4),
   .width (1)
@@ -94,7 +97,7 @@ hyper_pipeline #(
   .ap_clk(ap_clk           ),
   .areset(areset           ),
   .din   (write_access_pipe),
-  .dout  (write_access     )
+  .dout  (write_access)
 );
 
 hyper_pipeline #(
@@ -104,7 +107,7 @@ hyper_pipeline #(
   .ap_clk(ap_clk          ),
   .areset(areset          ),
   .din   (read_access_pipe),
-  .dout  (read_access     )
+  .dout  (read_access)
 );
 
 //back-end write channel
@@ -332,14 +335,25 @@ generate
           else
             v[k] <= v_reg [(2**CACHE_LINE_OFF_W)*k + index];
 
+           wire valid_pipe2;
+            hyper_pipeline #(
+              .stages(4),
+              .width (1)
+            ) inst_hyper_pipeline_enable (
+              .ap_clk(ap_clk  ),
+              .areset(areset  ),
+              .din   (valid      ),
+              .dout  (valid_pipe2)
+            );
           //tag-memory
           xpm_memory_spram_parent #(
             .DATA_W(TAG_W           ),
-            .ADDR_W(CACHE_LINE_OFF_W)
+            .ADDR_W(CACHE_LINE_OFF_W),
+            .READ_LATENCY_A(6     )
           ) tag_memory (
             .ap_clk(ap_clk                       ),
             .rsta  (reset                        ),
-            .en    (valid                        ),
+            .en    (valid  | valid_pipe2         ),
             .we    (way_select[k] & replace_valid),
             .addr  (index                        ),
             .din   (tag                          ),
@@ -526,18 +540,43 @@ module iob_gen_sp_ram #(
       //     end
       // endgenerate
 
-  xpm_memory_spram_parent #(
-    .DATA_W      (DATA_W),
-    .ADDR_W      (ADDR_W),
-    .BYTE_WRITE_W(8     )
-  ) iob_cache_mem (
+  // xpm_memory_spram_parent #(
+  //   .DATA_W      (DATA_W),
+  //   .ADDR_W      (ADDR_W),
+  //   .BYTE_WRITE_W(8     )
+  // ) iob_cache_mem (
+  //   .ap_clk(ap_clk  ),
+  //   .rsta  (reset   ),
+  //   .en    (en      ),
+  //   .we    (we      ),
+  //   .addr  (addr    ),
+  //   .dout  (data_out),
+  //   .din   (data_in )
+  // );
+
+  wire en_pipe2;
+  hyper_pipeline #(
+    .stages(4),
+    .width (1)
+  ) inst_hyper_pipeline_enable (
     .ap_clk(ap_clk  ),
-    .rsta  (reset   ),
-    .en    (en      ),
-    .we    (we      ),
-    .addr  (addr    ),
-    .dout  (data_out),
-    .din   (data_in )
+    .areset(areset  ),
+    .din   (en      ),
+    .dout  (en_pipe2)
   );
 
+  xpm_memory_spram_parent #(
+    .DATA_W        (DATA_W),
+    .ADDR_W        (ADDR_W),
+    .READ_LATENCY_A(6     ),
+    .BYTE_WRITE_W  (8     )
+  ) iob_cache_mem_latency_4 (
+    .ap_clk(ap_clk        ),
+    .rsta  (reset         ),
+    .en    (en  | en_pipe2),
+    .we    (we            ),
+    .addr  (addr          ),
+    .dout  (data_out      ),
+    .din   (data_in       )
+  );
     endmodule // iob_gen_sp_ram
