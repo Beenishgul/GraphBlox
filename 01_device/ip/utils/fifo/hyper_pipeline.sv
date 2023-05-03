@@ -13,30 +13,35 @@
 // -----------------------------------------------------------------------------
 
 module hyper_pipeline #(
-    parameter stages = 1 ,
-    parameter width  = 32
+    parameter STAGES = 1 ,
+    parameter WIDTH  = 32
 ) (
     input  logic             ap_clk,
     input  logic             areset,
-    input  logic [width-1:0] din   ,
-    output logic [width-1:0] dout
+    input  logic [WIDTH-1:0] din   ,
+    output logic [WIDTH-1:0] dout
 );
 
-    logic [width-1:0] d[stages-1:0];
+    generate
+        if(STAGES > 0) begin
+            logic [WIDTH-1:0] d[STAGES-1:0];
 
-    always_ff @(posedge ap_clk) begin
-        if (areset) begin
-            for (int i = 0; i < stages; i++) begin
-                d[i] <= 0;
+            always_ff @(posedge ap_clk) begin
+                if (areset) begin
+                    for (int i = 0; i < STAGES; i++) begin
+                        d[i] <= 0;
+                    end
+                end else begin
+                    d[0] <= din;
+                    for (int i = 1; i < STAGES; i++) begin
+                        d[i] <= d[i-1];
+                    end
+                end
             end
+            assign dout = d[STAGES-1];
         end else begin
-            d[0] <= din;
-            for (int i = 1; i < stages; i++) begin
-                d[i] <= d[i-1];
-            end
+            assign dout = din;
         end
-    end
+    endgenerate
 
-    assign dout = d[stages-1];
-
-endmodule
+endmodule : hyper_pipeline
