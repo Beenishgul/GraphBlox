@@ -81,34 +81,8 @@ reg  [                                            CACHE_N_WAYS-1:0] v         ;
 
 reg [(2**CACHE_WORD_OFF_W)*CACHE_FRONTEND_NBYTES-1:0] line_wstrb;
 
-// wire write_access =  |wstrb_reg & valid_reg;
-// wire read_access  = ~|wstrb_reg & valid_reg; //signal mantains the access 1 addition clock-cycle after ready is asserted
-
-wire write_access_pipe = |wstrb_reg & valid_reg ;
-wire read_access_pipe  = ~|wstrb_reg & valid_reg;
-
-wire write_access;
-wire write_access;
-
-hyper_pipeline #(
-  .stages(4),
-  .width (1)
-) inst_hyper_pipeline_write_access (
-  .ap_clk(ap_clk           ),
-  .areset(areset           ),
-  .din   (write_access_pipe),
-  .dout  (write_access)
-);
-
-hyper_pipeline #(
-  .stages(4),
-  .width (1)
-) inst_hyper_pipeline_read_access (
-  .ap_clk(ap_clk          ),
-  .areset(areset          ),
-  .din   (read_access_pipe),
-  .dout  (read_access)
-);
+wire write_access =  |wstrb_reg & valid_reg;
+wire read_access  = ~|wstrb_reg & valid_reg; //signal mantains the access 1 addition clock-cycle after ready is asserted
 
 //back-end write channel
 wire                                                                                                   buffer_empty, buffer_full;
@@ -335,38 +309,26 @@ generate
           else
             v[k] <= v_reg [(2**CACHE_LINE_OFF_W)*k + index];
 
-           wire valid_pipe2;
-            hyper_pipeline #(
-              .stages(4),
-              .width (1)
-            ) inst_hyper_pipeline_enable (
-              .ap_clk(ap_clk  ),
-              .areset(areset  ),
-              .din   (valid      ),
-              .dout  (valid_pipe2)
-            );
           //tag-memory
           xpm_memory_spram_parent #(
             .DATA_W(TAG_W           ),
             .ADDR_W(CACHE_LINE_OFF_W),
-            .READ_LATENCY_A(6     )
+            .READ_LATENCY_A(1     )
           ) tag_memory (
             .ap_clk(ap_clk                       ),
             .rsta  (reset                        ),
-            .en    (valid  | valid_pipe2         ),
+            .en    (valid                        ),
             .we    (way_select[k] & replace_valid),
             .addr  (index                        ),
             .din   (tag                          ),
             .dout  (line_tag[TAG_W*k +: TAG_W]   )
           );
 
-
           //Way hit signal - hit or replacement
           assign way_hit[k] = (tag == line_tag[TAG_W*k +: TAG_W]) & v[k];
         end
         //Read Data Multiplexer
         assign rdata [CACHE_FRONTEND_DATA_W-1:0] = line_rdata >> CACHE_FRONTEND_DATA_W*(offset + (2**CACHE_WORD_OFF_W)*way_hit_bin);
-
 
         //replacement-policy module
         replacement_policy #(
@@ -540,43 +502,19 @@ module iob_gen_sp_ram #(
       //     end
       // endgenerate
 
-  // xpm_memory_spram_parent #(
-  //   .DATA_W      (DATA_W),
-  //   .ADDR_W      (ADDR_W),
-  //   .BYTE_WRITE_W(8     )
-  // ) iob_cache_mem (
-  //   .ap_clk(ap_clk  ),
-  //   .rsta  (reset   ),
-  //   .en    (en      ),
-  //   .we    (we      ),
-  //   .addr  (addr    ),
-  //   .dout  (data_out),
-  //   .din   (data_in )
-  // );
-
-  wire en_pipe2;
-  hyper_pipeline #(
-    .stages(4),
-    .width (1)
-  ) inst_hyper_pipeline_enable (
-    .ap_clk(ap_clk  ),
-    .areset(areset  ),
-    .din   (en      ),
-    .dout  (en_pipe2)
-  );
-
   xpm_memory_spram_parent #(
-    .DATA_W        (DATA_W),
-    .ADDR_W        (ADDR_W),
-    .READ_LATENCY_A(6     ),
-    .BYTE_WRITE_W  (8     )
-  ) iob_cache_mem_latency_4 (
-    .ap_clk(ap_clk        ),
-    .rsta  (reset         ),
-    .en    (en  | en_pipe2),
-    .we    (we            ),
-    .addr  (addr          ),
-    .dout  (data_out      ),
-    .din   (data_in       )
+    .DATA_W      (DATA_W),
+    .ADDR_W      (ADDR_W),
+    .BYTE_WRITE_W(8     ),
+    .READ_LATENCY_A(1     )
+  ) iob_cache_mem (
+    .ap_clk(ap_clk  ),
+    .rsta  (reset   ),
+    .en    (en      ),
+    .we    (we      ),
+    .addr  (addr    ),
+    .dout  (data_out),
+    .din   (data_in )
   );
+
     endmodule // iob_gen_sp_ram

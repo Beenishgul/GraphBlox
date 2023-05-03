@@ -349,7 +349,7 @@ export TARGET = hw_emu
 # Check 01_device/scripts/generate_build_cfg
 # pick a suitable strategy or add yours
 # =========================================================
-export XILINX_IMPL_STRATEGY = 0
+export XILINX_IMPL_STRATEGY = 2
 # =========================================================
 
 # =========================================================
@@ -360,7 +360,7 @@ export XILINX_IMPL_STRATEGY = 0
 # Synth -> 2 parallel synths 
 # Impl  -> 2 parallel implementations  
 # =========================================================
-export XILINX_JOBS_STRATEGY = 8
+export XILINX_JOBS_STRATEGY = 4
 export XILINX_MAX_THREADS   = $(shell grep -c ^processor /proc/cpuinfo)
 # =========================================================
 
