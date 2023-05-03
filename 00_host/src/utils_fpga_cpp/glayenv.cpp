@@ -135,7 +135,6 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
 
-
     uint32_t *overlay = (uint32_t *) malloc(graph_buffer_size_in_bytes);
 
     for (uint32_t i = 0; i < (graph_buffer_size_in_bytes / sizeof(uint32_t)); ++i)
