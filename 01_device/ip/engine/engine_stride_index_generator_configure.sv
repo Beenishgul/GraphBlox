@@ -26,17 +26,25 @@ module engine_stride_index_generator_configure #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    MemoryPacket                      response_in_reg        ;
-    MemoryPacketMeta                  configuration_meta_int ;
-    StrideIndexGeneratorConfiguration configuration_reg      ;
-    logic [4:0]                       configuration_reg_valid;
+    logic                             areset_stride_index_generator;
+    MemoryPacket                      response_in_reg              ;
+    MemoryPacketMeta                  configuration_meta_int       ;
+    StrideIndexGeneratorConfiguration configuration_reg            ;
+    logic [4:0]                       configuration_reg_valid      ;
+
+// --------------------------------------------------------------------------------------
+// Register reset signal
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        areset_stride_index_generator <= areset;
+    end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
 
     always_ff @(posedge ap_clk) begin
-        if(areset) begin
+        if(areset_stride_index_generator) begin
             response_in_reg <= 0;
         end else begin
             response_in_reg <= response_in;
@@ -47,7 +55,7 @@ module engine_stride_index_generator_configure #(
 // Drive output
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset) begin
+        if(areset_stride_index_generator) begin
             configuration_out <= 0;
         end else begin
             configuration_out <= configuration_reg;
@@ -62,7 +70,7 @@ module engine_stride_index_generator_configure #(
         configuration_meta_int.id_bundle      = ENGINE_ID_BUNDLE;
         configuration_meta_int.id_engine      = ENGINE_ID_ENGINE;
         configuration_meta_int.address_base   = 0;
-        configuration_meta_int.address_offset = 0;
+        configuration_meta_int.address_offset = $clog2(CACHE_FRONTEND_DATA_W/8);
         configuration_meta_int.type_cmd       = CMD_INVALID;
         configuration_meta_int.type_struct    = STRUCT_STRIDE_INDEX;
         configuration_meta_int.type_operand   = OP_LOCATION_0;
@@ -71,7 +79,7 @@ module engine_stride_index_generator_configure #(
     end
 
     always_ff @(posedge ap_clk) begin
-        if(areset_vertex_cu) begin
+        if(areset_stride_index_generator) begin
             configuration_reg       <= 0;
             configuration_reg_valid <= 0;
         end else begin
@@ -79,7 +87,7 @@ module engine_stride_index_generator_configure #(
             configuration_reg.payload.meta <= configuration_meta_int;
 
             if(response_in_reg.valid & (response_in_reg.payload.meta.type_struct == STRUCT_KERNEL_SETUP)) begin
-                case (response_in_reg.payload.meta.address_offset)
+                case (response_in_reg.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
                     0 : begin
                         configuration_reg.payload.param.increment <= response_in_reg.payload.data.field[0];
                         configuration_reg.payload.param.decrement <= response_in_reg.payload.data.field[1];

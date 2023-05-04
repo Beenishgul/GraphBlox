@@ -45,12 +45,13 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_vertex_cu             ;
-    logic areset_stride_index_generator;
-    logic areset_fifo  KernelDescriptor descriptor_reg  ;
-    MemoryPacket response_in_reg ;
-    MemoryPacket response_out_int;
-    MemoryPacket request_out_reg ;
+    logic            areset_vertex_cu             ;
+    logic            areset_stride_index_generator;
+    logic            areset_fifo                  ;
+    KernelDescriptor descriptor_reg               ;
+    MemoryPacket     response_in_reg              ;
+    MemoryPacket     response_out_int             ;
+    MemoryPacket     request_out_reg              ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -82,20 +83,20 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in           ;
-    StrideIndexGeneratorConfiguration configuration_comb                                       ;
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out;
-    logic [4:0]                       configuration_reg_valid                                  ;
-    MemoryPacket                      engine_stride_index_generator_request_out                ;
-    FIFOStateSignalsOutput            engine_stride_index_generator_fifo_request_signals_out   ;
-    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_in    ;
-    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_reg   ;
-    logic                             engine_stride_index_generator_start_in                   ;
-    logic                             engine_stride_index_generator_pause_in                   ;
-    logic                             engine_stride_index_generator_ready_out                  ;
-    logic                             engine_stride_index_generator_done_out                   ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in        ;
+    MemoryPacket                      engine_stride_index_generator_request_out             ;
+    FIFOStateSignalsOutput            engine_stride_index_generator_fifo_request_signals_out;
+    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_in ;
+    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_reg;
+    logic                             engine_stride_index_generator_start_in                ;
+    logic                             engine_stride_index_generator_pause_in                ;
+    logic                             engine_stride_index_generator_ready_out               ;
+    logic                             engine_stride_index_generator_done_out                ;
 
     logic engine_stride_index_generator_fifo_setup_signal;
+
+    MemoryPacket                      engine_stride_index_generator_configure_response_in      ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -103,7 +104,7 @@ module vertex_cu #(
     always_ff @(posedge ap_clk) begin
         areset_vertex_cu              <= areset;
         areset_stride_index_generator <= areset;
-        ares                          <= areset;
+        areset_fifo                   <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -266,7 +267,28 @@ module vertex_cu #(
 
 
 // --------------------------------------------------------------------------------------
-// Serial Read Engine Generate
+// Drive Response Packet Setup Engine Configuration
+// 0 - increment/decrement
+// 1 - index_start
+// 2 - index_end
+// 3 - stride
+// 4 - granularity
+// --------------------------------------------------------------------------------------
+    assign engine_stride_index_generator_configure_response_in = response_out_int;
+
+    engine_stride_index_generator_configure #(
+        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
+        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
+        .ENGINE_ID_ENGINE(1               )
+    ) inst_engine_stride_index_generator_configure (
+        .ap_clk           (ap_clk                                                   ),
+        .areset           (areset_stride_index_generator                            ),
+        .response_in      (engine_stride_index_generator_configure_response_in      ),
+        .configuration_out(engine_stride_index_generator_configure_configuration_out)
+    );
+
+// --------------------------------------------------------------------------------------
+// Stride engine generator instantiation
 // --------------------------------------------------------------------------------------
     assign engine_stride_index_generator_configuration_in.payload = engine_stride_index_generator_configure_configuration_out.payload;
     assign engine_stride_index_generator_fifo_request_signals_in  = engine_stride_index_generator_fifo_request_signals_reg;
@@ -364,26 +386,6 @@ module vertex_cu #(
         .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
     );
 
-// --------------------------------------------------------------------------------------
-// Drive Response Packet Setup Engines
-// 0 - increment/decrement
-// 1 - index_start
-// 2 - index_end
-// 3 - stride
-// 4 - granularity
-// --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configure_response_in = response_out_int;
-
-    engine_stride_index_generator_configure #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
-    ) inst_engine_stride_index_generator_configure (
-        .ap_clk           (ap_clk                                                   ),
-        .areset           (areset                                                   ),
-        .response_in      (engine_stride_index_generator_configure_response_in      ),
-        .configuration_out(engine_stride_index_generator_configure_configuration_out)
-    );
 
 
 endmodule : vertex_cu
