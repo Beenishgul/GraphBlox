@@ -25,10 +25,10 @@ module demux_bus #(
   output logic [ BUS_WIDTH-1:0] data_out_valid
 );
 
-  logic [DATA_WIDTH-1:0] data_in_internal                      ;
-  logic [ BUS_WIDTH-1:0] sel_in_internal                       ;
-  logic [DATA_WIDTH-1:0] data_out_internal      [BUS_WIDTH-1:0];
-  logic [ BUS_WIDTH-1:0] data_out_valid_internal               ;
+  logic [DATA_WIDTH-1:0] data_in_int                      ;
+  logic [ BUS_WIDTH-1:0] sel_in_int                       ;
+  logic [DATA_WIDTH-1:0] data_out_int      [BUS_WIDTH-1:0];
+  logic [ BUS_WIDTH-1:0] data_out_valid_int               ;
   logic [DATA_WIDTH-1:0] data_out_reg           [BUS_WIDTH-1:0];
   logic [ BUS_WIDTH-1:0] data_out_valid_reg                    ;
 
@@ -39,11 +39,11 @@ module demux_bus #(
   // Use SCTLs in the latch logic.
   always_ff @(posedge ap_clk) begin
     if (areset) begin
-      data_in_internal <= 0;
-      sel_in_internal  <= 0;
+      data_in_int <= 0;
+      sel_in_int  <= 0;
     end else begin
-      data_in_internal <= data_in;
-      sel_in_internal  <= sel_in;
+      data_in_int <= data_in;
+      sel_in_int  <= sel_in;
     end
   end
 
@@ -66,13 +66,13 @@ module demux_bus #(
 // Demux Logic
 // --------------------------------------------------------------------------------------
   // Use efficient data structures.
-  assign data_out_reg       = data_out_internal;
-  assign data_out_valid_reg = data_out_valid_internal;
+  assign data_out_reg       = data_out_int;
+  assign data_out_valid_reg = data_out_valid_int;
   // Use parallelization in the demux logic.
   generate
     for (genvar i = 0; i < BUS_WIDTH; i++) begin : generate_demux
-      assign data_out_valid_internal[i] = (sel_in_internal == 1);
-      assign data_out_internal[i]       = data_in_internal;
+      assign data_out_valid_int[i] = (sel_in_int == 1);
+      assign data_out_int[i]       = data_in_int;
     end
   endgenerate
 

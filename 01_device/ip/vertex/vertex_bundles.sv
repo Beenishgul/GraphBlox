@@ -64,8 +64,8 @@ module vertex_bundle #(
     MemoryPacket vertex_bundle_mem_req_dout;
     MemoryPacket vertex_bundle_mem_req_din;
 
-    FIFOStateSignalsOutput fifo_response_signals_out_reg;
-    FIFOStateSignalsOutput fifo_request_signals_out_reg;
+    FIFOStateSignalsOutput fifo_response_signals_out_int;
+    FIFOStateSignalsOutput fifo_request_signals_out_int;
 
     FIFOStateSignalsInput resp_fifo_in_signals_reg;
     FIFOStateSignalsInput fifo_request_signals_in_reg;
@@ -142,13 +142,13 @@ module vertex_bundle #(
         end
         else begin
             fifo_setup_signal                      <= engine_serial_read_fifo_setup_signal | fifo_MemoryPacketRequest_vertex_bundle_signal |fifo_MemoryPacketResponse_vertex_bundle_signal;
-            vertex_bundle_memory_request_out.valid <= fifo_request_signals_out_reg.valid ;
+            vertex_bundle_memory_request_out.valid <= fifo_request_signals_out_int.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out                 <= fifo_request_signals_out_reg;
-        fifo_response_signals_out                <= fifo_response_signals_out_reg;
+        fifo_request_signals_out                 <= fifo_request_signals_out_int;
+        fifo_response_signals_out                <= fifo_response_signals_out_int;
         vertex_bundle_memory_request_out.payload <= vertex_bundle_mem_req_dout.payload;
     end
 
@@ -223,7 +223,7 @@ module vertex_bundle #(
             VERTEX_BUNDLE_REQ_BUSY : begin
                 vertex_bundle_done                           <= engine_serial_read_out_done_reg & engine_serial_read_fifo_out_signals_reg.empty;
                 vertex_bundle_start                          <= 1'b0;
-                engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~fifo_request_signals_out_reg.prog_full;
+                engine_serial_read_fifo_in_signals_reg.rd_en <= ~engine_serial_read_fifo_out_signals_reg.empty & ~fifo_request_signals_out_int.prog_full;
                 engine_serial_read_in_start_reg              <= 1'b0;
                 serial_read_config_reg.valid                 <= 1'b1;
             end
@@ -278,14 +278,14 @@ module vertex_bundle #(
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
-    assign fifo_MemoryPacketRequest_vertex_bundle_signal  = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
-    assign fifo_MemoryPacketResponse_vertex_bundle_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+    assign fifo_MemoryPacketRequest_vertex_bundle_signal  = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
+    assign fifo_MemoryPacketResponse_vertex_bundle_signal = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests in inst_fifo_812x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign resp_fifo_in_signals_reg.wr_en    = vertex_bundle_mem_resp_din.valid;
-    assign vertex_bundle_mem_resp_dout.valid = fifo_response_signals_out_reg.valid;
+    assign vertex_bundle_mem_resp_dout.valid = fifo_response_signals_out_int.valid;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(16                        ),
@@ -299,22 +299,22 @@ module vertex_bundle #(
         .wr_en       (resp_fifo_in_signals_reg.wr_en            ),
         .rd_en       (resp_fifo_in_signals_reg.rd_en            ),
         .dout        (vertex_bundle_mem_resp_dout.payload       ),
-        .full        (fifo_response_signals_out_reg.full        ),
-        .almost_full (fifo_response_signals_out_reg.almost_full ),
-        .empty       (fifo_response_signals_out_reg.empty       ),
-        .almost_empty(fifo_response_signals_out_reg.almost_empty),
-        .valid       (fifo_response_signals_out_reg.valid       ),
-        .prog_full   (fifo_response_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
+        .full        (fifo_response_signals_out_int.full        ),
+        .almost_full (fifo_response_signals_out_int.almost_full ),
+        .empty       (fifo_response_signals_out_int.empty       ),
+        .almost_empty(fifo_response_signals_out_int.almost_empty),
+        .valid       (fifo_response_signals_out_int.valid       ),
+        .prog_full   (fifo_response_signals_out_int.prog_full   ),
+        .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
+        .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
+        .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out inst_fifo_812x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     assign fifo_request_signals_in_reg.wr_en = vertex_bundle_mem_req_din.valid;
-    assign vertex_bundle_mem_req_dout.valid  = fifo_request_signals_out_reg.valid;
+    assign vertex_bundle_mem_req_dout.valid  = fifo_request_signals_out_int.valid;
     assign vertex_bundle_mem_req_din         = engine_serial_read_req;
 
     xpm_fifo_sync_wrapper #(
@@ -329,15 +329,15 @@ module vertex_bundle #(
         .wr_en       (fifo_request_signals_in_reg.wr_en        ),
         .rd_en       (fifo_request_signals_in_reg.rd_en        ),
         .dout        (vertex_bundle_mem_req_dout.payload       ),
-        .full        (fifo_request_signals_out_reg.full        ),
-        .almost_full (fifo_request_signals_out_reg.almost_full ),
-        .empty       (fifo_request_signals_out_reg.empty       ),
-        .almost_empty(fifo_request_signals_out_reg.almost_empty),
-        .valid       (fifo_request_signals_out_reg.valid       ),
-        .prog_full   (fifo_request_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+        .full        (fifo_request_signals_out_int.full        ),
+        .almost_full (fifo_request_signals_out_int.almost_full ),
+        .empty       (fifo_request_signals_out_int.empty       ),
+        .almost_empty(fifo_request_signals_out_int.almost_empty),
+        .valid       (fifo_request_signals_out_int.valid       ),
+        .prog_full   (fifo_request_signals_out_int.prog_full   ),
+        .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
     );
 
 endmodule : vertex_bundle

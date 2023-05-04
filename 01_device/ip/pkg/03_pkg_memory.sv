@@ -96,7 +96,7 @@ typedef enum logic[5:0] {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-typedef enum logic[10:0]{
+typedef enum logic[11:0]{
   STRUCT_INVALID,
   STRUCT_OUT_DEGREE,
   STRUCT_IN_DEGREE,
@@ -106,6 +106,7 @@ typedef enum logic[10:0]{
   STRUCT_INV_EDGES_IDX,
   STRUCT_AUXILIARY_1_DATA,
   STRUCT_AUXILIARY_2_DATA,
+  STRUCT_STRIDE_INDEX,
   STRUCT_KERNEL_SETUP,
   STRUCT_VERTEX_CU
 } type_data_structure;

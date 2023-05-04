@@ -30,6 +30,18 @@ package PKG_ENGINE;
 // based on the granularity. For example, if granularity is (8), each CU
 // (Compute Units) would get eight vertex IDs in chunks.
 
+    typedef enum logic[8:0] {
+        ENGINE_STRIDE_INDEX_GEN_RESET,
+        ENGINE_STRIDE_INDEX_GEN_IDLE,
+        ENGINE_STRIDE_INDEX_GEN_SETUP,
+        ENGINE_STRIDE_INDEX_GEN_START,
+        ENGINE_STRIDE_INDEX_GEN_BUSY_TRANS,
+        ENGINE_STRIDE_INDEX_GEN_BUSY,
+        ENGINE_STRIDE_INDEX_GEN_PAUSE_TRANS,
+        ENGINE_STRIDE_INDEX_GEN_PAUSE,
+        ENGINE_STRIDE_INDEX_GEN_DONE
+    } engine_stride_index_generator_state;
+
     typedef struct packed{
         logic                               increment  ;
         logic                               decrement  ;
@@ -216,5 +228,17 @@ package PKG_ENGINE;
         RandomWriteEngineConfigurationPayload payload;
     } RandomWriteEngineConfiguration;
 
+
+    function logic [CACHE_FRONTEND_DATA_W-1:0] register_engine_configuration (logic [CACHE_FRONTEND_DATA_W-1:0] in);
+
+        logic [CACHE_FRONTEND_DATA_W-1:0] out;
+
+        integer i;
+        for ( i = 0; i < CACHE_FRONTEND_NBYTES; i++) begin
+            out[i*8 +: 8] = in[((CACHE_FRONTEND_DATA_W-1)-(i*8)) -:8];
+        end
+
+        return out;
+    endfunction : register_engine_configuration
 
 endpackage

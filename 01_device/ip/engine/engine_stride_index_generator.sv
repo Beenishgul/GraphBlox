@@ -37,17 +37,17 @@ import PKG_CACHE::*;
 
 module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
-    input  logic                         ap_clk                  ,
-    input  logic                         areset                  ,
-    input  SerialReadEngineConfiguration configuration_in        ,
-    output MemoryPacket                  request_out             ,
-    input  FIFOStateSignalsInput         fifo_request_signals_in ,
-    output FIFOStateSignalsOutput        fifo_request_signals_out,
-    output logic                         fifo_setup_signal       ,
-    input  logic                         start_in                ,
-    input  logic                         pause_in                ,
-    output logic                         ready_out               ,
-    output logic                         done_out
+    input  logic                             ap_clk                  ,
+    input  logic                             areset                  ,
+    input  StrideIndexGeneratorConfiguration configuration_in        ,
+    output MemoryPacket                      request_out             ,
+    input  FIFOStateSignalsInput             fifo_request_signals_in ,
+    output FIFOStateSignalsOutput            fifo_request_signals_out,
+    output logic                             fifo_setup_signal       ,
+    input  logic                             start_in                ,
+    input  logic                             pause_in                ,
+    output logic                             ready_out               ,
+    output logic                             done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -57,32 +57,32 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     logic areset_counter;
     logic areset_fifo   ;
 
-    SerialReadEngineConfiguration configuration_reg;
-    MemoryPacket                  request_out_reg  ;
+    StrideIndexGeneratorConfiguration configuration_reg;
+    MemoryPacket                      request_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_serial_read_state current_state;
-    engine_serial_read_state next_state   ;
+    engine_stride_index_generator_state current_state;
+    engine_stride_index_generator_state next_state   ;
 
-    logic done_internal_reg;
-    logic start_in_reg     ;
-    logic pause_in_reg     ;
-    logic ready_out_reg    ;
-    logic done_out_reg     ;
+    logic done_int_reg ;
+    logic start_in_reg ;
+    logic pause_in_reg ;
+    logic ready_out_reg;
+    logic done_out_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din               ;
-    MemoryPacket           fifo_request_din_reg           ;
-    MemoryPacketPayload    fifo_request_dout              ;
-    MemoryPacket           fifo_request_comb              ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg    ;
-    FIFOStateSignalsInput  fifo_request_signals_in_inernal;
-    FIFOStateSignalsOutput fifo_request_signals_out_reg   ;
-    logic                  fifo_request_setup_signal      ;
+    MemoryPacketPayload    fifo_request_din             ;
+    MemoryPacket           fifo_request_din_reg         ;
+    MemoryPacketPayload    fifo_request_dout            ;
+    MemoryPacket           fifo_request_comb            ;
+    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_request_signals_out_int ;
+    logic                  fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -138,8 +138,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
             request_out.valid        <= 0;
         end
         else begin
-            fifo_setup_signal        <= fifo_request_setup_signal;
-            fifo_request_signals_out <= fifo_request_signals_out_reg;
+            fifo_setup_signal        <= fifo_request_setup_signal_int;
+            fifo_request_signals_out <= fifo_request_signals_out_int;
             ready_out                <= ready_out_reg;
             done_out                 <= done_out_reg;
             request_out.valid        <= request_out_reg.valid;
@@ -155,7 +155,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_engine)
-            current_state <= ENGINE_SERIAL_READ_RESET;
+            current_state <= ENGINE_STRIDE_INDEX_GEN_RESET;
         else begin
             current_state <= next_state;
         end
@@ -164,54 +164,54 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     always_comb begin
         next_state = current_state;
         case (current_state)
-            ENGINE_SERIAL_READ_RESET : begin
-                next_state = ENGINE_SERIAL_READ_IDLE;
+            ENGINE_STRIDE_INDEX_GEN_RESET : begin
+                next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
-            ENGINE_SERIAL_READ_IDLE : begin
+            ENGINE_STRIDE_INDEX_GEN_IDLE : begin
                 if(configuration_reg.valid && start_in_reg)
-                    next_state = ENGINE_SERIAL_READ_SETUP;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_SETUP;
                 else
-                    next_state = ENGINE_SERIAL_READ_IDLE;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
-            ENGINE_SERIAL_READ_SETUP : begin
-                next_state = ENGINE_SERIAL_READ_START;
+            ENGINE_STRIDE_INDEX_GEN_SETUP : begin
+                next_state = ENGINE_STRIDE_INDEX_GEN_START;
             end
-            ENGINE_SERIAL_READ_START : begin
-                next_state = ENGINE_SERIAL_READ_BUSY;
+            ENGINE_STRIDE_INDEX_GEN_START : begin
+                next_state = ENGINE_STRIDE_INDEX_GEN_BUSY;
             end
-            ENGINE_SERIAL_READ_BUSY_TRANS : begin
-                next_state = ENGINE_SERIAL_READ_BUSY;
+            ENGINE_STRIDE_INDEX_GEN_BUSY_TRANS : begin
+                next_state = ENGINE_STRIDE_INDEX_GEN_BUSY;
             end
-            ENGINE_SERIAL_READ_BUSY : begin
-                if (done_internal_reg)
-                    next_state = ENGINE_SERIAL_READ_DONE;
-                else if (fifo_request_signals_out_reg.prog_full | pause_in_reg)
-                    next_state = ENGINE_SERIAL_READ_PAUSE_TRANS;
+            ENGINE_STRIDE_INDEX_GEN_BUSY : begin
+                if (done_int_reg)
+                    next_state = ENGINE_STRIDE_INDEX_GEN_DONE;
+                else if (fifo_request_signals_out_int.prog_full | pause_in_reg)
+                    next_state = ENGINE_STRIDE_INDEX_GEN_PAUSE_TRANS;
                 else
-                    next_state = ENGINE_SERIAL_READ_BUSY;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_BUSY;
             end
-            ENGINE_SERIAL_READ_PAUSE_TRANS : begin
-                next_state = ENGINE_SERIAL_READ_PAUSE;
+            ENGINE_STRIDE_INDEX_GEN_PAUSE_TRANS : begin
+                next_state = ENGINE_STRIDE_INDEX_GEN_PAUSE;
             end
-            ENGINE_SERIAL_READ_PAUSE : begin
-                if (~fifo_request_signals_out_reg.prog_full & ~pause_in_reg)
-                    next_state = ENGINE_SERIAL_READ_BUSY_TRANS;
+            ENGINE_STRIDE_INDEX_GEN_PAUSE : begin
+                if (~fifo_request_signals_out_int.prog_full & ~pause_in_reg)
+                    next_state = ENGINE_STRIDE_INDEX_GEN_BUSY_TRANS;
                 else
-                    next_state = ENGINE_SERIAL_READ_PAUSE;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_PAUSE;
             end
-            ENGINE_SERIAL_READ_DONE : begin
+            ENGINE_STRIDE_INDEX_GEN_DONE : begin
                 if(configuration_reg.valid & start_in_reg)
-                    next_state = ENGINE_SERIAL_READ_DONE;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_DONE;
                 else
-                    next_state = ENGINE_SERIAL_READ_IDLE;
+                    next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            ENGINE_SERIAL_READ_RESET : begin
-                done_internal_reg          <= 1'b1;
+            ENGINE_STRIDE_INDEX_GEN_RESET : begin
+                done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b0;
@@ -222,8 +222,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_SERIAL_READ_IDLE : begin
-                done_internal_reg          <= 1'b1;
+            ENGINE_STRIDE_INDEX_GEN_IDLE : begin
+                done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b1;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b1;
@@ -234,20 +234,20 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_SERIAL_READ_SETUP : begin
-                done_internal_reg          <= 1'b0;
+            ENGINE_STRIDE_INDEX_GEN_SETUP : begin
+                done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b1;
                 counter_incr               <= configuration_reg.payload.param.increment;
                 counter_decr               <= configuration_reg.payload.param.decrement;
-                counter_load_value         <= configuration_reg.payload.param.start_read;
+                counter_load_value         <= configuration_reg.payload.param.index_start;
                 counter_stride_value       <= configuration_reg.payload.param.stride;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_SERIAL_READ_START : begin
-                done_internal_reg          <= 1'b0;
+            ENGINE_STRIDE_INDEX_GEN_START : begin
+                done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
@@ -256,8 +256,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= configuration_reg.payload.param.decrement;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_SERIAL_READ_PAUSE_TRANS : begin
-                done_internal_reg          <= 1'b0;
+            ENGINE_STRIDE_INDEX_GEN_PAUSE_TRANS : begin
+                done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
@@ -266,15 +266,15 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
             end
-            ENGINE_SERIAL_READ_BUSY : begin
-                if((counter_count >= configuration_reg.payload.param.end_read)) begin
-                    done_internal_reg          <= 1'b1;
+            ENGINE_STRIDE_INDEX_GEN_BUSY : begin
+                if((counter_count >= configuration_reg.payload.param.index_end)) begin
+                    done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
                     counter_decr               <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
-                    done_internal_reg          <= 1'b0;
+                    done_int_reg               <= 1'b0;
                     counter_enable             <= 1'b1;
                     counter_incr               <= configuration_reg.payload.param.increment;
                     counter_decr               <= configuration_reg.payload.param.decrement;
@@ -285,15 +285,15 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
-            ENGINE_SERIAL_READ_BUSY_TRANS : begin
-                if((counter_count >= configuration_reg.payload.param.end_read)) begin
-                    done_internal_reg          <= 1'b1;
+            ENGINE_STRIDE_INDEX_GEN_BUSY_TRANS : begin
+                if((counter_count >= configuration_reg.payload.param.index_end)) begin
+                    done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
                     counter_decr               <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
-                    done_internal_reg          <= 1'b0;
+                    done_int_reg               <= 1'b0;
                     counter_enable             <= 1'b1;
                     counter_incr               <= configuration_reg.payload.param.increment;
                     counter_decr               <= configuration_reg.payload.param.decrement;
@@ -304,8 +304,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
-            ENGINE_SERIAL_READ_PAUSE : begin
-                done_internal_reg          <= 1'b0;
+            ENGINE_STRIDE_INDEX_GEN_PAUSE : begin
+                done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
@@ -314,8 +314,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_SERIAL_READ_DONE : begin
-                done_internal_reg          <= 1'b1;
+            ENGINE_STRIDE_INDEX_GEN_DONE : begin
+                done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b1;
@@ -341,6 +341,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         fifo_request_comb.payload.meta.type_operand   = configuration_reg.payload.meta.type_operand ;
         fifo_request_comb.payload.meta.type_filter    = configuration_reg.payload.meta.type_filter;
         fifo_request_comb.payload.meta.type_ALU       = configuration_reg.payload.meta.type_ALU;
+        fifo_request_comb.payload.data.field          = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -364,16 +365,16 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // FIFO cache requests out fifo_814x16_MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy ;
+    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_signals_in_inernal.wr_en = fifo_request_din_reg.valid;
-    assign fifo_request_din                      = fifo_request_din_reg.payload;
+    assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
+    assign fifo_request_din                  = fifo_request_din_reg.payload;
 
     // Pop
-    assign fifo_request_signals_in_inernal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid                 = fifo_request_signals_out_reg.valid;
-    assign request_out_reg.payload               = fifo_request_dout;
+    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_reg.valid             = fifo_request_signals_out_int.valid;
+    assign request_out_reg.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -384,18 +385,18 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),
         .din         (fifo_request_din                         ),
-        .wr_en       (fifo_request_signals_in_inernal.wr_en    ),
-        .rd_en       (fifo_request_signals_in_inernal.rd_en    ),
+        .wr_en       (fifo_request_signals_in_int.wr_en        ),
+        .rd_en       (fifo_request_signals_in_int.rd_en        ),
         .dout        (fifo_request_dout                        ),
-        .full        (fifo_request_signals_out_reg.full        ),
-        .almost_full (fifo_request_signals_out_reg.almost_full ),
-        .empty       (fifo_request_signals_out_reg.empty       ),
-        .almost_empty(fifo_request_signals_out_reg.almost_empty),
-        .valid       (fifo_request_signals_out_reg.valid       ),
-        .prog_full   (fifo_request_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+        .full        (fifo_request_signals_out_int.full        ),
+        .almost_full (fifo_request_signals_out_int.almost_full ),
+        .empty       (fifo_request_signals_out_int.empty       ),
+        .almost_empty(fifo_request_signals_out_int.almost_empty),
+        .valid       (fifo_request_signals_out_int.valid       ),
+        .prog_full   (fifo_request_signals_out_int.prog_full   ),
+        .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
     );
 
 endmodule : engine_stride_index_generator

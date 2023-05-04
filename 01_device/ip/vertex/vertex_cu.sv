@@ -23,11 +23,10 @@ import PKG_VERTEX::*;
 import PKG_CACHE::*;
 
 module vertex_cu #(
-    parameter NUM_GRAPH_CLUSTERS = CU_COUNT_GLOBAL,
-    parameter NUM_GRAPH_PE       = CU_COUNT_LOCAL ,
-    parameter ENGINE_ID_X        = 1              ,
-    parameter ENGINE_ID_Y        = 1              ,
-    parameter COUNTER_WIDTH      = 32
+    parameter ENGINE_ID_VERTEX = 0 ,
+    parameter ENGINE_ID_BUNDLE = 0 ,
+    parameter ENGINE_ID_ENGINE = 0 ,
+    parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
     input  logic                       ap_clk                   ,
@@ -46,55 +45,55 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_vertex_cu  ;
-    logic areset_serial_read;
-    logic areset_fifo       ;
-
-    KernelDescriptor descriptor_reg  ;
-    MemoryPacket     response_in_reg ;
-    MemoryPacket     response_out_reg;
-    MemoryPacket     request_out_reg ;
+    logic areset_vertex_cu             ;
+    logic areset_stride_index_generator;
+    logic areset_fifo  KernelDescriptor descriptor_reg  ;
+    MemoryPacket response_in_reg ;
+    MemoryPacket response_out_int;
+    MemoryPacket request_out_reg ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
 // --------------------------------------------------------------------------------------
-    logic           done_internal_reg;
-    vertex_cu_state current_state    ;
-    vertex_cu_state next_state       ;
+    logic           done_int_reg ;
+    vertex_cu_state current_state;
+    vertex_cu_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 // Request FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din                ;
-    MemoryPacketPayload    fifo_request_dout               ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
-    FIFOStateSignalsInput  fifo_request_signals_in_internal;
-    FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
-    logic                  fifo_request_setup_signal       ;
+    MemoryPacketPayload    fifo_request_din             ;
+    MemoryPacketPayload    fifo_request_dout            ;
+    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_request_signals_out_int ;
+    logic                  fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_din                ;
-    MemoryPacketPayload    fifo_response_dout               ;
-    FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
-    FIFOStateSignalsInput  fifo_response_signals_in_internal;
-    FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
-    logic                  fifo_response_setup_signal       ;
+    MemoryPacketPayload    fifo_response_din             ;
+    MemoryPacketPayload    fifo_response_dout            ;
+    FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_response_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_response_signals_out_int ;
+    logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    SerialReadEngineConfiguration engine_stride_index_generator_configuration_in        ;
-    SerialReadEngineConfiguration configuration_comb                                    ;
-    MemoryPacket                  engine_stride_index_generator_request_out             ;
-    FIFOStateSignalsOutput        engine_stride_index_generator_fifo_request_signals_out;
-    FIFOStateSignalsInput         engine_stride_index_generator_fifo_request_signals_in ;
-    FIFOStateSignalsInput         engine_stride_index_generator_fifo_request_signals_reg;
-    logic                         engine_stride_index_generator_start_in                ;
-    logic                         engine_stride_index_generator_pause_in                ;
-    logic                         engine_stride_index_generator_ready_out               ;
-    logic                         engine_stride_index_generator_done_out                ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in           ;
+    StrideIndexGeneratorConfiguration configuration_comb                                       ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out;
+    logic [4:0]                       configuration_reg_valid                                  ;
+    MemoryPacket                      engine_stride_index_generator_request_out                ;
+    FIFOStateSignalsOutput            engine_stride_index_generator_fifo_request_signals_out   ;
+    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_in    ;
+    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_reg   ;
+    logic                             engine_stride_index_generator_start_in                   ;
+    logic                             engine_stride_index_generator_pause_in                   ;
+    logic                             engine_stride_index_generator_ready_out                  ;
+    logic                             engine_stride_index_generator_done_out                   ;
 
     logic engine_stride_index_generator_fifo_setup_signal;
 
@@ -102,9 +101,9 @@ module vertex_cu #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_vertex_cu   <= areset;
-        areset_serial_read <= areset;
-        areset_fifo        <= areset;
+        areset_vertex_cu              <= areset;
+        areset_stride_index_generator <= areset;
+        ares                          <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -154,9 +153,9 @@ module vertex_cu #(
             request_out.valid         <= 0;
         end
         else begin
-            fifo_setup_signal         <= engine_stride_index_generator_fifo_setup_signal | fifo_request_setup_signal | fifo_response_setup_signal;
-            fifo_response_signals_out <= fifo_response_signals_out_reg;
-            fifo_request_signals_out  <= fifo_request_signals_out_reg;
+            fifo_setup_signal         <= engine_stride_index_generator_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int;
+            fifo_response_signals_out <= fifo_response_signals_out_int;
+            fifo_request_signals_out  <= fifo_request_signals_out_int;
             request_out.valid         <= request_out_reg.valid ;
         end
     end
@@ -183,7 +182,7 @@ module vertex_cu #(
                 next_state = VERTEX_CU_IDLE;
             end
             VERTEX_CU_IDLE : begin
-                if(descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
+                if(engine_stride_index_generator_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
                     next_state = VERTEX_CU_REQ_START;
                 else
                     next_state = VERTEX_CU_IDLE;
@@ -196,15 +195,15 @@ module vertex_cu #(
                 end
             end
             VERTEX_CU_REQ_BUSY : begin
-                if (done_internal_reg)
+                if (done_int_reg)
                     next_state = VERTEX_CU_REQ_DONE;
-                else if (fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full)
+                else if (fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full)
                     next_state = VERTEX_CU_REQ_PAUSE;
                 else
                     next_state = VERTEX_CU_REQ_BUSY;
             end
             VERTEX_CU_REQ_PAUSE : begin
-                if (~(fifo_request_signals_out_reg.prog_full | fifo_response_signals_out_reg.prog_full))
+                if (~(fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full))
                     next_state = VERTEX_CU_REQ_BUSY;
                 else
                     next_state = VERTEX_CU_REQ_PAUSE;
@@ -221,42 +220,42 @@ module vertex_cu #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             VERTEX_CU_RESET : begin
-                done_internal_reg                                            <= 1'b1;
+                done_int_reg                                                 <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
                 engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_IDLE : begin
-                done_internal_reg                                            <= 1'b0;
+                done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
                 engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_REQ_START : begin
-                done_internal_reg                                            <= 1'b0;
+                done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b1;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
                 engine_stride_index_generator_configuration_in.valid         <= 1'b1;
             end
             VERTEX_CU_REQ_BUSY : begin
-                done_internal_reg                                            <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_reg.empty;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_reg.prog_full;
+                done_int_reg                                                 <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
                 engine_stride_index_generator_configuration_in.valid         <= 1'b1;
             end
             VERTEX_CU_REQ_PAUSE : begin
-                done_internal_reg                                            <= 1'b0;
+                done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b1;
                 engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
             VERTEX_CU_REQ_DONE : begin
-                done_internal_reg                                            <= 1'b1;
+                done_int_reg                                                 <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
@@ -267,42 +266,14 @@ module vertex_cu #(
 
 
 // --------------------------------------------------------------------------------------
-// Create Configuration Packet
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        configuration_comb.payload.param.increment     = 1'b1;
-        configuration_comb.payload.param.decrement     = 1'b0;
-        configuration_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        configuration_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        configuration_comb.payload.param.start_read    = 0;
-        configuration_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
-        configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
-
-        configuration_comb.payload.meta.id_vertex      = ENGINE_ID_X;
-        configuration_comb.payload.meta.id_bundle      = ENGINE_ID_X;
-        configuration_comb.payload.meta.id_engine      = ENGINE_ID_Y;
-        configuration_comb.payload.meta.address_base   = descriptor_reg.payload.graph_csr_struct;
-        configuration_comb.payload.meta.address_offset = 0;
-        configuration_comb.payload.meta.type_cmd       = CMD_READ;
-        configuration_comb.payload.meta.type_struct    = STRUCT_VERTEX_CU;
-        configuration_comb.payload.meta.type_operand   = OP_LOCATION_0;
-        configuration_comb.payload.meta.type_filter    = FILTER_NOP;
-        configuration_comb.payload.meta.type_ALU       = ALU_NOP;
-    end
-
-    always_ff @(posedge ap_clk) begin
-        engine_stride_index_generator_configuration_in.payload <= configuration_comb.payload;
-    end
-
-// --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_fifo_request_signals_in = engine_stride_index_generator_fifo_request_signals_reg;
+    assign engine_stride_index_generator_configuration_in.payload = engine_stride_index_generator_configure_configuration_out.payload;
+    assign engine_stride_index_generator_fifo_request_signals_in  = engine_stride_index_generator_fifo_request_signals_reg;
 
     engine_stride_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_stride_index_generator (
         .ap_clk                  (ap_clk                                                ),
-        .areset                  (areset_serial_read                                    ),
+        .areset                  (areset_stride_index_generator                         ),
         .configuration_in        (engine_stride_index_generator_configuration_in        ),
         .request_out             (engine_stride_index_generator_request_out             ),
         .fifo_request_signals_in (engine_stride_index_generator_fifo_request_signals_in ),
@@ -318,16 +289,19 @@ module vertex_cu #(
 // FIFO cache requests out MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_signals_in_internal.wr_en = engine_stride_index_generator_request_out.valid;
-    assign fifo_request_din                       = engine_stride_index_generator_request_out.payload;
+    // assign fifo_request_signals_in_int.wr_en = engine_stride_index_generator_request_out.valid;
+    // assign fifo_request_din                  = engine_stride_index_generator_request_out.payload;
+
+    assign fifo_request_signals_in_int.wr_en = 0;
+    assign fifo_request_din                  = 0;
 
     // Pop
-    assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid                  = fifo_request_signals_out_reg.valid;
-    assign request_out_reg.payload                = fifo_request_dout;
+    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_reg.valid             = fifo_request_signals_out_int.valid;
+    assign request_out_reg.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -338,34 +312,34 @@ module vertex_cu #(
         .clk         (ap_clk                                   ),
         .srst        (areset_fifo                              ),
         .din         (fifo_request_din                         ),
-        .wr_en       (fifo_request_signals_in_internal.wr_en   ),
-        .rd_en       (fifo_request_signals_in_internal.rd_en   ),
+        .wr_en       (fifo_request_signals_in_int.wr_en        ),
+        .rd_en       (fifo_request_signals_in_int.rd_en        ),
         .dout        (fifo_request_dout                        ),
-        .full        (fifo_request_signals_out_reg.full        ),
-        .almost_full (fifo_request_signals_out_reg.almost_full ),
-        .empty       (fifo_request_signals_out_reg.empty       ),
-        .almost_empty(fifo_request_signals_out_reg.almost_empty),
-        .valid       (fifo_request_signals_out_reg.valid       ),
-        .prog_full   (fifo_request_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+        .full        (fifo_request_signals_out_int.full        ),
+        .almost_full (fifo_request_signals_out_int.almost_full ),
+        .empty       (fifo_request_signals_out_int.empty       ),
+        .almost_empty(fifo_request_signals_out_int.almost_empty),
+        .valid       (fifo_request_signals_out_int.valid       ),
+        .prog_full   (fifo_request_signals_out_int.prog_full   ),
+        .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache response MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+    assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_internal.wr_en = response_in_reg.valid;
-    assign fifo_response_din                       = response_in_reg.payload;
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
+    assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;;
-    assign response_out_reg.valid                  = fifo_response_signals_out_reg.valid;
-    assign response_out_reg.payload                = fifo_response_dout;
+    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;;
+    assign response_out_int.valid             = fifo_response_signals_out_int.valid;
+    assign response_out_int.payload           = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
@@ -376,18 +350,40 @@ module vertex_cu #(
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
         .din         (fifo_response_din                         ),
-        .wr_en       (fifo_response_signals_in_internal.wr_en   ),
-        .rd_en       (fifo_response_signals_in_internal.rd_en   ),
+        .wr_en       (fifo_response_signals_in_int.wr_en        ),
+        .rd_en       (fifo_response_signals_in_int.rd_en        ),
         .dout        (fifo_response_dout                        ),
-        .full        (fifo_response_signals_out_reg.full        ),
-        .almost_full (fifo_response_signals_out_reg.almost_full ),
-        .empty       (fifo_response_signals_out_reg.empty       ),
-        .almost_empty(fifo_response_signals_out_reg.almost_empty),
-        .valid       (fifo_response_signals_out_reg.valid       ),
-        .prog_full   (fifo_response_signals_out_reg.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
-        .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
+        .full        (fifo_response_signals_out_int.full        ),
+        .almost_full (fifo_response_signals_out_int.almost_full ),
+        .empty       (fifo_response_signals_out_int.empty       ),
+        .almost_empty(fifo_response_signals_out_int.almost_empty),
+        .valid       (fifo_response_signals_out_int.valid       ),
+        .prog_full   (fifo_response_signals_out_int.prog_full   ),
+        .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
+        .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
+        .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
     );
+
+// --------------------------------------------------------------------------------------
+// Drive Response Packet Setup Engines
+// 0 - increment/decrement
+// 1 - index_start
+// 2 - index_end
+// 3 - stride
+// 4 - granularity
+// --------------------------------------------------------------------------------------
+    assign engine_stride_index_generator_configure_response_in = response_out_int;
+
+    engine_stride_index_generator_configure #(
+        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
+        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
+        .ENGINE_ID_ENGINE(1               )
+    ) inst_engine_stride_index_generator_configure (
+        .ap_clk           (ap_clk                                                   ),
+        .areset           (areset                                                   ),
+        .response_in      (engine_stride_index_generator_configure_response_in      ),
+        .configuration_out(engine_stride_index_generator_configure_configuration_out)
+    );
+
 
 endmodule : vertex_cu
