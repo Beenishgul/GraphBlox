@@ -21,6 +21,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
+// ------------------------
 // Stride\_Index\_Generator
 // ------------------------
 
@@ -70,7 +71,6 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     logic pause_in_reg     ;
     logic ready_out_reg    ;
     logic done_out_reg     ;
-
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -334,7 +334,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         fifo_request_comb.payload.meta.id_vertex      = configuration_reg.payload.meta.id_vertex;
         fifo_request_comb.payload.meta.id_bundle      = configuration_reg.payload.meta.id_bundle;
         fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_engine;
-        fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.array_pointer;
+        fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.index_start;
         fifo_request_comb.payload.meta.address_offset = counter_count;
         fifo_request_comb.payload.meta.type_cmd       = configuration_reg.payload.meta.type_cmd;
         fifo_request_comb.payload.meta.type_struct    = configuration_reg.payload.meta.type_struct;
@@ -397,6 +397,5 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
         .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
     );
-
 
 endmodule : engine_stride_index_generator
