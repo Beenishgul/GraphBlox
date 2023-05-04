@@ -34,25 +34,24 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-// AXI write master stage
   logic areset_control;
   logic areset_fifo   ;
   logic areset_arbiter;
 
   MemoryPacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
-  CacheRequest request_out_reg                          ;
+  CacheRequest request_out_int                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-  CacheRequestPayload    fifo_request_din                ;
-  CacheRequest           fifo_request_din_reg            ;
-  CacheRequest           fifo_request_comb               ;
-  CacheRequestPayload    fifo_request_dout               ;
-  FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
-  FIFOStateSignalsInput  fifo_request_signals_in_internal;
-  FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
-  logic                  fifo_request_setup_signal       ;
+  CacheRequestPayload    fifo_request_din             ;
+  CacheRequest           fifo_request_din_reg         ;
+  CacheRequest           fifo_request_comb            ;
+  CacheRequestPayload    fifo_request_dout            ;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
+  FIFOStateSignalsInput  fifo_request_signals_in_int  ;
+  FIFOStateSignalsOutput fifo_request_signals_out_int ;
+  logic                  fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -117,15 +116,15 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
       request_out.valid        <= 1'b0;
     end
     else begin
-      fifo_setup_signal        <= fifo_request_setup_signal;
-      fifo_request_signals_out <= fifo_request_signals_out_reg;
+      fifo_setup_signal        <= fifo_request_setup_signal_int;
+      fifo_request_signals_out <= fifo_request_signals_out_int;
       arbiter_grant_out        <= arbiter_grant;
-      request_out.valid        <= request_out_reg.valid;
+      request_out.valid        <= request_out_int.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    request_out.payload <= request_out_reg.payload ;
+    request_out.payload <= request_out_int.payload ;
   end
 
 // --------------------------------------------------------------------------------------
@@ -164,18 +163,18 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------
   // FIFO is reseting
-  assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+  assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_request_signals_in_internal.wr_en = fifo_request_din_reg.valid;
-  assign fifo_request_din.iob                   = fifo_request_din_reg.payload.iob;
-  assign fifo_request_din.meta                  = fifo_request_din_reg.payload.meta ;
+  assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
+  assign fifo_request_din.iob              = fifo_request_din_reg.payload.iob;
+  assign fifo_request_din.meta             = fifo_request_din_reg.payload.meta ;
 
   // Pop
-  assign fifo_request_signals_in_internal.rd_en = ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-  assign request_out_reg.valid                  = fifo_request_signals_out_reg.valid;
-  assign request_out_reg.payload.iob            = fifo_request_dout.iob;
-  assign request_out_reg.payload.meta           = fifo_request_dout.meta;
+  assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+  assign request_out_int.valid             = fifo_request_signals_out_int.valid;
+  assign request_out_int.payload.iob       = fifo_request_dout.iob;
+  assign request_out_int.payload.meta      = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -186,18 +185,18 @@ module cache_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
     .clk         (ap_clk                                   ),
     .srst        (areset_fifo                              ),
     .din         (fifo_request_din                         ),
-    .wr_en       (fifo_request_signals_in_internal.wr_en   ),
-    .rd_en       (fifo_request_signals_in_internal.rd_en   ),
+    .wr_en       (fifo_request_signals_in_int.wr_en        ),
+    .rd_en       (fifo_request_signals_in_int.rd_en        ),
     .dout        (fifo_request_dout                        ),
-    .full        (fifo_request_signals_out_reg.full        ),
-    .almost_full (fifo_request_signals_out_reg.almost_full ),
-    .empty       (fifo_request_signals_out_reg.empty       ),
-    .almost_empty(fifo_request_signals_out_reg.almost_empty),
-    .valid       (fifo_request_signals_out_reg.valid       ),
-    .prog_full   (fifo_request_signals_out_reg.prog_full   ),
-    .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
-    .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
-    .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+    .full        (fifo_request_signals_out_int.full        ),
+    .almost_full (fifo_request_signals_out_int.almost_full ),
+    .empty       (fifo_request_signals_out_int.empty       ),
+    .almost_empty(fifo_request_signals_out_int.almost_empty),
+    .valid       (fifo_request_signals_out_int.valid       ),
+    .prog_full   (fifo_request_signals_out_int.prog_full   ),
+    .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+    .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+    .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
   );
 
 // --------------------------------------------------------------------------------------

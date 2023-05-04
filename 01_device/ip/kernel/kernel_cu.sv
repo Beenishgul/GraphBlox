@@ -278,7 +278,11 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-  kernel_setup inst_kernel_setup (
+  kernel_setup #(
+    .ENGINE_ID_VERTEX(0),
+    .ENGINE_ID_BUNDLE(0),
+    .ENGINE_ID_ENGINE(0)
+  ) inst_kernel_setup (
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
     .control_state            (kernel_setup_control_state            ),
@@ -295,7 +299,11 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-  vertex_cu inst_vertex_cu (
+  vertex_cu #(
+    .ENGINE_ID_VERTEX(1),
+    .ENGINE_ID_BUNDLE(0),
+    .ENGINE_ID_ENGINE(0)
+  ) inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .control_state            (vertex_cu_control_state            ),

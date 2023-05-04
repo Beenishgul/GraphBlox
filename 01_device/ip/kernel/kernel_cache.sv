@@ -48,7 +48,7 @@ module kernel_cache (
   logic areset_control;
 
   CacheRequest  request_in_reg ;
-  CacheResponse response_in_reg;
+  CacheResponse response_in_int;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -66,23 +66,23 @@ module kernel_cache (
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  CacheRequestPayload    fifo_request_din                ;
-  CacheRequestPayload    fifo_request_dout               ;
-  FIFOStateSignalsOutput fifo_request_signals_out_reg    ;
-  FIFOStateSignalsInput  fifo_request_signals_in_reg     ;
-  FIFOStateSignalsInput  fifo_request_signals_in_internal;
-  logic                  fifo_request_setup_signal       ;
+  CacheRequestPayload    fifo_request_din             ;
+  CacheRequestPayload    fifo_request_dout            ;
+  FIFOStateSignalsOutput fifo_request_signals_out_int ;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
+  FIFOStateSignalsInput  fifo_request_signals_in_int  ;
+  logic                  fifo_request_setup_signal_int;
 
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-  CacheResponsePayload   fifo_response_din                ;
-  CacheResponsePayload   fifo_response_dout               ;
-  FIFOStateSignalsOutput fifo_response_signals_out_reg    ;
-  FIFOStateSignalsInput  fifo_response_signals_in_reg     ;
-  FIFOStateSignalsInput  fifo_response_signals_in_internal;
-  logic                  fifo_response_setup_signal       ;
+  CacheResponsePayload   fifo_response_din             ;
+  CacheResponsePayload   fifo_response_dout            ;
+  FIFOStateSignalsOutput fifo_response_signals_out_int ;
+  FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
+  FIFOStateSignalsInput  fifo_response_signals_in_int  ;
+  logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -126,15 +126,15 @@ module kernel_cache (
       response_out.valid        <= 1'b0;
     end
     else begin
-      fifo_setup_signal         <= fifo_request_setup_signal | fifo_response_setup_signal;
-      fifo_request_signals_out  <= fifo_request_signals_out_reg;
-      fifo_response_signals_out <= fifo_response_signals_out_reg;
-      response_out.valid        <= response_in_reg.valid;
+      fifo_setup_signal         <= fifo_request_setup_signal_int | fifo_response_setup_signal_int;
+      fifo_request_signals_out  <= fifo_request_signals_out_int;
+      fifo_response_signals_out <= fifo_response_signals_out_int;
+      response_out.valid        <= response_in_int.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    response_out.payload <= response_in_reg.payload;
+    response_out.payload <= response_in_int.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -242,20 +242,20 @@ module kernel_cache (
 // Cache request FIFO FWFT
 // --------------------------------------------------------------------------------------
   // FIFO is resetting
-  assign fifo_request_setup_signal = fifo_request_signals_out_reg.wr_rst_busy | fifo_request_signals_out_reg.rd_rst_busy;
+  assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_request_signals_in_internal.wr_en = request_in_reg.valid;
-  assign fifo_request_din.iob                   = request_in_reg.payload.iob;
-  assign fifo_request_din.meta                  = request_in_reg.payload.meta;
+  assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
+  assign fifo_request_din.iob              = request_in_reg.payload.iob;
+  assign fifo_request_din.meta             = request_in_reg.payload.meta;
 
   // Pop
-  assign fifo_request_signals_in_internal.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty & fifo_request_signals_in_reg.rd_en;
-  assign cache_request_mem.iob.valid            = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_reg.empty;
-  assign cache_request_mem.iob.addr             = fifo_request_dout.iob.addr;
-  assign cache_request_mem.iob.wdata            = fifo_request_dout.iob.wdata;
-  assign cache_request_mem.iob.wstrb            = fifo_request_dout.iob.wstrb;
-  assign cache_request_mem.meta                 = fifo_request_dout.meta;
+  assign fifo_request_signals_in_int.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+  assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty;
+  assign cache_request_mem.iob.addr        = fifo_request_dout.iob.addr;
+  assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
+  assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
+  assign cache_request_mem.meta            = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -267,35 +267,35 @@ module kernel_cache (
     .clk         (ap_clk                                   ),
     .srst        (areset_fifo                              ),
     .din         (fifo_request_din                         ),
-    .wr_en       (fifo_request_signals_in_internal.wr_en   ),
-    .rd_en       (fifo_request_signals_in_internal.rd_en   ),
+    .wr_en       (fifo_request_signals_in_int.wr_en        ),
+    .rd_en       (fifo_request_signals_in_int.rd_en        ),
     .dout        (fifo_request_dout                        ),
-    .full        (fifo_request_signals_out_reg.full        ),
-    .almost_full (fifo_request_signals_out_reg.almost_full ),
-    .empty       (fifo_request_signals_out_reg.empty       ),
-    .almost_empty(fifo_request_signals_out_reg.almost_empty),
-    .valid       (fifo_request_signals_out_reg.valid       ),
-    .prog_full   (fifo_request_signals_out_reg.prog_full   ),
-    .prog_empty  (fifo_request_signals_out_reg.prog_empty  ),
-    .wr_rst_busy (fifo_request_signals_out_reg.wr_rst_busy ),
-    .rd_rst_busy (fifo_request_signals_out_reg.rd_rst_busy )
+    .full        (fifo_request_signals_out_int.full        ),
+    .almost_full (fifo_request_signals_out_int.almost_full ),
+    .empty       (fifo_request_signals_out_int.empty       ),
+    .almost_empty(fifo_request_signals_out_int.almost_empty),
+    .valid       (fifo_request_signals_out_int.valid       ),
+    .prog_full   (fifo_request_signals_out_int.prog_full   ),
+    .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+    .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+    .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
   );
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
   // FIFO is resetting
-  assign fifo_response_setup_signal = fifo_response_signals_out_reg.wr_rst_busy | fifo_response_signals_out_reg.rd_rst_busy;
+  assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_internal.wr_en = cache_response_mem.iob.ready;
-  assign fifo_response_din.iob                   = cache_response_mem.iob;
-  assign fifo_response_din.meta                  = cache_request_mem.meta;
+  assign fifo_response_signals_in_int.wr_en = cache_response_mem.iob.ready;
+  assign fifo_response_din.iob              = cache_response_mem.iob;
+  assign fifo_response_din.meta             = cache_request_mem.meta;
 
   // Pop
-  assign fifo_response_signals_in_internal.rd_en = ~fifo_response_signals_out_reg.empty & fifo_response_signals_in_reg.rd_en;
-  assign response_in_reg.valid                   = fifo_response_signals_out_reg.valid;
-  assign response_in_reg.payload                 = fifo_response_dout;
+  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+  assign response_in_int.valid              = fifo_response_signals_out_int.valid;
+  assign response_in_int.payload            = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),
@@ -306,18 +306,18 @@ module kernel_cache (
     .clk         (ap_clk                                    ),
     .srst        (areset_fifo                               ),
     .din         (fifo_response_din                         ),
-    .wr_en       (fifo_response_signals_in_internal.wr_en   ),
-    .rd_en       (fifo_response_signals_in_internal.rd_en   ),
+    .wr_en       (fifo_response_signals_in_int.wr_en        ),
+    .rd_en       (fifo_response_signals_in_int.rd_en        ),
     .dout        (fifo_response_dout                        ),
-    .full        (fifo_response_signals_out_reg.full        ),
-    .almost_full (fifo_response_signals_out_reg.almost_full ),
-    .empty       (fifo_response_signals_out_reg.empty       ),
-    .almost_empty(fifo_response_signals_out_reg.almost_empty),
-    .valid       (fifo_response_signals_out_reg.valid       ),
-    .prog_full   (fifo_response_signals_out_reg.prog_full   ),
-    .prog_empty  (fifo_response_signals_out_reg.prog_empty  ),
-    .wr_rst_busy (fifo_response_signals_out_reg.wr_rst_busy ),
-    .rd_rst_busy (fifo_response_signals_out_reg.rd_rst_busy )
+    .full        (fifo_response_signals_out_int.full        ),
+    .almost_full (fifo_response_signals_out_int.almost_full ),
+    .empty       (fifo_response_signals_out_int.empty       ),
+    .almost_empty(fifo_response_signals_out_int.almost_empty),
+    .valid       (fifo_response_signals_out_int.valid       ),
+    .prog_full   (fifo_response_signals_out_int.prog_full   ),
+    .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
+    .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
+    .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
   );
 
 
