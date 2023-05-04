@@ -35,6 +35,7 @@ package PKG_ENGINE;
         logic                               decrement  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
     } StrideIndexGeneratorConfigurationParameters;
 
