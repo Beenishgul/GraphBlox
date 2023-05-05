@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_setup.sv
+// File   : vertex_cu_bundles.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,31 +21,31 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module kernel_setup #(
+module vertex_cu_bundles #(
     parameter ENGINE_ID_VERTEX = 0 ,
     parameter ENGINE_ID_BUNDLE = 0 ,
     parameter ENGINE_ID_ENGINE = 0 ,
     parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
-    input  logic                       ap_clk                   ,
-    input  logic                       areset                   ,
-    input  KernelDescriptor            descriptor_in            ,
-    output MemoryPacket                request_out              ,
-    input  FIFOStateSignalsInput       fifo_request_signals_in  ,
-    output FIFOStateSignalsOutput      fifo_request_signals_out ,
-    input  MemoryPacket                response_in              ,
-    input  FIFOStateSignalsInput       fifo_response_signals_in ,
-    output FIFOStateSignalsOutput      fifo_response_signals_out,
-    output logic                       fifo_setup_signal
+    input  logic                  ap_clk                   ,
+    input  logic                  areset                   ,
+    input  KernelDescriptor       descriptor_in            ,
+    output MemoryPacket           request_out              ,
+    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_signals_out ,
+    input  MemoryPacket           response_in              ,
+    input  FIFOStateSignalsInput  fifo_response_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_signals_out,
+    output logic                  fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_kernel_setup;
-    logic areset_serial_read ;
-    logic areset_fifo        ;
+    logic areset_vertex_cu_bundles;
+    logic areset_serial_read      ;
+    logic areset_fifo             ;
 
     KernelDescriptor descriptor_reg  ;
     MemoryPacket     response_in_reg ;
@@ -55,9 +55,9 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
 // --------------------------------------------------------------------------------------
-    logic              done_int_reg ;
-    kernel_setup_state current_state;
-    kernel_setup_state next_state   ;
+    logic                   done_int_reg ;
+    vertex_cu_bundles_state current_state;
+    vertex_cu_bundles_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 // Request FIFO
@@ -99,16 +99,16 @@ module kernel_setup #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_kernel_setup <= areset;
-        areset_serial_read  <= areset;
-        areset_fifo         <= areset;
+        areset_vertex_cu_bundles <= areset;
+        areset_serial_read       <= areset;
+        areset_fifo              <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_kernel_setup) begin
+        if (areset_vertex_cu_bundles) begin
             descriptor_reg.valid <= 0;
         end
         else begin
@@ -124,7 +124,7 @@ module kernel_setup #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_kernel_setup) begin
+        if (areset_vertex_cu_bundles) begin
             fifo_response_signals_in_reg <= 0;
             fifo_request_signals_in_reg  <= 0;
             response_in_reg.valid        <= 0;
@@ -144,7 +144,7 @@ module kernel_setup #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_kernel_setup) begin
+        if (areset_vertex_cu_bundles) begin
             fifo_setup_signal         <= 1;
             fifo_response_signals_out <= 0;
             fifo_request_signals_out  <= 0;
@@ -166,7 +166,7 @@ module kernel_setup #(
 // SETUP State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_kernel_setup)
+        if(areset_vertex_cu_bundles)
             current_state <= KERNEL_SETUP_RESET;
         else begin
             current_state <= next_state;
@@ -388,4 +388,4 @@ module kernel_setup #(
     );
 
 
-endmodule : kernel_setup
+endmodule : vertex_cu_bundles

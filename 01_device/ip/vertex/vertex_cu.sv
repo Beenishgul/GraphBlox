@@ -390,6 +390,22 @@ module vertex_cu #(
 // instantiate vertex bundles
 // --------------------------------------------------------------------------------------
 
+    vertex_cu_bundles #(
+        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
+        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
+        .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE),
+    ) inst_vertex_cu_bundles (
+        .ap_clk                   (ap_clk                   ),
+        .areset                   (areset                   ),
+        .descriptor_in            (descriptor_in            ),
+        .request_out              (request_out              ),
+        .fifo_request_signals_in  (fifo_request_signals_in  ),
+        .fifo_request_signals_out (fifo_request_signals_out ),
+        .response_in              (response_in              ),
+        .fifo_response_signals_in (fifo_response_signals_in ),
+        .fifo_response_signals_out(fifo_response_signals_out),
+        .fifo_setup_signal        (fifo_setup_signal        )
+    );
 
 
 endmodule : vertex_cu
