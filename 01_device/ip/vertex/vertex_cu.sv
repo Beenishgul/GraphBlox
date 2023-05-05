@@ -272,7 +272,7 @@ module vertex_cu #(
 // 1 - index_start
 // 2 - index_end
 // 3 - stride
-// 4 - granularity
+// 4 - granularity - $clog2(BIT_WIDTH) used to shift
 // --------------------------------------------------------------------------------------
     assign engine_stride_index_generator_configure_response_in = response_out_int;
 
@@ -386,6 +386,8 @@ module vertex_cu #(
         .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
     );
 
-
+// --------------------------------------------------------------------------------------
+// FIFO cache response MemoryPacket
+// --------------------------------------------------------------------------------------
 
 endmodule : vertex_cu
