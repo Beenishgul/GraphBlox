@@ -24,8 +24,16 @@ package PKG_GLOBALS;
 	parameter CU_CACHE_SIZE_BYTES = 32768                                  ; // size in Bytes 32KB
 	parameter CU_CACHE_LINES_NUM  = CU_CACHE_SIZE_BYTES / (M_AXI4_DATA_W/8); // size in lines 512 (cacheline 64Bytes)
 
-	parameter CU_ENGINES_COUNT_TOTAL = 64                            ;
+	parameter CU_VERTEX_COUNT_TOTAL = 32                            ;
+	parameter CU_BUNDLE_COUNT_TOTAL = 4                             ;
+	parameter CU_ENGINE_COUNT_TOTAL = 5                             ;
+
+
 	parameter CU_ENGINE_ID_BITS      = $clog2(CU_ENGINES_COUNT_TOTAL);
+
+	parameter CU_VERTEX_WIDTH_BITS  = $clog2(CU_VERTEX_COUNT_TOTAL);
+	parameter CU_BUNDLE_WIDTH_BITS  = $clog2(CU_BUNDLE_COUNT_TOTAL);
+	parameter CU_ENGINE_WIDTH_BITS  = $clog2(CU_ENGINE_COUNT_TOTAL);
 
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS
