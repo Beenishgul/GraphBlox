@@ -29,8 +29,8 @@ module demux_bus #(
   logic [ BUS_WIDTH-1:0] sel_in_int                       ;
   logic [DATA_WIDTH-1:0] data_out_int      [BUS_WIDTH-1:0];
   logic [ BUS_WIDTH-1:0] data_out_valid_int               ;
-  logic [DATA_WIDTH-1:0] data_out_reg           [BUS_WIDTH-1:0];
-  logic [ BUS_WIDTH-1:0] data_out_valid_reg                    ;
+  logic [DATA_WIDTH-1:0] data_out_reg      [BUS_WIDTH-1:0];
+  logic [ BUS_WIDTH-1:0] data_out_valid_reg               ;
 
 
 // --------------------------------------------------------------------------------------

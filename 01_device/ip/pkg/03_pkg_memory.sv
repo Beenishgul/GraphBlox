@@ -115,13 +115,13 @@ typedef enum logic[11:0]{
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [    CU_ENGINE_ID_BITS-1:0] id_vertex     ; // SIZE = 6 bits
-  logic [    CU_ENGINE_ID_BITS-1:0] id_bundle     ; // SIZE = 6 bits
-  logic [    CU_ENGINE_ID_BITS-1:0] id_engine     ; // SIZE = 6 bits
+  logic [ CU_VERTEX_WIDTH_BITS-1:0] id_vertex     ; // SIZE = 4 bits
+  logic [ CU_BUNDLE_WIDTH_BITS-1:0] id_bundle     ; // SIZE = 2 bits
+  logic [ CU_ENGINE_WIDTH_BITS-1:0] id_engine     ; // SIZE = 3 bits
   logic [CACHE_FRONTEND_ADDR_W-1:0] address_base  ; // SIZE = 64 bits
   logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
   type_kernel_cmd                   type_cmd      ; // SIZE = 5 bits
-  type_data_structure               type_struct   ; // SIZE = 11 bits
+  type_data_structure               type_struct   ; // SIZE = 12 bits
   type_engine_operand               type_operand  ; // SIZE = 6 bits
   type_filter_operation             type_filter   ; // SIZE = 6 bits
   type_ALU_operation                type_ALU      ; // SIZE = 6 bits
