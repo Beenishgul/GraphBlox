@@ -78,7 +78,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput kernel_setup_control_state            ;
   KernelDescriptor            kernel_setup_descriptor               ;
   MemoryPacket                kernel_setup_response_in              ;
   FIFOStateSignalsOutput      kernel_setup_fifo_response_signals_out;
@@ -91,7 +90,6 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
-  ControlChainInterfaceOutput vertex_cu_control_state            ;
   KernelDescriptor            vertex_cu_descriptor               ;
   MemoryPacket                vertex_cu_response_in              ;
   FIFOStateSignalsOutput      vertex_cu_fifo_response_signals_out;
@@ -285,7 +283,6 @@ module kernel_cu #(
   ) inst_kernel_setup (
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
-    .control_state            (kernel_setup_control_state            ),
     .descriptor_in            (kernel_setup_descriptor               ),
     .request_out              (kernel_setup_request_out              ),
     .fifo_request_signals_in  (kernel_setup_fifo_request_signals_in  ),
@@ -306,7 +303,6 @@ module kernel_cu #(
   ) inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
-    .control_state            (vertex_cu_control_state            ),
     .descriptor_in            (vertex_cu_descriptor               ),
     .response_in              (vertex_cu_response_in              ),
     .fifo_response_signals_in (vertex_cu_fifo_response_signals_in ),
