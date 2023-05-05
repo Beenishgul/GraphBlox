@@ -127,7 +127,7 @@ module kernel_cu #(
           counter         <= 0;
         end
         else begin
-          if(vertex_cu_response_in.valid & (vertex_cu_response_in.payload.meta.type_struct == STRUCT_VERTEX_CU))
+          if(vertex_cu_response_in.valid & (vertex_cu_response_in.payload.meta.type_struct == STRUCT_KERNEL_SETUP))
             counter <= vertex_cu_response_in.payload.meta.address_offset;
           else
             counter <= counter;
