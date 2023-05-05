@@ -930,11 +930,11 @@ module kernel_testbench ();
 
         graph.csr_struct[0] = 0;
         // StrideIndexGeneratorConfiguration 
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = 1;                        // 0 - increment/decrement
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                        // 1 - index_start
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;       // 2 - index_end
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = GLOBAL_DATA_WIDTH_BITS/8; // 3 - stride
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = GLOBAL_DATA_WIDTH_BITS/8; // 4 - granularity
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 0 - increment/decrement
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - index_start
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;               // 2 - index_end
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - stride
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = $clog2(GLOBAL_DATA_WIDTH_BITS/8); // 4 - granularity - log2 value for shifting
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = 0;
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = 0;
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = 0;
