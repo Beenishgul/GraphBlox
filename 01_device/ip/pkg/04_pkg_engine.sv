@@ -228,17 +228,4 @@ package PKG_ENGINE;
         RandomWriteEngineConfigurationPayload payload;
     } RandomWriteEngineConfiguration;
 
-
-    function logic [CACHE_FRONTEND_DATA_W-1:0] register_engine_configuration (logic [CACHE_FRONTEND_DATA_W-1:0] in);
-
-        logic [CACHE_FRONTEND_DATA_W-1:0] out;
-
-        integer i;
-        for ( i = 0; i < CACHE_FRONTEND_NBYTES; i++) begin
-            out[i*8 +: 8] = in[((CACHE_FRONTEND_DATA_W-1)-(i*8)) -:8];
-        end
-
-        return out;
-    endfunction : register_engine_configuration
-
 endpackage
