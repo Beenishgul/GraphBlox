@@ -19,14 +19,16 @@ module demux_bus #(
 ) (
   input  logic                  ap_clk                  ,
   input  logic                  areset                  ,
-  input  logic [ BUS_WIDTH-1:0] sel_in                  ,
+  input  logic [ SEL_WIDTH-1:0] sel_in                  ,
+  input  logic [ BUS_WIDTH-1:0] data_in_valid           ,
   input  logic [DATA_WIDTH-1:0] data_in                 ,
   output logic [DATA_WIDTH-1:0] data_out [BUS_WIDTH-1:0],
   output logic [ BUS_WIDTH-1:0] data_out_valid
 );
 
   logic [DATA_WIDTH-1:0] data_in_int                      ;
-  logic [ BUS_WIDTH-1:0] sel_in_int                       ;
+  logic [ SEL_WIDTH-1:0] sel_in_int                       ;
+  logic [ BUS_WIDTH-1:0] data_in_valid_int                ;
   logic [DATA_WIDTH-1:0] data_out_int      [BUS_WIDTH-1:0];
   logic [ BUS_WIDTH-1:0] data_out_valid_int               ;
   logic [DATA_WIDTH-1:0] data_out_reg      [BUS_WIDTH-1:0];
@@ -39,11 +41,13 @@ module demux_bus #(
   // Use SCTLs in the latch logic.
   always_ff @(posedge ap_clk) begin
     if (areset) begin
-      data_in_int <= 0;
-      sel_in_int  <= 0;
+      data_in_int       <= 0;
+      sel_in_int        <= 0;
+      data_in_valid_int <= 0;
     end else begin
-      data_in_int <= data_in;
-      sel_in_int  <= sel_in;
+      data_in_int       <= data_in;
+      sel_in_int        <= sel_in;
+      data_in_valid_int <= data_in_valid;
     end
   end
 
@@ -71,7 +75,7 @@ module demux_bus #(
   // Use parallelization in the demux logic.
   generate
     for (genvar i = 0; i < BUS_WIDTH; i++) begin : generate_demux
-      assign data_out_valid_int[i] = (sel_in_int == 1);
+      assign data_out_valid_int[i] = (sel_in_int == i) & data_in_valid_int[i];
       assign data_out_int[i]       = data_in_int;
     end
   endgenerate
