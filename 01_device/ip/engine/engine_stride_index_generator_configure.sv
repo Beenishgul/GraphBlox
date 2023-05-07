@@ -30,7 +30,7 @@ module engine_stride_index_generator_configure #(
     MemoryPacket                      response_in_reg              ;
     MemoryPacketMeta                  configuration_meta_int       ;
     StrideIndexGeneratorConfiguration configuration_reg            ;
-    logic [4:0]                       configuration_reg_valid      ;
+    logic [6:0]                       configuration_reg_valid      ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -108,6 +108,17 @@ module engine_stride_index_generator_configure #(
                     4 : begin
                         configuration_reg.payload.param.granularity <= response_in_reg.payload.data.field;
                         configuration_reg_valid[4]                  <= 1;
+                    end
+                    5 : begin
+                        configuration_reg.payload.param.type_cmd    <= response_in_reg.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0];
+                        configuration_reg.payload.param.type_struct <= response_in_reg.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS];
+                        configuration_reg_valid[5]                  <= 1;
+                    end
+                    6 : begin
+                        configuration_reg.payload.param.type_operand <= response_in_reg.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0];
+                        configuration_reg.payload.param.type_filter  <= response_in_reg.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS];
+                        configuration_reg.payload.param.type_ALU     <= response_in_reg.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)];
+                        configuration_reg_valid[6]                   <= 1;
                     end
                     default : begin
                         configuration_reg.payload.param <= configuration_reg.payload.param;

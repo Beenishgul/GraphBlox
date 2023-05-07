@@ -46,18 +46,21 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-typedef enum logic[4:0] {
+parameter TYPE_KERNEL_CMD_BITS = 6;
+typedef enum logic[TYPE_KERNEL_CMD_BITS-1:0] {
   CMD_INVALID,
   CMD_READ,
   CMD_WRITE,
   CMD_PREFETCH_READ,
-  CMD_PREFETCH_WRITE
+  CMD_PREFETCH_WRITE,
+  CMD_CONFIGURE
 } type_kernel_cmd;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Operand location
 // --------------------------------------------------------------------------------------
-typedef enum logic[7:0] {
+parameter TYPE_ENGINE_OPERAND_BITS = 8;
+typedef enum logic[TYPE_ENGINE_OPERAND_BITS-1:0] {
   OP_LOCATION_0,
   OP_LOCATION_1,
   OP_LOCATION_2,
@@ -71,7 +74,8 @@ typedef enum logic[7:0] {
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-typedef enum logic[6:0]{
+parameter TYPE_FILTER_OPERATION_BITS = 7;
+typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
   FILTER_NOP,
   FILTER_GT,
   FILTER_LT,
@@ -84,7 +88,8 @@ typedef enum logic[6:0]{
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-typedef enum logic[5:0] {
+parameter TYPE_ALU_OPERATION_BITS = 6;
+typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
   ALU_NOP,
   ALU_ADD,
   ALU_SUB,
@@ -96,7 +101,8 @@ typedef enum logic[5:0] {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-typedef enum logic[11:0]{
+parameter TYPE_DATA_STRUCTURE_BITS = 13;
+typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
   STRUCT_INVALID,
   STRUCT_OUT_DEGREE,
   STRUCT_IN_DEGREE,
@@ -108,6 +114,7 @@ typedef enum logic[11:0]{
   STRUCT_AUXILIARY_2_DATA,
   STRUCT_STRIDE_INDEX,
   STRUCT_KERNEL_SETUP,
+  STRUCT_ENGINE_SETUP,
   STRUCT_VERTEX_CU
 } type_data_structure;
 
