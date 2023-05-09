@@ -939,8 +939,6 @@ module kernel_testbench ();
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-($bits(type_ALU_operation)+$bits(type_filter_operation)+$bits(type_engine_operand)){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0};
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = 0;
 
-
-
         for (int i = 1; i < graph.mem512_csr_struct_count; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.csr_struct[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
