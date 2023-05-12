@@ -38,18 +38,20 @@ module engine_stride_index_generator_configure #(
     MemoryPacketMeta                  configuration_meta_int       ;
     StrideIndexGeneratorConfiguration configuration_reg            ;
     logic [6:0]                       configuration_reg_valid      ;
+    logic                             ready_in_reg                 ;
+    logic                             done_in_reg                  ;
 
 // --------------------------------------------------------------------------------------
-//   Engine FIFO signals
+// Response FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din             ;
-    MemoryPacket           fifo_request_din_reg         ;
-    MemoryPacketPayload    fifo_request_dout            ;
-    MemoryPacket           fifo_request_comb            ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_request_signals_out_int ;
-    logic                  fifo_request_setup_signal_int;
+    MemoryPacketPayload    fifo_response_din             ;
+    MemoryPacket           fifo_response_dout_int        ;
+    MemoryPacketPayload    fifo_response_dout            ;
+    FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_response_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_response_signals_out_int ;
+    logic                  fifo_response_setup_signal_int;
+
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -65,8 +67,12 @@ module engine_stride_index_generator_configure #(
     always_ff @(posedge ap_clk) begin
         if(areset_stride_index_generator) begin
             response_in_reg <= 0;
+            ready_in_reg    <= 0;
+            done_in_reg     <= 0;
         end else begin
             response_in_reg <= response_in;
+            ready_in_reg    <= ready_in;
+            done_in_reg     <= done_in;
         end
     end
 
@@ -102,41 +108,45 @@ module engine_stride_index_generator_configure #(
             configuration_reg       <= 0;
             configuration_reg_valid <= 0;
         end else begin
-            configuration_reg.valid        <= &configuration_reg_valid;
-            configuration_reg.payload.meta <= configuration_meta_int;
+            configuration_reg.valid                       <= &configuration_reg_valid;
+            configuration_reg.payload.meta.id_vertex      <= configuration_meta_int.id_vertex ;
+            configuration_reg.payload.meta.id_bundle      <= configuration_meta_int.id_bundle ;
+            configuration_reg.payload.meta.id_engine      <= configuration_meta_int.id_engine ;
+            configuration_reg.payload.meta.address_base   <= configuration_meta_int.address_base ;
+            configuration_reg.payload.meta.address_offset <= configuration_meta_int.address_offset ;
 
-            if(response_in_reg.valid & (response_in_reg.payload.meta.type_struct == STRUCT_KERNEL_SETUP)) begin
-                case (response_in_reg.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
+            if(fifo_response_dout_int.valid & (fifo_response_dout_int.payload.meta.type_struct == STRUCT_KERNEL_SETUP)) begin
+                case (fifo_response_dout_int.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
                     0 : begin
-                        configuration_reg.payload.param.increment   <= response_in_reg.payload.data.field[0];
-                        configuration_reg.payload.param.decrement   <= response_in_reg.payload.data.field[1];
-                        configuration_reg_valid[0]                  <= 1;
+                        configuration_reg.payload.param.increment <= fifo_response_dout_int.payload.data.field[0];
+                        configuration_reg.payload.param.decrement <= fifo_response_dout_int.payload.data.field[1];
+                        configuration_reg_valid[0]                <= 1;
                     end
                     1 : begin
-                        configuration_reg.payload.param.index_start <= response_in_reg.payload.data.field;
+                        configuration_reg.payload.param.index_start <= fifo_response_dout_int.payload.data.field;
                         configuration_reg_valid[1]                  <= 1;
                     end
                     2 : begin
-                        configuration_reg.payload.param.index_end   <= response_in_reg.payload.data.field;
-                        configuration_reg_valid[2]                  <= 1;
+                        configuration_reg.payload.param.index_end <= fifo_response_dout_int.payload.data.field;
+                        configuration_reg_valid[2]                <= 1;
                     end
                     3 : begin
-                        configuration_reg.payload.param.stride      <= response_in_reg.payload.data.field;
-                        configuration_reg_valid[3]                  <= 1;
+                        configuration_reg.payload.param.stride <= fifo_response_dout_int.payload.data.field;
+                        configuration_reg_valid[3]             <= 1;
                     end
                     4 : begin
-                        configuration_reg.payload.param.granularity <= response_in_reg.payload.data.field;
+                        configuration_reg.payload.param.granularity <= fifo_response_dout_int.payload.data.field;
                         configuration_reg_valid[4]                  <= 1;
                     end
                     5 : begin
-                        configuration_reg.payload.meta.type_cmd     <= response_in_reg.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0];
-                        configuration_reg.payload.meta.type_struct  <= response_in_reg.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS];
-                        configuration_reg_valid[5]                  <= 1;
+                        configuration_reg.payload.meta.type_cmd    <= fifo_response_dout_int.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0];
+                        configuration_reg.payload.meta.type_struct <= fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS];
+                        configuration_reg_valid[5]                 <= 1;
                     end
                     6 : begin
-                        configuration_reg.payload.meta.type_operand <= response_in_reg.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0];
-                        configuration_reg.payload.meta.type_filter  <= response_in_reg.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS];
-                        configuration_reg.payload.meta.type_ALU     <= response_in_reg.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)];
+                        configuration_reg.payload.meta.type_operand <= fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0];
+                        configuration_reg.payload.meta.type_filter  <= fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS];
+                        configuration_reg.payload.meta.type_ALU     <= fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)];
                         configuration_reg_valid[6]                  <= 1;
                     end
                     default : begin
@@ -163,7 +173,7 @@ module engine_stride_index_generator_configure #(
     assign fifo_response_din.meta             = response_in_reg.payload.meta;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en        = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+    assign fifo_response_signals_in_int.rd_en        = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~(&configuration_reg_valid);
     assign fifo_response_dout_int.valid              = fifo_response_signals_out_int.valid;
     assign fifo_response_dout_int.payload.meta       = fifo_response_dout.meta;
     assign fifo_response_dout_int.payload.data.field = fifo_response_dout.iob.rdata;
