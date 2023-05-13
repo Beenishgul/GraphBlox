@@ -38,8 +38,6 @@ module engine_stride_index_generator_configure #(
     MemoryPacketMeta                  configuration_meta_int ;
     StrideIndexGeneratorConfiguration configuration_reg      ;
     logic [6:0]                       configuration_reg_valid;
-    logic                             ready_in_reg           ;
-    logic                             done_in_reg            ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -55,13 +53,13 @@ module engine_stride_index_generator_configure #(
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_configuration_din             ;
-    MemoryPacket           fifo_configuration_dout_int        ;
-    MemoryPacketPayload    fifo_configuration_dout            ;
-    FIFOStateSignalsInput  fifo_configuration_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_configuration_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_configuration_signals_out_int ;
-    logic                  fifo_configuration_setup_signal_int;
+    StrideIndexGeneratorConfigurationPayload fifo_configuration_din             ;
+    StrideIndexGeneratorConfiguration        fifo_configuration_dout_int        ;
+    StrideIndexGeneratorConfigurationPayload fifo_configuration_dout            ;
+    FIFOStateSignalsInput                    fifo_configuration_signals_in_reg  ;
+    FIFOStateSignalsInput                    fifo_configuration_signals_in_int  ;
+    FIFOStateSignalsOutput                   fifo_configuration_signals_out_int ;
+    logic                                    fifo_configuration_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -129,6 +127,10 @@ module engine_stride_index_generator_configure #(
             configuration_reg       <= 0;
             configuration_reg_valid <= 0;
         end else begin
+
+            if(&configuration_reg_valid)
+                configuration_reg_valid <= 0;
+
             configuration_reg.valid                       <= &configuration_reg_valid;
             configuration_reg.payload.meta.id_vertex      <= configuration_meta_int.id_vertex ;
             configuration_reg.payload.meta.id_bundle      <= configuration_meta_int.id_bundle ;
@@ -230,20 +232,18 @@ module engine_stride_index_generator_configure #(
 
     // Push
     assign fifo_configuration_signals_in_int.wr_en = configuration_reg.valid;
-    assign fifo_configuration_din.iob              = configuration_reg.payload.iob;
-    assign fifo_configuration_din.meta             = configuration_reg.payload.meta;
+    assign fifo_configuration_din                  = configuration_reg.payload
 
-    // Pop
-    assign fifo_configuration_signals_in_int.rd_en        = ~fifo_configuration_signals_out_int.empty & fifo_configuration_signals_in_reg.rd_en & ~(&configuration_reg_valid);
-    assign fifo_configuration_dout_int.valid              = fifo_configuration_signals_out_int.valid;
-    assign fifo_configuration_dout_int.payload.meta       = fifo_configuration_dout.meta;
-    assign fifo_configuration_dout_int.payload.data.field = fifo_configuration_dout.iob.rdata;
+        // Pop
+        assign fifo_configuration_signals_in_int.rd_en = ~fifo_configuration_signals_out_int.empty & fifo_configuration_signals_in_reg.rd_en;
+    assign fifo_configuration_dout_int.valid   = fifo_configuration_signals_out_int.valid;
+    assign fifo_configuration_dout_int.payload = fifo_configuration_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                                      ),
-        .WRITE_DATA_WIDTH($bits(StrideIndexGeneratorConfiguration)),
-        .READ_DATA_WIDTH ($bits(StrideIndexGeneratorConfiguration)),
-        .PROG_THRESH     (8                                       )
+        .FIFO_WRITE_DEPTH(32                                             ),
+        .WRITE_DATA_WIDTH($bits(StrideIndexGeneratorConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(StrideIndexGeneratorConfigurationPayload)),
+        .PROG_THRESH     (8                                              )
     ) inst_fifo_MemoryPacket (
         .clk         (ap_clk                                         ),
         .srst        (areset_fifo                                    ),
