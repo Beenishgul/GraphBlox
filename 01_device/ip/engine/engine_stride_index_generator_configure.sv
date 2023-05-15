@@ -198,7 +198,7 @@ module engine_stride_index_generator_configure #(
     assign fifo_response_din.meta             = response_in_reg.payload.meta;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en        = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~(&configuration_reg_valid);
+    assign fifo_response_signals_in_int.rd_en        = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~(&configuration_reg_valid) & ~fifo_configuration_signals_out_int.prog_full ;
     assign fifo_response_dout_int.valid              = fifo_response_signals_out_int.valid;
     assign fifo_response_dout_int.payload.meta       = fifo_response_dout.meta;
     assign fifo_response_dout_int.payload.data.field = fifo_response_dout.iob.rdata;
