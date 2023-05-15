@@ -127,10 +127,6 @@ module engine_stride_index_generator_configure #(
             configuration_reg       <= 0;
             configuration_reg_valid <= 0;
         end else begin
-
-            if(&configuration_reg_valid)
-                configuration_reg_valid <= 0;
-
             configuration_reg.valid                       <= &configuration_reg_valid;
             configuration_reg.payload.meta.id_vertex      <= configuration_meta_int.id_vertex ;
             configuration_reg.payload.meta.id_bundle      <= configuration_meta_int.id_bundle ;
@@ -174,12 +170,18 @@ module engine_stride_index_generator_configure #(
                     end
                     default : begin
                         configuration_reg.payload.param <= configuration_reg.payload.param;
-                        configuration_reg_valid         <= configuration_reg_valid;
+                        if(&configuration_reg_valid)
+                            configuration_reg_valid <= 0;
+                        else
+                            configuration_reg_valid <= configuration_reg_valid;
                     end
                 endcase
             end else begin
                 configuration_reg.payload.param <= configuration_reg.payload.param;
-                configuration_reg_valid         <= configuration_reg_valid;
+                if(&configuration_reg_valid)
+                    configuration_reg_valid <= 0;
+                else
+                    configuration_reg_valid <= configuration_reg_valid;
             end
         end
     end
