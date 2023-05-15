@@ -83,7 +83,6 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in        ;
     MemoryPacket                      engine_stride_index_generator_request_out             ;
     FIFOStateSignalsOutput            engine_stride_index_generator_fifo_request_signals_out;
     FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_in ;
@@ -92,11 +91,20 @@ module vertex_cu #(
     logic                             engine_stride_index_generator_pause_in                ;
     logic                             engine_stride_index_generator_ready_out               ;
     logic                             engine_stride_index_generator_done_out                ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in        ;
+    logic                             engine_stride_index_generator_fifo_setup_signal       ;
 
-    logic engine_stride_index_generator_fifo_setup_signal;
-
-    MemoryPacket                      engine_stride_index_generator_configure_response_in      ;
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out;
+// Serial Read Engine Configure
+// --------------------------------------------------------------------------------------
+    MemoryPacket                      engine_stride_index_generator_configure_response_in                   ;
+    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out             ;
+    FIFOStateSignalsOutput            engine_stride_index_generator_configure_fifo_response_signals_out     ;
+    FIFOStateSignalsInput             engine_stride_index_generator_configure_fifo_response_signals_in      ;
+    FIFOStateSignalsInput             engine_stride_index_generator_configure_response_signals_reg          ;
+    FIFOStateSignalsOutput            engine_stride_index_generator_configure_fifo_configuration_signals_out;
+    FIFOStateSignalsInput             engine_stride_index_generator_configure_fifo_configuration_signals_in ;
+    FIFOStateSignalsInput             engine_stride_index_generator_configure_configuration_signals_reg     ;
+    logic                             engine_stride_index_generator_configure_fifo_setup_signal             ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -154,7 +162,7 @@ module vertex_cu #(
             request_out.valid         <= 0;
         end
         else begin
-            fifo_setup_signal         <= engine_stride_index_generator_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int;
+            fifo_setup_signal         <= engine_stride_index_generator_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_configure_fifo_setup_signal;
             fifo_response_signals_out <= fifo_response_signals_out_int;
             fifo_request_signals_out  <= fifo_request_signals_out_int;
             request_out.valid         <= request_out_reg.valid ;
@@ -287,6 +295,22 @@ module vertex_cu #(
         .configuration_out(engine_stride_index_generator_configure_configuration_out)
     );
 
+    engine_stride_index_generator_configure #(
+        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
+        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
+        .ENGINE_ID_ENGINE(1               )
+    ) inst_engine_stride_index_generator_configure (
+        .ap_clk                        (ap_clk                                                                ),
+        .areset                        (areset_stride_index_generator                                         ),
+        .response_in                   (engine_stride_index_generator_configure_response_in                   ),
+        .fifo_response_signals_in      (engine_stride_index_generator_configure_fifo_response_signals_in      ),
+        .fifo_response_signals_out     (engine_stride_index_generator_configure_fifo_response_signals_out     ),
+        .configuration_out             (engine_stride_index_generator_configure_configuration_out             ),
+        .fifo_configuration_signals_in (engine_stride_index_generator_configure_fifo_configuration_signals_in ),
+        .fifo_configuration_signals_out(engine_stride_index_generator_configure_fifo_configuration_signals_out),
+        .fifo_setup_signal             (engine_stride_index_generator_configure_fifo_setup_signal             )
+    );
+
 // --------------------------------------------------------------------------------------
 // Stride engine generator instantiation
 // --------------------------------------------------------------------------------------
@@ -390,22 +414,22 @@ module vertex_cu #(
 // instantiate vertex bundles
 // --------------------------------------------------------------------------------------
 
-    vertex_cu_bundles #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE),
-    ) inst_vertex_cu_bundles (
-        .ap_clk                   (ap_clk                   ),
-        .areset                   (areset                   ),
-        .descriptor_in            (descriptor_in            ),
-        .request_out              (request_out              ),
-        .fifo_request_signals_in  (fifo_request_signals_in  ),
-        .fifo_request_signals_out (fifo_request_signals_out ),
-        .response_in              (response_in              ),
-        .fifo_response_signals_in (fifo_response_signals_in ),
-        .fifo_response_signals_out(fifo_response_signals_out),
-        .fifo_setup_signal        (fifo_setup_signal        )
-    );
+    // vertex_cu_bundles #(
+    //     .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
+    //     .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
+    //     .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE)
+    // ) inst_vertex_cu_bundles (
+    //     .ap_clk                   (ap_clk                   ),
+    //     .areset                   (areset                   ),
+    //     .descriptor_in            (descriptor_in            ),
+    //     .request_out              (request_out              ),
+    //     .fifo_request_signals_in  (fifo_request_signals_in  ),
+    //     .fifo_request_signals_out (fifo_request_signals_out ),
+    //     .response_in              (response_in              ),
+    //     .fifo_response_signals_in (fifo_response_signals_in ),
+    //     .fifo_response_signals_out(fifo_response_signals_out),
+    //     .fifo_setup_signal        (fifo_setup_signal        )
+    // );
 
 
 endmodule : vertex_cu
