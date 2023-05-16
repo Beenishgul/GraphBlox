@@ -174,244 +174,38 @@ module vertex_cu #(
     end
 
 // --------------------------------------------------------------------------------------
-// SETUP State Machine
+// Instantiate vertex scheduling
 // --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if(areset_vertex_cu)
-            current_state <= VERTEX_CU_RESET;
-        else begin
-            current_state <= next_state;
-        end
-    end // always_ff @(posedge ap_clk)
 
-    always_comb begin
-        next_state = current_state;
-        case (current_state)
-            VERTEX_CU_RESET : begin
-                next_state = VERTEX_CU_IDLE;
-            end
-            VERTEX_CU_IDLE : begin
-                if(engine_stride_index_generator_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
-                    next_state = VERTEX_CU_REQ_START;
-                else
-                    next_state = VERTEX_CU_IDLE;
-            end
-            VERTEX_CU_REQ_START : begin
-                if(engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out) begin
-                    next_state = VERTEX_CU_REQ_START;
-                end else begin
-                    next_state = VERTEX_CU_REQ_BUSY;
-                end
-            end
-            VERTEX_CU_REQ_BUSY : begin
-                if (done_int_reg)
-                    next_state = VERTEX_CU_REQ_DONE;
-                else if (fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full)
-                    next_state = VERTEX_CU_REQ_PAUSE;
-                else
-                    next_state = VERTEX_CU_REQ_BUSY;
-            end
-            VERTEX_CU_REQ_PAUSE : begin
-                if (~(fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full))
-                    next_state = VERTEX_CU_REQ_BUSY;
-                else
-                    next_state = VERTEX_CU_REQ_PAUSE;
-            end
-            VERTEX_CU_REQ_DONE : begin
-                if (descriptor_reg.valid)
-                    next_state = VERTEX_CU_REQ_DONE;
-                else
-                    next_state = VERTEX_CU_IDLE;
-            end
-        endcase
-    end // always_comb
+    logic                  areset_stride_index                          ;
+    KernelDescriptor       engine_stride_index_descriptor_in            ;
+    MemoryPacket           engine_stride_index_request_out              ;
+    FIFOStateSignalsInput  engine_stride_index_fifo_request_signals_in  ;
+    FIFOStateSignalsOutput engine_stride_index_fifo_request_signals_out ;
+    MemoryPacket           engine_stride_index_response_in              ;
+    FIFOStateSignalsInput  engine_stride_index_fifo_response_signals_in ;
+    FIFOStateSignalsOutput engine_stride_index_fifo_response_signals_out;
+    logic                  engine_stride_index_fifo_setup_signal        ;
 
-    always_ff @(posedge ap_clk) begin
-        case (current_state)
-            VERTEX_CU_RESET : begin
-                done_int_reg                                                 <= 1'b1;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
-            end
-            VERTEX_CU_IDLE : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
-            end
-            VERTEX_CU_REQ_START : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b1;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b1;
-            end
-            VERTEX_CU_REQ_BUSY : begin
-                done_int_reg                                                 <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b1;
-            end
-            VERTEX_CU_REQ_PAUSE : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b1;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
-            end
-            VERTEX_CU_REQ_DONE : begin
-                done_int_reg                                                 <= 1'b1;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
-            end
-        endcase
-    end // always_ff @(posedge ap_clk)
-
-
-// --------------------------------------------------------------------------------------
-// Drive Response Packet Setup Engine Configuration
-// 0 - increment/decrement
-// 1 - index_start
-// 2 - index_end
-// 3 - stride
-// 4 - granularity - $clog2(BIT_WIDTH) used to shift
-// --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configure_response_in = response_out_int;
-
-    engine_stride_index_generator_configure #(
+    engine_stride_index #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
         .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
         .ENGINE_ID_ENGINE(1               )
-    ) inst_engine_stride_index_generator_configure (
-        .ap_clk           (ap_clk                                                   ),
-        .areset           (areset_stride_index_generator                            ),
-        .response_in      (engine_stride_index_generator_configure_response_in      ),
-        .configuration_out(engine_stride_index_generator_configure_configuration_out)
-    );
-
-    engine_stride_index_generator_configure #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
-    ) inst_engine_stride_index_generator_configure (
-        .ap_clk                        (ap_clk                                                                ),
-        .areset                        (areset_stride_index_generator                                         ),
-        .response_in                   (engine_stride_index_generator_configure_response_in                   ),
-        .fifo_response_signals_in      (engine_stride_index_generator_configure_fifo_response_signals_in      ),
-        .fifo_response_signals_out     (engine_stride_index_generator_configure_fifo_response_signals_out     ),
-        .configuration_out             (engine_stride_index_generator_configure_configuration_out             ),
-        .fifo_configuration_signals_in (engine_stride_index_generator_configure_fifo_configuration_signals_in ),
-        .fifo_configuration_signals_out(engine_stride_index_generator_configure_fifo_configuration_signals_out),
-        .fifo_setup_signal             (engine_stride_index_generator_configure_fifo_setup_signal             )
+    ) inst_engine_stride_index (
+        .ap_clk                   (ap_clk                                       ),
+        .areset                   (areset_stride_index                          ),
+        .descriptor_in            (engine_stride_index_descriptor_in            ),
+        .request_out              (engine_stride_index_request_out              ),
+        .fifo_request_signals_in  (engine_stride_index_fifo_request_signals_in  ),
+        .fifo_request_signals_out (engine_stride_index_fifo_request_signals_out ),
+        .response_in              (engine_stride_index_response_in              ),
+        .fifo_response_signals_in (engine_stride_index_fifo_response_signals_in ),
+        .fifo_response_signals_out(engine_stride_index_fifo_response_signals_out),
+        .fifo_setup_signal        (engine_stride_index_fifo_setup_signal        )
     );
 
 // --------------------------------------------------------------------------------------
-// Stride engine generator instantiation
-// --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configuration_in.payload = engine_stride_index_generator_configure_configuration_out.payload;
-    assign engine_stride_index_generator_fifo_request_signals_in  = engine_stride_index_generator_fifo_request_signals_reg;
-
-    engine_stride_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_stride_index_generator (
-        .ap_clk                  (ap_clk                                                ),
-        .areset                  (areset_stride_index_generator                         ),
-        .configuration_in        (engine_stride_index_generator_configuration_in        ),
-        .request_out             (engine_stride_index_generator_request_out             ),
-        .fifo_request_signals_in (engine_stride_index_generator_fifo_request_signals_in ),
-        .fifo_request_signals_out(engine_stride_index_generator_fifo_request_signals_out),
-        .fifo_setup_signal       (engine_stride_index_generator_fifo_setup_signal       ),
-        .start_in                (engine_stride_index_generator_start_in                ),
-        .pause_in                (engine_stride_index_generator_pause_in                ),
-        .ready_out               (engine_stride_index_generator_ready_out               ),
-        .done_out                (engine_stride_index_generator_done_out                )
-    );
-
-// --------------------------------------------------------------------------------------
-// FIFO cache requests out MemoryPacket
-// --------------------------------------------------------------------------------------
-    // FIFO is resetting
-    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
-
-    // Push
-    // assign fifo_request_signals_in_int.wr_en = engine_stride_index_generator_request_out.valid;
-    // assign fifo_request_din                  = engine_stride_index_generator_request_out.payload;
-
-    assign fifo_request_signals_in_int.wr_en = 0;
-    assign fifo_request_din                  = 0;
-
-    // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_reg.payload           = fifo_request_dout;
-
-    xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacketRequest (
-        .clk         (ap_clk                                   ),
-        .srst        (areset_fifo                              ),
-        .din         (fifo_request_din                         ),
-        .wr_en       (fifo_request_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_signals_in_int.rd_en        ),
-        .dout        (fifo_request_dout                        ),
-        .full        (fifo_request_signals_out_int.full        ),
-        .almost_full (fifo_request_signals_out_int.almost_full ),
-        .empty       (fifo_request_signals_out_int.empty       ),
-        .almost_empty(fifo_request_signals_out_int.almost_empty),
-        .valid       (fifo_request_signals_out_int.valid       ),
-        .prog_full   (fifo_request_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
-    );
-
-// --------------------------------------------------------------------------------------
-// FIFO cache response MemoryPacket
-// --------------------------------------------------------------------------------------
-    // FIFO is resetting
-    assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
-
-    // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-    assign fifo_response_din                  = response_in_reg.payload;
-
-    // Pop
-    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;;
-    assign response_out_int.valid             = fifo_response_signals_out_int.valid;
-    assign response_out_int.payload           = fifo_response_dout;
-
-    xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacketResponse (
-        .clk         (ap_clk                                    ),
-        .srst        (areset_fifo                               ),
-        .din         (fifo_response_din                         ),
-        .wr_en       (fifo_response_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_signals_in_int.rd_en        ),
-        .dout        (fifo_response_dout                        ),
-        .full        (fifo_response_signals_out_int.full        ),
-        .almost_full (fifo_response_signals_out_int.almost_full ),
-        .empty       (fifo_response_signals_out_int.empty       ),
-        .almost_empty(fifo_response_signals_out_int.almost_empty),
-        .valid       (fifo_response_signals_out_int.valid       ),
-        .prog_full   (fifo_response_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
-    );
-
-// --------------------------------------------------------------------------------------
-// instantiate vertex bundles
+// Instantiate vertex bundles
 // --------------------------------------------------------------------------------------
 
     // vertex_cu_bundles #(
