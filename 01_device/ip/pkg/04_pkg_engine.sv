@@ -31,6 +31,18 @@ package PKG_ENGINE;
 // (Compute Units) would get eight vertex IDs in chunks.
 
     typedef enum logic[8:0] {
+        ENGINE_STRIDE_INDEX_RESET,
+        ENGINE_STRIDE_INDEX_IDLE,
+        ENGINE_STRIDE_INDEX_SETUP,
+        ENGINE_STRIDE_INDEX_START,
+        ENGINE_STRIDE_INDEX_BUSY_TRANS,
+        ENGINE_STRIDE_INDEX_BUSY,
+        ENGINE_STRIDE_INDEX_PAUSE_TRANS,
+        ENGINE_STRIDE_INDEX_PAUSE,
+        ENGINE_STRIDE_INDEX_DONE
+    } engine_stride_index_state;
+
+    typedef enum logic[8:0] {
         ENGINE_STRIDE_INDEX_GEN_RESET,
         ENGINE_STRIDE_INDEX_GEN_IDLE,
         ENGINE_STRIDE_INDEX_GEN_SETUP,
