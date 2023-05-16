@@ -23,7 +23,7 @@ MODULE=$4
 
 
 pkgs="pkg"
-engine="engine"
+engines="engines"
 kernel="kernel"
 top="top"
 
@@ -41,7 +41,7 @@ portmaps="portmaps"
 
 
 mkdir -p ${ACTIVE_IP_DIR}/${pkgs}
-mkdir -p ${ACTIVE_IP_DIR}/${engine}
+mkdir -p ${ACTIVE_IP_DIR}/${engines}
 mkdir -p ${ACTIVE_IP_DIR}/${kernel}
 mkdir -p ${ACTIVE_IP_DIR}/${top}
 mkdir -p ${ACTIVE_IP_DIR}/${memory}
@@ -52,7 +52,7 @@ mkdir -p ${ACTIVE_IP_DIR}/${utils}
 
 
 cp -r ${ORIGINAL_IP_DIR}/${pkgs}/* ${ACTIVE_IP_DIR}/${pkgs}
-cp -r ${ORIGINAL_IP_DIR}/${engine}/* ${ACTIVE_IP_DIR}/${engine}
+cp -r ${ORIGINAL_IP_DIR}/${engines}/* ${ACTIVE_IP_DIR}/${engines}
 cp -r ${ORIGINAL_IP_DIR}/${kernel}/* ${ACTIVE_IP_DIR}/${kernel}
 cp -r ${ORIGINAL_IP_DIR}/${top}/* ${ACTIVE_IP_DIR}/${top}
 cp -r ${ORIGINAL_IP_DIR}/${memory}/* ${ACTIVE_IP_DIR}/${memory}
