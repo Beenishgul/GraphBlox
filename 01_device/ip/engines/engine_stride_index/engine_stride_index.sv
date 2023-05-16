@@ -29,22 +29,22 @@ module engine_stride_index #(
     parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
-    input  logic                       ap_clk                   ,
-    input  logic                       areset                   ,
-    input  KernelDescriptor            descriptor_in            ,
-    output MemoryPacket                request_out              ,
-    input  FIFOStateSignalsInput       fifo_request_signals_in  ,
-    output FIFOStateSignalsOutput      fifo_request_signals_out ,
-    input  MemoryPacket                response_in              ,
-    input  FIFOStateSignalsInput       fifo_response_signals_in ,
-    output FIFOStateSignalsOutput      fifo_response_signals_out,
-    output logic                       fifo_setup_signal
+    input  logic                  ap_clk                   ,
+    input  logic                  areset                   ,
+    input  KernelDescriptor       descriptor_in            ,
+    output MemoryPacket           request_out              ,
+    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_signals_out ,
+    input  MemoryPacket           response_in              ,
+    input  FIFOStateSignalsInput  fifo_response_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_signals_out,
+    output logic                  fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic            areset_engine_stride_index             ;
+    logic            areset_engine_stride_index   ;
     logic            areset_stride_index_generator;
     logic            areset_fifo                  ;
     KernelDescriptor descriptor_reg               ;
@@ -55,7 +55,7 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
 // --------------------------------------------------------------------------------------
-    logic           done_int_reg ;
+    logic                     done_int_reg ;
     engine_stride_index_state current_state;
     engine_stride_index_state next_state   ;
 
@@ -109,7 +109,7 @@ module engine_stride_index #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_engine_stride_index              <= areset;
+        areset_engine_stride_index    <= areset;
         areset_stride_index_generator <= areset;
         areset_fifo                   <= areset;
     end
@@ -177,7 +177,7 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_engine_stride_index)
-            current_state <= VERTEX_CU_RESET;
+            current_state <= ENGINE_STRIDE_INDEX_RESET;
         else begin
             current_state <= next_state;
         end
@@ -186,88 +186,82 @@ module engine_stride_index #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            VERTEX_CU_RESET : begin
-                next_state = VERTEX_CU_IDLE;
+            ENGINE_STRIDE_INDEX_RESET : begin
+                next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
-            VERTEX_CU_IDLE : begin
+            ENGINE_STRIDE_INDEX_IDLE : begin
                 if(engine_stride_index_generator_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
-                    next_state = VERTEX_CU_REQ_START;
+                    next_state = ENGINE_STRIDE_INDEX_START;
                 else
-                    next_state = VERTEX_CU_IDLE;
+                    next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
-            VERTEX_CU_REQ_START : begin
+            ENGINE_STRIDE_INDEX_START : begin
                 if(engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out) begin
-                    next_state = VERTEX_CU_REQ_START;
+                    next_state = ENGINE_STRIDE_INDEX_START;
                 end else begin
-                    next_state = VERTEX_CU_REQ_BUSY;
+                    next_state = ENGINE_STRIDE_INDEX_BUSY;
                 end
             end
-            VERTEX_CU_REQ_BUSY : begin
+            ENGINE_STRIDE_INDEX_BUSY : begin
                 if (done_int_reg)
-                    next_state = VERTEX_CU_REQ_DONE;
+                    next_state = ENGINE_STRIDE_INDEX_DONE;
                 else if (fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full)
-                    next_state = VERTEX_CU_REQ_PAUSE;
+                    next_state = ENGINE_STRIDE_INDEX_PAUSE;
                 else
-                    next_state = VERTEX_CU_REQ_BUSY;
+                    next_state = ENGINE_STRIDE_INDEX_BUSY;
             end
-            VERTEX_CU_REQ_PAUSE : begin
+            ENGINE_STRIDE_INDEX_PAUSE : begin
                 if (~(fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full))
-                    next_state = VERTEX_CU_REQ_BUSY;
+                    next_state = ENGINE_STRIDE_INDEX_BUSY;
                 else
-                    next_state = VERTEX_CU_REQ_PAUSE;
+                    next_state = ENGINE_STRIDE_INDEX_PAUSE;
             end
-            VERTEX_CU_REQ_DONE : begin
+            ENGINE_STRIDE_INDEX_DONE : begin
                 if (descriptor_reg.valid)
-                    next_state = VERTEX_CU_REQ_DONE;
+                    next_state = ENGINE_STRIDE_INDEX_DONE;
                 else
-                    next_state = VERTEX_CU_IDLE;
+                    next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            VERTEX_CU_RESET : begin
+            ENGINE_STRIDE_INDEX_RESET : begin
                 done_int_reg                                                 <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
-            VERTEX_CU_IDLE : begin
+            ENGINE_STRIDE_INDEX_IDLE : begin
                 done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
-            VERTEX_CU_REQ_START : begin
+            ENGINE_STRIDE_INDEX_START : begin
                 done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b1;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b1;
             end
-            VERTEX_CU_REQ_BUSY : begin
+            ENGINE_STRIDE_INDEX_BUSY : begin
                 done_int_reg                                                 <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b1;
             end
-            VERTEX_CU_REQ_PAUSE : begin
+            ENGINE_STRIDE_INDEX_PAUSE : begin
                 done_int_reg                                                 <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b1;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
-            VERTEX_CU_REQ_DONE : begin
+            ENGINE_STRIDE_INDEX_DONE : begin
                 done_int_reg                                                 <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_stride_index_generator_start_in                       <= 1'b0;
                 engine_stride_index_generator_pause_in                       <= 1'b0;
-                engine_stride_index_generator_configuration_in.valid         <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -288,17 +282,6 @@ module engine_stride_index #(
         .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
         .ENGINE_ID_ENGINE(1               )
     ) inst_engine_stride_index_generator_configure (
-        .ap_clk           (ap_clk                                                   ),
-        .areset           (areset_stride_index_generator                            ),
-        .response_in      (engine_stride_index_generator_configure_response_in      ),
-        .configuration_out(engine_stride_index_generator_configure_configuration_out)
-    );
-
-    engine_stride_index_generator_configure #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
-    ) inst_engine_stride_index_generator_configure (
         .ap_clk                        (ap_clk                                                                ),
         .areset                        (areset_stride_index_generator                                         ),
         .response_in                   (engine_stride_index_generator_configure_response_in                   ),
@@ -313,8 +296,8 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
 // Stride engine generator instantiation
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configuration_in.payload = engine_stride_index_generator_configure_configuration_out.payload;
-    assign engine_stride_index_generator_fifo_request_signals_in  = engine_stride_index_generator_fifo_request_signals_reg;
+    assign engine_stride_index_generator_configuration_in        = engine_stride_index_generator_configure_configuration_out;
+    assign engine_stride_index_generator_fifo_request_signals_in = engine_stride_index_generator_fifo_request_signals_reg;
 
     engine_stride_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_stride_index_generator (
         .ap_clk                  (ap_clk                                                ),
@@ -337,11 +320,8 @@ module engine_stride_index #(
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
     // Push
-    // assign fifo_request_signals_in_int.wr_en = engine_stride_index_generator_request_out.valid;
-    // assign fifo_request_din                  = engine_stride_index_generator_request_out.payload;
-
-    assign fifo_request_signals_in_int.wr_en = 0;
-    assign fifo_request_din                  = 0;
+    assign fifo_request_signals_in_int.wr_en = engine_stride_index_generator_request_out.valid;
+    assign fifo_request_din                  = engine_stride_index_generator_request_out.payload;
 
     // Pop
     assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
@@ -372,7 +352,7 @@ module engine_stride_index #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache response MemoryPacket
+// FIFO response MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
