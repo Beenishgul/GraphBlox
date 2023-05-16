@@ -28,6 +28,7 @@ MODULE=$6
 pkgs="pkg"
 
 engines="engines"
+engine_kernel_setup="engine_kernel_setup"
 engine_alu_operations="engine_alu_operations"
 engine_conditional="engine_conditional"
 engine_read="engine_read"
@@ -94,6 +95,7 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME}
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/ ${CFG_FILE_NAME} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_kernel_setup} ${CFG_FILE_NAME} "sv"
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_read} ${CFG_FILE_NAME} "sv"
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_write} ${CFG_FILE_NAME} "sv"
