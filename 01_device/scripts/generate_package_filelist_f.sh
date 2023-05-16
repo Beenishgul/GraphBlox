@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-04-19 18:03:37
+# @Last Modified time: 2023-05-15 22:03:56
 #!/bin/bash
 
 
@@ -28,7 +28,14 @@ IP_DIR=$4
 VIP_DIR=$5
 
 pkgs="pkg"
-engine="engine"
+
+engines="engines"
+engine_alu_operations="engine_alu_operations"
+engine_conditional="engine_conditional"
+engine_read="engine_read"
+engine_stride_index="engine_stride_index"
+engine_write="engine_write"
+
 kernel="kernel"
 top="top"
 
@@ -91,7 +98,12 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engine}/ ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/ ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_read} ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_write} ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_alu_operations} ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_conditional} ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NAME} "sv"
 

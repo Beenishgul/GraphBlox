@@ -228,4 +228,52 @@ package PKG_ENGINE;
         RandomWriteEngineConfigurationPayload payload;
     } RandomWriteEngineConfiguration;
 
+// Kernel\_Setup\_Engine
+// --------------------
+
+// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
+
+// The kernel setup acts like a serial read engine
+// sends read commands to the memory control layer.
+// Each read or write requests a chunk of data specified with the
+// "granularity" parameter -- alignment should be honored for a cache line.
+// The "stride" parameter sets the offset taken by each consecutive read;
+// strides should also honor alignment restrictions. This behavior is
+// related to reading CSR structure data, for example, reading the offsets
+// array.
+
+    typedef enum logic[8:0] {
+        ENGINE_KERNEL_SETUP_RESET,
+        ENGINE_KERNEL_SETUP_IDLE,
+        ENGINE_KERNEL_SETUP_SETUP,
+        ENGINE_KERNEL_SETUP_START,
+        ENGINE_KERNEL_SETUP_BUSY_TRANS,
+        ENGINE_KERNEL_SETUP_BUSY,
+        ENGINE_KERNEL_SETUP_PAUSE_TRANS,
+        ENGINE_KERNEL_SETUP_PAUSE,
+        ENGINE_KERNEL_SETUP_DONE
+    } engine_kernel_setup_state;
+
+    typedef struct packed{
+        logic                               increment    ;
+        logic                               decrement    ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } KernelSetupEngineConfigurationParameters;
+
+    typedef struct packed{
+        KernelSetupEngineConfigurationParameters param;
+        MemoryPacketMeta                         meta ;
+    } KernelSetupEngineConfigurationPayload;
+
+
+    typedef struct packed{
+        logic                                 valid  ;
+        KernelSetupEngineConfigurationPayload payload;
+    } KernelSetupEngineConfiguration;
+
 endpackage
