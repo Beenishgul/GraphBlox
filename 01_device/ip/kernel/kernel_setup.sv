@@ -82,16 +82,16 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    SerialReadEngineConfiguration engine_kernel_setup_configuration_in        ;
-    SerialReadEngineConfiguration configuration_comb                          ;
-    MemoryPacket                  engine_kernel_setup_request_out             ;
-    FIFOStateSignalsOutput        engine_kernel_setup_fifo_request_signals_out;
-    FIFOStateSignalsInput         engine_kernel_setup_fifo_request_signals_in ;
-    FIFOStateSignalsInput         engine_kernel_setup_fifo_request_signals_reg;
-    logic                         engine_kernel_setup_start_in                ;
-    logic                         engine_kernel_setup_pause_in                ;
-    logic                         engine_kernel_setup_ready_out               ;
-    logic                         engine_kernel_setup_done_out                ;
+    KernelSetupEngineConfiguration engine_kernel_setup_configuration_in        ;
+    KernelSetupEngineConfiguration configuration_comb                          ;
+    MemoryPacket                   engine_kernel_setup_request_out             ;
+    FIFOStateSignalsOutput         engine_kernel_setup_fifo_request_signals_out;
+    FIFOStateSignalsInput          engine_kernel_setup_fifo_request_signals_in ;
+    FIFOStateSignalsInput          engine_kernel_setup_fifo_request_signals_reg;
+    logic                          engine_kernel_setup_start_in                ;
+    logic                          engine_kernel_setup_pause_in                ;
+    logic                          engine_kernel_setup_ready_out               ;
+    logic                          engine_kernel_setup_done_out                ;
 
     logic engine_kernel_setup_fifo_setup_signal;
 
