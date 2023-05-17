@@ -6,26 +6,26 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_stride_index_generator_configure.sv
+// File   : engine_stride_index_configure.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-module engine_stride_index_generator_configure #(
+module engine_stride_index_configure #(
     parameter ENGINE_ID_VERTEX = 0,
     parameter ENGINE_ID_BUNDLE = 0,
     parameter ENGINE_ID_ENGINE = 0
 ) (
-    input  logic                             ap_clk                        ,
-    input  logic                             areset                        ,
-    input  MemoryPacket                      response_in                   ,
-    input  FIFOStateSignalsInput             fifo_response_signals_in      ,
-    output FIFOStateSignalsOutput            fifo_response_signals_out     ,
-    output StrideIndexGeneratorConfiguration configuration_out             ,
-    input  FIFOStateSignalsInput             fifo_configuration_signals_in ,
-    output FIFOStateSignalsOutput            fifo_configuration_signals_out,
-    output logic                             fifo_setup_signal
+    input  logic                    ap_clk                        ,
+    input  logic                    areset                        ,
+    input  MemoryPacket             response_in                   ,
+    input  FIFOStateSignalsInput    fifo_response_signals_in      ,
+    output FIFOStateSignalsOutput   fifo_response_signals_out     ,
+    output StrideIndexConfiguration configuration_out             ,
+    input  FIFOStateSignalsInput    fifo_configuration_signals_in ,
+    output FIFOStateSignalsOutput   fifo_configuration_signals_out,
+    output logic                    fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
@@ -34,10 +34,10 @@ module engine_stride_index_generator_configure #(
     logic areset_stride_index_generator;
     logic areset_fifo                  ;
 
-    MemoryPacket                      response_in_reg        ;
-    MemoryPacketMeta                  configuration_meta_int ;
-    StrideIndexGeneratorConfiguration configuration_reg      ;
-    logic [6:0]                       configuration_reg_valid;
+    MemoryPacket             response_in_reg        ;
+    MemoryPacketMeta         configuration_meta_int ;
+    StrideIndexConfiguration configuration_reg      ;
+    logic [6:0]              configuration_reg_valid;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -53,13 +53,13 @@ module engine_stride_index_generator_configure #(
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    StrideIndexGeneratorConfigurationPayload fifo_configuration_din             ;
-    StrideIndexGeneratorConfiguration        fifo_configuration_dout_int        ;
-    StrideIndexGeneratorConfigurationPayload fifo_configuration_dout            ;
-    FIFOStateSignalsInput                    fifo_configuration_signals_in_reg  ;
-    FIFOStateSignalsInput                    fifo_configuration_signals_in_int  ;
-    FIFOStateSignalsOutput                   fifo_configuration_signals_out_int ;
-    logic                                    fifo_configuration_setup_signal_int;
+    StrideIndexConfigurationPayload fifo_configuration_din             ;
+    StrideIndexConfiguration        fifo_configuration_dout_int        ;
+    StrideIndexConfigurationPayload fifo_configuration_dout            ;
+    FIFOStateSignalsInput           fifo_configuration_signals_in_reg  ;
+    FIFOStateSignalsInput           fifo_configuration_signals_in_int  ;
+    FIFOStateSignalsOutput          fifo_configuration_signals_out_int ;
+    logic                           fifo_configuration_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -242,10 +242,10 @@ module engine_stride_index_generator_configure #(
     assign fifo_configuration_dout_int.payload = fifo_configuration_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                                             ),
-        .WRITE_DATA_WIDTH($bits(StrideIndexGeneratorConfigurationPayload)),
-        .READ_DATA_WIDTH ($bits(StrideIndexGeneratorConfigurationPayload)),
-        .PROG_THRESH     (8                                              )
+        .FIFO_WRITE_DEPTH(32                                    ),
+        .WRITE_DATA_WIDTH($bits(StrideIndexConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(StrideIndexConfigurationPayload)),
+        .PROG_THRESH     (8                                     )
     ) inst_fifo_MemoryPacket (
         .clk         (ap_clk                                         ),
         .srst        (areset_fifo                                    ),
@@ -264,4 +264,4 @@ module engine_stride_index_generator_configure #(
         .rd_rst_busy (fifo_configuration_signals_out_int.rd_rst_busy )
     );
 
-endmodule : engine_stride_index_generator_configure
+endmodule : engine_stride_index_configure

@@ -46,6 +46,7 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     logic            areset_engine_stride_index   ;
     logic            areset_stride_index_generator;
+    logic            areset_stride_index_configure;
     logic            areset_fifo                  ;
     KernelDescriptor descriptor_reg               ;
     MemoryPacket     response_in_reg              ;
@@ -82,28 +83,28 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    MemoryPacket                      engine_stride_index_generator_request_out             ;
-    FIFOStateSignalsOutput            engine_stride_index_generator_fifo_request_signals_out;
-    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_in ;
-    FIFOStateSignalsInput             engine_stride_index_generator_fifo_request_signals_reg;
-    logic                             engine_stride_index_generator_start_in                ;
-    logic                             engine_stride_index_generator_pause_in                ;
-    logic                             engine_stride_index_generator_ready_out               ;
-    logic                             engine_stride_index_generator_done_out                ;
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configuration_in        ;
-    logic                             engine_stride_index_generator_fifo_setup_signal       ;
+    MemoryPacket             engine_stride_index_generator_request_out             ;
+    FIFOStateSignalsOutput   engine_stride_index_generator_fifo_request_signals_out;
+    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_in ;
+    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_reg;
+    logic                    engine_stride_index_generator_start_in                ;
+    logic                    engine_stride_index_generator_pause_in                ;
+    logic                    engine_stride_index_generator_ready_out               ;
+    logic                    engine_stride_index_generator_done_out                ;
+    StrideIndexConfiguration engine_stride_index_generator_configuration_in        ;
+    logic                    engine_stride_index_generator_fifo_setup_signal       ;
 
 // Serial Read Engine Configure
 // --------------------------------------------------------------------------------------
-    MemoryPacket                      engine_stride_index_generator_configure_response_in                   ;
-    StrideIndexGeneratorConfiguration engine_stride_index_generator_configure_configuration_out             ;
-    FIFOStateSignalsOutput            engine_stride_index_generator_configure_fifo_response_signals_out     ;
-    FIFOStateSignalsInput             engine_stride_index_generator_configure_fifo_response_signals_in      ;
-    FIFOStateSignalsInput             engine_stride_index_generator_configure_response_signals_reg          ;
-    FIFOStateSignalsOutput            engine_stride_index_generator_configure_fifo_configuration_signals_out;
-    FIFOStateSignalsInput             engine_stride_index_generator_configure_fifo_configuration_signals_in ;
-    FIFOStateSignalsInput             engine_stride_index_generator_configure_configuration_signals_reg     ;
-    logic                             engine_stride_index_generator_configure_fifo_setup_signal             ;
+    MemoryPacket             engine_stride_index_configure_response_in                   ;
+    StrideIndexConfiguration engine_stride_index_configure_configuration_out             ;
+    FIFOStateSignalsOutput   engine_stride_index_configure_fifo_response_signals_out     ;
+    FIFOStateSignalsInput    engine_stride_index_configure_fifo_response_signals_in      ;
+    FIFOStateSignalsInput    engine_stride_index_configure_response_signals_reg          ;
+    FIFOStateSignalsOutput   engine_stride_index_configure_fifo_configuration_signals_out;
+    FIFOStateSignalsInput    engine_stride_index_configure_fifo_configuration_signals_in ;
+    FIFOStateSignalsInput    engine_stride_index_configure_configuration_signals_reg     ;
+    logic                    engine_stride_index_configure_fifo_setup_signal             ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -111,6 +112,7 @@ module engine_stride_index #(
     always_ff @(posedge ap_clk) begin
         areset_engine_stride_index    <= areset;
         areset_stride_index_generator <= areset;
+        areset_stride_index_configure <= areset;
         areset_fifo                   <= areset;
     end
 
@@ -161,7 +163,7 @@ module engine_stride_index #(
             request_out.valid         <= 0;
         end
         else begin
-            fifo_setup_signal         <= engine_stride_index_generator_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_configure_fifo_setup_signal;
+            fifo_setup_signal         <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_fifo_setup_signal | engine_stride_index_configure_fifo_setup_signal;
             fifo_response_signals_out <= fifo_response_signals_out_int;
             fifo_request_signals_out  <= fifo_request_signals_out_int;
             request_out.valid         <= request_out_reg.valid ;
@@ -190,7 +192,7 @@ module engine_stride_index #(
                 next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
-                if(engine_stride_index_generator_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
+                if(engine_stride_index_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
                     next_state = ENGINE_STRIDE_INDEX_START;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
@@ -275,28 +277,28 @@ module engine_stride_index #(
 // 3 - stride
 // 4 - granularity - $clog2(BIT_WIDTH) used to shift
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configure_response_in = response_out_int;
+    assign engine_stride_index_configure_response_in = response_out_int;
 
-    engine_stride_index_generator_configure #(
+    engine_stride_index_configure #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
         .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
         .ENGINE_ID_ENGINE(1               )
-    ) inst_engine_stride_index_generator_configure (
-        .ap_clk                        (ap_clk                                                                ),
-        .areset                        (areset_stride_index_generator                                         ),
-        .response_in                   (engine_stride_index_generator_configure_response_in                   ),
-        .fifo_response_signals_in      (engine_stride_index_generator_configure_fifo_response_signals_in      ),
-        .fifo_response_signals_out     (engine_stride_index_generator_configure_fifo_response_signals_out     ),
-        .configuration_out             (engine_stride_index_generator_configure_configuration_out             ),
-        .fifo_configuration_signals_in (engine_stride_index_generator_configure_fifo_configuration_signals_in ),
-        .fifo_configuration_signals_out(engine_stride_index_generator_configure_fifo_configuration_signals_out),
-        .fifo_setup_signal             (engine_stride_index_generator_configure_fifo_setup_signal             )
+    ) inst_engine_stride_index_configure (
+        .ap_clk                        (ap_clk                                                      ),
+        .areset                        (areset_stride_index_configure                               ),
+        .response_in                   (engine_stride_index_configure_response_in                   ),
+        .fifo_response_signals_in      (engine_stride_index_configure_fifo_response_signals_in      ),
+        .fifo_response_signals_out     (engine_stride_index_configure_fifo_response_signals_out     ),
+        .configuration_out             (engine_stride_index_configure_configuration_out             ),
+        .fifo_configuration_signals_in (engine_stride_index_configure_fifo_configuration_signals_in ),
+        .fifo_configuration_signals_out(engine_stride_index_configure_fifo_configuration_signals_out),
+        .fifo_setup_signal             (engine_stride_index_configure_fifo_setup_signal             )
     );
 
 // --------------------------------------------------------------------------------------
 // Stride engine generator instantiation
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_generator_configuration_in        = engine_stride_index_generator_configure_configuration_out;
+    assign engine_stride_index_generator_configuration_in        = engine_stride_index_configure_configuration_out;
     assign engine_stride_index_generator_fifo_request_signals_in = engine_stride_index_generator_fifo_request_signals_reg;
 
     engine_stride_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_stride_index_generator (
@@ -362,7 +364,7 @@ module engine_stride_index #(
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;;
+    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~engine_stride_index_configure_fifo_response_signals_out.prog_full;
     assign response_out_int.valid             = fifo_response_signals_out_int.valid;
     assign response_out_int.payload           = fifo_response_dout;
 
