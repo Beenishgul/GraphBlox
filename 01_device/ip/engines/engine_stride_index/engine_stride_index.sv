@@ -38,7 +38,8 @@ module engine_stride_index #(
     input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
-    output logic                  fifo_setup_signal
+    output logic                  fifo_setup_signal        ,
+    output logic                  done_out
 );
 
 // --------------------------------------------------------------------------------------
