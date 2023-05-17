@@ -37,17 +37,17 @@ import PKG_CACHE::*;
 
 module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
-    input  logic                             ap_clk                  ,
-    input  logic                             areset                  ,
-    input  StrideIndexGeneratorConfiguration configuration_in        ,
-    output MemoryPacket                      request_out             ,
-    input  FIFOStateSignalsInput             fifo_request_signals_in ,
-    output FIFOStateSignalsOutput            fifo_request_signals_out,
-    output logic                             fifo_setup_signal       ,
-    input  logic                             start_in                ,
-    input  logic                             pause_in                ,
-    output logic                             ready_out               ,
-    output logic                             done_out
+    input  logic                    ap_clk                  ,
+    input  logic                    areset                  ,
+    input  StrideIndexConfiguration configuration_in        ,
+    output MemoryPacket             request_out             ,
+    input  FIFOStateSignalsInput    fifo_request_signals_in ,
+    output FIFOStateSignalsOutput   fifo_request_signals_out,
+    output logic                    fifo_setup_signal       ,
+    input  logic                    start_in                ,
+    input  logic                    pause_in                ,
+    output logic                    ready_out               ,
+    output logic                    done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     logic areset_counter;
     logic areset_fifo   ;
 
-    StrideIndexGeneratorConfiguration configuration_reg;
-    MemoryPacket                      request_out_reg  ;
+    StrideIndexConfiguration configuration_reg;
+    MemoryPacket             request_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals

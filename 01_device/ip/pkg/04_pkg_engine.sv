@@ -61,17 +61,17 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
-    } StrideIndexGeneratorConfigurationParameters;
+    } StrideIndexConfigurationParameters;
 
     typedef struct packed{
-        StrideIndexGeneratorConfigurationParameters param;
-        MemoryPacketMeta                            meta ;
-    } StrideIndexGeneratorConfigurationPayload;
+        StrideIndexConfigurationParameters param;
+        MemoryPacketMeta                   meta ;
+    } StrideIndexConfigurationPayload;
 
     typedef struct packed{
-        logic                                    valid  ;
-        StrideIndexGeneratorConfigurationPayload payload;
-    } StrideIndexGeneratorConfiguration;
+        logic                           valid  ;
+        StrideIndexConfigurationPayload payload;
+    } StrideIndexConfiguration;
 
 // CSR\_Index\_Generator
 // ---------------------
