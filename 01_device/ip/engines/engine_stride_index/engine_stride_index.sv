@@ -101,10 +101,8 @@ module engine_stride_index #(
     StrideIndexConfiguration engine_stride_index_configure_configuration_out             ;
     FIFOStateSignalsOutput   engine_stride_index_configure_fifo_response_signals_out     ;
     FIFOStateSignalsInput    engine_stride_index_configure_fifo_response_signals_in      ;
-    FIFOStateSignalsInput    engine_stride_index_configure_response_signals_reg          ;
     FIFOStateSignalsOutput   engine_stride_index_configure_fifo_configuration_signals_out;
     FIFOStateSignalsInput    engine_stride_index_configure_fifo_configuration_signals_in ;
-    FIFOStateSignalsInput    engine_stride_index_configure_configuration_signals_reg     ;
     logic                    engine_stride_index_configure_fifo_setup_signal             ;
 
 // --------------------------------------------------------------------------------------
@@ -122,7 +120,7 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine_stride_index) begin
-            descriptor_reg.valid <= 0;
+            descriptor_reg.valid <= 1'b0;
         end
         else begin
             descriptor_reg.valid <= descriptor_in.valid;
@@ -140,7 +138,7 @@ module engine_stride_index #(
         if (areset_engine_stride_index) begin
             fifo_response_signals_in_reg <= 0;
             fifo_request_signals_in_reg  <= 0;
-            response_in_reg.valid        <= 0;
+            response_in_reg.valid        <= 1'b0  ;
         end
         else begin
             fifo_response_signals_in_reg <= fifo_response_signals_in;
@@ -158,16 +156,18 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine_stride_index) begin
-            fifo_setup_signal         <= 1;
+            fifo_setup_signal         <= 1'b1  ;
             fifo_response_signals_out <= 0;
             fifo_request_signals_out  <= 0;
-            request_out.valid         <= 0;
+            request_out.valid         <= 1'b0;
+            done_out                  <= 1'b0;
         end
         else begin
             fifo_setup_signal         <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_fifo_setup_signal | engine_stride_index_configure_fifo_setup_signal;
             fifo_response_signals_out <= fifo_response_signals_out_int;
             fifo_request_signals_out  <= fifo_request_signals_out_int;
             request_out.valid         <= request_out_reg.valid ;
+            done_out                  <= done_int_reg;
         end
     end
 
@@ -216,7 +216,7 @@ module engine_stride_index #(
                     next_state = ENGINE_STRIDE_INDEX_PAUSE;
             end
             ENGINE_STRIDE_INDEX_DONE : begin
-                if (descriptor_reg.valid)
+                if (descriptor_reg.valid & engine_stride_index_configure_fifo_configuration_signals_out.empty)
                     next_state = ENGINE_STRIDE_INDEX_DONE;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;

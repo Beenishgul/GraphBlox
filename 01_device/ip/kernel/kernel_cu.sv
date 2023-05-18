@@ -78,26 +78,26 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
-  KernelDescriptor            kernel_setup_descriptor               ;
-  MemoryPacket                kernel_setup_response_in              ;
-  FIFOStateSignalsOutput      kernel_setup_fifo_response_signals_out;
-  FIFOStateSignalsInput       kernel_setup_fifo_response_signals_in ;
-  MemoryPacket                kernel_setup_request_out              ;
-  FIFOStateSignalsOutput      kernel_setup_fifo_request_signals_out ;
-  FIFOStateSignalsInput       kernel_setup_fifo_request_signals_in  ;
-  logic                       kernel_setup_fifo_setup_signal        ;
+  KernelDescriptor       kernel_setup_descriptor               ;
+  MemoryPacket           kernel_setup_response_in              ;
+  FIFOStateSignalsOutput kernel_setup_fifo_response_signals_out;
+  FIFOStateSignalsInput  kernel_setup_fifo_response_signals_in ;
+  MemoryPacket           kernel_setup_request_out              ;
+  FIFOStateSignalsOutput kernel_setup_fifo_request_signals_out ;
+  FIFOStateSignalsInput  kernel_setup_fifo_request_signals_in  ;
+  logic                  kernel_setup_fifo_setup_signal        ;
 
 // --------------------------------------------------------------------------------------
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
-  KernelDescriptor            vertex_cu_descriptor               ;
-  MemoryPacket                vertex_cu_response_in              ;
-  FIFOStateSignalsOutput      vertex_cu_fifo_response_signals_out;
-  FIFOStateSignalsInput       vertex_cu_fifo_response_signals_in ;
-  MemoryPacket                vertex_cu_request_out              ;
-  FIFOStateSignalsOutput      vertex_cu_fifo_request_signals_out ;
-  FIFOStateSignalsInput       vertex_cu_fifo_request_signals_in  ;
-  logic                       vertex_cu_fifo_setup_signal        ;
+  KernelDescriptor       vertex_cu_descriptor               ;
+  MemoryPacket           vertex_cu_response_in              ;
+  FIFOStateSignalsOutput vertex_cu_fifo_response_signals_out;
+  FIFOStateSignalsInput  vertex_cu_fifo_response_signals_in ;
+  MemoryPacket           vertex_cu_request_out              ;
+  FIFOStateSignalsOutput vertex_cu_fifo_request_signals_out ;
+  FIFOStateSignalsInput  vertex_cu_fifo_request_signals_in  ;
+  logic                  vertex_cu_fifo_setup_signal        ;
 
 
 // --------------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ module kernel_cu #(
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU
 // --------------------------------------------------------------------------------------
   assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_response_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
-  assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out);
+  assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out.prog_full);
 
   assign kernel_setup_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
   assign kernel_setup_fifo_response_signals_in.rd_en = 1;
