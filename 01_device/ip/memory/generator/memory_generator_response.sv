@@ -78,7 +78,7 @@ module memory_generator_response #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      response_in_reg.valid        <= 0;
+      response_in_reg.valid        <= 1'b0;
       fifo_response_signals_in_reg <= 0;
     end else begin
       response_in_reg.valid              <= response_in.valid;
@@ -112,24 +112,24 @@ module memory_generator_response #(
     for (i=0; i < DEMUX_BUS_WIDTH; i++) begin
       always_ff @(posedge ap_clk ) begin
         if(areset_control) begin
-          response_out[i].valid <= 1'b0;
-          demux_bus_data_in_valid[i] <= 1'b0;
+          response_out[i].valid       <= 1'b0;
+          demux_bus_data_in_valid[i]  <= 1'b0;
         end else begin
-          response_out[i].valid <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid
-          end
-        end
-
-        always_ff @(posedge ap_clk) begin
-          response_out[i].payload <= demux_bus_data_out[i];
+          response_out[i].valid       <= demux_bus_data_out_valid[i];
+          demux_bus_data_in_valid[i]  <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid
         end
       end
 
       always_ff @(posedge ap_clk) begin
-        demux_bus_data_in <= fifo_response_dout_int.payload;
-        demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
+        response_out[i].payload <= demux_bus_data_out[i];
       end
-    endgenerate
+    end
+
+    always_ff @(posedge ap_clk) begin
+      demux_bus_data_in <= fifo_response_dout_int.payload;
+      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
+    end
+  endgenerate
 // --------------------------------------------------------------------------------------
 // Demux instantiation
 // --------------------------------------------------------------------------------------

@@ -74,7 +74,7 @@ module engine_stride_index_configure #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_stride_index_generator) begin
-            response_in_reg.valid             <= 0;
+            response_in_reg.valid             <= 1'b0;
             fifo_response_signals_in_reg      <= 0;
             fifo_configuration_signals_in_reg <= 0;
         end else begin
@@ -139,34 +139,34 @@ module engine_stride_index_configure #(
                     0 : begin
                         configuration_reg.payload.param.increment <= fifo_response_dout_int.payload.data.field[0];
                         configuration_reg.payload.param.decrement <= fifo_response_dout_int.payload.data.field[1];
-                        configuration_reg_valid[0]                <= 1;
+                        configuration_reg_valid[0]                <= 1'b1  ;
                     end
                     1 : begin
                         configuration_reg.payload.param.index_start <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[1]                  <= 1;
+                        configuration_reg_valid[1]                  <= 1'b1  ;
                     end
                     2 : begin
                         configuration_reg.payload.param.index_end <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[2]                <= 1;
+                        configuration_reg_valid[2]                <= 1'b1  ;
                     end
                     3 : begin
                         configuration_reg.payload.param.stride <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[3]             <= 1;
+                        configuration_reg_valid[3]             <= 1'b1  ;
                     end
                     4 : begin
                         configuration_reg.payload.param.granularity <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[4]                  <= 1;
+                        configuration_reg_valid[4]                  <= 1'b1  ;
                     end
                     5 : begin
                         configuration_reg.payload.meta.type_cmd    <= fifo_response_dout_int.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0];
                         configuration_reg.payload.meta.type_struct <= fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS];
-                        configuration_reg_valid[5]                 <= 1;
+                        configuration_reg_valid[5]                 <= 1'b1  ;
                     end
                     6 : begin
                         configuration_reg.payload.meta.type_operand <= fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0];
                         configuration_reg.payload.meta.type_filter  <= fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS];
                         configuration_reg.payload.meta.type_ALU     <= fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)];
-                        configuration_reg_valid[6]                  <= 1;
+                        configuration_reg_valid[6]                  <= 1'b1  ;
                     end
                     default : begin
                         configuration_reg.payload.param <= configuration_reg.payload.param;

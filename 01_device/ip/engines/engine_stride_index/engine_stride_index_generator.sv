@@ -110,9 +110,9 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
             fifo_request_signals_in_reg <= 0;
-            start_in_reg                <= 0;
-            configuration_reg.valid     <= 0;
-            pause_in_reg                <= 0;
+            start_in_reg                <= 1'b0;
+            configuration_reg.valid     <= 1'b0;
+            pause_in_reg                <= 1'b0;
         end
         else begin
             fifo_request_signals_in_reg <= fifo_request_signals_in ;
@@ -137,11 +137,11 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
-            fifo_setup_signal        <= 1;
+            fifo_setup_signal        <= 1'b1;
             fifo_request_signals_out <= 0;
-            ready_out                <= 0;
-            done_out                 <= 0;
-            request_out.valid        <= 0;
+            ready_out                <= 1'b0;
+            done_out                 <= 1'b0;
+            request_out.valid        <= 1'b0;
         end
         else begin
             fifo_setup_signal        <= fifo_request_setup_signal_int;
