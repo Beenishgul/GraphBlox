@@ -118,9 +118,15 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
             fifo_request_signals_in_reg <= fifo_request_signals_in ;
             start_in_reg                <= start_in;
             pause_in_reg                <= pause_in;
-            configuration_reg.valid     <= configuration_in.valid;
+            if(ready_out_reg & done_out_reg) begin
+                configuration_reg.valid <= configuration_in.valid;
+            end else begin
+                configuration_reg.valid <= configuration_reg.valid;
+            end
         end
     end
+
+
 
     always_ff @(posedge ap_clk) begin
         configuration_reg.payload <= configuration_in.payload;
@@ -168,7 +174,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
             ENGINE_STRIDE_INDEX_GEN_IDLE : begin
-                if(configuration_reg.valid && start_in_reg)
+                if(configuration_reg.valid & start_in_reg)
                     next_state = ENGINE_STRIDE_INDEX_GEN_SETUP;
                 else
                     next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;

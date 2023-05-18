@@ -193,17 +193,13 @@ module engine_stride_index #(
                 next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
-                if(engine_stride_index_configure_configuration_out.valid & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
+                if(~engine_stride_index_configure_fifo_configuration_signals_out.empty & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
                     next_state = ENGINE_STRIDE_INDEX_START;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_START : begin
-                if(engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out) begin
-                    next_state = ENGINE_STRIDE_INDEX_START;
-                end else begin
-                    next_state = ENGINE_STRIDE_INDEX_BUSY;
-                end
+                next_state = ENGINE_STRIDE_INDEX_BUSY;
             end
             ENGINE_STRIDE_INDEX_BUSY : begin
                 if (done_int_reg)
@@ -231,40 +227,46 @@ module engine_stride_index #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_STRIDE_INDEX_RESET : begin
-                done_int_reg                                                 <= 1'b1;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
+                done_int_reg                                                      <= 1'b1;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_start_in                            <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
+                done_int_reg                                                      <= 1'b0;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_start_in                            <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_START : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b1;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
+                done_int_reg                                                      <= 1'b0;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b1;
+                engine_stride_index_generator_start_in                            <= 1'b1;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_BUSY : begin
-                done_int_reg                                                 <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
+                done_int_reg                                                      <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_signals_out_int.prog_full;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_start_in                            <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_PAUSE : begin
-                done_int_reg                                                 <= 1'b0;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b1;
+                done_int_reg                                                      <= 1'b0;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_start_in                            <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b1;
             end
             ENGINE_STRIDE_INDEX_DONE : begin
-                done_int_reg                                                 <= 1'b1;
-                engine_stride_index_generator_fifo_request_signals_reg.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                       <= 1'b0;
-                engine_stride_index_generator_pause_in                       <= 1'b0;
+                done_int_reg                                                      <= 1'b1;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_start_in                            <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
