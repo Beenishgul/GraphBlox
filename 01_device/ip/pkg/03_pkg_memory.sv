@@ -54,7 +54,7 @@ typedef enum logic[TYPE_KERNEL_CMD_BITS-1:0] {
   CMD_PREFETCH_READ,
   CMD_PREFETCH_WRITE,
   CMD_CONFIGURE
-} type_kernel_cmd;
+} type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Operand location
@@ -127,7 +127,7 @@ typedef struct packed{
   logic [ CU_ENGINE_WIDTH_BITS-1:0] id_engine     ; // SIZE = 3 bits
   logic [CACHE_FRONTEND_ADDR_W-1:0] address_base  ; // SIZE = 64 bits
   logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
-  type_kernel_cmd                   type_cmd      ; // SIZE = 5 bits
+  type_memory_cmd                   type_cmd      ; // SIZE = 5 bits
   type_data_structure               type_struct   ; // SIZE = 12 bits
   type_engine_operand               type_operand  ; // SIZE = 6 bits
   type_filter_operation             type_filter   ; // SIZE = 6 bits

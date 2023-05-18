@@ -158,14 +158,14 @@ module engine_stride_index_configure #(
                         configuration_reg_valid[4]                  <= 1'b1  ;
                     end
                     5 : begin
-                        configuration_reg.payload.meta.type_cmd    <= fifo_response_dout_int.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0];
-                        configuration_reg.payload.meta.type_struct <= fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS];
+                        configuration_reg.payload.meta.type_cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0]);
+                        configuration_reg.payload.meta.type_struct <= type_data_structure'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS]);
                         configuration_reg_valid[5]                 <= 1'b1  ;
                     end
                     6 : begin
-                        configuration_reg.payload.meta.type_operand <= fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0];
-                        configuration_reg.payload.meta.type_filter  <= fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS];
-                        configuration_reg.payload.meta.type_ALU     <= fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)];
+                        configuration_reg.payload.meta.type_operand <= type_engine_operand'(fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0]);
+                        configuration_reg.payload.meta.type_filter  <= type_filter_operation'(fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
+                        configuration_reg.payload.meta.type_ALU     <= type_ALU_operation'(fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
                         configuration_reg_valid[6]                  <= 1'b1  ;
                     end
                     default : begin
@@ -194,21 +194,19 @@ module engine_stride_index_configure #(
 
     // Push
     assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-    assign fifo_response_din.iob              = response_in_reg.payload.iob;
-    assign fifo_response_din.meta             = response_in_reg.payload.meta;
+    assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en        = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~(&configuration_reg_valid) & ~fifo_configuration_signals_out_int.prog_full ;
-    assign fifo_response_dout_int.valid              = fifo_response_signals_out_int.valid;
-    assign fifo_response_dout_int.payload.meta       = fifo_response_dout.meta;
-    assign fifo_response_dout_int.payload.data.field = fifo_response_dout.iob.rdata;
+    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & ~(&configuration_reg_valid) & ~fifo_configuration_signals_out_int.prog_full ;
+    assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
+    assign fifo_response_dout_int.payload     = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacket (
+    ) inst_fifo_MemoryPacket_response (
         .clk         (ap_clk                                    ),
         .srst        (areset_fifo                               ),
         .din         (fifo_response_din                         ),
@@ -234,19 +232,19 @@ module engine_stride_index_configure #(
 
     // Push
     assign fifo_configuration_signals_in_int.wr_en = configuration_reg.valid;
-    assign fifo_configuration_din                  = configuration_reg.payload
+    assign fifo_configuration_din                  = configuration_reg.payload;
 
-        // Pop
-        assign fifo_configuration_signals_in_int.rd_en = ~fifo_configuration_signals_out_int.empty & fifo_configuration_signals_in_reg.rd_en;
-    assign fifo_configuration_dout_int.valid   = fifo_configuration_signals_out_int.valid;
-    assign fifo_configuration_dout_int.payload = fifo_configuration_dout;
+    // Pop
+    assign fifo_configuration_signals_in_int.rd_en = ~fifo_configuration_signals_out_int.empty & fifo_configuration_signals_in_reg.rd_en;
+    assign fifo_configuration_dout_int.valid       = fifo_configuration_signals_out_int.valid;
+    assign fifo_configuration_dout_int.payload     = fifo_configuration_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                                    ),
         .WRITE_DATA_WIDTH($bits(StrideIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(StrideIndexConfigurationPayload)),
         .PROG_THRESH     (8                                     )
-    ) inst_fifo_MemoryPacket (
+    ) inst_fifo_MemoryPacket_configuration (
         .clk         (ap_clk                                         ),
         .srst        (areset_fifo                                    ),
         .din         (fifo_configuration_din                         ),

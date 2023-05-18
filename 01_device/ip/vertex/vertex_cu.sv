@@ -31,7 +31,6 @@ module vertex_cu #(
     // System Signals
     input  logic                       ap_clk                   ,
     input  logic                       areset                   ,
-    input  ControlChainInterfaceOutput control_state            ,
     input  KernelDescriptor            descriptor_in            ,
     output MemoryPacket                request_out              ,
     input  FIFOStateSignalsInput       fifo_request_signals_in  ,
