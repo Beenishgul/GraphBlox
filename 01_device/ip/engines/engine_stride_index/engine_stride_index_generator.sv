@@ -44,7 +44,6 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     input  FIFOStateSignalsInput    fifo_request_signals_in ,
     output FIFOStateSignalsOutput   fifo_request_signals_out,
     output logic                    fifo_setup_signal       ,
-    input  logic                    start_in                ,
     input  logic                    pause_in                ,
     output logic                    ready_out               ,
     output logic                    done_out
@@ -67,7 +66,6 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     engine_stride_index_generator_state next_state   ;
 
     logic done_int_reg ;
-    logic start_in_reg ;
     logic pause_in_reg ;
     logic ready_out_reg;
     logic done_out_reg ;
@@ -110,13 +108,11 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
             fifo_request_signals_in_reg <= 0;
-            start_in_reg                <= 1'b0;
             configuration_reg.valid     <= 1'b0;
             pause_in_reg                <= 1'b0;
         end
         else begin
             fifo_request_signals_in_reg <= fifo_request_signals_in ;
-            start_in_reg                <= start_in;
             pause_in_reg                <= pause_in;
             if(ready_out_reg & done_out_reg) begin
                 configuration_reg.valid <= configuration_in.valid;
@@ -173,7 +169,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                 next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
             ENGINE_STRIDE_INDEX_GEN_IDLE : begin
-                if(configuration_reg.valid & start_in_reg)
+                if(configuration_reg.valid)
                     next_state = ENGINE_STRIDE_INDEX_GEN_SETUP;
                 else
                     next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
@@ -205,9 +201,6 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                     next_state = ENGINE_STRIDE_INDEX_GEN_PAUSE;
             end
             ENGINE_STRIDE_INDEX_GEN_DONE : begin
-                if(configuration_reg.valid & start_in_reg)
-                    next_state = ENGINE_STRIDE_INDEX_GEN_DONE;
-                else
                     next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
         endcase

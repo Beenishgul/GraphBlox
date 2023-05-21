@@ -324,6 +324,8 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
                 counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
         endcase
