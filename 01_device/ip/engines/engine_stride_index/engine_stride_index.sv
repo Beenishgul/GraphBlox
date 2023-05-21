@@ -88,7 +88,6 @@ module engine_stride_index #(
     FIFOStateSignalsOutput   engine_stride_index_generator_fifo_request_signals_out;
     FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_in ;
     FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_reg;
-    logic                    engine_stride_index_generator_start_in                ;
     logic                    engine_stride_index_generator_pause_in                ;
     logic                    engine_stride_index_generator_ready_out               ;
     logic                    engine_stride_index_generator_done_out                ;
@@ -229,42 +228,36 @@ module engine_stride_index #(
                 done_int_reg                                                      <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                            <= 1'b0;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
                 done_int_reg                                                      <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                            <= 1'b0;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_START : begin
                 done_int_reg                                                      <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b1;
-                engine_stride_index_generator_start_in                            <= 1'b1;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_BUSY : begin
                 done_int_reg                                                      <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_signals_out_int.prog_full;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                            <= 1'b0;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_STRIDE_INDEX_PAUSE : begin
                 done_int_reg                                                      <= 1'b0;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                            <= 1'b0;
                 engine_stride_index_generator_pause_in                            <= 1'b1;
             end
             ENGINE_STRIDE_INDEX_DONE : begin
                 done_int_reg                                                      <= 1'b1;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
-                engine_stride_index_generator_start_in                            <= 1'b0;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
         endcase
@@ -312,7 +305,6 @@ module engine_stride_index #(
         .fifo_request_signals_in (engine_stride_index_generator_fifo_request_signals_in ),
         .fifo_request_signals_out(engine_stride_index_generator_fifo_request_signals_out),
         .fifo_setup_signal       (engine_stride_index_generator_fifo_setup_signal       ),
-        .start_in                (engine_stride_index_generator_start_in                ),
         .pause_in                (engine_stride_index_generator_pause_in                ),
         .ready_out               (engine_stride_index_generator_ready_out               ),
         .done_out                (engine_stride_index_generator_done_out                )
