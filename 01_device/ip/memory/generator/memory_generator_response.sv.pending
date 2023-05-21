@@ -95,14 +95,15 @@ module memory_generator_response #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      fifo_setup_signal         <= 1'b1;
-      fifo_response_signals_out <= 0;
+      fifo_setup_signal <= 1'b1;
     end else begin
-      fifo_setup_signal         <= fifo_response_setup_signal_int;
-      fifo_response_signals_out <= fifo_response_signals_out_int;
+      fifo_setup_signal <= fifo_response_setup_signal_int;
     end
   end
 
+  always_ff @(posedge ap_clk) begin
+    fifo_response_signals_out <= fifo_response_signals_out_int;
+  end
 // --------------------------------------------------------------------------------------
 //  Demux Logic and arbitration
 // --------------------------------------------------------------------------------------
@@ -113,23 +114,23 @@ module memory_generator_response #(
       always_ff @(posedge ap_clk ) begin
         if(areset_control) begin
           response_out[i].valid       <= 1'b0;
-          demux_bus_data_in_valid[i]  <= 1'b0;
+          demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
           response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i]  <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid
+          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid
+          end
+        end
+
+        always_ff @(posedge ap_clk) begin
+          response_out[i].payload <= demux_bus_data_out[i];
         end
       end
 
       always_ff @(posedge ap_clk) begin
-        response_out[i].payload <= demux_bus_data_out[i];
+        demux_bus_data_in <= fifo_response_dout_int.payload;
+        demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
       end
-    end
-
-    always_ff @(posedge ap_clk) begin
-      demux_bus_data_in <= fifo_response_dout_int.payload;
-      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
-    end
-  endgenerate
+    endgenerate
 // --------------------------------------------------------------------------------------
 // Demux instantiation
 // --------------------------------------------------------------------------------------

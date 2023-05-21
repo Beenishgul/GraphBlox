@@ -81,12 +81,14 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      fifo_setup_signal         <= 1'b1;
-      fifo_response_signals_out <= 0;
+      fifo_setup_signal <= 1'b1;
     end else begin
-      fifo_setup_signal         <= fifo_response_setup_signal_int;
-      fifo_response_signals_out <= fifo_response_signals_out_int;
+      fifo_setup_signal <= fifo_response_setup_signal_int;
     end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    fifo_response_signals_out <= fifo_response_signals_out_int;
   end
 
 // --------------------------------------------------------------------------------------

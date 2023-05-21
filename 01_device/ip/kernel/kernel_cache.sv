@@ -120,21 +120,19 @@ module kernel_cache (
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      fifo_setup_signal         <= 1'b1;
-      fifo_request_signals_out  <= 0;
-      fifo_response_signals_out <= 0;
-      response_out.valid        <= 1'b0;
+      fifo_setup_signal  <= 1'b1;
+      response_out.valid <= 1'b0;
     end
     else begin
-      fifo_setup_signal         <= fifo_request_setup_signal_int | fifo_response_setup_signal_int;
-      fifo_request_signals_out  <= fifo_request_signals_out_int;
-      fifo_response_signals_out <= fifo_response_signals_out_int;
-      response_out.valid        <= response_in_int.valid;
+      fifo_setup_signal  <= fifo_request_setup_signal_int | fifo_response_setup_signal_int;
+      response_out.valid <= response_in_int.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    response_out.payload <= response_in_int.payload;
+    fifo_request_signals_out  <= fifo_request_signals_out_int;
+    fifo_response_signals_out <= fifo_response_signals_out_int;
+    response_out.payload      <= response_in_int.payload;
   end
 
 // --------------------------------------------------------------------------------------

@@ -145,21 +145,19 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_kernel_setup) begin
-            fifo_setup_signal         <= 1;
-            fifo_response_signals_out <= 0;
-            fifo_request_signals_out  <= 0;
-            request_out.valid         <= 0;
+            fifo_setup_signal <= 1;
+            request_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal         <= engine_kernel_setup_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int;
-            fifo_response_signals_out <= fifo_response_signals_out_int;
-            fifo_request_signals_out  <= fifo_request_signals_out_int;
-            request_out.valid         <= request_out_int.valid ;
+            fifo_setup_signal <= engine_kernel_setup_fifo_setup_signal | fifo_request_setup_signal_int | fifo_response_setup_signal_int;
+            request_out.valid <= request_out_int.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        request_out.payload <= request_out_int.payload;
+        fifo_response_signals_out <= fifo_response_signals_out_int;
+        fifo_request_signals_out  <= fifo_request_signals_out_int;
+        request_out.payload       <= request_out_int.payload;
     end
 
 // --------------------------------------------------------------------------------------

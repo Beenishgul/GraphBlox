@@ -102,7 +102,9 @@ module engine_stride_index_configure #(
     end
 
     always_ff @(posedge ap_clk) begin
-        configuration_out.payload <= fifo_configuration_dout_int.payload;
+        fifo_response_signals_out      <= fifo_response_signals_out_int;
+        fifo_configuration_signals_out <= fifo_configuration_signals_out_int;
+        configuration_out.payload      <= fifo_configuration_dout_int.payload;
     end
 
 
