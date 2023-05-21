@@ -133,23 +133,22 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
-            fifo_setup_signal        <= 1;
-            fifo_request_signals_out <= 0;
-            ready_out                <= 0;
-            done_out                 <= 0;
-            request_out.valid        <= 0;
+            fifo_setup_signal <= 1;
+            ready_out         <= 0;
+            done_out          <= 0;
+            request_out.valid <= 0;
         end
         else begin
-            fifo_setup_signal        <= fifo_request_setup_signal_int;
-            fifo_request_signals_out <= fifo_request_signals_out_int;
-            ready_out                <= ready_out_reg;
-            done_out                 <= done_out_reg;
-            request_out.valid        <= request_out_reg.valid;
+            fifo_setup_signal <= fifo_request_setup_signal_int;
+            ready_out         <= ready_out_reg;
+            done_out          <= done_out_reg;
+            request_out.valid <= request_out_reg.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        request_out.payload <= request_out_reg.payload;
+        fifo_request_signals_out <= fifo_request_signals_out_int;
+        request_out.payload      <= request_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------

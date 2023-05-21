@@ -156,23 +156,22 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine_stride_index) begin
-            fifo_setup_signal         <= 1'b1  ;
-            fifo_response_signals_out <= 0;
-            fifo_request_signals_out  <= 0;
-            request_out.valid         <= 1'b0;
-            done_out                  <= 1'b0;
+            fifo_setup_signal <= 1'b1  ;
+
+            request_out.valid <= 1'b0;
+            done_out          <= 1'b0;
         end
         else begin
-            fifo_setup_signal         <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_fifo_setup_signal | engine_stride_index_configure_fifo_setup_signal;
-            fifo_response_signals_out <= fifo_response_signals_out_int;
-            fifo_request_signals_out  <= fifo_request_signals_out_int;
-            request_out.valid         <= request_out_reg.valid ;
-            done_out                  <= done_int_reg;
+            fifo_setup_signal <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_fifo_setup_signal | engine_stride_index_configure_fifo_setup_signal;
+            request_out.valid <= request_out_reg.valid ;
+            done_out          <= done_int_reg;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        request_out.payload <= request_out_reg.payload;
+        fifo_response_signals_out <= fifo_response_signals_out_int;
+        fifo_request_signals_out  <= fifo_request_signals_out_int;
+        request_out.payload       <= request_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
