@@ -139,30 +139,30 @@ module engine_stride_index_configure #(
             if(fifo_response_dout_int.valid & (fifo_response_dout_int.payload.meta.type_struct == STRUCT_KERNEL_SETUP)) begin
                 case (fifo_response_dout_int.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
                     0 : begin
-                        configuration_reg.payload.param.increment <= fifo_response_dout_int.payload.data.field[0];
-                        configuration_reg.payload.param.decrement <= fifo_response_dout_int.payload.data.field[1];
-                        configuration_reg_valid[0]                <= 1'b1  ;
+                        configuration_reg.payload.param.increment   <= fifo_response_dout_int.payload.data.field[0];
+                        configuration_reg.payload.param.decrement   <= fifo_response_dout_int.payload.data.field[1];
+                        configuration_reg_valid[0]                  <= 1'b1  ;
                     end
                     1 : begin
                         configuration_reg.payload.param.index_start <= fifo_response_dout_int.payload.data.field;
                         configuration_reg_valid[1]                  <= 1'b1  ;
                     end
                     2 : begin
-                        configuration_reg.payload.param.index_end <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[2]                <= 1'b1  ;
+                        configuration_reg.payload.param.index_end   <= fifo_response_dout_int.payload.data.field;
+                        configuration_reg_valid[2]                  <= 1'b1  ;
                     end
                     3 : begin
-                        configuration_reg.payload.param.stride <= fifo_response_dout_int.payload.data.field;
-                        configuration_reg_valid[3]             <= 1'b1  ;
+                        configuration_reg.payload.param.stride      <= fifo_response_dout_int.payload.data.field;
+                        configuration_reg_valid[3]                  <= 1'b1  ;
                     end
                     4 : begin
                         configuration_reg.payload.param.granularity <= fifo_response_dout_int.payload.data.field;
                         configuration_reg_valid[4]                  <= 1'b1  ;
                     end
                     5 : begin
-                        configuration_reg.payload.meta.type_cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_KERNEL_CMD_BITS-1:0]);
-                        configuration_reg.payload.meta.type_struct <= type_data_structure'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_KERNEL_CMD_BITS)-1:TYPE_KERNEL_CMD_BITS]);
-                        configuration_reg_valid[5]                 <= 1'b1  ;
+                        configuration_reg.payload.meta.type_cmd     <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
+                        configuration_reg.payload.meta.type_struct  <= type_data_structure'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
+                        configuration_reg_valid[5]                  <= 1'b1  ;
                     end
                     6 : begin
                         configuration_reg.payload.meta.type_operand <= type_engine_operand'(fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0]);

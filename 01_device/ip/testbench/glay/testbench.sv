@@ -930,14 +930,14 @@ module kernel_testbench ();
         realcount = 0;
 
         graph.csr_struct[0] = 0;
-        // StrideIndexGeneratorConfiguration 
+        // StrideIndexGeneratorConfiguration
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 0 - increment/decrement
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - index_start
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;               // 2 - index_end
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - stride
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = $clog2(GLOBAL_DATA_WIDTH_BITS/8); // 4 - granularity - log2 value for shifting
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-($bits(type_data_structure)+$bits(type_memory_cmd)){1'b0}},CMD_CONFIGURE,STRUCT_ENGINE_SETUP};
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-($bits(type_ALU_operation)+$bits(type_filter_operation)+$bits(type_engine_operand)){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0};
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - granularity - log2 value for shifting
+        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; // 6 - granularity - log2 value for shifting
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = 0;
 
         for (int i = 1; i < graph.mem512_csr_struct_count; i++) begin

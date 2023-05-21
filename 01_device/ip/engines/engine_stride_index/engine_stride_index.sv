@@ -280,6 +280,7 @@ module engine_stride_index #(
 // 4 - granularity - $clog2(BIT_WIDTH) used to shift
 // --------------------------------------------------------------------------------------
     assign engine_stride_index_configure_response_in = response_out_int;
+    assign engine_stride_index_configure_fifo_response_signals_in.rd_en = 1'b1;
 
     engine_stride_index_configure #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),

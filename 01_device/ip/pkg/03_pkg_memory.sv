@@ -46,8 +46,8 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-parameter TYPE_KERNEL_CMD_BITS = 6;
-typedef enum logic[TYPE_KERNEL_CMD_BITS-1:0] {
+parameter TYPE_MEMORY_CMD_BITS = 6;
+typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_INVALID,
   CMD_READ,
   CMD_WRITE,
