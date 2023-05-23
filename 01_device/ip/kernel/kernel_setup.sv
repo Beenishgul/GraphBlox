@@ -178,13 +178,13 @@ module kernel_setup #(
                 next_state = KERNEL_SETUP_IDLE;
             end
             KERNEL_SETUP_IDLE : begin
-                if(descriptor_reg.valid & engine_kernel_setup_done_out & engine_kernel_setup_ready_out)
+                if(descriptor_reg.valid & (engine_kernel_setup_done_out & engine_kernel_setup_ready_out))
                     next_state = KERNEL_SETUP_REQ_START;
                 else
                     next_state = KERNEL_SETUP_IDLE;
             end
             KERNEL_SETUP_REQ_START : begin
-                if(engine_kernel_setup_done_out & engine_kernel_setup_ready_out) begin
+                if(engine_kernel_setup_done_out | engine_kernel_setup_ready_out) begin
                     next_state = KERNEL_SETUP_REQ_START;
                 end else begin
                     next_state = KERNEL_SETUP_REQ_BUSY;
