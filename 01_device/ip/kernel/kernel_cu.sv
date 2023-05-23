@@ -288,7 +288,7 @@ module kernel_cu #(
     .fifo_request_signals_in  (vertex_cu_fifo_request_signals_in  ),
     .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
     .fifo_setup_signal        (vertex_cu_fifo_setup_signal        ),
-    .doun_out                 (vertex_cu_done_out                 )
+    .done_out                 (vertex_cu_done_out                 )
   );
 
 endmodule : kernel_cu
