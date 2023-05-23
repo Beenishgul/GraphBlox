@@ -191,7 +191,7 @@ module engine_stride_index #(
                 next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
-                if(~engine_stride_index_configure_fifo_configuration_signals_out.empty & descriptor_reg.valid & engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out)
+                if(~engine_stride_index_configure_fifo_configuration_signals_out.empty & descriptor_reg.valid & (engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out))
                     next_state = ENGINE_STRIDE_INDEX_START;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
@@ -200,7 +200,10 @@ module engine_stride_index #(
                 next_state = ENGINE_STRIDE_INDEX_START_TRANS;
             end
             ENGINE_STRIDE_INDEX_START_TRANS : begin
-                next_state = ENGINE_STRIDE_INDEX_BUSY;
+                if(engine_stride_index_generator_done_out | engine_stride_index_generator_ready_out)
+                    next_state = ENGINE_STRIDE_INDEX_START_TRANS;
+                else
+                    next_state = ENGINE_STRIDE_INDEX_BUSY;
             end
             ENGINE_STRIDE_INDEX_BUSY : begin
                 if (done_int_reg)
