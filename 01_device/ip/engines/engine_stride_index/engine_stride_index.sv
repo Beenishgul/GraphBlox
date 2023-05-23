@@ -49,10 +49,10 @@ module engine_stride_index #(
     logic            areset_stride_index_generator;
     logic            areset_stride_index_configure;
     logic            areset_fifo                  ;
-    KernelDescriptor descriptor_reg               ;
+    KernelDescriptor descriptor_in_reg            ;
     MemoryPacket     response_in_reg              ;
     MemoryPacket     response_out_int             ;
-    MemoryPacket     request_out_reg              ;
+    MemoryPacket     request_out_int              ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -119,15 +119,15 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine_stride_index) begin
-            descriptor_reg.valid <= 1'b0;
+            descriptor_in_reg.valid <= 1'b0;
         end
         else begin
-            descriptor_reg.valid <= descriptor_in.valid;
+            descriptor_in_reg.valid <= descriptor_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        descriptor_reg.payload <= descriptor_in.payload;
+        descriptor_in_reg.payload <= descriptor_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ module engine_stride_index #(
         end
         else begin
             fifo_setup_signal <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_stride_index_generator_fifo_setup_signal | engine_stride_index_configure_fifo_setup_signal;
-            request_out.valid <= request_out_reg.valid ;
+            request_out.valid <= request_out_int.valid ;
             done_out          <= done_int_reg;
         end
     end
@@ -170,7 +170,7 @@ module engine_stride_index #(
     always_ff @(posedge ap_clk) begin
         fifo_response_signals_out <= fifo_response_signals_out_int;
         fifo_request_signals_out  <= fifo_request_signals_out_int;
-        request_out.payload       <= request_out_reg.payload;
+        request_out.payload       <= request_out_int.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ module engine_stride_index #(
                 next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_IDLE : begin
-                if(~engine_stride_index_configure_fifo_configuration_signals_out.empty & descriptor_reg.valid & (engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out))
+                if(~engine_stride_index_configure_fifo_configuration_signals_out.empty & descriptor_in_reg.valid & (engine_stride_index_generator_done_out & engine_stride_index_generator_ready_out))
                     next_state = ENGINE_STRIDE_INDEX_START;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
@@ -220,7 +220,7 @@ module engine_stride_index #(
                     next_state = ENGINE_STRIDE_INDEX_PAUSE;
             end
             ENGINE_STRIDE_INDEX_DONE : begin
-                if (descriptor_reg.valid & engine_stride_index_configure_fifo_configuration_signals_out.empty)
+                if (descriptor_in_reg.valid & engine_stride_index_configure_fifo_configuration_signals_out.empty)
                     next_state = ENGINE_STRIDE_INDEX_DONE;
                 else
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
@@ -334,8 +334,8 @@ module engine_stride_index #(
 
     // Pop
     assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_reg.payload           = fifo_request_dout;
+    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
+    assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),

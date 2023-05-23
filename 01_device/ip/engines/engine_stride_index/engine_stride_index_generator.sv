@@ -57,7 +57,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
     logic areset_fifo   ;
 
     StrideIndexConfiguration configuration_reg;
-    MemoryPacket             request_out_reg  ;
+    MemoryPacket             request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -142,13 +142,13 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
             fifo_setup_signal <= fifo_request_setup_signal_int;
             ready_out         <= ready_out_reg;
             done_out          <= done_out_reg;
-            request_out.valid <= request_out_reg.valid;
+            request_out.valid <= request_out_int.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         fifo_request_signals_out <= fifo_request_signals_out_int;
-        request_out.payload      <= request_out_reg.payload;
+        request_out.payload      <= request_out_int.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
                     next_state = ENGINE_STRIDE_INDEX_GEN_PAUSE;
             end
             ENGINE_STRIDE_INDEX_GEN_DONE : begin
-                    next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
+                next_state = ENGINE_STRIDE_INDEX_GEN_IDLE;
             end
         endcase
     end // always_comb
@@ -372,8 +372,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 
     // Pop
     assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_reg.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_reg.payload           = fifo_request_dout;
+    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
+    assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(32                        ),

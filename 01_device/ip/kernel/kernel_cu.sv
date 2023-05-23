@@ -33,8 +33,8 @@ module kernel_cu #(
   input  CacheResponse          response_in              ,
   output FIFOStateSignalsOutput fifo_response_signals_out,
   input  FIFOStateSignalsInput  fifo_response_signals_in ,
-  output logic                  done_signal              ,
-  output logic                  fifo_setup_signal
+  output logic                  fifo_setup_signal        ,
+  output logic                  done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -46,10 +46,13 @@ module kernel_cu #(
   logic areset_setup    ;
   logic areset_cu       ;
 
-  logic [    NUM_GRAPH_CLUSTERS-1:0] done_signal_reg             ;
-  logic [GLOBAL_DATA_WIDTH_BITS-1:0] counter                     ;
   logic [     NUM_SETUP_MODULES-1:0] cu_setup_state              ;
   KernelDescriptor                   descriptor_in_reg           ;
+
+ // --------------------------------------------------------------------------------------
+// Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU <-> Cache
+// --------------------------------------------------------------------------------------
+
   CacheResponse                      response_in_reg             ;
   CacheRequest                       request_out_reg             ;
   FIFOStateSignalsInput              fifo_response_signals_in_reg;
@@ -98,6 +101,7 @@ module kernel_cu #(
   FIFOStateSignalsOutput vertex_cu_fifo_request_signals_out ;
   FIFOStateSignalsInput  vertex_cu_fifo_request_signals_in  ;
   logic                  vertex_cu_fifo_setup_signal        ;
+  logic                  vertex_cu_done_out                 ;
 
 
 // --------------------------------------------------------------------------------------
@@ -108,33 +112,6 @@ module kernel_cu #(
     areset_setup     <= areset;
     areset_generator <= areset;
     areset_cu        <= areset;
-  end
-
-// --------------------------------------------------------------------------------------
-// Done Logic (DUMMY)
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-      counter         <= 0;
-    end
-    else begin
-      if (descriptor_in_reg.valid) begin
-        if(counter >= ((descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8))-8)) begin
-          done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b1}};
-          counter         <= 0;
-        end
-        else begin
-          if(vertex_cu_response_in.valid & (vertex_cu_response_in.payload.meta.type_struct == STRUCT_KERNEL_SETUP))
-            counter <= vertex_cu_response_in.payload.meta.address_offset;
-          else
-            counter <= counter;
-        end
-      end else begin
-        done_signal_reg <= {NUM_GRAPH_CLUSTERS{1'b0}};
-        counter         <= 0;
-      end
-    end
   end
 
 // --------------------------------------------------------------------------------------
@@ -163,13 +140,13 @@ module kernel_cu #(
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
       fifo_setup_signal <= 1'b1;
-      done_signal       <= 1'b0;
       request_out.valid <= 1'b0;
+      done_out          <= 1'b0;
     end
     else begin
       fifo_setup_signal <= |cu_setup_state;
-      done_signal       <= &done_signal_reg;
       request_out.valid <= request_out_reg.valid ;
+      done_out          <= vertex_cu_done_out;
     end
   end
 
@@ -310,7 +287,8 @@ module kernel_cu #(
     .request_out              (vertex_cu_request_out              ),
     .fifo_request_signals_in  (vertex_cu_fifo_request_signals_in  ),
     .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
-    .fifo_setup_signal        (vertex_cu_fifo_setup_signal        )
+    .fifo_setup_signal        (vertex_cu_fifo_setup_signal        ),
+    .doun_out                 (vertex_cu_done_out                 )
   );
 
 endmodule : kernel_cu

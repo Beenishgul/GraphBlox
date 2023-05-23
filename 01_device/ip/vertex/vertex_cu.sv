@@ -38,17 +38,18 @@ module vertex_cu #(
     input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
-    output logic                  fifo_setup_signal
+    output logic                  fifo_setup_signal        ,
+    output logic                  done_out
 );
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic            areset_vertex_cu;
-    logic            areset_fifo     ;
-    KernelDescriptor descriptor_reg  ;
-    MemoryPacket     response_in_reg ;
-    MemoryPacket     request_out_reg ;
+    logic            areset_vertex_cu ;
+    logic            areset_fifo      ;
+    KernelDescriptor descriptor_in_reg;
+    MemoryPacket     response_in_reg  ;
+    MemoryPacket     request_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 // Request FIFO
@@ -87,20 +88,54 @@ module vertex_cu #(
         areset_fifo         <= areset;
     end
 
+
+// --------------------------------------------------------------------------------------
+// Done Logic (DUMMY) Variables
+// --------------------------------------------------------------------------------------
+    logic                              done_signal_reg;
+    logic [GLOBAL_DATA_WIDTH_BITS-1:0] counter        ;
+
+// --------------------------------------------------------------------------------------
+// Done Logic (DUMMY)
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_vertex_cu) begin
+            done_signal_reg <= 1'b0;
+            counter         <= 0;
+        end
+        else begin
+            if (descriptor_in_reg.valid) begin
+                if(counter >= descriptor_in_reg.payload.auxiliary_2) begin
+                    done_signal_reg <= 1'b1;
+                    counter         <= 0;
+                end
+                else begin
+                    if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.type_struct == STRUCT_ENGINE_SETUP))
+                        counter <= engine_stride_index_request_out.payload.data.field;
+                    else
+                        counter <= counter;
+                end
+            end else begin
+                done_signal_reg <= 1'b0;
+                counter         <= 0;
+            end
+        end
+    end
+
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_vertex_cu) begin
-            descriptor_reg.valid <= 1'b0;
+            descriptor_in_reg.valid <= 1'b0;
         end
         else begin
-            descriptor_reg.valid <= descriptor_in.valid;
+            descriptor_in_reg.valid <= descriptor_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        descriptor_reg.payload <= descriptor_in.payload;
+        descriptor_in_reg.payload <= descriptor_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -130,10 +165,12 @@ module vertex_cu #(
         if (areset_vertex_cu) begin
             fifo_setup_signal <= 1'b1;
             request_out.valid <= 1'b0;
+            done_out          <= 1'b0;
         end
         else begin
             fifo_setup_signal <= engine_stride_index_fifo_setup_signal;
             request_out.valid <= request_out_reg.valid ;
+            done_out          <= engine_stride_index_done_out | done_signal_reg;
         end
     end
 
@@ -146,7 +183,7 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Instantiate vertex scheduling using stride index generator
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_descriptor_in                 = descriptor_reg  ;
+    assign engine_stride_index_descriptor_in                 = descriptor_in_reg  ;
     assign engine_stride_index_fifo_request_signals_in.rd_en = 1'b1  ;
 
     // FIFOStateSignalsOutput engine_stride_index_fifo_request_signals_out ;
