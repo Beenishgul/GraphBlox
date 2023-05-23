@@ -133,7 +133,7 @@ module kernel_afu #(
   FIFOStateSignalsOutput kernel_cu_fifo_response_signals_out;
   FIFOStateSignalsInput  kernel_cu_fifo_response_signals_in ;
 
-  logic kernel_cu_done_signal      ;
+  logic kernel_cu_done_out         ;
   logic kernel_cu_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ module kernel_afu #(
       kernel_control_in.ap_start    <= ap_start;
       kernel_control_in.ap_continue <= ap_continue;
       kernel_control_in.setup       <= ~(kernel_cache_fifo_setup_signal | kernel_cu_fifo_setup_signal);
-      kernel_control_in.done        <= kernel_cu_done_signal;
+      kernel_control_in.done        <= kernel_cu_done_out;
     end
   end
 
@@ -351,8 +351,8 @@ module kernel_afu #(
     .response_in              (kernel_cu_response_in              ),
     .fifo_response_signals_out(kernel_cu_fifo_response_signals_out),
     .fifo_response_signals_in (kernel_cu_fifo_response_signals_in ),
-    .done_signal              (kernel_cu_done_signal              ),
-    .fifo_setup_signal        (kernel_cu_fifo_setup_signal        )
+    .fifo_setup_signal        (kernel_cu_fifo_setup_signal        ),
+    .done_out                 (kernel_cu_done_out                 )
   );
 
 // --------------------------------------------------------------------------------------

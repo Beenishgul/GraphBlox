@@ -47,10 +47,10 @@ module kernel_setup #(
     logic areset_serial_read ;
     logic areset_fifo        ;
 
-    KernelDescriptor descriptor_reg  ;
-    MemoryPacket     response_in_reg ;
-    MemoryPacket     response_out_int;
-    MemoryPacket     request_out_int ;
+    KernelDescriptor descriptor_in_reg;
+    MemoryPacket     response_in_reg  ;
+    MemoryPacket     response_out_int ;
+    MemoryPacket     request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -109,15 +109,15 @@ module kernel_setup #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_kernel_setup) begin
-            descriptor_reg.valid <= 0;
+            descriptor_in_reg.valid <= 0;
         end
         else begin
-            descriptor_reg.valid <= descriptor_in.valid;
+            descriptor_in_reg.valid <= descriptor_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        descriptor_reg.payload <= descriptor_in.payload;
+        descriptor_in_reg.payload <= descriptor_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ module kernel_setup #(
                 next_state = KERNEL_SETUP_IDLE;
             end
             KERNEL_SETUP_IDLE : begin
-                if(descriptor_reg.valid & (engine_kernel_setup_done_out & engine_kernel_setup_ready_out))
+                if(descriptor_in_reg.valid & (engine_kernel_setup_done_out & engine_kernel_setup_ready_out))
                     next_state = KERNEL_SETUP_REQ_START;
                 else
                     next_state = KERNEL_SETUP_IDLE;
@@ -205,7 +205,7 @@ module kernel_setup #(
                     next_state = KERNEL_SETUP_REQ_PAUSE;
             end
             KERNEL_SETUP_REQ_DONE : begin
-                if (descriptor_reg.valid)
+                if (descriptor_in_reg.valid)
                     next_state = KERNEL_SETUP_REQ_DONE;
                 else
                     next_state = KERNEL_SETUP_IDLE;
@@ -267,17 +267,17 @@ module kernel_setup #(
     always_comb begin
         configuration_comb.payload.param.increment     = 1'b1;
         configuration_comb.payload.param.decrement     = 1'b0;
-        configuration_comb.payload.param.array_pointer = descriptor_reg.payload.graph_csr_struct;
-        configuration_comb.payload.param.array_size    = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
+        configuration_comb.payload.param.array_pointer = descriptor_in_reg.payload.graph_csr_struct;
+        configuration_comb.payload.param.array_size    = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
         configuration_comb.payload.param.start_read    = 0;
-        configuration_comb.payload.param.end_read      = descriptor_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
+        configuration_comb.payload.param.end_read      = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
         configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
         configuration_comb.payload.meta.id_vertex      = ENGINE_ID_VERTEX;
         configuration_comb.payload.meta.id_bundle      = ENGINE_ID_BUNDLE;
         configuration_comb.payload.meta.id_engine      = ENGINE_ID_ENGINE;
-        configuration_comb.payload.meta.address_base   = descriptor_reg.payload.graph_csr_struct;
+        configuration_comb.payload.meta.address_base   = descriptor_in_reg.payload.graph_csr_struct;
         configuration_comb.payload.meta.address_offset = 0;
         configuration_comb.payload.meta.type_cmd       = CMD_READ;
         configuration_comb.payload.meta.type_struct    = STRUCT_KERNEL_SETUP;
