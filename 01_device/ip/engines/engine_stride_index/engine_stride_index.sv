@@ -197,6 +197,9 @@ module engine_stride_index #(
                     next_state = ENGINE_STRIDE_INDEX_IDLE;
             end
             ENGINE_STRIDE_INDEX_START : begin
+                next_state = ENGINE_STRIDE_INDEX_START_TRANS;
+            end
+            ENGINE_STRIDE_INDEX_START_TRANS : begin
                 next_state = ENGINE_STRIDE_INDEX_BUSY;
             end
             ENGINE_STRIDE_INDEX_BUSY : begin
@@ -242,6 +245,12 @@ module engine_stride_index #(
                 engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b1;
                 engine_stride_index_generator_pause_in                            <= 1'b0;
             end
+            ENGINE_STRIDE_INDEX_START_TRANS : begin
+                done_int_reg                                                      <= 1'b0;
+                engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
+                engine_stride_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
+                engine_stride_index_generator_pause_in                            <= 1'b0;
+            end
             ENGINE_STRIDE_INDEX_BUSY : begin
                 done_int_reg                                                      <= engine_stride_index_generator_done_out & engine_stride_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
                 engine_stride_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_signals_out_int.prog_full;
@@ -272,7 +281,7 @@ module engine_stride_index #(
 // 3 - stride
 // 4 - granularity - $clog2(BIT_WIDTH) used to shift
 // --------------------------------------------------------------------------------------
-    assign engine_stride_index_configure_response_in = response_out_int;
+    assign engine_stride_index_configure_response_in                    = response_out_int;
     assign engine_stride_index_configure_fifo_response_signals_in.rd_en = 1'b1;
 
     engine_stride_index_configure #(
