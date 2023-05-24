@@ -20,7 +20,9 @@ ORIGINAL_IP_DIR=$1
 ACTIVE_IP_DIR=$2
 CTRL_MODE=$3
 MODULE=$4
-
+GRAPH_DIR=$5
+GRAPH_SUIT=$6
+GRAPH_NAME=$7
 
 pkgs="pkg"
 engines="engines"
@@ -81,6 +83,24 @@ then
   newtext="${ACTIVE_IP_DIR}/${testbench}/${MODULE}/testbench.sv"
   search="kernel"
   replace=${KERNEL_NAME}
+  if [[ $search != "" && $replace != "" ]]; then
+    sed -i "s/$search/$replace/" $newtext
+  fi
+
+  search="GRAPH_DIR"
+  replace=${GRAPH_DIR}
+  if [[ $search != "" && $replace != "" ]]; then
+    sed -i "s/$search/$replace/" $newtext
+  fi
+
+  search="GRAPH_SUIT"
+  replace=${GRAPH_SUIT}
+  if [[ $search != "" && $replace != "" ]]; then
+    sed -i "s/$search/$replace/" $newtext
+  fi
+
+  search="GRAPH_NAME"
+  replace=${GRAPH_NAME}
   if [[ $search != "" && $replace != "" ]]; then
     sed -i "s/$search/$replace/" $newtext
   fi

@@ -19,7 +19,7 @@ APP_DIR             ?= $(shell cd .. && pwd | xargs basename )
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
 ACTIVE_APP_DIR      := $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)
-BENCH_DIR           ?= 03_test_graphs
+BENCH_DIR           ?= 02_test_graphs
 #dir root/managed_folders
 
 SRC_DIR             ?= src

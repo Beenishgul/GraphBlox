@@ -16,11 +16,17 @@ INTEGRATION         ?= openmp
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
+
 GIT_VER             ?= $(shell cd .. ; git log -1 --pretty=format:"%h")
 
 APP_DIR             ?= $(shell cd .. && pwd | xargs basename )
 HOST_DIR            ?= 00_host
 DEVICE_DIR          ?= 01_device
+BENCH_DIR           ?= 02_test_graphs
+
+GRAPH_DIR  ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
+GRAPH_SUIT ?= TEST
+GRAPH_NAME ?= v51_e1021
 
 XILINX_DIR          ?= xilinx_project
 SCRIPTS_DIR         ?= scripts
@@ -51,6 +57,8 @@ KERNEL_NAME         ?= glay_kernel
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
+
+
 
 ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
@@ -174,7 +182,7 @@ all: gen-vip package-kernel build-hw
 $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE):
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(TESTBENCH_MODULE)
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR) $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(TESTBENCH_MODULE) $(GRAPH_DIR) $(GRAPH_SUIT) $(GRAPH_NAME)
 
 .PHONY: gen-ip-dir
 gen-ip-dir: $(ACTIVE_APP_DIR)/$(IP_DIR_ACTIVE)
