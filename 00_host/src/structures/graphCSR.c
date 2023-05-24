@@ -540,39 +540,39 @@ void writetoTextFilesGraphCSR (const char *fname, struct GraphCSR *graphCSR)
     FILE *fptr_edges_array_weight;
 #endif
 
-    char *fname_txt_out_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_out_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_out_degree = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_out_degree = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_out_degree = strcpy (fname_txt_out_degree, fname);
     fname_bin_out_degree = strcat (fname_txt_out_degree, ".out_degree");
 
-    char *fname_txt_in_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_in_degree = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_in_degree = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_in_degree = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_in_degree = strcpy (fname_txt_in_degree, fname);
     fname_bin_in_degree = strcat (fname_txt_in_degree, ".in_degree");
 
-    char *fname_txt_edges_idx = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_edges_idx = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_edges_idx = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_edges_idx = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_edges_idx = strcpy (fname_txt_edges_idx, fname);
     fname_bin_edges_idx = strcat (fname_txt_edges_idx, ".edges_idx");
 
-    char *fname_txt_edges_array_src = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_edges_array_src = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_edges_array_src = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_edges_array_src = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_edges_array_src = strcpy (fname_txt_edges_array_src, fname);
     fname_bin_edges_array_src = strcat (fname_txt_edges_array_src, ".edges_array_src");
 
-    char *fname_txt_edges_array_dest = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_edges_array_dest = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_edges_array_dest = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_edges_array_dest = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_edges_array_dest = strcpy (fname_txt_edges_array_dest, fname);
     fname_bin_edges_array_dest = strcat (fname_txt_edges_array_dest, ".edges_array_dest");
 
 #if WEIGHTED
-    char *fname_txt_edges_array_weight = (char *) malloc((strlen(fname) + 10) * sizeof(char));
-    char *fname_bin_edges_array_weight = (char *) malloc((strlen(fname) + 10) * sizeof(char));
+    char *fname_txt_edges_array_weight = (char *) malloc((strlen(fname) + 20) * sizeof(char));
+    char *fname_bin_edges_array_weight = (char *) malloc((strlen(fname) + 20) * sizeof(char));
 
     fname_txt_edges_array_weight = strcpy (fname_txt_edges_array_weight, fname);
     fname_bin_edges_array_weight = strcat (fname_txt_edges_array_weight, ".edges_array_weight");

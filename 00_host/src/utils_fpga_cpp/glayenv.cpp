@@ -101,7 +101,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 
     Edges_buffer_size_in_bytes  = graph->num_edges * sizeof(uint32_t);
     Vertex_buffer_size_in_bytes = graph->num_vertices * sizeof(uint32_t);
-    graph_buffer_size_in_bytes  = 32 * sizeof(uint64_t);
+    graph_buffer_size_in_bytes  = 64 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
 
     // Each Memory bank contains a Graph CSR segment
     graph_csr_struct_buffer     =  xrt::bo(glayHandle->deviceHandle, graph_buffer_size_in_bytes,  bank_grp_idx);
@@ -139,8 +139,17 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
 
     for (uint32_t i = 0; i < (graph_buffer_size_in_bytes / sizeof(uint32_t)); ++i)
     {
-        overlay[i] = i;
+        overlay[i] = 0;
     }
+
+    overlay[0] = 1; // 0 - increment/decrement
+    overlay[1] = 0; // 1 - index_start
+    overlay[2] = graph->num_vertices; // 2 - index_end
+    overlay[3] = 1; // 3 - stride
+    overlay[4] = 2; // 4 - granularity - log2 value for shifting
+    overlay[5] = 0x000A000B; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+    overlay[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
+    overlay[7] = 0;
 
     graph_csr_struct_buffer.write(overlay, graph_buffer_size_in_bytes, 0);
     vertex_out_degree_buffer.write(graph->vertices->out_degree, Vertex_buffer_size_in_bytes, 0);
