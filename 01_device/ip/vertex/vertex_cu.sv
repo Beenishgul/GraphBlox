@@ -105,15 +105,17 @@ module vertex_cu #(
         end
         else begin
             if (descriptor_in_reg.valid) begin
-                if(counter >= descriptor_in_reg.payload.auxiliary_2) begin
+                if(counter >= 100000) begin
                     done_signal_reg <= 1'b1;
                     counter         <= 0;
                 end
                 else begin
-                    if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.type_struct == STRUCT_ENGINE_SETUP))
-                        counter <= engine_stride_index_request_out.payload.data.field;
-                    else
-                        counter <= counter;
+                    if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.type_struct == STRUCT_ENGINE_SETUP)) begin
+                        counter <= counter + 1;
+                        if (counter == 0 )
+                            $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field);
+                    end else
+                    counter <= counter;
                 end
             end else begin
                 done_signal_reg <= 1'b0;
