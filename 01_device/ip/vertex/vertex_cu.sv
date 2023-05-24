@@ -112,10 +112,10 @@ module vertex_cu #(
                 else begin
                     if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.type_struct == STRUCT_ENGINE_SETUP)) begin
                         counter <= counter + 1;
-                        if (counter == 0 )
+                        if (counter == 0)
                             $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field);
                     end else
-                    counter <= counter;
+                        counter <= counter;
                 end
             end else begin
                 done_signal_reg <= 1'b0;
