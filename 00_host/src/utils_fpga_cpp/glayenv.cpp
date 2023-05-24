@@ -147,7 +147,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
     overlay[2] = graph->num_vertices; // 2 - index_end
     overlay[3] = 1; // 3 - stride
     overlay[4] = 2; // 4 - granularity - log2 value for shifting
-    overlay[5] = 0x000A000B; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+    overlay[5] = 0x000002C5; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
     overlay[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
     overlay[7] = 0;
 
