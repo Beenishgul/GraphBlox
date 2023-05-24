@@ -90,7 +90,7 @@ then
   search="GRAPH_DIR"
   replace=${GRAPH_DIR}
   if [[ $search != "" && $replace != "" ]]; then
-    sed -i "s/$search/$replace/" $newtext
+    sed -i "s@$search@$replace@" $newtext
   fi
 
   search="GRAPH_SUIT"
