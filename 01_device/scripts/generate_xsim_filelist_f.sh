@@ -166,6 +166,12 @@ echo $newtext >> ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/sim/bram_512x32_asym_512wrt_64rd.v"
 # echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.v"
+echo $newtext >> ${CFG_FILE_NAME}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/sim/system_cache_512x64.vhd"
+echo $newtext >> ${CFG_FILE_NAME}
+
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${testbench}/${MODULE}/ ${CFG_FILE_NAME} "sv"
 
 newtext=""
