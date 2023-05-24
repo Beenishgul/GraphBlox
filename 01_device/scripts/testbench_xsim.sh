@@ -29,8 +29,9 @@ ip_directory=$4
 ctrl_mode=$5
 
 # Set xvlog options
-xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.f -i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps -L xilinx_vip --sv"
-xelab_opts="-debug typical -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
+xvhdl_opts="--incr --relax --incr --relax -L uvm -L system_cache_v5_0_8 -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f -L xilinx_vip"
+xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps -L xilinx_vip --sv"
+xelab_opts="-debug typical -L system_cache_v5_0_8 -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
 xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
@@ -70,7 +71,8 @@ compile()
 {
   echo "Starting Compile [xvlog]"
   echo "MSG: Arg: $xvlog_opts"
-  xvlog $xvlog_opts 2>&1 | tee compile.log
+  xvlog $xvlog_opts 2>&1 | tee compile.xvlog.log
+  xvhdl $xvhdl_opts 2>&1 | tee compile.xvhdl.log
 }
 
 # RUN_STEP: <elaborate>
@@ -88,14 +90,14 @@ simulate()
 {
   echo "Starting Simulate [xsim]"
   echo "MSG: Arg: $xsim_opts"
-  xsim $xsim_opts -log simulate.log
+  xsim $xsim_opts  -key {Behavioral:sim_1:Functional:system_cache_512x64} -log simulate.log 
 }
 
 simulate_gui()
 {
   echo "Starting Simulate [xsim]"
   echo "MSG: Arg: $xsim_opts"
-  xsim  --gui $xsim_opts -log simulate.log
+  xsim  --gui $xsim_opts  -key {Behavioral:sim_1:Functional:system_cache_512x64} -log simulate.log
 }
 
 
