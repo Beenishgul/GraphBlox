@@ -7,7 +7,7 @@ export GIT_VER                 = $(shell cd . ; git log -1 --pretty=format:"%h")
 export APP_DIR                 = $(shell basename "$(PWD)")
 export HOST_DIR                = 00_host
 export DEVICE_DIR              = 01_device
-export BENCH_DIR               = 03_test_graphs
+export BENCH_DIR               = 02_test_graphs
 # =========================================================
 
 
@@ -139,7 +139,6 @@ debug:
 # =========================================================
 # Run Tests HOST
 # =========================================================
-
 .PHONY: run-test
 run-test:
 	-@$(MAKE) run-test $(MAKE_HOST) 

@@ -975,27 +975,27 @@ module kernel_testbench ();
 
 
     task automatic initalize_graph (ref GraphCSR graph);
-        graph.graph_name = "v51_e1021";
+        graph.graph_name = "GRAPH_NAME";
 
-        graph.file_ptr_edges_array_dest = $fopen("../../../03_test_graphs/TEST/v51_e1021/graph.bin.edges_array_dest", "r");
+        graph.file_ptr_edges_array_dest = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_dest", "r");
         if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
         else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
-        graph.file_ptr_edges_array_src = $fopen("../../../03_test_graphs/TEST/v51_e1021/graph.bin.edges_array_src", "r");
+        graph.file_ptr_edges_array_src = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_src", "r");
         if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
         else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
 
-        graph.file_ptr_edges_idx = $fopen("../../../03_test_graphs/TEST/v51_e1021/graph.bin.edges_idx", "r");
+        graph.file_ptr_edges_idx = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_idx", "r");
         if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
         else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
 
 
-        graph.file_ptr_in_degree = $fopen("../../../03_test_graphs/TEST/v51_e1021/graph.bin.in_degree", "r");
+        graph.file_ptr_in_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
         else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
 
 
-        graph.file_ptr_out_degree = $fopen("../../../03_test_graphs/TEST/v51_e1021/graph.bin.out_degree", "r");
+        graph.file_ptr_out_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.out_degree", "r");
         if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
         else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
