@@ -77,8 +77,11 @@ add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${ker
 puts "[color 4 "                        Set Defines ${ctrl_mode}"]"
 # set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
 # set_property verilog_define ${ctrl_mode} [get_filesets sim_1]
-update_compile_order -fileset sources_1  
-update_compile_order -fileset sim_1  
+
+puts "[color 4 "                        Update compile order: sources_1"]"
+update_compile_order -fileset sources_1  >> $log_file
+puts "[color 4 "                        Update compile order: sim_1"]"
+update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Create IP packaging project"]" 
 # create IP packaging project
