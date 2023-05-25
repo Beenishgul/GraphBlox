@@ -530,6 +530,7 @@ set_property -dict [list                                    \
                     CONFIG.C_NUM_OPTIMIZED_PORTS {0}        \
                     CONFIG.C_NUM_WAYS {4}                   \
                     CONFIG.C_S0_AXI_GEN_DATA_WIDTH {512}    \
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH {64}     \
                       ] [get_ips ${module_name}]
 
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]

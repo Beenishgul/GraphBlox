@@ -139,16 +139,18 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI
 // --------------------------------------------------------------------------------------
-  AXI4MasterReadInterfaceInput   kernel_system_cache_s_axi_read_in     ;
-  AXI4MasterReadInterfaceOutput  kernel_system_cache_s_axi_read_out    ;
-  AXI4MasterWriteInterfaceInput  kernel_system_cache_s_axi_write_in    ;
-  AXI4MasterWriteInterfaceOutput kernel_system_cache_s_axi_write_out   ;
-  AXI4MasterReadInterfaceInput   kernel_system_cache_m_axi_read_in     ;
-  AXI4MasterReadInterfaceOutput  kernel_system_cache_m_axi_read_out    ;
-  AXI4MasterWriteInterfaceInput  kernel_system_cache_m_axi_write_in    ;
-  AXI4MasterWriteInterfaceOutput kernel_system_cache_m_axi_write_out   ;
-  logic                          kernel_system_cache_cache_setup_signal;
-  logic                          kernel_system_cache_areset            ;
+  AXI4MasterReadInterfaceInput   kernel_system_cache_s_axi_read_out ;
+  AXI4MasterReadInterfaceOutput  kernel_system_cache_s_axi_read_in  ;
+  AXI4MasterWriteInterfaceInput  kernel_system_cache_s_axi_write_out;
+  AXI4MasterWriteInterfaceOutput kernel_system_cache_s_axi_write_in ;
+
+  AXI4MasterReadInterfaceInput   kernel_system_cache_m_axi_read_in  ;
+  AXI4MasterReadInterfaceOutput  kernel_system_cache_m_axi_read_out ;
+  AXI4MasterWriteInterfaceInput  kernel_system_cache_m_axi_write_in ;
+  AXI4MasterWriteInterfaceOutput kernel_system_cache_m_axi_write_out;
+
+  logic kernel_system_cache_setup_signal;
+  logic kernel_system_cache_areset      ;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
@@ -345,16 +347,17 @@ module kernel_afu #(
   kernel_system_cache inst_kernel_system_cache (
     .ap_clk            (ap_clk                             ),
     .areset            (kernel_system_cache_areset         ),
-    .s_axi_read_in     (kernel_system_cache_s_axi_read_in  ),
     .s_axi_read_out    (kernel_system_cache_s_axi_read_out ),
-    .s_axi_write_in    (kernel_system_cache_s_axi_write_in ),
+    .s_axi_read_in     (kernel_system_cache_s_axi_read_in  ),
     .s_axi_write_out   (kernel_system_cache_s_axi_write_out),
+    .s_axi_write_in    (kernel_system_cache_s_axi_write_in ),
     .m_axi_read_in     (kernel_system_cache_m_axi_read_in  ),
     .m_axi_read_out    (kernel_system_cache_m_axi_read_out ),
     .m_axi_write_in    (kernel_system_cache_m_axi_write_in ),
     .m_axi_write_out   (kernel_system_cache_m_axi_write_out),
     .cache_setup_signal(kernel_system_cache_setup_signal   )
   );
+
 
 // --------------------------------------------------------------------------------------
 // Cache -> System Cache
@@ -369,10 +372,10 @@ module kernel_afu #(
     .fifo_response_signals_out(kernel_cache_fifo_response_signals_out),
     .fifo_response_signals_in (kernel_cache_fifo_response_signals_in ),
     .fifo_setup_signal        (kernel_cache_fifo_setup_signal        ),
-    .m_axi_read_in            (kernel_system_cache_s_axi_read_in     ),
-    .m_axi_read_out           (kernel_system_cache_s_axi_read_out    ),
-    .m_axi_write_in           (kernel_system_cache_s_axi_write_in    ),
-    .m_axi_write_out          (kernel_system_cache_s_axi_write_out   )
+    .m_axi_read_in            (kernel_system_cache_s_axi_read_out    ),
+    .m_axi_read_out           (kernel_system_cache_s_axi_read_in     ),
+    .m_axi_write_in           (kernel_system_cache_s_axi_write_out   ),
+    .m_axi_write_out          (kernel_system_cache_s_axi_write_in    )
   );
 
 // --------------------------------------------------------------------------------------
