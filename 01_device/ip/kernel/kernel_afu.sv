@@ -357,8 +357,7 @@ module kernel_afu #(
     .m_axi_write_out   (kernel_system_cache_m_axi_write_out),
     .cache_setup_signal(kernel_system_cache_setup_signal   )
   );
-
-
+  
 // --------------------------------------------------------------------------------------
 // Cache -> System Cache
 // --------------------------------------------------------------------------------------

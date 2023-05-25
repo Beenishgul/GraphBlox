@@ -41,6 +41,7 @@ module kernel_system_cache (
   logic areset_s_axi       ;
   logic areset_system_cache;
   logic areset_control     ;
+  logic areset_pipe        ;
 
   logic cache_setup_signal_int;
 
@@ -55,11 +56,21 @@ module kernel_system_cache (
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
+  hyper_pipeline #(
+      .STAGES(5),
+      .WIDTH(1)
+    ) inst_hyper_pipeline (
+      .ap_clk (ap_clk),
+      .areset (areset),
+      .din    (areset),
+      .dout   (areset_pipe)
+    );
+
   always_ff @(posedge ap_clk) begin
-    areset_m_axi        <= areset;
-    areset_s_axi        <= areset;
+    areset_m_axi        <= areset_pipe;
+    areset_s_axi        <= areset_pipe;
+    areset_control      <= areset_pipe;
     areset_system_cache <= areset;
-    areset_control      <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -125,6 +136,8 @@ module kernel_system_cache (
     end
     else begin
       m_axi_write_out <= m_axi_write.out;
+      // m_axi_write_out.awvalid <= 0;
+      // m_axi_write_out.wvalid <= 0;
     end
   end
 
@@ -146,6 +159,7 @@ module kernel_system_cache (
     end
     else begin
       m_axi_read_out <= m_axi_read.out;
+      // m_axi_read_out.arvalid <= 0;
     end
   end
 
@@ -166,7 +180,7 @@ module kernel_system_cache (
     .ARESETN           (areset_system_cache    ),
     .Initializing      (cache_setup_signal_int ),
     
-    .S0_AXI_GEN_ARUSER (                       ),
+    .S0_AXI_GEN_ARUSER (0                      ),
     .S0_AXI_GEN_AWUSER (0                      ),
     .S0_AXI_GEN_RVALID (s_axi_read.in.rvalid   ), // Input Read channel valid
     .S0_AXI_GEN_ARREADY(s_axi_read.in.arready  ), // Input Read Address read channel ready

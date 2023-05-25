@@ -520,7 +520,7 @@ create_ip -name system_cache            \
 
 set_property -dict [list                                    \
                     CONFIG.C_CACHE_DATA_WIDTH {512}         \
-                    CONFIG.C_CACHE_SIZE {1048576}           \
+                    CONFIG.C_CACHE_SIZE {131072}            \
                     CONFIG.C_M0_AXI_ADDR_WIDTH {64}         \
                     CONFIG.C_M0_AXI_DATA_WIDTH {512}        \
                     CONFIG.C_M1_AXI_DATA_WIDTH {32}         \
@@ -531,7 +531,7 @@ set_property -dict [list                                    \
                     CONFIG.C_NUM_WAYS {4}                   \
                     CONFIG.C_S0_AXI_GEN_DATA_WIDTH {512}    \
                     CONFIG.C_S0_AXI_GEN_ADDR_WIDTH {64}     \
-                      ] [get_ips ${module_name}]
+                    ] [get_ips ${module_name}]
 
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
