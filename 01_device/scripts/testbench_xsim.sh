@@ -72,7 +72,7 @@ compile()
   echo "Starting Compile [xvlog]"
   echo "MSG: Arg: $xvlog_opts"
   xvlog $xvlog_opts 2>&1 | tee compile.xvlog.log
-  xvhdl $xvhdl_opts 2>&1 | tee compile.xvhdl.log
+  # xvhdl $xvhdl_opts 2>&1 | tee compile.xvhdl.log
 }
 
 # RUN_STEP: <elaborate>
@@ -90,14 +90,14 @@ simulate()
 {
   echo "Starting Simulate [xsim]"
   echo "MSG: Arg: $xsim_opts"
-  xsim $xsim_opts  -key {Behavioral:sim_1:Functional:system_cache_512x64} -log simulate.log 
+  xsim $xsim_opts -log simulate.log 
 }
 
 simulate_gui()
 {
   echo "Starting Simulate [xsim]"
   echo "MSG: Arg: $xsim_opts"
-  xsim  --gui $xsim_opts  -key {Behavioral:sim_1:Functional:system_cache_512x64} -log simulate.log
+  xsim  --gui $xsim_opts -log simulate.log
 }
 
 
