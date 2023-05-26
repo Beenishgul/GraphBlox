@@ -277,6 +277,20 @@ sub sub_print_msg {
  $time_flag = 0;
 }
 
+sub sub_print_args {
+ my $line = $_;
+
+ my @fields_v3 =  split ' ', $line;
+
+ print ' ' x 24;
+ print "[", RED, "ARGS", RESET , "] "; 
+ # print MAGENTA, join("\n                                   ",@fields_v2), RESET;
+ shift(@fields_v3); 
+ print MAGENTA, wrap('', ' ' x 36, @fields_v3), RESET, "\n"; 
+ $time_flag = 0;
+}
+
+
 
 print "\n", "=========================================================", "\n";
 print "[", BLUE, "Running Simulation", RESET, "]";
@@ -320,6 +334,7 @@ while(<STDIN>) {
     my $step_16 = "Starting:";
     my $step_17 = "MSG:";
     my $step_18 = "Fatal:";
+    my $step_19 = "Arg:";
 
     # my $vpl = \[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\];sub_print_time_s
 
@@ -332,6 +347,7 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^$step_15$/ )  { sub_print_step($line);}
                 elsif ($fields_s[0] =~ /^$step_16$/ )  { sub_print_step($line);}
                 elsif ($fields_s[0] =~ /^$step_17$/ )  { sub_print_msg($line);}
+                elsif ($fields_s[0] =~ /^$step_19$/ )  { sub_print_args($line);}
                 elsif ($fields_s[0] =~ /^$step_18$/ )  { sub_print_fatal($line);}
                 elsif ($fields_s[0] =~ /^$step_1$/ )   { sub_print_step($line);}
                 elsif ($fields_s[0] =~ /^$step_2$/ )   { sub_print_step($line);}
