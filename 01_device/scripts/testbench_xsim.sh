@@ -69,10 +69,27 @@ run()
 # RUN_STEP: <compile>
 compile()
 {
-  echo "Starting Compile [xvlog]"
-  echo "MSG: Arg: $xvlog_opts"
-  xvlog $xvlog_opts 2>&1 | tee compile.xvlog.log
-  # xvhdl $xvhdl_opts 2>&1 | tee compile.xvhdl.log
+
+  filename_vhdl="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f"
+  filename_v="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f"
+  filename_sv="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f"
+
+  if [[ -z $(grep '[^[:space:]]' $filename_v) && -z $(grep '[^[:space:]]' $filename_sv) ]] ; then
+    echo "MSG: Empty file : ${filename_v}" 
+    echo "MSG: Empty file : ${filename_sv}" 
+  else
+    echo "Starting Compile [xvlog]"
+    echo "Arg: $xvlog_opts"
+    xvlog $xvlog_opts 2>&1 | tee compile.xvlog.log
+  fi
+
+  if [[ -z $(grep '[^[:space:]]' $filename_vhdl) ]] ; then
+    echo "MSG: Empty file : ${filename_vhdl}" 
+  else
+    echo "Starting Compile [xvhdl]"
+    echo "Arg: $xvhdl_opts"
+    xvhdl $xvhdl_opts 2>&1 | tee compile.xvhdl.log
+  fi
 }
 
 # RUN_STEP: <elaborate>
@@ -80,7 +97,7 @@ elaborate()
 {
 
   echo "Starting Elaborate [xelab]"
-  echo "MSG: Arg: $xelab_opts"
+  echo "Arg: $xelab_opts"
   xelab ${kernel_name}_testbench glbl $xelab_opts -log elaborate.log
 
 }
@@ -89,14 +106,14 @@ elaborate()
 simulate()
 {
   echo "Starting Simulate [xsim]"
-  echo "MSG: Arg: $xsim_opts"
+  echo "Arg: $xsim_opts"
   xsim $xsim_opts -log simulate.log 
 }
 
 simulate_gui()
 {
   echo "Starting Simulate [xsim]"
-  echo "MSG: Arg: $xsim_opts"
+  echo "Arg: $xsim_opts"
   xsim  --gui $xsim_opts -log simulate.log
 }
 
@@ -106,7 +123,7 @@ wave_run()
 {
 
   echo "Starting Wave Run [xsim --gui]"
-  echo "MSG: Arg: work.${kernel_name}_testbench.wdb"
+  echo "Arg: work.${kernel_name}_testbench.wdb"
   xsim --gui work.${kernel_name}_testbench.wdb
 }
 
