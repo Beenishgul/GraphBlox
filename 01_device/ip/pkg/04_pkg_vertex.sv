@@ -29,15 +29,15 @@ package PKG_VERTEX;
   } vertex_cu_state;
 
 // --------------------------------------------------------------------------------------
-//   State Machine Vertex Bundle
+//   State Machine Vertex Bundles
 // --------------------------------------------------------------------------------------
   typedef enum logic[5:0] {
-    VERTEX_BUNDLE_RESET,
-    VERTEX_BUNDLE_IDLE,
-    VERTEX_BUNDLE_REQ_START,
-    VERTEX_BUNDLE_REQ_BUSY,
-    VERTEX_BUNDLE_REQ_PAUSE,
-    VERTEX_BUNDLE_REQ_DONE
-  } vertex_bundle_state;
+    VERTEX_BUNDLES_RESET,
+    VERTEX_BUNDLES_IDLE,
+    VERTEX_BUNDLES_REQ_START,
+    VERTEX_BUNDLES_REQ_BUSY,
+    VERTEX_BUNDLES_REQ_PAUSE,
+    VERTEX_BUNDLES_REQ_DONE
+  } vertex_bundles_state;
 
 endpackage
