@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_stride_index_generator.sv
+// File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -35,7 +35,7 @@ import PKG_CACHE::*;
 
 // uint32_t *strideIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
-module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
+module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
     input  logic                    ap_clk                  ,
     input  logic                    areset                  ,
@@ -62,8 +62,8 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_stride_index_generator_state current_state;
-    engine_stride_index_generator_state next_state   ;
+    engine_csr_index_generator_state current_state;
+    engine_csr_index_generator_state next_state   ;
 
     logic done_int_reg ;
     logic pause_in_reg ;
@@ -398,4 +398,4 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
     );
 
-endmodule : engine_stride_index_generator
+endmodule : engine_csr_index_generator
