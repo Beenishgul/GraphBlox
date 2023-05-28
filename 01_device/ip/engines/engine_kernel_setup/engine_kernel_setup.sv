@@ -335,16 +335,16 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.id_vertex      = configuration_reg.payload.meta.id_vertex;
-        fifo_request_comb.payload.meta.id_bundle      = configuration_reg.payload.meta.id_bundle;
-        fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_engine;
-        fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.array_pointer;
-        fifo_request_comb.payload.meta.address_offset = counter_count;
-        fifo_request_comb.payload.meta.type_cmd       = configuration_reg.payload.meta.type_cmd;
-        fifo_request_comb.payload.meta.type_struct    = configuration_reg.payload.meta.type_struct;
-        fifo_request_comb.payload.meta.type_operand   = configuration_reg.payload.meta.type_operand ;
-        fifo_request_comb.payload.meta.type_filter    = configuration_reg.payload.meta.type_filter;
-        fifo_request_comb.payload.meta.type_ALU       = configuration_reg.payload.meta.type_ALU;
+        fifo_request_comb.payload.meta.route        = configuration_reg.payload.meta.route;
+        fifo_request_comb.payload.meta.address.base = configuration_reg.payload.param.array_pointer;
+        if(configuration_reg.payload.meta.address.shift.direction) begin
+            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift;
+        end else begin
+            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift;
+        end
+        fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
+        fifo_request_comb.payload.meta.type          = configuration_reg.payload.meta.type;
+        fifo_request_comb.payload.data.field         = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin

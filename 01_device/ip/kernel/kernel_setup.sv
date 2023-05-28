@@ -271,7 +271,7 @@ module kernel_setup #(
         configuration_comb.payload.param.array_size    = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
         configuration_comb.payload.param.start_read    = 0;
         configuration_comb.payload.param.end_read      = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
+        configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
         configuration_comb.payload.meta.route.from.id_vertex = ENGINE_ID_VERTEX;
@@ -282,6 +282,8 @@ module kernel_setup #(
         configuration_comb.payload.meta.route.to.id_engine   = ENGINE_ID_ENGINE;
         configuration_comb.payload.meta.address.base         = descriptor_in_reg.payload.graph_csr_struct;
         configuration_comb.payload.meta.address.offset       = 0;
+        configuration_comb.payload.meta.address.shift        = $clog2(CACHE_FRONTEND_DATA_W/8);
+        configuration_comb.payload.meta.address.direction    = 1'b1;
         configuration_comb.payload.meta.type.cmd             = CMD_READ;
         configuration_comb.payload.meta.type.struct          = STRUCT_KERNEL_SETUP;
         configuration_comb.payload.meta.type.operand         = OP_LOCATION_0;
