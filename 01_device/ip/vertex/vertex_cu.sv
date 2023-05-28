@@ -197,7 +197,7 @@ module vertex_cu #(
     end
 
 // --------------------------------------------------------------------------------------
-// FIFO
+// FIFO -> Kernel setup - Cache
 // --------------------------------------------------------------------------------------
     assign request_out_reg               = vertex_bundles_request_out;
     assign fifo_response_signals_out_int = vertex_bundles_fifo_response_in_signals_out;
@@ -259,7 +259,5 @@ module vertex_cu #(
         .fifo_setup_signal           (vertex_bundles_fifo_setup_signal           ),
         .done_out                    (vertex_bundles_done_out                    )
     );
-
-
 
 endmodule : vertex_cu
