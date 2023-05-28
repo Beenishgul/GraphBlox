@@ -24,7 +24,6 @@ import PKG_CACHE::*;
 module bundle_engines #(
     parameter ENGINE_ID_VERTEX = 0 ,
     parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
     parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
@@ -34,12 +33,12 @@ module bundle_engines #(
     input  MemoryPacket           request_in                  ,
     input  FIFOStateSignalsInput  fifo_request_in_signals_in  ,
     output FIFOStateSignalsOutput fifo_request_in_signals_out ,
-    output MemoryPacket           request_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_out_signals_out,
     input  MemoryPacket           response_in                 ,
     input  FIFOStateSignalsInput  fifo_response_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_in_signals_out,
+    output MemoryPacket           request_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_out_signals_out,
     output logic                  fifo_setup_signal           ,
     output logic                  done_out
 );

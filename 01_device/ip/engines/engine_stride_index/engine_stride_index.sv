@@ -32,12 +32,12 @@ module engine_stride_index #(
     input  logic                  ap_clk                   ,
     input  logic                  areset                   ,
     input  KernelDescriptor       descriptor_in            ,
-    output MemoryPacket           request_out              ,
-    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
-    output FIFOStateSignalsOutput fifo_request_signals_out ,
     input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
+    output MemoryPacket           request_out              ,
+    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
     output logic                  done_out
 );

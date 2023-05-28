@@ -46,17 +46,17 @@ module kernel_cu #(
   logic areset_setup    ;
   logic areset_cu       ;
 
-  logic [     NUM_SETUP_MODULES-1:0] cu_setup_state              ;
-  KernelDescriptor                   descriptor_in_reg           ;
+  logic [NUM_SETUP_MODULES-1:0] cu_setup_state   ;
+  KernelDescriptor              descriptor_in_reg;
 
- // --------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU <-> Cache
 // --------------------------------------------------------------------------------------
 
-  CacheResponse                      response_in_reg             ;
-  CacheRequest                       request_out_reg             ;
-  FIFOStateSignalsInput              fifo_response_signals_in_reg;
-  FIFOStateSignalsInput              fifo_request_signals_in_reg ;
+  CacheResponse         response_in_reg             ;
+  CacheRequest          request_out_reg             ;
+  FIFOStateSignalsInput fifo_response_signals_in_reg;
+  FIFOStateSignalsInput fifo_request_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 // Cache response generator
@@ -261,23 +261,19 @@ module kernel_cu #(
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
     .descriptor_in            (kernel_setup_descriptor               ),
-    .request_out              (kernel_setup_request_out              ),
-    .fifo_request_signals_in  (kernel_setup_fifo_request_signals_in  ),
-    .fifo_request_signals_out (kernel_setup_fifo_request_signals_out ),
     .response_in              (kernel_setup_response_in              ),
     .fifo_response_signals_in (kernel_setup_fifo_response_signals_in ),
     .fifo_response_signals_out(kernel_setup_fifo_response_signals_out),
+    .request_out              (kernel_setup_request_out              ),
+    .fifo_request_signals_in  (kernel_setup_fifo_request_signals_in  ),
+    .fifo_request_signals_out (kernel_setup_fifo_request_signals_out ),
     .fifo_setup_signal        (kernel_setup_fifo_setup_signal        )
   );
 
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-  vertex_cu #(
-    .ENGINE_ID_VERTEX(1),
-    .ENGINE_ID_BUNDLE(0),
-    .ENGINE_ID_ENGINE(0)
-  ) inst_vertex_cu (
+  vertex_cu #(.ENGINE_ID_VERTEX(1)) inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .descriptor_in            (vertex_cu_descriptor               ),
