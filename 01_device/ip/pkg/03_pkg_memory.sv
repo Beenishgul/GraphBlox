@@ -122,16 +122,39 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [ CU_VERTEX_WIDTH_BITS-1:0] id_vertex     ; // SIZE = 4 bits
-  logic [ CU_BUNDLE_WIDTH_BITS-1:0] id_bundle     ; // SIZE = 2 bits
-  logic [ CU_ENGINE_WIDTH_BITS-1:0] id_engine     ; // SIZE = 3 bits
-  logic [CACHE_FRONTEND_ADDR_W-1:0] address_base  ; // SIZE = 64 bits
-  logic [CACHE_FRONTEND_DATA_W-1:0] address_offset; // SIZE = 64 bits
-  type_memory_cmd                   type_cmd      ; // SIZE = 5 bits
-  type_data_structure               type_struct   ; // SIZE = 12 bits
-  type_engine_operand               type_operand  ; // SIZE = 6 bits
-  type_filter_operation             type_filter   ; // SIZE = 6 bits
-  type_ALU_operation                type_ALU      ; // SIZE = 6 bits
+  logic [CU_VERTEX_WIDTH_BITS-1:0] id_vertex; // SIZE = 4 bits
+  logic [CU_BUNDLE_WIDTH_BITS-1:0] id_bundle; // SIZE = 4 bits
+  logic [CU_ENGINE_WIDTH_BITS-1:0] id_engine; // SIZE = 5 bits
+} MemoryPacketArbitrate;
+
+typedef struct packed{
+  MemoryPacketArbitrate from;
+  MemoryPacketArbitrate to  ;
+} MemoryPacketRoute;
+
+typedef struct packed{
+  logic                                     direct   ; // 0 - right, 1 left
+  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
+} MemoryPacketAddressShift;
+
+typedef struct packed{
+  logic [CACHE_FRONTEND_ADDR_W-1:0] base  ; // SIZE = 64 bits
+  logic [CACHE_FRONTEND_ADDR_W-1:0] offset; // SIZE = 64 bits
+  MemoryPacketAddressShift          shift ; // SIZE = 64 bits
+} MemoryPacketAddress;
+
+typedef struct packed{
+  type_memory_cmd       cmd    ; // SIZE = 5 bits
+  type_data_structure   struct ; // SIZE = 12 bits
+  type_engine_operand   operand; // SIZE = 6 bits
+  type_filter_operation filter ; // SIZE = 6 bits
+  type_ALU_operation    alu    ; // SIZE = 6 bits
+} MemoryPacketType;
+
+typedef struct packed{
+  MemoryPacketRoute   route  ;
+  MemoryPacketAddress address;
+  MemoryPacketType    type   ;
 } MemoryPacketMeta;
 
 typedef struct packed{

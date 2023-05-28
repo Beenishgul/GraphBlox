@@ -293,16 +293,19 @@ module vertex_bundles #(
         configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
         configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
 
-        configuration_comb.payload.meta.id_vertex      = ENGINE_ID_VERTEX;
-        configuration_comb.payload.meta.id_bundle      = ENGINE_ID_BUNDLE;
-        configuration_comb.payload.meta.id_engine      = ENGINE_ID_ENGINE;
-        configuration_comb.payload.meta.address_base   = descriptor_in_reg.payload.graph_csr_struct;
-        configuration_comb.payload.meta.address_offset = 0;
-        configuration_comb.payload.meta.type_cmd       = CMD_READ;
-        configuration_comb.payload.meta.type_struct    = STRUCT_VERTEX_BUNDLES;
-        configuration_comb.payload.meta.type_operand   = OP_LOCATION_0;
-        configuration_comb.payload.meta.type_filter    = FILTER_NOP;
-        configuration_comb.payload.meta.type_ALU       = ALU_NOP;
+        configuration_comb.payload.meta.route.from.id_vertex = ENGINE_ID_VERTEX;
+        configuration_comb.payload.meta.route.from.id_bundle = ENGINE_ID_BUNDLE;
+        configuration_comb.payload.meta.route.from.id_engine = ENGINE_ID_ENGINE;
+        configuration_comb.payload.meta.route.to.id_vertex   = ENGINE_ID_VERTEX;
+        configuration_comb.payload.meta.route.to.id_bundle   = ENGINE_ID_BUNDLE;
+        configuration_comb.payload.meta.route.to.id_engine   = ENGINE_ID_ENGINE;
+        configuration_comb.payload.meta.address.base         = descriptor_in_reg.payload.graph_csr_struct;
+        configuration_comb.payload.meta.address.offset       = 0;
+        configuration_comb.payload.meta.type.cmd             = CMD_READ;
+        configuration_comb.payload.meta.type.struct          = STRUCT_VERTEX_BUNDLES;
+        configuration_comb.payload.meta.type.operand         = OP_LOCATION_0;
+        configuration_comb.payload.meta.type.filter          = FILTER_NOP;
+        configuration_comb.payload.meta.type.alu             = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin

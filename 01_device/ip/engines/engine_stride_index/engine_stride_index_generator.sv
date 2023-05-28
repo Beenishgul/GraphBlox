@@ -329,16 +329,10 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.id_vertex      = configuration_reg.payload.meta.id_vertex;
-        fifo_request_comb.payload.meta.id_bundle      = configuration_reg.payload.meta.id_bundle;
-        fifo_request_comb.payload.meta.id_engine      = configuration_reg.payload.meta.id_engine;
-        fifo_request_comb.payload.meta.address_base   = configuration_reg.payload.param.index_start;
-        fifo_request_comb.payload.meta.address_offset = counter_count << configuration_reg.payload.param.granularity;
-        fifo_request_comb.payload.meta.type_cmd       = configuration_reg.payload.meta.type_cmd;
-        fifo_request_comb.payload.meta.type_struct    = configuration_reg.payload.meta.type_struct;
-        fifo_request_comb.payload.meta.type_operand   = configuration_reg.payload.meta.type_operand ;
-        fifo_request_comb.payload.meta.type_filter    = configuration_reg.payload.meta.type_filter;
-        fifo_request_comb.payload.meta.type_ALU       = configuration_reg.payload.meta.type_ALU;
+        fifo_request_comb.payload.meta.route          = configuration_reg.payload.meta.route;
+        fifo_request_comb.payload.meta.address.base   = configuration_reg.payload.param.index_start;
+        fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.param.granularity;
+        fifo_request_comb.payload.meta.type           = configuration_reg.payload.meta.type;
         fifo_request_comb.payload.data.field          = counter_count;
     end
 
