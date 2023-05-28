@@ -37,7 +37,7 @@ module engine_stride_index_configure #(
     MemoryPacket             response_in_reg        ;
     MemoryPacketMeta         configuration_meta_int ;
     StrideIndexConfiguration configuration_reg      ;
-    logic [6:0]              configuration_valid_reg;
+    logic [7:0]              configuration_valid_reg;
     logic                    configuration_valid_int;
 
 // --------------------------------------------------------------------------------------
@@ -123,6 +123,8 @@ module engine_stride_index_configure #(
         configuration_meta_int.route.to.id_engine   = ENGINE_ID_ENGINE;
         configuration_meta_int.address.base         = 0;
         configuration_meta_int.address.offset       = $clog2(CACHE_FRONTEND_DATA_W/8);
+        configuration_meta_int.address.shift        = 0;
+        configuration_meta_int.address.direction    = 1'b1;
         configuration_meta_int.type.cmd             = CMD_INVALID;
         configuration_meta_int.type.struct          = STRUCT_STRIDE_INDEX;
         configuration_meta_int.type.operand         = OP_LOCATION_0;
@@ -135,9 +137,9 @@ module engine_stride_index_configure #(
             configuration_reg       <= 0;
             configuration_valid_reg <= 0;
         end else begin
-            configuration_reg.valid                <= configuration_valid_int;
-            configuration_reg.payload.meta.route   <= configuration_meta_int.route ;
-            configuration_reg.payload.meta.address <= configuration_meta_int.address ;
+            configuration_reg.valid                   <= configuration_valid_int;
+            configuration_reg.payload.meta.route.from <= configuration_meta_int.route.from;
+            configuration_reg.payload.meta.address    <= configuration_meta_int.address;
 
             if(fifo_response_dout_int.valid) begin
                 case (fifo_response_dout_int.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
@@ -159,8 +161,10 @@ module engine_stride_index_configure #(
                         configuration_valid_reg[3]             <= 1'b1  ;
                     end
                     4 : begin
-                        configuration_reg.payload.param.granularity <= fifo_response_dout_int.payload.data.field;
-                        configuration_valid_reg[4]                  <= 1'b1  ;
+                        configuration_reg.payload.param.granularity      <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
+                        configuration_reg.payload.meta.address.shift     <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
+                        configuration_reg.payload.meta.address.direction <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W];
+                        configuration_valid_reg[4]                       <= 1'b1  ;
                     end
                     5 : begin
                         configuration_reg.payload.meta.type.cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
@@ -172,6 +176,12 @@ module engine_stride_index_configure #(
                         configuration_reg.payload.meta.type.filter  <= type_filter_operation'(fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
                         configuration_reg.payload.meta.type.alu     <= type_ALU_operation'(fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
                         configuration_valid_reg[6]                  <= 1'b1  ;
+                    end
+                    7 : begin
+                        configuration_reg.payload.meta.route.to.id_vertex <= fifo_response_dout_int.payload.data.field[CU_VERTEX_WIDTH_BITS-1:0];
+                        configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field[(CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)-1:CU_VERTEX_WIDTH_BITS];
+                        configuration_reg.payload.meta.route.to.id_engine <= fifo_response_dout_int.payload.data.field[(CU_ENGINE_WIDTH_BITS+CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)-1:(CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)];
+                        configuration_valid_reg[7]                        <= 1'b1  ;
                     end
                     default : begin
                         configuration_reg.payload.param <= configuration_reg.payload.param;
