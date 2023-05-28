@@ -24,13 +24,20 @@ package PKG_GLOBALS;
 	parameter CU_CACHE_SIZE_BYTES = 32768                                  ; // size in Bytes 32KB
 	parameter CU_CACHE_LINES_NUM  = CU_CACHE_SIZE_BYTES / (M_AXI4_DATA_W/8); // size in lines 512 (cacheline 64Bytes)
 
-	parameter CU_VERTEX_COUNT_TOTAL = 32                            ;
-	parameter CU_BUNDLE_COUNT_TOTAL = 4                             ;
-	parameter CU_ENGINE_COUNT_TOTAL = 6                             ;
+	parameter CU_VERTEX_COUNT_TOTAL = 16                            ;
+	parameter CU_BUNDLE_COUNT_TOTAL = 8                             ;
+	parameter CU_ENGINE_COUNT_TOTAL = 8                             ;
+	parameter CU_BUFFER_COUNT_TOTAL = 12                            ;
 
-	parameter CU_VERTEX_WIDTH_BITS  = $clog2(CU_VERTEX_COUNT_TOTAL); // 5
-	parameter CU_BUNDLE_WIDTH_BITS  = CU_BUNDLE_COUNT_TOTAL;
-	parameter CU_ENGINE_WIDTH_BITS  = CU_ENGINE_COUNT_TOTAL;
+  logic [CU_VERTEX_COUNT_WIDTH_BITS-1:0] id_vertex; // SIZE = 4 bits  - up to 16 vertex cu - pending
+  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
+  logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 12 bits - up to 12 buffers in the descriptor
+
+	parameter CU_VERTEX_COUNT_WIDTH_BITS  = $clog2(CU_VERTEX_COUNT_TOTAL); // 5
+	parameter CU_BUNDLE_COUNT_WIDTH_BITS  = CU_BUNDLE_COUNT_TOTAL;
+	parameter CU_ENGINE_COUNT_WIDTH_BITS  = CU_ENGINE_COUNT_TOTAL;
+	parameter CU_BUFFER_COUNT_WIDTH_BITS  = CU_BUFFER_COUNT_TOTAL;
 
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS

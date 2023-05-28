@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : vertex_cu_bundles.sv
+// File   : bundle_engines.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,7 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module vertex_cu_bundles #(
+module bundle_engines #(
     parameter ENGINE_ID_VERTEX = 0 ,
     parameter ENGINE_ID_BUNDLE = 0 ,
     parameter ENGINE_ID_ENGINE = 0 ,
@@ -47,9 +47,9 @@ module vertex_cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_vertex_cu_bundles;
-    logic areset_serial_read      ;
-    logic areset_fifo             ;
+    logic areset_bundle_engines;
+    logic areset_serial_read   ;
+    logic areset_fifo          ;
 
     KernelDescriptor descriptor_in_reg;
     MemoryPacket     request_in_reg   ;
@@ -60,9 +60,9 @@ module vertex_cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
 // --------------------------------------------------------------------------------------
-    logic                   done_int_reg ;
-    vertex_cu_bundles_state current_state;
-    vertex_cu_bundles_state next_state   ;
+    logic                done_int_reg ;
+    bundle_engines_state current_state;
+    bundle_engines_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Request MemoryPacket
@@ -114,16 +114,16 @@ module vertex_cu_bundles #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_vertex_cu_bundles <= areset;
-        areset_serial_read       <= areset;
-        areset_fifo              <= areset;
+        areset_bundle_engines <= areset;
+        areset_serial_read    <= areset;
+        areset_fifo           <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_cu_bundles) begin
+        if (areset_bundle_engines) begin
             descriptor_in_reg.valid <= 0;
         end
         else begin
@@ -139,7 +139,7 @@ module vertex_cu_bundles #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_cu_bundles) begin
+        if (areset_bundle_engines) begin
             fifo_response_in_signals_in_reg <= 0;
             fifo_request_out_signals_in_reg <= 0;
             request_in_reg.valid            <= 0;
@@ -162,7 +162,7 @@ module vertex_cu_bundles #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_cu_bundles) begin
+        if (areset_bundle_engines) begin
             fifo_setup_signal            <= 1;
             fifo_response_in_signals_out <= 0;
             fifo_request_out_signals_out <= 0;
@@ -184,7 +184,7 @@ module vertex_cu_bundles #(
 // SETUP State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_vertex_cu_bundles)
+        if(areset_bundle_engines)
             current_state <= KERNEL_SETUP_RESET;
         else begin
             current_state <= next_state;
@@ -296,9 +296,11 @@ module vertex_cu_bundles #(
         configuration_comb.payload.meta.route.from.id_vertex = ENGINE_ID_VERTEX;
         configuration_comb.payload.meta.route.from.id_bundle = ENGINE_ID_BUNDLE;
         configuration_comb.payload.meta.route.from.id_engine = ENGINE_ID_ENGINE;
+        configuration_comb.payload.meta.route.from.id_buffer = 0;
         configuration_comb.payload.meta.route.to.id_vertex   = ENGINE_ID_VERTEX;
         configuration_comb.payload.meta.route.to.id_bundle   = ENGINE_ID_BUNDLE;
         configuration_comb.payload.meta.route.to.id_engine   = ENGINE_ID_ENGINE;
+        configuration_comb.payload.meta.route.to.id_buffer = 0;
         configuration_comb.payload.meta.address.base         = descriptor_in_reg.payload.graph_csr_struct;
         configuration_comb.payload.meta.address.offset       = 0;
         configuration_comb.payload.meta.type.cmd             = CMD_READ;
@@ -455,4 +457,4 @@ module vertex_cu_bundles #(
 // --------------------------------------------------------------------------------------
 
 
-endmodule : vertex_cu_bundles
+endmodule : bundle_engines
