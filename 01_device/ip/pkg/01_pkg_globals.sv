@@ -26,11 +26,11 @@ package PKG_GLOBALS;
 
 	parameter CU_VERTEX_COUNT_TOTAL = 32                            ;
 	parameter CU_BUNDLE_COUNT_TOTAL = 4                             ;
-	parameter CU_ENGINE_COUNT_TOTAL = 5                             ;
+	parameter CU_ENGINE_COUNT_TOTAL = 6                             ;
 
 	parameter CU_VERTEX_WIDTH_BITS  = $clog2(CU_VERTEX_COUNT_TOTAL);
-	parameter CU_BUNDLE_WIDTH_BITS  = $clog2(CU_BUNDLE_COUNT_TOTAL);
-	parameter CU_ENGINE_WIDTH_BITS  = $clog2(CU_ENGINE_COUNT_TOTAL);
+	parameter CU_BUNDLE_WIDTH_BITS  = CU_BUNDLE_COUNT_TOTAL;
+	parameter CU_ENGINE_WIDTH_BITS  = CU_ENGINE_COUNT_TOTAL;
 
 // --------------------------------------------------------------------------------------
 //  GLay COMMON graph GLOBALS
