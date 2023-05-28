@@ -146,10 +146,10 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
     overlay[1] = 0; // 1 - index_start
     overlay[2] = graph->num_vertices; // 2 - index_end
     overlay[3] = 1; // 3 - stride
-    overlay[4] = 2; // 4 - granularity - log2 value for shifting
+    overlay[4] = 0x80000002; // 4 - granularity - log2 value for shifting
     overlay[5] = 0x000002C5; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
     overlay[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
-    overlay[7] = 0;
+    overlay[7] = 0x00007011;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
 
     graph_csr_struct_buffer.write(overlay, graph_buffer_size_in_bytes, 0);
     vertex_out_degree_buffer.write(graph->vertices->out_degree, Vertex_buffer_size_in_bytes, 0);

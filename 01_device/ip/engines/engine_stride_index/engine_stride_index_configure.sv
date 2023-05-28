@@ -118,9 +118,11 @@ module engine_stride_index_configure #(
         configuration_meta_int.route.from.id_vertex = ENGINE_ID_VERTEX;
         configuration_meta_int.route.from.id_bundle = ENGINE_ID_BUNDLE;
         configuration_meta_int.route.from.id_engine = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.from.id_buffer = 0;
         configuration_meta_int.route.to.id_vertex   = ENGINE_ID_VERTEX;
         configuration_meta_int.route.to.id_bundle   = ENGINE_ID_BUNDLE;
         configuration_meta_int.route.to.id_engine   = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.to.id_buffer   = 0;
         configuration_meta_int.address.base         = 0;
         configuration_meta_int.address.offset       = $clog2(CACHE_FRONTEND_DATA_W/8);
         configuration_meta_int.address.shift        = 0;
@@ -178,9 +180,10 @@ module engine_stride_index_configure #(
                         configuration_valid_reg[6]                  <= 1'b1  ;
                     end
                     7 : begin
-                        configuration_reg.payload.meta.route.to.id_vertex <= fifo_response_dout_int.payload.data.field[CU_VERTEX_WIDTH_BITS-1:0];
-                        configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field[(CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)-1:CU_VERTEX_WIDTH_BITS];
-                        configuration_reg.payload.meta.route.to.id_engine <= fifo_response_dout_int.payload.data.field[(CU_ENGINE_WIDTH_BITS+CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)-1:(CU_BUNDLE_WIDTH_BITS+CU_VERTEX_WIDTH_BITS)];
+                        configuration_reg.payload.meta.route.to.id_vertex <= fifo_response_dout_int.payload.data.field[(CU_VERTEX_COUNT_WIDTH_BITS)-1:0];
+                        configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field[(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:CU_VERTEX_COUNT_WIDTH_BITS];
+                        configuration_reg.payload.meta.route.to.id_engine <= fifo_response_dout_int.payload.data.field[(CU_ENGINE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
+                        configuration_reg.payload.meta.route.to.id_buffer <= fifo_response_dout_int.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_ENGINE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_ENGINE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
                         configuration_valid_reg[7]                        <= 1'b1  ;
                     end
                     default : begin
