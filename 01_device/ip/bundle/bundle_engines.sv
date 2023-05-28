@@ -48,21 +48,13 @@ module bundle_engines #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_bundle_engines;
-    logic areset_serial_read   ;
-    logic areset_fifo          ;
 
     KernelDescriptor descriptor_in_reg;
     MemoryPacket     request_in_reg   ;
     MemoryPacket     response_in_reg  ;
     MemoryPacket     response_in_int  ;
+    MemoryPacket     request_in_int   ;
     MemoryPacket     request_out_int  ;
-
-// --------------------------------------------------------------------------------------
-// Setup state machine signals
-// --------------------------------------------------------------------------------------
-    logic                done_int_reg ;
-    bundle_engines_state current_state;
-    bundle_engines_state next_state   ;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Request MemoryPacket
@@ -95,27 +87,10 @@ module bundle_engines #(
     logic                  fifo_response_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// Serial Read Engine Signals
-// --------------------------------------------------------------------------------------
-    SerialReadEngineConfiguration engine_serial_read_configuration_in            ;
-    SerialReadEngineConfiguration configuration_comb                             ;
-    MemoryPacket                  engine_serial_read_request_out                 ;
-    FIFOStateSignalsOutput        engine_serial_read_fifo_request_out_signals_out;
-    FIFOStateSignalsInput         engine_serial_read_fifo_request_out_signals_in ;
-    FIFOStateSignalsInput         engine_serial_read_fifo_request_out_signals_reg;
-    logic                         engine_serial_read_start_in                    ;
-    logic                         engine_serial_read_pause_in                    ;
-    logic                         engine_serial_read_ready_out                   ;
-    logic                         engine_serial_read_done_out                    ;
-
-    logic engine_serial_read_fifo_setup_signal;
-
-// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         areset_bundle_engines <= areset;
-        areset_serial_read    <= areset;
         areset_fifo           <= areset;
     end
 
@@ -169,7 +144,7 @@ module bundle_engines #(
             request_out.valid            <= 0;
         end
         else begin
-            fifo_setup_signal            <= engine_serial_read_fifo_setup_signal | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int;
+            fifo_setup_signal            <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int;
             fifo_response_in_signals_out <= fifo_response_in_signals_out_int;
             fifo_request_out_signals_out <= fifo_request_out_signals_out_int;
             request_out.valid            <= request_out_int.valid ;
@@ -181,167 +156,14 @@ module bundle_engines #(
     end
 
 // --------------------------------------------------------------------------------------
-// SETUP State Machine
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if(areset_bundle_engines)
-            current_state <= KERNEL_SETUP_RESET;
-        else begin
-            current_state <= next_state;
-        end
-    end // always_ff @(posedge ap_clk)
-
-    always_comb begin
-        next_state = current_state;
-        case (current_state)
-            KERNEL_SETUP_RESET : begin
-                next_state = KERNEL_SETUP_IDLE;
-            end
-            KERNEL_SETUP_IDLE : begin
-                if(descriptor_in_reg.valid & engine_serial_read_done_out & engine_serial_read_ready_out)
-                    next_state = KERNEL_SETUP_REQ_START;
-                else
-                    next_state = KERNEL_SETUP_IDLE;
-            end
-            KERNEL_SETUP_REQ_START : begin
-                if(engine_serial_read_done_out & engine_serial_read_ready_out) begin
-                    next_state = KERNEL_SETUP_REQ_START;
-                end else begin
-                    next_state = KERNEL_SETUP_REQ_BUSY;
-                end
-            end
-            KERNEL_SETUP_REQ_BUSY : begin
-                if (done_int_reg)
-                    next_state = KERNEL_SETUP_REQ_DONE;
-                else if (fifo_request_out_signals_out_int.prog_full | fifo_response_in_signals_out_int.prog_full)
-                    next_state = KERNEL_SETUP_REQ_PAUSE;
-                else
-                    next_state = KERNEL_SETUP_REQ_BUSY;
-            end
-            KERNEL_SETUP_REQ_PAUSE : begin
-                if (~(fifo_request_out_signals_out_int.prog_full | fifo_response_in_signals_out_int.prog_full))
-                    next_state = KERNEL_SETUP_REQ_BUSY;
-                else
-                    next_state = KERNEL_SETUP_REQ_PAUSE;
-            end
-            KERNEL_SETUP_REQ_DONE : begin
-                if (descriptor_in_reg.valid)
-                    next_state = KERNEL_SETUP_REQ_DONE;
-                else
-                    next_state = KERNEL_SETUP_IDLE;
-            end
-        endcase
-    end // always_comb
-
-    always_ff @(posedge ap_clk) begin
-        case (current_state)
-            KERNEL_SETUP_RESET : begin
-                done_int_reg                                          <= 1'b1;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_start_in                           <= 1'b0;
-                engine_serial_read_pause_in                           <= 1'b0;
-                engine_serial_read_configuration_in.valid             <= 1'b0;
-            end
-            KERNEL_SETUP_IDLE : begin
-                done_int_reg                                          <= 1'b0;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_start_in                           <= 1'b0;
-                engine_serial_read_pause_in                           <= 1'b0;
-                engine_serial_read_configuration_in.valid             <= 1'b0;
-            end
-            KERNEL_SETUP_REQ_START : begin
-                done_int_reg                                          <= 1'b0;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_start_in                           <= 1'b1;
-                engine_serial_read_pause_in                           <= 1'b0;
-                engine_serial_read_configuration_in.valid             <= 1'b1;
-            end
-            KERNEL_SETUP_REQ_BUSY : begin
-                done_int_reg                                          <= engine_serial_read_done_out & engine_serial_read_fifo_request_out_signals_out.empty & fifo_request_out_signals_out_int.empty;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= ~fifo_request_out_signals_out_int.prog_full;
-                engine_serial_read_start_in                           <= 1'b0;
-                engine_serial_read_pause_in                           <= 1'b0;
-                engine_serial_read_configuration_in.valid             <= 1'b1;
-            end
-            KERNEL_SETUP_REQ_PAUSE : begin
-                done_int_reg                                          <= 1'b0;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_start_in                           <= 1'b0;
-                engine_serial_read_pause_in                           <= 1'b1;
-                engine_serial_read_configuration_in.valid             <= 1'b0;
-            end
-            KERNEL_SETUP_REQ_DONE : begin
-                done_int_reg                                          <= 1'b1;
-                engine_serial_read_fifo_request_out_signals_reg.rd_en <= 1'b0;
-                engine_serial_read_start_in                           <= 1'b0;
-                engine_serial_read_pause_in                           <= 1'b0;
-                engine_serial_read_configuration_in.valid             <= 1'b0;
-            end
-        endcase
-    end // always_ff @(posedge ap_clk)
-
-// --------------------------------------------------------------------------------------
-// Create Configuration Packet
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        configuration_comb.payload.param.increment     = 1'b1;
-        configuration_comb.payload.param.decrement     = 1'b0;
-        configuration_comb.payload.param.array_pointer = descriptor_in_reg.payload.graph_csr_struct;
-        configuration_comb.payload.param.array_size    = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        configuration_comb.payload.param.start_read    = 0;
-        configuration_comb.payload.param.end_read      = descriptor_in_reg.payload.auxiliary_2*(CACHE_BACKEND_DATA_W/8);
-        configuration_comb.payload.param.stride        = CACHE_FRONTEND_DATA_W/8;
-        configuration_comb.payload.param.granularity   = CACHE_FRONTEND_DATA_W/8;
-
-        configuration_comb.payload.meta.route.from.id_vertex = ENGINE_ID_VERTEX;
-        configuration_comb.payload.meta.route.from.id_bundle = ENGINE_ID_BUNDLE;
-        configuration_comb.payload.meta.route.from.id_engine = ENGINE_ID_ENGINE;
-        configuration_comb.payload.meta.route.from.id_buffer = 0;
-        configuration_comb.payload.meta.route.to.id_vertex   = ENGINE_ID_VERTEX;
-        configuration_comb.payload.meta.route.to.id_bundle   = ENGINE_ID_BUNDLE;
-        configuration_comb.payload.meta.route.to.id_engine   = ENGINE_ID_ENGINE;
-        configuration_comb.payload.meta.route.to.id_buffer = 0;
-        configuration_comb.payload.meta.address.base         = descriptor_in_reg.payload.graph_csr_struct;
-        configuration_comb.payload.meta.address.offset       = 0;
-        configuration_comb.payload.meta.type.cmd             = CMD_READ;
-        configuration_comb.payload.meta.type.struct          = STRUCT_KERNEL_SETUP;
-        configuration_comb.payload.meta.type.operand         = OP_LOCATION_0;
-        configuration_comb.payload.meta.type.filter          = FILTER_NOP;
-        configuration_comb.payload.meta.type.alu             = ALU_NOP;
-    end
-
-    always_ff @(posedge ap_clk) begin
-        engine_serial_read_configuration_in.payload <= configuration_comb.payload;
-    end
-
-// --------------------------------------------------------------------------------------
-// Serial Read Engine Generate
-// --------------------------------------------------------------------------------------
-    assign engine_serial_read_fifo_request_out_signals_in = engine_serial_read_fifo_request_out_signals_reg;
-
-    engine_serial_read #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_serial_read (
-        .ap_clk                      (ap_clk                                         ),
-        .areset                      (areset_serial_read                             ),
-        .configuration_in            (engine_serial_read_configuration_in            ),
-        .request_out                 (engine_serial_read_request_out                 ),
-        .fifo_request_out_signals_in (engine_serial_read_fifo_request_out_signals_in ),
-        .fifo_request_out_signals_out(engine_serial_read_fifo_request_out_signals_out),
-        .fifo_setup_signal           (engine_serial_read_fifo_setup_signal           ),
-        .start_in                    (engine_serial_read_start_in                    ),
-        .pause_in                    (engine_serial_read_pause_in                    ),
-        .ready_out                   (engine_serial_read_ready_out                   ),
-        .done_out                    (engine_serial_read_done_out                    )
-    );
-
-// --------------------------------------------------------------------------------------
-// FIFO cache requests out MemoryPacket
+// FIFO OUTPUT requests MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_out_setup_signal_int = fifo_request_out_signals_out_int.wr_rst_busy | fifo_request_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_out_signals_in_int.wr_en = engine_serial_read_request_out.valid;
-    assign fifo_request_out_din                  = engine_serial_read_request_out.payload;
+    assign fifo_request_out_signals_in_int.wr_en = 1'b0;
+    assign fifo_request_out_din                  = 0;
 
     // Pop
     assign fifo_request_out_signals_in_int.rd_en = ~fifo_request_out_signals_out_int.empty & fifo_request_out_signals_in_reg.rd_en;
@@ -448,12 +270,17 @@ module bundle_engines #(
     );
 
 // --------------------------------------------------------------------------------------
-// Bundles Arbitration
+// Engines Arbitration INPUT
 // --------------------------------------------------------------------------------------
 
 
 // --------------------------------------------------------------------------------------
-// Generate Bundles
+// Engines Arbitration OUTPUT
+// --------------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------------------------------------
+// Generate Engines
 // --------------------------------------------------------------------------------------
 
 

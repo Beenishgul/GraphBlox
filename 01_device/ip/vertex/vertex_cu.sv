@@ -187,6 +187,10 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // FIFO 
 // --------------------------------------------------------------------------------------
+    
+    assign request_out_reg               = 0;
+    assign fifo_response_signals_out_int = engine_stride_index_fifo_response_signals_out;
+    assign fifo_request_signals_out_int  = engine_stride_index_fifo_request_signals_out;
 
 // --------------------------------------------------------------------------------------
 // Instantiate vertex scheduling using stride index generator
@@ -222,12 +226,9 @@ module vertex_cu #(
 // Instantiate vertex bundles
 // --------------------------------------------------------------------------------------
 
-    assign request_out_reg               = 0;
-    assign fifo_response_signals_out_int = engine_stride_index_fifo_response_signals_out;
-    assign fifo_request_signals_out_int  = engine_stride_index_fifo_request_signals_out;
+
 
     assign engine_stride_index_descriptor_in                 = descriptor_in_reg  ;
-
     assign engine_stride_index_response_in                    = response_in_reg;
 
     logic                  areset_bundles                             ;
