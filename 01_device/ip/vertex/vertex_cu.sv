@@ -24,20 +24,18 @@ import PKG_CACHE::*;
 
 module vertex_cu #(
     parameter ENGINE_ID_VERTEX = 0 ,
-    parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
     parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
     input  logic                  areset                   ,
     input  KernelDescriptor       descriptor_in            ,
-    output MemoryPacket           request_out              ,
-    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
-    output FIFOStateSignalsOutput fifo_request_signals_out ,
     input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
+    output MemoryPacket           request_out              ,
+    input  FIFOStateSignalsInput  fifo_request_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
     output logic                  done_out
 );
@@ -46,7 +44,6 @@ module vertex_cu #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic            areset_vertex_cu ;
-    logic            areset_fifo      ;
     KernelDescriptor descriptor_in_reg;
     MemoryPacket     response_in_reg  ;
     MemoryPacket     request_out_reg  ;
@@ -66,7 +63,6 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Instantiate vertex scheduling using stride index generator
 // --------------------------------------------------------------------------------------
-
     logic                  areset_stride_index                          ;
     KernelDescriptor       engine_stride_index_descriptor_in            ;
     MemoryPacket           engine_stride_index_request_out              ;
@@ -78,6 +74,22 @@ module vertex_cu #(
     logic                  engine_stride_index_fifo_setup_signal        ;
     logic                  engine_stride_index_done_out                 ;
 
+// --------------------------------------------------------------------------------------
+// Instantiate vertex bundles
+// --------------------------------------------------------------------------------------
+    logic                  areset_bundles                             ;
+    KernelDescriptor       vertex_bundles_descriptor_in               ;
+    MemoryPacket           vertex_bundles_request_in                  ;
+    FIFOStateSignalsInput  vertex_bundles_fifo_request_in_signals_in  ;
+    FIFOStateSignalsOutput vertex_bundles_fifo_request_in_signals_out ;
+    MemoryPacket           vertex_bundles_request_out                 ;
+    FIFOStateSignalsInput  vertex_bundles_fifo_request_out_signals_in ;
+    FIFOStateSignalsOutput vertex_bundles_fifo_request_out_signals_out;
+    MemoryPacket           vertex_bundles_response_in                 ;
+    FIFOStateSignalsInput  vertex_bundles_fifo_response_in_signals_in ;
+    FIFOStateSignalsOutput vertex_bundles_fifo_response_in_signals_out;
+    logic                  vertex_bundles_fifo_setup_signal           ;
+    logic                  vertex_bundles_done_out                    ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -85,7 +97,7 @@ module vertex_cu #(
     always_ff @(posedge ap_clk) begin
         areset_vertex_cu    <= areset;
         areset_stride_index <= areset;
-        areset_fifo         <= areset;
+        areset_bundles      <= areset;
     end
 
 
@@ -170,7 +182,7 @@ module vertex_cu #(
             done_out          <= 1'b0;
         end
         else begin
-            fifo_setup_signal <= engine_stride_index_fifo_setup_signal;
+            fifo_setup_signal <= engine_stride_index_fifo_setup_signal | vertex_bundles_fifo_setup_signal;
             request_out.valid <= request_out_reg.valid ;
             // done_out          <= engine_stride_index_done_out | done_signal_reg;
             done_out          <= engine_stride_index_done_out;
@@ -185,39 +197,35 @@ module vertex_cu #(
     end
 
 // --------------------------------------------------------------------------------------
-// FIFO 
+// FIFO
 // --------------------------------------------------------------------------------------
-    
-    assign request_out_reg               = 0;
-    assign fifo_response_signals_out_int = engine_stride_index_fifo_response_signals_out;
-    assign fifo_request_signals_out_int  = engine_stride_index_fifo_request_signals_out;
+    assign request_out_reg               = vertex_bundles_request_out;
+    assign fifo_response_signals_out_int = vertex_bundles_fifo_response_in_signals_out;
+    assign fifo_request_signals_out_int  = vertex_bundles_fifo_request_out_signals_out;
 
 // --------------------------------------------------------------------------------------
 // Instantiate vertex scheduling using stride index generator
 // --------------------------------------------------------------------------------------
     assign engine_stride_index_descriptor_in                 = descriptor_in_reg  ;
-    assign engine_stride_index_fifo_request_signals_in.rd_en = 1'b1  ;
-
-    // FIFOStateSignalsOutput engine_stride_index_fifo_request_signals_out ;
-    // FIFOStateSignalsOutput engine_stride_index_fifo_response_signals_out;
+    assign engine_stride_index_fifo_request_signals_in.rd_en = ~vertex_bundles_fifo_request_in_signals_out.prog_full ;
 
     assign engine_stride_index_response_in                    = response_in_reg;
     assign engine_stride_index_fifo_response_signals_in.rd_en = 1'b1  ;
 
     engine_stride_index #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
+        .ENGINE_ID_BUNDLE(0               ),
+        .ENGINE_ID_ENGINE(0               )
     ) inst_engine_stride_index (
         .ap_clk                   (ap_clk                                       ),
         .areset                   (areset_stride_index                          ),
         .descriptor_in            (engine_stride_index_descriptor_in            ),
-        .request_out              (engine_stride_index_request_out              ),
-        .fifo_request_signals_in  (engine_stride_index_fifo_request_signals_in  ),
-        .fifo_request_signals_out (engine_stride_index_fifo_request_signals_out ),
         .response_in              (engine_stride_index_response_in              ),
         .fifo_response_signals_in (engine_stride_index_fifo_response_signals_in ),
         .fifo_response_signals_out(engine_stride_index_fifo_response_signals_out),
+        .request_out              (engine_stride_index_request_out              ),
+        .fifo_request_signals_in  (engine_stride_index_fifo_request_signals_in  ),
+        .fifo_request_signals_out (engine_stride_index_fifo_request_signals_out ),
         .fifo_setup_signal        (engine_stride_index_fifo_setup_signal        ),
         .done_out                 (engine_stride_index_done_out                 )
     );
@@ -225,43 +233,29 @@ module vertex_cu #(
 // --------------------------------------------------------------------------------------
 // Instantiate vertex bundles
 // --------------------------------------------------------------------------------------
+    assign vertex_bundles_descriptor_in = descriptor_in_reg  ;
 
+    assign vertex_bundles_request_in                       = engine_stride_index_request_out;
+    assign vertex_bundles_fifo_request_in_signals_in.rd_en = 1'b1;
 
+    assign vertex_bundles_response_in                 = response_in_reg;
+    assign vertex_bundles_fifo_response_in_signals_in = fifo_response_signals_in_reg;
 
-    assign engine_stride_index_descriptor_in                 = descriptor_in_reg  ;
-    assign engine_stride_index_response_in                    = response_in_reg;
+    assign vertex_bundles_fifo_request_out_signals_in = fifo_request_signals_in_reg ;
 
-    logic                  areset_bundles                             ;
-    KernelDescriptor       vertex_bundles_descriptor_in               ;
-    MemoryPacket           vertex_bundles_request_in                  ;
-    FIFOStateSignalsInput  vertex_bundles_fifo_request_in_signals_in  ;
-    FIFOStateSignalsOutput vertex_bundles_fifo_request_in_signals_out ;
-    MemoryPacket           vertex_bundles_request_out                 ;
-    FIFOStateSignalsInput  vertex_bundles_fifo_request_out_signals_in ;
-    FIFOStateSignalsOutput vertex_bundles_fifo_request_out_signals_out;
-    MemoryPacket           vertex_bundles_response_in                 ;
-    FIFOStateSignalsInput  vertex_bundles_fifo_response_in_signals_in ;
-    FIFOStateSignalsOutput vertex_bundles_fifo_response_in_signals_out;
-    logic                  vertex_bundles_fifo_setup_signal           ;
-    logic                  vertex_bundles_done_out                    ;
-
-    vertex_bundles #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE)
-    ) inst_vertex_bundles (
+    vertex_bundles #(.ENGINE_ID_VERTEX(ENGINE_ID_VERTEX)) inst_vertex_bundles (
         .ap_clk                      (ap_clk                                     ),
-        .areset                      (vertex_bundles_areset                      ),
+        .areset                      (areset_bundles                             ),
         .descriptor_in               (vertex_bundles_descriptor_in               ),
         .request_in                  (vertex_bundles_request_in                  ),
         .fifo_request_in_signals_in  (vertex_bundles_fifo_request_in_signals_in  ),
         .fifo_request_in_signals_out (vertex_bundles_fifo_request_in_signals_out ),
-        .request_out                 (vertex_bundles_request_out                 ),
-        .fifo_request_out_signals_in (vertex_bundles_fifo_request_out_signals_in ),
-        .fifo_request_out_signals_out(vertex_bundles_fifo_request_out_signals_out),
         .response_in                 (vertex_bundles_response_in                 ),
         .fifo_response_in_signals_in (vertex_bundles_fifo_response_in_signals_in ),
         .fifo_response_in_signals_out(vertex_bundles_fifo_response_in_signals_out),
+        .request_out                 (vertex_bundles_request_out                 ),
+        .fifo_request_out_signals_in (vertex_bundles_fifo_request_out_signals_in ),
+        .fifo_request_out_signals_out(vertex_bundles_fifo_request_out_signals_out),
         .fifo_setup_signal           (vertex_bundles_fifo_setup_signal           ),
         .done_out                    (vertex_bundles_done_out                    )
     );
