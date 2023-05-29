@@ -24,10 +24,17 @@ package PKG_GLOBALS;
 	parameter CU_CACHE_SIZE_BYTES = 32768                                  ; // size in Bytes 32KB
 	parameter CU_CACHE_LINES_NUM  = CU_CACHE_SIZE_BYTES / (M_AXI4_DATA_W/8); // size in lines 512 (cacheline 64Bytes)
 
-	parameter CU_VERTEX_COUNT_TOTAL = 16;
+// Kernel current supported engines/bundles/buffers
+	parameter CU_VERTEX_COUNT = 1 ;
+	parameter CU_BUNDLE_COUNT = 4 ;
+	parameter CU_ENGINE_COUNT = 8 ;
+	parameter CU_BUFFER_COUNT = 10;
+
+// Maximum supported engines/bundles/buffers
+	parameter CU_VERTEX_COUNT_TOTAL = 64;
 	parameter CU_BUNDLE_COUNT_TOTAL = 8 ;
 	parameter CU_ENGINE_COUNT_TOTAL = 8 ;
-	parameter CU_BUFFER_COUNT_TOTAL = 12;
+	parameter CU_BUFFER_COUNT_TOTAL = 10;
 
 	parameter CU_VERTEX_COUNT_WIDTH_BITS = $clog2(CU_VERTEX_COUNT_TOTAL); // 5
 	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL        ;

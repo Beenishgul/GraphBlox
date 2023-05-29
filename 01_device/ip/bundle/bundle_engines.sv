@@ -22,8 +22,8 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module bundle_engines #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter COUNTER_WIDTH    = 32
+    parameter ENGINE_ID_VERTEX = 0,
+    parameter ENGINE_ID_BUNDLE = 0
 ) (
     // System Signals
     input  logic                  ap_clk                      ,
@@ -83,7 +83,7 @@ module bundle_engines #(
     FIFOStateSignalsInput  fifo_request_out_signals_in_int  ;
     FIFOStateSignalsOutput fifo_request_out_signals_out_int ;
     logic                  fifo_request_out_setup_signal_int;
-    
+
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
