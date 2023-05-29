@@ -43,6 +43,7 @@ then
    config+="sp=${KERNEL_NAME}_1.buffer_6:HBM[1]\n"
    config+="sp=${KERNEL_NAME}_1.buffer_7:HBM[1]\n"
    config+="sp=${KERNEL_NAME}_1.buffer_8:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_9:HBM[1]\n"
 elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR0\n"
@@ -55,6 +56,7 @@ then
    config+="sp=${KERNEL_NAME}_1.buffer_6:DDR[0]\n"
    config+="sp=${KERNEL_NAME}_1.buffer_7:DDR[0]\n"
    config+="sp=${KERNEL_NAME}_1.buffer_8:DDR[0]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_9:DDR[0]\n"
 else
   config+="slr=${KERNEL_NAME}_1:SLR0\n"
   config+="sp=${KERNEL_NAME}_1.buffer_0:DDR[0]\n"
@@ -66,6 +68,7 @@ else
   config+="sp=${KERNEL_NAME}_1.buffer_6:DDR[0]\n"
   config+="sp=${KERNEL_NAME}_1.buffer_7:DDR[0]\n"
   config+="sp=${KERNEL_NAME}_1.buffer_8:DDR[0]\n"
+  config+="sp=${KERNEL_NAME}_1.buffer_9:DDR[0]\n"
 fi
 
 
