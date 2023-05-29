@@ -267,10 +267,10 @@ module kernel_setup #(
     always_comb begin
         configuration_comb.payload.param.increment     = 1'b1;
         configuration_comb.payload.param.decrement     = 1'b0;
-        configuration_comb.payload.param.array_pointer = descriptor_in_reg.payload.graph_csr_struct;
-        configuration_comb.payload.param.array_size    = descriptor_in_reg.payload.auxiliary_2;
+        configuration_comb.payload.param.array_pointer = descriptor_in_reg.payload.buffer_0;
+        configuration_comb.payload.param.array_size    = descriptor_in_reg.payload.buffer_8;
         configuration_comb.payload.param.start_read    = 0;
-        configuration_comb.payload.param.end_read      = descriptor_in_reg.payload.auxiliary_2;
+        configuration_comb.payload.param.end_read      = descriptor_in_reg.payload.buffer_8;
         configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
@@ -282,7 +282,7 @@ module kernel_setup #(
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_engine      = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_buffer      = 0;
-        configuration_comb.payload.meta.address.base            = descriptor_in_reg.payload.graph_csr_struct;
+        configuration_comb.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
         configuration_comb.payload.meta.address.offset          = 0;
         configuration_comb.payload.meta.address.shift.amount    = $clog2(CACHE_FRONTEND_DATA_W/8);
         configuration_comb.payload.meta.address.shift.direction = 1'b1;

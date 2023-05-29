@@ -122,21 +122,22 @@ module top #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
   (* DONT_TOUCH                              = "yes" *)
-  reg           areset             = 1'b0;
-  wire          ap_start                 ;
-  wire          ap_idle                  ;
-  wire          ap_done                  ;
-  wire          ap_ready                 ;
-  wire          ap_continue              ;
-  wire [64-1:0] graph_csr_struct         ;
-  wire [64-1:0] vertex_out_degree        ;
-  wire [64-1:0] vertex_in_degree         ;
-  wire [64-1:0] vertex_edges_idx         ;
-  wire [64-1:0] edges_array_weight       ;
-  wire [64-1:0] edges_array_src          ;
-  wire [64-1:0] edges_array_dest         ;
-  wire [64-1:0] auxiliary_1              ;
-  wire [64-1:0] auxiliary_2              ;
+  reg           areset      = 1'b0;
+  wire          ap_start          ;
+  wire          ap_idle           ;
+  wire          ap_done           ;
+  wire          ap_ready          ;
+  wire          ap_continue       ;
+  wire [64-1:0] buffer_0          ;
+  wire [64-1:0] buffer_1          ;
+  wire [64-1:0] buffer_2          ;
+  wire [64-1:0] buffer_3          ;
+  wire [64-1:0] buffer_4          ;
+  wire [64-1:0] buffer_5          ;
+  wire [64-1:0] buffer_6          ;
+  wire [64-1:0] buffer_7          ;
+  wire [64-1:0] buffer_8          ;
+  wire [64-1:0] buffer_9          ;
 
 // Register and invert reset signal.
   always @(posedge ap_clk) begin
@@ -146,48 +147,47 @@ module top #(
 // --------------------------------------------------------------------------------------
 // Begin control interface RTL.  Modifying not recommended.
 // --------------------------------------------------------------------------------------
-
-
 // AXI4-Lite slave interface
   top_control_s_axi #(
     .C_S_AXI_ADDR_WIDTH(C_S_AXI_CONTROL_ADDR_WIDTH),
     .C_S_AXI_DATA_WIDTH(C_S_AXI_CONTROL_DATA_WIDTH)
   ) inst_top_control_s_axi (
-    .ACLK              (ap_clk               ),
-    .ARESET            (areset               ),
-    .ACLK_EN           (1'b1                 ),
-    .AWVALID           (s_axi_control_awvalid),
-    .AWREADY           (s_axi_control_awready),
-    .AWADDR            (s_axi_control_awaddr ),
-    .WVALID            (s_axi_control_wvalid ),
-    .WREADY            (s_axi_control_wready ),
-    .WDATA             (s_axi_control_wdata  ),
-    .WSTRB             (s_axi_control_wstrb  ),
-    .ARVALID           (s_axi_control_arvalid),
-    .ARREADY           (s_axi_control_arready),
-    .ARADDR            (s_axi_control_araddr ),
-    .RVALID            (s_axi_control_rvalid ),
-    .RREADY            (s_axi_control_rready ),
-    .RDATA             (s_axi_control_rdata  ),
-    .RRESP             (s_axi_control_rresp  ),
-    .BVALID            (s_axi_control_bvalid ),
-    .BREADY            (s_axi_control_bready ),
-    .BRESP             (s_axi_control_bresp  ),
-    .interrupt         (interrupt            ),
-    .ap_start          (ap_start             ),
-    .ap_done           (ap_done              ),
-    .ap_ready          (ap_ready             ),
-    .ap_idle           (ap_idle              ),
-    .ap_continue       (ap_continue          ),
-    .graph_csr_struct  (graph_csr_struct     ),
-    .vertex_out_degree (vertex_out_degree    ),
-    .vertex_in_degree  (vertex_in_degree     ),
-    .vertex_edges_idx  (vertex_edges_idx     ),
-    .edges_array_weight(edges_array_weight   ),
-    .edges_array_src   (edges_array_src      ),
-    .edges_array_dest  (edges_array_dest     ),
-    .auxiliary_1       (auxiliary_1          ),
-    .auxiliary_2       (auxiliary_2          )
+    .ACLK       (ap_clk               ),
+    .ARESET     (areset               ),
+    .ACLK_EN    (1'b1                 ),
+    .AWVALID    (s_axi_control_awvalid),
+    .AWREADY    (s_axi_control_awready),
+    .AWADDR     (s_axi_control_awaddr ),
+    .WVALID     (s_axi_control_wvalid ),
+    .WREADY     (s_axi_control_wready ),
+    .WDATA      (s_axi_control_wdata  ),
+    .WSTRB      (s_axi_control_wstrb  ),
+    .ARVALID    (s_axi_control_arvalid),
+    .ARREADY    (s_axi_control_arready),
+    .ARADDR     (s_axi_control_araddr ),
+    .RVALID     (s_axi_control_rvalid ),
+    .RREADY     (s_axi_control_rready ),
+    .RDATA      (s_axi_control_rdata  ),
+    .RRESP      (s_axi_control_rresp  ),
+    .BVALID     (s_axi_control_bvalid ),
+    .BREADY     (s_axi_control_bready ),
+    .BRESP      (s_axi_control_bresp  ),
+    .interrupt  (interrupt            ),
+    .ap_start   (ap_start             ),
+    .ap_done    (ap_done              ),
+    .ap_ready   (ap_ready             ),
+    .ap_idle    (ap_idle              ),
+    .ap_continue(ap_continue          ),
+    .buffer_0   (buffer_0             ),
+    .buffer_1   (buffer_1             ),
+    .buffer_2   (buffer_2             ),
+    .buffer_3   (buffer_3             ),
+    .buffer_4   (buffer_4             ),
+    .buffer_5   (buffer_5             ),
+    .buffer_6   (buffer_6             ),
+    .buffer_7   (buffer_7             ),
+    .buffer_8   (buffer_8             ),
+    .buffer_9   (buffer_9             )
   );
 
 // --------------------------------------------------------------------------------------
@@ -198,59 +198,60 @@ module top #(
     .C_M00_AXI_ADDR_WIDTH(C_M00_AXI_ADDR_WIDTH),
     .C_M00_AXI_DATA_WIDTH(C_M00_AXI_DATA_WIDTH)
   ) inst_kernel_afu (
-    .ap_clk            (ap_clk            ),
-    .ap_rst_n          (ap_rst_n          ),
-    .m00_axi_awvalid   (m00_axi_awvalid   ),
-    .m00_axi_awready   (m00_axi_awready   ),
-    .m00_axi_awaddr    (m00_axi_awaddr    ),
-    .m00_axi_awlen     (m00_axi_awlen     ),
-    .m00_axi_wvalid    (m00_axi_wvalid    ),
-    .m00_axi_wready    (m00_axi_wready    ),
-    .m00_axi_wdata     (m00_axi_wdata     ),
-    .m00_axi_wstrb     (m00_axi_wstrb     ),
-    .m00_axi_wlast     (m00_axi_wlast     ),
-    .m00_axi_bvalid    (m00_axi_bvalid    ),
-    .m00_axi_bready    (m00_axi_bready    ),
-    .m00_axi_arvalid   (m00_axi_arvalid   ),
-    .m00_axi_arready   (m00_axi_arready   ),
-    .m00_axi_araddr    (m00_axi_araddr    ),
-    .m00_axi_arlen     (m00_axi_arlen     ),
-    .m00_axi_rvalid    (m00_axi_rvalid    ),
-    .m00_axi_rready    (m00_axi_rready    ),
-    .m00_axi_rdata     (m00_axi_rdata     ),
-    .m00_axi_rlast     (m00_axi_rlast     ),
-    .m00_axi_bid       (m00_axi_bid       ),
-    .m00_axi_rid       (m00_axi_rid       ),
-    .m00_axi_rresp     (m00_axi_rresp     ),
-    .m00_axi_bresp     (m00_axi_bresp     ),
-    .m00_axi_awid      (m00_axi_awid      ),
-    .m00_axi_awsize    (m00_axi_awsize    ),
-    .m00_axi_awburst   (m00_axi_awburst   ),
-    .m00_axi_awlock    (m00_axi_awlock    ),
-    .m00_axi_awcache   (m00_axi_awcache   ),
-    .m00_axi_awprot    (m00_axi_awprot    ),
-    .m00_axi_awqos     (m00_axi_awqos     ),
-    .m00_axi_arid      (m00_axi_arid      ),
-    .m00_axi_arsize    (m00_axi_arsize    ),
-    .m00_axi_arburst   (m00_axi_arburst   ),
-    .m00_axi_arlock    (m00_axi_arlock    ),
-    .m00_axi_arcache   (m00_axi_arcache   ),
-    .m00_axi_arprot    (m00_axi_arprot    ),
-    .m00_axi_arqos     (m00_axi_arqos     ),
-    .ap_start          (ap_start          ),
-    .ap_idle           (ap_idle           ),
-    .ap_done           (ap_done           ),
-    .ap_ready          (ap_ready          ),
-    .ap_continue       (ap_continue       ),
-    .graph_csr_struct  (graph_csr_struct  ),
-    .vertex_out_degree (vertex_out_degree ),
-    .vertex_in_degree  (vertex_in_degree  ),
-    .vertex_edges_idx  (vertex_edges_idx  ),
-    .edges_array_weight(edges_array_weight),
-    .edges_array_src   (edges_array_src   ),
-    .edges_array_dest  (edges_array_dest  ),
-    .auxiliary_1       (auxiliary_1       ),
-    .auxiliary_2       (auxiliary_2       )
+    .ap_clk         (ap_clk         ),
+    .ap_rst_n       (ap_rst_n       ),
+    .m00_axi_awvalid(m00_axi_awvalid),
+    .m00_axi_awready(m00_axi_awready),
+    .m00_axi_awaddr (m00_axi_awaddr ),
+    .m00_axi_awlen  (m00_axi_awlen  ),
+    .m00_axi_wvalid (m00_axi_wvalid ),
+    .m00_axi_wready (m00_axi_wready ),
+    .m00_axi_wdata  (m00_axi_wdata  ),
+    .m00_axi_wstrb  (m00_axi_wstrb  ),
+    .m00_axi_wlast  (m00_axi_wlast  ),
+    .m00_axi_bvalid (m00_axi_bvalid ),
+    .m00_axi_bready (m00_axi_bready ),
+    .m00_axi_arvalid(m00_axi_arvalid),
+    .m00_axi_arready(m00_axi_arready),
+    .m00_axi_araddr (m00_axi_araddr ),
+    .m00_axi_arlen  (m00_axi_arlen  ),
+    .m00_axi_rvalid (m00_axi_rvalid ),
+    .m00_axi_rready (m00_axi_rready ),
+    .m00_axi_rdata  (m00_axi_rdata  ),
+    .m00_axi_rlast  (m00_axi_rlast  ),
+    .m00_axi_bid    (m00_axi_bid    ),
+    .m00_axi_rid    (m00_axi_rid    ),
+    .m00_axi_rresp  (m00_axi_rresp  ),
+    .m00_axi_bresp  (m00_axi_bresp  ),
+    .m00_axi_awid   (m00_axi_awid   ),
+    .m00_axi_awsize (m00_axi_awsize ),
+    .m00_axi_awburst(m00_axi_awburst),
+    .m00_axi_awlock (m00_axi_awlock ),
+    .m00_axi_awcache(m00_axi_awcache),
+    .m00_axi_awprot (m00_axi_awprot ),
+    .m00_axi_awqos  (m00_axi_awqos  ),
+    .m00_axi_arid   (m00_axi_arid   ),
+    .m00_axi_arsize (m00_axi_arsize ),
+    .m00_axi_arburst(m00_axi_arburst),
+    .m00_axi_arlock (m00_axi_arlock ),
+    .m00_axi_arcache(m00_axi_arcache),
+    .m00_axi_arprot (m00_axi_arprot ),
+    .m00_axi_arqos  (m00_axi_arqos  ),
+    .ap_start       (ap_start       ),
+    .ap_idle        (ap_idle        ),
+    .ap_done        (ap_done        ),
+    .ap_ready       (ap_ready       ),
+    .ap_continue    (ap_continue    ),
+    .buffer_0       (buffer_0       ),
+    .buffer_1       (buffer_1       ),
+    .buffer_2       (buffer_2       ),
+    .buffer_3       (buffer_3       ),
+    .buffer_4       (buffer_4       ),
+    .buffer_5       (buffer_5       ),
+    .buffer_6       (buffer_6       ),
+    .buffer_7       (buffer_7       ),
+    .buffer_8       (buffer_8       ),
+    .buffer_9       (buffer_9       )
   );
 
 endmodule
