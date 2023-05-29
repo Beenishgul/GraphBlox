@@ -116,7 +116,7 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
   STRUCT_KERNEL_SETUP,
   STRUCT_ENGINE_SETUP,
   STRUCT_VERTEX_CU
-} type_data_structure;
+} type_data_buffer;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
@@ -134,8 +134,8 @@ typedef struct packed{
 } MemoryPacketRoute;
 
 typedef struct packed{
-  logic                                     direct   ; // 0 - right, 1 left
-  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
+  logic                                     direct; // 0 - right, 1 left
+  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount; // SIZE = 64 bits
 } MemoryPacketAddressShift;
 
 typedef struct packed{
@@ -146,7 +146,7 @@ typedef struct packed{
 
 typedef struct packed{
   type_memory_cmd       cmd    ; // SIZE = 5 bits
-  type_data_structure   buffer ; // SIZE = 12 bits
+  type_data_buffer      buffer ; // SIZE = 12 bits
   type_engine_operand   operand; // SIZE = 6 bits
   type_filter_operation filter ; // SIZE = 6 bits
   type_ALU_operation    alu    ; // SIZE = 6 bits
