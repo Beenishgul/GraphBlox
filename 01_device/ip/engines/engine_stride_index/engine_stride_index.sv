@@ -84,16 +84,6 @@ module engine_stride_index #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-    MemoryPacket             engine_stride_index_generator_request_out             ;
-    FIFOStateSignalsOutput   engine_stride_index_generator_fifo_request_signals_out;
-    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_in ;
-    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_reg;
-    logic                    engine_stride_index_generator_pause_in                ;
-    logic                    engine_stride_index_generator_ready_out               ;
-    logic                    engine_stride_index_generator_done_out                ;
-    StrideIndexConfiguration engine_stride_index_generator_configuration_in        ;
-    logic                    engine_stride_index_generator_fifo_setup_signal       ;
-
 // Serial Read Engine Configure
 // --------------------------------------------------------------------------------------
     MemoryPacket             engine_stride_index_configure_response_in                   ;
@@ -103,6 +93,18 @@ module engine_stride_index #(
     FIFOStateSignalsOutput   engine_stride_index_configure_fifo_configuration_signals_out;
     FIFOStateSignalsInput    engine_stride_index_configure_fifo_configuration_signals_in ;
     logic                    engine_stride_index_configure_fifo_setup_signal             ;
+// --------------------------------------------------------------------------------------
+// Serial Read Engine Generator
+// --------------------------------------------------------------------------------------
+    MemoryPacket             engine_stride_index_generator_request_out             ;
+    FIFOStateSignalsOutput   engine_stride_index_generator_fifo_request_signals_out;
+    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_in ;
+    FIFOStateSignalsInput    engine_stride_index_generator_fifo_request_signals_reg;
+    logic                    engine_stride_index_generator_pause_in                ;
+    logic                    engine_stride_index_generator_ready_out               ;
+    logic                    engine_stride_index_generator_done_out                ;
+    StrideIndexConfiguration engine_stride_index_generator_configuration_in        ;
+    logic                    engine_stride_index_generator_fifo_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal

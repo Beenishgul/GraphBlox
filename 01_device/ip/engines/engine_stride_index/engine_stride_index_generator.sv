@@ -343,8 +343,7 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg.payload.meta <= fifo_request_comb.payload.meta;
-        fifo_request_din_reg.payload.data <= fifo_request_comb.payload.data;
+        fifo_request_din_reg.payload <= fifo_request_comb.payload;
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (
