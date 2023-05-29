@@ -343,7 +343,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
             fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift;
         end
         fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
-        fifo_request_comb.payload.meta.type          = configuration_reg.payload.meta.type;
+        fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
         fifo_request_comb.payload.data.field         = counter_count;
     end
 

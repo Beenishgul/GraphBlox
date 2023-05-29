@@ -286,11 +286,11 @@ module kernel_setup #(
         configuration_comb.payload.meta.address.offset       = 0;
         configuration_comb.payload.meta.address.shift        = $clog2(CACHE_FRONTEND_DATA_W/8);
         configuration_comb.payload.meta.address.direction    = 1'b1;
-        configuration_comb.payload.meta.type.cmd             = CMD_READ;
-        configuration_comb.payload.meta.type.buffer          = STRUCT_KERNEL_SETUP;
-        configuration_comb.payload.meta.type.operand         = OP_LOCATION_0;
-        configuration_comb.payload.meta.type.filter          = FILTER_NOP;
-        configuration_comb.payload.meta.type.alu             = ALU_NOP;
+        configuration_comb.payload.meta.subclass.cmd             = CMD_READ;
+        configuration_comb.payload.meta.subclass.buffer          = STRUCT_KERNEL_SETUP;
+        configuration_comb.payload.meta.subclass.operand         = OP_LOCATION_0;
+        configuration_comb.payload.meta.subclass.filter          = FILTER_NOP;
+        configuration_comb.payload.meta.subclass.alu             = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
