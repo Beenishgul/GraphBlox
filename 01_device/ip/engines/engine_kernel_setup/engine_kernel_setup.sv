@@ -338,9 +338,9 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
         fifo_request_comb.payload.meta.route        = configuration_reg.payload.meta.route;
         fifo_request_comb.payload.meta.address.base = configuration_reg.payload.param.array_pointer;
         if(configuration_reg.payload.meta.address.shift.direction) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift;
+            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift;
+            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end
         fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;

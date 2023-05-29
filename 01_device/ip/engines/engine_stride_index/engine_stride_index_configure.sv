@@ -115,23 +115,23 @@ module engine_stride_index_configure #(
     assign configuration_valid_int = &configuration_valid_reg;
 
     always_comb begin
-        configuration_meta_int.route.from.id_vertex = ENGINE_ID_VERTEX;
-        configuration_meta_int.route.from.id_bundle = ENGINE_ID_BUNDLE;
-        configuration_meta_int.route.from.id_engine = ENGINE_ID_ENGINE;
-        configuration_meta_int.route.from.id_buffer = 0;
-        configuration_meta_int.route.to.id_vertex   = ENGINE_ID_VERTEX;
-        configuration_meta_int.route.to.id_bundle   = ENGINE_ID_BUNDLE;
-        configuration_meta_int.route.to.id_engine   = ENGINE_ID_ENGINE;
-        configuration_meta_int.route.to.id_buffer   = 0;
-        configuration_meta_int.address.base         = 0;
-        configuration_meta_int.address.offset       = $clog2(CACHE_FRONTEND_DATA_W/8);
-        configuration_meta_int.address.shift        = 0;
-        configuration_meta_int.address.direction    = 1'b1;
-        configuration_meta_int.type.cmd             = CMD_INVALID;
-        configuration_meta_int.type.buffer          = STRUCT_STRIDE_INDEX;
-        configuration_meta_int.type.operand         = OP_LOCATION_0;
-        configuration_meta_int.type.filter          = FILTER_NOP;
-        configuration_meta_int.type.alu             = ALU_NOP;
+        configuration_meta_int.route.from.id_vertex    = ENGINE_ID_VERTEX;
+        configuration_meta_int.route.from.id_bundle    = ENGINE_ID_BUNDLE;
+        configuration_meta_int.route.from.id_engine    = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.from.id_buffer    = 0;
+        configuration_meta_int.route.to.id_vertex      = ENGINE_ID_VERTEX;
+        configuration_meta_int.route.to.id_bundle      = ENGINE_ID_BUNDLE;
+        configuration_meta_int.route.to.id_engine      = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.to.id_buffer      = 0;
+        configuration_meta_int.address.base            = 0;
+        configuration_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
+        configuration_meta_int.address.shift.amount    = 0;
+        configuration_meta_int.address.shift.direction = 1'b1;
+        configuration_meta_int.subclass.cmd            = CMD_INVALID;
+        configuration_meta_int.subclass.buffer         = STRUCT_STRIDE_INDEX;
+        configuration_meta_int.subclass.operand        = OP_LOCATION_0;
+        configuration_meta_int.subclass.filter         = FILTER_NOP;
+        configuration_meta_int.subclass.alu            = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -144,7 +144,7 @@ module engine_stride_index_configure #(
             configuration_reg.payload.meta.address    <= configuration_meta_int.address;
 
             if(fifo_response_dout_int.valid) begin
-                case (fifo_response_dout_int.payload.meta.address_offset >> $clog2(CACHE_FRONTEND_DATA_W/8))
+                case (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount)
                     0 : begin
                         configuration_reg.payload.param.increment <= fifo_response_dout_int.payload.data.field[0];
                         configuration_reg.payload.param.decrement <= fifo_response_dout_int.payload.data.field[1];
@@ -163,10 +163,10 @@ module engine_stride_index_configure #(
                         configuration_valid_reg[3]             <= 1'b1  ;
                     end
                     4 : begin
-                        configuration_reg.payload.param.granularity      <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
-                        configuration_reg.payload.meta.address.shift     <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
-                        configuration_reg.payload.meta.address.direction <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W];
-                        configuration_valid_reg[4]                       <= 1'b1  ;
+                        configuration_reg.payload.param.granularity            <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
+                        configuration_reg.payload.meta.address.shift.amount    <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
+                        configuration_reg.payload.meta.address.shift.direction <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W];
+                        configuration_valid_reg[4]                             <= 1'b1  ;
                     end
                     5 : begin
                         configuration_reg.payload.meta.subclass.cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
