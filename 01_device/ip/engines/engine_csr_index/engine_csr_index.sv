@@ -180,7 +180,7 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_engine_csr_index)
-            current_state <= ENGINE_STRIDE_INDEX_RESET;
+            current_state <= ENGINE_CSR_INDEX_RESET;
         else begin
             current_state <= next_state;
         end
@@ -189,86 +189,86 @@ module engine_csr_index #(
     always_comb begin
         next_state = current_state;
         case (current_state)
-            ENGINE_STRIDE_INDEX_RESET : begin
-                next_state = ENGINE_STRIDE_INDEX_IDLE;
+            ENGINE_CSR_INDEX_RESET : begin
+                next_state = ENGINE_CSR_INDEX_IDLE;
             end
-            ENGINE_STRIDE_INDEX_IDLE : begin
+            ENGINE_CSR_INDEX_IDLE : begin
                 if(~engine_csr_index_configure_fifo_configuration_signals_out.empty & descriptor_in_reg.valid & (engine_csr_index_generator_done_out & engine_csr_index_generator_ready_out))
-                    next_state = ENGINE_STRIDE_INDEX_START;
+                    next_state = ENGINE_CSR_INDEX_START;
                 else
-                    next_state = ENGINE_STRIDE_INDEX_IDLE;
+                    next_state = ENGINE_CSR_INDEX_IDLE;
             end
-            ENGINE_STRIDE_INDEX_START : begin
-                next_state = ENGINE_STRIDE_INDEX_START_TRANS;
+            ENGINE_CSR_INDEX_START : begin
+                next_state = ENGINE_CSR_INDEX_START_TRANS;
             end
-            ENGINE_STRIDE_INDEX_START_TRANS : begin
+            ENGINE_CSR_INDEX_START_TRANS : begin
                 if(engine_csr_index_generator_done_out | engine_csr_index_generator_ready_out)
-                    next_state = ENGINE_STRIDE_INDEX_START_TRANS;
+                    next_state = ENGINE_CSR_INDEX_START_TRANS;
                 else
-                    next_state = ENGINE_STRIDE_INDEX_BUSY;
+                    next_state = ENGINE_CSR_INDEX_BUSY;
             end
-            ENGINE_STRIDE_INDEX_BUSY : begin
+            ENGINE_CSR_INDEX_BUSY : begin
                 if (done_int_reg)
-                    next_state = ENGINE_STRIDE_INDEX_DONE;
+                    next_state = ENGINE_CSR_INDEX_DONE;
                 else if (fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full)
-                    next_state = ENGINE_STRIDE_INDEX_PAUSE;
+                    next_state = ENGINE_CSR_INDEX_PAUSE;
                 else
-                    next_state = ENGINE_STRIDE_INDEX_BUSY;
+                    next_state = ENGINE_CSR_INDEX_BUSY;
             end
-            ENGINE_STRIDE_INDEX_PAUSE : begin
+            ENGINE_CSR_INDEX_PAUSE : begin
                 if (~(fifo_request_signals_out_int.prog_full | fifo_response_signals_out_int.prog_full))
-                    next_state = ENGINE_STRIDE_INDEX_BUSY;
+                    next_state = ENGINE_CSR_INDEX_BUSY;
                 else
-                    next_state = ENGINE_STRIDE_INDEX_PAUSE;
+                    next_state = ENGINE_CSR_INDEX_PAUSE;
             end
-            ENGINE_STRIDE_INDEX_DONE : begin
+            ENGINE_CSR_INDEX_DONE : begin
                 if (descriptor_in_reg.valid & engine_csr_index_configure_fifo_configuration_signals_out.empty)
-                    next_state = ENGINE_STRIDE_INDEX_DONE;
+                    next_state = ENGINE_CSR_INDEX_DONE;
                 else
-                    next_state = ENGINE_STRIDE_INDEX_IDLE;
+                    next_state = ENGINE_CSR_INDEX_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            ENGINE_STRIDE_INDEX_RESET : begin
+            ENGINE_CSR_INDEX_RESET : begin
                 done_int_reg                                                   <= 1'b1;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
-            ENGINE_STRIDE_INDEX_IDLE : begin
+            ENGINE_CSR_INDEX_IDLE : begin
                 done_int_reg                                                   <= 1'b0;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
-            ENGINE_STRIDE_INDEX_START : begin
+            ENGINE_CSR_INDEX_START : begin
                 done_int_reg                                                   <= 1'b0;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b1;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
-            ENGINE_STRIDE_INDEX_START_TRANS : begin
+            ENGINE_CSR_INDEX_START_TRANS : begin
                 done_int_reg                                                   <= 1'b0;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
-            ENGINE_STRIDE_INDEX_BUSY : begin
+            ENGINE_CSR_INDEX_BUSY : begin
                 done_int_reg                                                   <= engine_csr_index_generator_done_out & engine_csr_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_signals_out_int.prog_full;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
-            ENGINE_STRIDE_INDEX_PAUSE : begin
+            ENGINE_CSR_INDEX_PAUSE : begin
                 done_int_reg                                                   <= 1'b0;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b1;
             end
-            ENGINE_STRIDE_INDEX_DONE : begin
+            ENGINE_CSR_INDEX_DONE : begin
                 done_int_reg                                                   <= 1'b1;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= 1'b0;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
