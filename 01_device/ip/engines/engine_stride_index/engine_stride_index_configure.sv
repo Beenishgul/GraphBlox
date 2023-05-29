@@ -169,15 +169,15 @@ module engine_stride_index_configure #(
                         configuration_valid_reg[4]                       <= 1'b1  ;
                     end
                     5 : begin
-                        configuration_reg.payload.meta.type.cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
-                        configuration_reg.payload.meta.type.buffer <= type_data_buffer'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
-                        configuration_valid_reg[5]                 <= 1'b1  ;
+                        configuration_reg.payload.meta.subclass.cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
+                        configuration_reg.payload.meta.subclass.buffer <= type_data_buffer'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
+                        configuration_valid_reg[5]                     <= 1'b1  ;
                     end
                     6 : begin
-                        configuration_reg.payload.meta.type.operand <= type_engine_operand'(fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0]);
-                        configuration_reg.payload.meta.type.filter  <= type_filter_operation'(fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
-                        configuration_reg.payload.meta.type.alu     <= type_ALU_operation'(fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
-                        configuration_valid_reg[6]                  <= 1'b1  ;
+                        configuration_reg.payload.meta.subclass.operand <= type_engine_operand'(fifo_response_dout_int.payload.data.field[TYPE_ENGINE_OPERAND_BITS-1:0]);
+                        configuration_reg.payload.meta.subclass.filter  <= type_filter_operation'(fifo_response_dout_int.payload.data.field[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
+                        configuration_reg.payload.meta.subclass.alu     <= type_ALU_operation'(fifo_response_dout_int.payload.data.field[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
+                        configuration_valid_reg[6]                      <= 1'b1  ;
                     end
                     7 : begin
                         configuration_reg.payload.meta.route.to.id_vertex <= fifo_response_dout_int.payload.data.field[(CU_VERTEX_COUNT_WIDTH_BITS)-1:0];
@@ -211,7 +211,7 @@ module engine_stride_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((fifo_response_dout_int.payload.meta.type.buffer == STRUCT_KERNEL_SETUP)|(fifo_response_dout_int.payload.meta.type.buffer == STRUCT_ENGINE_SETUP));
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((fifo_response_dout_int.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(fifo_response_dout_int.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop

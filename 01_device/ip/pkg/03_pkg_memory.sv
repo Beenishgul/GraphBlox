@@ -153,9 +153,9 @@ typedef struct packed{
 } MemoryPacketType;
 
 typedef struct packed{
-  MemoryPacketRoute   route  ;
-  MemoryPacketAddress address;
-  MemoryPacketType    type   ;
+  MemoryPacketRoute   route   ;
+  MemoryPacketAddress address ;
+  MemoryPacketType    subclass;
 } MemoryPacketMeta;
 
 typedef struct packed{
