@@ -117,17 +117,17 @@ module vertex_cu #(
         end
         else begin
             if (descriptor_in_reg.valid) begin
-                if(counter >= 100000) begin
+                if(counter >= 200) begin
                     done_signal_reg <= 1'b1;
                     counter         <= 0;
                 end
                 else begin
-                    if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
+                    // if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
                         counter <= counter + 1;
-                        if (counter == 0)
-                            $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field);
-                    end else
-                    counter <= counter;
+                        // if (counter == 0)
+                        //     $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field);
+                    // end else
+                    // counter <= counter;
                 end
             end else begin
                 done_signal_reg <= 1'b0;
@@ -184,8 +184,8 @@ module vertex_cu #(
         else begin
             fifo_setup_signal <= engine_stride_index_fifo_setup_signal | vertex_bundles_fifo_setup_signal;
             request_out.valid <= request_out_reg.valid ;
-            done_out          <= engine_stride_index_done_out | done_signal_reg;
-            // done_out          <= engine_stride_index_done_out;
+            // done_out          <= engine_stride_index_done_out | done_signal_reg;
+            done_out          <= engine_stride_index_done_out;
 
         end
     end
