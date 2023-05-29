@@ -21,10 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module vertex_bundles #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter COUNTER_WIDTH    = 32
-) (
+module vertex_bundles #(parameter ENGINE_ID_VERTEX = 0) (
     // System Signals
     input  logic                  ap_clk                      ,
     input  logic                  areset                      ,
