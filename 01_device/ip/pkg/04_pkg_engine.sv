@@ -178,14 +178,14 @@ package PKG_ENGINE;
     } ReadWriteEngineConfigurationParameters;
 
     typedef struct packed{
-        SerialReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
+        ReadWriteEngineConfigurationParameters param;
+        MemoryPacketMeta                       meta ;
     } ReadWriteEngineConfigurationPayload;
 
 
     typedef struct packed{
-        logic                                valid  ;
-        SerialReadEngineConfigurationPayload payload;
+        logic                               valid  ;
+        ReadWriteEngineConfigurationPayload payload;
     } ReadWriteEngineConfiguration;
 
 
