@@ -345,7 +345,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg.payload.meta <= fifo_request_comb.payload.meta;
+        fifo_request_din_reg.payload <= fifo_request_comb.payload;
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (
