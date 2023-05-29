@@ -89,17 +89,17 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] offset       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] degree       ;
-    } CSRIndexGeneratorConfigurationParameters;
+    } CSRIndexConfigurationParameters;
 
     typedef struct packed{
-        CSRIndexGeneratorConfigurationParameters param;
-        MemoryPacketMeta                         meta ;
-    } CSRIndexGeneratorConfigurationPayload;
+        CSRIndexConfigurationParameters param;
+        MemoryPacketMeta                meta ;
+    } CSRIndexConfigurationPayload;
 
     typedef struct packed{
-        logic                                 valid  ;
-        CSRIndexGeneratorConfigurationPayload payload;
-    } CSRIndexGeneratorConfiguration;
+        logic                        valid  ;
+        CSRIndexConfigurationPayload payload;
+    } CSRIndexConfiguration;
 
 // Serial\_Read\_Engine
 // --------------------
