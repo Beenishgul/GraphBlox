@@ -25,62 +25,63 @@ module kernel_afu #(
   parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
 ) (
   // System Signals
-  input  logic                              ap_clk            ,
-  input  logic                              ap_rst_n          ,
+  input  logic                              ap_clk         ,
+  input  logic                              ap_rst_n       ,
   // AXI4 master interface m00_axi
-  output logic                              m00_axi_awvalid   ,
-  input  logic                              m00_axi_awready   ,
-  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr    ,
-  output logic [                     8-1:0] m00_axi_awlen     ,
-  output logic                              m00_axi_wvalid    ,
-  input  logic                              m00_axi_wready    ,
-  output logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata     ,
-  output logic [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb     ,
-  output logic                              m00_axi_wlast     ,
-  input  logic                              m00_axi_bvalid    ,
-  output logic                              m00_axi_bready    ,
-  output logic                              m00_axi_arvalid   ,
-  input  logic                              m00_axi_arready   ,
-  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr    ,
-  output logic [                     8-1:0] m00_axi_arlen     ,
-  input  logic                              m00_axi_rvalid    ,
-  output logic                              m00_axi_rready    ,
-  input  logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata     ,
-  input  logic                              m00_axi_rlast     ,
+  output logic                              m00_axi_awvalid,
+  input  logic                              m00_axi_awready,
+  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr ,
+  output logic [                     8-1:0] m00_axi_awlen  ,
+  output logic                              m00_axi_wvalid ,
+  input  logic                              m00_axi_wready ,
+  output logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata  ,
+  output logic [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb  ,
+  output logic                              m00_axi_wlast  ,
+  input  logic                              m00_axi_bvalid ,
+  output logic                              m00_axi_bready ,
+  output logic                              m00_axi_arvalid,
+  input  logic                              m00_axi_arready,
+  output logic [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr ,
+  output logic [                     8-1:0] m00_axi_arlen  ,
+  input  logic                              m00_axi_rvalid ,
+  output logic                              m00_axi_rready ,
+  input  logic [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata  ,
+  input  logic                              m00_axi_rlast  ,
   // Control Signals
   // AXI4 master interface m00_axi missing ports
-  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_bid       ,
-  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_rid       ,
-  input  logic [                     2-1:0] m00_axi_rresp     ,
-  input  logic [                     2-1:0] m00_axi_bresp     ,
-  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_awid      ,
-  output logic [                     3-1:0] m00_axi_awsize    ,
-  output logic [                     2-1:0] m00_axi_awburst   ,
-  output logic [                     1-1:0] m00_axi_awlock    ,
-  output logic [                     4-1:0] m00_axi_awcache   ,
-  output logic [                     3-1:0] m00_axi_awprot    ,
-  output logic [                     4-1:0] m00_axi_awqos     ,
-  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_arid      ,
-  output logic [                     3-1:0] m00_axi_arsize    ,
-  output logic [                     2-1:0] m00_axi_arburst   ,
-  output logic [                     1-1:0] m00_axi_arlock    ,
-  output logic [                     4-1:0] m00_axi_arcache   ,
-  output logic [                     3-1:0] m00_axi_arprot    ,
-  output logic [                     4-1:0] m00_axi_arqos     ,
-  input  logic                              ap_start          ,
-  output logic                              ap_idle           ,
-  output logic                              ap_done           ,
-  output logic                              ap_ready          ,
-  input  logic                              ap_continue       ,
-  input  logic [                    64-1:0] graph_csr_struct  ,
-  input  logic [                    64-1:0] vertex_out_degree ,
-  input  logic [                    64-1:0] vertex_in_degree  ,
-  input  logic [                    64-1:0] vertex_edges_idx  ,
-  input  logic [                    64-1:0] edges_array_weight,
-  input  logic [                    64-1:0] edges_array_src   ,
-  input  logic [                    64-1:0] edges_array_dest  ,
-  input  logic [                    64-1:0] auxiliary_1       ,
-  input  logic [                    64-1:0] auxiliary_2
+  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_bid    ,
+  input  logic [        CACHE_AXI_ID_W-1:0] m00_axi_rid    ,
+  input  logic [                     2-1:0] m00_axi_rresp  ,
+  input  logic [                     2-1:0] m00_axi_bresp  ,
+  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_awid   ,
+  output logic [                     3-1:0] m00_axi_awsize ,
+  output logic [                     2-1:0] m00_axi_awburst,
+  output logic [                     1-1:0] m00_axi_awlock ,
+  output logic [                     4-1:0] m00_axi_awcache,
+  output logic [                     3-1:0] m00_axi_awprot ,
+  output logic [                     4-1:0] m00_axi_awqos  ,
+  output logic [        CACHE_AXI_ID_W-1:0] m00_axi_arid   ,
+  output logic [                     3-1:0] m00_axi_arsize ,
+  output logic [                     2-1:0] m00_axi_arburst,
+  output logic [                     1-1:0] m00_axi_arlock ,
+  output logic [                     4-1:0] m00_axi_arcache,
+  output logic [                     3-1:0] m00_axi_arprot ,
+  output logic [                     4-1:0] m00_axi_arqos  ,
+  input  logic                              ap_start       ,
+  output logic                              ap_idle        ,
+  output logic                              ap_done        ,
+  output logic                              ap_ready       ,
+  input  logic                              ap_continue    ,
+  input  logic [                    64-1:0] buffer_0       ,
+  input  logic [                    64-1:0] buffer_1       ,
+  input  logic [                    64-1:0] buffer_2       ,
+  input  logic [                    64-1:0] buffer_3       ,
+  input  logic [                    64-1:0] buffer_4       ,
+  input  logic [                    64-1:0] buffer_5       ,
+  input  logic [                    64-1:0] buffer_6       ,
+  input  logic [                    64-1:0] buffer_7       ,
+  input  logic [                    64-1:0] buffer_8       ,
+  input  logic [                    64-1:0] buffer_9       
 );
 
 // --------------------------------------------------------------------------------------
@@ -140,10 +141,10 @@ module kernel_afu #(
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi               <= ~ap_rst_n;
-    areset_cu                  <= ~ap_rst_n | ap_done;
-    areset_control             <= ~ap_rst_n;
-    areset_cache               <= ~ap_rst_n;
+    areset_m_axi   <= ~ap_rst_n;
+    areset_cu      <= ~ap_rst_n | ap_done;
+    areset_control <= ~ap_rst_n;
+    areset_cache   <= ~ap_rst_n;
   end
 
 // --------------------------------------------------------------------------------------
@@ -288,15 +289,16 @@ module kernel_afu #(
 // DRIVE DESCRIPTOR
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    kernel_control_descriptor_in.graph_csr_struct   <= graph_csr_struct  ;
-    kernel_control_descriptor_in.vertex_out_degree  <= vertex_out_degree ;
-    kernel_control_descriptor_in.vertex_in_degree   <= vertex_in_degree  ;
-    kernel_control_descriptor_in.vertex_edges_idx   <= vertex_edges_idx  ;
-    kernel_control_descriptor_in.edges_array_weight <= edges_array_weight;
-    kernel_control_descriptor_in.edges_array_src    <= edges_array_src   ;
-    kernel_control_descriptor_in.edges_array_dest   <= edges_array_dest  ;
-    kernel_control_descriptor_in.auxiliary_1        <= auxiliary_1       ;
-    kernel_control_descriptor_in.auxiliary_2        <= auxiliary_2       ;
+    kernel_control_descriptor_in.buffer_0 <= buffer_0  ;
+    kernel_control_descriptor_in.buffer_1 <= buffer_1  ;
+    kernel_control_descriptor_in.buffer_2 <= buffer_2  ;
+    kernel_control_descriptor_in.buffer_3 <= buffer_3  ;
+    kernel_control_descriptor_in.buffer_4 <= buffer_4  ;
+    kernel_control_descriptor_in.buffer_5 <= buffer_5  ;
+    kernel_control_descriptor_in.buffer_6 <= buffer_6  ;
+    kernel_control_descriptor_in.buffer_7 <= buffer_7  ;
+    kernel_control_descriptor_in.buffer_8 <= buffer_8  ;
+    kernel_control_descriptor_in.buffer_9 <= buffer_9  ;
   end
 
 // --------------------------------------------------------------------------------------

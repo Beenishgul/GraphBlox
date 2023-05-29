@@ -266,65 +266,72 @@ puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"
 
 puts "[color 4 "                        Set RTL kernel (${kernel_name}) registers property"]" 
 
-puts_reg_info "graph_csr_struct" "description_text" "0x010" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "graph_csr_struct" $addr_block]
+puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_0" $addr_block]
   set_property address_offset 0x010 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "vertex_out_degree" "description_text" "0x01c" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "vertex_out_degree" $addr_block]
+puts_reg_info "buffer_1" "vertex out degree" "0x01c" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_1" $addr_block]
   set_property address_offset 0x01c $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "vertex_in_degree" "description_text" "0x028" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "vertex_in_degree" $addr_block]
+puts_reg_info "buffer_2" "vertex in degree" "0x028" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_2" $addr_block]
   set_property address_offset 0x028 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "vertex_edges_idx" "description_text" "0x034" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "vertex_edges_idx" $addr_block]
+puts_reg_info "buffer_3" "vertex edges CSR index" "0x034" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_3" $addr_block]
   set_property address_offset 0x034 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "edges_array_weight" "description_text" "0x040" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "edges_array_weight" $addr_block]
+puts_reg_info "buffer_4" "edges array weight" "0x040" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_4" $addr_block]
   set_property address_offset 0x040 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "edges_array_src" "description_text" "0x04c" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "edges_array_src" $addr_block]
+puts_reg_info "buffer_5" "edges array src" "0x04c" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_5" $addr_block]
   set_property address_offset 0x04c $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "edges_array_dest" "description_text" "0x058" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "edges_array_dest" $addr_block]
+puts_reg_info "buffer_6" "edges array dest" "0x058" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_6" $addr_block]
   set_property address_offset 0x058 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "auxiliary_1" "description_text" "0x064" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "auxiliary_1" $addr_block]
+puts_reg_info "buffer_7" "auxiliary 1" "0x064" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_7" $addr_block]
   set_property address_offset 0x064 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "auxiliary_2" "description_text" "0x070" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "auxiliary_2" $addr_block]
+puts_reg_info "buffer_8" "auxiliary 2" "0x070" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_8" $addr_block]
   set_property address_offset 0x070 $reg
+  set_property size           [expr {8*8}]   $reg
+  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set_property value m00_axi $regparam 
+
+puts_reg_info "buffer_9" "auxiliary 3" "0x07c" [expr {8*8}]
+  set reg      [::ipx::add_register -quiet "buffer_9" $addr_block]
+  set_property address_offset 0x07c $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
