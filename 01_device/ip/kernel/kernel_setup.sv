@@ -60,7 +60,7 @@ module kernel_setup #(
     kernel_setup_state next_state   ;
 
 // --------------------------------------------------------------------------------------
-// Request FIFO
+// Request FIFO OUTPUT
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_request_din             ;
     MemoryPacketPayload    fifo_request_dout            ;
@@ -70,7 +70,7 @@ module kernel_setup #(
     logic                  fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// Response FIFO
+// Response FIFO INPUT
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_response_din             ;
     MemoryPacketPayload    fifo_response_dout            ;

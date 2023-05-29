@@ -66,16 +66,6 @@ module vertex_bundles #(
     logic                  fifo_request_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT Request MemoryPacket
-// --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_out_din             ;
-    MemoryPacketPayload    fifo_request_out_dout            ;
-    FIFOStateSignalsInput  fifo_request_out_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_request_out_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_request_out_signals_out_int ;
-    logic                  fifo_request_out_setup_signal_int;
-
-// --------------------------------------------------------------------------------------
 // FIFO INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_response_in_din             ;
@@ -84,6 +74,16 @@ module vertex_bundles #(
     FIFOStateSignalsInput  fifo_response_in_signals_in_int  ;
     FIFOStateSignalsOutput fifo_response_in_signals_out_int ;
     logic                  fifo_response_in_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// FIFO OUTPUT Request MemoryPacket
+// --------------------------------------------------------------------------------------
+    MemoryPacketPayload    fifo_request_out_din             ;
+    MemoryPacketPayload    fifo_request_out_dout            ;
+    FIFOStateSignalsInput  fifo_request_out_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_request_out_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_request_out_signals_out_int ;
+    logic                  fifo_request_out_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
