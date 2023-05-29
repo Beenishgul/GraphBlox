@@ -926,11 +926,9 @@ module kernel_testbench ();
 
         bit [32-1:0] temp_edges_array_src ;
         bit [32-1:0] temp_edges_array_dest;
-
-        realcount = 0;
-
         bit [GLOBAL_DATA_WIDTH_BITS-1:0] setup_temp;
 
+        realcount = 0;
         setup_temp = 0;
         graph.csr_struct[0] = 0;
         // StrideIndexGeneratorConfiguration

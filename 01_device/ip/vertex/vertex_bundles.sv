@@ -46,6 +46,7 @@ module vertex_bundles #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_vertex_bundles;
+    logic areset_fifo          ;
 
     KernelDescriptor descriptor_in_reg;
     MemoryPacket     request_in_reg   ;

@@ -134,8 +134,8 @@ typedef struct packed{
 } MemoryPacketRoute;
 
 typedef struct packed{
-  logic                                     direct; // 0 - right, 1 left
-  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount; // SIZE = 64 bits
+  logic                                     direction; // 0 - right, 1 left
+  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
 } MemoryPacketAddressShift;
 
 typedef struct packed{
