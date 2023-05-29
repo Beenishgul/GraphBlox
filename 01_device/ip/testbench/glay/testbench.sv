@@ -938,7 +938,7 @@ module kernel_testbench ();
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - stride
 
         setup_temp[GLOBAL_DATA_WIDTH_BITS-2:0] = $clog2(GLOBAL_DATA_WIDTH_BITS/8);            // 4 - (granularity - log2 value for shifting)
-        setup_temp[GLOBAL_DATA_WIDTH_BITS] = 1'b1;                                            // 4 - shift direction 1-left 0-right
+        setup_temp[GLOBAL_DATA_WIDTH_BITS-1] = 1'b1;                                            // 4 - shift direction 1-left 0-right
         graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp; // 4 - shift direction 1-left 0-right | (granularity - log2 value for shifting)
         setup_temp = 0;
 

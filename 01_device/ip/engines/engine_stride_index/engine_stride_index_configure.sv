@@ -165,7 +165,7 @@ module engine_stride_index_configure #(
                     4 : begin
                         configuration_reg.payload.param.granularity            <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
                         configuration_reg.payload.meta.address.shift.amount    <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-2:0];
-                        configuration_reg.payload.meta.address.shift.direction <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W];
+                        configuration_reg.payload.meta.address.shift.direction <= fifo_response_dout_int.payload.data.field[CACHE_FRONTEND_DATA_W-1];
                         configuration_valid_reg[4]                             <= 1'b1  ;
                     end
                     5 : begin
@@ -211,7 +211,7 @@ module engine_stride_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((fifo_response_dout_int.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(fifo_response_dout_int.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((response_in_reg.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
