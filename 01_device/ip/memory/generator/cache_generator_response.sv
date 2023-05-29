@@ -113,7 +113,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 
   always_comb begin
     if(fifo_response_dout_int.valid) begin
-      case (fifo_response_dout_int.payload.meta.type.struct)
+      case (fifo_response_dout_int.payload.meta.type.buffer)
         STRUCT_KERNEL_SETUP : begin
           response_out_reg[0] = fifo_response_dout_int;
           response_out_reg[1] = fifo_response_dout_int;

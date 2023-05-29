@@ -329,12 +329,18 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.route          = configuration_reg.payload.meta.route;
-        fifo_request_comb.payload.meta.address.base   = configuration_reg.payload.param.index_start;
-        fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.param.granularity;
-        fifo_request_comb.payload.meta.type           = configuration_reg.payload.meta.type;
-        fifo_request_comb.payload.data.field          = counter_count;
+        fifo_request_comb.payload.meta.route        = configuration_reg.payload.meta.route;
+        fifo_request_comb.payload.meta.address.base = configuration_reg.payload.param.index_start;
+        if(configuration_reg.payload.meta.address.shift.direction) begin
+            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.param.granularity;
+        end else begin
+            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.param.granularity;
+        end
+        fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
+        fifo_request_comb.payload.meta.type          = configuration_reg.payload.meta.type;
+        fifo_request_comb.payload.data.field         = counter_count;
     end
+
 
     always_ff @(posedge ap_clk) begin
         fifo_request_din_reg.payload.meta <= fifo_request_comb.payload.meta;

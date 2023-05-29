@@ -146,7 +146,7 @@ typedef struct packed{
 
 typedef struct packed{
   type_memory_cmd       cmd    ; // SIZE = 5 bits
-  type_data_structure   struct ; // SIZE = 12 bits
+  type_data_structure   buffer ; // SIZE = 12 bits
   type_engine_operand   operand; // SIZE = 6 bits
   type_filter_operation filter ; // SIZE = 6 bits
   type_ALU_operation    alu    ; // SIZE = 6 bits

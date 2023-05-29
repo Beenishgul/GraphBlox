@@ -128,7 +128,7 @@ module engine_stride_index_configure #(
         configuration_meta_int.address.shift        = 0;
         configuration_meta_int.address.direction    = 1'b1;
         configuration_meta_int.type.cmd             = CMD_INVALID;
-        configuration_meta_int.type.struct          = STRUCT_STRIDE_INDEX;
+        configuration_meta_int.type.buffer          = STRUCT_STRIDE_INDEX;
         configuration_meta_int.type.operand         = OP_LOCATION_0;
         configuration_meta_int.type.filter          = FILTER_NOP;
         configuration_meta_int.type.alu             = ALU_NOP;
@@ -170,7 +170,7 @@ module engine_stride_index_configure #(
                     end
                     5 : begin
                         configuration_reg.payload.meta.type.cmd    <= type_memory_cmd'(fifo_response_dout_int.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
-                        configuration_reg.payload.meta.type.struct <= type_data_structure'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
+                        configuration_reg.payload.meta.type.buffer <= type_data_structure'(fifo_response_dout_int.payload.data.field[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
                         configuration_valid_reg[5]                 <= 1'b1  ;
                     end
                     6 : begin
@@ -211,7 +211,7 @@ module engine_stride_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((fifo_response_dout_int.payload.meta.type.struct == STRUCT_KERNEL_SETUP)|(fifo_response_dout_int.payload.meta.type.struct == STRUCT_ENGINE_SETUP));
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((fifo_response_dout_int.payload.meta.type.buffer == STRUCT_KERNEL_SETUP)|(fifo_response_dout_int.payload.meta.type.buffer == STRUCT_ENGINE_SETUP));
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
