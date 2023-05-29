@@ -84,11 +84,39 @@ package PKG_ENGINE;
 // CSR\_Index\_Generator to acquire the neighbor IDs for further
 // processing, in this scenario reading the data of the vertex neighbors.
 
+    typedef enum logic[8:0] {
+        ENGINE_CSR_INDEX_RESET,
+        ENGINE_CSR_INDEX_IDLE,
+        ENGINE_CSR_INDEX_SETUP,
+        ENGINE_CSR_INDEX_START,
+        ENGINE_CSR_INDEX_START_TRANS,
+        ENGINE_CSR_INDEX_BUSY,
+        ENGINE_CSR_INDEX_PAUSE_TRANS,
+        ENGINE_CSR_INDEX_PAUSE,
+        ENGINE_CSR_INDEX_DONE
+    } engine_csr_index_state;
+
+    typedef enum logic[8:0] {
+        ENGINE_CSR_INDEX_GEN_RESET,
+        ENGINE_CSR_INDEX_GEN_IDLE,
+        ENGINE_CSR_INDEX_GEN_SETUP,
+        ENGINE_CSR_INDEX_GEN_START,
+        ENGINE_CSR_INDEX_GEN_BUSY_TRANS,
+        ENGINE_CSR_INDEX_GEN_BUSY,
+        ENGINE_CSR_INDEX_GEN_PAUSE_TRANS,
+        ENGINE_CSR_INDEX_GEN_PAUSE,
+        ENGINE_CSR_INDEX_GEN_DONE
+    } engine_csr_index_generator_state;
+
     typedef struct packed{
+        logic                               increment    ;
+        logic                               decrement    ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] offset       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] degree       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
     } CSRIndexConfigurationParameters;
 
     typedef struct packed{
@@ -101,144 +129,65 @@ package PKG_ENGINE;
         CSRIndexConfigurationPayload payload;
     } CSRIndexConfiguration;
 
-// Serial\_Read\_Engine
+// Read\_Write\_Engine
 // --------------------
 
-// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
+// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity, mode
 
-// The serial read engine sends read commands to the memory control layer.
+// The read/write recieves a sequence and trnsformes it to memory commands
+// sent to the memory control layer.
 // Each read or write requests a chunk of data specified with the
 // "granularity" parameter -- alignment should be honored for a cache line.
 // The "stride" parameter sets the offset taken by each consecutive read;
 // strides should also honor alignment restrictions. This behavior is
 // related to reading CSR structure data, for example, reading the offsets
-// array.
+// array. Mode parameter would decide the engine read/write mode.
 
     typedef enum logic[8:0] {
-        ENGINE_SERIAL_READ_RESET,
-        ENGINE_SERIAL_READ_IDLE,
-        ENGINE_SERIAL_READ_SETUP,
-        ENGINE_SERIAL_READ_START,
-        ENGINE_SERIAL_READ_BUSY_TRANS,
-        ENGINE_SERIAL_READ_BUSY,
-        ENGINE_SERIAL_READ_PAUSE_TRANS,
-        ENGINE_SERIAL_READ_PAUSE,
-        ENGINE_SERIAL_READ_DONE
-    } engine_serial_read_state;
+        ENGINE_READ_WRITE_RESET,
+        ENGINE_READ_WRITE_IDLE,
+        ENGINE_READ_WRITE_SETUP,
+        ENGINE_READ_WRITE_START,
+        ENGINE_READ_WRITE_START_TRANS,
+        ENGINE_READ_WRITE_BUSY,
+        ENGINE_READ_WRITE_PAUSE_TRANS,
+        ENGINE_READ_WRITE_PAUSE,
+        ENGINE_READ_WRITE_DONE
+    } engine_read_write_state;
+
+    typedef enum logic[8:0] {
+        ENGINE_READ_WRITE_GEN_RESET,
+        ENGINE_READ_WRITE_GEN_IDLE,
+        ENGINE_READ_WRITE_GEN_SETUP,
+        ENGINE_READ_WRITE_GEN_START,
+        ENGINE_READ_WRITE_GEN_BUSY_TRANS,
+        ENGINE_READ_WRITE_GEN_BUSY,
+        ENGINE_READ_WRITE_GEN_PAUSE_TRANS,
+        ENGINE_READ_WRITE_GEN_PAUSE,
+        ENGINE_READ_WRITE_GEN_DONE
+    } engine_read_write_generator_state;
 
     typedef struct packed{
         logic                               increment    ;
         logic                               decrement    ;
+        logic                               mode         ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } SerialReadEngineConfigurationParameters;
+    } ReadWriteEngineConfigurationParameters;
 
     typedef struct packed{
         SerialReadEngineConfigurationParameters param;
         MemoryPacketMeta                        meta ;
-    } SerialReadEngineConfigurationPayload;
+    } ReadWriteEngineConfigurationPayload;
 
 
     typedef struct packed{
         logic                                valid  ;
         SerialReadEngineConfigurationPayload payload;
-    } SerialReadEngineConfiguration;
+    } ReadWriteEngineConfiguration;
 
-// Serial\_Write\_Engine
-// ---------------------
-
-// ### Input :array\_pointer, array\_size, index, granularity
-
-// The serial write engine sends coalesced write commands to the memory
-// control layer. Each write-request groups a chunk of data (group of
-// vertices) intended to be written in a serial pattern. The serial write
-// engine is simpler to design as it plans only to group serial data and
-// write them in single bursts depending on the "granularity" parameter.
-// This behavior can be found in iterative SpMV-based graph algorithms like
-// PageRank.
-
-    typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_write  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_write    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } SerialWriteEngineConfigurationParameters;
-
-    typedef struct packed{
-        SerialWriteEngineConfigurationParameters param;
-        MemoryPacketMeta                         meta ;
-    } SerialWriteEngineConfigurationPayload;
-
-    typedef struct packed{
-        logic                                 valid  ;
-        SerialWriteEngineConfigurationPayload payload;
-    } SerialWriteEngineConfiguration;
-
-// Random\_Read\_Engine
-// --------------------------------------------
-
-// ### Input: array\_pointer, array\_size, index, granularity
-
-// A random read engine does not require a stride access pattern. Instead,
-// arbitrary fine-grain commands are sent straight to a caching element in
-// a fine-grained manner. Optimizations can occur on the caching level with
-// grouping or reordering. The main challenge would be designing an engine
-// that supports fine-grain accesses while balancing the design complexity
-// if such optimizations were to be kept.
-
-    typedef struct packed{
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } RandomReadEngineConfigurationParameters;
-
-    typedef struct packed{
-        RandomReadEngineConfigurationParameters param;
-        MemoryPacketMeta                        meta ;
-    } RandomReadEngineConfigurationPayload;
-
-    typedef struct packed{
-        logic                                valid  ;
-        RandomReadEngineConfigurationPayload payload;
-    } RandomReadEngineConfiguration;
-
-// Random\_Write\_Engine
-// --------------------------------------------
-
-// ### Input: array\_pointer, array\_size, index, granularity
-
-// A random read engine does not require a stride access pattern. Instead,
-// arbitrary fine-grain commands are sent straight to a caching element in
-// a fine-grained manner. Optimizations can occur on the caching level with
-// grouping or reordering. The main challenge would be designing an engine
-// that supports fine-grain accesses while balancing the design complexity
-// if such optimizations were to be kept.
-
-    typedef struct packed{
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index        ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } RandomWriteEngineConfigurationParameters;
-
-    typedef struct packed{
-        RandomWriteEngineConfigurationParameters param;
-        MemoryPacketMeta                         meta ;
-    } RandomWriteEngineConfigurationPayload;
-
-    typedef struct packed{
-        logic                                 valid  ;
-        RandomWriteEngineConfigurationPayload payload;
-    } RandomWriteEngineConfiguration;
 
 // Kernel\_Setup\_Engine
 // --------------------

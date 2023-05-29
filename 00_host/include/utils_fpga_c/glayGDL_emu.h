@@ -12,51 +12,22 @@ extern "C" {
 // of the features of GLay architecture combined with a description
 // language that can be compiled to reprogram the graph overlay.
 
-// Serial\_Read\_Engine
+// Read\_Write\_Engine
 // --------------------
 
-// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
+// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity, mode
 
-// The serial read engine sends read commands to the memory control layer.
+// The read/write recieves a sequence and trnsformes it to memory commands
+// sent to the memory control layer.
 // Each read or write requests a chunk of data specified with the
 // "granularity" parameter -- alignment should be honored for a cache line.
 // The "stride" parameter sets the offset taken by each consecutive read;
 // strides should also honor alignment restrictions. This behavior is
 // related to reading CSR structure data, for example, reading the offsets
-// array.
+// array. Mode parameter would decide the engine read/write mode.
 
-uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity);
+uint32_t *ReadWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity, uint32_t mode);
 
-// Serial\_Write\_Engine
-// ---------------------
-
-// ### Input :array\_pointer, array\_size, index, granularity
-
-// The serial write engine sends coalesced write commands to the memory
-// control layer. Each write-request groups a chunk of data (group of
-// vertices) intended to be written in a serial pattern. The serial write
-// engine is simpler to design as it plans only to group serial data and
-// write them in single bursts depending on the "granularity" parameter.
-// This behavior can be found in iterative SpMV-based graph algorithms like
-// PageRank.
-
-uint32_t *serialWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity);
-
-// Random\_Read\_Engine / Random\_Write\_Engine
-// --------------------------------------------
-
-// ### Input: array\_pointer, array\_size, index, granularity
-
-// A random read engine does not require a stride access pattern. Instead,
-// arbitrary fine-grain commands are sent straight to a caching element in
-// a fine-grained manner. Optimizations can occur on the caching level with
-// grouping or reordering. The main challenge would be designing an engine
-// that supports fine-grain accesses while balancing the design complexity
-// if such optimizations were to be kept.
-
-
-uint32_t *randomReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity);
-uint32_t *randomWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity);
 
 // Stride\_Index\_Generator
 // ------------------------

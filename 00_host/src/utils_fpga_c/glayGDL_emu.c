@@ -25,66 +25,25 @@
 // of the features of GLay architecture combined with a description
 // language that can be compiled to reprogram the graph overlay.
 
-// Serial\_Read\_Engine
+// Read\_Write\_Engine
 // --------------------
 
-// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
+// ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity, mode
 
-// The serial read engine sends read commands to the memory control layer.
+// The read/write recieves a sequence and trnsformes it to memory commands
+// sent to the memory control layer.
 // Each read or write requests a chunk of data specified with the
 // "granularity" parameter -- alignment should be honored for a cache line.
 // The "stride" parameter sets the offset taken by each consecutive read;
 // strides should also honor alignment restrictions. This behavior is
 // related to reading CSR structure data, for example, reading the offsets
-// array.
+// array. Mode parameter would decide the engine read/write mode.
 
-uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity){
-
-
-	return NULL;
-}
-
-// Serial\_Write\_Engine
-// ---------------------
-
-// ### Input :array\_pointer, array\_size, index, granularity
-
-// The serial write engine sends coalesced write commands to the memory
-// control layer. Each write-request groups a chunk of data (group of
-// vertices) intended to be written in a serial pattern. The serial write
-// engine is simpler to design as it plans only to group serial data and
-// write them in single bursts depending on the "granularity" parameter.
-// This behavior can be found in iterative SpMV-based graph algorithms like
-// PageRank.
-
-uint32_t *serialWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity){
+uint32_t *ReadWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity, uint32_t mode)
+{
 
 
-	return NULL;
-}
-
-// Random\_Read\_Engine / Random\_Write\_Engine
-// --------------------------------------------
-
-// ### Input: array\_pointer, array\_size, index, granularity
-
-// A random read engine does not require a stride access pattern. Instead,
-// arbitrary fine-grain commands are sent straight to a caching element in
-// a fine-grained manner. Optimizations can occur on the caching level with
-// grouping or reordering. The main challenge would be designing an engine
-// that supports fine-grain accesses while balancing the design complexity
-// if such optimizations were to be kept.
-
-
-uint32_t *randomReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity){
-
-
-	return NULL;
-}
-uint32_t *randomWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t index, uint32_t granularity){
-
-
-	return NULL;
+    return NULL;
 }
 
 // Stride\_Index\_Generator
@@ -98,10 +57,11 @@ uint32_t *randomWriteEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t
 // based on the granularity. For example, if granularity is (8), each CU
 // (Compute Units) would get eight vertex IDs in chunks.
 
-uint32_t *strideIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity){
+uint32_t *strideIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
 // CSR\_Index\_Generator
@@ -115,10 +75,11 @@ uint32_t *strideIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t 
 // CSR\_Index\_Generator to acquire the neighbor IDs for further
 // processing, in this scenario reading the data of the vertex neighbors.
 
-uint32_t *CSRIndexGenerator(uint32_t *arrayPointer, uint32_t arraySize, uint32_t offset, uint32_t granularity){
+uint32_t *CSRIndexGenerator(uint32_t *arrayPointer, uint32_t arraySize, uint32_t offset, uint32_t granularity)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
 // ALU\_Operation\_\<Mul, Add, Sub, Acc\>
@@ -130,10 +91,11 @@ uint32_t *CSRIndexGenerator(uint32_t *arrayPointer, uint32_t arraySize, uint32_t
 // arithmetic operations. Each output is coupled with an ID that can be
 // used for writing the result to the correct index if needed.
 
-uint32_t *ALUOperation(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode){
+uint32_t *ALUOperation(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
 // Conditional\_Break\_\<GT, LT, EQ\>
@@ -146,10 +108,11 @@ uint32_t *ALUOperation(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode){
 // module is reprogrammable to implement Less Than (LT), Greater Than (GT),
 // and Equal (EQ) operations.
 
-uint32_t *conditionalBreak(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode){
+uint32_t *conditionalBreak(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
 // Conditional\_Filter\_\<GT, LT, EQ\>
@@ -161,10 +124,11 @@ uint32_t *conditionalBreak(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mod
 // Like Conditional\_Break, a filter would filter out results forwarded to
 // other engines in the overlay based on a condition.
 
-uint32_t *conditionalFilter(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode){
+uint32_t *conditionalFilter(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
 
@@ -177,9 +141,10 @@ uint32_t *conditionalFilter(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mo
 // be applied in order not to generate any subsequent dependent commands,
 // for example, reads/writes correlated with a vertex ID.
 
-uint32_t *conditionalContinue(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode){
+uint32_t *conditionalContinue(uint32_t op1, uint32_t op2, uint32_t id, uint32_t mode)
+{
 
 
-	return NULL;
+    return NULL;
 }
 
