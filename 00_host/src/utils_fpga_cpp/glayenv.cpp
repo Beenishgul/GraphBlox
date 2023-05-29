@@ -101,7 +101,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 
     Edges_buffer_size_in_bytes  = graph->num_edges * sizeof(uint32_t);
     Vertex_buffer_size_in_bytes = graph->num_vertices * sizeof(uint32_t);
-    graph_buffer_size_in_bytes  = 64 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
+    graph_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
 
     // Each Memory bank contains a Graph CSR segment
     graph_csr_struct_buffer     =  xrt::bo(glayHandle->deviceHandle, graph_buffer_size_in_bytes,  bank_grp_idx);
@@ -128,7 +128,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     buf_addr[6] = edges_array_weight_buffer.address();
 #endif
     buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
-    buf_addr[8] = graph_buffer_size_in_bytes / 64; // not passing an address but number of cachelines to read from graph_csr_struct
+    buf_addr[8] = graph_buffer_size_in_bytes / sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
 
 }
 
