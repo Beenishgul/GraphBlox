@@ -85,6 +85,7 @@ extern "C" {
 #define EDGES_ARRAY_DEST_OFFSET      0x58
 #define AUXILIARY_1_OFFSET           0x64
 #define AUXILIARY_2_OFFSET           0x70
+#define AUXILIARY_3_OFFSET           0x7c
 
 // ********************************************************************************************
 // ***************                      DataStructure CSR                        **************
@@ -103,6 +104,7 @@ struct __attribute__((__packed__)) GLAYGraphCSR
     void *auxiliary1;                   // 8-Bytes
     //---------------------------------------------------//--// 64bytes
     void *auxiliary2;                   // 8-Bytes
+    void *auxiliary3;                   // 8-Bytes
     float max_weight;                   // 4-Bytes
 };
 
@@ -122,6 +124,7 @@ struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
     xrtBufferHandle edges_array_dest_buffer;
     xrtBufferHandle auxiliary_1_buffer;
     xrtBufferHandle auxiliary_2_buffer;
+    xrtBufferHandle auxiliary_3_buffer;
     xrtMemoryGroup bank_grp_idx;
 };
 

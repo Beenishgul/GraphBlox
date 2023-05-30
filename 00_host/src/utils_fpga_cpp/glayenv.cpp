@@ -117,6 +117,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 
     auxiliary_1_buffer          =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
     auxiliary_2_buffer          =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
+    auxiliary_3_buffer          =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
 
     buf_addr[0] = graph_csr_struct_buffer.address();
     buf_addr[1] = vertex_out_degree_buffer.address();
@@ -129,7 +130,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 #endif
     buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
     buf_addr[8] = graph_buffer_size_in_bytes / sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
-
+    buf_addr[9] = 0;
 }
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
@@ -178,6 +179,9 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
     auxiliary_2_buffer.write(&buf_addr[8], 8, 0);
     auxiliary_2_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE, Vertex_buffer_size_in_bytes, 0);
 
+    auxiliary_3_buffer.write(&buf_addr[9], 8, 0);
+    auxiliary_3_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE, Vertex_buffer_size_in_bytes, 0);
+
     return 0;
 }
 
@@ -202,7 +206,6 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
     glayHandle->ipHandle.write_register(EDGES_ARRAY_SRC_OFFSET, (buf_addr[5]));
     glayHandle->ipHandle.write_register((EDGES_ARRAY_SRC_OFFSET + 4), (buf_addr[5]) >> 32);
 
-
 #if WEIGHTED
     glayHandle->ipHandle.write_register(EDGES_ARRAY_WEIGHT_OFFSET, (buf_addr[6]));
     glayHandle->ipHandle.write_register((EDGES_ARRAY_WEIGHT_OFFSET + 4), (buf_addr[6]) >> 32);
@@ -213,6 +216,9 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToD
 
     glayHandle->ipHandle.write_register(AUXILIARY_2_OFFSET, buf_addr[8]);
     glayHandle->ipHandle.write_register((AUXILIARY_2_OFFSET + 4), buf_addr[8] >> 32);
+
+    glayHandle->ipHandle.write_register(AUXILIARY_3_OFFSET, buf_addr[9]);
+    glayHandle->ipHandle.write_register((AUXILIARY_3_OFFSET + 4), buf_addr[9] >> 32);
 
     return 0;
 }
@@ -235,6 +241,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
 
     glayHandle->runKernelHandle.set_arg(AUXILIARY_1_ID, glayGraphCSRxrtBufferHandlePerBank->auxiliary_1_buffer);
     glayHandle->runKernelHandle.set_arg(AUXILIARY_2_ID, glayGraphCSRxrtBufferHandlePerBank->auxiliary_2_buffer);
+    glayHandle->runKernelHandle.set_arg(AUXILIARY_3_ID, glayGraphCSRxrtBufferHandlePerBank->auxiliary_3_buffer);
 
     return 0;
 }

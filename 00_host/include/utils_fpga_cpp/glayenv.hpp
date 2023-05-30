@@ -96,6 +96,7 @@ extern "C" {
 #define EDGES_ARRAY_DEST_OFFSET      0x58
 #define AUXILIARY_1_OFFSET           0x64
 #define AUXILIARY_2_OFFSET           0x70
+#define AUXILIARY_3_OFFSET           0x7c
 
 #define GRAPH_CSR_STRUCT_ID      0
 #define VERTEX_OUT_DEGREE_ID     1
@@ -106,6 +107,7 @@ extern "C" {
 #define EDGES_ARRAY_DEST_ID      6
 #define AUXILIARY_1_ID           7
 #define AUXILIARY_2_ID           8
+#define AUXILIARY_3_ID           9
 
 // ********************************************************************************************
 // ***************                      DataStructure CSR                        **************
@@ -124,6 +126,7 @@ struct __attribute__((__packed__)) GLAYGraphCSR
     void *auxiliary1;                   // 8-Bytes
     //---------------------------------------------------//--// 64bytes
     void *auxiliary2;                   // 8-Bytes
+    void *auxiliary3;                   // 8-Bytes
     float max_weight;                   // 4-Bytes
 };
 
@@ -171,7 +174,8 @@ public:
     xrt::bo edges_array_dest_buffer;
     xrt::bo auxiliary_1_buffer;
     xrt::bo auxiliary_2_buffer;
-    uint64_t buf_addr[9];
+    xrt::bo auxiliary_3_buffer;
+    uint64_t buf_addr[10];
 
 
     GLAYGraphCSRxrtBufferHandlePerBank()=default;
