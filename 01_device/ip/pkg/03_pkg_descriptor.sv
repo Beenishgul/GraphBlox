@@ -17,15 +17,6 @@ package PKG_DESCRIPTOR;
 
     import PKG_GLOBALS::*;
 
-    typedef enum logic[5:0] {
-        RESET,
-        IDLE,
-        REQ,
-        WAITING_FOR_REQUEST,
-        READ_DATA,
-        DONE_REQ
-    } descriptor_state;
-
     typedef struct packed{
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] buffer_0; // graph overlay program
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] buffer_1; // vertex in degree
