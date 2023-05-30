@@ -5,7 +5,7 @@
 // ==============================================================
 `timescale 1ns/1ps
 module top_control_s_axi #(parameter
-    C_S_AXI_ADDR_WIDTH = 7 ,
+    C_S_AXI_ADDR_WIDTH = 8 ,
     C_S_AXI_DATA_WIDTH = 32
 ) (
     input  wire                            ACLK       ,
