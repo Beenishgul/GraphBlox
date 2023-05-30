@@ -234,7 +234,8 @@ public:
     uint32_t *overlay;
     // Each Memory bank contains a Graph CSR segment
     xrt::bo  xrt_buffer[10];
-    uint64_t buf_addr[10];
+    uint64_t xrt_buffer_address[10];
+    size_t   xrt_buffer_size[10];
 
 
     GLAYGraphCSRxrtBufferHandlePerBank()=default;
