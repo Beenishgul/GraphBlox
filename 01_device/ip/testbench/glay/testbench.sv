@@ -40,7 +40,6 @@ class GraphCSR;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_src[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_dest[];
 
-
     function new ();
         this.file_error    = 0;
         this.file_ptr_edges_idx  = 0;
