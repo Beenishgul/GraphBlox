@@ -273,14 +273,14 @@ puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "buffer_1" "vertex out degree" "0x01c" [expr {8*8}]
+puts_reg_info "buffer_1" "vertex in degree" "0x01c" [expr {8*8}]
   set reg      [::ipx::add_register -quiet "buffer_1" $addr_block]
   set_property address_offset 0x01c $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "buffer_2" "vertex in degree" "0x028" [expr {8*8}]
+puts_reg_info "buffer_2" "vertex out degree" "0x028" [expr {8*8}]
   set reg      [::ipx::add_register -quiet "buffer_2" $addr_block]
   set_property address_offset 0x028 $reg
   set_property size           [expr {8*8}]   $reg
@@ -294,21 +294,21 @@ puts_reg_info "buffer_3" "vertex edges CSR index" "0x034" [expr {8*8}]
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "buffer_4" "edges array weight" "0x040" [expr {8*8}]
+puts_reg_info "buffer_4" "edges array src" "0x040" [expr {8*8}]
   set reg      [::ipx::add_register -quiet "buffer_4" $addr_block]
   set_property address_offset 0x040 $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "buffer_5" "edges array src" "0x04c" [expr {8*8}]
+puts_reg_info "buffer_5" "edges array dest" "0x04c" [expr {8*8}]
   set reg      [::ipx::add_register -quiet "buffer_5" $addr_block]
   set_property address_offset 0x04c $reg
   set_property size           [expr {8*8}]   $reg
   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-puts_reg_info "buffer_6" "edges array dest" "0x058" [expr {8*8}]
+puts_reg_info "buffer_6" "edges array weight" "0x058" [expr {8*8}]
   set reg      [::ipx::add_register -quiet "buffer_6" $addr_block]
   set_property address_offset 0x058 $reg
   set_property size           [expr {8*8}]   $reg
