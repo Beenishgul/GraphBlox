@@ -7,12 +7,10 @@ import axi_vip_pkg::*;
 import slv_m00_axi_vip_pkg::*;
 import control_kernel_vip_pkg::*;
 
-
 import PKG_GLOBALS::*;
 import PKG_AXI4::*;
 import PKG_DESCRIPTOR::*;
 import PKG_MEMORY::*;
-
 
 class GraphCSR;
 
@@ -38,7 +36,6 @@ class GraphCSR;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_src[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_dest[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
-
 
     function new ();
         this.file_error    = 0;
@@ -122,6 +119,7 @@ module kernel_testbench ();
         ap_rst_n_sequence(50);
         initial_reset =1;
     end
+
 //AXI4 master interface m00_axi
     wire [                     1-1:0] m00_axi_awvalid;
     wire [                     1-1:0] m00_axi_awready;
@@ -320,7 +318,6 @@ module kernel_testbench ();
         .s_axi_arqos  (m00_axi_arqos  )
     );
 
-
     slv_m00_axi_vip_slv_mem_t m00_axi    ;
     slv_m00_axi_vip_slv_t     m00_axi_slv;
 
@@ -368,7 +365,6 @@ module kernel_testbench ();
 ///////////////////////////////////////////////////////////////////////////
 // Pointer for interface : m00_axi
     bit [63:0] buffer_9_ptr = 64'h0;
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Backdoor fill the input buffer AXI vip memory model with 32-bit words
@@ -498,7 +494,6 @@ module kernel_testbench ();
         end while ((rd_value & CTRL_READY_MASK) == 0);
     endtask
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Write to the control registers to enable the triggering of interrupts for the kernel
     task automatic enable_interrupts();
@@ -565,7 +560,6 @@ module kernel_testbench ();
 
     endtask
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // For each of the connected slave interfaces, apply a WREADY policy to introduce backpressure.
 // Based on the simulation seed the order/shape of the WREADY per-channel will be different.
@@ -581,7 +575,6 @@ module kernel_testbench ();
         m00_axi.wr_driver.set_wready_gen(rgen);
 
     endtask
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // For each of the connected slave interfaces, force the memory model to not insert any inter-beat
@@ -629,7 +622,6 @@ module kernel_testbench ();
             error_found = 1;
         end
     endtask
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // For each of the scalar registers, check:
@@ -996,7 +988,6 @@ module kernel_testbench ();
 
     endfunction : read_files_graphCSR
 
-
     task automatic initalize_graph (ref GraphCSR graph);
         graph.graph_name = "GRAPH_NAME";
 
@@ -1099,7 +1090,6 @@ module kernel_testbench ();
             $display("Finished iteration: %d / %d", iter+1, num_iterations);
         end
     endtask
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
