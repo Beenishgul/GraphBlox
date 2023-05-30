@@ -99,38 +99,49 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bank_grp_idx)
 {
 
-    edges_buffer_size_in_bytes  = graph->num_edges * sizeof(uint32_t);
     vertex_buffer_size_in_bytes = graph->num_vertices * sizeof(uint32_t);
+    edges_buffer_size_in_bytes  = graph->num_edges * sizeof(uint32_t);
     overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
 
     InitializeGLAYOverlayProgram(overlay_buffer_size_in_bytes, 1, graph);
 
-    // Each Memory bank contains a Graph CSR segment
-    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, overlay_buffer_size_in_bytes, bank_grp_idx); // graph overlay program
-    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex in degree
-    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex out degree
-    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex edges CSR index
-    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array src
-    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array dest
-#if WEIGHTED
-    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array weight
-#endif
-    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 1
-    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 2
-    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 3
+    xrt_buffer_size[0] = overlay_buffer_size_in_bytes;
+    xrt_buffer_size[1] = vertex_buffer_size_in_bytes;
+    xrt_buffer_size[2] = vertex_buffer_size_in_bytes;
+    xrt_buffer_size[3] = vertex_buffer_size_in_bytes;
+    xrt_buffer_size[4] = edges_buffer_size_in_bytes;
+    xrt_buffer_size[5] = edges_buffer_size_in_bytes;
+    xrt_buffer_size[6] = edges_buffer_size_in_bytes;
+    xrt_buffer_size[7] = 8;
+    xrt_buffer_size[8] = 8;
+    xrt_buffer_size[9] = 8;
 
-    buf_addr[0] = xrt_buffer[0].address();
-    buf_addr[1] = xrt_buffer[1].address();
-    buf_addr[2] = xrt_buffer[2].address();
-    buf_addr[3] = xrt_buffer[3].address();
-    buf_addr[4] = xrt_buffer[4].address();
-    buf_addr[5] = xrt_buffer[5].address();
+    // Each Memory bank contains a Graph CSR segment
+    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], bank_grp_idx); // graph overlay program
+    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], bank_grp_idx);  // vertex in degree
+    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], bank_grp_idx);  // vertex out degree
+    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], bank_grp_idx);  // vertex edges CSR index
+    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], bank_grp_idx);   // edges array src
+    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], bank_grp_idx);   // edges array dest
 #if WEIGHTED
-    buf_addr[6] = xrt_buffer[6].address();
+    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], bank_grp_idx);   // edges array weight
 #endif
-    buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
-    buf_addr[8] = overlay_buffer_size_in_bytes / sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
-    buf_addr[9] = 2;
+    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 1
+    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 2
+    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 3
+
+    xrt_buffer_address[0] = xrt_buffer[0].address();
+    xrt_buffer_address[1] = xrt_buffer[1].address();
+    xrt_buffer_address[2] = xrt_buffer[2].address();
+    xrt_buffer_address[3] = xrt_buffer[3].address();
+    xrt_buffer_address[4] = xrt_buffer[4].address();
+    xrt_buffer_address[5] = xrt_buffer[5].address();
+#if WEIGHTED
+    xrt_buffer_address[6] = xrt_buffer[6].address();
+#endif
+    xrt_buffer_address[7] = 0; // endian mode 0-big endian 1-little endian
+    xrt_buffer_address[8] = overlay_buffer_size_in_bytes / sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
+    xrt_buffer_address[9] = 2;
 
 }
 
@@ -160,34 +171,34 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayProgram(size_t Oer
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
 
-    xrt_buffer[0].write(overlay, overlay_buffer_size_in_bytes, 0);
-    xrt_buffer[1].write(graph->vertices->in_degree, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[2].write(graph->vertices->out_degree, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[3].write(graph->vertices->edges_idx, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[4].write(graph->sorted_edges_array->edges_array_src, edges_buffer_size_in_bytes, 0);
-    xrt_buffer[5].write(graph->sorted_edges_array->edges_array_dest, edges_buffer_size_in_bytes, 0);
+    xrt_buffer[0].write(overlay, xrt_buffer_size[0], 0);
+    xrt_buffer[1].write(graph->vertices->in_degree, xrt_buffer_size[1], 0);
+    xrt_buffer[2].write(graph->vertices->out_degree, xrt_buffer_size[2], 0);
+    xrt_buffer[3].write(graph->vertices->edges_idx, xrt_buffer_size[3], 0);
+    xrt_buffer[4].write(graph->sorted_edges_array->edges_array_src, xrt_buffer_size[4], 0);
+    xrt_buffer[5].write(graph->sorted_edges_array->edges_array_dest, xrt_buffer_size[5], 0);
 #if WEIGHTED
-    xrt_buffer[6].write(graph->sorted_edges_array->edges_array_weight, edges_buffer_size_in_bytes, 0);
+    xrt_buffer[6].write(graph->sorted_edges_array->edges_array_weight, xrt_buffer_size[6], 0);
 #endif
 
-    xrt_buffer[0].sync(XCL_BO_SYNC_BO_TO_DEVICE, overlay_buffer_size_in_bytes, 0);
-    xrt_buffer[1].sync(XCL_BO_SYNC_BO_TO_DEVICE, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[2].sync(XCL_BO_SYNC_BO_TO_DEVICE, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[3].sync(XCL_BO_SYNC_BO_TO_DEVICE, vertex_buffer_size_in_bytes, 0);
-    xrt_buffer[4].sync(XCL_BO_SYNC_BO_TO_DEVICE, edges_buffer_size_in_bytes, 0);
-    xrt_buffer[5].sync(XCL_BO_SYNC_BO_TO_DEVICE, edges_buffer_size_in_bytes, 0);
+    xrt_buffer[0].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[0], 0);
+    xrt_buffer[1].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[1], 0);
+    xrt_buffer[2].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[2], 0);
+    xrt_buffer[3].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[3], 0);
+    xrt_buffer[4].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[4], 0);
+    xrt_buffer[5].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[5], 0);
 #if WEIGHTED
-    xrt_buffer[6].sync(XCL_BO_SYNC_BO_TO_DEVICE, edges_buffer_size_in_bytes, 0);
+    xrt_buffer[6].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[6], 0);
 #endif
 
-    xrt_buffer[7].write(&buf_addr[7], 8, 0);
-    xrt_buffer[7].sync(XCL_BO_SYNC_BO_TO_DEVICE, 8, 0);
+    xrt_buffer[7].write(&xrt_buffer_address[7], xrt_buffer_size[7], 0);
+    xrt_buffer[7].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[7], 0);
 
-    xrt_buffer[8].write(&buf_addr[8], 8, 0);
-    xrt_buffer[8].sync(XCL_BO_SYNC_BO_TO_DEVICE, 8, 0);
+    xrt_buffer[8].write(&xrt_buffer_address[8], xrt_buffer_size[8], 0);
+    xrt_buffer[8].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[8], 0);
 
-    xrt_buffer[9].write(&buf_addr[9], 8, 0);
-    xrt_buffer[9].sync(XCL_BO_SYNC_BO_TO_DEVICE, 8, 0);
+    xrt_buffer[9].write(&xrt_buffer_address[9], xrt_buffer_size[9], 0);
+    xrt_buffer[9].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[9], 0);
 
     return 0;
 }
@@ -195,37 +206,37 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
 int GLAYGraphCSRxrtBufferHandlePerBank::writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle)
 {
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_0_DATA_0, (buf_addr[0]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_0_DATA_0 + 4), (buf_addr[0]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_0_DATA_0, (xrt_buffer_address[0]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_0_DATA_0 + 4), (xrt_buffer_address[0]) >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_1_DATA_0, (buf_addr[1]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_1_DATA_0 + 4), (buf_addr[1]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_1_DATA_0, (xrt_buffer_address[1]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_1_DATA_0 + 4), (xrt_buffer_address[1]) >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_2_DATA_0, (buf_addr[2]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_2_DATA_0 + 4), (buf_addr[2]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_2_DATA_0, (xrt_buffer_address[2]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_2_DATA_0 + 4), (xrt_buffer_address[2]) >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_3_DATA_0, (buf_addr[3]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_3_DATA_0 + 4), (buf_addr[3]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_3_DATA_0, (xrt_buffer_address[3]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_3_DATA_0 + 4), (xrt_buffer_address[3]) >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_4_DATA_0, (buf_addr[4]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_4_DATA_0 + 4), (buf_addr[4]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_4_DATA_0, (xrt_buffer_address[4]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_4_DATA_0 + 4), (xrt_buffer_address[4]) >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_5_DATA_0, (buf_addr[5]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_5_DATA_0 + 4), (buf_addr[5]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_5_DATA_0, (xrt_buffer_address[5]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_5_DATA_0 + 4), (xrt_buffer_address[5]) >> 32);
 
 #if WEIGHTED
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_6_DATA_0, (buf_addr[6]));
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_6_DATA_0 + 4), (buf_addr[6]) >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_6_DATA_0, (xrt_buffer_address[6]));
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_6_DATA_0 + 4), (xrt_buffer_address[6]) >> 32);
 #endif
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_7_DATA_0, buf_addr[7]);
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_7_DATA_0 + 4), buf_addr[7] >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_7_DATA_0, xrt_buffer_address[7]);
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_7_DATA_0 + 4), xrt_buffer_address[7] >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_8_DATA_0, buf_addr[8]);
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_8_DATA_0 + 4), buf_addr[8] >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_8_DATA_0, xrt_buffer_address[8]);
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_8_DATA_0 + 4), xrt_buffer_address[8] >> 32);
 
-    glayHandle->ipHandle.write_register(ADDR_BUFFER_9_DATA_0, buf_addr[9]);
-    glayHandle->ipHandle.write_register((ADDR_BUFFER_9_DATA_0 + 4), buf_addr[9] >> 32);
+    glayHandle->ipHandle.write_register(ADDR_BUFFER_9_DATA_0, xrt_buffer_address[9]);
+    glayHandle->ipHandle.write_register((ADDR_BUFFER_9_DATA_0 + 4), xrt_buffer_address[9] >> 32);
 
     return 0;
 }
