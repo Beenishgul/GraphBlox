@@ -106,18 +106,18 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     InitializeGLAYOverlayProgram(overlay_buffer_size_in_bytes, 1, graph);
 
     // Each Memory bank contains a Graph CSR segment
-    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, overlay_buffer_size_in_bytes,  bank_grp_idx);
-    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);
-    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);
-    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);
-    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes,  bank_grp_idx);
-    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes,  bank_grp_idx);
+    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, overlay_buffer_size_in_bytes, bank_grp_idx); // graph overlay program
+    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex in degree
+    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex out degree
+    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);  // vertex edges CSR index
+    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array src
+    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array dest
 #if WEIGHTED
-    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);
+    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, edges_buffer_size_in_bytes, bank_grp_idx);   // edges array weight
 #endif
-    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
-    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
-    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);
+    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 1
+    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 2
+    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, 8, xrt::bo::flags::normal, bank_grp_idx);    // auxiliary 3
 
     buf_addr[0] = xrt_buffer[0].address();
     buf_addr[1] = xrt_buffer[1].address();
