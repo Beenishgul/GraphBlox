@@ -16,12 +16,12 @@ import PKG_MEMORY::*;
 
 class GraphCSR;
 
-    string  graph_name             ;
-    integer mem512_vertex_count    ;
-    integer mem512_edge_count      ;
-    integer mem512_csr_struct_count;
-    integer vertex_count           ;
-    integer edge_count             ;
+    string  graph_name                 ;
+    integer vertex_count               ;
+    integer edge_count                 ;
+    integer mem512_vertex_count        ;
+    integer mem512_edge_count          ;
+    integer mem512_overlay_program_size;
 
     integer file_error               ;
     integer file_ptr_edges_idx       ;
@@ -30,15 +30,15 @@ class GraphCSR;
     integer file_ptr_edges_array_src ;
     integer file_ptr_edges_array_dest;
 
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] overlay_program[];
 
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] csr_struct[];
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] out_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] in_degree[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] out_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_idx[];
-
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_src[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_dest[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
+
 
     function new ();
         this.file_error    = 0;
@@ -51,7 +51,7 @@ class GraphCSR;
         this.edge_count = 0;
         this.mem512_vertex_count = 0;
         this.mem512_edge_count = 0;
-        this.mem512_csr_struct_count = 4;
+        this.mem512_overlay_program_size = 4;
     endfunction
 
     function void display ();
@@ -409,12 +409,9 @@ module kernel_testbench ();
         $display("%t : Starting System Reset Sequence", $time);
         fork
             ap_rst_n_sequence(25);
-
-
         join
 
     endtask
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
@@ -474,8 +471,6 @@ module kernel_testbench ();
         rd_value = rd_rsp.get_data_beat(0);
         rddata = rd_value;
     endtask
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Poll the Control interface status register.
@@ -699,32 +694,32 @@ module kernel_testbench ();
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: edges_array_weight (0x040)
+        //Write ID 4: buffer_4 (0x040)
         check_register_value(32'h040, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: edges_array_weight (0x044)
+        //Write ID 4: buffer_4 (0x044)
         check_register_value(32'h044, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: edges_array_src (0x04c)
+        //Write ID 5: buffer_5 (0x04c)
         check_register_value(32'h04c, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: edges_array_src (0x050)
+        //Write ID 5: buffer_5 (0x050)
         check_register_value(32'h050, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: edges_array_dest (0x058)
+        //Write ID 6: buffer_6 (0x058)
         check_register_value(32'h058, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: edges_array_dest (0x05c)
+        //Write ID 6: buffer_6 (0x05c)
         check_register_value(32'h05c, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
@@ -771,7 +766,6 @@ module kernel_testbench ();
         buffer_5_ptr = get_random_ptr();
         buffer_6_ptr = get_random_ptr();
         buffer_7_ptr = 1;
-        // buffer_8_ptr = $urandom_range(1024,256);
         buffer_8_ptr = 32;
         buffer_9_ptr = 0;
 
@@ -874,13 +868,13 @@ module kernel_testbench ();
     task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Backdoor fill the memory with the content.
-        m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.csr_struct, 0, graph.mem512_csr_struct_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_size);
         m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_weight, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_dest, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_vertex_count);
 
     endtask
 
@@ -925,22 +919,22 @@ module kernel_testbench ();
 
     function automatic void read_files_graphCSR(ref GraphCSR graph);
 
-        // graph.csr_struct[0] = 0;
-        // graph.csr_struct[1] = 0;
-        // graph.csr_struct[2] = 0;
-        // graph.csr_struct[3] = 0;
+        // graph.overlay_program[0] = 0;
+        // graph.overlay_program[1] = 0;
+        // graph.overlay_program[2] = 0;
+        // graph.overlay_program[3] = 0;
 
-        // graph.csr_struct[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count;
-        // graph.csr_struct[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
-        // graph.csr_struct[0][(64)+:64] = buffer_1_ptr;
-        // graph.csr_struct[0][(64*2)+:64] = buffer_2_ptr;
-        // graph.csr_struct[0][(64*3)+:64] = buffer_3_ptr;
-        // graph.csr_struct[0][(64*4)+:64] = buffer_5_ptr;
-        // graph.csr_struct[0][(64*5)+:64] = buffer_6_ptr;
-        // graph.csr_struct[0][(64*6)+:64] = buffer_4_ptr;
-        // graph.csr_struct[0][(64*7)+:64] = buffer_7_ptr;
-        // graph.csr_struct[1][0+:64] = buffer_8_ptr;
-        // graph.csr_struct[1][(64)+:64] = 1;
+        // graph.overlay_program[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count;
+        // graph.overlay_program[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
+        // graph.overlay_program[0][(64)+:64] = buffer_1_ptr;
+        // graph.overlay_program[0][(64*2)+:64] = buffer_2_ptr;
+        // graph.overlay_program[0][(64*3)+:64] = buffer_3_ptr;
+        // graph.overlay_program[0][(64*4)+:64] = buffer_5_ptr;
+        // graph.overlay_program[0][(64*5)+:64] = buffer_6_ptr;
+        // graph.overlay_program[0][(64*6)+:64] = buffer_4_ptr;
+        // graph.overlay_program[0][(64*7)+:64] = buffer_7_ptr;
+        // graph.overlay_program[1][0+:64] = buffer_8_ptr;
+        // graph.overlay_program[1][(64)+:64] = 1;
 
         int          realcount                 = 0;
         bit [32-1:0] temp_out_degree              ;
@@ -953,25 +947,25 @@ module kernel_testbench ();
 
         realcount = 0;
         setup_temp = 0;
-        graph.csr_struct[0] = 0;
+        graph.overlay_program[0] = 0;
         // StrideIndexGeneratorConfiguration
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 0 - increment/decrement
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - index_start
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;               // 2 - index_end
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - stride
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 0 - increment/decrement
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - index_start
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;               // 2 - index_end
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - stride
 
         setup_temp[GLOBAL_DATA_WIDTH_BITS-2:0] = $clog2(GLOBAL_DATA_WIDTH_BITS/8);            // 4 - (granularity - log2 value for shifting)
         setup_temp[GLOBAL_DATA_WIDTH_BITS-1] = 1'b1;                                          // 4 - shift direction 1-left 0-right
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp; // 4 - shift direction 1-left 0-right | (granularity - log2 value for shifting)
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp; // 4 - shift direction 1-left 0-right | (granularity - log2 value for shifting)
         setup_temp = 0;
 
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-        graph.csr_struct[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {10'b000000000000,8'b00000111,8'b00000001,6'b000001}; // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {10'b000000000000,8'b00000111,8'b00000001,6'b000001}; // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
 
-        for (int i = 1; i < graph.mem512_csr_struct_count; i++) begin
+        for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
-                graph.csr_struct[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
+                graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
                 realcount++;
             end
         end
@@ -1006,50 +1000,48 @@ module kernel_testbench ();
     task automatic initalize_graph (ref GraphCSR graph);
         graph.graph_name = "GRAPH_NAME";
 
-        graph.file_ptr_edges_array_dest= $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_dest", "r");
-        if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
-        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
-
-        graph.file_ptr_edges_array_src = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_src", "r");
-        if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
-        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
-
-        graph.file_ptr_edges_idx = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_idx", "r");
-        if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
-        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
-
-
         graph.file_ptr_in_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
         else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
-
 
         graph.file_ptr_out_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.out_degree", "r");
         if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
         else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
+        graph.file_ptr_edges_idx = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_idx", "r");
+        if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
+        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
+
+        graph.file_ptr_edges_array_src = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_src", "r");
+        if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
+        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
+
+        graph.file_ptr_edges_array_dest= $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_dest", "r");
+        if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
+        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
+
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
         graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
 
+        graph.mem512_overlay_program_size = int'(buffer_8_ptr); // cachelines
+
         graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_csr_struct_count = int'(buffer_8_ptr); // cachelines
 
-        graph.csr_struct = new [graph.mem512_csr_struct_count];
         graph.out_degree = new [graph.mem512_vertex_count];
         graph.in_degree  = new [graph.mem512_vertex_count];
         graph.edges_idx  = new [graph.mem512_vertex_count];
-
         graph.edges_array_src = new [graph.mem512_edge_count];
         graph.edges_array_dest= new [graph.mem512_edge_count];
+        graph.overlay_program = new [graph.mem512_overlay_program_size];
 
         read_files_graphCSR(graph);
 
-        $fclose(graph.file_ptr_edges_array_dest);
-        $fclose(graph.file_ptr_edges_array_src);
-        $fclose(graph.file_ptr_edges_idx);
         $fclose(graph.file_ptr_in_degree);
         $fclose(graph.file_ptr_out_degree);
+        $fclose(graph.file_ptr_edges_idx);
+        $fclose(graph.file_ptr_edges_array_src);
+        $fclose(graph.file_ptr_edges_array_dest);
 
         graph.display();
     endtask
