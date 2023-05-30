@@ -335,6 +335,7 @@ while(<STDIN>) {
     my $step_17 = "MSG:";
     my $step_18 = "Fatal:";
     my $step_19 = "Arg:";
+    my $step_20 = "Error:";
 
     # my $vpl = \[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\];sub_print_time_s
 
@@ -361,10 +362,11 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^$step_10$/ )  { sub_print_step($line);}
                 elsif ($fields_s[0] =~ /^$step_11$/ )  { sub_print_finished($line);}
                 elsif ($fields_s[0] =~ /^$step_13$/ )  { sub_print_compiling($line);}
+                elsif ($fields_s[0] =~ /^$step_20$/  )    { sub_print_fatal ($line);}
                 elsif ($fields_s[0] =~ /^Time:/   )    { sub_print_time_s($line); }
                 elsif ($fields_s[0] =~ /^Info:/   )    { sub_print_info_s($line); }
                 elsif ($fields_s[0] =~ /^INFO:/   )    { sub_print_info($line); }
-                elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_error ($line);}
+                elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_fatal ($line);}
                 elsif ($fields_s[0] =~ /^WARNING:/)    { sub_print_warning ($line);}
                 elsif ($line =~ /$step_12/    )        { sub_print_time ($line);}
                 elsif ($fields_s[0] =~ /^\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]$/       )  { sub_print_vpl($line);}

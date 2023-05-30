@@ -726,7 +726,7 @@ module top_control_s_axi #(parameter
         if (ARESET)
             int_buffer_9[31:0] <= 0;
         else if (ACLK_EN) begin
-            if (w_hs && waddr == ADDR_BUFFER_8_DATA_0)
+            if (w_hs && waddr == ADDR_BUFFER_9_DATA_0)
                 int_buffer_9[31:0] <= (WDATA[31:0] & wmask) | (int_buffer_9[31:0] & ~wmask);
         end
     end
@@ -736,7 +736,7 @@ module top_control_s_axi #(parameter
         if (ARESET)
             int_buffer_9[63:32] <= 0;
         else if (ACLK_EN) begin
-            if (w_hs && waddr == ADDR_BUFFER_8_DATA_1)
+            if (w_hs && waddr == ADDR_BUFFER_9_DATA_1)
                 int_buffer_9[63:32] <= (WDATA[31:0] & wmask) | (int_buffer_9[63:32] & ~wmask);
         end
     end

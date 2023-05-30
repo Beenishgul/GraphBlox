@@ -103,6 +103,8 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     vertex_buffer_size_in_bytes = graph->num_vertices * sizeof(uint32_t);
     overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
 
+    InitializeGLAYOverlayProgram(overlay_buffer_size_in_bytes, 1, graph);
+
     // Each Memory bank contains a Graph CSR segment
     xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, overlay_buffer_size_in_bytes,  bank_grp_idx);
     xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, vertex_buffer_size_in_bytes, bank_grp_idx);
@@ -128,26 +130,31 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 #endif
     buf_addr[7] = 0; // endian mode 0-big endian 1-little endian
     buf_addr[8] = overlay_buffer_size_in_bytes / sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
-    buf_addr[9] = 0;
+    buf_addr[9] = 2;
 
+}
 
+void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayProgram(size_t OerlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph)
+{
     // initialize overlay
-    overlay = (uint32_t *) malloc(overlay_buffer_size_in_bytes);
+    overlay = (uint32_t *) malloc(OerlayBufferSizeInBytes);
 
-    for (uint32_t i = 0; i < (overlay_buffer_size_in_bytes / sizeof(uint32_t)); ++i)
+    for (uint32_t i = 0; i < (OerlayBufferSizeInBytes / sizeof(uint32_t)); ++i)
     {
         overlay[i] = 0;
     }
 
-    overlay[0] = 1; // 0 - increment/decrement
-    overlay[1] = 0; // 1 - index_start
-    overlay[2] = graph->num_vertices; // 2 - index_end
-    overlay[3] = 1; // 3 - stride
-    overlay[4] = 0x80000002; // 4 - granularity - log2 value for shifting
-    overlay[5] = 0x000002C5; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
-    overlay[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
-    overlay[7] = 0x00007011;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-
+    if(algorithm == 1)
+    {
+        overlay[0] = 1; // 0 - increment/decrement
+        overlay[1] = 0; // 1 - index_start
+        overlay[2] = graph->num_vertices; // 2 - index_end
+        overlay[3] = 1; // 3 - stride
+        overlay[4] = 0x80000002; // 4 - granularity - log2 value for shifting
+        overlay[5] = 0x000002C5; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+        overlay[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
+        overlay[7] = 0x00007011;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    }
 }
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
