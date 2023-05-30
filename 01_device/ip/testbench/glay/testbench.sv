@@ -23,12 +23,12 @@ class GraphCSR;
     integer vertex_count           ;
     integer edge_count             ;
 
-    integer file_error         ;
-    integer file_ptr_edges_idx ;
-    integer file_ptr_in_degree ;
-    integer file_ptr_out_degree;
-    integer file_ptr_buffer_5  ;
-    integer file_ptr_buffer_6  ;
+    integer file_error               ;
+    integer file_ptr_edges_idx       ;
+    integer file_ptr_in_degree       ;
+    integer file_ptr_out_degree      ;
+    integer file_ptr_edges_array_src ;
+    integer file_ptr_edges_array_dest;
 
 
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] csr_struct[];
@@ -36,17 +36,18 @@ class GraphCSR;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] in_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_idx[];
 
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] buffer_5[];
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] buffer_6[];
-    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] buffer_4[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_src[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_dest[];
+
 
     function new ();
         this.file_error    = 0;
         this.file_ptr_edges_idx  = 0;
         this.file_ptr_in_degree  = 0;
         this.file_ptr_out_degree  = 0;
-        this.file_ptr_buffer_5  = 0;
-        this.file_ptr_buffer_6= 0;
+        this.file_ptr_edges_array_src  = 0;
+        this.file_ptr_edges_array_dest= 0;
         this.vertex_count = 0;
         this.edge_count = 0;
         this.mem512_vertex_count = 0;
@@ -699,32 +700,32 @@ module kernel_testbench ();
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: buffer_4 (0x040)
+        //Write ID 4: edges_array_weight (0x040)
         check_register_value(32'h040, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: buffer_4 (0x044)
+        //Write ID 4: edges_array_weight (0x044)
         check_register_value(32'h044, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: buffer_5 (0x04c)
+        //Write ID 5: edges_array_src (0x04c)
         check_register_value(32'h04c, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: buffer_5 (0x050)
+        //Write ID 5: edges_array_src (0x050)
         check_register_value(32'h050, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: buffer_6 (0x058)
+        //Write ID 6: edges_array_dest (0x058)
         check_register_value(32'h058, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: buffer_6 (0x05c)
+        //Write ID 6: edges_array_dest (0x05c)
         check_register_value(32'h05c, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
@@ -749,12 +750,12 @@ module kernel_testbench ();
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 9: buffer_8 (0x07c)
+        //Write ID 9: buffer_9 (0x07c)
         check_register_value(32'h07c, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 9: buffer_8 (0x080)
+        //Write ID 9: buffer_9 (0x080)
         check_register_value(32'h080, 32, tmp_error_found);
         error_found |= tmp_error_found;
 
@@ -808,27 +809,27 @@ module kernel_testbench ();
         write_register(32'h038, buffer_3_ptr[63:32]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: buffer_4 (0x040) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        //Write ID 4: edges_array_weight (0x040) -> Randomized 4k aligned address (Global memory, lower 32 bits)
         write_register(32'h040, buffer_4_ptr[31:0]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 4: buffer_4 (0x044) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        //Write ID 4: edges_array_weight (0x044) -> Randomized 4k aligned address (Global memory, upper 32 bits)
         write_register(32'h044, buffer_4_ptr[63:32]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: buffer_5 (0x04c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        //Write ID 5: edges_array_src (0x04c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
         write_register(32'h04c, buffer_5_ptr[31:0]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 5: buffer_5 (0x050) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        //Write ID 5: edges_array_src (0x050) -> Randomized 4k aligned address (Global memory, upper 32 bits)
         write_register(32'h050, buffer_5_ptr[63:32]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: buffer_6 (0x058) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        //Write ID 6: edges_array_dest (0x058) -> Randomized 4k aligned address (Global memory, lower 32 bits)
         write_register(32'h058, buffer_6_ptr[31:0]);
 
         ///////////////////////////////////////////////////////////////////////////
-        //Write ID 6: buffer_6 (0x05c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        //Write ID 6: edges_array_dest (0x05c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
         write_register(32'h05c, buffer_6_ptr[63:32]);
 
         ///////////////////////////////////////////////////////////////////////////
@@ -861,13 +862,13 @@ module kernel_testbench ();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Backdoor fill the memory with the content.
-        m00_axi_fill_memory(buffer_0_ptr,   LP_MAX_LENGTH);
-        m00_axi_fill_memory(buffer_1_ptr,  LP_MAX_LENGTH);
-        m00_axi_fill_memory(buffer_2_ptr,   LP_MAX_LENGTH);
-        m00_axi_fill_memory(buffer_3_ptr,   LP_MAX_LENGTH);
-        m00_axi_fill_memory(buffer_5_ptr,    LP_MAX_LENGTH);
-        m00_axi_fill_memory(buffer_6_ptr,   LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_0_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_1_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_2_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_3_ptr, LP_MAX_LENGTH);
         m00_axi_fill_memory(buffer_4_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_5_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_6_ptr, LP_MAX_LENGTH);
 
     endtask
 
@@ -876,12 +877,12 @@ module kernel_testbench ();
         // Backdoor fill the memory with the content.
         m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.csr_struct, 0, graph.mem512_csr_struct_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_weight, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_dest, 0, graph.mem512_vertex_count);
 
-        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.buffer_6, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.buffer_5, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.buffer_4, 0, graph.mem512_vertex_count);
     endtask
 
     function automatic bit check_kernel_result();
@@ -947,8 +948,8 @@ module kernel_testbench ();
         bit [32-1:0] temp_in_degree               ;
         bit [32-1:0] temp_edges_idx               ;
 
-        bit [32-1:0] temp_buffer_5 ;
-        bit [32-1:0] temp_buffer_6;
+        bit [32-1:0] temp_edges_array_src ;
+        bit [32-1:0] temp_edges_array_dest;
         bit [GLOBAL_DATA_WIDTH_BITS-1:0] setup_temp;
 
         realcount = 0;
@@ -993,10 +994,10 @@ module kernel_testbench ();
 
         for (int i = 0; i < graph.mem512_vertex_count; i++) begin
             for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
-                graph.file_error =  $fscanf(graph.file_ptr_buffer_5, "%0d\n",temp_buffer_5);
-                graph.buffer_5[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_buffer_5;
-                graph.file_error =  $fscanf(graph.file_ptr_buffer_6, "%0d\n",temp_buffer_6);
-                graph.buffer_6[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_buffer_6;
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
+                graph.edges_array_src[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_src;
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
+                graph.edges_array_dest[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_dest;
             end
         end
 
@@ -1006,13 +1007,13 @@ module kernel_testbench ();
     task automatic initalize_graph (ref GraphCSR graph);
         graph.graph_name = "GRAPH_NAME";
 
-        graph.file_ptr_buffer_6= $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.buffer_6", "r");
-        if(graph.file_ptr_buffer_6) $display("File was opened successfully : %0d",graph.file_ptr_buffer_6);
-        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_buffer_6);
+        graph.file_ptr_edges_array_dest= $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_dest", "r");
+        if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
+        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
-        graph.file_ptr_buffer_5 = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.buffer_5", "r");
-        if(graph.file_ptr_buffer_5) $display("File was opened successfully : %0d",graph.file_ptr_buffer_5);
-        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_buffer_5);
+        graph.file_ptr_edges_array_src = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_src", "r");
+        if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
+        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
 
         graph.file_ptr_edges_idx = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_idx", "r");
         if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
@@ -1029,7 +1030,7 @@ module kernel_testbench ();
         else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
-        graph.file_error =      $fscanf(graph.file_ptr_buffer_5, "%d\n",graph.edge_count);
+        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
 
         graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
@@ -1040,13 +1041,13 @@ module kernel_testbench ();
         graph.in_degree  = new [graph.mem512_vertex_count];
         graph.edges_idx  = new [graph.mem512_vertex_count];
 
-        graph.buffer_5 = new [graph.mem512_edge_count];
-        graph.buffer_6= new [graph.mem512_edge_count];
+        graph.edges_array_src = new [graph.mem512_edge_count];
+        graph.edges_array_dest= new [graph.mem512_edge_count];
 
         read_files_graphCSR(graph);
 
-        $fclose(graph.file_ptr_buffer_6);
-        $fclose(graph.file_ptr_buffer_5);
+        $fclose(graph.file_ptr_edges_array_dest);
+        $fclose(graph.file_ptr_edges_array_src);
         $fclose(graph.file_ptr_edges_idx);
         $fclose(graph.file_ptr_in_degree);
         $fclose(graph.file_ptr_out_degree);
