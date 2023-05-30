@@ -111,6 +111,11 @@ module top_control_s_axi #(parameter
 // 0x74 : Data signal of buffer_8
 //        bit 31~0 - buffer_8[63:32] (Read/Write)
 // 0x78 : reserved
+// 0x7c : Data signal of buffer_9
+//        bit 31~0 - buffer_9[31:0] (Read/Write)
+// 0x80 : Data signal of buffer_9
+//        bit 31~0 - buffer_9[63:32] (Read/Write)
+// 0x84 : reserved
 // (SC = Self Clear, COR = Clear on Read, TOW = Toggle on Write, COH = Clear on Handshake)
 
 //------------------------Parameter----------------------
