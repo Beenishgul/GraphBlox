@@ -10,6 +10,9 @@
 01_device/vivado.log  
 01_device/vivado_pid*.str  
 01_device/xilinx_*
+01_device/.Xil
+01_device/*.err
+01_device/*.log
 vivado.jou  
 vivado.log 
 vivado_pid*.str  
