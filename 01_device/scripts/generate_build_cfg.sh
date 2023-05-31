@@ -81,7 +81,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
    config+="\n[vivado]\n"
    config+="impl.strategies=Performance_Explore,Area_Explore\n"
    config+="impl.jobs=${JOBS_STRATEGY}\n"
@@ -94,7 +94,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
@@ -109,7 +109,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
@@ -134,7 +134,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
@@ -157,7 +157,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
 
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
@@ -179,7 +179,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
@@ -201,7 +201,7 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
-   config+="param=compiler.multiStrategiesWaitOnAllRuns=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
 
    config+="\n[vivado]\n"
