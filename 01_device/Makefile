@@ -465,6 +465,7 @@ help: session-info
 # =========================================================
 .PHONY: clean
 clean: session-info 
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/.Xil
 	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)*$(GIT_VER)
 	$(RMDIR) *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	$(RMDIR) *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
@@ -478,6 +479,7 @@ clean: session-info
 
 .PHONY: clean-all
 clean-all: session-info 
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/.Xil
 	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)_*
 	$(RMDIR) *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
 	$(RMDIR) *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
