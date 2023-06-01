@@ -259,6 +259,26 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
     return 0;
 }
 
+void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()
+{
+    uint32_t engine_id = 0;
+
+    for (uint32_t i = 0; i < 10; ++i)
+    {
+        overlay[i] = 0;
+        printf("Buffer %u : [%lX] [%lu]\n", i,  xrt_buffer_address[i], xrt_buffer_size[i]);
+    }
+
+    for (uint32_t i = 0; i < (overlay_buffer_size_in_bytes / sizeof(uint32_t)); ++i)
+    {
+        overlay[i] = 0;
+        printf("Engine %u : %u [%X]\n", engine_id, overlay[i], overlay[i]);
+
+        if((engine_id % 8) == 0)
+            engine_id++;
+    }
+}
+
 
 // ********************************************************************************************
 // ***************                  GLAY Control                                 **************

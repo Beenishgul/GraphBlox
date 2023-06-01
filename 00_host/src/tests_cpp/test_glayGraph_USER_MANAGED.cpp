@@ -327,6 +327,8 @@ main (int argc, char **argv)
 
     waitGLAYUserManaged(arguments->glayHandle);
 
+    glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
+
     // closeGLAYUserManaged(arguments->glayHandle);
 
     // releaseGLAY(arguments->glayHandle);
