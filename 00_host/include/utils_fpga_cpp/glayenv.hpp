@@ -243,6 +243,8 @@ public:
     int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle);
     void InitializeGLAYOverlayProgram(size_t OerlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph);
     int setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
+    void printGLAYGraphCSRxrtBufferHandlePerBank();
+
 };
 
 struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bank_grp_idx);
