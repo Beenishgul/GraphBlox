@@ -99,19 +99,17 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bank_grp_idx)
 {
 
-    vertex_buffer_size_in_bytes = graph->num_vertices * sizeof(uint32_t);
-    edges_buffer_size_in_bytes  = graph->num_edges * sizeof(uint32_t);
     overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t); // (4 cachelines 64-bytes / 4 bytes)
 
     InitializeGLAYOverlayProgram(overlay_buffer_size_in_bytes, 1, graph);
 
     xrt_buffer_size[0] = overlay_buffer_size_in_bytes;
-    xrt_buffer_size[1] = vertex_buffer_size_in_bytes;
-    xrt_buffer_size[2] = vertex_buffer_size_in_bytes;
-    xrt_buffer_size[3] = vertex_buffer_size_in_bytes;
-    xrt_buffer_size[4] = edges_buffer_size_in_bytes;
-    xrt_buffer_size[5] = edges_buffer_size_in_bytes;
-    xrt_buffer_size[6] = edges_buffer_size_in_bytes;
+    xrt_buffer_size[1] = graph->num_vertices * sizeof(uint32_t);;
+    xrt_buffer_size[2] = graph->num_vertices * sizeof(uint32_t);;
+    xrt_buffer_size[3] = graph->num_vertices * sizeof(uint32_t);;
+    xrt_buffer_size[4] = graph->num_edges * sizeof(uint32_t);;
+    xrt_buffer_size[5] = graph->num_edges * sizeof(uint32_t);;
+    xrt_buffer_size[6] = graph->num_edges * sizeof(uint32_t);;
     xrt_buffer_size[7] = 8;
     xrt_buffer_size[8] = 8;
     xrt_buffer_size[9] = 8;
