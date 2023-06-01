@@ -344,7 +344,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
         end
         fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field         = counter_count;
+        fifo_request_comb.payload.data.field_0         = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
