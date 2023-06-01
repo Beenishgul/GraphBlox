@@ -286,11 +286,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
         arguments->device_index = atoi(arg);
         break;
     case 'Q':
-        arguments->kernel_name = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->kernel_name = (char *) malloc((strlen(arg) + 20) * sizeof(char));
         arguments->kernel_name  = strcpy (arguments->kernel_name, arg);
         break;
     case 'q':
-        arguments->xclbin_path = (char *) malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
         arguments->xclbin_path  = strcpy (arguments->xclbin_path, arg);
         break;
     default:
