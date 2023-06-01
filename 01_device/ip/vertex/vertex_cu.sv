@@ -123,9 +123,9 @@ module vertex_cu #(
                 end
                 else begin
                     // if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
-                        counter <= counter + 1;
-                        // if (counter == 0)
-                        //     $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field_0);
+                    counter <= counter + 1;
+                    // if (counter == 0)
+                    //     $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field_0);
                     // end else
                     // counter <= counter;
                 end

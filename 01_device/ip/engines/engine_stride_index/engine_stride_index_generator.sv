@@ -338,7 +338,10 @@ module engine_stride_index_generator #(parameter COUNTER_WIDTH      = 32) (
         end
         fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field_0         = counter_count;
+        fifo_request_comb.payload.data.field_0       = counter_count;
+        fifo_request_comb.payload.data.field_1       = 0;
+        fifo_request_comb.payload.data.field_2       = 0;
+        fifo_request_comb.payload.data.field_3       = 0;
     end
 
 
