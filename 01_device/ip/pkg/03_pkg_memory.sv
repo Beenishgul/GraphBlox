@@ -159,7 +159,10 @@ typedef struct packed{
 } MemoryPacketMeta;
 
 typedef struct packed{
-  logic [CACHE_FRONTEND_DATA_W-1:0] field;
+  logic [CACHE_FRONTEND_DATA_W-1:0] field_0;
+  logic [CACHE_FRONTEND_DATA_W-1:0] field_1;
+  logic [CACHE_FRONTEND_DATA_W-1:0] field_2;
+  logic [CACHE_FRONTEND_DATA_W-1:0] field_3;
 } MemoryPacketData;
 
 typedef struct packed{
