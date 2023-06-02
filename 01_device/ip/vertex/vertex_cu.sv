@@ -184,8 +184,8 @@ module vertex_cu #(
         else begin
             fifo_setup_signal <= engine_stride_index_fifo_setup_signal | vertex_bundles_fifo_setup_signal;
             request_out.valid <= request_out_reg.valid ;
-            // done_out          <= engine_stride_index_done_out | done_signal_reg;
-            done_out          <= engine_stride_index_done_out;
+            done_out          <= engine_stride_index_done_out | done_signal_reg;
+            // done_out          <= engine_stride_index_done_out;
 
         end
     end
