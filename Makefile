@@ -387,7 +387,7 @@ export TARGET = hw_emu
 # Check 01_device/scripts/generate_build_cfg
 # pick a suitable strategy or add yours
 # =========================================================
-export XILINX_IMPL_STRATEGY = 2
+export XILINX_IMPL_STRATEGY = 8
 # =========================================================
 
 # =========================================================
