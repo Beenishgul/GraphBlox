@@ -22,7 +22,6 @@
 
 struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName, int ctrlMode)
 {
-
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
@@ -84,10 +83,7 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     for (auto i : glayHandle->cuHandles[0].get_args())
         std::cout << std::hex << std::uppercase << i.get_offset() << "\n";
 
-
-
     return glayHandle;
-
 }
 
 
@@ -127,9 +123,9 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex); // E | edges array src
     xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex); // E | edges array dest
     xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex); // E | edges array weight
-    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, xrt::bo::flags::normal, bankGroupIndex); // auxiliary 1
-    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, xrt::bo::flags::normal, bankGroupIndex); // auxiliary 2
-    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, xrt::bo::flags::normal, bankGroupIndex); // auxiliary 3
+    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 1
+    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 2
+    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 3
 
     // ********************************************************************************************
     // ***************                  Setup Device pointers                        **************
@@ -142,8 +138,8 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_device[5] = xrt_buffer[5].address();
 #if WEIGHTED
     xrt_buffer_device[6] = xrt_buffer[6].address();
-// #else
-//     xrt_buffer_device[6] = 1;
+#else
+    xrt_buffer_device[6] = 1;
 #endif
     xrt_buffer_device[7] = 0; // endian mode 0-big endian 1-little endian
     xrt_buffer_device[8] = overlay_buffer_size_in_bytes / sizeof(uint32_t); // Each read is 4-Bytes granularity (256 cycles to configure)
@@ -160,8 +156,8 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_host[5] = graph->sorted_edges_array->edges_array_dest;
 #if WEIGHTED
     xrt_buffer_host[6] = graph->sorted_edges_array->edges_array_weight;
-// #else
-//     xrt_buffer_host[6] = &xrt_buffer_device[6];
+#else
+    xrt_buffer_host[6] = &xrt_buffer_device[6];
 #endif
     xrt_buffer_host[7] = &xrt_buffer_device[7]; // endian mode 0-big endian 1-little endian
     xrt_buffer_host[8] = &xrt_buffer_device[8]; // sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
@@ -170,37 +166,16 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
 {
-    // xrt_buffer[0].write(xrt_buffer_host[0], xrt_buffer_size[0], 0);
-    // xrt_buffer[1].write(xrt_buffer_host[1], xrt_buffer_size[1], 0);
-    // xrt_buffer[2].write(xrt_buffer_host[2], xrt_buffer_size[2], 0);
-    // xrt_buffer[3].write(xrt_buffer_host[3], xrt_buffer_size[3], 0);
-    // xrt_buffer[4].write(xrt_buffer_host[4], xrt_buffer_size[4], 0);
-    // xrt_buffer[5].write(xrt_buffer_host[5], xrt_buffer_size[5], 0);
-    // xrt_buffer[6].write(xrt_buffer_host[6], xrt_buffer_size[6], 0);
-    // xrt_buffer[7].write(xrt_buffer_device[7], xrt_buffer_size[7], 0);
-    // xrt_buffer[8].write(xrt_buffer_device[8], xrt_buffer_size[8], 0);
-    // xrt_buffer[9].write(xrt_buffer_device[9], xrt_buffer_size[9], 0);
-
-    // xrt_buffer[0].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[0], 0);
-    // xrt_buffer[1].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[1], 0);
-    // xrt_buffer[2].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[2], 0);
-    // xrt_buffer[3].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[3], 0);
-    // xrt_buffer[4].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[4], 0);
-    // xrt_buffer[5].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[5], 0);
-    // xrt_buffer[6].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[6], 0);
-    // xrt_buffer[7].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[7], 0);
-    // xrt_buffer[8].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[8], 0);
-    // xrt_buffer[9].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[9], 0);
-
-    xrt_buffer[0].write(overlay_configuration, xrt_buffer_size[0], 0);
-    xrt_buffer[1].write(graph->vertices->in_degree, xrt_buffer_size[1], 0);
-    xrt_buffer[2].write(graph->vertices->out_degree, xrt_buffer_size[2], 0);
-    xrt_buffer[3].write(graph->vertices->edges_idx, xrt_buffer_size[3], 0);
-    xrt_buffer[4].write(graph->sorted_edges_array->edges_array_src, xrt_buffer_size[4], 0);
-    xrt_buffer[5].write(graph->sorted_edges_array->edges_array_dest, xrt_buffer_size[5], 0);
-#if WEIGHTED
-    xrt_buffer[6].write(graph->sorted_edges_array->edges_array_weight, xrt_buffer_size[6], 0);
-#endif
+    xrt_buffer[0].write(xrt_buffer_host[0], xrt_buffer_size[0], 0);
+    xrt_buffer[1].write(xrt_buffer_host[1], xrt_buffer_size[1], 0);
+    xrt_buffer[2].write(xrt_buffer_host[2], xrt_buffer_size[2], 0);
+    xrt_buffer[3].write(xrt_buffer_host[3], xrt_buffer_size[3], 0);
+    xrt_buffer[4].write(xrt_buffer_host[4], xrt_buffer_size[4], 0);
+    xrt_buffer[5].write(xrt_buffer_host[5], xrt_buffer_size[5], 0);
+    xrt_buffer[6].write(xrt_buffer_host[6], xrt_buffer_size[6], 0);
+    xrt_buffer[7].write(xrt_buffer_host[7], xrt_buffer_size[7], 0);
+    xrt_buffer[8].write(xrt_buffer_host[8], xrt_buffer_size[8], 0);
+    xrt_buffer[9].write(xrt_buffer_host[9], xrt_buffer_size[9], 0);
 
     xrt_buffer[0].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[0], 0);
     xrt_buffer[1].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[1], 0);
@@ -208,17 +183,9 @@ int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerB
     xrt_buffer[3].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[3], 0);
     xrt_buffer[4].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[4], 0);
     xrt_buffer[5].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[5], 0);
-#if WEIGHTED
     xrt_buffer[6].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[6], 0);
-#endif
-
-    xrt_buffer[7].write(&xrt_buffer_device[7], xrt_buffer_size[7], 0);
     xrt_buffer[7].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[7], 0);
-
-    xrt_buffer[8].write(&xrt_buffer_device[8], xrt_buffer_size[8], 0);
     xrt_buffer[8].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[8], 0);
-
-    xrt_buffer[9].write(&xrt_buffer_device[9], xrt_buffer_size[9], 0);
     xrt_buffer[9].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[9], 0);
 
     return 0;

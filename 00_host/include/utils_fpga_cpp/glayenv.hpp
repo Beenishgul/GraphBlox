@@ -179,7 +179,6 @@ extern "C" {
 // ********************************************************************************************
 // ***************                      DataStructure CSR                        **************
 // ********************************************************************************************
-
 struct __attribute__((__packed__)) GLAYGraphCSR
 {
     uint32_t num_edges;                 // 4-Bytes
@@ -200,7 +199,6 @@ struct __attribute__((__packed__)) GLAYGraphCSR
 // ********************************************************************************************
 // ***************                      XRT Device Management                    **************
 // ********************************************************************************************
-
 struct xrtGLAYHandle
 {
     int numThreads;
@@ -224,7 +222,6 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 // ********************************************************************************************
 // ***************                      XRT Buffer Management                    **************
 // ********************************************************************************************
-
 class GLAYGraphCSRxrtBufferHandlePerBank
 {
 public:
@@ -244,7 +241,6 @@ public:
     int setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
     void InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph);
     void printGLAYGraphCSRxrtBufferHandlePerBank();
-
 };
 
 struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bankGroupIndex);
@@ -252,10 +248,8 @@ struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandl
 // ********************************************************************************************
 // ***************                  GLAY Control                                 **************
 // ********************************************************************************************
-
 void freeGlayHandle(struct xrtGLAYHandle *glayHandle);
 void releaseGLAY(struct xrtGLAYHandle *glayHandle);
-
 
 // ********************************************************************************************
 // ***************                  GLAY Control USER_MANAGED                    **************
