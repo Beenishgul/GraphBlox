@@ -322,7 +322,7 @@ main (int argc, char **argv)
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
     glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRUserManaged(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
-    // glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
+    glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
 
     startGLAYUserManaged(arguments->glayHandle);
 
