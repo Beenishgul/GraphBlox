@@ -294,18 +294,19 @@ void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank
     for (uint32_t j = 0; j < 4; j++)
     {
         bundle_id = j;
-        printf(" \nBUNDLE-ID %-4u \n", bundle_id);
+        printf(" \nBUNDLE-ID [%-2u] \n", bundle_id);
         for (uint32_t i = 0; i < 8; i++)
         {
             engine_id = i;
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 0], overlay_configuration[j * 64 + i * 8 + 0]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 1], overlay_configuration[j * 64 + i * 8 + 1]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 2], overlay_configuration[j * 64 + i * 8 + 2]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 3], overlay_configuration[j * 64 + i * 8 + 3]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 4], overlay_configuration[j * 64 + i * 8 + 4]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 5], overlay_configuration[j * 64 + i * 8 + 5]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 6], overlay_configuration[j * 64 + i * 8 + 6]);
-            printf("ENGINE-ID %-4u : %-14u [0x%08X]\n", engine_id, overlay_configuration[j * 64 + i * 8 + 7], overlay_configuration[j * 64 + i * 8 + 7]);
+            printf("ENGINE-ID [%-2u] \n", engine_id);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 0]);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 1]);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 2]);
+            printf("[0x%08X]\n", overlay_configuration[j * 64 + i * 8 + 3]);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 4]);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 5]);
+            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 6]);
+            printf("[0x%08X]\n", overlay_configuration[j * 64 + i * 8 + 7]);
         }
     }
 }

@@ -313,7 +313,7 @@ main (int argc, char **argv)
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
     arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->kernel_name, 2);
-   
+
     if(arguments->glayHandle == NULL)
     {
         printf("ERROR:--> setupGLAYDevice\n");
@@ -321,6 +321,7 @@ main (int argc, char **argv)
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
     glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
 
     startGLAYCtrlChain(arguments->glayHandle);
 
