@@ -76,7 +76,6 @@ start:
 	$(ECHO) "========================================================="
 	-@$(MAKE) start $(MAKE_DEVICE)
 	-@$(MAKE) start $(MAKE_HOST)
-	-@$(MAKE) gen-host-bin $(MAKE_DEVICE)
 	$(ECHO) "========================================================="
 	$(ECHO) "${YELLOW}Usage : make help -- to view options!${NC}"
 	$(ECHO) "========================================================="
