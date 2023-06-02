@@ -88,14 +88,12 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="synth.jobs=${JOBS_STRATEGY}\n"
    config+="param=general.maxThreads=${MAX_THREADS}\n"
 
-
    echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 2 ]]
   then
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-
 
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
@@ -110,7 +108,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-
 
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
@@ -136,7 +133,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
@@ -159,7 +155,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
@@ -180,7 +175,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
-
 
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
@@ -203,7 +197,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
-
    config+="\n[vivado]\n"
    config+="impl.strategies=ALL\n"
    config+="impl.jobs=${JOBS_STRATEGY})\n"
@@ -217,6 +210,18 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithHoldFix}\n"
    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n" 
+
+   echo -e "${config}" >> ${CFG_FILE_NAME}
+elif [[ ${IMPL_STRATEGY} -eq 8 ]]
+  then
+   config+="\n[advanced]\n"
+   config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+   config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+   config+="\n[vivado]\n"
+   config+="impl.strategies=Congestion_SpreadLogic_high\n"
+   config+="impl.jobs=${JOBS_STRATEGY}\n"
+   config+="synth.jobs=${JOBS_STRATEGY}\n"
+   config+="param=general.maxThreads=${MAX_THREADS}\n"
 
    echo -e "${config}" >> ${CFG_FILE_NAME}
  else
