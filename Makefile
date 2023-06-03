@@ -76,6 +76,7 @@ start:
 	$(ECHO) "========================================================="
 	-@$(MAKE) start $(MAKE_DEVICE)
 	-@$(MAKE) start $(MAKE_HOST)
+	-@$(MAKE) gen-host-bin $(MAKE_DEVICE)
 	$(ECHO) "========================================================="
 	$(ECHO) "${YELLOW}Usage : make help -- to view options!${NC}"
 	$(ECHO) "========================================================="
@@ -358,7 +359,7 @@ export TARGET = hw_emu
 # Check 01_device/scripts/generate_build_cfg
 # pick a suitable strategy or add yours
 # =========================================================
-export XILINX_IMPL_STRATEGY = 8
+export XILINX_IMPL_STRATEGY = 2
 # =========================================================
 
 # =========================================================
