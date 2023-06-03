@@ -27,11 +27,9 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->xclbinPath = xclbinPath;
     glayHandle->kernelName = kernelName;
     glayHandle->ctrlMode  = ctrlMode;
-    //Open a Device (use "xbutil scan" to show the available devices)
-    std::cout << "Open the device :" << glayHandle->deviceIndex << std::endl;
+
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
 
-    std::cout << "Load the xclbin : " << glayHandle->xclbinPath << std::endl;
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
 
     glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
@@ -49,8 +47,6 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
         glayHandle->ipHandle = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
 
-
-    std::cout << "Fetch compute Units" << std::endl;
     for (auto &kernel : glayHandle->xclbinHandle.get_kernels())
     {
         if (kernel.get_name() == glayHandle->kernelName)
@@ -61,32 +57,28 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     if (glayHandle->cuHandles.empty()) throw std::runtime_error(std::string("IP ") + glayHandle->kernelName + std::string(" not found in the provided xclbin"));
 
-    // std::cout << "Determine memory index\n";
-    // for (auto &mem : glayHandle->xclbinHandle.get_mems())
-    // {
-    //     if (mem.get_used())
-    //     {
-    //         glayHandle->mem_used = mem;
-    //         break;
-    //     }
-    // }
-
-    // glayHandle->interruptHandle = glayHandle->ipHandle.create_interrupt_notify();
-    // glayHandle->interruptHandle.disable();
-
-    std::cout << "device name                   :     " << glayHandle->deviceHandle.get_info<xrt::info::device::name>() << "\n";
-    std::cout << "device bdf                    :     " << glayHandle->deviceHandle.get_info<xrt::info::device::bdf>() << "\n";
-    std::cout << "device max_clock_frequency_mhz:     " << glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() << "\n";
-
-    // glayHandle->cuHandles[0].
-    std::cout << "Kernel Arguments Offsets:" << "\n";
-    for (auto i : glayHandle->cuHandles[0].get_args())
-        std::cout << std::hex << std::uppercase << i.get_offset() << "\n";
+    printGLAYDevice(glayHandle);
 
     return glayHandle;
 }
 
+void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
+{
+    printf("\n-----------------------------------------------------\n");
+    printf("DEVICE::NAME                    [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::name>().c_str() );
+    printf("DEVICE::BDF                     [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::bdf>().c_str() );
+    printf("DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld] \n", glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() );
+    printf("-----------------------------------------------------\n");
+    printf(" \nKernel Arguments Offsets: HANDLE[%2u] \n", 0);
 
+    uint32_t i = 0;
+    for (auto it : glayHandle->cuHandles[0].get_args())
+    {
+        printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
+        i++;
+    }
+    printf("-----------------------------------------------------\n");
+}
 
 // ********************************************************************************************
 // ***************                  GLAY General                                 **************
@@ -342,11 +334,11 @@ void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
     do
     {
         glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-        printf("start %x \n", glay_control_read);
+        printf("MSG: START-[0x%08X] \n", glay_control_read);
     }
     while(!(glay_control_read & CONTROL_READY));
 
-    printf("wait %x \n", glay_control_read);
+    printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
 }
 
 void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
@@ -356,11 +348,11 @@ void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
     do
     {
         glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-        printf("wait %x \n", glay_control_read);
+        printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
     }
     while(!(glay_control_read & CONTROL_IDLE));
 
-    printf("wait %x \n", glay_control_read);
+    printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
 }
 
 void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle)

@@ -350,17 +350,17 @@ ifeq ($(TARGET),hw_emu)
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
-	echo "Generating emulation config file for platform $(PLATFORM).." ;\
-	emconfigutil --platform $(PLATFORM)  ;\
-	echo "Enter Hardware Emulation Mode" ;\
+	echo "INFO: Generating emulation config file for platform $(PLATFORM)" | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_emu.pl ;\
+	emconfigutil --platform $(PLATFORM)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_emu_sub.pl;\
+	echo "INFO: Enter Hardware Emulation Mode" | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_emu_sub.pl;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	if [ $(DEBUG_CMD) -eq 1 ]; then \
 		gdb -ex=r --args $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	else \
-		$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
+		$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_emu_sub.pl;\
 	fi
 else
-	$(ECHO) "${RED}This build target <TARGET=hw_emu> not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
+	$(ECHO) "${RED}ERROR: This build target <TARGET=hw_emu> not valid when design target is <<TARGET=$(TARGET)>> ${NC}" | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_emu.pl
 endif
 
 .PHONY: run-emu
@@ -400,14 +400,14 @@ open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL
 .PHONY: report_metrics
 report_metrics: session-info $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
 ifeq ($(TARGET),hw_emu)
-	$(ECHO) "${RED}This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
+	$(ECHO) "${RED}ERROR: This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
 else
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(CD) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE); \
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/report_metrics.tcl -notrace $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/color_tail_report.pl
 	$(ECHO) ""
-	$(ECHO) "Vivado Utilization/Power Report Generation Complete..."
+	$(ECHO) "INFO: Vivado Utilization/Power Report Generation Complete..."
 	$(ECHO) "####################################"
 	$(ECHO) ""
 endif

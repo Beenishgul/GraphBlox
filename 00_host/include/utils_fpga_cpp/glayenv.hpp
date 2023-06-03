@@ -27,16 +27,6 @@ extern "C" {
 #endif
 
 
-// User Managed Kernel masks
-
-#define CONTROL_OFFSET             0x00
-#define CONTROL_START              0x01
-#define CONTROL_DONE               0x02
-#define CONTROL_IDLE               0x04
-#define CONTROL_READY              0x08
-#define CONTROL_CONTINUE           0x10
-
-
 // ********************************************************************************************
 // ***************                      DataStructure CSR OFFSETS                **************
 // ********************************************************************************************
@@ -113,6 +103,14 @@ extern "C" {
 //        bit 31~0 - buffer_9[63:32] (Read/Write)
 // 0x84 : reserved
 
+// User Managed Kernel MASK
+#define CONTROL_OFFSET             0x00
+#define CONTROL_START              0x01
+#define CONTROL_DONE               0x02
+#define CONTROL_IDLE               0x04
+#define CONTROL_READY              0x08
+#define CONTROL_CONTINUE           0x10
+
 #define ADDR_BUFFER_0_DATA_0  0x10
 #define ADDR_BUFFER_0_DATA_1  0x14
 
@@ -153,28 +151,6 @@ extern "C" {
 #define ADDR_BUFFER_7_ID  7
 #define ADDR_BUFFER_8_ID  8
 #define ADDR_BUFFER_9_ID  9
-
-#define GRAPH_CSR_STRUCT_OFFSET      0x10
-#define VERTEX_IN_DEGREE_OFFSET      0x1c
-#define VERTEX_OUT_DEGREE_OFFSET     0x28
-#define VERTEX_EDGES_IDX_OFFSET      0x34
-#define EDGES_ARRAY_SRC_OFFSET       0x40
-#define EDGES_ARRAY_DEST_OFFSET      0x4c
-#define EDGES_ARRAY_WEIGHT_OFFSET    0x58
-#define AUXILIARY_1_OFFSET           0x64
-#define AUXILIARY_2_OFFSET           0x70
-#define AUXILIARY_3_OFFSET           0x7c
-
-#define GRAPH_CSR_STRUCT_ID      0
-#define VERTEX_IN_DEGREE_ID      1
-#define VERTEX_OUT_DEGREE_ID     2
-#define VERTEX_EDGES_IDX_ID      3
-#define EDGES_ARRAY_SRC_ID       4
-#define EDGES_ARRAY_DEST_ID      5
-#define EDGES_ARRAY_WEIGHT_ID    6
-#define AUXILIARY_1_ID           7
-#define AUXILIARY_2_ID           8
-#define AUXILIARY_3_ID           9
 
 // ********************************************************************************************
 // ***************                      DataStructure CSR                        **************
@@ -218,6 +194,7 @@ struct xrtGLAYHandle
 };
 
 struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName, int ctrlMode);
+void printGLAYDevice(struct xrtGLAYHandle *glayHandle);
 
 // ********************************************************************************************
 // ***************                      XRT Buffer Management                    **************
