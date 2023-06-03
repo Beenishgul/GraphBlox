@@ -333,6 +333,9 @@ while(<STDIN>) {
     my $step_22 = "configuring";
     my $step_23 = "scheduler";
     my $step_24 = "emulation";
+    my $step_25 = "DEVICE:";
+    my $step_26 = "ARG";
+    my $step_27 = "Kernel Arguments Offsets:";
 
     # my $vpl = \[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\];sub_print_time_s
 
@@ -367,6 +370,9 @@ while(<STDIN>) {
                 elsif ($fields_s[0] =~ /^$step_22$/  ) { sub_print_msg ($line);}
                 elsif ($fields_s[0] =~ /^$step_23$/  ) { sub_print_msg ($line);}
                 elsif ($fields_s[0] =~ /^$step_24$/  ) { sub_print_msg ($line);}
+                elsif ($fields_s[0] =~ /$step_25$/  ) { sub_print_msg ($line);}
+                elsif ($fields_s[0] =~ /$step_26$/  ) { sub_print_msg ($line);}
+                elsif ($fields_s[0] =~ /$step_27$/  ) { sub_print_msg ($line);}
                 elsif ($fields_s[0] =~ /^ERROR:/  )    { sub_print_fatal ($line);}
                 elsif ($fields_s[0] =~ /^WARNING:/)    { sub_print_warning ($line);}
                 elsif ($line =~ /^$step_12/    )        { sub_print_time ($line);}
