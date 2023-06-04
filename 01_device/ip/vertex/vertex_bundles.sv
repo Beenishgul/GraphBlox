@@ -113,6 +113,9 @@ module vertex_bundles #(
     logic                  bundle_engines_fifo_setup_signal                   [ENGINE_BUNDLES_NUM-1:0];
     logic                  bundle_engines_done_out                            [ENGINE_BUNDLES_NUM-1:0];
 
+    logic [ENGINE_BUNDLES_NUM-1:0] bundle_engines_fifo_setup_signal_reg;
+    logic [ENGINE_BUNDLES_NUM-1:0] bundle_engines_done_out_reg         ;
+
 
 
 // --------------------------------------------------------------------------------------
@@ -174,9 +177,9 @@ module vertex_bundles #(
             done_out          <= 0;
         end
         else begin
-            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int | (|bundle_engines_fifo_setup_signal);
+            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int | (|bundle_engines_fifo_setup_signal_reg);
             request_out.valid <= request_out_int.valid ;
-            done_out          <= (&bundle_engines_done_out);
+            done_out          <= (&bundle_engines_done_out_reg);
         end
     end
 
@@ -373,6 +376,8 @@ module vertex_bundles #(
     logic                  bundle_engines_fifo_setup_signal                   [ENGINE_BUNDLES_NUM-1:0];
     logic                  bundle_engines_done_out                            [ENGINE_BUNDLES_NUM-1:0];
 
+// Generate Bundles - Drive input signals
+// --------------------------------------------------------------------------------------
     generate
         for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_reg_input
             always_ff @(posedge ap_clk) begin
@@ -394,6 +399,25 @@ module vertex_bundles #(
         end
     endgenerate
 
+// Generate Bundles - Drive output signals
+// --------------------------------------------------------------------------------------
+    generate
+        for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_reg_output
+            always_ff @(posedge ap_clk) begin
+                if (areset_vertex_bundles) begin
+                    bundle_engines_fifo_setup_signal_reg[i] <= 1'b1;
+                    bundle_engines_done_out_reg[i] <= 1'b1;
+                end
+                else begin
+                    bundle_engines_fifo_setup_signal_reg[i] <= bundle_engines_fifo_setup_signal[i];
+                    bundle_engines_done_out_reg[i] <= bundle_engines_done_out[i];
+                end
+            end
+        end
+    endgenerate
+
+// Generate Bundles - instants
+// --------------------------------------------------------------------------------------
     generate
         for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_engines
             bundle_engines #(
