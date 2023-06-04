@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : memory_generator_response.sv
+// File   : bundle_arbiter_1_to_N_request.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -19,41 +19,41 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module memory_generator_response #(
+module bundle_arbiter_1_to_N_request #(
   parameter NUM_MEMORY_REQUESTOR = 2                        ,
   parameter DEMUX_DATA_WIDTH     = $bis(MemoryPacketPayload),
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR     ,
   parameter DEMUX_SEL_WIDTH      = $clog2(BUS_WIDTH)
 ) (
-  input  logic                  ap_clk                                 ,
-  input  logic                  areset                                 ,
-  input  MemoryPacket           response_in                            ,
-  input  FIFOStateSignalsInput  fifo_response_signals_in               ,
-  output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
+  input  logic                  ap_clk                                ,
+  input  logic                  areset                                ,
+  input  MemoryPacket           request_in                            ,
+  input  FIFOStateSignalsInput  fifo_request_signals_in               ,
+  output FIFOStateSignalsOutput fifo_request_signals_out              ,
+  output MemoryPacket           request_out [NUM_MEMORY_REQUESTOR-1:0],
   output logic                  fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
-// Cache response variables
+// Cache request variables
 // --------------------------------------------------------------------------------------
   logic areset_control;
   logic areset_fifo   ;
   logic areset_demux  ;
 
-  MemoryPacket response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
-  MemoryPacket response_in_reg                           ;
+  MemoryPacket request_out_reg[NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket request_in_reg                           ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-  MemoryPacketPayload    fifo_response_din             ;
-  MemoryPacket           fifo_response_dout_int        ;
-  MemoryPacketPayload    fifo_response_dout            ;
-  FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
-  FIFOStateSignalsInput  fifo_response_signals_in_int  ;
-  FIFOStateSignalsOutput fifo_response_signals_out_int ;
-  logic                  fifo_response_setup_signal_int;
+  MemoryPacketPayload    fifo_request_din             ;
+  MemoryPacket           fifo_request_dout_int        ;
+  MemoryPacketPayload    fifo_request_dout            ;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
+  FIFOStateSignalsInput  fifo_request_signals_in_int  ;
+  FIFOStateSignalsOutput fifo_request_signals_out_int ;
+  logic                  fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Demux Logic and arbitration
@@ -78,16 +78,16 @@ module memory_generator_response #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      response_in_reg.valid        <= 1'b0;
-      fifo_response_signals_in_reg <= 0;
+      request_in_reg.valid        <= 1'b0;
+      fifo_request_signals_in_reg <= 0;
     end else begin
-      response_in_reg.valid              <= response_in.valid;
-      fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
+      request_in_reg.valid              <= request_in.valid;
+      fifo_request_signals_in_reg.rd_en <= fifo_request_signals_in.rd_en;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    response_in_reg.payload <= response_in.payload;
+    request_in_reg.payload <= request_in.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -97,12 +97,12 @@ module memory_generator_response #(
     if(areset_control) begin
       fifo_setup_signal <= 1'b1;
     end else begin
-      fifo_setup_signal <= fifo_response_setup_signal_int;
+      fifo_setup_signal <= fifo_request_setup_signal_int;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    fifo_response_signals_out <= fifo_response_signals_out_int;
+    fifo_request_signals_out <= fifo_request_signals_out_int;
   end
 // --------------------------------------------------------------------------------------
 //  Demux Logic and arbitration
@@ -110,25 +110,25 @@ module memory_generator_response #(
   genvar i;
   generate
     // demux output
-    for (i=0; i < DEMUX_BUS_WIDTH; i++) begin : generate_response_out
+    for (i=0; i < DEMUX_BUS_WIDTH; i++) begin : generate_request_out
       always_ff @(posedge ap_clk ) begin
         if(areset_control) begin
-          response_out[i].valid       <= 1'b0;
+          request_out[i].valid       <= 1'b0;
           demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
-          response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid
+          request_out[i].valid       <= demux_bus_data_out_valid[i];
+          demux_bus_data_in_valid[i] <= (fifo_request_dout_int.payload.meta.id_bundle == i) & fifo_request_dout_int.valid
           end
         end
 
         always_ff @(posedge ap_clk) begin
-          response_out[i].payload <= demux_bus_data_out[i];
+          request_out[i].payload <= demux_bus_data_out[i];
         end
       end
 
       always_ff @(posedge ap_clk) begin
-        demux_bus_data_in <= fifo_response_dout_int.payload;
-        demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
+        demux_bus_data_in <= fifo_request_dout_int.payload;
+        demux_bus_sel_in  <= fifo_request_dout_int.payload.meta.id_bundle;
       end
     endgenerate
 // --------------------------------------------------------------------------------------
@@ -148,21 +148,21 @@ module memory_generator_response #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO memory response out fifo MemoryPacket
+// FIFO memory request out fifo MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
+    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy  | fifo_request_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-    assign fifo_response_din.iob              = response_in_reg.payload.iob;
-    assign fifo_response_din.meta             = response_in_reg.payload.meta;
+    assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
+    assign fifo_request_din.iob              = request_in_reg.payload.iob;
+    assign fifo_request_din.meta             = request_in_reg.payload.meta;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-    assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
-    assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
-    assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
+    assign fifo_request_signals_in_int.rd_en          = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+    assign fifo_request_dout_int.valid                = fifo_request_signals_out_int.valid;
+    assign fifo_request_dout_int.payload.meta         = fifo_request_dout.meta;
+    assign fifo_request_dout_int.payload.data.field_0 = fifo_request_dout.iob.rdata;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -170,21 +170,21 @@ module memory_generator_response #(
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
     .PROG_THRESH     (8                         )
   ) inst_fifo_MemoryPacket (
-    .clk         (ap_clk                                    ),
-    .srst        (areset_fifo                               ),
-    .din         (fifo_response_din                         ),
-    .wr_en       (fifo_response_signals_in_int.wr_en        ),
-    .rd_en       (fifo_response_signals_in_int.rd_en        ),
-    .dout        (fifo_response_dout                        ),
-    .full        (fifo_response_signals_out_int.full        ),
-    .almost_full (fifo_response_signals_out_int.almost_full ),
-    .empty       (fifo_response_signals_out_int.empty       ),
-    .almost_empty(fifo_response_signals_out_int.almost_empty),
-    .valid       (fifo_response_signals_out_int.valid       ),
-    .prog_full   (fifo_response_signals_out_int.prog_full   ),
-    .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
-    .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
-    .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
+    .clk         (ap_clk                                   ),
+    .srst        (areset_fifo                              ),
+    .din         (fifo_request_din                         ),
+    .wr_en       (fifo_request_signals_in_int.wr_en        ),
+    .rd_en       (fifo_request_signals_in_int.rd_en        ),
+    .dout        (fifo_request_dout                        ),
+    .full        (fifo_request_signals_out_int.full        ),
+    .almost_full (fifo_request_signals_out_int.almost_full ),
+    .empty       (fifo_request_signals_out_int.empty       ),
+    .almost_empty(fifo_request_signals_out_int.almost_empty),
+    .valid       (fifo_request_signals_out_int.valid       ),
+    .prog_full   (fifo_request_signals_out_int.prog_full   ),
+    .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
+    .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
+    .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
   );
 
-  endmodule : memory_generator_response
+  endmodule : bundle_arbiter_1_to_N_request

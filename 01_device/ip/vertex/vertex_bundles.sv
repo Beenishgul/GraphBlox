@@ -302,14 +302,50 @@ module vertex_bundles #(
     );
 
 // --------------------------------------------------------------------------------------
+// Bundles Signals Assign INPUT
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
 // Bundles Arbitration INPUT
 // --------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------
+// Arbiter Signals: Memory Request Generator
+// --------------------------------------------------------------------------------------
+    // kernel_setup
+    assign kernel_setup_response_in              = cache_generator_response_out[0];
+    assign cache_generator_request_in[0]         = kernel_setup_request_out;
+    assign cache_generator_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
+
+    // vertex_cu
+    assign vertex_cu_response_in                 = cache_generator_response_out[1];
+    assign cache_generator_request_in[1]         = vertex_cu_request_out;
+    assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+
+// --------------------------------------------------------------------------------------
+// Cache Memory arbitration
+// --------------------------------------------------------------------------------------
+    assign request_out_reg = cache_generator_request_out;
+
+    cache_generator_request #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_request (
+        .ap_clk                  (ap_clk                                   ),
+        .areset                  (areset_generator                         ),
+        .request_in              (cache_generator_request_in               ),
+        .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
+        .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
+        .arbiter_request_in      (cache_generator_arbiter_request_in       ),
+        .arbiter_grant_out       (cache_generator_arbiter_grant_out        ),
+        .request_out             (cache_generator_request_out              ),
+        .fifo_setup_signal       (cache_generator_fifo_request_setup_signal)
+    );
+
+// --------------------------------------------------------------------------------------
+// Bundles Signals Assign OUTPUT
+// --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
 // Bundles Arbitration OUTPUT
 // --------------------------------------------------------------------------------------
-
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
@@ -338,7 +374,7 @@ module vertex_bundles #(
     logic                  bundle_engines_done_out                            [ENGINE_BUNDLES_NUM-1:0];
 
     generate
-        for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_input
+        for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_reg_input
             always_ff @(posedge ap_clk) begin
                 bundle_areset[i] <= areset;
             end
