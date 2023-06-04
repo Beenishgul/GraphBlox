@@ -42,6 +42,7 @@ module vertex_bundles #(
     output logic                  done_out
 );
 
+    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -170,10 +171,12 @@ module vertex_bundles #(
         if (areset_vertex_bundles) begin
             fifo_setup_signal <= 1;
             request_out.valid <= 0;
+            done_out          <= 0;
         end
         else begin
-            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int;
+            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int | (|bundle_engines_fifo_setup_signal);
             request_out.valid <= request_out_int.valid ;
+            done_out          <= (&bundle_engines_done_out);
         end
     end
 
@@ -334,7 +337,27 @@ module vertex_bundles #(
     logic                  bundle_engines_fifo_setup_signal                   [ENGINE_BUNDLES_NUM-1:0];
     logic                  bundle_engines_done_out                            [ENGINE_BUNDLES_NUM-1:0];
 
-    genvar i;
+    generate
+        for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_input
+            always_ff @(posedge ap_clk) begin
+                bundle_areset[i] <= areset;
+            end
+
+            always_ff @(posedge ap_clk) begin
+                if (areset_vertex_bundles) begin
+                    bundle_engines_descriptor_in[i].valid <= 0;
+                end
+                else begin
+                    bundle_engines_descriptor_in[i].valid <= descriptor_in_reg.valid;
+                end
+            end
+
+            always_ff @(posedge ap_clk) begin
+                bundle_engines_descriptor_in[i].payload <= descriptor_in_reg.payload;
+            end
+        end
+    endgenerate
+
     generate
         for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_engines
             bundle_engines #(
