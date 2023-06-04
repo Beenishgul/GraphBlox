@@ -273,7 +273,10 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Vertex CU
 // --------------------------------------------------------------------------------------
-  vertex_cu #(.ENGINE_ID_VERTEX(1)) inst_vertex_cu (
+  vertex_cu #(
+    .ENGINE_ID_VERTEX  (1              ),
+    .ENGINE_BUNDLES_NUM(CU_BUNDLE_COUNT)
+  ) inst_vertex_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .descriptor_in            (vertex_cu_descriptor               ),

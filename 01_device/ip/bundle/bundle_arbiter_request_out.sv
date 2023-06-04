@@ -89,7 +89,7 @@ module memory_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 
   genvar i;
   generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_request_in_reg
       always_ff @(posedge ap_clk) begin
         if (areset_control) begin
           request_in_reg[i].valid  <= 1'b0;
@@ -189,7 +189,7 @@ module memory_generator_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 // Bus arbiter for requests fifo_942x16_MemoryPacket
 // --------------------------------------------------------------------------------------
   generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
       always_comb begin
         arbiter_bus_in[i]    = request_in_reg[i];
         arbiter_bus_valid[i] = request_in_reg[i].valid;

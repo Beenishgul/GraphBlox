@@ -96,7 +96,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 // --------------------------------------------------------------------------------------
   genvar i;
   generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_response_out
       always_ff @(posedge ap_clk ) begin
         if(areset_control) begin
           response_out[i].valid <= 0;
