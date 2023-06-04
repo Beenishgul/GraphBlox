@@ -110,7 +110,7 @@ module memory_generator_response #(
   genvar i;
   generate
     // demux output
-    for (i=0; i < DEMUX_BUS_WIDTH; i++) begin
+    for (i=0; i < DEMUX_BUS_WIDTH; i++) begin : generate_response_out
       always_ff @(posedge ap_clk ) begin
         if(areset_control) begin
           response_out[i].valid       <= 1'b0;

@@ -28,12 +28,12 @@ module hyper_pipeline #(
 
             always_ff @(posedge ap_clk) begin
                 if (areset) begin
-                    for (int i = 0; i < STAGES; i++) begin
+                    for (int i = 0; i < STAGES; i++) begin : generate_din_reset
                         d[i] <= 0;
                     end
                 end else begin
                     d[0] <= din;
-                    for (int i = 1; i < STAGES; i++) begin
+                    for (int i = 1; i < STAGES; i++) begin : generate_din_data
                         d[i] <= d[i-1];
                     end
                 end
