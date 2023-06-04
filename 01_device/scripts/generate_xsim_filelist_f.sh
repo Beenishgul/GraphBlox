@@ -47,6 +47,7 @@ memory_ram="ram"
 
 control="control"
 vertex="vertex"
+bundle="bundle"
 utils="utils"
 utils_arbiter="arbiter"
 utils_fifo="fifo"
@@ -95,6 +96,8 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/ 
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_generator}/ ${CFG_FILE_NAME_SV} "sv"  
 
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${bundle}/ ${CFG_FILE_NAME_SV} "sv"
+
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME_SV} "sv"
@@ -102,7 +105,7 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/ ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_kernel_setup} ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME_SV} "sv"
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_csr_index} ${CFG_FILE_NAME_SV} "sv"
+# generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_csr_index} ${CFG_FILE_NAME_SV} "sv"
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_read_write} ${CFG_FILE_NAME_SV} "sv"
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_write} ${CFG_FILE_NAME_SV} "sv"
 # generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_alu_operations} ${CFG_FILE_NAME_SV} "sv"
