@@ -305,12 +305,28 @@ module vertex_bundles #(
     );
 
 // --------------------------------------------------------------------------------------
-// Bundles Signals Assign INPUT
+// Generate Bundles
 // --------------------------------------------------------------------------------------
+    MemoryPacket           bundle_engines_request_engine_in                   [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_request_engine_in_signals_in   [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_request_engine_in_signals_out  [ENGINE_BUNDLES_NUM-1:0];
+    MemoryPacket           bundle_engines_response_engine_in                  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_response_engine_in_signals_in  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_response_engine_in_signals_out [ENGINE_BUNDLES_NUM-1:0];
 
-// --------------------------------------------------------------------------------------
-// Bundles Arbitration INPUT
-// --------------------------------------------------------------------------------------
+    MemoryPacket           bundle_engines_request_engine_out                  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_request_engine_out_signals_in  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_request_engine_out_signals_out [ENGINE_BUNDLES_NUM-1:0];
+    MemoryPacket           bundle_engines_response_egnine_out                 [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_response_egnine_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_response_egnine_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
+
+    MemoryPacket           bundle_engines_response_memory_in                  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_response_memory_in_signals_in  [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_response_memory_in_signals_out [ENGINE_BUNDLES_NUM-1:0];
+    MemoryPacket           bundle_engines_request_mem_out                     [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_request_mem_out_signals_in     [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_request_mem_out_signals_out    [ENGINE_BUNDLES_NUM-1:0];
 
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Memory Request Generator
@@ -323,10 +339,10 @@ module vertex_bundles #(
     // vertex_cu
     assign vertex_cu_response_in                 = cache_generator_response_out[1];
     assign cache_generator_request_in[1]         = vertex_cu_request_out;
-    assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+    assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
 // --------------------------------------------------------------------------------------
-// Cache Memory arbitration
+//  Bundles Engine Arbitration INPUT
 // --------------------------------------------------------------------------------------
     assign request_out_reg = cache_generator_request_out;
 
@@ -349,32 +365,6 @@ module vertex_bundles #(
 // --------------------------------------------------------------------------------------
 // Bundles Arbitration OUTPUT
 // --------------------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------------------
-// Generate Bundles
-// --------------------------------------------------------------------------------------
-    logic                  bundle_areset                                      [ENGINE_BUNDLES_NUM-1:0];
-    KernelDescriptor       bundle_engines_descriptor_in                       [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_request_engine_in                   [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_request_engine_in_signals_in   [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_request_engine_in_signals_out  [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_response_engine_in                  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_response_engine_in_signals_in  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_response_engine_in_signals_out [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_response_memory_in                  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_response_memory_in_signals_in  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_response_memory_in_signals_out [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_request_engine_out                  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_request_engine_out_signals_in  [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_request_engine_out_signals_out [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_response_egnine_out                 [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_response_egnine_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_response_egnine_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_request_mem_out                     [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_request_mem_out_signals_in     [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_request_mem_out_signals_out    [ENGINE_BUNDLES_NUM-1:0];
-    logic                  bundle_engines_fifo_setup_signal                   [ENGINE_BUNDLES_NUM-1:0];
-    logic                  bundle_engines_done_out                            [ENGINE_BUNDLES_NUM-1:0];
 
 // Generate Bundles - Drive input signals
 // --------------------------------------------------------------------------------------
