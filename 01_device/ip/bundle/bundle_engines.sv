@@ -44,9 +44,9 @@ module bundle_engines #(
     output MemoryPacket           response_egnine_out                 ,
     input  FIFOStateSignalsInput  fifo_response_egnine_out_signals_in ,
     output FIFOStateSignalsOutput fifo_response_egnine_out_signals_out,
-    output MemoryPacket           request_mem_out                     ,
-    input  FIFOStateSignalsInput  fifo_request_mem_out_signals_in     ,
-    output FIFOStateSignalsOutput fifo_request_mem_out_signals_out    ,
+    output MemoryPacket           request_memory_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out ,
     output logic                  fifo_setup_signal                   ,
     output logic                  done_out
 );
