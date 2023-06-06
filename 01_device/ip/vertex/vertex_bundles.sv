@@ -115,7 +115,33 @@ module vertex_bundles #(
     logic [ENGINE_BUNDLES_NUM-1:0] bundle_engines_fifo_setup_signal_reg;
     logic [ENGINE_BUNDLES_NUM-1:0] bundle_engines_done_out_reg         ;
 
+// --------------------------------------------------------------------------------------
+// Generate Bundles -  Memory Arbitration OUTPUT
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Signals
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Arbiter Signals: Memory Request Generator
+// --------------------------------------------------------------------------------------
+    logic                          areset_arbiter_N_to_1                                                 ;
+    MemoryPacket                   bundle_arbiter_N_to_1_request_in              [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput          bundle_arbiter_N_to_1_fifo_request_signals_in                         ;
+    FIFOStateSignalsOutput         bundle_arbiter_N_to_1_fifo_request_signals_out                        ;
+    logic [ENGINE_BUNDLES_NUM-1:0] bundle_arbiter_N_to_1_arbiter_request_in                              ;
+    logic [ENGINE_BUNDLES_NUM-1:0] bundle_arbiter_N_to_1_arbiter_grant_out                               ;
+    MemoryPacket                   bundle_arbiter_N_to_1_request_out                                     ;
+    logic                          bundle_arbiter_N_to_1_fifo_setup_signal                               ;
 
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Signals
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    logic                  areset_arbiter_1_to_N                                                  ;
+    MemoryPacket           bundle_arbiter_1_to_N_response_in                                      ;
+    FIFOStateSignalsInput  bundle_arbiter_1_to_N_fifo_response_signals_in [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_arbiter_1_to_N_fifo_response_signals_out                        ;
+    MemoryPacket           bundle_arbiter_1_to_N_response_out             [ENGINE_BUNDLES_NUM-1:0];
+    logic                  bundle_arbiter_1_to_N_fifo_setup_signal                                ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -123,6 +149,8 @@ module vertex_bundles #(
     always_ff @(posedge ap_clk) begin
         areset_vertex_bundles <= areset;
         areset_fifo           <= areset;
+        areset_arbiter_N_to_1 <= areset;
+        areset_arbiter_1_to_N <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -176,7 +204,7 @@ module vertex_bundles #(
             done_out          <= 0;
         end
         else begin
-            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int | (|bundle_engines_fifo_setup_signal_reg);
+            fifo_setup_signal <= fifo_request_in_setup_signal_int | fifo_request_out_setup_signal_int | fifo_response_in_setup_signal_int | (|bundle_engines_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
             request_out.valid <= request_out_int.valid ;
             done_out          <= (&bundle_engines_done_out_reg);
         end
@@ -238,7 +266,7 @@ module vertex_bundles #(
     assign fifo_response_in_din                  = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_in_signals_in_int.rd_en = ~fifo_response_in_signals_out_int.empty & fifo_response_in_signals_in_reg.rd_en;;
+    assign fifo_response_in_signals_in_int.rd_en = ~fifo_response_in_signals_out_int.empty & fifo_response_in_signals_in_reg.rd_en & ~bundle_arbiter_1_to_N_fifo_response_signals_out.prog_full;
     assign response_in_int.valid                 = fifo_response_in_signals_out_int.valid;
     assign response_in_int.payload               = fifo_response_in_dout;
 
@@ -272,8 +300,8 @@ module vertex_bundles #(
     assign fifo_request_out_setup_signal_int = fifo_request_out_signals_out_int.wr_rst_busy | fifo_request_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_out_signals_in_int.wr_en = 1'b0;
-    assign fifo_request_out_din                  = 0;
+    assign fifo_request_out_signals_in_int.wr_en = bundle_arbiter_N_to_1_request_out.valid;
+    assign fifo_request_out_din                  = bundle_arbiter_N_to_1_request_out.payload;
 
     // Pop
     assign fifo_request_out_signals_in_int.rd_en = ~fifo_request_out_signals_out_int.empty & fifo_request_out_signals_in_reg.rd_en;
@@ -307,15 +335,7 @@ module vertex_bundles #(
 // Generate Bundles Arbitration|Instants|Signals
 // --------------------------------------------------------------------------------------
 
-    MemoryPacket           bundle_engines_response_memory_in                 [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_response_memory_in_signals_in [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_response_memory_in_signals_out[ENGINE_BUNDLES_NUM-1:0];
-
-    MemoryPacket           bundle_engines_request_memory_out                 [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_request_memory_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_request_memory_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
-
-
+// --------------------------------------------------------------------------------------
 // Generate Bundles - Drive input signals
 // --------------------------------------------------------------------------------------
     generate
@@ -339,6 +359,7 @@ module vertex_bundles #(
         end
     endgenerate
 
+// --------------------------------------------------------------------------------------
 // Generate Bundles - Drive output signals
 // --------------------------------------------------------------------------------------
     generate
@@ -356,9 +377,11 @@ module vertex_bundles #(
         end
     endgenerate
 
+// --------------------------------------------------------------------------------------
 // Generate Bundles - Drive Intra-signals
 // --------------------------------------------------------------------------------------
-// Bundle[0]->[1]->[2]->[3]->[4]->[0]
+// Generate Bundles - [0]->[1]->[2]->[3]->[4]->[0]
+// --------------------------------------------------------------------------------------
     assign bundle_engines_request_engine_in[0] = bundle_engines_request_engine_out[ENGINE_BUNDLES_NUM-1];
     assign bundle_engines_fifo_request_engine_out_signals_in[ENGINE_BUNDLES_NUM-1].rd_en = ~bundle_engines_fifo_request_engine_in_signals_out[0].prog_full;
 
@@ -375,48 +398,26 @@ module vertex_bundles #(
         end
     endgenerate
 
-// Bundles Memory Arbitration OUTPUT
 // --------------------------------------------------------------------------------------
-// Signals
-
-    MemoryPacket           bundle_engines_request_memory_out                 [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_request_memory_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_request_memory_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
-
+// Generate Bundles - Memory Arbitration OUTPUT
 // --------------------------------------------------------------------------------------
-// Arbiter Signals: Memory Request Generator
+// Generate Bundles - Signals
 // --------------------------------------------------------------------------------------
-    // kernel_setup
-    assign kernel_setup_response_in              = cache_generator_response_out[0];
-    assign cache_generator_request_in[0]         = kernel_setup_request_out;
-    assign cache_generator_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
-
-    // vertex_cu
-    assign vertex_cu_response_in                 = cache_generator_response_out[1];
-    assign cache_generator_request_in[1]         = vertex_cu_request_out;
-    assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
-
+// Generate Bundles - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-//  Bundles Engine Arbitration INPUT
-// --------------------------------------------------------------------------------------
-    assign request_out_reg = cache_generator_request_out;
+    generate
+        for (i=0; i<ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_arbiter_N_to_1_request_in
+            assign bundle_arbiter_N_to_1_request_in[i]         = bundle_engines_request_memory_out[i];
+            assign bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_engines_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
+            assign bundle_engines_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
+        end
+    endgenerate
 
-    cache_generator_request #(.NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM)) inst_cache_generator_request (
-        .ap_clk                  (ap_clk                                   ),
-        .areset                  (areset_generator                         ),
-        .request_in              (cache_generator_request_in               ),
-        .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
-        .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
-        .arbiter_request_in      (cache_generator_arbiter_request_in       ),
-        .arbiter_grant_out       (cache_generator_arbiter_grant_out        ),
-        .request_out             (cache_generator_request_out              ),
-        .fifo_setup_signal       (cache_generator_fifo_request_setup_signal)
-    );
-
+    assign bundle_arbiter_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
     bundle_arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM)) inst_bundle_arbiter_N_to_1_request_memory_out (
         .ap_clk                  (ap_clk                                        ),
-        .areset                  (bundle_arbiter_N_to_1_areset                  ),
+        .areset                  (areset_arbiter_N_to_1                         ),
         .request_in              (bundle_arbiter_N_to_1_request_in              ),
         .fifo_request_signals_in (bundle_arbiter_N_to_1_fifo_request_signals_in ),
         .fifo_request_signals_out(bundle_arbiter_N_to_1_fifo_request_signals_out),
@@ -426,37 +427,64 @@ module vertex_bundles #(
         .fifo_setup_signal       (bundle_arbiter_N_to_1_fifo_setup_signal       )
     );
 
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Signals
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    generate
+        for (i=0; i<ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_arbiter_1_to_N_response
+            assign bundle_arbiter_1_to_N_response_in[i] = response_in_int;
+            assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_engines_fifo_response_memory_in_signals_out.prog_full;
+
+            assign bundle_engines_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
+            assign bundle_engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+        end
+    endgenerate
+
+// --------------------------------------------------------------------------------------
+    bundle_arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM)) inst_bundle_arbiter_1_to_N_response_memory_in (
+        .ap_clk                   (ap_clk                                         ),
+        .areset                   (areset_arbiter_1_to_N                          ),
+        .response_in              (bundle_arbiter_1_to_N_response_in              ),
+        .fifo_response_signals_in (bundle_arbiter_1_to_N_fifo_response_signals_in ),
+        .fifo_response_signals_out(bundle_arbiter_1_to_N_fifo_response_signals_out),
+        .response_out             (bundle_arbiter_1_to_N_response_out             ),
+        .fifo_setup_signal        (bundle_arbiter_1_to_N_fifo_setup_signal        )
+    );
+
+// --------------------------------------------------------------------------------------
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_engines
             bundle_engines #(
                 .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-                .ENGINE_ID_BUNDLE(i)
+                .ENGINE_ID_BUNDLE(i               )
             ) inst_bundle_engines (
-                .ap_clk                               (ap_clk),
-                .areset                               (bundle_areset[i]),
-                .descriptor_in                        (bundle_engines_descriptor_in[i]),
-                .request_engine_in                    (bundle_engines_request_engine_in[i]),
-                .fifo_request_engine_in_signals_in    (bundle_engines_fifo_request_engine_in_signals_in[i]),
-                .fifo_request_engine_in_signals_out   (bundle_engines_fifo_request_engine_in_signals_out[i]),
-                .response_engine_in                   (bundle_engines_response_engine_in[i]),
-                .fifo_response_engine_in_signals_in   (bundle_engines_fifo_response_engine_in_signals_in[i]),
-                .fifo_response_engine_in_signals_out  (bundle_engines_fifo_response_engine_in_signals_out[i]),
-                .response_memory_in                   (bundle_engines_response_memory_in[i]),
-                .fifo_response_memory_in_signals_in   (bundle_engines_fifo_response_memory_in_signals_in[i]),
-                .fifo_response_memory_in_signals_out  (bundle_engines_fifo_response_memory_in_signals_out[i]),
-                .request_engine_out                   (bundle_engines_request_engine_out[i]),
-                .fifo_request_engine_out_signals_in   (bundle_engines_fifo_request_engine_out_signals_in[i]),
-                .fifo_request_engine_out_signals_out  (bundle_engines_fifo_request_engine_out_signals_out[i]),
-                .response_egnine_out                  (bundle_engines_response_egnine_out[i]),
-                .fifo_response_egnine_out_signals_in  (bundle_engines_fifo_response_egnine_out_signals_in[i]),
-                .fifo_response_egnine_out_signals_out (bundle_engines_fifo_response_egnine_out_signals_out[i]),
-                .request_memory_out                   (bundle_engines_request_memory_out[i]),
-                .fifo_request_memory_out_signals_in   (bundle_engines_fifo_request_memory_out_signals_in[i]),
-                .fifo_request_memory_out_signals_out  (bundle_engines_fifo_request_memory_out_signals_out[i]),
-                .fifo_setup_signal                    (bundle_engines_fifo_setup_signal[i]),
-                .done_out                             (bundle_engines_done_out[i])
+                .ap_clk                              (ap_clk                                                ),
+                .areset                              (bundle_areset[i]                                      ),
+                .descriptor_in                       (bundle_engines_descriptor_in[i]                       ),
+                .request_engine_in                   (bundle_engines_request_engine_in[i]                   ),
+                .fifo_request_engine_in_signals_in   (bundle_engines_fifo_request_engine_in_signals_in[i]   ),
+                .fifo_request_engine_in_signals_out  (bundle_engines_fifo_request_engine_in_signals_out[i]  ),
+                .response_engine_in                  (bundle_engines_response_engine_in[i]                  ),
+                .fifo_response_engine_in_signals_in  (bundle_engines_fifo_response_engine_in_signals_in[i]  ),
+                .fifo_response_engine_in_signals_out (bundle_engines_fifo_response_engine_in_signals_out[i] ),
+                .response_memory_in                  (bundle_engines_response_memory_in[i]                  ),
+                .fifo_response_memory_in_signals_in  (bundle_engines_fifo_response_memory_in_signals_in[i]  ),
+                .fifo_response_memory_in_signals_out (bundle_engines_fifo_response_memory_in_signals_out[i] ),
+                .request_engine_out                  (bundle_engines_request_engine_out[i]                  ),
+                .fifo_request_engine_out_signals_in  (bundle_engines_fifo_request_engine_out_signals_in[i]  ),
+                .fifo_request_engine_out_signals_out (bundle_engines_fifo_request_engine_out_signals_out[i] ),
+                .response_egnine_out                 (bundle_engines_response_egnine_out[i]                 ),
+                .fifo_response_egnine_out_signals_in (bundle_engines_fifo_response_egnine_out_signals_in[i] ),
+                .fifo_response_egnine_out_signals_out(bundle_engines_fifo_response_egnine_out_signals_out[i]),
+                .request_memory_out                  (bundle_engines_request_memory_out[i]                  ),
+                .fifo_request_memory_out_signals_in  (bundle_engines_fifo_request_memory_out_signals_in[i]  ),
+                .fifo_request_memory_out_signals_out (bundle_engines_fifo_request_memory_out_signals_out[i] ),
+                .fifo_setup_signal                   (bundle_engines_fifo_setup_signal[i]                   ),
+                .done_out                            (bundle_engines_done_out[i]                            )
             );
         end
     endgenerate
