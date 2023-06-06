@@ -57,13 +57,19 @@ module bundle_engines #(
     logic areset_bundle_engines;
     logic areset_fifo          ;
 
-    KernelDescriptor descriptor_in_reg      ;
-    MemoryPacket     request_engine_in_reg  ;
-    MemoryPacket     response_engine_in_reg ;
-    MemoryPacket     response_engine_in_int ;
-    MemoryPacket     request_engine_in_int  ;
-    MemoryPacket     request_engine_out_int ;
-    MemoryPacket     response_engine_out_int;
+    KernelDescriptor descriptor_in_reg;
+
+    MemoryPacket request_engine_in_int ;
+    MemoryPacket request_engine_in_reg ;
+    MemoryPacket request_memory_out_reg;
+    MemoryPacket response_engine_in_reg;
+    MemoryPacket response_memory_in_reg;
+
+    MemoryPacket request_engine_out_int ;
+    MemoryPacket request_memory_out_int ;
+    MemoryPacket response_engine_in_int ;
+    MemoryPacket response_engine_out_int;
+    MemoryPacket response_memory_in_int ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Request MemoryPacket
@@ -137,7 +143,7 @@ module bundle_engines #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_bundle_engines) begin
-            descriptor_in_reg.valid <= 0;
+            descriptor_in_reg.valid <= 1'b0;
         end
         else begin
             descriptor_in_reg.valid <= descriptor_in.valid;
@@ -157,8 +163,9 @@ module bundle_engines #(
             fifo_response_engine_in_signals_in_reg  <= 0;
             fifo_request_engine_out_signals_in_reg  <= 0;
             fifo_response_engine_out_signals_in_reg <= 0;
-            request_engine_in_reg.valid             <= 0;
-            response_engine_in_reg.valid            <= 0;
+            request_engine_in_reg.valid             <= 1'b0;
+            response_engine_in_reg.valid            <= 1'b0;
+            response_memory_in_reg.valid            <= 1'b0;
         end
         else begin
             fifo_request_engine_in_signals_in_reg   <= fifo_request_engine_in_signals_in;
@@ -167,12 +174,14 @@ module bundle_engines #(
             fifo_response_engine_out_signals_in_reg <= fifo_response_engine_out_signals_in;
             request_engine_in_reg.valid             <= request_engine_in.valid;
             response_engine_in_reg.valid            <= response_engine_in.valid;
+            response_memory_in_reg.valid            <= response_memory_in.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         request_engine_in_reg.payload  <= request_engine_in.payload;
         response_engine_in_reg.payload <= response_engine_in.payload;
+        response_memory_in_reg.payload <= response_memory_in.payload ;
     end
 
 // --------------------------------------------------------------------------------------
@@ -180,14 +189,16 @@ module bundle_engines #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_bundle_engines) begin
-            fifo_setup_signal         <= 1;
-            request_engine_out.valid  <= 0;
-            response_engine_out.valid <= 0;
+            fifo_setup_signal         <= 1'b1;
+            request_engine_out.valid  <= 1'b0;
+            response_engine_out.valid <= 1'b0;
+            request_memory_out.valid  <= 1'b0 ;
         end
         else begin
             fifo_setup_signal         <= fifo_request_engine_in_setup_signal_int | fifo_response_engine_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_response_engine_out_setup_signal_int;
             request_engine_out.valid  <= request_engine_out_int.valid ;
             response_engine_out.valid <= response_engine_out_int.valid ;
+            request_memory_out.valid  <= request_memory_out_int.valid ;
         end
     end
 
@@ -198,6 +209,7 @@ module bundle_engines #(
         fifo_response_engine_out_signals_out <= fifo_response_engine_out_signals_out_int;
         request_engine_out.payload           <= request_engine_out_int.payload;
         response_engine_out.payload          <= response_engine_out_int.payload ;
+        request_memory_out.payload           <= request_memory_out_int.payload ;
     end
 
 // --------------------------------------------------------------------------------------
