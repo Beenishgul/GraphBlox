@@ -100,7 +100,7 @@ module bundle_arbiter_N_to_1_response #(parameter NUM_MEMORY_REQUESTOR      = 2)
       end
 
       always_ff @(posedge ap_clk) begin
-        response_in_reg[i].payload  <= response_in[i].payload ;
+        response_in_reg[i].payload  <= response_in[i].payload;
       end
     end
   endgenerate

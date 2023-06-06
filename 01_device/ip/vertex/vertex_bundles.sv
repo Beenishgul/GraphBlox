@@ -103,9 +103,9 @@ module vertex_bundles #(
     MemoryPacket           bundle_engines_request_engine_out                  [ENGINE_BUNDLES_NUM-1:0];
     FIFOStateSignalsInput  bundle_engines_fifo_request_engine_out_signals_in  [ENGINE_BUNDLES_NUM-1:0];
     FIFOStateSignalsOutput bundle_engines_fifo_request_engine_out_signals_out [ENGINE_BUNDLES_NUM-1:0];
-    MemoryPacket           bundle_engines_response_egnine_out                 [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsInput  bundle_engines_fifo_response_egnine_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
-    FIFOStateSignalsOutput bundle_engines_fifo_response_egnine_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
+    MemoryPacket           bundle_engines_response_engine_out                 [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsInput  bundle_engines_fifo_response_engine_out_signals_in [ENGINE_BUNDLES_NUM-1:0];
+    FIFOStateSignalsOutput bundle_engines_fifo_response_engine_out_signals_out[ENGINE_BUNDLES_NUM-1:0];
     MemoryPacket           bundle_engines_request_memory_out                  [ENGINE_BUNDLES_NUM-1:0];
     FIFOStateSignalsInput  bundle_engines_fifo_request_memory_out_signals_in  [ENGINE_BUNDLES_NUM-1:0];
     FIFOStateSignalsOutput bundle_engines_fifo_request_memory_out_signals_out [ENGINE_BUNDLES_NUM-1:0];
@@ -443,7 +443,10 @@ module vertex_bundles #(
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    bundle_arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM)) inst_bundle_arbiter_1_to_N_response_memory_in (
+    bundle_arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM       ),
+        .DEMUX_DATA_WIDTH    ($bis(MemoryPacketPayload))
+    ) inst_bundle_arbiter_1_to_N_response_memory_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N                          ),
         .response_in              (bundle_arbiter_1_to_N_response_in              ),
@@ -477,9 +480,9 @@ module vertex_bundles #(
                 .request_engine_out                  (bundle_engines_request_engine_out[i]                  ),
                 .fifo_request_engine_out_signals_in  (bundle_engines_fifo_request_engine_out_signals_in[i]  ),
                 .fifo_request_engine_out_signals_out (bundle_engines_fifo_request_engine_out_signals_out[i] ),
-                .response_egnine_out                 (bundle_engines_response_egnine_out[i]                 ),
-                .fifo_response_egnine_out_signals_in (bundle_engines_fifo_response_egnine_out_signals_in[i] ),
-                .fifo_response_egnine_out_signals_out(bundle_engines_fifo_response_egnine_out_signals_out[i]),
+                .response_engine_out                 (bundle_engines_response_engine_out[i]                 ),
+                .fifo_response_engine_out_signals_in (bundle_engines_fifo_response_engine_out_signals_in[i] ),
+                .fifo_response_engine_out_signals_out(bundle_engines_fifo_response_engine_out_signals_out[i]),
                 .request_memory_out                  (bundle_engines_request_memory_out[i]                  ),
                 .fifo_request_memory_out_signals_in  (bundle_engines_fifo_request_memory_out_signals_in[i]  ),
                 .fifo_request_memory_out_signals_out (bundle_engines_fifo_request_memory_out_signals_out[i] ),
