@@ -25,15 +25,16 @@ module bundle_arbiter_1_to_N_response #(
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR     ,
   parameter DEMUX_SEL_WIDTH      = $clog2(BUS_WIDTH)
 ) (
-  input  logic                  ap_clk                                 ,
-  input  logic                  areset                                 ,
-  input  MemoryPacket           response_in                            ,
-  input  FIFOStateSignalsInput  fifo_response_signals_in               ,
-  output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
+  input  logic                  ap_clk                                             ,
+  input  logic                  areset                                             ,
+  input  MemoryPacket           response_in                                        ,
+  input  FIFOStateSignalsInput  fifo_response_signals_in [NUM_MEMORY_REQUESTOR-1:0],
+  output FIFOStateSignalsOutput fifo_response_signals_out                          ,
+  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0]            ,
   output logic                  fifo_setup_signal
 );
 
+  genvar i;
 // --------------------------------------------------------------------------------------
 // Cache response variables
 // --------------------------------------------------------------------------------------
@@ -47,13 +48,13 @@ module bundle_arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-  MemoryPacketPayload    fifo_response_din             ;
-  MemoryPacket           fifo_response_dout_int        ;
-  MemoryPacketPayload    fifo_response_dout            ;
-  FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
-  FIFOStateSignalsInput  fifo_response_signals_in_int  ;
-  FIFOStateSignalsOutput fifo_response_signals_out_int ;
-  logic                  fifo_response_setup_signal_int;
+  MemoryPacketPayload              fifo_response_din                 ;
+  MemoryPacket                     fifo_response_dout_int            ;
+  MemoryPacketPayload              fifo_response_dout                ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en;
+  FIFOStateSignalsInput            fifo_response_signals_in_int      ;
+  FIFOStateSignalsOutput           fifo_response_signals_out_int     ;
+  logic                            fifo_response_setup_signal_int    ;
 
 // --------------------------------------------------------------------------------------
 // Demux Logic and arbitration
@@ -78,17 +79,25 @@ module bundle_arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if(areset_control) begin
-      response_in_reg.valid        <= 1'b0;
-      fifo_response_signals_in_reg <= 0;
+      response_in_reg.valid <= 1'b0;
     end else begin
-      response_in_reg.valid              <= response_in.valid;
-      fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
+      response_in_reg.valid <= response_in.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     response_in_reg.payload <= response_in.payload;
   end
+
+  generate
+    for (i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_bundle_arbiter_N_to_1_request_in
+      if(areset_control) begin
+        fifo_response_signals_in_reg_rd_en[i] <= 0;
+      end else begin
+        fifo_response_signals_in_reg_rd_en[i]  <= fifo_response_signals_in[i].rd_en;
+      end
+    end
+  endgenerate
 
 // --------------------------------------------------------------------------------------
 //   Drive Outputs
@@ -159,16 +168,20 @@ module bundle_arbiter_1_to_N_response #(
     assign fifo_response_din.meta             = response_in_reg.payload.meta;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+    assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.id_bundle);
     assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
     assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
     assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
+    assign fifo_response_dout_int.payload.data.field_1 = 0;
+    assign fifo_response_dout_int.payload.data.field_2 = 0;
+    assign fifo_response_dout_int.payload.data.field_3 = 0;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (8                         )
+    .PROG_THRESH     (8                         ),
+    .READ_MODE       ("fwft"                    )
   ) inst_fifo_MemoryPacket (
     .clk         (ap_clk                                    ),
     .srst        (areset_fifo                               ),
