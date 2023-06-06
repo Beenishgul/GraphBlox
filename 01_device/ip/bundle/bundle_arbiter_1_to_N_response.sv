@@ -20,9 +20,9 @@ import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
 module bundle_arbiter_1_to_N_response #(
-  parameter NUM_MEMORY_REQUESTOR = 2                        ,
-  parameter DEMUX_DATA_WIDTH     = $bis(MemoryPacketPayload),
-  parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR     ,
+  parameter NUM_MEMORY_REQUESTOR = 2                         ,
+  parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload),
+  parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter DEMUX_SEL_WIDTH      = $clog2(DEMUX_BUS_WIDTH)
 ) (
   input  logic                  ap_clk                                             ,
@@ -126,7 +126,7 @@ module bundle_arbiter_1_to_N_response #(
           demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
           response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.id_bundle == i) & fifo_response_dout_int.valid;
+          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.route.to.id_bundle == i) & fifo_response_dout_int.valid;
         end
       end
 
@@ -137,7 +137,7 @@ module bundle_arbiter_1_to_N_response #(
 
     always_ff @(posedge ap_clk) begin
       demux_bus_data_in <= fifo_response_dout_int.payload;
-      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.id_bundle;
+      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.route.to.id_bundle;
     end
   endgenerate
 // --------------------------------------------------------------------------------------
@@ -164,17 +164,12 @@ module bundle_arbiter_1_to_N_response #(
 
   // Push
   assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-  assign fifo_response_din.iob              = response_in_reg.payload.iob;
-  assign fifo_response_din.meta             = response_in_reg.payload.meta;
+  assign fifo_response_din                  = response_in_reg.payload;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.id_bundle);
-  assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
-  assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
-  assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_1 = 0;
-  assign fifo_response_dout_int.payload.data.field_2 = 0;
-  assign fifo_response_dout_int.payload.data.field_3 = 0;
+  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle);
+  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
+  assign fifo_response_dout_int.payload     = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),

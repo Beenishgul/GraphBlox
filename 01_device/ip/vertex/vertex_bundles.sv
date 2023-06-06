@@ -435,7 +435,7 @@ module vertex_bundles #(
     generate
         for (i=0; i<ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_arbiter_1_to_N_response
             assign bundle_arbiter_1_to_N_response_in[i] = response_in_int;
-            assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_engines_fifo_response_memory_in_signals_out.prog_full;
+            assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_engines_fifo_response_memory_in_signals_out[i].prog_full;
 
             assign bundle_engines_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
             assign bundle_engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
@@ -443,10 +443,7 @@ module vertex_bundles #(
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    bundle_arbiter_1_to_N_response #(
-        .NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM       ),
-        .DEMUX_DATA_WIDTH    ($bis(MemoryPacketPayload))
-    ) inst_bundle_arbiter_1_to_N_response_memory_in (
+    bundle_arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(ENGINE_BUNDLES_NUM)) inst_bundle_arbiter_1_to_N_response_memory_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N                          ),
         .response_in              (bundle_arbiter_1_to_N_response_in              ),
