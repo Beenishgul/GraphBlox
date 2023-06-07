@@ -23,7 +23,7 @@ module bundle_arbiter_1_to_N_response #(
   parameter NUM_MEMORY_REQUESTOR = 2                         ,
   parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload),
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
-  parameter DEMUX_SEL_WIDTH      = $clog2(DEMUX_BUS_WIDTH)
+  parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
@@ -126,7 +126,7 @@ module bundle_arbiter_1_to_N_response #(
           demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
           response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= (fifo_response_dout_int.payload.meta.route.to.id_bundle == i) & fifo_response_dout_int.valid;
+          demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_bundle[i] & fifo_response_dout_int.valid;
         end
       end
 
@@ -143,7 +143,7 @@ module bundle_arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 // Demux instantiation
 // --------------------------------------------------------------------------------------
-  demux_bus #(
+  demux_bus_one_hot #(
     .DATA_WIDTH(DEMUX_DATA_WIDTH),
     .BUS_WIDTH (DEMUX_BUS_WIDTH )
   ) inst_demux_bus (
