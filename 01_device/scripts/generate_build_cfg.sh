@@ -31,7 +31,20 @@ CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
 config=""
  
 config+="[connectivity]\n"
-if [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
+if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
+then
+   config+="slr=${KERNEL_NAME}_1:SLR0\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_0:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_1:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_2:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_3:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_4:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_5:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_6:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_7:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_8:HBM[1]\n"
+   config+="sp=${KERNEL_NAME}_1.buffer_9:HBM[1]\n"
+elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
 then
    config+="slr=${KERNEL_NAME}_1:SLR0\n"
    config+="sp=${KERNEL_NAME}_1.buffer_0:HBM[1]\n"
