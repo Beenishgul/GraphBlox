@@ -159,8 +159,8 @@ module engine_csr_index_configure #(
                         configuration_valid_reg[2]                <= 1'b1  ;
                     end
                     3 : begin
-                        configuration_reg.payload.param.stride <= fifo_response_dout_int.payload.data.field_0;
-                        configuration_valid_reg[3]             <= 1'b1  ;
+                        configuration_reg.payload.param.csr <= fifo_response_dout_int.payload.data.field_0;
+                        configuration_valid_reg[3]          <= 1'b1  ;
                     end
                     4 : begin
                         configuration_reg.payload.param.granularity            <= fifo_response_dout_int.payload.data.field_0[CACHE_FRONTEND_DATA_W-2:0];
