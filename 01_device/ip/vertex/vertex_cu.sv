@@ -212,7 +212,7 @@ module vertex_cu #(
     assign engine_stride_index_response_in                    = response_in_reg;
     assign engine_stride_index_fifo_response_signals_in.rd_en = 1'b1  ;
 
-    engine_stride_index #(
+    engine_csr_index #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
         .ENGINE_ID_BUNDLE(0               ),
         .ENGINE_ID_ENGINE(0               )

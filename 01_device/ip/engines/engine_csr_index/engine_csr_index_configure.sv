@@ -150,11 +150,11 @@ module engine_csr_index_configure #(
             if(fifo_response_dout_int.valid) begin
                 case (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount)
                     (ENGINE_SEQ_MIN+0) : begin
-                        configuration_reg.payload.param.mode_increment <= fifo_response_dout_int.payload.data.field_0[0];
-                        configuration_reg.payload.param.mode_decrement <= fifo_response_dout_int.payload.data.field_0[1];
-                        configuration_reg.payload.param.mode_sequence  <= fifo_response_dout_int.payload.data.field_0[2];
-                        configuration_reg.payload.param.mode_buffer    <= fifo_response_dout_int.payload.data.field_0[3];
-                        configuration_valid_reg[0]                     <= 1'b1  ;
+                        configuration_reg.payload.param.increment     <= fifo_response_dout_int.payload.data.field_0[0];
+                        configuration_reg.payload.param.decrement     <= fifo_response_dout_int.payload.data.field_0[1];
+                        configuration_reg.payload.param.mode_sequence <= fifo_response_dout_int.payload.data.field_0[2];
+                        configuration_reg.payload.param.mode_buffer   <= fifo_response_dout_int.payload.data.field_0[3];
+                        configuration_valid_reg[0]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+1) : begin
                         configuration_reg.payload.param.index_start <= fifo_response_dout_int.payload.data.field_0;
@@ -165,8 +165,8 @@ module engine_csr_index_configure #(
                         configuration_valid_reg[2]                <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+3) : begin
-                        configuration_reg.payload.param.csr <= fifo_response_dout_int.payload.data.field_0;
-                        configuration_valid_reg[3]          <= 1'b1  ;
+                        configuration_reg.payload.param.stride <= fifo_response_dout_int.payload.data.field_0;
+                        configuration_valid_reg[3]             <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+4) : begin
                         configuration_reg.payload.param.granularity            <= fifo_response_dout_int.payload.data.field_0[CACHE_FRONTEND_DATA_W-2:0];
