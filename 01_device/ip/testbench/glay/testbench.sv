@@ -940,7 +940,7 @@ module kernel_testbench ();
         realcount = 0;
         setup_temp = 0;
         graph.overlay_program[0] = 0;
-        // StrideIndexGeneratorConfiguration
+        //CSR/StrideIndexGeneratorConfiguration
         setup_temp[0] = 1'b1;
         setup_temp[1] = 1'b0;
         setup_temp[2] = 1'b1;
@@ -961,8 +961,9 @@ module kernel_testbench ();
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {10'b000000000000,8'b00000111,8'b00000001,6'b000001}; // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
 
-buffer_5_ptr[31:0]
-buffer_5_ptr[63:32]
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS] = buffer_5_ptr[31:0]; // 8 - BUFFER pointer
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS] = buffer_5_ptr[63:32]; // 9- BUFFER pointer
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count; // 10 - BUFFER size
 
 
         for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
@@ -987,7 +988,7 @@ buffer_5_ptr[63:32]
 
         realcount = 0;
 
-        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
+        for (int i = 0; i < graph.mem512_edge_count; i++) begin
             for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
                 graph.edges_array_src[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_src;
