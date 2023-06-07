@@ -283,7 +283,7 @@ module engine_csr_index #(
 // 0 - increment/decrement
 // 1 - index_start
 // 2 - index_end
-// 3 - stride
+// 3 - csr
 // 4 - granularity - $clog2(BIT_WIDTH) used to shift
 // --------------------------------------------------------------------------------------
     assign engine_csr_index_configure_response_in                    = response_out_int;
@@ -325,7 +325,7 @@ module engine_csr_index #(
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out MemoryPacket
+// FIFO sequence requests out MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;

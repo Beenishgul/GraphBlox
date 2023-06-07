@@ -126,7 +126,7 @@ module bundle_arbiter_1_to_N_response #(
           demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
           response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_bundle[i] & fifo_response_dout_int.valid;
+          demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
         end
       end
 
@@ -137,7 +137,7 @@ module bundle_arbiter_1_to_N_response #(
 
     always_ff @(posedge ap_clk) begin
       demux_bus_data_in <= fifo_response_dout_int.payload;
-      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.route.to.id_bundle;
+      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.route.from.id_bundle;
     end
   endgenerate
 // --------------------------------------------------------------------------------------

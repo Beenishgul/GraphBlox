@@ -109,14 +109,16 @@ package PKG_ENGINE;
     } engine_csr_index_generator_state;
 
     typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+        logic                               mode_increment;
+        logic                               mode_decrement;
+        logic                               mode_sequence ;
+        logic                               mode_buffer   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size    ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end     ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride        ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity   ;
     } CSRIndexConfigurationParameters;
 
     typedef struct packed{
