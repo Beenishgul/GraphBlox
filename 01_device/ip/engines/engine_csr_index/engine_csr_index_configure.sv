@@ -37,12 +37,13 @@ module engine_csr_index_configure #(
     logic areset_csr_index_generator;
     logic areset_fifo               ;
 
-    MemoryPacket                      response_in_reg                ;
-    MemoryPacketMeta                  configuration_meta_int         ;
-    CSRIndexConfiguration             configuration_reg              ;
-    logic [     ENGINE_SEQ_WIDTH-1:0] configuration_valid_reg        ;
-    logic                             configuration_valid_int        ;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_in_reg_offset_sequence;
+    MemoryPacket                      response_in_reg                       ;
+    MemoryPacketMeta                  configuration_meta_int                ;
+    CSRIndexConfiguration             configuration_reg                     ;
+    logic [     ENGINE_SEQ_WIDTH-1:0] configuration_valid_reg               ;
+    logic                             configuration_valid_int               ;
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_in_reg_offset_sequence       ;
+    logic [CACHE_FRONTEND_ADDR_W-1:0] fifo_response_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -116,8 +117,9 @@ module engine_csr_index_configure #(
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
-    assign configuration_valid_int         = &configuration_valid_reg;
-    assign response_in_reg_offset_sequence = (response_in_reg.payload.meta.address.offset >> response_in_reg.payload.meta.address.shift.amount);
+    assign configuration_valid_int                = &configuration_valid_reg;
+    assign response_in_reg_offset_sequence        = (response_in_reg.payload.meta.address.offset >> response_in_reg.payload.meta.address.shift.amount);
+    assign fifo_response_dout_int_offset_sequence = (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
         configuration_meta_int.route.from.id_vertex    = ENGINE_ID_VERTEX;
@@ -149,7 +151,7 @@ module engine_csr_index_configure #(
             configuration_reg.payload.meta.address    <= configuration_meta_int.address;
 
             if(fifo_response_dout_int.valid) begin
-                case (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount)
+                case (fifo_response_dout_int_offset_sequence)
                     (ENGINE_SEQ_MIN+0) : begin
                         configuration_reg.payload.param.increment     <= fifo_response_dout_int.payload.data.field_0[0];
                         configuration_reg.payload.param.decrement     <= fifo_response_dout_int.payload.data.field_0[1];

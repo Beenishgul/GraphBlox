@@ -26,6 +26,8 @@ module engine_csr_index #(
     parameter ENGINE_ID_VERTEX = 0 ,
     parameter ENGINE_ID_BUNDLE = 0 ,
     parameter ENGINE_ID_ENGINE = 0 ,
+    parameter ENGINE_SEQ_WIDTH = 11,
+    parameter ENGINE_SEQ_MIN   = 0 ,
     parameter COUNTER_WIDTH    = 32
 ) (
     // System Signals
@@ -292,7 +294,9 @@ module engine_csr_index #(
     engine_csr_index_configure #(
         .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
         .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
+        .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE),
+        .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
+        .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  )
     ) inst_engine_csr_index_configure (
         .ap_clk                        (ap_clk                                                   ),
         .areset                        (areset_csr_index_configure                               ),
