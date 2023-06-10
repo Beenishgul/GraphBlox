@@ -46,43 +46,34 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-parameter TYPE_MEMORY_CMD_BITS = 6;
+parameter TYPE_MEMORY_CMD_BITS = 4;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_INVALID,
   CMD_READ,
   CMD_WRITE,
-  CMD_PREFETCH_READ,
-  CMD_PREFETCH_WRITE,
   CMD_CONFIGURE
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Operand location
 // --------------------------------------------------------------------------------------
-parameter TYPE_ENGINE_OPERAND_BITS = 8;
+parameter TYPE_ENGINE_OPERAND_BITS = 4;
 typedef enum logic[TYPE_ENGINE_OPERAND_BITS-1:0] {
   OP_LOCATION_0,
   OP_LOCATION_1,
   OP_LOCATION_2,
-  OP_LOCATION_3,
-  OP_LOCATION_4,
-  OP_LOCATION_5,
-  OP_LOCATION_6,
-  OP_LOCATION_7
+  OP_LOCATION_3
 } type_engine_operand;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-parameter TYPE_FILTER_OPERATION_BITS = 7;
+parameter TYPE_FILTER_OPERATION_BITS = 4;
 typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
   FILTER_NOP,
   FILTER_GT,
   FILTER_LT,
-  FILTER_EQ,
-  FILTER_GT_EQ,
-  FILTER_LT_EQ,
-  FILTER_NOT_EQ
+  FILTER_EQ
 } type_filter_operation;
 
 // --------------------------------------------------------------------------------------
@@ -101,21 +92,13 @@ typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-parameter TYPE_DATA_STRUCTURE_BITS = 13;
+parameter TYPE_DATA_STRUCTURE_BITS = 5;
 typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
   STRUCT_INVALID,
-  STRUCT_OUT_DEGREE,
-  STRUCT_IN_DEGREE,
-  STRUCT_EDGES_IDX,
-  STRUCT_INV_OUT_DEGREE,
-  STRUCT_INV_IN_DEGREE,
-  STRUCT_INV_EDGES_IDX,
-  STRUCT_AUXILIARY_1_DATA,
-  STRUCT_AUXILIARY_2_DATA,
-  STRUCT_STRIDE_INDEX,
+  STRUCT_KERNEL_DATA,
+  STRUCT_ENGINE_DATA,
   STRUCT_KERNEL_SETUP,
-  STRUCT_ENGINE_SETUP,
-  STRUCT_VERTEX_CU
+  STRUCT_ENGINE_SETUP
 } type_data_buffer;
 
 // --------------------------------------------------------------------------------------

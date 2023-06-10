@@ -135,7 +135,7 @@ module engine_csr_index_configure #(
         configuration_meta_int.address.shift.amount    = 0;
         configuration_meta_int.address.shift.direction = 1'b1;
         configuration_meta_int.subclass.cmd            = CMD_INVALID;
-        configuration_meta_int.subclass.buffer         = STRUCT_STRIDE_INDEX;
+        configuration_meta_int.subclass.buffer         = STRUCT_INVALID;
         configuration_meta_int.subclass.operand        = OP_LOCATION_0;
         configuration_meta_int.subclass.filter         = FILTER_NOP;
         configuration_meta_int.subclass.alu            = ALU_NOP;

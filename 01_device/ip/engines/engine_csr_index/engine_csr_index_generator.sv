@@ -122,8 +122,6 @@ module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
         end
     end
 
-
-
     always_ff @(posedge ap_clk) begin
         configuration_reg.payload <= configuration_in.payload;
     end
@@ -343,7 +341,6 @@ module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
         fifo_request_comb.payload.data.field_2       = 0;
         fifo_request_comb.payload.data.field_3       = 0;
     end
-
 
     always_ff @(posedge ap_clk) begin
         fifo_request_din_reg.payload <= fifo_request_comb.payload;
