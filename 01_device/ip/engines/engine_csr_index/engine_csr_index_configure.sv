@@ -13,11 +13,12 @@
 // -----------------------------------------------------------------------------
 
 module engine_csr_index_configure #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
-    parameter ENGINE_SEQ_MAX   = 11,
-    parameter ENGINE_SEQ_MIN   = 0
+    parameter ENGINE_ID_VERTEX = 0                                ,
+    parameter ENGINE_ID_BUNDLE = 0                                ,
+    parameter ENGINE_ID_ENGINE = 0                                ,
+    parameter ENGINE_SEQ_WIDTH = 11                               ,
+    parameter ENGINE_SEQ_MIN   = 0                                ,
+    parameter ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
     input  logic                  ap_clk                        ,
     input  logic                  areset                        ,
@@ -39,7 +40,7 @@ module engine_csr_index_configure #(
     MemoryPacket                      response_in_reg                ;
     MemoryPacketMeta                  configuration_meta_int         ;
     CSRIndexConfiguration             configuration_reg              ;
-    logic [       ENGINE_SEQ_MAX-1:0] configuration_valid_reg        ;
+    logic [     ENGINE_SEQ_WIDTH-1:0] configuration_valid_reg        ;
     logic                             configuration_valid_int        ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] response_in_reg_offset_sequence;
 
@@ -229,7 +230,7 @@ module engine_csr_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((response_in_reg.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_in_reg_offset_sequence < ENGINE_SEQ_MAX) & (response_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((response_in_reg.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
