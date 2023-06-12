@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : bundle_arbiter_N_to_1_request.sv
+// File   : arbiter_N_to_1_request.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -19,7 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module bundle_arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
+module arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
   input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
@@ -212,4 +212,4 @@ module bundle_arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) 
     .arbiter_bus_out  (arbiter_bus_out  )
   );
 
-endmodule : bundle_arbiter_N_to_1_request
+endmodule : arbiter_N_to_1_request

@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : bundle_arbiter_1_to_N_response.sv
+// File   : arbiter_1_to_N_response.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-01-11 23:47:45
 // Editor : sublime text4, tab size (2)
@@ -19,7 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module bundle_arbiter_1_to_N_response #(
+module arbiter_1_to_N_response #(
   parameter NUM_MEMORY_REQUESTOR = 2                         ,
   parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload),
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
@@ -195,4 +195,4 @@ module bundle_arbiter_1_to_N_response #(
     .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
   );
 
-endmodule : bundle_arbiter_1_to_N_response
+endmodule : arbiter_1_to_N_response

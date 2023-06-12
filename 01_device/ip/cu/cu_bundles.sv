@@ -379,7 +379,7 @@ module cu_bundles #(
 
     assign bundle_arbiter_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
-    bundle_arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_N_to_1_request_memory_out (
+    arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_N_to_1_request_memory_out (
         .ap_clk                  (ap_clk                                        ),
         .areset                  (areset_arbiter_N_to_1                         ),
         .request_in              (bundle_arbiter_N_to_1_request_in              ),
@@ -407,7 +407,7 @@ module cu_bundles #(
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    bundle_arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_1_to_N_response_memory_in (
+    arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_1_to_N_response_memory_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N                          ),
         .response_in              (bundle_arbiter_1_to_N_response_in              ),
