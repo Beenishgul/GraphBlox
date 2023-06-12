@@ -44,7 +44,7 @@ module kernel_cu #(
   logic areset_control  ;
   logic areset_generator;
   logic areset_setup    ;
-  logic areset_cu       ;
+  logic areset_bundles  ;
 
   logic [NUM_SETUP_MODULES-1:0] cu_setup_state   ;
   KernelDescriptor              descriptor_in_reg;
@@ -93,15 +93,15 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
-  KernelDescriptor       vertex_cu_descriptor               ;
-  MemoryPacket           vertex_cu_response_in              ;
-  FIFOStateSignalsOutput vertex_cu_fifo_response_signals_out;
-  FIFOStateSignalsInput  vertex_cu_fifo_response_signals_in ;
-  MemoryPacket           vertex_cu_request_out              ;
-  FIFOStateSignalsOutput vertex_cu_fifo_request_signals_out ;
-  FIFOStateSignalsInput  vertex_cu_fifo_request_signals_in  ;
-  logic                  vertex_cu_fifo_setup_signal        ;
-  logic                  vertex_cu_done_out                 ;
+  KernelDescriptor       cu_bundles_descriptor               ;
+  MemoryPacket           cu_bundles_response_in              ;
+  FIFOStateSignalsOutput cu_bundles_fifo_response_signals_out;
+  FIFOStateSignalsInput  cu_bundles_fifo_response_signals_in ;
+  MemoryPacket           cu_bundles_request_out              ;
+  FIFOStateSignalsOutput cu_bundles_fifo_request_signals_out ;
+  FIFOStateSignalsInput  cu_bundles_fifo_request_signals_in  ;
+  logic                  cu_bundles_fifo_setup_signal        ;
+  logic                  cu_bundles_done_out                 ;
 
 
 // --------------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ module kernel_cu #(
     areset_control   <= areset;
     areset_setup     <= areset;
     areset_generator <= areset;
-    areset_cu        <= areset;
+    areset_bundles   <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ module kernel_cu #(
     else begin
       fifo_setup_signal <= |cu_setup_state;
       request_out.valid <= request_out_reg.valid ;
-      done_out          <= vertex_cu_done_out;
+      done_out          <= cu_bundles_done_out;
     end
   end
 
@@ -167,7 +167,7 @@ module kernel_cu #(
       cu_setup_state[0] <= cache_generator_fifo_request_setup_signal;
       cu_setup_state[1] <= cache_generator_fifo_response_setup_signal;
       cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
-      cu_setup_state[3] <= vertex_cu_fifo_setup_signal;
+      cu_setup_state[3] <= cu_bundles_fifo_setup_signal;
     end
   end
 
@@ -178,32 +178,32 @@ module kernel_cu #(
     if (areset_control) begin
       descriptor_in_reg.valid       <= 0;
       kernel_setup_descriptor.valid <= 0;
-      vertex_cu_descriptor.valid    <= 0;
+      cu_bundles_descriptor.valid   <= 0;
     end
     else begin
       descriptor_in_reg.valid       <= descriptor_in.valid;
       kernel_setup_descriptor.valid <= descriptor_in_reg.valid;
-      vertex_cu_descriptor.valid    <= descriptor_in_reg.valid;
+      cu_bundles_descriptor.valid   <= descriptor_in_reg.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
     descriptor_in_reg.payload       <= descriptor_in.payload;
     kernel_setup_descriptor.payload <= descriptor_in_reg.payload;
-    vertex_cu_descriptor.payload    <= descriptor_in_reg.payload;
+    cu_bundles_descriptor.payload   <= descriptor_in_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU
 // --------------------------------------------------------------------------------------
   assign cache_generator_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_response_signals_out.prog_full & fifo_request_signals_in_reg.rd_en;
-  assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|vertex_cu_fifo_response_signals_out.prog_full);
+  assign cache_generator_fifo_response_signals_in.rd_en = ~(kernel_setup_fifo_response_signals_out.prog_full|cu_bundles_fifo_response_signals_out.prog_full);
 
   assign kernel_setup_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
   assign kernel_setup_fifo_response_signals_in.rd_en = 1;
 
-  assign vertex_cu_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
-  assign vertex_cu_fifo_response_signals_in.rd_en = 1;
+  assign cu_bundles_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
+  assign cu_bundles_fifo_response_signals_in.rd_en = 1;
 
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Cache Request Generator
@@ -214,9 +214,9 @@ module kernel_cu #(
   assign cache_generator_arbiter_request_in[0] = ~kernel_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
   // vertex_cu
-  assign vertex_cu_response_in                 = cache_generator_response_out[1];
-  assign cache_generator_request_in[1]         = vertex_cu_request_out;
-  assign cache_generator_arbiter_request_in[1] = ~vertex_cu_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+  assign cu_bundles_response_in                = cache_generator_response_out[1];
+  assign cache_generator_request_in[1]         = cu_bundles_request_out;
+  assign cache_generator_arbiter_request_in[1] = ~cu_bundles_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
@@ -271,23 +271,23 @@ module kernel_cu #(
   );
 
 // --------------------------------------------------------------------------------------
-// Vertex CU
+// Bundles CU
 // --------------------------------------------------------------------------------------
-  vertex_cu #(
+  cu_bundles #(
     .ENGINE_ID_VERTEX  (1              ),
     .ENGINE_BUNDLES_NUM(CU_BUNDLE_COUNT)
   ) inst_vertex_cu (
-    .ap_clk                   (ap_clk                             ),
-    .areset                   (areset_cu                          ),
-    .descriptor_in            (vertex_cu_descriptor               ),
-    .response_in              (vertex_cu_response_in              ),
-    .fifo_response_signals_in (vertex_cu_fifo_response_signals_in ),
-    .fifo_response_signals_out(vertex_cu_fifo_response_signals_out),
-    .request_out              (vertex_cu_request_out              ),
-    .fifo_request_signals_in  (vertex_cu_fifo_request_signals_in  ),
-    .fifo_request_signals_out (vertex_cu_fifo_request_signals_out ),
-    .fifo_setup_signal        (vertex_cu_fifo_setup_signal        ),
-    .done_out                 (vertex_cu_done_out                 )
+    .ap_clk                             (ap_clk                              ),
+    .areset                             (areset_bundles                      ),
+    .descriptor_in                      (cu_bundles_descriptor               ),
+    .response_memory_in                 (cu_bundles_response_in              ),
+    .fifo_response_memory_in_signals_in (cu_bundles_fifo_response_signals_in ),
+    .fifo_response_memory_in_signals_out(cu_bundles_fifo_response_signals_out),
+    .request_memory_out                 (cu_bundles_request_out              ),
+    .fifo_request_memory_out_signals_in (cu_bundles_fifo_request_signals_in  ),
+    .fifo_request_memory_out_signals_out(cu_bundles_fifo_request_signals_out ),
+    .fifo_setup_signal                  (cu_bundles_fifo_setup_signal        ),
+    .done_out                           (cu_bundles_done_out                 )
   );
 
 endmodule : kernel_cu

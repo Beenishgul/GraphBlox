@@ -46,7 +46,7 @@ memory_generator="generator"
 memory_ram="ram"
 
 control="control"
-vertex="vertex"
+cu="cu"
 bundle="bundle"
 utils="utils"
 utils_arbiter="arbiter"
@@ -98,7 +98,7 @@ generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_generato
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${bundle}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${cu}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME_SV} "sv"
 
