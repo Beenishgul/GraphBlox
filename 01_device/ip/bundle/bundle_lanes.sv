@@ -407,7 +407,7 @@ module bundle_lanes #(
 // Generate Lanes - Drive input signals
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_reg_input
+        for (i=0; i< NUM_LANES; i++) begin : generate_bundle_reg_input
             always_ff @(posedge ap_clk) begin
                 lanes_areset[i] <= areset;
             end
@@ -431,7 +431,7 @@ module bundle_lanes #(
 // Generate Lanes - Drive output signals
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_reg_output
+        for (i=0; i< NUM_LANES; i++) begin : generate_bundle_reg_output
             always_ff @(posedge ap_clk) begin
                 if (areset_lanes) begin
                     lanes_fifo_setup_signal_reg[i] <= 1'b1;
