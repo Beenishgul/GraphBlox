@@ -49,10 +49,9 @@ module kernel_cu #(
   logic [NUM_SETUP_MODULES-1:0] cu_setup_state   ;
   KernelDescriptor              descriptor_in_reg;
 
-  // --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU <-> Cache
 // --------------------------------------------------------------------------------------
-
   CacheResponse         response_in_reg             ;
   CacheRequest          request_out_reg             ;
   FIFOStateSignalsInput fifo_response_signals_in_reg;
