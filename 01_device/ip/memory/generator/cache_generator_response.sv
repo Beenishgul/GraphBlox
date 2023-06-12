@@ -147,7 +147,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                         ),
+    .FIFO_WRITE_DEPTH(16                         ),
     .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
     .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
     .PROG_THRESH     (8                          )
