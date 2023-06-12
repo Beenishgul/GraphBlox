@@ -631,7 +631,7 @@ module bundle_lanes #(
     lane_csr_merge_filter #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  )
+        .ID_LANE  (3        )
     ) inst_lane_csr_merge_filter (
         .ap_clk                             (ap_clk                                      ),
         .areset                             (lanes_areset[3]                             ),
@@ -654,7 +654,7 @@ module bundle_lanes #(
     lane_alu_filter #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  )
+        .ID_LANE  (4        )
     ) inst_lane_alu_filter (
         .ap_clk                             (ap_clk                                      ),
         .areset                             (lanes_areset[4]                             ),
@@ -677,7 +677,7 @@ module bundle_lanes #(
     lane_buffer_filter #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  )
+        .ID_LANE  (5        )
     ) inst_lane_buffer_filter (
         .ap_clk                             (ap_clk                                      ),
         .areset                             (lanes_areset[5]                             ),
