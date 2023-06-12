@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-12 19:23:35
+// Revise : 2023-06-12 19:42:25
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ import PKG_CACHE::*;
 module bundle_lanes #(
     parameter ID_CU     = 0,
     parameter ID_BUNDLE = 0,
-    parameter NUM_LANES = 8
+    parameter NUM_LANES = 6
 ) (
     // System Signals
     input  logic                  ap_clk                             ,

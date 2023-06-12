@@ -19,7 +19,10 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
+module arbiter_N_to_1_request #(
+  parameter NUM_MEMORY_REQUESTOR  = 2                              ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)
+) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
   input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
@@ -56,13 +59,13 @@ module arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-  MemoryPacket arbiter_bus_out                          ;
-  MemoryPacket arbiter_bus_in [NUM_MEMORY_REQUESTOR-1:0];
+  MemoryPacket arbiter_bus_out                           ;
+  MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
-  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant      ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request    ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request_reg;
-  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_bus_valid  ;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant      ;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request    ;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request_reg;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid  ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -194,6 +197,13 @@ module arbiter_N_to_1_request #(parameter NUM_MEMORY_REQUESTOR      = 2) (
         arbiter_bus_in[i]    = request_in_reg[i];
         arbiter_bus_valid[i] = request_in_reg[i].valid;
         arbiter_request[i]   = arbiter_request_reg[i];
+      end
+    end
+    for (i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
+      always_comb begin
+        arbiter_bus_in[i]    = 0;
+        arbiter_bus_valid[i] = 0;
+        arbiter_request[i]   = 0;
       end
     end
   endgenerate
