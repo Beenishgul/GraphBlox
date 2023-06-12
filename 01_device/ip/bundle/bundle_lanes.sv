@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : lanes.sv
+// File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,7 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lanes #(
+module bundle_lanes #(
     parameter ID_CU     = 0,
     parameter ID_BUNDLE = 0,
     parameter NUM_LANES = 6
@@ -46,6 +46,7 @@ module lanes #(
     output logic                  done_out
 );
 
+    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -233,7 +234,7 @@ module lanes #(
             request_memory_out.valid <= 1'b0 ;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int;
+            fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|lanes_fifo_setup_signal_reg);
             request_engine_out.valid <= request_engine_out_int.valid ;
             request_memory_out.valid <= request_memory_out_int.valid ;
         end
@@ -559,4 +560,4 @@ module lanes #(
 // --------------------------------------------------------------------------------------
 
 
-endmodule : lanes
+endmodule : bundle_lanes
