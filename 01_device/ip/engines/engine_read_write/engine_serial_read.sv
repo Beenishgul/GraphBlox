@@ -380,7 +380,7 @@ module engine_serial_read #(parameter COUNTER_WIDTH      = 32) (
     assign request_out_reg.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(16                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
