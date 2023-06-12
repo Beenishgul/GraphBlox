@@ -2,7 +2,7 @@
 
 open_run impl_1
 # open_run impl_Performance_EarlyBlockPlacement
-#Utilisation
+#Utilization
 report_utilization -file utilization_hierarchical.txt -hierarchical
 report_utilization -file utilization_report.txt
 
