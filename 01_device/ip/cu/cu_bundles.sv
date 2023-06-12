@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : vertex_bundles.sv
+// File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,7 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module vertex_bundles #(
+module cu_bundles #(
     parameter ENGINE_ID_VERTEX   = 0,
     parameter ENGINE_BUNDLES_NUM = 4
 ) (
@@ -43,8 +43,8 @@ module vertex_bundles #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_vertex_bundles;
-    logic areset_fifo          ;
+    logic areset_cu_bundles;
+    logic areset_fifo      ;
 
     KernelDescriptor descriptor_in_reg     ;
     MemoryPacket     response_memory_in_reg;
@@ -132,17 +132,52 @@ module vertex_bundles #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_vertex_bundles <= areset;
+        areset_cu_bundles     <= areset;
         areset_fifo           <= areset;
         areset_arbiter_N_to_1 <= areset;
         areset_arbiter_1_to_N <= areset;
     end
 
 // --------------------------------------------------------------------------------------
+// Done Logic (DUMMY) Variables
+// --------------------------------------------------------------------------------------
+    logic                              done_signal_reg;
+    logic [GLOBAL_DATA_WIDTH_BITS-1:0] counter        ;
+
+// --------------------------------------------------------------------------------------
+// Done Logic (DUMMY)
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_vertex_cu) begin
+            done_signal_reg <= 1'b0;
+            counter         <= 0;
+        end
+        else begin
+            if (descriptor_in_reg.valid) begin
+                if(counter >= 200) begin
+                    done_signal_reg <= 1'b1;
+                    counter         <= 0;
+                end
+                else begin
+                    // if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
+                    counter <= counter + 1;
+                    // if (counter == 0)
+                    //     $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field_0);
+                    // end else
+                    // counter <= counter;
+                end
+            end else begin
+                done_signal_reg <= 1'b0;
+                counter         <= 0;
+            end
+        end
+    end
+
+// --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_bundles) begin
+        if (areset_cu_bundles) begin
             descriptor_in_reg.valid <= 0;
         end
         else begin
@@ -158,7 +193,7 @@ module vertex_bundles #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_bundles) begin
+        if (areset_cu_bundles) begin
             fifo_response_memory_in_signals_in_reg <= 0;
             fifo_request_memory_out_signals_in_reg <= 0;
             response_memory_in_reg.valid           <= 0;
@@ -178,7 +213,7 @@ module vertex_bundles #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_vertex_bundles) begin
+        if (areset_cu_bundles) begin
             fifo_setup_signal        <= 1;
             request_memory_out.valid <= 0;
             done_out                 <= 0;
@@ -186,7 +221,7 @@ module vertex_bundles #(
         else begin
             fifo_setup_signal        <= fifo_request_memory_out_setup_signal_int | fifo_response_memory_in_setup_signal_int | (|bundle_engines_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
             request_memory_out.valid <= request_memory_out_int.valid ;
-            done_out                 <= (&bundle_engines_done_out_reg);
+            done_out                 <= (&bundle_engines_done_out_reg) | done_signal_reg;
         end
     end
 
@@ -286,7 +321,7 @@ module vertex_bundles #(
             end
 
             always_ff @(posedge ap_clk) begin
-                if (areset_vertex_bundles) begin
+                if (areset_cu_bundles) begin
                     bundle_engines_descriptor_in[i].valid <= 0;
                 end
                 else begin
@@ -306,7 +341,7 @@ module vertex_bundles #(
     generate
         for (i=0; i< ENGINE_BUNDLES_NUM; i++) begin : generate_bundle_reg_output
             always_ff @(posedge ap_clk) begin
-                if (areset_vertex_bundles) begin
+                if (areset_cu_bundles) begin
                     bundle_engines_fifo_setup_signal_reg[i] <= 1'b1;
                     bundle_engines_done_out_reg[i]          <= 1'b1;
                 end
@@ -418,4 +453,4 @@ module vertex_bundles #(
         end
     endgenerate
 
-endmodule : vertex_bundles
+endmodule : cu_bundles

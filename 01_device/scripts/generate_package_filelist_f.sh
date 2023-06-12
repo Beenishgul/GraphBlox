@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-07 17:33:36
+# @Last Modified time: 2023-06-12 17:17:17
 #!/bin/bash
 
 
@@ -48,7 +48,7 @@ memory_ram="ram"
 
 control="control"
 bundle="bundle"
-vertex="vertex"
+cu="cu"
 
 utils="utils"
 utils_arbiter="arbiter"
@@ -99,7 +99,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_fifo}/ 
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${bundle}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${vertex}/ ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${cu}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 

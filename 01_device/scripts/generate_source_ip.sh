@@ -35,7 +35,7 @@ generator="generator"
 
 testbench="testbench"
 control="control"
-vertex="vertex"
+cu="cu"
 bundle="bundle"
 utils="utils"
 
@@ -51,7 +51,7 @@ mkdir -p ${ACTIVE_IP_DIR}/${memory}
 mkdir -p ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
 mkdir -p ${ACTIVE_IP_DIR}/${control}
 mkdir -p ${ACTIVE_IP_DIR}/${bundle}
-mkdir -p ${ACTIVE_IP_DIR}/${vertex}
+mkdir -p ${ACTIVE_IP_DIR}/${cu}
 mkdir -p ${ACTIVE_IP_DIR}/${utils}
 
 
@@ -61,7 +61,7 @@ cp -r ${ORIGINAL_IP_DIR}/${kernel}/* ${ACTIVE_IP_DIR}/${kernel}
 cp -r ${ORIGINAL_IP_DIR}/${top}/* ${ACTIVE_IP_DIR}/${top}
 cp -r ${ORIGINAL_IP_DIR}/${memory}/* ${ACTIVE_IP_DIR}/${memory}
 cp -r ${ORIGINAL_IP_DIR}/${bundle}/* ${ACTIVE_IP_DIR}/${bundle}
-cp -r ${ORIGINAL_IP_DIR}/${vertex}/* ${ACTIVE_IP_DIR}/${vertex}
+cp -r ${ORIGINAL_IP_DIR}/${cu}/* ${ACTIVE_IP_DIR}/${cu}
 cp -r ${ORIGINAL_IP_DIR}/${utils}/* ${ACTIVE_IP_DIR}/${utils}
 cp -r ${ORIGINAL_IP_DIR}/${testbench}/${MODULE}/* ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
 
