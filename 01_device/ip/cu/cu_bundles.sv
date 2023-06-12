@@ -423,11 +423,11 @@ module cu_bundles #(
     generate
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_lanes
             bundle_lanes #(
-                .ID_CU(ID_CU),
-                .ID_BUNDLE(i               )
+                .ID_CU    (ID_CU),
+                .ID_BUNDLE(i    )
             ) inst_bundle_lanes (
-                .ap_clk                             (ap_clk                                               ),
-                .areset                             (bundle_areset[i]                                     ),
+                .ap_clk                             (ap_clk                                             ),
+                .areset                             (bundle_areset[i]                                   ),
                 .descriptor_in                      (bundle_lanes_descriptor_in[i]                      ),
                 .response_engine_in                 (bundle_lanes_response_engine_in[i]                 ),
                 .fifo_response_engine_in_signals_in (bundle_lanes_fifo_response_engine_in_signals_in[i] ),

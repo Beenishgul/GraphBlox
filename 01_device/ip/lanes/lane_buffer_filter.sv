@@ -22,8 +22,9 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module lane_buffer_filter #(
-    parameter ID_CU = 0,
-    parameter ID_BUNDLE = 0
+    parameter ID_CU     = 0,
+    parameter ID_BUNDLE = 0,
+    parameter ID_LANE   = 0
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -49,7 +50,7 @@ module lane_buffer_filter #(
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_lane_buffer_filter;
-    logic areset_fifo          ;
+    logic areset_fifo              ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -107,7 +108,7 @@ module lane_buffer_filter #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         areset_lane_buffer_filter <= areset;
-        areset_fifo           <= areset;
+        areset_fifo               <= areset;
     end
 
 // --------------------------------------------------------------------------------------

@@ -559,5 +559,146 @@ module bundle_lanes #(
 // Generate Lanes
 // --------------------------------------------------------------------------------------
 
+    lane_rw_merge_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (0        )
+    ) inst_lane_rw_merge_filter_0 (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[0]                             ),
+        .descriptor_in                      (lanes_descriptor_in[0]                      ),
+        .response_engine_in                 (lanes_response_engine_in[0]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[0] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[0]),
+        .response_memory_in                 (lanes_response_memory_in[0]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[0] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[0]),
+        .request_engine_out                 (lanes_request_engine_out[0]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[0] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[0]),
+        .request_memory_out                 (lanes_request_memory_out[0]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[0] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[0]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[0]                  ),
+        .done_out                           (lanes_done_out[0]                           )
+    );
+    lane_rw_merge_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (1        )
+    ) inst_lane_rw_merge_filter_1 (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[1]                             ),
+        .descriptor_in                      (lanes_descriptor_in[1]                      ),
+        .response_engine_in                 (lanes_response_engine_in[1]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[1] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[1]),
+        .response_memory_in                 (lanes_response_memory_in[1]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[1] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[1]),
+        .request_engine_out                 (lanes_request_engine_out[1]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[1] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[1]),
+        .request_memory_out                 (lanes_request_memory_out[1]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[1] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[1]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[1]                  ),
+        .done_out                           (lanes_done_out[1]                           )
+    );
+    lane_rw_merge_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (2        )
+    ) inst_lane_rw_merge_filter_2 (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[2]                             ),
+        .descriptor_in                      (lanes_descriptor_in[2]                      ),
+        .response_engine_in                 (lanes_response_engine_in[2]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[2] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[2]),
+        .response_memory_in                 (lanes_response_memory_in[2]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[2] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[2]),
+        .request_engine_out                 (lanes_request_engine_out[2]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[2] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[2]),
+        .request_memory_out                 (lanes_request_memory_out[2]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[2] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[2]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[2]                  ),
+        .done_out                           (lanes_done_out[2]                           )
+    );
+    lane_csr_merge_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (ID_LANE  )
+    ) inst_lane_csr_merge_filter (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[3]                             ),
+        .descriptor_in                      (lanes_descriptor_in[3]                      ),
+        .response_engine_in                 (lanes_response_engine_in[3]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[3] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[3]),
+        .response_memory_in                 (lanes_response_memory_in[3]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[3] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[3]),
+        .request_engine_out                 (lanes_request_engine_out[3]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[3] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[3]),
+        .request_memory_out                 (lanes_request_memory_out[3]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[3] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[3]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[3]                  ),
+        .done_out                           (lanes_done_out[3]                           )
+    );
+    lane_alu_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (ID_LANE  )
+    ) inst_lane_alu_filter (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[4]                             ),
+        .descriptor_in                      (lanes_descriptor_in[4]                      ),
+        .response_engine_in                 (lanes_response_engine_in[4]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[4] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[4]),
+        .response_memory_in                 (lanes_response_memory_in[4]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[4] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[4]),
+        .request_engine_out                 (lanes_request_engine_out[4]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[4] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[4]),
+        .request_memory_out                 (lanes_request_memory_out[4]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[4] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[4]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[4]                  ),
+        .done_out                           (lanes_done_out[4]                           )
+    );
+    lane_buffer_filter #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (ID_LANE  )
+    ) inst_lane_buffer_filter (
+        .ap_clk                             (ap_clk                                      ),
+        .areset                             (lanes_areset[5]                             ),
+        .descriptor_in                      (lanes_descriptor_in[5]                      ),
+        .response_engine_in                 (lanes_response_engine_in[5]                 ),
+        .fifo_response_engine_in_signals_in (lanes_fifo_response_engine_in_signals_in[5] ),
+        .fifo_response_engine_in_signals_out(lanes_fifo_response_engine_in_signals_out[5]),
+        .response_memory_in                 (lanes_response_memory_in[5]                 ),
+        .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[5] ),
+        .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[5]),
+        .request_engine_out                 (lanes_request_engine_out[5]                 ),
+        .fifo_request_engine_out_signals_in (lanes_fifo_request_engine_out_signals_in[5] ),
+        .fifo_request_engine_out_signals_out(lanes_fifo_request_engine_out_signals_out[5]),
+        .request_memory_out                 (lanes_request_memory_out[5]                 ),
+        .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[5] ),
+        .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[5]),
+        .fifo_setup_signal                  (lanes_fifo_setup_signal[5]                  ),
+        .done_out                           (lanes_done_out[5]                           )
+    );
+
+
+
 
 endmodule : bundle_lanes

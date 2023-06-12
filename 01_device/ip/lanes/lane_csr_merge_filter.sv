@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : lane_merge_filter.sv
+// File   : lane_csr_merge_filter.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,9 +21,10 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_merge_filter #(
-    parameter ID_CU = 0,
-    parameter ID_BUNDLE = 0
+module lane_csr_merge_filter #(
+    parameter ID_CU     = 0,
+    parameter ID_BUNDLE = 0,
+    parameter ID_LANE   = 0
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -48,8 +49,8 @@ module lane_merge_filter #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_lane_merge_filter;
-    logic areset_fifo             ;
+    logic areset_lane_csr_merge_filter;
+    logic areset_fifo                 ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -106,15 +107,15 @@ module lane_merge_filter #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_lane_merge_filter <= areset;
-        areset_fifo              <= areset;
+        areset_lane_csr_merge_filter <= areset;
+        areset_fifo                  <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_merge_filter) begin
+        if (areset_lane_csr_merge_filter) begin
             descriptor_in_reg.valid <= 1'b0;
         end
         else begin
@@ -130,7 +131,7 @@ module lane_merge_filter #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_merge_filter) begin
+        if (areset_lane_csr_merge_filter) begin
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_request_engine_out_signals_in_reg <= 0;
             response_engine_in_reg.valid           <= 1'b0;
@@ -153,7 +154,7 @@ module lane_merge_filter #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_merge_filter) begin
+        if (areset_lane_csr_merge_filter) begin
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0 ;
@@ -339,4 +340,4 @@ module lane_merge_filter #(
 // --------------------------------------------------------------------------------------
 
 
-endmodule : lane_merge_filter
+endmodule : lane_csr_merge_filter

@@ -22,8 +22,9 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module lane_rw_merge_filter #(
-    parameter ID_CU = 0,
-    parameter ID_BUNDLE = 0
+    parameter ID_CU     = 0,
+    parameter ID_BUNDLE = 0,
+    parameter ID_LANE   = 0
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
