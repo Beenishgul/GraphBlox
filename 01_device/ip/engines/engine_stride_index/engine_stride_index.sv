@@ -23,10 +23,10 @@ import PKG_VERTEX::*;
 import PKG_CACHE::*;
 
 module engine_stride_index #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
-    parameter COUNTER_WIDTH    = 32
+    parameter ID_CU         = 0 ,
+    parameter ID_BUNDLE     = 0 ,
+    parameter ID_LANE       = 0 ,
+    parameter COUNTER_WIDTH = 32
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
@@ -290,9 +290,9 @@ module engine_stride_index #(
     assign engine_stride_index_configure_fifo_response_signals_in.rd_en = 1'b1;
 
     engine_stride_index_configure #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(1               )
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (1        )
     ) inst_engine_stride_index_configure (
         .ap_clk                        (ap_clk                                                      ),
         .areset                        (areset_stride_index_configure                               ),

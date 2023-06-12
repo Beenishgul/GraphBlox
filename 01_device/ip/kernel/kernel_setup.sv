@@ -22,10 +22,10 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module kernel_setup #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
-    parameter COUNTER_WIDTH    = 32
+    parameter ID_CU         = 0 ,
+    parameter ID_BUNDLE     = 0 ,
+    parameter ID_LANE       = 0 ,
+    parameter COUNTER_WIDTH = 32
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
@@ -274,9 +274,9 @@ module kernel_setup #(
         configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
-        configuration_comb.payload.meta.route.from.id_vertex    = ENGINE_ID_VERTEX;
-        configuration_comb.payload.meta.route.from.id_bundle    = ENGINE_ID_BUNDLE;
-        configuration_comb.payload.meta.route.from.id_engine    = ENGINE_ID_ENGINE;
+        configuration_comb.payload.meta.route.from.id_vertex    = ID_CU;
+        configuration_comb.payload.meta.route.from.id_bundle    = ID_BUNDLE;
+        configuration_comb.payload.meta.route.from.id_engine    = ID_LANE;
         configuration_comb.payload.meta.route.from.id_buffer    = 0;
         configuration_comb.payload.meta.route.to.id_vertex      = {CU_VERTEX_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};

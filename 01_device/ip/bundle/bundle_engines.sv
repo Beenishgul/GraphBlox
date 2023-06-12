@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : bundle_engines.sv
+// File   : lanes.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-01-23 16:17:05
 // Editor : sublime text4, tab size (4)
@@ -21,9 +21,10 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module bundle_engines #(
-    parameter ENGINE_ID_VERTEX = 0,
-    parameter ENGINE_ID_BUNDLE = 0
+module lanes #(
+    parameter ID_CU     = 0,
+    parameter ID_BUNDLE = 0,
+    parameter NUM_LANES = 4
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -48,8 +49,8 @@ module bundle_engines #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_bundle_engines;
-    logic areset_fifo          ;
+    logic areset_lanes;
+    logic areset_fifo ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -103,18 +104,41 @@ module bundle_engines #(
     logic                  fifo_request_memory_out_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
+// Generate Bundles
+// --------------------------------------------------------------------------------------
+    logic                  lanes_areset                             [NUM_LANES-1:0];
+    KernelDescriptor       lanes_descriptor_in                      [NUM_LANES-1:0];
+    MemoryPacket           lanes_response_engine_in                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_response_engine_in_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_response_engine_in_signals_out[NUM_LANES-1:0];
+    MemoryPacket           lanes_response_memory_in                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_response_memory_in_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_response_memory_in_signals_out[NUM_LANES-1:0];
+    MemoryPacket           lanes_request_engine_out                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_request_engine_out_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_request_engine_out_signals_out[NUM_LANES-1:0];
+    MemoryPacket           lanes_request_memory_out                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_request_memory_out_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_request_memory_out_signals_out[NUM_LANES-1:0];
+    logic                  lanes_fifo_setup_signal                  [NUM_LANES-1:0];
+    logic                  lanes_done_out                           [NUM_LANES-1:0];
+
+    logic [NUM_LANES-1:0] lanes_fifo_setup_signal_reg;
+    logic [NUM_LANES-1:0] lanes_done_out_reg         ;
+
+// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_bundle_engines <= areset;
-        areset_fifo           <= areset;
+        areset_lanes <= areset;
+        areset_fifo  <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_bundle_engines) begin
+        if (areset_lanes) begin
             descriptor_in_reg.valid <= 1'b0;
         end
         else begin
@@ -130,7 +154,7 @@ module bundle_engines #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_bundle_engines) begin
+        if (areset_lanes) begin
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_request_engine_out_signals_in_reg <= 0;
             response_engine_in_reg.valid           <= 1'b0;
@@ -153,7 +177,7 @@ module bundle_engines #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_bundle_engines) begin
+        if (areset_lanes) begin
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0 ;
@@ -339,4 +363,4 @@ module bundle_engines #(
 // --------------------------------------------------------------------------------------
 
 
-endmodule : bundle_engines
+endmodule : lanes
