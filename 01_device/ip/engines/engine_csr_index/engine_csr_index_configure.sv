@@ -241,7 +241,7 @@ module engine_csr_index_configure #(
     assign fifo_response_dout_int.payload     = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(16                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
