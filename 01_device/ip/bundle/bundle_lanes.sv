@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-01-23 16:17:05
+// Revise : 2023-06-12 19:23:35
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ import PKG_CACHE::*;
 module bundle_lanes #(
     parameter ID_CU     = 0,
     parameter ID_BUNDLE = 0,
-    parameter NUM_LANES = 6
+    parameter NUM_LANES = 8
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -697,8 +697,5 @@ module bundle_lanes #(
         .fifo_setup_signal                  (lanes_fifo_setup_signal[5]                  ),
         .done_out                           (lanes_done_out[5]                           )
     );
-
-
-
 
 endmodule : bundle_lanes

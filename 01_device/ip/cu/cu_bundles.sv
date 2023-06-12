@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-01-23 16:17:05
+// Revise : 2023-06-12 19:23:05
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -215,7 +215,8 @@ module cu_bundles #(
         else begin
             fifo_setup_signal        <= fifo_request_memory_out_setup_signal_int | fifo_response_memory_in_setup_signal_int | (|bundle_lanes_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
             request_memory_out.valid <= request_memory_out_int.valid ;
-            done_out                 <= (&bundle_lanes_done_out_reg) | done_signal_reg;
+            // done_out                 <= (&bundle_lanes_done_out_reg) | done_signal_reg;
+            done_out                 <= done_signal_reg;
         end
     end
 

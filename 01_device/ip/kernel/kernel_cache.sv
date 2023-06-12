@@ -296,7 +296,7 @@ module kernel_cache (
   assign response_in_int.payload            = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                         ),
+    .FIFO_WRITE_DEPTH(16                         ),
     .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
     .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
     .PROG_THRESH     (8                          )
