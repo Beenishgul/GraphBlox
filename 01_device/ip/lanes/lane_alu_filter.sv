@@ -22,8 +22,8 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module lane_alu_filter #(
-    parameter ENGINE_ID_VERTEX = 0,
-    parameter ENGINE_ID_BUNDLE = 0
+    parameter ID_CU = 0,
+    parameter ID_BUNDLE = 0
 ) (
     // System Signals
     input  logic                  ap_clk                             ,

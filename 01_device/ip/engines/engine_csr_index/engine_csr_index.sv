@@ -23,9 +23,9 @@ import PKG_VERTEX::*;
 import PKG_CACHE::*;
 
 module engine_csr_index #(
-    parameter ENGINE_ID_VERTEX = 0 ,
-    parameter ENGINE_ID_BUNDLE = 0 ,
-    parameter ENGINE_ID_ENGINE = 0 ,
+    parameter ID_CU            = 0 ,
+    parameter ID_BUNDLE        = 0 ,
+    parameter ID_LANE          = 0 ,
     parameter ENGINE_SEQ_WIDTH = 11,
     parameter ENGINE_SEQ_MIN   = 0 ,
     parameter COUNTER_WIDTH    = 32
@@ -292,9 +292,9 @@ module engine_csr_index #(
     assign engine_csr_index_configure_fifo_response_memory_in_signals_in.rd_en = 1'b1;
 
     engine_csr_index_configure #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(ENGINE_ID_BUNDLE),
-        .ENGINE_ID_ENGINE(ENGINE_ID_ENGINE),
+        .ID_CU           (ID_CU           ),
+        .ID_BUNDLE       (ID_BUNDLE       ),
+        .ID_LANE         (ID_LANE         ),
         .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
         .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  )
     ) inst_engine_csr_index_configure (

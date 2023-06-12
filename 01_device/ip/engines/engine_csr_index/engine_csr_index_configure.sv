@@ -13,9 +13,9 @@
 // -----------------------------------------------------------------------------
 
 module engine_csr_index_configure #(
-    parameter ENGINE_ID_VERTEX = 0                                ,
-    parameter ENGINE_ID_BUNDLE = 0                                ,
-    parameter ENGINE_ID_ENGINE = 0                                ,
+    parameter ID_CU            = 0                                ,
+    parameter ID_BUNDLE        = 0                                ,
+    parameter ID_LANE          = 0                                ,
     parameter ENGINE_SEQ_WIDTH = 11                               ,
     parameter ENGINE_SEQ_MIN   = 0                                ,
     parameter ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
@@ -122,13 +122,13 @@ module engine_csr_index_configure #(
     assign fifo_response_dout_int_offset_sequence = (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configuration_meta_int.route.from.id_vertex    = ENGINE_ID_VERTEX;
-        configuration_meta_int.route.from.id_bundle    = ENGINE_ID_BUNDLE;
-        configuration_meta_int.route.from.id_engine    = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.from.id_vertex    = ID_CU;
+        configuration_meta_int.route.from.id_bundle    = ID_BUNDLE;
+        configuration_meta_int.route.from.id_engine    = ID_LANE;
         configuration_meta_int.route.from.id_buffer    = 0;
-        configuration_meta_int.route.to.id_vertex      = ENGINE_ID_VERTEX;
-        configuration_meta_int.route.to.id_bundle      = ENGINE_ID_BUNDLE;
-        configuration_meta_int.route.to.id_engine      = ENGINE_ID_ENGINE;
+        configuration_meta_int.route.to.id_vertex      = ID_CU;
+        configuration_meta_int.route.to.id_bundle      = ID_BUNDLE;
+        configuration_meta_int.route.to.id_engine      = ID_LANE;
         configuration_meta_int.route.to.id_buffer      = 0;
         configuration_meta_int.address.base            = 0;
         configuration_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);

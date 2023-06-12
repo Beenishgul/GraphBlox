@@ -23,9 +23,8 @@ import PKG_VERTEX::*;
 import PKG_CACHE::*;
 
 module vertex_cu #(
-    parameter ENGINE_ID_VERTEX   = 0 ,
-    parameter ENGINE_BUNDLES_NUM = 4 ,
-    parameter COUNTER_WIDTH      = 32
+    parameter ID_CU       = 0,
+    parameter NUM_BUNDLES = 4
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
@@ -213,9 +212,9 @@ module vertex_cu #(
     assign engine_stride_index_fifo_response_signals_in.rd_en = 1'b1  ;
 
     engine_csr_index #(
-        .ENGINE_ID_VERTEX(ENGINE_ID_VERTEX),
-        .ENGINE_ID_BUNDLE(0               ),
-        .ENGINE_ID_ENGINE(0               )
+        .ID_CU    (ID_CU),
+        .ID_BUNDLE(0    ),
+        .ID_LANE  (0    )
     ) inst_engine_stride_index (
         .ap_clk                   (ap_clk                                       ),
         .areset                   (areset_stride_index                          ),
@@ -244,8 +243,8 @@ module vertex_cu #(
     assign vertex_bundles_fifo_request_out_signals_in = fifo_request_signals_in_reg ;
 
     vertex_bundles #(
-        .ENGINE_ID_VERTEX  (ENGINE_ID_VERTEX  ),
-        .ENGINE_BUNDLES_NUM(ENGINE_BUNDLES_NUM)
+        .ID_CU      (ID_CU      ),
+        .NUM_BUNDLES(NUM_BUNDLES)
     ) inst_vertex_bundles (
         .ap_clk                      (ap_clk                                     ),
         .areset                      (areset_bundles                             ),
