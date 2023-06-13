@@ -131,15 +131,19 @@ module lane_buffer_filter #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_buffer_filter) begin
+        if (areset_lane_alu_filter) begin
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_request_engine_out_signals_in_reg <= 0;
+            fifo_response_memory_in_signals_in_reg <= 0;
+            fifo_request_memory_out_signals_in_reg <= 0;
             response_engine_in_reg.valid           <= 1'b0;
             response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
             fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
             fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
+            fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
+            fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
             response_engine_in_reg.valid           <= response_engine_in.valid;
             response_memory_in_reg.valid           <= response_memory_in.valid ;
         end
@@ -154,7 +158,7 @@ module lane_buffer_filter #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_buffer_filter) begin
+        if (areset_lane_alu_filter) begin
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0 ;
@@ -169,6 +173,8 @@ module lane_buffer_filter #(
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
         fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_int;
+        fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
+        fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_int;
         request_engine_out.payload          <= request_engine_out_int.payload;
         request_memory_out.payload          <= request_memory_out_int.payload ;
     end
