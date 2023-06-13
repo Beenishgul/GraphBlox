@@ -59,7 +59,7 @@ generate
     assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; // verify - Writes data of the size of CACHE_BACKEND_DATA_W
     assign m_axi_awburst = 2'd0;
     assign m_axi_awlock  = 1'b0; // 00 - Normal Access
-    assign m_axi_awcache = 4'b1111;
+    assign m_axi_awcache = 4'b0011;
     assign m_axi_awprot  = 3'd0;
     assign m_axi_wlast   = m_axi_wvalid_int;
     assign m_axi_awqos   = 4'd0;
@@ -167,7 +167,7 @@ generate
       //Constant AXI signals
       assign m_axi_awid    = CACHE_AXI_ID;
       assign m_axi_awlock  = 1'b0;
-      assign m_axi_awcache = 4'b1111;
+      assign m_axi_awcache = 4'b0011;
       assign m_axi_awprot  = 3'd0;
 
       //Burst parameters - single

@@ -146,6 +146,6 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/bram_512x32_asym_512wrt_64rd.xci"
 # echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
-echo $newtext >> ${CFG_FILE_NAME}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
+# echo $newtext >> ${CFG_FILE_NAME}
 
