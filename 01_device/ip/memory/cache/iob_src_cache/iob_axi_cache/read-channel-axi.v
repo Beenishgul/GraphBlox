@@ -48,7 +48,7 @@ assign m_axi_rready  = m_axi_rready_int;
 //Constant AXI signals
 assign m_axi_arid    = CACHE_AXI_ID;
 assign m_axi_arlock  = 1'b0;
-assign m_axi_arcache = 4'b1111;
+assign m_axi_arcache = 4'b0011;
 assign m_axi_arprot  = 3'd0;
 //Burst parameters
 assign m_axi_arlen   = 8'd0; //will choose the burst lenght depending on the cache's and slave's data width
