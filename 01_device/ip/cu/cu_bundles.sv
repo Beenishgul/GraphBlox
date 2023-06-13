@@ -148,7 +148,7 @@ module cu_bundles #(
         end
         else begin
             if (descriptor_in_reg.valid) begin
-                if(counter >= 200) begin
+                if(counter >= 1000) begin
                     done_signal_reg <= 1'b1;
                     counter         <= 0;
                 end
