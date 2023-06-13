@@ -505,10 +505,10 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
 # export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
-# ----------------------------------------------------------------------------
-# generate SYSTEM CACHE
-# ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate SYSTEM CACHE: AXI_system_cache_line512xaddr64_4way_1MB"]" 
+# # ----------------------------------------------------------------------------
+# # generate SYSTEM CACHE
+# # ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate SYSTEM CACHE: AXI_system_cache_line512xaddr64_4way_64KB"]" 
 
 set module_name system_cache_512x64
 create_ip -name system_cache            \
@@ -520,15 +520,14 @@ create_ip -name system_cache            \
 
 set_property -dict [list                                    \
                     CONFIG.C_CACHE_DATA_WIDTH {512}         \
-                    CONFIG.C_CACHE_SIZE {131072}            \
+                    CONFIG.C_CACHE_SIZE {65536}             \
                     CONFIG.C_M0_AXI_ADDR_WIDTH {64}         \
                     CONFIG.C_M0_AXI_DATA_WIDTH {512}        \
                     CONFIG.C_NUM_GENERIC_PORTS {1}          \
                     CONFIG.C_NUM_OPTIMIZED_PORTS {0}        \
-                    CONFIG.C_NUM_WAYS {4}                   \
-                    CONFIG.C_ENABLE_NON_SECURE 0            \
-                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH.VALUE_SRC PROPAGATED \
-                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH.VALUE_SRC PROPAGATED \
+                    CONFIG.C_NUM_WAYS {2}                   \
+                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH {512}    \
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH {64}     \
                     ] [get_ips ${module_name}]
 
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
