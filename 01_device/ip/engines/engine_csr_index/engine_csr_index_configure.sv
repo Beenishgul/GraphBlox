@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:25:40
+// Revise : 2023-06-13 23:42:55
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -122,11 +122,11 @@ module engine_csr_index_configure #(
     assign fifo_response_dout_int_offset_sequence = (fifo_response_dout_int.payload.meta.address.offset >> fifo_response_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configuration_meta_int.route.from.id_vertex    = ID_CU;
+        configuration_meta_int.route.from.id_cu        = ID_CU;
         configuration_meta_int.route.from.id_bundle    = ID_BUNDLE;
         configuration_meta_int.route.from.id_lane      = ID_LANE;
         configuration_meta_int.route.from.id_buffer    = 0;
-        configuration_meta_int.route.to.id_vertex      = ID_CU;
+        configuration_meta_int.route.to.id_cu          = ID_CU;
         configuration_meta_int.route.to.id_bundle      = ID_BUNDLE;
         configuration_meta_int.route.to.id_lane        = ID_LANE;
         configuration_meta_int.route.to.id_buffer      = 0;
@@ -189,7 +189,7 @@ module engine_csr_index_configure #(
                         configuration_valid_reg[6]                      <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
-                        configuration_reg.payload.meta.route.to.id_vertex <= fifo_response_dout_int.payload.data.field_0[(CU_VERTEX_COUNT_WIDTH_BITS)-1:0];
+                        configuration_reg.payload.meta.route.to.id_cu     <= fifo_response_dout_int.payload.data.field_0[(CU_VERTEX_COUNT_WIDTH_BITS)-1:0];
                         configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:CU_VERTEX_COUNT_WIDTH_BITS];
                         configuration_reg.payload.meta.route.to.id_lane   <= fifo_response_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
                         configuration_reg.payload.meta.route.to.id_buffer <= fifo_response_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
