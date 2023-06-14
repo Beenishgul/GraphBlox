@@ -399,18 +399,20 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
+    assign bundle_arbiter_1_to_N_response_in = response_memory_in_int;
     generate
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_1_to_N_response
-            assign bundle_arbiter_1_to_N_response_in[i] = response_memory_in_int;
             assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_memory_in_signals_out[i].prog_full;
-
             assign bundle_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
             assign bundle_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_1_to_N_response_memory_in (
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(NUM_BUNDLES),
+        .ID_LEVEL            (1          )
+    ) inst_bundle_arbiter_1_to_N_response_memory_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N                          ),
         .response_in              (bundle_arbiter_1_to_N_response_in              ),

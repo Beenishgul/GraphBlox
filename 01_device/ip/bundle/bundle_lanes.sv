@@ -485,18 +485,20 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Engine Response Generator
 // --------------------------------------------------------------------------------------
+    assign arbiter_1_to_N_lanes_response_in = response_engine_in_int;
     generate
         for (i=0; i<NUM_LANES; i++) begin : generate_arbiter_1_to_N_engine_response
-            assign arbiter_1_to_N_lanes_response_in[i] = response_engine_in_int;
             assign arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full;
-
             assign lanes_response_engine_in[i] = arbiter_1_to_N_lanes_response_out[i];
             assign lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(NUM_LANES)) inst_arbiter_1_to_N_engine_response_in (
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(NUM_LANES),
+        .ID_LEVEL            (2        )
+    ) inst_arbiter_1_to_N_engine_response_in (
         .ap_clk                   (ap_clk                                        ),
         .areset                   (areset_arbiter_1_to_N_lanes                   ),
         .response_in              (arbiter_1_to_N_lanes_response_in              ),
@@ -540,18 +542,20 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
+    assign arbiter_1_to_N_memory_response_in = response_memory_in_int;
     generate
         for (i=0; i<NUM_LANES; i++) begin : generate_arbiter_1_to_N_memory_response
-            assign arbiter_1_to_N_memory_response_in[i] = response_memory_in_int;
             assign arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_memory_in_signals_out[i].prog_full;
-
             assign lanes_response_memory_in[i] = arbiter_1_to_N_memory_response_out[i];
             assign lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(.NUM_MEMORY_REQUESTOR(NUM_LANES)) inst_arbiter_1_to_N_memory_response_in (
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(NUM_LANES),
+        .ID_LEVEL            (2        )
+    ) inst_arbiter_1_to_N_memory_response_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N_memory                   ),
         .response_in              (arbiter_1_to_N_memory_response_in              ),
