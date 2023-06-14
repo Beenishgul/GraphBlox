@@ -3,12 +3,12 @@
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
-// Copyright (c) 2021-2022 All rights reserved
+// Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : PKG_GLOBALS.sv
+// File   : 01_pkg_globals.sv
 // Create : 2022-11-16 19:43:34
-// Revise : 2022-11-16 19:43:34
+// Revise : 2023-06-13 23:25:34
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 `timescale 1 ns / 1 ps
@@ -38,7 +38,7 @@ package PKG_GLOBALS;
 
 	parameter CU_VERTEX_COUNT_WIDTH_BITS = $clog2(CU_VERTEX_COUNT_TOTAL); // 5
 	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL        ;
-	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL        ;
+	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_ENGINE_COUNT_TOTAL        ;
 	parameter CU_BUFFER_COUNT_WIDTH_BITS = CU_BUFFER_COUNT_TOTAL        ;
 
 // --------------------------------------------------------------------------------------

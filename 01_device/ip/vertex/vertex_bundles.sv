@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : vertex_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-01-23 16:17:05
+// Revise : 2023-06-13 23:27:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module vertex_bundles #(
-    parameter ID_CU   = 0,
+    parameter ID_CU       = 0,
     parameter NUM_BUNDLES = 4
 ) (
     // System Signals
@@ -107,26 +107,26 @@ module vertex_bundles #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-    logic                          areset_arbiter_N_to_1                                                 ;
-    MemoryPacket                   bundle_arbiter_N_to_1_request_in              [NUM_BUNDLES-1:0];
-    FIFOStateSignalsInput          bundle_arbiter_N_to_1_fifo_request_signals_in                         ;
-    FIFOStateSignalsOutput         bundle_arbiter_N_to_1_fifo_request_signals_out                        ;
-    logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_request_in                              ;
-    logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_grant_out                               ;
-    MemoryPacket                   bundle_arbiter_N_to_1_request_out                                     ;
-    logic                          bundle_arbiter_N_to_1_fifo_setup_signal                               ;
+    logic                   areset_arbiter_N_to_1                                          ;
+    MemoryPacket            bundle_arbiter_N_to_1_request_in              [NUM_BUNDLES-1:0];
+    FIFOStateSignalsInput   bundle_arbiter_N_to_1_fifo_request_signals_in                  ;
+    FIFOStateSignalsOutput  bundle_arbiter_N_to_1_fifo_request_signals_out                 ;
+    logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_request_in                       ;
+    logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_grant_out                        ;
+    MemoryPacket            bundle_arbiter_N_to_1_request_out                              ;
+    logic                   bundle_arbiter_N_to_1_fifo_setup_signal                        ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
-    logic                  areset_arbiter_1_to_N                                                  ;
-    MemoryPacket           bundle_arbiter_1_to_N_response_in                                      ;
+    logic                  areset_arbiter_1_to_N                                           ;
+    MemoryPacket           bundle_arbiter_1_to_N_response_in                               ;
     FIFOStateSignalsInput  bundle_arbiter_1_to_N_fifo_response_signals_in [NUM_BUNDLES-1:0];
-    FIFOStateSignalsOutput bundle_arbiter_1_to_N_fifo_response_signals_out                        ;
+    FIFOStateSignalsOutput bundle_arbiter_1_to_N_fifo_response_signals_out                 ;
     MemoryPacket           bundle_arbiter_1_to_N_response_out             [NUM_BUNDLES-1:0];
-    logic                  bundle_arbiter_1_to_N_fifo_setup_signal                                ;
+    logic                  bundle_arbiter_1_to_N_fifo_setup_signal                         ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
