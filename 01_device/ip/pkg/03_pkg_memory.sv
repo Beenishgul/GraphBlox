@@ -3,13 +3,13 @@
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
-// Copyright (c) 2021-2022 All rights reserved
+// Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : PKG_MEMORY.sv
+// File   : 03_pkg_memory.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2022-11-29 16:14:59
-// Editor : sublime text4, tab size (4)
+// Revise : 2023-06-13 23:25:25
+// Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 
@@ -108,7 +108,7 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
 typedef struct packed{
   logic [CU_VERTEX_COUNT_WIDTH_BITS-1:0] id_vertex; // SIZE = 4 bits  - up to 4 vertex cu - pending
   logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
-  logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
+  logic [  CU_LANE_COUNT_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 engines per bundle
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 12 bits - up to 12 buffers in the descriptor
 } MemoryPacketArbitrate;
 
