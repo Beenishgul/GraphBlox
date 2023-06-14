@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:33:52
+// Revise : 2023-06-13 23:49:36
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -74,25 +74,25 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
-    logic                  bundle_areset                                   [NUM_BUNDLES-1:0];
-    KernelDescriptor       bundle_lanes_descriptor_in                      [NUM_BUNDLES-1:0];
-    MemoryPacket           bundle_lanes_response_engine_in                 [NUM_BUNDLES-1:0];
-    FIFOStateSignalsInput  bundle_lanes_fifo_response_engine_in_signals_in [NUM_BUNDLES-1:0];
-    FIFOStateSignalsOutput bundle_lanes_fifo_response_engine_in_signals_out[NUM_BUNDLES-1:0];
-    MemoryPacket           bundle_lanes_response_memory_in                 [NUM_BUNDLES-1:0];
-    FIFOStateSignalsInput  bundle_lanes_fifo_response_memory_in_signals_in [NUM_BUNDLES-1:0];
-    FIFOStateSignalsOutput bundle_lanes_fifo_response_memory_in_signals_out[NUM_BUNDLES-1:0];
-    MemoryPacket           bundle_lanes_request_engine_out                 [NUM_BUNDLES-1:0];
-    FIFOStateSignalsInput  bundle_lanes_fifo_request_engine_out_signals_in [NUM_BUNDLES-1:0];
-    FIFOStateSignalsOutput bundle_lanes_fifo_request_engine_out_signals_out[NUM_BUNDLES-1:0];
-    MemoryPacket           bundle_lanes_request_memory_out                 [NUM_BUNDLES-1:0];
-    FIFOStateSignalsInput  bundle_lanes_fifo_request_memory_out_signals_in [NUM_BUNDLES-1:0];
-    FIFOStateSignalsOutput bundle_lanes_fifo_request_memory_out_signals_out[NUM_BUNDLES-1:0];
-    logic                  bundle_lanes_fifo_setup_signal                  [NUM_BUNDLES-1:0];
-    logic                  bundle_lanes_done_out                           [NUM_BUNDLES-1:0];
+    logic                  bundle_areset                             [NUM_BUNDLES-1:0];
+    KernelDescriptor       bundle_descriptor_in                      [NUM_BUNDLES-1:0];
+    MemoryPacket           bundle_response_lanes_in                  [NUM_BUNDLES-1:0];
+    FIFOStateSignalsInput  bundle_fifo_response_lanes_in_signals_in  [NUM_BUNDLES-1:0];
+    FIFOStateSignalsOutput bundle_fifo_response_lanes_in_signals_out [NUM_BUNDLES-1:0];
+    MemoryPacket           bundle_response_memory_in                 [NUM_BUNDLES-1:0];
+    FIFOStateSignalsInput  bundle_fifo_response_memory_in_signals_in [NUM_BUNDLES-1:0];
+    FIFOStateSignalsOutput bundle_fifo_response_memory_in_signals_out[NUM_BUNDLES-1:0];
+    MemoryPacket           bundle_request_lanes_out                  [NUM_BUNDLES-1:0];
+    FIFOStateSignalsInput  bundle_fifo_request_lanes_out_signals_in  [NUM_BUNDLES-1:0];
+    FIFOStateSignalsOutput bundle_fifo_request_lanes_out_signals_out [NUM_BUNDLES-1:0];
+    MemoryPacket           bundle_request_memory_out                 [NUM_BUNDLES-1:0];
+    FIFOStateSignalsInput  bundle_fifo_request_memory_out_signals_in [NUM_BUNDLES-1:0];
+    FIFOStateSignalsOutput bundle_fifo_request_memory_out_signals_out[NUM_BUNDLES-1:0];
+    logic                  bundle_fifo_setup_signal                  [NUM_BUNDLES-1:0];
+    logic                  bundle_done_out                           [NUM_BUNDLES-1:0];
 
-    logic [NUM_BUNDLES-1:0] bundle_lanes_fifo_setup_signal_reg;
-    logic [NUM_BUNDLES-1:0] bundle_lanes_done_out_reg         ;
+    logic [NUM_BUNDLES-1:0] bundle_fifo_setup_signal_reg;
+    logic [NUM_BUNDLES-1:0] bundle_done_out_reg         ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles -  Memory Arbitration OUTPUT
@@ -153,10 +153,10 @@ module cu_bundles #(
                     counter         <= 0;
                 end
                 else begin
-                    // if(engine_stride_index_request_out.valid & (engine_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
+                    // if(lanes_stride_index_request_out.valid & (lanes_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
                     counter <= counter + 1;
                     // if (counter == 0)
-                    //     $display("MSG:  VERTEX ID -> %0d", engine_stride_index_request_out.payload.data.field_0);
+                    //     $display("MSG:  VERTEX ID -> %0d", lanes_stride_index_request_out.payload.data.field_0);
                     // end else
                     // counter <= counter;
                 end
@@ -213,9 +213,9 @@ module cu_bundles #(
             done_out                 <= 0;
         end
         else begin
-            fifo_setup_signal        <= fifo_request_memory_out_setup_signal_int | fifo_response_memory_in_setup_signal_int | (|bundle_lanes_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
+            fifo_setup_signal        <= fifo_request_memory_out_setup_signal_int | fifo_response_memory_in_setup_signal_int | (|bundle_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
             request_memory_out.valid <= request_memory_out_int.valid ;
-            // done_out                 <= (&bundle_lanes_done_out_reg) | done_signal_reg;
+            // done_out                 <= (&bundle_done_out_reg) | done_signal_reg;
             done_out                 <= done_signal_reg;
         end
     end
@@ -317,15 +317,15 @@ module cu_bundles #(
 
             always_ff @(posedge ap_clk) begin
                 if (areset_cu_bundles) begin
-                    bundle_lanes_descriptor_in[i].valid <= 0;
+                    bundle_descriptor_in[i].valid <= 0;
                 end
                 else begin
-                    bundle_lanes_descriptor_in[i].valid <= descriptor_in_reg.valid;
+                    bundle_descriptor_in[i].valid <= descriptor_in_reg.valid;
                 end
             end
 
             always_ff @(posedge ap_clk) begin
-                bundle_lanes_descriptor_in[i].payload <= descriptor_in_reg.payload;
+                bundle_descriptor_in[i].payload <= descriptor_in_reg.payload;
             end
         end
     endgenerate
@@ -337,12 +337,12 @@ module cu_bundles #(
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_reg_output
             always_ff @(posedge ap_clk) begin
                 if (areset_cu_bundles) begin
-                    bundle_lanes_fifo_setup_signal_reg[i] <= 1'b1;
-                    bundle_lanes_done_out_reg[i]          <= 1'b1;
+                    bundle_fifo_setup_signal_reg[i] <= 1'b1;
+                    bundle_done_out_reg[i]          <= 1'b1;
                 end
                 else begin
-                    bundle_lanes_fifo_setup_signal_reg[i] <= bundle_lanes_fifo_setup_signal[i];
-                    bundle_lanes_done_out_reg[i]          <= bundle_lanes_done_out[i];
+                    bundle_fifo_setup_signal_reg[i] <= bundle_fifo_setup_signal[i];
+                    bundle_done_out_reg[i]          <= bundle_done_out[i];
                 end
             end
         end
@@ -353,15 +353,15 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles - [0]->[1]->[2]->[3]->[4]->[0]
 // --------------------------------------------------------------------------------------
-    assign bundle_lanes_response_engine_in[0] = bundle_lanes_request_engine_out[NUM_BUNDLES-1];
-    assign bundle_lanes_fifo_request_engine_out_signals_in[NUM_BUNDLES-1].rd_en = ~bundle_lanes_fifo_response_engine_in_signals_out[0].prog_full;
-    assign bundle_lanes_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
+    assign bundle_response_lanes_in[0] = bundle_request_lanes_out[NUM_BUNDLES-1];
+    assign bundle_fifo_request_lanes_out_signals_in[NUM_BUNDLES-1].rd_en = ~bundle_fifo_response_lanes_in_signals_out[0].prog_full;
+    assign bundle_fifo_response_lanes_in_signals_in[0].rd_en = 1'b1;
 
     generate
         for (i=1; i<NUM_BUNDLES; i++) begin : generate_bundle_intra_signals
-            assign bundle_lanes_response_engine_in[i] = bundle_lanes_request_engine_out[i-1];
-            assign bundle_lanes_fifo_request_engine_out_signals_in[i-1].rd_en = ~bundle_lanes_fifo_response_engine_in_signals_out[i].prog_full;
-            assign bundle_lanes_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
+            assign bundle_response_lanes_in[i] = bundle_request_lanes_out[i-1];
+            assign bundle_fifo_request_lanes_out_signals_in[i-1].rd_en = ~bundle_fifo_response_lanes_in_signals_out[i].prog_full;
+            assign bundle_fifo_response_lanes_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
@@ -374,9 +374,9 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_N_to_1_request_in
-            assign bundle_arbiter_N_to_1_request_in[i]         = bundle_lanes_request_memory_out[i];
-            assign bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_lanes_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
-            assign bundle_lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
+            assign bundle_arbiter_N_to_1_request_in[i]         = bundle_request_memory_out[i];
+            assign bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
+            assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
         end
     endgenerate
 
@@ -402,10 +402,10 @@ module cu_bundles #(
     generate
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_1_to_N_response
             assign bundle_arbiter_1_to_N_response_in[i] = response_memory_in_int;
-            assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_lanes_fifo_response_memory_in_signals_out[i].prog_full;
+            assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_memory_in_signals_out[i].prog_full;
 
-            assign bundle_lanes_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
-            assign bundle_lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+            assign bundle_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
+            assign bundle_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
@@ -424,28 +424,28 @@ module cu_bundles #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_lanes
+        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
             bundle_lanes #(
                 .ID_CU    (ID_CU),
                 .ID_BUNDLE(i    )
             ) inst_bundle_lanes (
-                .ap_clk                             (ap_clk                                             ),
-                .areset                             (bundle_areset[i]                                   ),
-                .descriptor_in                      (bundle_lanes_descriptor_in[i]                      ),
-                .response_engine_in                 (bundle_lanes_response_engine_in[i]                 ),
-                .fifo_response_engine_in_signals_in (bundle_lanes_fifo_response_engine_in_signals_in[i] ),
-                .fifo_response_engine_in_signals_out(bundle_lanes_fifo_response_engine_in_signals_out[i]),
-                .response_memory_in                 (bundle_lanes_response_memory_in[i]                 ),
-                .fifo_response_memory_in_signals_in (bundle_lanes_fifo_response_memory_in_signals_in[i] ),
-                .fifo_response_memory_in_signals_out(bundle_lanes_fifo_response_memory_in_signals_out[i]),
-                .request_engine_out                 (bundle_lanes_request_engine_out[i]                 ),
-                .fifo_request_engine_out_signals_in (bundle_lanes_fifo_request_engine_out_signals_in[i] ),
-                .fifo_request_engine_out_signals_out(bundle_lanes_fifo_request_engine_out_signals_out[i]),
-                .request_memory_out                 (bundle_lanes_request_memory_out[i]                 ),
-                .fifo_request_memory_out_signals_in (bundle_lanes_fifo_request_memory_out_signals_in[i] ),
-                .fifo_request_memory_out_signals_out(bundle_lanes_fifo_request_memory_out_signals_out[i]),
-                .fifo_setup_signal                  (bundle_lanes_fifo_setup_signal[i]                  ),
-                .done_out                           (bundle_lanes_done_out[i]                           )
+                .ap_clk                             (ap_clk                                       ),
+                .areset                             (bundle_areset[i]                             ),
+                .descriptor_in                      (bundle_descriptor_in[i]                      ),
+                .response_lanes_in                  (bundle_response_lanes_in[i]                  ),
+                .fifo_response_lanes_in_signals_in  (bundle_fifo_response_lanes_in_signals_in[i]  ),
+                .fifo_response_lanes_in_signals_out (bundle_fifo_response_lanes_in_signals_out[i] ),
+                .response_memory_in                 (bundle_response_memory_in[i]                 ),
+                .fifo_response_memory_in_signals_in (bundle_fifo_response_memory_in_signals_in[i] ),
+                .fifo_response_memory_in_signals_out(bundle_fifo_response_memory_in_signals_out[i]),
+                .request_lanes_out                  (bundle_request_lanes_out[i]                  ),
+                .fifo_request_lanes_out_signals_in  (bundle_fifo_request_lanes_out_signals_in[i]  ),
+                .fifo_request_lanes_out_signals_out (bundle_fifo_request_lanes_out_signals_out[i] ),
+                .request_memory_out                 (bundle_request_memory_out[i]                 ),
+                .fifo_request_memory_out_signals_in (bundle_fifo_request_memory_out_signals_in[i] ),
+                .fifo_request_memory_out_signals_out(bundle_fifo_request_memory_out_signals_out[i]),
+                .fifo_setup_signal                  (bundle_fifo_setup_signal[i]                  ),
+                .done_out                           (bundle_done_out[i]                           )
             );
         end
     endgenerate
