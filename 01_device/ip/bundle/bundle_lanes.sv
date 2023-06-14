@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 01:32:37
+// Revise : 2023-06-14 01:35:21
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -488,7 +488,7 @@ module bundle_lanes #(
     generate
         for (i=0; i<NUM_LANES; i++) begin : generate_arbiter_1_to_N_engine_response
             assign arbiter_1_to_N_lanes_response_in[i] = response_engine_in_int;
-            assign arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_responslanene_in_signals_out[i].prog_full;
+            assign arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full;
 
             assign lanes_response_engine_in[i] = arbiter_1_to_N_lanes_response_out[i];
             assign lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
