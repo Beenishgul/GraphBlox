@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : arbiter_1_to_N_response.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-01-11 23:47:45
+// Revise : 2023-06-14 03:57:10
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -23,7 +23,8 @@ module arbiter_1_to_N_response #(
   parameter NUM_MEMORY_REQUESTOR = 2                         ,
   parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload),
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
-  parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR
+  parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
+  parameter ID_LEVEL             = 1
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
@@ -38,23 +39,23 @@ module arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 // Cache response variables
 // --------------------------------------------------------------------------------------
-  logic areset_control;
-  logic areset_fifo   ;
-  logic areset_demux  ;
+  logic areset_control  ;
+  logic areset_fifo     ;
+  logic areset_demux_bus;
 
-  MemoryPacket response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
-  MemoryPacket response_in_reg                           ;
+  MemoryPacket response_in_reg;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-  MemoryPacketPayload              fifo_response_din                 ;
-  MemoryPacket                     fifo_response_dout_int            ;
-  MemoryPacketPayload              fifo_response_dout                ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en;
-  FIFOStateSignalsInput            fifo_response_signals_in_int      ;
-  FIFOStateSignalsOutput           fifo_response_signals_out_int     ;
-  logic                            fifo_response_setup_signal_int    ;
+  MemoryPacketPayload              fifo_response_din                    ;
+  MemoryPacket                     fifo_response_dout_int               ;
+  MemoryPacketPayload              fifo_response_dout                   ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en   ;
+  logic                            fifo_response_signals_in_reg_peek_int;
+  FIFOStateSignalsInput            fifo_response_signals_in_int         ;
+  FIFOStateSignalsOutput           fifo_response_signals_out_int        ;
+  logic                            fifo_response_setup_signal_int       ;
 
 // --------------------------------------------------------------------------------------
 // Demux Logic and arbitration
@@ -69,9 +70,9 @@ module arbiter_1_to_N_response #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_control <= areset;
-    areset_fifo    <= areset;
-    areset_demux   <= areset;
+    areset_control   <= areset;
+    areset_fifo      <= areset;
+    areset_demux_bus <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -99,6 +100,25 @@ module arbiter_1_to_N_response #(
         end
       end
     end
+
+    case (ID_LEVEL)
+      0 :
+        begin
+          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        end
+      1 :
+        begin
+          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+        end
+      2 :
+        begin
+          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+        end
+      default :
+        begin
+          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        end
+    endcase
   endgenerate
 
 // --------------------------------------------------------------------------------------
@@ -126,7 +146,25 @@ module arbiter_1_to_N_response #(
           demux_bus_data_in_valid[i] <= 1'b0;
         end else begin
           response_out[i].valid       <= demux_bus_data_out_valid[i];
-          demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
+
+          case (ID_LEVEL)
+            0       :
+              begin
+                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+              end
+            1       :
+              begin
+                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
+              end
+            2       :
+              begin
+                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
+              end
+            default :
+              begin
+                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+              end
+          endcase
         end
       end
 
@@ -137,7 +175,25 @@ module arbiter_1_to_N_response #(
 
     always_ff @(posedge ap_clk) begin
       demux_bus_data_in <= fifo_response_dout_int.payload;
-      demux_bus_sel_in  <= fifo_response_dout_int.payload.meta.route.from.id_bundle;
+
+      case (ID_LEVEL)
+        0       :
+          begin
+            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+          end
+        1       :
+          begin
+            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_bundle[NUM_MEMORY_REQUESTOR-1:0];
+          end
+        2       :
+          begin
+            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_lane[NUM_MEMORY_REQUESTOR-1:0];
+          end
+        default :
+          begin
+            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+          end
+      endcase
     end
   endgenerate
 // --------------------------------------------------------------------------------------
@@ -167,8 +223,8 @@ module arbiter_1_to_N_response #(
   assign fifo_response_din                  = response_in_reg.payload;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle);
-  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
+  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg_peek_int;
+  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg_peek_int;
   assign fifo_response_dout_int.payload     = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
