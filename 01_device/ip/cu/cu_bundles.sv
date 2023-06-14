@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:25:59
+// Revise : 2023-06-13 23:33:52
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -355,11 +355,13 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
     assign bundle_lanes_response_engine_in[0] = bundle_lanes_request_engine_out[NUM_BUNDLES-1];
     assign bundle_lanes_fifo_request_engine_out_signals_in[NUM_BUNDLES-1].rd_en = ~bundle_lanes_fifo_response_engine_in_signals_out[0].prog_full;
+    assign bundle_lanes_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
 
     generate
         for (i=1; i<NUM_BUNDLES; i++) begin : generate_bundle_intra_signals
             assign bundle_lanes_response_engine_in[i] = bundle_lanes_request_engine_out[i-1];
             assign bundle_lanes_fifo_request_engine_out_signals_in[i-1].rd_en = ~bundle_lanes_fifo_response_engine_in_signals_out[i].prog_full;
+            assign bundle_lanes_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 

@@ -253,9 +253,9 @@ module kernel_cu #(
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
   kernel_setup #(
-    .ID_CU    (CU_VERTEX_COUNT_WIDTH_BITS{1'b1}),
-    .ID_BUNDLE(CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}),
-    .ID_LANE  (CU_LANE_COUNT_WIDTH_BITS{1'b1}  )
+    .ID_CU    (0                                 ),
+    .ID_BUNDLE({CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}}),
+    .ID_LANE  ({CU_LANE_COUNT_WIDTH_BITS{1'b1}}  )
   ) inst_kernel_setup (
     .ap_clk                   (ap_clk                                ),
     .areset                   (areset_setup                          ),
@@ -273,7 +273,7 @@ module kernel_cu #(
 // Bundles CU
 // --------------------------------------------------------------------------------------
   cu_bundles #(
-    .ID_CU      (1              ),
+    .ID_CU      (0              ),
     .NUM_BUNDLES(CU_BUNDLE_COUNT)
   ) inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
