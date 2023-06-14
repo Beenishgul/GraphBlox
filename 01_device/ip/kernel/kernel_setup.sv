@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_setup.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:26:46
+// Revise : 2023-06-13 23:42:51
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -274,11 +274,11 @@ module kernel_setup #(
         configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
-        configuration_comb.payload.meta.route.from.id_vertex    = ID_CU;
+        configuration_comb.payload.meta.route.from.id_cu        = ID_CU;
         configuration_comb.payload.meta.route.from.id_bundle    = ID_BUNDLE;
         configuration_comb.payload.meta.route.from.id_lane      = ID_LANE;
         configuration_comb.payload.meta.route.from.id_buffer    = 0;
-        configuration_comb.payload.meta.route.to.id_vertex      = {CU_VERTEX_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.to.id_cu          = ID_CU;
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_lane        = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_buffer      = 0;
