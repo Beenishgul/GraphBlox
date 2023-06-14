@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cache_generator_request.sv
 // Create : 2023-06-13 23:23:08
-// Revise : 2023-06-13 23:26:10
+// Revise : 2023-06-14 18:43:36
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -227,7 +227,6 @@ module cache_generator_request #(
   ) inst_arbiter_bus_N_in_1_out (
     .ap_clk           (ap_clk           ),
     .areset           (areset_arbiter   ),
-    .arbiter_enable   (1'b1             ),
     .arbiter_req      (arbiter_request  ),
     .arbiter_bus_valid(arbiter_bus_valid),
     .arbiter_bus_in   (arbiter_bus_in   ),

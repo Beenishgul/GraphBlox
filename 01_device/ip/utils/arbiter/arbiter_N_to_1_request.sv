@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : arbiter_N_to_1_request.sv
 // Create : 2023-06-13 23:26:21
-// Revise : 2023-06-13 23:26:35
+// Revise : 2023-06-14 18:43:20
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -214,7 +214,6 @@ module arbiter_N_to_1_request #(
   ) inst_arbiter_bus_N_in_1_out (
     .ap_clk           (ap_clk           ),
     .areset           (areset_arbiter   ),
-    .arbiter_enable   (1'b1             ),
     .arbiter_req      (arbiter_request  ),
     .arbiter_bus_valid(arbiter_bus_valid),
     .arbiter_bus_in   (arbiter_bus_in   ),
