@@ -470,14 +470,14 @@ module bundle_lanes #(
 
     assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = ~fifo_request_lanes_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
-    lane_arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_LANES)) inst_lane_arbiter_N_to_1_engine_request_out (
+    arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_LANES)) inst_lane_arbiter_N_to_1_engine_request_out (
         .ap_clk                  (ap_clk                                           ),
         .areset                  (areset_lane_arbiter_N_to_1_lanes                 ),
         .request_in              (lane_arbiter_N_to_1_lane_request_in              ),
         .fifo_request_signals_in (lane_arbiter_N_to_1_lane_fifo_request_signals_in ),
         .fifo_request_signals_out(lane_arbiter_N_to_1_lane_fifo_request_signals_out),
-        .lane_arbiter_request_in (lane_arbiter_N_to_1_lane_lane_arbiter_request_in ),
-        .lane_arbiter_grant_out  (lane_arbiter_N_to_1_lane_lane_arbiter_grant_out  ),
+        .arbiter_request_in      (lane_arbiter_N_to_1_lane_lane_arbiter_request_in ),
+        .arbiter_grant_out       (lane_arbiter_N_to_1_lane_lane_arbiter_grant_out  ),
         .request_out             (lane_arbiter_N_to_1_lane_request_out             ),
         .fifo_setup_signal       (lane_arbiter_N_to_1_lane_fifo_setup_signal       )
     );
@@ -497,7 +497,7 @@ module bundle_lanes #(
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    lane_arbiter_1_to_N_response #(
+    arbiter_1_to_N_response #(
         .NUM_MEMORY_REQUESTOR(NUM_LANES),
         .ID_LEVEL            (2        )
     ) inst_lane_arbiter_1_to_N_engine_response_in (
@@ -533,8 +533,8 @@ module bundle_lanes #(
         .request_in              (lane_arbiter_N_to_1_memory_request_in              ),
         .fifo_request_signals_in (lane_arbiter_N_to_1_memory_fifo_request_signals_in ),
         .fifo_request_signals_out(lane_arbiter_N_to_1_memory_fifo_request_signals_out),
-        .lane_arbiter_request_in (lane_arbiter_N_to_1_memory_lane_arbiter_request_in ),
-        .lane_arbiter_grant_out  (lane_arbiter_N_to_1_memory_lane_arbiter_grant_out  ),
+        .arbiter_request_in      (lane_arbiter_N_to_1_memory_lane_arbiter_request_in ),
+        .arbiter_grant_out       (lane_arbiter_N_to_1_memory_lane_arbiter_grant_out  ),
         .request_out             (lane_arbiter_N_to_1_memory_request_out             ),
         .fifo_setup_signal       (lane_arbiter_N_to_1_memory_fifo_setup_signal       )
     );

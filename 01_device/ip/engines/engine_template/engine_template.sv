@@ -376,7 +376,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -398,7 +398,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -420,7 +420,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -442,7 +442,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -464,7 +464,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -486,7 +486,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -508,7 +508,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
@@ -531,7 +531,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in       = 0;
                 assign template_fifo_response_memory_in_signals_out      = 0;
                 assign template_request_engine_out                       = 0;
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_request_out_signals_out_int.prog_full;
+                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_engine_out_signals_out      = 0;
                 assign template_request_memory_out                       = 0;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
