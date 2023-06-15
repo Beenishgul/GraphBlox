@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 21:45:32
+// Revise : 2023-06-14 23:51:25
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module cu_bundles #(
-    parameter ID_CU       = 0,
-    parameter NUM_BUNDLES = 4
+    parameter ID_CU = 0,
+    `include "cu_parameters.vh"
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -429,7 +429,11 @@ module cu_bundles #(
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
             bundle_lanes #(
                 .ID_CU    (ID_CU),
-                .ID_BUNDLE(i    )
+                .ID_BUNDLE(i    ),
+                .NUM_LANES(NUM_LANES),
+                .NUM_ENGINES(NUM_ENGINES),
+                .LANES_CONFIG(LANES_CONFIG),
+                .ENGINES_CONFIG(ENGINES_CONFIG)
             ) inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
                 .areset                             (areset_bundle[i]                             ),

@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 22:38:52
+// Revise : 2023-06-14 23:51:20
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -25,7 +25,10 @@ module lane_template #(
     parameter ID_CU       = 0,
     parameter ID_BUNDLE   = 0,
     parameter ID_LANE     = 0,
-    parameter NUM_ENGINES = 3
+    parameter NUM_LANES   = 6,
+    parameter NUM_ENGINES = 3,
+    parameter LANES_CONFIG[NUM_LANES] = '{3,3,3,2,2,2},
+    parameter ENGINES_CONFIG[NUM_LANES][NUM_ENGINES] = '{'{1,5,4},'{1,5,4},'{1,5,4},'{2,5,0},'{3,4,0},'{6,4,0}},
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -359,11 +362,11 @@ module lane_template #(
     );
 
 // --------------------------------------------------------------------------------------
-// Lanes INPUT
+// Lane INPUT
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
-// Lanes OUTPUT
+// Lane OUTPUT
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
@@ -373,7 +376,7 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
 // Generate Engines - instants default 1 engine
 // --------------------------------------------------------------------------------------
-   
+
 
 
 endmodule : lane_template
