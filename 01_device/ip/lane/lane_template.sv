@@ -110,7 +110,7 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     logic                   areset_engine                              [NUM_ENGINES-1:0];
     KernelDescriptor        engines_descriptor_in                      [NUM_ENGINES-1:0];
-    MemoryPacket            engines_response_engine_in                 [NUM_ENGINES-1:0];
+    MemoryPacket            engines_response_lane_in                   [NUM_ENGINES-1:0];
     FIFOStateSignalsInput   engines_fifo_response_lane_in_signals_in   [NUM_ENGINES-1:0];
     FIFOStateSignalsOutput  engines_fifo_response_lane_in_signals_out  [NUM_ENGINES-1:0];
     MemoryPacket            engines_response_memory_in                 [NUM_ENGINES-1:0];
@@ -409,7 +409,7 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
 // Generate Engines - in->[0]->[1]->[2]->[3]->[4]->out
 // --------------------------------------------------------------------------------------
-    assign engines_response_lane_in[0]   = response_lane_in_int;
+    assign engines_response_lane_in[0] = response_lane_in_int;
     assign engines_response_memory_in[0] = response_memory_in_int;
     assign engines_fifo_response_lane_in_signals_in[0].rd_en = 1'b1;
     assign engines_fifo_response_memory_in_signals_in[0].rd_en = 1'b1;
@@ -454,7 +454,7 @@ module lane_template #(
                 .BUNDLES_CONFIG_ARRAY     (BUNDLES_CONFIG_ARRAY     )
             ) inst_engine_template (
                 .ap_clk                             (ap_clk                                        ),
-                .areset                             (areset_bundle[i]                              ),
+                .areset                             (areset_engine[i]                              ),
                 .descriptor_in                      (engines_descriptor_in[i]                      ),
                 .response_engine_in                 (engines_response_lane_in[i]                   ),
                 .fifo_response_engine_in_signals_in (engines_fifo_response_lane_in_signals_in[i]   ),
