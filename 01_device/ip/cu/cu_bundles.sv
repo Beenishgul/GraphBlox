@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:49:36
+// Revise : 2023-06-14 21:45:32
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
-    logic                  bundle_areset                             [NUM_BUNDLES-1:0];
+    logic                  areset_bundle                             [NUM_BUNDLES-1:0];
     KernelDescriptor       bundle_descriptor_in                      [NUM_BUNDLES-1:0];
     MemoryPacket           bundle_response_lanes_in                  [NUM_BUNDLES-1:0];
     FIFOStateSignalsInput  bundle_fifo_response_lanes_in_signals_in  [NUM_BUNDLES-1:0];
@@ -312,7 +312,7 @@ module cu_bundles #(
     generate
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_reg_input
             always_ff @(posedge ap_clk) begin
-                bundle_areset[i] <= areset;
+                areset_bundle[i] <= areset;
             end
 
             always_ff @(posedge ap_clk) begin
@@ -432,7 +432,7 @@ module cu_bundles #(
                 .ID_BUNDLE(i    )
             ) inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
-                .areset                             (bundle_areset[i]                             ),
+                .areset                             (areset_bundle[i]                             ),
                 .descriptor_in                      (bundle_descriptor_in[i]                      ),
                 .response_lanes_in                  (bundle_response_lanes_in[i]                  ),
                 .fifo_response_lanes_in_signals_in  (bundle_fifo_response_lanes_in_signals_in[i]  ),
