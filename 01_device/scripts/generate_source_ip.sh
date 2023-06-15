@@ -37,7 +37,7 @@ testbench="testbench"
 control="control"
 bundle="bundle"
 cu="cu"
-lanes="lanes"
+lane="lane"
 
 utils="utils"
 
@@ -54,7 +54,7 @@ mkdir -p ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
 mkdir -p ${ACTIVE_IP_DIR}/${control}
 mkdir -p ${ACTIVE_IP_DIR}/${bundle}
 mkdir -p ${ACTIVE_IP_DIR}/${cu}
-mkdir -p ${ACTIVE_IP_DIR}/${lanes}
+mkdir -p ${ACTIVE_IP_DIR}/${lane}
 mkdir -p ${ACTIVE_IP_DIR}/${utils}
 
 
@@ -65,7 +65,7 @@ cp -r ${ORIGINAL_IP_DIR}/${top}/* ${ACTIVE_IP_DIR}/${top}
 cp -r ${ORIGINAL_IP_DIR}/${memory}/* ${ACTIVE_IP_DIR}/${memory}
 cp -r ${ORIGINAL_IP_DIR}/${bundle}/* ${ACTIVE_IP_DIR}/${bundle}
 cp -r ${ORIGINAL_IP_DIR}/${cu}/* ${ACTIVE_IP_DIR}/${cu}
-cp -r ${ORIGINAL_IP_DIR}/${lanes}/* ${ACTIVE_IP_DIR}/${lanes}
+cp -r ${ORIGINAL_IP_DIR}/${lane}/* ${ACTIVE_IP_DIR}/${lane}
 cp -r ${ORIGINAL_IP_DIR}/${utils}/* ${ACTIVE_IP_DIR}/${utils}
 cp -r ${ORIGINAL_IP_DIR}/${testbench}/${MODULE}/* ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
 
