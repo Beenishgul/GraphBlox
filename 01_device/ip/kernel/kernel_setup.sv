@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_setup.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:42:51
+// Revise : 2023-06-14 21:15:16
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -365,7 +365,7 @@ module kernel_setup #(
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop
-    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;;
+    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
     assign response_out_int.valid             = fifo_response_signals_out_int.valid;
     assign response_out_int.payload           = fifo_response_dout;
 

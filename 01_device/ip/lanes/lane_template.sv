@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : lane_buffer_filter.sv
+// File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 21:15:16
+// Revise : 2023-06-14 22:38:52
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,10 +21,11 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_buffer_filter #(
-    parameter ID_CU     = 0,
-    parameter ID_BUNDLE = 0,
-    parameter ID_LANE   = 0
+module lane_template #(
+    parameter ID_CU       = 0,
+    parameter ID_BUNDLE   = 0,
+    parameter ID_LANE     = 0,
+    parameter NUM_ENGINES = 3
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -46,11 +47,12 @@ module lane_buffer_filter #(
     output logic                  done_out
 );
 
+    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_lane_buffer_filter;
-    logic areset_fifo              ;
+    logic areset_lane_alu_filter;
+    logic areset_fifo           ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -104,18 +106,41 @@ module lane_buffer_filter #(
     logic                  fifo_request_memory_out_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
+// Generate Engines
+// --------------------------------------------------------------------------------------
+    logic                  areset_lane                              [NUM_LANES-1:0];
+    KernelDescriptor       lanes_descriptor_in                      [NUM_LANES-1:0];
+    MemoryPacket           lanes_response_engine_in                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_response_lane_in_signals_in   [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_response_lane_in_signals_out  [NUM_LANES-1:0];
+    MemoryPacket           lanes_response_memory_in                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_response_memory_in_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_response_memory_in_signals_out[NUM_LANES-1:0];
+    MemoryPacket           lanes_request_lane_out                   [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_request_lane_out_signals_in   [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_request_lane_out_signals_out  [NUM_LANES-1:0];
+    MemoryPacket           lanes_request_memory_out                 [NUM_LANES-1:0];
+    FIFOStateSignalsInput  lanes_fifo_request_memory_out_signals_in [NUM_LANES-1:0];
+    FIFOStateSignalsOutput lanes_fifo_request_memory_out_signals_out[NUM_LANES-1:0];
+    logic                  lanes_fifo_setup_signal                  [NUM_LANES-1:0];
+    logic                  lanes_done_out                           [NUM_LANES-1:0];
+
+    logic [NUM_LANES-1:0] lanes_fifo_setup_signal_reg;
+    logic [NUM_LANES-1:0] lanes_done_out_reg         ;
+
+// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_lane_buffer_filter <= areset;
-        areset_fifo               <= areset;
+        areset_lane_alu_filter <= areset;
+        areset_fifo            <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_buffer_filter) begin
+        if (areset_lane_alu_filter) begin
             descriptor_in_reg.valid <= 1'b0;
         end
         else begin
@@ -131,7 +156,7 @@ module lane_buffer_filter #(
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_buffer_filter) begin
+        if (areset_lane_alu_filter) begin
             fifo_response_lane_in_signals_in_reg   <= 0;
             fifo_request_lane_out_signals_in_reg   <= 0;
             fifo_response_memory_in_signals_in_reg <= 0;
@@ -158,15 +183,17 @@ module lane_buffer_filter #(
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_lane_buffer_filter) begin
+        if (areset_lane_alu_filter) begin
             fifo_setup_signal        <= 1'b1;
             request_lane_out.valid   <= 1'b0;
-            request_memory_out.valid <= 1'b0 ;
+            request_memory_out.valid <= 1'b0;
+            done_out                 <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int;
             request_lane_out.valid   <= request_lane_out_int.valid ;
-            request_memory_out.valid <= request_memory_out_int.valid ;
+            request_memory_out.valid <= request_memory_out_int.valid;
+            done_out                 <= (&lanes_done_out_reg);
         end
     end
 
@@ -332,18 +359,21 @@ module lane_buffer_filter #(
     );
 
 // --------------------------------------------------------------------------------------
-// Lanes Arbitration INPUT
+// Lanes INPUT
 // --------------------------------------------------------------------------------------
 
-
 // --------------------------------------------------------------------------------------
-// Lanes Arbitration OUTPUT
-// --------------------------------------------------------------------------------------
-
-
-// --------------------------------------------------------------------------------------
-// Generate Lanes
+// Lanes OUTPUT
 // --------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------
+// Generate Engines
+// --------------------------------------------------------------------------------------
 
-endmodule : lane_buffer_filter
+// --------------------------------------------------------------------------------------
+// Generate Engines - instants default 1 engine
+// --------------------------------------------------------------------------------------
+   
+
+
+endmodule : lane_template

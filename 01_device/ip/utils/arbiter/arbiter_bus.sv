@@ -48,7 +48,7 @@ module arbiter_bus_N_in_1_out #(
     parameter ARBITER_WIDTH    = 2**$clog2(WIDTH)     ,
     parameter SELECT_WIDTH     = $clog2(ARBITER_WIDTH),
     parameter BUS_WIDTH        = 8                    ,
-    parameter ARBITER_FAIRNESS = 1
+    parameter ARBITER_FAIRNESS = 0
 ) (
     input  logic                     ap_clk                            ,
     input  logic                     areset                            ,
