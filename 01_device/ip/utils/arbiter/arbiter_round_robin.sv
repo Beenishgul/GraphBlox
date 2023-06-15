@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : arbiter_round_robin.sv
 // Create : 2023-06-14 18:54:52
-// Revise : 2023-06-14 19:27:35
+// Revise : 2023-06-14 19:37:17
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -16,10 +16,10 @@ module arbiter_round_robin #(
     parameter WIDTH         = 2               ,
     parameter ARBITER_WIDTH = 2**$clog2(WIDTH)
 ) (
-    input logic                     areset,
-    input logic                     ap_clk,
-    input logic [ARBITER_WIDTH-1:0] req   ,
-    input logic [ARBITER_WIDTH-1:0] grant
+    input  logic                     areset,
+    input  logic                     ap_clk,
+    input  logic [ARBITER_WIDTH-1:0] req   ,
+    output logic [ARBITER_WIDTH-1:0] grant
 );
 
     logic                     areset_arbiter;
@@ -27,7 +27,6 @@ module arbiter_round_robin #(
     logic [ARBITER_WIDTH-1:0] mask_req      ;
     logic [ARBITER_WIDTH-1:0] mask_grant    ;
     logic [ARBITER_WIDTH-1:0] grant_comb    ;
-    logic [ARBITER_WIDTH-1:0] grant         ;
     logic                     no_mask_req   ;
     logic [ARBITER_WIDTH-1:0] nomask_grant  ;
     logic                     update_ptr    ;

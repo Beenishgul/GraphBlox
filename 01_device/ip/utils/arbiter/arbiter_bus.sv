@@ -44,10 +44,11 @@
 import PKG_FUNCTIONS::*;
 
 module arbiter_bus_N_in_1_out #(
-    parameter WIDTH         = 2                    ,
-    parameter ARBITER_WIDTH = 2**$clog2(WIDTH)     ,
-    parameter SELECT_WIDTH  = $clog2(ARBITER_WIDTH),
-    parameter BUS_WIDTH     = 8
+    parameter WIDTH            = 2                    ,
+    parameter ARBITER_WIDTH    = 2**$clog2(WIDTH)     ,
+    parameter SELECT_WIDTH     = $clog2(ARBITER_WIDTH),
+    parameter BUS_WIDTH        = 8                    ,
+    parameter ARBITER_FAIRNESS = 1
 ) (
     input  logic                     ap_clk                            ,
     input  logic                     areset                            ,
@@ -109,20 +110,54 @@ module arbiter_bus_N_in_1_out #(
         end
     end
 
+    generate
+        case (ARBITER_FAIRNESS)
+            0       : begin
+// --------------------------------------------------------------------------------------
+// RR Arbiter instance output
+// --------------------------------------------------------------------------------------
+                arbiter_round_robin #(
+                    .WIDTH        (WIDTH        ),
+                    .ARBITER_WIDTH(ARBITER_WIDTH)
+                ) inst_arbiter_round_robin (
+                    .areset(areset_arbiter      ),
+                    .ap_clk(ap_clk              ),
+                    .req   (arbiter_req         ),
+                    .grant (arbiter_grant_reg)
+                );
+            end
+            1       : begin
 // --------------------------------------------------------------------------------------
 // Arbiter instance output
 // --------------------------------------------------------------------------------------
-    arbiter #(
-        .WIDTH       (ARBITER_WIDTH),
-        .SELECT_WIDTH(SELECT_WIDTH )
-    ) inst_arbiter (
-        .enable(1'b1             ),
-        .req   (arbiter_req      ),
-        .grant (arbiter_grant_reg),
-        .select(select           ),
-        .valid (valid            ),
-        .ap_clk(ap_clk           ),
-        .areset(areset_arbiter   )
-    );
+                arbiter #(
+                    .WIDTH       (ARBITER_WIDTH),
+                    .SELECT_WIDTH(SELECT_WIDTH )
+                ) inst_arbiter (
+                    .enable(1'b1             ),
+                    .req   (arbiter_req      ),
+                    .grant (arbiter_grant_reg),
+                    .select(select           ),
+                    .valid (valid            ),
+                    .ap_clk(ap_clk           ),
+                    .areset(areset_arbiter   )
+                );
+            end
+            default : begin
+// --------------------------------------------------------------------------------------
+// RR Arbiter instance output
+// --------------------------------------------------------------------------------------
+                arbiter_round_robin #(
+                    .WIDTH        (WIDTH        ),
+                    .ARBITER_WIDTH(ARBITER_WIDTH)
+                ) inst_arbiter_round_robin (
+                    .areset(areset_arbiter      ),
+                    .ap_clk(ap_clk              ),
+                    .req   (arbiter_req         ),
+                    .grant (arbiter_grant_reg)
+                );
+            end
+        endcase
+    endgenerate
 
 endmodule : arbiter_bus_N_in_1_out

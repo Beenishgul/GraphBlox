@@ -102,22 +102,18 @@ module arbiter_1_to_N_response #(
     end
 
     case (ID_LEVEL)
-      0 :
-        begin
-          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
-        end
-      1 :
-        begin
-          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
-        end
-      2 :
-        begin
-          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
-        end
-      default :
-        begin
-          assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
-        end
+      0 : begin
+        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+      end
+      1 : begin
+        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+      end
+      2 : begin
+        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+      end
+      default : begin
+        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+      end
     endcase
   endgenerate
 
@@ -148,22 +144,18 @@ module arbiter_1_to_N_response #(
           response_out[i].valid       <= demux_bus_data_out_valid[i];
 
           case (ID_LEVEL)
-            0       :
-              begin
-                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
-              end
-            1       :
-              begin
-                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
-              end
-            2       :
-              begin
-                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
-              end
-            default :
-              begin
-                demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
-              end
+            0       : begin
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+            end
+            1       : begin
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
+            end
+            2       : begin
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
+            end
+            default : begin
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+            end
           endcase
         end
       end
@@ -177,22 +169,18 @@ module arbiter_1_to_N_response #(
       demux_bus_data_in <= fifo_response_dout_int.payload;
 
       case (ID_LEVEL)
-        0       :
-          begin
-            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
-          end
-        1       :
-          begin
-            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_bundle[NUM_MEMORY_REQUESTOR-1:0];
-          end
-        2       :
-          begin
-            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_lane[NUM_MEMORY_REQUESTOR-1:0];
-          end
-        default :
-          begin
-            demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
-          end
+        0       : begin
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+        end
+        1       : begin
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_bundle[NUM_MEMORY_REQUESTOR-1:0];
+        end
+        2       : begin
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_lane[NUM_MEMORY_REQUESTOR-1:0];
+        end
+        default : begin
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+        end
       endcase
     end
   endgenerate
