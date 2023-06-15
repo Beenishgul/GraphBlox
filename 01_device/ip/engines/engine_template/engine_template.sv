@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_template.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-14 22:29:22
+// Revise : 2023-06-14 23:41:43
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -22,11 +22,11 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_template #(
-    parameter ID_CU       = 0,
-    parameter ID_BUNDLE   = 0,
-    parameter ID_LANE     = 0,
-    parameter ID_ENGINE   = 0,
-    parameter MODE_ENGINE = 0
+    parameter ID_CU          = 0,
+    parameter ID_BUNDLE      = 0,
+    parameter ID_LANE        = 0,
+    parameter ID_ENGINE      = 0,
+    parameter ENGINES_CONFIG = 0
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -361,7 +361,7 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
 
     generate
-        case (MODE_ENGINE)
+        case (ENGINES_CONFIG)
             0       : begin
 // --------------------------------------------------------------------------------------
 // ENGINE EMPTY
@@ -494,7 +494,7 @@ module engine_template #(
                 assign template_done_out                                 = 1'b1;
 // --------------------------------------------------------------------------------------
             end
-               6       : begin
+            6       : begin
 // --------------------------------------------------------------------------------------
 // ENGINE FORWARD BUFFER
 // --------------------------------------------------------------------------------------
