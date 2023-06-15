@@ -428,12 +428,17 @@ module cu_bundles #(
     generate
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
             bundle_lanes #(
-                .ID_CU    (ID_CU),
-                .ID_BUNDLE(i    ),
-                .NUM_LANES(NUM_LANES),
-                .NUM_ENGINES(NUM_ENGINES),
-                .LANES_CONFIG(LANES_CONFIG),
-                .ENGINES_CONFIG(ENGINES_CONFIG)
+                .ID_CU                    (ID_CU                       ),
+                .ID_BUNDLE                (i                           ),
+                .NUM_BUNDLES              (NUM_BUNDLES                 ),
+                .NUM_LANES                (LANES_COUNT_ARRAY[i]        ),
+                .NUM_ENGINES              (NUM_ENGINES                 ),
+                .LANES_COUNT_ARRAY        (LANES_COUNT_ARRAY           ),
+                .ENGINES_COUNT_ARRAY      (LANES_ENGINES_COUNT_ARRAY[i]),
+                .LANES_ENGINES_COUNT_ARRAY(LANES_ENGINES_COUNT_ARRAY   ),
+                .ENGINES_CONFIG_ARRAY     (ENGINES_CONFIG_ARRAY        ),
+                .LANES_CONFIG_ARRAY       (BUNDLES_CONFIG_ARRAY[i]     ),
+                .BUNDLES_CONFIG_ARRAY     (BUNDLES_CONFIG_ARRAY        )
             ) inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
                 .areset                             (areset_bundle[i]                             ),

@@ -26,7 +26,8 @@ module engine_template #(
     parameter ID_BUNDLE      = 0,
     parameter ID_LANE        = 0,
     parameter ID_ENGINE      = 0,
-    parameter ENGINES_CONFIG = 0
+    parameter ENGINES_CONFIG = 0,
+    `include "cu_parameters.vh"
 ) (
     // System Signals
     input  logic                  ap_clk                             ,

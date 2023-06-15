@@ -30,6 +30,7 @@ VIP_DIR=$5
 pkgs="pkg"
 
 engines="engines"
+engine_template="engine_template"
 engine_kernel_setup="engine_kernel_setup"
 engine_alu_operations="engine_alu_operations"
 engine_conditional="engine_conditional"
@@ -108,6 +109,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_N
 
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/ ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_kernel_setup} ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_template} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_read_write} ${CFG_FILE_NAME} "sv"
