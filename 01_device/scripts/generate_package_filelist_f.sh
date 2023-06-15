@@ -50,7 +50,7 @@ memory_ram="ram"
 control="control"
 bundle="bundle"
 cu="cu"
-lanes="lanes"
+lane="lane"
 
 utils="utils"
 utils_arbiter="arbiter"
@@ -103,7 +103,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${bundle}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${cu}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${lanes}/ ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${lane}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
