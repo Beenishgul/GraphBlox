@@ -11,7 +11,8 @@
 	parameter NUM_LANES_MAX   = 6,
 	parameter NUM_ENGINES_MAX = 3,
 // --------------------------------------------------------------------------------------
-// ENGINE TYPES ORDERED in pipeline
+// ENGINE CONFIG TYPES ORDERED in pipeline
+// --------------------------------------------------------------------------------------
 // (0) ENGINE EMPTY
 // (1) ENGINE MEMORY R/W Generator
 // (2) ENGINE CSR
@@ -19,6 +20,10 @@
 // (4) ENGINE FILTER
 // (5) ENGINE MERGE
 // (6) ENGINE FORWARD BUFFER
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+// TOPOLOGY CONFIGURATIONS
 // --------------------------------------------------------------------------------------
 	parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]  = '{6,6,6,6},
 	parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX] = {3,3,3,3,2,2},
