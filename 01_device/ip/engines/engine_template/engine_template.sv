@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_template.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-15 22:26:48
+// Revise : 2023-06-15 22:37:22
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -370,11 +370,11 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
                 assign areset_template = areset_engine;
 
-                assign template_descriptor_in                      = descriptor_in_reg;
-                assign template_response_engine_in                 = response_engine_in_int;
-                assign template_fifo_response_engine_in_signals_in = 1'b1;
-                assign template_response_memory_in                 = response_memory_in_int;
-                assign template_fifo_response_memory_in_signals_in = 1'b1;
+                assign template_descriptor_in                            = descriptor_in_reg;
+                assign template_response_engine_in                       = response_engine_in_int;
+                assign template_fifo_response_engine_in_signals_in.rd_en = 1'b1;
+                assign template_response_memory_in                       = response_memory_in_int;
+                assign template_fifo_response_memory_in_signals_in.rd_en = 1'b1;
 
                 assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
