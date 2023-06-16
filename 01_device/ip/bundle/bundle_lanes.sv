@@ -55,7 +55,6 @@ module bundle_lanes #(
 
     KernelDescriptor descriptor_in_reg;
 
-    MemoryPacket request_memory_out_reg;
     MemoryPacket response_engine_in_reg;
     MemoryPacket response_memory_in_reg;
 

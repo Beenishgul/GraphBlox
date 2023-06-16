@@ -58,7 +58,6 @@ module engine_pipeline #(
 
     KernelDescriptor descriptor_in_reg;
 
-    MemoryPacket request_memory_out_reg;
     MemoryPacket response_engine_in_reg;
     MemoryPacket response_memory_in_reg;
 
@@ -113,17 +112,11 @@ module engine_pipeline #(
     logic                  areset_template                             ;
     KernelDescriptor       template_descriptor_in                      ;
     MemoryPacket           template_response_engine_in                 ;
-    FIFOStateSignalsInput  template_fifo_response_engine_in_signals_in ;
     FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out;
     MemoryPacket           template_response_memory_in                 ;
-    FIFOStateSignalsInput  template_fifo_response_memory_in_signals_in ;
     FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out;
     MemoryPacket           template_request_engine_out                 ;
-    FIFOStateSignalsInput  template_fifo_request_engine_out_signals_in ;
-    FIFOStateSignalsOutput template_fifo_request_engine_out_signals_out;
     MemoryPacket           template_request_memory_out                 ;
-    FIFOStateSignalsInput  template_fifo_request_memory_out_signals_in ;
-    FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out;
     logic                  template_fifo_setup_signal                  ;
     logic                  template_done_out                           ;
 
@@ -393,17 +386,7 @@ module engine_pipeline #(
     assign template_fifo_setup_signal = 1'b0;
     assign template_done_out          = 1'b1;
 
-    assign template_fifo_response_engine_in_signals_in  = 0;
     assign template_fifo_response_engine_in_signals_out = fifo_request_engine_out_signals_out_int;
-
-    assign template_fifo_response_memory_in_signals_in  = 0;
     assign template_fifo_response_memory_in_signals_out = fifo_request_memory_out_signals_out_int;
-
-    assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
-    assign template_fifo_request_engine_out_signals_out      = 0;
-
-    assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
-    assign template_fifo_request_memory_out_signals_out      = 0;
-
 
 endmodule : engine_pipeline
