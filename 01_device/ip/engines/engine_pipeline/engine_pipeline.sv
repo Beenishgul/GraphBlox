@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_pipeline.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-15 22:16:53
+// Revise : 2023-06-15 22:31:52
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -368,8 +368,8 @@ module engine_pipeline #(
     assign template_descriptor_in = descriptor_in_reg;
 
     hyper_pipeline #(
-        .STAGES(PIPELINE_STAGES           ),
-        .WIDTH ($bits(MemoryPacketPayload))
+        .STAGES(PIPELINE_STAGES    ),
+        .WIDTH ($bits(MemoryPacket))
     ) inst_hyper_pipeline_template_response_engine_in (
         .ap_clk(ap_clk                     ),
         .areset(areset_template            ),
@@ -378,8 +378,8 @@ module engine_pipeline #(
     );
 
     hyper_pipeline #(
-        .STAGES(PIPELINE_STAGES           ),
-        .WIDTH ($bits(MemoryPacketPayload))
+        .STAGES(PIPELINE_STAGES    ),
+        .WIDTH ($bits(MemoryPacket))
     ) inst_hyper_pipeline_template_response_memory_in (
         .ap_clk(ap_clk                     ),
         .areset(areset_template            ),
