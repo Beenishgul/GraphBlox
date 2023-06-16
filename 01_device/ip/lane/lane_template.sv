@@ -56,7 +56,6 @@ module lane_template #(
 
     KernelDescriptor descriptor_in_reg;
 
-    MemoryPacket request_memory_out_reg;
     MemoryPacket response_lane_in_reg  ;
     MemoryPacket response_memory_in_reg;
 
