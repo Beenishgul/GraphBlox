@@ -20,9 +20,7 @@ import PKG_CACHE::*;
 
 module kernel_afu #(
   parameter C_M00_AXI_ADDR_WIDTH = M_AXI_MEMORY_ADDR_WIDTH     ,
-  parameter C_M00_AXI_DATA_WIDTH = M_AXI_MEMORY_DATA_WIDTH_BITS,
-  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL             ,
-  parameter NUM_GRAPH_PE         = CU_COUNT_LOCAL
+  parameter C_M00_AXI_DATA_WIDTH = M_AXI_MEMORY_DATA_WIDTH_BITS
 ) (
   // System Signals
   input  logic                              ap_clk         ,
@@ -84,6 +82,7 @@ module kernel_afu #(
   input  logic [                    64-1:0] buffer_9
 );
 
+  genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -306,16 +305,12 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
   // kernel_cache
   assign kernel_cache_request_in                     = kernel_cu_request_out;
-  assign kernel_cache_fifo_request_signals_in.wr_en  = 0;
   assign kernel_cache_fifo_request_signals_in.rd_en  = ~(kernel_cu_fifo_response_signals_out.prog_full);
-  assign kernel_cache_fifo_response_signals_in.wr_en = 0;
   assign kernel_cache_fifo_response_signals_in.rd_en = ~(kernel_cu_fifo_response_signals_out.prog_full);
 
   // kernel_cu
   assign kernel_cu_response_in                    = kernel_cache_response_out;
-  assign kernel_cu_fifo_request_signals_in.wr_en  = 0;
   assign kernel_cu_fifo_request_signals_in.rd_en  = ~(kernel_cache_fifo_request_signals_out.prog_full | kernel_cache_fifo_response_signals_out.prog_full);
-  assign kernel_cu_fifo_response_signals_in.wr_en = 0;
   assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
   // Kernel_setup
@@ -343,7 +338,8 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // CU -> Caches/PEs
 // --------------------------------------------------------------------------------------
-  kernel_cu #(.NUM_GRAPH_CLUSTERS(NUM_GRAPH_CLUSTERS)) inst_kernel_cu (
+
+  kernel_cu #(.ID_CU(0)) inst_kernel_cu (
     .ap_clk                   (ap_clk                             ),
     .areset                   (areset_cu                          ),
     .descriptor_in            (kernel_cu_descriptor_in            ),

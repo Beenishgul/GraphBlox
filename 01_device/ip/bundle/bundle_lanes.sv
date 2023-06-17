@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 23:50:39
+// Revise : 2023-06-17 02:29:46
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,11 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module bundle_lanes #(
-    parameter ID_CU     = 0,
-    parameter ID_BUNDLE = 0,
-    `include "cu_parameters.vh"
-) (
+module bundle_lanes #(`include "bundle_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -571,20 +567,7 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lanes
-            lane_template #(
-                .ID_CU                    (ID_CU                       ),
-                .ID_BUNDLE                (ID_BUNDLE                   ),
-                .ID_LANE                  (i                           ),
-                .NUM_BUNDLES              (NUM_BUNDLES                 ),
-                .NUM_LANES                (NUM_LANES                   ),
-                .NUM_ENGINES              (ENGINES_COUNT_ARRAY[i]      ),
-                .LANES_COUNT_ARRAY        (LANES_COUNT_ARRAY           ),
-                .ENGINES_COUNT_ARRAY      (ENGINES_COUNT_ARRAY         ),
-                .LANES_ENGINES_COUNT_ARRAY(LANES_ENGINES_COUNT_ARRAY   ),
-                .ENGINES_CONFIG_ARRAY     (LANES_CONFIG_ARRAY[i]       ),
-                .LANES_CONFIG_ARRAY       (LANES_CONFIG_ARRAY          ),
-                .BUNDLES_CONFIG_ARRAY     (BUNDLES_CONFIG_ARRAY        )
-            ) inst_lane_template (
+            lane_template #(`include"set_lane_parameters.vh") inst_lane_template (
                 .ap_clk                             (ap_clk                                      ),
                 .areset                             (areset_lane[i]                              ),
                 .descriptor_in                      (lanes_descriptor_in[i]                      ),

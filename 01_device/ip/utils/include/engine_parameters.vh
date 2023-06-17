@@ -1,4 +1,8 @@
-    parameter ID_CU           = 0,
+    parameter ID_CU          = 0,
+    parameter ID_BUNDLE      = 0,
+    parameter ID_LANE        = 0,
+    parameter ID_ENGINE      = 0,
+    parameter ENGINES_CONFIG = 0,
 // --------------------------------------------------------------------------------------
 // MAX NUMBER IN ALL CONFIGURATIONS FOR EACH VARIABLE
 // --------------------------------------------------------------------------------------
@@ -9,7 +13,7 @@
 // --------------------------------------------------------------------------------------
 // CU Configuration
 // --------------------------------------------------------------------------------------
-    parameter NUM_CUS     = 2,
+    parameter NUM_CUS     = 4,
     parameter NUM_BUNDLES = 4,
     parameter NUM_LANES   = 6,
     parameter NUM_ENGINES = 3,

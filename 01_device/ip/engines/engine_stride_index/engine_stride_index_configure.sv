@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_stride_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-13 23:42:59
+// Revise : 2023-06-17 01:02:24
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -180,10 +180,10 @@ module engine_stride_index_configure #(
                         configuration_valid_reg[6]                      <= 1'b1  ;
                     end
                     7 : begin
-                        configuration_reg.payload.meta.route.to.id_cu     <= fifo_response_dout_int.payload.data.field_0[(CU_VERTEX_COUNT_WIDTH_BITS)-1:0];
-                        configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:CU_VERTEX_COUNT_WIDTH_BITS];
-                        configuration_reg.payload.meta.route.to.id_lane   <= fifo_response_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
-                        configuration_reg.payload.meta.route.to.id_buffer <= fifo_response_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_VERTEX_COUNT_WIDTH_BITS)];
+                        configuration_reg.payload.meta.route.to.id_cu     <= fifo_response_dout_int.payload.data.field_0[(KERNEL_CU_COUNT_WIDTH_BITS)-1:0];
+                        configuration_reg.payload.meta.route.to.id_bundle <= fifo_response_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:KERNEL_CU_COUNT_WIDTH_BITS];
+                        configuration_reg.payload.meta.route.to.id_lane   <= fifo_response_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
+                        configuration_reg.payload.meta.route.to.id_buffer <= fifo_response_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
                         configuration_valid_reg[7]                        <= 1'b1  ;
                     end
                     default : begin

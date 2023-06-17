@@ -1,18 +1,17 @@
 // -----------------------------------------------------------------------------
 //
-//    "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
-// Copyright (c) 2021-2022 All rights reserved
+// Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : top.v
-// Create : 2022-11-29 19:06:29
-// Revise : 2022-11-29 19:06:29
+// Create : 2023-06-17 01:02:46
+// Revise : 2023-06-17 01:02:57
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-// This is a generated file. Use and modify at your own risk.
 // --------------------------------------------------------------------------------------/
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none

@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_template.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-15 22:37:22
+// Revise : 2023-06-17 02:27:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,14 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module engine_template #(
-    parameter ID_CU          = 0,
-    parameter ID_BUNDLE      = 0,
-    parameter ID_LANE        = 0,
-    parameter ID_ENGINE      = 0,
-    parameter ENGINES_CONFIG = 0,
-    `include "cu_parameters.vh"
-) (
+module engine_template #(`include "engine_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,

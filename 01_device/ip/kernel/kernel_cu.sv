@@ -19,11 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(
-  parameter NUM_GRAPH_CLUSTERS   = CU_COUNT_GLOBAL,
-  parameter NUM_SETUP_MODULES    = 4              ,
-  parameter NUM_MEMORY_REQUESTOR = 2
-) (
+module kernel_cu #(`include "kernel_parameters.vh") (
   input  logic                  ap_clk                   ,
   input  logic                  areset                   ,
   input  KernelDescriptor       descriptor_in            ,
@@ -46,8 +42,7 @@ module kernel_cu #(
   logic areset_setup    ;
   logic areset_bundles  ;
 
-  logic [NUM_SETUP_MODULES-1:0] cu_setup_state   ;
-  KernelDescriptor              descriptor_in_reg;
+  KernelDescriptor descriptor_in_reg;
 
 // --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU <-> Cache
@@ -143,30 +138,9 @@ module kernel_cu #(
       done_out          <= 1'b0;
     end
     else begin
-      fifo_setup_signal <= |cu_setup_state;
+      fifo_setup_signal <= cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | kernel_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
       request_out.valid <= request_out_reg.valid ;
       done_out          <= cu_bundles_done_out;
-    end
-  end
-
-  always_ff @(posedge ap_clk) begin
-    fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
-    fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
-    request_out.payload       <= request_out_reg.payload;
-  end
-
-// --------------------------------------------------------------------------------------
-// Control signals
-// --------------------------------------------------------------------------------------
-  always_ff @(posedge ap_clk) begin
-    if (areset_control) begin
-      cu_setup_state <= {NUM_GRAPH_CLUSTERS{1'b1}};
-    end
-    else begin
-      cu_setup_state[0] <= cache_generator_fifo_request_setup_signal;
-      cu_setup_state[1] <= cache_generator_fifo_response_setup_signal;
-      cu_setup_state[2] <= kernel_setup_fifo_setup_signal;
-      cu_setup_state[3] <= cu_bundles_fifo_setup_signal;
     end
   end
 
@@ -253,7 +227,7 @@ module kernel_cu #(
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
   kernel_setup #(
-    .ID_CU    (0                                 ),
+    .ID_CU    ({KERNEL_CU_COUNT_WIDTH_BITS{1'b1}}),
     .ID_BUNDLE({CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}}),
     .ID_LANE  ({CU_LANE_COUNT_WIDTH_BITS{1'b1}}  )
   ) inst_kernel_setup (
@@ -272,10 +246,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(
-    .ID_CU      (0              ),
-    .NUM_BUNDLES(CU_BUNDLE_COUNT)
-  ) inst_cu_bundles (
+  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),
