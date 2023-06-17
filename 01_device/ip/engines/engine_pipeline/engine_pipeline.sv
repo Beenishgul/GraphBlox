@@ -22,13 +22,13 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_pipeline #(parameter
-    ID_CU            = 0,
-    ID_BUNDLE        = 0,
-    ID_LANE          = 0,
-    ID_ENGINE        = 0,
-    ENGINES_CONFIG   = 0,
-    FIFO_WRITE_DEPTH = 8,
-    PROG_THRESH      = 4,
+    ID_CU            = 0 ,
+    ID_BUNDLE        = 0 ,
+    ID_LANE          = 0 ,
+    ID_ENGINE        = 0 ,
+    ENGINES_CONFIG   = 0 ,
+    FIFO_WRITE_DEPTH = 16,
+    PROG_THRESH      = 8 ,
     PIPELINE_STAGES  = 2
 ) (
     // System Signals
