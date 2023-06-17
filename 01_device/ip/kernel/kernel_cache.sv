@@ -262,21 +262,18 @@ module kernel_cache (
     .PROG_THRESH     (8                         ),
     .READ_MODE       ("fwft"                    )
   ) inst_fifo_CacheRequest (
-    .clk         (ap_clk                                   ),
-    .srst        (areset_fifo                              ),
-    .din         (fifo_request_din                         ),
-    .wr_en       (fifo_request_signals_in_int.wr_en        ),
-    .rd_en       (fifo_request_signals_in_int.rd_en        ),
-    .dout        (fifo_request_dout                        ),
-    .full        (fifo_request_signals_out_int.full        ),
-    .almost_full (fifo_request_signals_out_int.almost_full ),
-    .empty       (fifo_request_signals_out_int.empty       ),
-    .almost_empty(fifo_request_signals_out_int.almost_empty),
-    .valid       (fifo_request_signals_out_int.valid       ),
-    .prog_full   (fifo_request_signals_out_int.prog_full   ),
-    .prog_empty  (fifo_request_signals_out_int.prog_empty  ),
-    .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
-    .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
+    .clk        (ap_clk                                  ),
+    .srst       (areset_fifo                             ),
+    .din        (fifo_request_din                        ),
+    .wr_en      (fifo_request_signals_in_int.wr_en       ),
+    .rd_en      (fifo_request_signals_in_int.rd_en       ),
+    .dout       (fifo_request_dout                       ),
+    .full       (fifo_request_signals_out_int.full       ),
+    .empty      (fifo_request_signals_out_int.empty      ),
+    .valid      (fifo_request_signals_out_int.valid      ),
+    .prog_full  (fifo_request_signals_out_int.prog_full  ),
+    .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
+    .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
   );
 
 // --------------------------------------------------------------------------------------
@@ -301,21 +298,18 @@ module kernel_cache (
     .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
     .PROG_THRESH     (8                          )
   ) inst_fifo_CacheResponse (
-    .clk         (ap_clk                                    ),
-    .srst        (areset_fifo                               ),
-    .din         (fifo_response_din                         ),
-    .wr_en       (fifo_response_signals_in_int.wr_en        ),
-    .rd_en       (fifo_response_signals_in_int.rd_en        ),
-    .dout        (fifo_response_dout                        ),
-    .full        (fifo_response_signals_out_int.full        ),
-    .almost_full (fifo_response_signals_out_int.almost_full ),
-    .empty       (fifo_response_signals_out_int.empty       ),
-    .almost_empty(fifo_response_signals_out_int.almost_empty),
-    .valid       (fifo_response_signals_out_int.valid       ),
-    .prog_full   (fifo_response_signals_out_int.prog_full   ),
-    .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
-    .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
-    .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
+    .clk        (ap_clk                                   ),
+    .srst       (areset_fifo                              ),
+    .din        (fifo_response_din                        ),
+    .wr_en      (fifo_response_signals_in_int.wr_en       ),
+    .rd_en      (fifo_response_signals_in_int.rd_en       ),
+    .dout       (fifo_response_dout                       ),
+    .full       (fifo_response_signals_out_int.full       ),
+    .empty      (fifo_response_signals_out_int.empty      ),
+    .valid      (fifo_response_signals_out_int.valid      ),
+    .prog_full  (fifo_response_signals_out_int.prog_full  ),
+    .wr_rst_busy(fifo_response_signals_out_int.wr_rst_busy),
+    .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
   );
 
 

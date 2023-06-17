@@ -28,12 +28,9 @@ import PKG_CACHE::*;
 // --------------------------------------------------------------------------------------
 typedef struct packed {
   logic full        ;
-  logic almost_full ;
   logic empty       ;
-  logic almost_empty;
   logic valid       ;
   logic prog_full   ;
-  logic prog_empty  ;
   logic wr_rst_busy ;
   logic rd_rst_busy ;
 } FIFOStateSignalsOutput;

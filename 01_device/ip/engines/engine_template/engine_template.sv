@@ -228,12 +228,9 @@ module engine_template #(
         .rd_en       (fifo_response_engine_in_signals_in_int.rd_en        ),
         .dout        (fifo_response_engine_in_dout                        ),
         .full        (fifo_response_engine_in_signals_out_int.full        ),
-        .almost_full (fifo_response_engine_in_signals_out_int.almost_full ),
         .empty       (fifo_response_engine_in_signals_out_int.empty       ),
-        .almost_empty(fifo_response_engine_in_signals_out_int.almost_empty),
         .valid       (fifo_response_engine_in_signals_out_int.valid       ),
         .prog_full   (fifo_response_engine_in_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_engine_in_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_response_engine_in_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_response_engine_in_signals_out_int.rd_rst_busy )
     );
@@ -266,12 +263,9 @@ module engine_template #(
         .rd_en       (fifo_response_memory_in_signals_in_int.rd_en        ),
         .dout        (fifo_response_memory_in_dout                        ),
         .full        (fifo_response_memory_in_signals_out_int.full        ),
-        .almost_full (fifo_response_memory_in_signals_out_int.almost_full ),
         .empty       (fifo_response_memory_in_signals_out_int.empty       ),
-        .almost_empty(fifo_response_memory_in_signals_out_int.almost_empty),
         .valid       (fifo_response_memory_in_signals_out_int.valid       ),
         .prog_full   (fifo_response_memory_in_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_memory_in_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_response_memory_in_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_response_memory_in_signals_out_int.rd_rst_busy )
     );
@@ -304,12 +298,9 @@ module engine_template #(
         .rd_en       (fifo_request_engine_out_signals_in_int.rd_en        ),
         .dout        (fifo_request_engine_out_dout                        ),
         .full        (fifo_request_engine_out_signals_out_int.full        ),
-        .almost_full (fifo_request_engine_out_signals_out_int.almost_full ),
         .empty       (fifo_request_engine_out_signals_out_int.empty       ),
-        .almost_empty(fifo_request_engine_out_signals_out_int.almost_empty),
         .valid       (fifo_request_engine_out_signals_out_int.valid       ),
         .prog_full   (fifo_request_engine_out_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_request_engine_out_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_request_engine_out_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_request_engine_out_signals_out_int.rd_rst_busy )
     );
@@ -342,12 +333,9 @@ module engine_template #(
         .rd_en       (fifo_request_memory_out_signals_in_int.rd_en        ),
         .dout        (fifo_request_memory_out_dout                        ),
         .full        (fifo_request_memory_out_signals_out_int.full        ),
-        .almost_full (fifo_request_memory_out_signals_out_int.almost_full ),
         .empty       (fifo_request_memory_out_signals_out_int.empty       ),
-        .almost_empty(fifo_request_memory_out_signals_out_int.almost_empty),
         .valid       (fifo_request_memory_out_signals_out_int.valid       ),
         .prog_full   (fifo_request_memory_out_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_request_memory_out_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_request_memory_out_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_request_memory_out_signals_out_int.rd_rst_busy )
     );

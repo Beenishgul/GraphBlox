@@ -124,7 +124,7 @@ set clkbifparam [::ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # Set desired frequency
 # ========================================================= 
 
-set desired_frequency 300000000               
+set desired_frequency 250000000               
 puts "[color 4 "                        Set desired frequency "][color 5 "${desired_frequency} Hz"]"
 set_property value ${desired_frequency} $clkbifparam
 
