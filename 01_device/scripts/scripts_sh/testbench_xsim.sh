@@ -27,12 +27,13 @@ app_directory=$2
 scripts_directory=$3
 ip_directory=$4
 ctrl_mode=$5
+tcl_directory=$6
 
 # Set xvlog options
 xvhdl_opts="--incr --relax --incr --relax -L uvm -L system_cache_v5_0_8 -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f -L xilinx_vip"
 xvlog_opts="--incr --relax -L uvm -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps -L xilinx_vip --sv"
 xelab_opts="-debug typical -L system_cache_v5_0_8 -L unisims_ver  -L xpm --incr --relax --mt auto -L xilinx_vip -L xpm -L axi_infrastructure_v1_1_0 -L xil_defaultlib -L axi_vip_v1_1_12 -L uvm"
-xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
+xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/${tcl_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
 echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
 
@@ -60,10 +61,11 @@ run()
   echo "MSG: Scripts DIR: $3"
   echo "MSG: IP DIR:      $4"
   echo "MSG: CTRL MODE    $5"
-  echo "MSG: Arguments    $6"
+  echo "MSG: Scripts DIR  $6"
+  echo "MSG: Arguments    $7"
   
-  check_args $# $6
-  setup $6 $7
+  check_args $# $7
+  setup $7 $8
 }
 
 # RUN_STEP: <compile>
@@ -194,7 +196,7 @@ check_args()
 {
   echo "check_args $1"
   echo "check_args $2"
-  if [[ ($1 == 6 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
+  if [[ ($1 == 7 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
     echo -e "ERROR: Unknown option specified '$2' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
@@ -225,4 +227,4 @@ from the previous run will be removed. If you don't want to remove the simulator
 }
 
 # Launch script
-run $1 $2 $3 $4 $5 $6
+run $1 $2 $3 $4 $5 $6 $7
