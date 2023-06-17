@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_pipeline.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-15 22:31:52
+// Revise : 2023-06-17 02:50:13
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -27,8 +27,7 @@ module engine_pipeline #(
     parameter ID_LANE         = 0,
     parameter ID_ENGINE       = 0,
     parameter ENGINES_CONFIG  = 0,
-    parameter PIPELINE_STAGES = 2,
-    `include "cu_parameters.vh"
+    parameter PIPELINE_STAGES = 2
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
