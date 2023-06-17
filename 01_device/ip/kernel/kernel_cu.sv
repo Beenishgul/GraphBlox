@@ -19,7 +19,9 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(`include "kernel_parameters.vh") (
+module kernel_cu #(
+  `include "kernel_parameters.vh"
+  ) (
   input  logic                  ap_clk                   ,
   input  logic                  areset                   ,
   input  KernelDescriptor       descriptor_in            ,
@@ -246,7 +248,9 @@ module kernel_cu #(`include "kernel_parameters.vh") (
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+  cu_bundles #(
+    `include"set_cu_parameters.vh"
+    ) inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),

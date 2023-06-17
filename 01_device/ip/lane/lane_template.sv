@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 02:29:28
+// Revise : 2023-06-17 03:16:08
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(`include "lane_parameters.vh") (
+module lane_template #(
+    `include "lane_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -431,7 +433,9 @@ module lane_template #(`include "lane_parameters.vh") (
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_ENGINES; i++) begin : generate_bundles
-            engine_template #(`include"set_engine_parameters.vh") inst_engine_template (
+            engine_template #(
+                `include"set_engine_parameters.vh"
+                ) inst_engine_template (
                 .ap_clk                             (ap_clk                                        ),
                 .areset                             (areset_engine[i]                              ),
                 .descriptor_in                      (engines_descriptor_in[i]                      ),

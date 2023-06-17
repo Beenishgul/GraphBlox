@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 02:29:46
+// Revise : 2023-06-17 03:15:54
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module bundle_lanes #(`include "bundle_parameters.vh") (
+module bundle_lanes #(
+    `include "bundle_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -567,7 +569,9 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lanes
-            lane_template #(`include"set_lane_parameters.vh") inst_lane_template (
+            lane_template #(
+                `include"set_lane_parameters.vh"
+                ) inst_lane_template (
                 .ap_clk                             (ap_clk                                      ),
                 .areset                             (areset_lane[i]                              ),
                 .descriptor_in                      (lanes_descriptor_in[i]                      ),
