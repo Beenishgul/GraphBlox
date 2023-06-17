@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_cu.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-01-11 23:47:45
+// Revise : 2023-06-17 17:08:39
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -144,6 +144,12 @@ module kernel_cu #(
       request_out.valid <= request_out_reg.valid ;
       done_out          <= cu_bundles_done_out;
     end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
+    fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
+    request_out.payload       <= request_out_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
