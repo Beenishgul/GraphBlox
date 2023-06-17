@@ -1,14 +1,14 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//    "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
-// Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 03:15:54
+// Create : 2023-06-17 07:15:49
+// Revise : 2023-06-17 07:15:56
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -273,21 +273,18 @@ module bundle_lanes #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketResponseLanesInput (
-        .clk         (ap_clk                                             ),
-        .srst        (areset_fifo                                        ),
-        .din         (fifo_response_lanes_in_din                         ),
-        .wr_en       (fifo_response_lanes_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_lanes_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_lanes_in_dout                        ),
-        .full        (fifo_response_lanes_in_signals_out_int.full        ),
-        .almost_full (fifo_response_lanes_in_signals_out_int.almost_full ),
-        .empty       (fifo_response_lanes_in_signals_out_int.empty       ),
-        .almost_empty(fifo_response_lanes_in_signals_out_int.almost_empty),
-        .valid       (fifo_response_lanes_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_lanes_in_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_lanes_in_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_response_lanes_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_lanes_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                            ),
+        .srst       (areset_fifo                                       ),
+        .din        (fifo_response_lanes_in_din                        ),
+        .wr_en      (fifo_response_lanes_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_lanes_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_lanes_in_dout                       ),
+        .full       (fifo_response_lanes_in_signals_out_int.full       ),
+        .empty      (fifo_response_lanes_in_signals_out_int.empty      ),
+        .valid      (fifo_response_lanes_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_lanes_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_lanes_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_lanes_in_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -311,21 +308,18 @@ module bundle_lanes #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_response_memory_in_din                         ),
-        .wr_en       (fifo_response_memory_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_memory_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_memory_in_dout                        ),
-        .full        (fifo_response_memory_in_signals_out_int.full        ),
-        .almost_full (fifo_response_memory_in_signals_out_int.almost_full ),
-        .empty       (fifo_response_memory_in_signals_out_int.empty       ),
-        .almost_empty(fifo_response_memory_in_signals_out_int.almost_empty),
-        .valid       (fifo_response_memory_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_memory_in_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_memory_in_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_response_memory_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_memory_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_response_memory_in_din                        ),
+        .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_memory_in_dout                       ),
+        .full       (fifo_response_memory_in_signals_out_int.full       ),
+        .empty      (fifo_response_memory_in_signals_out_int.empty      ),
+        .valid      (fifo_response_memory_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -349,21 +343,18 @@ module bundle_lanes #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketRequestLanesOutput (
-        .clk         (ap_clk                                             ),
-        .srst        (areset_fifo                                        ),
-        .din         (fifo_request_lanes_out_din                         ),
-        .wr_en       (fifo_request_lanes_out_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_lanes_out_signals_in_int.rd_en        ),
-        .dout        (fifo_request_lanes_out_dout                        ),
-        .full        (fifo_request_lanes_out_signals_out_int.full        ),
-        .almost_full (fifo_request_lanes_out_signals_out_int.almost_full ),
-        .empty       (fifo_request_lanes_out_signals_out_int.empty       ),
-        .almost_empty(fifo_request_lanes_out_signals_out_int.almost_empty),
-        .valid       (fifo_request_lanes_out_signals_out_int.valid       ),
-        .prog_full   (fifo_request_lanes_out_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_request_lanes_out_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_request_lanes_out_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_lanes_out_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                            ),
+        .srst       (areset_fifo                                       ),
+        .din        (fifo_request_lanes_out_din                        ),
+        .wr_en      (fifo_request_lanes_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_lanes_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_lanes_out_dout                       ),
+        .full       (fifo_request_lanes_out_signals_out_int.full       ),
+        .empty      (fifo_request_lanes_out_signals_out_int.empty      ),
+        .valid      (fifo_request_lanes_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_lanes_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_lanes_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_lanes_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -387,21 +378,18 @@ module bundle_lanes #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketRequestMemoryOutput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_request_memory_out_din                         ),
-        .wr_en       (fifo_request_memory_out_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_memory_out_signals_in_int.rd_en        ),
-        .dout        (fifo_request_memory_out_dout                        ),
-        .full        (fifo_request_memory_out_signals_out_int.full        ),
-        .almost_full (fifo_request_memory_out_signals_out_int.almost_full ),
-        .empty       (fifo_request_memory_out_signals_out_int.empty       ),
-        .almost_empty(fifo_request_memory_out_signals_out_int.almost_empty),
-        .valid       (fifo_request_memory_out_signals_out_int.valid       ),
-        .prog_full   (fifo_request_memory_out_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_request_memory_out_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_request_memory_out_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_memory_out_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_request_memory_out_din                        ),
+        .wr_en      (fifo_request_memory_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_memory_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_memory_out_dout                       ),
+        .full       (fifo_request_memory_out_signals_out_int.full       ),
+        .empty      (fifo_request_memory_out_signals_out_int.empty      ),
+        .valid      (fifo_request_memory_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -571,7 +559,7 @@ module bundle_lanes #(
         for (i=0; i< NUM_LANES; i++) begin : generate_lanes
             lane_template #(
                 `include"set_lane_parameters.vh"
-                ) inst_lane_template (
+            ) inst_lane_template (
                 .ap_clk                             (ap_clk                                      ),
                 .areset                             (areset_lane[i]                              ),
                 .descriptor_in                      (lanes_descriptor_in[i]                      ),

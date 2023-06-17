@@ -225,21 +225,18 @@ module engine_stride_index_configure #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacket_response (
-        .clk         (ap_clk                                    ),
-        .srst        (areset_fifo                               ),
-        .din         (fifo_response_din                         ),
-        .wr_en       (fifo_response_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_signals_in_int.rd_en        ),
-        .dout        (fifo_response_dout                        ),
-        .full        (fifo_response_signals_out_int.full        ),
-        .almost_full (fifo_response_signals_out_int.almost_full ),
-        .empty       (fifo_response_signals_out_int.empty       ),
-        .almost_empty(fifo_response_signals_out_int.almost_empty),
-        .valid       (fifo_response_signals_out_int.valid       ),
-        .prog_full   (fifo_response_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                   ),
+        .srst       (areset_fifo                              ),
+        .din        (fifo_response_din                        ),
+        .wr_en      (fifo_response_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_signals_in_int.rd_en       ),
+        .dout       (fifo_response_dout                       ),
+        .full       (fifo_response_signals_out_int.full       ),
+        .empty      (fifo_response_signals_out_int.empty      ),
+        .valid      (fifo_response_signals_out_int.valid      ),
+        .prog_full  (fifo_response_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -263,21 +260,18 @@ module engine_stride_index_configure #(
         .READ_DATA_WIDTH ($bits(StrideIndexConfigurationPayload)),
         .PROG_THRESH     (8                                     )
     ) inst_fifo_MemoryPacket_configuration (
-        .clk         (ap_clk                                         ),
-        .srst        (areset_fifo                                    ),
-        .din         (fifo_configuration_din                         ),
-        .wr_en       (fifo_configuration_signals_in_int.wr_en        ),
-        .rd_en       (fifo_configuration_signals_in_int.rd_en        ),
-        .dout        (fifo_configuration_dout                        ),
-        .full        (fifo_configuration_signals_out_int.full        ),
-        .almost_full (fifo_configuration_signals_out_int.almost_full ),
-        .empty       (fifo_configuration_signals_out_int.empty       ),
-        .almost_empty(fifo_configuration_signals_out_int.almost_empty),
-        .valid       (fifo_configuration_signals_out_int.valid       ),
-        .prog_full   (fifo_configuration_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_configuration_signals_out_int.prog_empty  ),
-        .wr_rst_busy (fifo_configuration_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_configuration_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                        ),
+        .srst       (areset_fifo                                   ),
+        .din        (fifo_configuration_din                        ),
+        .wr_en      (fifo_configuration_signals_in_int.wr_en       ),
+        .rd_en      (fifo_configuration_signals_in_int.rd_en       ),
+        .dout       (fifo_configuration_dout                       ),
+        .full       (fifo_configuration_signals_out_int.full       ),
+        .empty      (fifo_configuration_signals_out_int.empty      ),
+        .valid      (fifo_configuration_signals_out_int.valid      ),
+        .prog_full  (fifo_configuration_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_configuration_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_configuration_signals_out_int.rd_rst_busy)
     );
 
 endmodule : engine_stride_index_configure

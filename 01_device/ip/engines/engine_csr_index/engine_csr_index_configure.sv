@@ -253,12 +253,9 @@ module engine_csr_index_configure #(
         .rd_en       (fifo_response_signals_in_int.rd_en        ),
         .dout        (fifo_response_dout                        ),
         .full        (fifo_response_signals_out_int.full        ),
-        .almost_full (fifo_response_signals_out_int.almost_full ),
         .empty       (fifo_response_signals_out_int.empty       ),
-        .almost_empty(fifo_response_signals_out_int.almost_empty),
         .valid       (fifo_response_signals_out_int.valid       ),
         .prog_full   (fifo_response_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_response_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
     );
@@ -291,12 +288,9 @@ module engine_csr_index_configure #(
         .rd_en       (fifo_configuration_signals_in_int.rd_en        ),
         .dout        (fifo_configuration_dout                        ),
         .full        (fifo_configuration_signals_out_int.full        ),
-        .almost_full (fifo_configuration_signals_out_int.almost_full ),
         .empty       (fifo_configuration_signals_out_int.empty       ),
-        .almost_empty(fifo_configuration_signals_out_int.almost_empty),
         .valid       (fifo_configuration_signals_out_int.valid       ),
         .prog_full   (fifo_configuration_signals_out_int.prog_full   ),
-        .prog_empty  (fifo_configuration_signals_out_int.prog_empty  ),
         .wr_rst_busy (fifo_configuration_signals_out_int.wr_rst_busy ),
         .rd_rst_busy (fifo_configuration_signals_out_int.rd_rst_busy )
     );
