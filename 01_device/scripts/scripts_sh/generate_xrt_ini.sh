@@ -20,14 +20,14 @@ ACTIVE_APP_DIR=$1
 SCRIPTS_DIR=$2
 KERNEL_NAME=$3
 ctrl_mode=$4
-
+SCRIPTS_TCL=$5
 
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
 
 debug_mode="batch"
 # debug_mode="gui"
-user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/cmd_xsim.tcl"
+user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${SCRIPTS_TCL}/cmd_xsim.tcl"
 runtime_log="console"
 
 profile="true"
