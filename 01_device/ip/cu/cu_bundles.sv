@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_bundles.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 23:51:25
+// Revise : 2023-06-17 02:26:09
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,10 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module cu_bundles #(
-    parameter ID_CU = 0,
-    `include "cu_parameters.vh"
-) (
+module cu_bundles #(`include "cu_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -427,19 +424,7 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
-            bundle_lanes #(
-                .ID_CU                    (ID_CU                       ),
-                .ID_BUNDLE                (i                           ),
-                .NUM_BUNDLES              (NUM_BUNDLES                 ),
-                .NUM_LANES                (LANES_COUNT_ARRAY[i]        ),
-                .NUM_ENGINES              (NUM_ENGINES                 ),
-                .LANES_COUNT_ARRAY        (LANES_COUNT_ARRAY           ),
-                .ENGINES_COUNT_ARRAY      (LANES_ENGINES_COUNT_ARRAY[i]),
-                .LANES_ENGINES_COUNT_ARRAY(LANES_ENGINES_COUNT_ARRAY   ),
-                .ENGINES_CONFIG_ARRAY     (ENGINES_CONFIG_ARRAY        ),
-                .LANES_CONFIG_ARRAY       (BUNDLES_CONFIG_ARRAY[i]     ),
-                .BUNDLES_CONFIG_ARRAY     (BUNDLES_CONFIG_ARRAY        )
-            ) inst_bundle_lanes (
+            bundle_lanes #(`include"set_bundle_parameters.vh") inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
                 .areset                             (areset_bundle[i]                             ),
                 .descriptor_in                      (bundle_descriptor_in[i]                      ),

@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 02_pkg_cache.sv
 // Create : 2022-11-16 19:43:34
-// Revise : 2023-06-13 23:25:30
+// Revise : 2023-06-17 00:42:14
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 `timescale 1 ns / 1 ps
@@ -65,18 +65,18 @@ package PKG_CACHE;
 
 /*---------------------------------------------------*/
 //AXI specific parameters
-	parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W ;
-	parameter                      CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W ;
-	parameter                      CACHE_AXI_ID_W    = M_AXI_MEMORY_ID_WIDTH; //AXI ID (identification) width
-	parameter                      CACHE_AXI_LEN_W   = M_AXI_MEMORY_LEN_W   ; //AXI ID burst length (log2)
-	parameter                      CACHE_AXI_LOCK_W  = M_AXI_MEMORY_LOCK_W  ;
-	parameter                      CACHE_AXI_CACHE_W = M_AXI_MEMORY_CACHE_W ;
-	parameter                      CACHE_AXI_PROT_W  = M_AXI_MEMORY_PROT_W  ;
-	parameter                      CACHE_AXI_QOS_W   = M_AXI_MEMORY_QOS_W   ;
-	parameter                      CACHE_AXI_BURST_W = M_AXI_MEMORY_BURST_W ;
-	parameter                      CACHE_AXI_RESP_W  = M_AXI_MEMORY_RESP_W  ;
-	parameter                      CACHE_AXI_SIZE_W  = M_AXI_MEMORY_SIZE_W  ;
-	parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID      = 0                    ; //AXI ID value
+	parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W;
+	parameter                      CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W;
+	parameter                      CACHE_AXI_ID_W    = M_AXI_MEMORY_ID_W   ; //AXI ID (identification) width
+	parameter                      CACHE_AXI_LEN_W   = M_AXI_MEMORY_LEN_W  ; //AXI ID burst length (log2)
+	parameter                      CACHE_AXI_LOCK_W  = M_AXI_MEMORY_LOCK_W ;
+	parameter                      CACHE_AXI_CACHE_W = M_AXI_MEMORY_CACHE_W;
+	parameter                      CACHE_AXI_PROT_W  = M_AXI_MEMORY_PROT_W ;
+	parameter                      CACHE_AXI_QOS_W   = M_AXI_MEMORY_QOS_W  ;
+	parameter                      CACHE_AXI_BURST_W = M_AXI_MEMORY_BURST_W;
+	parameter                      CACHE_AXI_RESP_W  = M_AXI_MEMORY_RESP_W ;
+	parameter                      CACHE_AXI_SIZE_W  = M_AXI_MEMORY_SIZE_W ;
+	parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID      = 0                   ; //AXI ID value
 
 
 endpackage

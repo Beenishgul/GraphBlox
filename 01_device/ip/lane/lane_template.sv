@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-14 23:51:20
+// Revise : 2023-06-17 02:29:28
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,12 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(
-    parameter ID_CU     = 0,
-    parameter ID_BUNDLE = 0,
-    parameter ID_LANE   = 0,
-    `include "cu_parameters.vh"
-) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -436,22 +431,7 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_ENGINES; i++) begin : generate_bundles
-            engine_template #(
-                .ID_CU                    (ID_CU                    ),
-                .ID_BUNDLE                (ID_BUNDLE                ),
-                .ID_LANE                  (ID_LANE                  ),
-                .ID_ENGINE                (i                        ),
-                .ENGINES_CONFIG           (ENGINES_CONFIG_ARRAY[i]  ),
-                .NUM_BUNDLES              (NUM_BUNDLES              ),
-                .NUM_LANES                (NUM_LANES                ),
-                .NUM_ENGINES              (NUM_ENGINES              ),
-                .LANES_COUNT_ARRAY        (LANES_COUNT_ARRAY        ),
-                .ENGINES_COUNT_ARRAY      (ENGINES_COUNT_ARRAY      ),
-                .LANES_ENGINES_COUNT_ARRAY(LANES_ENGINES_COUNT_ARRAY),
-                .ENGINES_CONFIG_ARRAY     (ENGINES_CONFIG_ARRAY     ),
-                .LANES_CONFIG_ARRAY       (LANES_CONFIG_ARRAY       ),
-                .BUNDLES_CONFIG_ARRAY     (BUNDLES_CONFIG_ARRAY     )
-            ) inst_engine_template (
+            engine_template #(`include"set_engine_parameters.vh") inst_engine_template (
                 .ap_clk                             (ap_clk                                        ),
                 .areset                             (areset_engine[i]                              ),
                 .descriptor_in                      (engines_descriptor_in[i]                      ),
