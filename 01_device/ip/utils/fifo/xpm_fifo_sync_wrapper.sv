@@ -8,17 +8,16 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : xpm_fifo_sync_wrapper.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-06-17 07:48:38
+// Revise : 2023-06-17 16:37:19
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 module xpm_fifo_sync_wrapper #(
-  parameter        FIFO_WRITE_DEPTH = 16                                     ,
-  parameter        WRITE_DATA_WIDTH = 32                                     ,
-  parameter        READ_DATA_WIDTH  = 32                                     ,
-  parameter        PROG_THRESH      = 6                                      ,
-  parameter string READ_MODE        = "std"                                  ,
-  parameter string USE_ADV_FEATURES = (READ_MODE == "fwft") ? "1A0A" : "1002"
+  parameter FIFO_WRITE_DEPTH = 16   ,
+  parameter WRITE_DATA_WIDTH = 32   ,
+  parameter READ_DATA_WIDTH  = 32   ,
+  parameter PROG_THRESH      = 6    ,
+  parameter READ_MODE        = "std"
 ) (
   input  logic                        clk        ,
   input  logic                        srst       ,
@@ -34,7 +33,6 @@ module xpm_fifo_sync_wrapper #(
   output logic                        rd_rst_busy
 );
 
-
 // xpm_fifo_sync: Synchronous FIFO
 // Xilinx Parameterized Macro
   xpm_fifo_sync #(
@@ -45,7 +43,7 @@ module xpm_fifo_sync_wrapper #(
     .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
     .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
     .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
-    .USE_ADV_FEATURES   (USE_ADV_FEATURES              ), //string; "0000" to "1F1F", "1A0A", "1002";
+    .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
     .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
     .FIFO_READ_LATENCY  (1                             ), //positive integer;
     .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
@@ -60,15 +58,25 @@ module xpm_fifo_sync_wrapper #(
     .wr_en        (wr_en      ),
     .din          (din        ),
     .full         (full       ),
+    .overflow     (           ),
     .prog_full    (prog_full  ),
+    .wr_data_count(           ),
+    .almost_full  (           ),
+    .wr_ack       (           ),
     .wr_rst_busy  (wr_rst_busy),
     .rd_en        (rd_en      ),
     .dout         (dout       ),
     .empty        (empty      ),
+    .prog_empty   (           ),
+    .rd_data_count(           ),
+    .almost_empty (           ),
     .data_valid   (valid      ),
+    .underflow    (           ),
     .rd_rst_busy  (rd_rst_busy),
     .injectsbiterr(1'b0       ),
-    .injectdbiterr(1'b0       )
+    .injectdbiterr(1'b0       ),
+    .sbiterr      (           ),
+    .dbiterr      (           )
   );
 // End of xpm_fifo_sync instance declaration
 
