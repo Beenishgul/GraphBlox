@@ -21,13 +21,15 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module engine_pipeline #(
-    parameter ID_CU           = 0,
-    parameter ID_BUNDLE       = 0,
-    parameter ID_LANE         = 0,
-    parameter ID_ENGINE       = 0,
-    parameter ENGINES_CONFIG  = 0,
-    parameter PIPELINE_STAGES = 2
+module engine_pipeline #(parameter
+    ID_CU            = 0,
+    ID_BUNDLE        = 0,
+    ID_LANE          = 0,
+    ID_ENGINE        = 0,
+    ENGINES_CONFIG   = 0,
+    FIFO_WRITE_DEPTH = 8,
+    PROG_THRESH      = 4,
+    PIPELINE_STAGES  = 2
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -213,10 +215,10 @@ module engine_pipeline #(
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseEngineInput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),
@@ -251,10 +253,10 @@ module engine_pipeline #(
     assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),
@@ -289,10 +291,10 @@ module engine_pipeline #(
     assign request_engine_out_int.payload               = fifo_request_engine_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestEngineOutput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),
@@ -327,10 +329,10 @@ module engine_pipeline #(
     assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestMemoryOutput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),
