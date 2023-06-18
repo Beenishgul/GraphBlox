@@ -750,13 +750,13 @@ module kernel_testbench ();
     task automatic set_memory_pointers();
         ///////////////////////////////////////////////////////////////////////////
         //Randomly generate memory pointers.
-        buffer_0_ptr = get_random_ptr();
-        buffer_1_ptr = get_random_ptr();
-        buffer_2_ptr = get_random_ptr();
-        buffer_3_ptr = get_random_ptr();
-        buffer_4_ptr = get_random_ptr();
-        buffer_5_ptr = get_random_ptr();
-        buffer_6_ptr = get_random_ptr();
+        buffer_0_ptr[62:0] = get_random_ptr();
+        buffer_1_ptr[62:0] = get_random_ptr();
+        buffer_2_ptr[62:0] = get_random_ptr();
+        buffer_3_ptr[62:0] = get_random_ptr();
+        buffer_4_ptr[62:0] = get_random_ptr();
+        buffer_5_ptr[62:0] = get_random_ptr();
+        buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr = 1;
         buffer_8_ptr = 32;
         buffer_9_ptr = 0;
