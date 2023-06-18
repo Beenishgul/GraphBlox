@@ -16,6 +16,7 @@ module write_channel_axi #(
   parameter                      CACHE_AXI_ID_W        = 1                                                                  ,
   parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID          = 0                                                                  ,
   // Write-Policy
+  parameter                      CACHE_AXI_CACHE_MODE  = 4'b0011                                                            ,
   parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH                                                     , //write policy: write-through (0), write-back (1)
   parameter                      CACHE_WORD_OFF_W      = 3                                                                  , //required for write-back
   parameter                      CACHE_AXI_LOCK_W      = 1                                                                  ,
@@ -59,7 +60,7 @@ generate
     assign m_axi_awsize  = CACHE_BACKEND_BYTE_W; // verify - Writes data of the size of CACHE_BACKEND_DATA_W
     assign m_axi_awburst = 2'd0;
     assign m_axi_awlock  = 1'b0; // 00 - Normal Access
-    assign m_axi_awcache = 4'b0011;
+    assign m_axi_awcache = CACHE_AXI_CACHE_MODE;
     assign m_axi_awprot  = 3'd0;
     assign m_axi_wlast   = m_axi_wvalid_int;
     assign m_axi_awqos   = 4'd0;
@@ -167,7 +168,7 @@ generate
       //Constant AXI signals
       assign m_axi_awid    = CACHE_AXI_ID;
       assign m_axi_awlock  = 1'b0;
-      assign m_axi_awcache = 4'b0011;
+      assign m_axi_awcache = CACHE_AXI_CACHE_MODE;
       assign m_axi_awprot  = 3'd0;
 
       //Burst parameters - single

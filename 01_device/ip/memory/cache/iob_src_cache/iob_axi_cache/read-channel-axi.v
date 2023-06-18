@@ -14,6 +14,7 @@ module read_channel_axi #(
   // //AXI specific parameters
   parameter                      CACHE_AXI_ADDR_W      = CACHE_BACKEND_ADDR_W                                               ,
   parameter                      CACHE_AXI_DATA_W      = CACHE_BACKEND_DATA_W                                               ,
+  parameter                      CACHE_AXI_CACHE_MODE  = 4'b0011                                                            ,
   parameter                      CACHE_AXI_LEN_W       = 8                                                                  , //AXI ID burst length (log2)
   parameter                      CACHE_AXI_ID_W        = 1                                                                  , //AXI ID (identification) width
   parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID          = 0                                                                  , //AXI ID value
@@ -48,7 +49,7 @@ assign m_axi_rready  = m_axi_rready_int;
 //Constant AXI signals
 assign m_axi_arid    = CACHE_AXI_ID;
 assign m_axi_arlock  = 1'b0;
-assign m_axi_arcache = 4'b0011;
+assign m_axi_arcache = CACHE_AXI_CACHE_MODE;
 assign m_axi_arprot  = 3'd0;
 //Burst parameters
 assign m_axi_arlen   = 8'd0; //will choose the burst lenght depending on the cache's and slave's data width

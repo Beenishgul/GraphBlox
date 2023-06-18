@@ -16,6 +16,7 @@ module back_end_axi #(
   parameter                      CACHE_BACKEND_NBYTES  = CACHE_BACKEND_DATA_W/8                                             , //Number of bytes
   parameter                      CACHE_BACKEND_BYTE_W  = $clog2(CACHE_BACKEND_NBYTES)                                       , //Offset of Number of Bytes
  // Write-Policy
+  parameter                      CACHE_AXI_CACHE_MODE  = 4'b0011                                                            ,
   parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH                                                     , //write policy: write-through (0), write-back (1)
   //AXI specific parameters
   parameter                      CACHE_AXI_ADDR_W      = CACHE_BACKEND_ADDR_W                                               ,
@@ -68,7 +69,8 @@ read_channel_axi #(
   .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
   .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
   .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     ),
-  .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     )
+  .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     ),
+  .CACHE_AXI_CACHE_MODE (CACHE_AXI_CACHE_MODE )
 ) read_fsm (
   .replace_valid(replace_valid),
   .replace_addr (replace_addr ),
@@ -99,7 +101,8 @@ write_channel_axi #(
   .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
   .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
   .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     ),
-  .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     )
+  .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     ),
+  .CACHE_AXI_CACHE_MODE (CACHE_AXI_CACHE_MODE )
 ) write_fsm (
   .valid(write_valid),
   .addr (write_addr ),
