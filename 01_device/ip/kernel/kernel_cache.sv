@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_cache.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-06-13 23:22:04
+// Revise : 2023-06-17 21:16:00
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -190,34 +190,35 @@ module kernel_cache (
   assign cache_ctrl_in.wtb_empty = 1'b1;
 
   iob_cache_axi #(
-    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W),
-    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W),
-    .CACHE_N_WAYS         (CACHE_N_WAYS         ),
-    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W     ),
-    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W     ),
-    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W  ),
-    .CACHE_REP_POLICY     (CACHE_REP_POLICY     ),
-    .CACHE_NWAY_W         (CACHE_NWAY_W         ),
-    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES),
-    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W),
-    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W ),
-    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W ),
-    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES ),
-    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W ),
-    .CACHE_WRITE_POL      (CACHE_WRITE_POL      ),
-    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE     ),
-    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT       ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W     ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W     ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W       ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W      ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID         ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W     ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W    ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W     ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     )
+    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W                        ),
+    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W                        ),
+    .CACHE_N_WAYS         (CACHE_N_WAYS                                 ),
+    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W                             ),
+    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W                             ),
+    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W                          ),
+    .CACHE_REP_POLICY     (CACHE_REP_POLICY                             ),
+    .CACHE_NWAY_W         (CACHE_NWAY_W                                 ),
+    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES                        ),
+    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W                        ),
+    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W                         ),
+    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W                         ),
+    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES                         ),
+    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W                         ),
+    .CACHE_WRITE_POL      (CACHE_WRITE_POL                              ),
+    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE                             ),
+    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT                               ),
+    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W                             ),
+    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W                             ),
+    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W                               ),
+    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W                              ),
+    .CACHE_AXI_ID         (CACHE_AXI_ID                                 ),
+    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W                             ),
+    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W                            ),
+    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W                             ),
+    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W                              ),
+    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W                            ),
+    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W                             ),
+    .CACHE_AXI_CACHE_MODE (M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
   ) inst_cache_axi (
     .valid        (cache_request_mem.iob.valid ),
     .addr         (cache_request_mem.iob.addr  ),

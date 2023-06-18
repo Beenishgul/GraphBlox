@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-15 22:01:48
+# @Last Modified time: 2023-06-17 21:23:32
 #!/bin/bash
 
 
@@ -150,6 +150,6 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/bram_512x32_asym_512wrt_64rd.xci"
 # echo $newtext >> ${CFG_FILE_NAME}
 
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
+echo $newtext >> ${CFG_FILE_NAME}
 

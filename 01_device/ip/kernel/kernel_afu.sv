@@ -137,13 +137,30 @@ module kernel_afu #(
   logic kernel_cu_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
+// System Cache -> AXI
+// --------------------------------------------------------------------------------------
+  AXI4SlaveReadInterfaceOutput  kernel_system_cache_s_axi_read_out ;
+  AXI4SlaveReadInterfaceInput   kernel_system_cache_s_axi_read_in  ;
+  AXI4SlaveWriteInterfaceOutput kernel_system_cache_s_axi_write_out;
+  AXI4SlaveWriteInterfaceInput  kernel_system_cache_s_axi_write_in ;
+
+  AXI4MasterReadInterfaceInput   kernel_system_cache_m_axi_read_in  ;
+  AXI4MasterReadInterfaceOutput  kernel_system_cache_m_axi_read_out ;
+  AXI4MasterWriteInterfaceInput  kernel_system_cache_m_axi_write_in ;
+  AXI4MasterWriteInterfaceOutput kernel_system_cache_m_axi_write_out;
+
+  logic kernel_system_cache_setup_signal       ;
+  logic areset_system_cache              = 1'b0;
+
+// --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi   <= ~ap_rst_n;
-    areset_cu      <= ~ap_rst_n | ap_done;
-    areset_control <= ~ap_rst_n;
-    areset_cache   <= ~ap_rst_n;
+    areset_m_axi        <= ~ap_rst_n;
+    areset_cu           <= ~ap_rst_n | ap_done;
+    areset_control      <= ~ap_rst_n;
+    areset_cache        <= ~ap_rst_n;
+    areset_system_cache <= ~ap_rst_n;
   end
 
 // --------------------------------------------------------------------------------------
@@ -159,7 +176,7 @@ module kernel_afu #(
     else begin
       kernel_control_in.ap_start    <= ap_start;
       kernel_control_in.ap_continue <= ap_continue;
-      kernel_control_in.setup       <= ~(kernel_cache_fifo_setup_signal | kernel_cu_fifo_setup_signal);
+      kernel_control_in.setup       <= ~(kernel_cache_fifo_setup_signal | kernel_cu_fifo_setup_signal | kernel_system_cache_setup_signal);
       kernel_control_in.done        <= kernel_cu_done_out;
     end
   end
@@ -300,24 +317,85 @@ module kernel_afu #(
     kernel_control_descriptor_in.buffer_9 <= buffer_9  ;
   end
 
+// // --------------------------------------------------------------------------------------
+// // Assign Kernel Cache <-> CU Signals
+// // --------------------------------------------------------------------------------------
+//   // kernel_cache
+//   assign kernel_cache_request_in                     = kernel_cu_request_out;
+//   assign kernel_cache_fifo_request_signals_in.rd_en  = ~(kernel_cu_fifo_response_signals_out.prog_full);
+//   assign kernel_cache_fifo_response_signals_in.rd_en = ~(kernel_cu_fifo_response_signals_out.prog_full);
+
+//   // kernel_cu
+//   assign kernel_cu_response_in                    = kernel_cache_response_out;
+//   assign kernel_cu_fifo_request_signals_in.rd_en  = ~(kernel_cache_fifo_request_signals_out.prog_full | kernel_cache_fifo_response_signals_out.prog_full);
+//   assign kernel_cu_fifo_response_signals_in.rd_en = 0;
+
+//   // Kernel_setup
+//   assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
+
+// // --------------------------------------------------------------------------------------
+// // Cache -> AXI
+// // --------------------------------------------------------------------------------------
+//   kernel_cache inst_kernel_cache (
+//     .ap_clk                   (ap_clk                                ),
+//     .areset                   (areset_cache                          ),
+//     .request_in               (kernel_cache_request_in               ),
+//     .fifo_request_signals_out (kernel_cache_fifo_request_signals_out ),
+//     .fifo_request_signals_in  (kernel_cache_fifo_request_signals_in  ),
+//     .response_out             (kernel_cache_response_out             ),
+//     .fifo_response_signals_out(kernel_cache_fifo_response_signals_out),
+//     .fifo_response_signals_in (kernel_cache_fifo_response_signals_in ),
+//     .fifo_setup_signal        (kernel_cache_fifo_setup_signal        ),
+//     .m_axi_read_in            (m_axi_read.in                         ),
+//     .m_axi_read_out           (m_axi_read.out                        ),
+//     .m_axi_write_in           (m_axi_write.in                        ),
+//     .m_axi_write_out          (m_axi_write.out                       )
+//   );
+
 // --------------------------------------------------------------------------------------
 // Assign Kernel Cache <-> CU Signals
 // --------------------------------------------------------------------------------------
   // kernel_cache
   assign kernel_cache_request_in                     = kernel_cu_request_out;
+  assign kernel_cache_fifo_request_signals_in.wr_en  = 0;
   assign kernel_cache_fifo_request_signals_in.rd_en  = ~(kernel_cu_fifo_response_signals_out.prog_full);
+  assign kernel_cache_fifo_response_signals_in.wr_en = 0;
   assign kernel_cache_fifo_response_signals_in.rd_en = ~(kernel_cu_fifo_response_signals_out.prog_full);
 
   // kernel_cu
   assign kernel_cu_response_in                    = kernel_cache_response_out;
+  assign kernel_cu_fifo_request_signals_in.wr_en  = 0;
   assign kernel_cu_fifo_request_signals_in.rd_en  = ~(kernel_cache_fifo_request_signals_out.prog_full | kernel_cache_fifo_response_signals_out.prog_full);
+  assign kernel_cu_fifo_response_signals_in.wr_en = 0;
   assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
   // Kernel_setup
   assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
 
 // --------------------------------------------------------------------------------------
-// Cache -> AXI
+// System Cache -> AXI
+// --------------------------------------------------------------------------------------
+  assign kernel_system_cache_m_axi_read_in  = m_axi_read.in  ;
+  assign m_axi_read.out                     = kernel_system_cache_m_axi_read_out  ;
+  assign kernel_system_cache_m_axi_write_in = m_axi_write.in ;
+  assign m_axi_write.out                    = kernel_system_cache_m_axi_write_out;
+
+  kernel_system_cache inst_kernel_system_cache (
+    .ap_clk            (ap_clk                             ),
+    .areset            (areset_system_cache                ),
+    .s_axi_read_out    (kernel_system_cache_s_axi_read_out ),
+    .s_axi_read_in     (kernel_system_cache_s_axi_read_in  ),
+    .s_axi_write_out   (kernel_system_cache_s_axi_write_out),
+    .s_axi_write_in    (kernel_system_cache_s_axi_write_in ),
+    .m_axi_read_in     (kernel_system_cache_m_axi_read_in  ),
+    .m_axi_read_out    (kernel_system_cache_m_axi_read_out ),
+    .m_axi_write_in    (kernel_system_cache_m_axi_write_in ),
+    .m_axi_write_out   (kernel_system_cache_m_axi_write_out),
+    .cache_setup_signal(kernel_system_cache_setup_signal   )
+  );
+
+// --------------------------------------------------------------------------------------
+// Cache -> System Cache
 // --------------------------------------------------------------------------------------
   kernel_cache inst_kernel_cache (
     .ap_clk                   (ap_clk                                ),
@@ -329,10 +407,10 @@ module kernel_afu #(
     .fifo_response_signals_out(kernel_cache_fifo_response_signals_out),
     .fifo_response_signals_in (kernel_cache_fifo_response_signals_in ),
     .fifo_setup_signal        (kernel_cache_fifo_setup_signal        ),
-    .m_axi_read_in            (m_axi_read.in                         ),
-    .m_axi_read_out           (m_axi_read.out                        ),
-    .m_axi_write_in           (m_axi_write.in                        ),
-    .m_axi_write_out          (m_axi_write.out                       )
+    .m_axi_read_in            (kernel_system_cache_s_axi_read_out    ),
+    .m_axi_read_out           (kernel_system_cache_s_axi_read_in     ),
+    .m_axi_write_in           (kernel_system_cache_s_axi_write_out   ),
+    .m_axi_write_out          (kernel_system_cache_s_axi_write_in    )
   );
 
 // --------------------------------------------------------------------------------------

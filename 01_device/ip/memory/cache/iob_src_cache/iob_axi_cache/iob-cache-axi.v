@@ -24,6 +24,7 @@ module iob_cache_axi #(
   parameter                      CACHE_BACKEND_BYTE_W  = $clog2(CACHE_BACKEND_NBYTES) , //Offset of Number of Bytes
   /*---------------------------------------------------*/
   //Write Policy
+  parameter                      CACHE_AXI_CACHE_MODE  = 4'b0011                      ,
   parameter                      CACHE_WRITE_POL       = `WRITE_THROUGH               , //write policy: write-through (0), write-back (1)
   /*---------------------------------------------------*/
   //AXI specific parameters
@@ -212,7 +213,8 @@ module iob_cache_axi #(
     .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W      ),
     .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W    ),
     .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W     ),
-    .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     )
+    .CACHE_AXI_SIZE_W     (CACHE_AXI_SIZE_W     ),
+    .CACHE_AXI_CACHE_MODE (CACHE_AXI_CACHE_MODE )
   ) back_end (
     //write-through-buffer (write-channel)
     .write_valid  (write_valid  ),
