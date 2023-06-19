@@ -112,6 +112,11 @@ module kernel_afu #(
   logic kernel_cu_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
+// CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
+// --------------------------------------------------------------------------------------
+  KernelDescriptor kernel_cu_descriptor_in;
+
+// --------------------------------------------------------------------------------------
 // System Cache -> AXI
 // --------------------------------------------------------------------------------------
   AXI4SlaveReadInterfaceOutput  kernel_cache_s_axi_read_out ;
@@ -317,10 +322,13 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
 // --------------------------------------------------------------------------------------
+// Kernel_setup
+  assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
+
   kernel_cu #(.ID_CU(0)) inst_kernel_cu (
     .ap_clk           (ap_clk                      ),
-    .areset           (areset                      ),
-    .descriptor_in    (descriptor_in               ),
+    .areset           (areset_cu                   ),
+    .descriptor_in    (kernel_cu_descriptor_in     ),
     .m_axi_read_in    (kernel_cache_s_axi_read_out ),
     .m_axi_read_out   (kernel_cache_s_axi_read_in  ),
     .m_axi_write_in   (kernel_cache_s_axi_write_out),
