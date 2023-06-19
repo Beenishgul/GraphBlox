@@ -328,8 +328,8 @@ else ifeq ($(HOST_NAME), jaguar)
 # 	export PART  = xcu55c-fsvh2892-2L-e
 # 	export PLATFORM = xilinx_u55c_gen3x16_xdma_3_202210_1
 
-	export XILINX_JOBS_STRATEGY = 4
-	export XILINX_MAX_THREADS   = 8
+	export XILINX_JOBS_STRATEGY = 8
+	export XILINX_MAX_THREADS   = 32
 else
 	export ALVEO =  U250
 	export PART  =  xcu250-figd2104-2L-e
