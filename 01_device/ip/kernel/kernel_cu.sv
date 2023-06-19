@@ -19,7 +19,9 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(`include "kernel_parameters.vh") (
+module kernel_cu #(
+  `include "kernel_parameters.vh"
+  ) (
   input  logic                          ap_clk           ,
   input  logic                          areset           ,
   input  KernelDescriptor               descriptor_in    ,
@@ -39,6 +41,7 @@ module kernel_cu #(`include "kernel_parameters.vh") (
   logic areset_generator;
   logic areset_setup    ;
   logic areset_bundles  ;
+  logic areset_cache    ;
 
   KernelDescriptor descriptor_in_reg;
 
@@ -96,7 +99,7 @@ module kernel_cu #(`include "kernel_parameters.vh") (
   logic                  cu_bundles_done_out                 ;
 
 // --------------------------------------------------------------------------------------
-// Cache -> AXI
+// CU Cache -> AXI
 // --------------------------------------------------------------------------------------
   CacheRequest           cu_cache_request_in              ;
   FIFOStateSignalsOutput cu_cache_fifo_request_signals_out;
@@ -107,11 +110,14 @@ module kernel_cu #(`include "kernel_parameters.vh") (
   FIFOStateSignalsInput  cu_cache_fifo_response_signals_in ;
   logic                  cu_cache_fifo_setup_signal        ;
 
+  AXI4MasterReadInterfaceInput   cu_cache_m_axi_read_in  ;
+  AXI4MasterReadInterfaceOutput  cu_cache_m_axi_read_out ;
+  AXI4MasterWriteInterfaceInput  cu_cache_m_axi_write_in ;
+  AXI4MasterWriteInterfaceOutput cu_cache_m_axi_write_out;
+
 // --------------------------------------------------------------------------------------
 // CU -> PEs
 // --------------------------------------------------------------------------------------
-  KernelDescriptor kernel_cu_descriptor_in;
-
   CacheRequest           kernel_cu_request_out             ;
   FIFOStateSignalsOutput kernel_cu_fifo_request_signals_out;
   FIFOStateSignalsInput  kernel_cu_fifo_request_signals_in ;
@@ -128,6 +134,7 @@ module kernel_cu #(`include "kernel_parameters.vh") (
     areset_setup     <= areset;
     areset_generator <= areset;
     areset_bundles   <= areset;
+    areset_cache     <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -140,14 +147,16 @@ module kernel_cu #(`include "kernel_parameters.vh") (
       response_in_reg.valid        <= 0;
     end
     else begin
-      fifo_response_signals_in_reg <= fifo_response_signals_in;
-      fifo_request_signals_in_reg  <= fifo_request_signals_in;
-      response_in_reg.valid        <= response_in.valid;
+      fifo_response_signals_in_reg <= kernel_cu_fifo_response_signals_in;
+      fifo_request_signals_in_reg  <= kernel_cu_fifo_request_signals_in;
+      response_in_reg.valid        <= kernel_cu_response_in.valid;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    response_in_reg.payload <= response_in.payload;
+    cu_cache_m_axi_read_in  <= m_axi_read_in;
+    cu_cache_m_axi_read_in  <= m_axi_write_in;
+    response_in_reg.payload <= kernel_cu_response_in.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -160,16 +169,18 @@ module kernel_cu #(`include "kernel_parameters.vh") (
       done_out          <= 1'b0;
     end
     else begin
-      fifo_setup_signal <= cu_cache_fifo_setup_signal | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
-      request_out.valid <= request_out_reg.valid ;
-      done_out          <= cu_bundles_done_out;
+      fifo_setup_signal           <= cu_cache_fifo_setup_signal | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
+      kernel_cu_request_out.valid <= request_out_reg.valid ;
+      done_out                    <= cu_bundles_done_out;
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
-    fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
-    request_out.payload       <= request_out_reg.payload;
+    m_axi_read_out                      <= cu_cache_m_axi_read_out ;
+    m_axi_write_out                     <= cu_cache_m_axi_write_out ;
+    kernel_cu_fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
+    kernel_cu_fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
+    kernel_cu_request_out.payload       <= request_out_reg.payload;
   end
 
 // --------------------------------------------------------------------------------------
@@ -284,10 +295,10 @@ module kernel_cu #(`include "kernel_parameters.vh") (
     .fifo_response_signals_out(cu_cache_fifo_response_signals_out),
     .fifo_response_signals_in (cu_cache_fifo_response_signals_in ),
     .fifo_setup_signal        (cu_cache_fifo_setup_signal        ),
-    .m_axi_read_in            (kernel_cache_s_axi_read_out       ),
-    .m_axi_read_out           (kernel_cache_s_axi_read_in        ),
-    .m_axi_write_in           (kernel_cache_s_axi_write_out      ),
-    .m_axi_write_out          (kernel_cache_s_axi_write_in       )
+    .m_axi_read_in            (cu_cache_m_axi_read_in            ),
+    .m_axi_read_out           (cu_cache_m_axi_read_out           ),
+    .m_axi_write_in           (cu_cache_m_axi_write_in           ),
+    .m_axi_write_out          (cu_cache_m_axi_write_out          )
   );
 
 // --------------------------------------------------------------------------------------
