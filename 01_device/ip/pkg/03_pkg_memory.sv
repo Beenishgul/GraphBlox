@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 03_pkg_memory.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-06-18 23:25:41
+// Revise : 2023-06-19 00:25:39
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -27,12 +27,12 @@ import PKG_CACHE::*;
 // FIFO Signals
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-  logic full        ;
-  logic empty       ;
-  logic valid       ;
-  logic prog_full   ;
-  logic wr_rst_busy ;
-  logic rd_rst_busy ;
+  logic full       ;
+  logic empty      ;
+  logic valid      ;
+  logic prog_full  ;
+  logic wr_rst_busy;
+  logic rd_rst_busy;
 } FIFOStateSignalsOutput;
 
 typedef struct packed {
@@ -94,9 +94,9 @@ typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
 parameter TYPE_DATA_STRUCTURE_BITS = 5;
 typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
   STRUCT_INVALID,
-  STRUCT_KERNEL_DATA,
+  STRUCT_CU_DATA,
   STRUCT_ENGINE_DATA,
-  STRUCT_KERNEL_SETUP,
+  STRUCT_CU_SETUP,
   STRUCT_ENGINE_SETUP
 } type_data_buffer;
 
