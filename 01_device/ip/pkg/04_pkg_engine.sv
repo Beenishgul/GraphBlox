@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 04_pkg_engine.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-06-13 23:25:49
+// Revise : 2023-06-18 23:52:09
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -191,12 +191,12 @@ package PKG_ENGINE;
     } ReadWriteEngineConfiguration;
 
 
-// Kernel\_Setup\_Engine
+// CU\_Setup\_Engine
 // --------------------
 
 // ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
 
-// The kernel setup acts like a serial read engine
+// The cu setup acts like a serial read engine
 // sends read commands to the memory control layer.
 // Each read or write requests a chunk of data specified with the
 // "granularity" parameter -- alignment should be honored for a cache line.
@@ -206,16 +206,16 @@ package PKG_ENGINE;
 // array.
 
     typedef enum logic[8:0] {
-        ENGINE_KERNEL_SETUP_RESET,
-        ENGINE_KERNEL_SETUP_IDLE,
-        ENGINE_KERNEL_SETUP_SETUP,
-        ENGINE_KERNEL_SETUP_START,
-        ENGINE_KERNEL_SETUP_BUSY_TRANS,
-        ENGINE_KERNEL_SETUP_BUSY,
-        ENGINE_KERNEL_SETUP_PAUSE_TRANS,
-        ENGINE_KERNEL_SETUP_PAUSE,
-        ENGINE_KERNEL_SETUP_DONE
-    } engine_kernel_setup_state;
+        ENGINE_CU_SETUP_RESET,
+        ENGINE_CU_SETUP_IDLE,
+        ENGINE_CU_SETUP_SETUP,
+        ENGINE_CU_SETUP_START,
+        ENGINE_CU_SETUP_BUSY_TRANS,
+        ENGINE_CU_SETUP_BUSY,
+        ENGINE_CU_SETUP_PAUSE_TRANS,
+        ENGINE_CU_SETUP_PAUSE,
+        ENGINE_CU_SETUP_DONE
+    } engine_cu_setup_state;
 
     typedef struct packed{
         logic                               increment    ;
@@ -226,17 +226,17 @@ package PKG_ENGINE;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } KernelSetupEngineConfigurationParameters;
+    } CUSetupEngineConfigurationParameters;
 
     typedef struct packed{
-        KernelSetupEngineConfigurationParameters param;
-        MemoryPacketMeta                         meta ;
-    } KernelSetupEngineConfigurationPayload;
+        CUSetupEngineConfigurationParameters param;
+        MemoryPacketMeta                     meta ;
+    } CUSetupEngineConfigurationPayload;
 
 
     typedef struct packed{
-        logic                                 valid  ;
-        KernelSetupEngineConfigurationPayload payload;
-    } KernelSetupEngineConfiguration;
+        logic                             valid  ;
+        CUSetupEngineConfigurationPayload payload;
+    } CUSetupEngineConfiguration;
 
 endpackage
