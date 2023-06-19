@@ -10,9 +10,9 @@
 // --------------------------------------------------------------------------------------
 // CU Configuration
 // --------------------------------------------------------------------------------------
-    parameter NUM_CUS     = 2,
-    parameter NUM_BUNDLES = 4,
-    parameter NUM_LANES   = 6,
+    parameter NUM_CUS     = 1,
+    parameter NUM_BUNDLES = 1,
+    parameter NUM_LANES   = 4,
     parameter NUM_ENGINES = 3,
 
     parameter NUM_CUS_INDEX     = NUM_CUS,
@@ -61,7 +61,7 @@
     parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},
     parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}},
 
-    parameter int CU_BUNDLES_COUNT_ARRAY[NUM_CUS_MAX] = '{4,4},
+    parameter int CU_BUNDLES_COUNT_ARRAY[NUM_CUS_MAX] = '{2,4},
     parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX] = '{'{6,6,6,6},'{6,6,6,6}},
     parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}},'{'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}}},
     parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}},'{'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}}}
