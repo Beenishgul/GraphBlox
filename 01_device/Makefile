@@ -260,6 +260,11 @@ run-sim-help: session-info
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)  $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -help  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
+.PHONY: run-sim-project
+run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(SCRIPTS_DIR_ACTIVE)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
+
 # =========================================================
 # XCLBIN V++ Flags
 # =========================================================

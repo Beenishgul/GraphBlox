@@ -54,8 +54,6 @@ puts "========================================================="
 
 # set_part ${part_id} >> $log_file
 
-
- 
 create_project ${kernel_name}_ip_project -in_memory -force -part $part_id >> $log_file
 
 set_property PART $part_id [current_project]
