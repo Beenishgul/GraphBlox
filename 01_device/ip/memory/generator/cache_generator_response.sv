@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cache_generator_response.sv
 // Create : 2023-06-17 01:03:07
-// Revise : 2023-06-19 00:44:02
+// Revise : 2023-06-19 01:19:58
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -136,19 +136,24 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-  assign fifo_response_din.iob              = response_in_reg.payload.iob;
-  assign fifo_response_din.meta             = response_in_reg.payload.meta;
+  assign fifo_response_signals_in_int.wr_en      = response_in_reg.valid;
+  assign fifo_response_din.iob                   = response_in_reg.payload.iob;
+  assign fifo_response_din.meta.address          = response_in_reg.payload.meta.address ;
+  assign fifo_response_din.meta.route            = response_in_reg.payload.meta.route;
+  assign fifo_response_din.meta.subclass.buffer  = response_in_reg.payload.meta.subclass.buffer;
+  assign fifo_response_din.meta.subclass.operand = response_in_reg.payload.meta.subclass.operand ;
+  assign fifo_response_din.meta.subclass.filter  = response_in_reg.payload.meta.subclass.filter ;
+  assign fifo_response_din.meta.subclass.alu     = response_in_reg.payload.meta.subclass.alu ;
+  assign fifo_response_din.meta.subclass.cmd     = CMD_MEM_RESPONSE;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en               = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-  assign fifo_response_dout_int.valid                     = fifo_response_signals_out_int.valid;
-  assign fifo_response_dout_int.payload.meta              = fifo_response_dout.meta;
-  assign fifo_response_dout_int.payload.meta.subclass.cmd = CMD_MEM_RESPONSE;
-  assign fifo_response_dout_int.payload.data.field_0      = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_1      = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_2      = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_3      = fifo_response_dout.iob.rdata;
+  assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+  assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
+  assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
+  assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_1 = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_2 = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_3 = fifo_response_dout.iob.rdata;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(16                         ),

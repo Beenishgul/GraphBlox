@@ -74,7 +74,7 @@ puts "[color 4 "                        Add design sources into project"]"
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f]] >> $log_file
-# add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
+add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
 
 puts "[color 4 "                        Set Defines ${ctrl_mode}"]"
 # set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
