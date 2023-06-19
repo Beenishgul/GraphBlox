@@ -153,7 +153,7 @@ module kernel_cu #(`include "kernel_parameters.vh") (
 
   always_ff @(posedge ap_clk) begin
     cu_cache_m_axi_read_in  <= m_axi_read_in;
-    cu_cache_m_axi_read_in  <= m_axi_write_in;
+    cu_cache_m_axi_write_in <= m_axi_write_in;
     response_in_reg.payload <= kernel_cu_response_in.payload;
   end
 
