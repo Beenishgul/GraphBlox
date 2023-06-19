@@ -72,6 +72,9 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
+add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xdc.f]] >> $log_file
+
+puts "[color 4 "                        Add design sources into sim_1"]" 
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
