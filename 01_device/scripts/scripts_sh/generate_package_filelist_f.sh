@@ -113,7 +113,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_cu_s
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_template} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_pipeline} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_read_write} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_write} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_alu_operations} ${CFG_FILE_NAME} "sv"

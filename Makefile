@@ -280,6 +280,7 @@ export SCRIPTS_DIR        = scripts
 export SCRIPTS_PERL       = scripts_pl
 export SCRIPTS_TCL        = scripts_tcl
 export SCRIPTS_SHELL      = scripts_sh
+export SCRIPTS_XDC        = scripts_xdc
 export IP_DIR             = ip
 export REPORTS_DIR        = reports
 
