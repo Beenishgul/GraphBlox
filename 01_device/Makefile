@@ -218,7 +218,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 
 .PHONY: gen-vip
-gen-vip: session-info  gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
+gen-vip: session-info gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR)
 
@@ -275,8 +275,6 @@ VPPCONFLAGS =   --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_
 				--log_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_log \
 				--report_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_report
 		
-
-
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
@@ -292,7 +290,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
 
 $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR)
 
 .PHONY: package-kernel
 package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
