@@ -129,8 +129,7 @@ module kernel_afu #(
   AXI4MasterWriteInterfaceInput  kernel_cache_m_axi_write_in ;
   AXI4MasterWriteInterfaceOutput kernel_cache_m_axi_write_out;
 
-  logic kernel_cache_setup_signal       ;
-  logic areset_cache              = 1'b0;
+  logic kernel_cache_setup_signal;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
@@ -139,7 +138,6 @@ module kernel_afu #(
     areset_m_axi   <= ~ap_rst_n;
     areset_cu      <= ~ap_rst_n | ap_done;
     areset_control <= ~ap_rst_n;
-    areset_cache   <= ~ap_rst_n;
     areset_cache   <= ~ap_rst_n;
   end
 
