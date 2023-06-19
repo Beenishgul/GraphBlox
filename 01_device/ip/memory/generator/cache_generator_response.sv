@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cache_generator_response.sv
 // Create : 2023-06-17 01:03:07
-// Revise : 2023-06-18 23:28:39
+// Revise : 2023-06-19 00:44:02
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   always_comb begin
     if(fifo_response_dout_int.valid) begin
       case (fifo_response_dout_int.payload.meta.subclass.buffer)
-        STRUCT_KERNEL_SETUP : begin
+        STRUCT_CU_SETUP : begin
           response_out_reg[0] = fifo_response_dout_int;
           response_out_reg[1] = fifo_response_dout_int;
         end

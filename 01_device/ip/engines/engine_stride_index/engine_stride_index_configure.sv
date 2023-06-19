@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_stride_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 01:02:24
+// Revise : 2023-06-19 00:48:45
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ module engine_stride_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((response_in_reg.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
+    assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & ((response_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
     assign fifo_response_din                  = response_in_reg.payload;
 
     // Pop

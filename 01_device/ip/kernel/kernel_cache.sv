@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_system_cache.sv
+// File   : kernel_cache.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 21:39:30
+// Revise : 2023-06-19 00:51:45
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ import PKG_CONTROL::*;
 import PKG_CACHE::*;
 import PKG_MEMORY::*;
 
-module kernel_system_cache (
+module kernel_cache (
   // System Signals
   input  logic                          ap_clk            ,
   input  logic                          areset            ,
@@ -196,4 +196,4 @@ module kernel_system_cache (
     .M0_AXI_BREADY     (m_axi_write.out.bready      )  // Output Write response channel ready
   );
 
-endmodule : kernel_system_cache
+endmodule : kernel_cache
