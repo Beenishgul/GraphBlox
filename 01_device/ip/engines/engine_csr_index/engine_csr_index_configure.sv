@@ -8,9 +8,17 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:48:07
+// Revise : 2023-06-19 01:31:06
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
+
+import PKG_AXI4::*;
+import PKG_GLOBALS::*;
+import PKG_DESCRIPTOR::*;
+import PKG_CONTROL::*;
+import PKG_MEMORY::*;
+import PKG_ENGINE::*;
+import PKG_CACHE::*;
 
 module engine_csr_index_configure #(
     parameter ID_CU            = 0                                ,
