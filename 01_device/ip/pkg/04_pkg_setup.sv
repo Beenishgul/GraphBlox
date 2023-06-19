@@ -3,13 +3,13 @@
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
-// Copyright (c) 2021-2022 All rights reserved
+// Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : PKG_SETUP.sv
+// File   : 04_pkg_setup.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2022-11-29 16:14:59
-// Editor : sublime text4, tab size (4)
+// Revise : 2023-06-19 00:22:31
+// Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 
@@ -23,13 +23,13 @@ package PKG_SETUP;
 // --------------------------------------------------------------------------------------
 
   typedef enum logic[5:0] {
-    KERNEL_SETUP_RESET,
-    KERNEL_SETUP_IDLE,
-    KERNEL_SETUP_REQ_START,
-    KERNEL_SETUP_REQ_BUSY,
-    KERNEL_SETUP_REQ_PAUSE,
-    KERNEL_SETUP_REQ_DONE
-  } kernel_setup_state;
+    CU_SETUP_RESET,
+    CU_SETUP_IDLE,
+    CU_SETUP_REQ_START,
+    CU_SETUP_REQ_BUSY,
+    CU_SETUP_REQ_PAUSE,
+    CU_SETUP_REQ_DONE
+  } cu_setup_state;
 
 
 endpackage
