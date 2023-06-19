@@ -457,6 +457,11 @@ run-sim-wave:
 .PHONY: run-sim-help
 run-sim-help:
 	-@$(MAKE) run-sim-help $(MAKE_DEVICE)
+
+.PHONY: run-sim-project
+run-sim-project:
+	-@$(MAKE) run-sim-project $(MAKE_DEVICE)
+
 # =========================================================
 
 # =========================================================
