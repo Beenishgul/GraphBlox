@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cache_generator_response.sv
 // Create : 2023-06-17 01:03:07
-// Revise : 2023-06-17 01:03:12
+// Revise : 2023-06-18 23:28:39
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -141,13 +141,14 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_din.meta             = response_in_reg.payload.meta;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-  assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
-  assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
-  assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_1 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_2 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_3 = fifo_response_dout.iob.rdata;
+  assign fifo_response_signals_in_int.rd_en               = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+  assign fifo_response_dout_int.valid                     = fifo_response_signals_out_int.valid;
+  assign fifo_response_dout_int.payload.meta              = fifo_response_dout.meta;
+  assign fifo_response_dout_int.payload.meta.subclass.cmd = CMD_MEM_RESPONSE;
+  assign fifo_response_dout_int.payload.data.field_0      = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_1      = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_2      = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field_3      = fifo_response_dout.iob.rdata;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(16                         ),
