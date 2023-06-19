@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-17 21:23:32
+# @Last Modified time: 2023-06-19 00:03:02
 #!/bin/bash
 
 
@@ -31,7 +31,7 @@ pkgs="pkg"
 
 engines="engines"
 engine_template="engine_template"
-engine_kernel_setup="engine_kernel_setup"
+engine_cu_setup="engine_cu_setup"
 engine_alu_operations="engine_alu_operations"
 engine_conditional="engine_conditional"
 engine_read_write="engine_read_write"
@@ -109,7 +109,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${lane}/ ${CFG_FILE_NAME
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${control}/ ${CFG_FILE_NAME} "sv"
 
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/ ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_kernel_setup} ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_cu_setup} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_template} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_pipeline} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
