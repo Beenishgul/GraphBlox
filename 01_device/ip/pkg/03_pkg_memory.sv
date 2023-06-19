@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 03_pkg_memory.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-06-16 22:15:37
+// Revise : 2023-06-18 23:25:41
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -43,11 +43,12 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-parameter TYPE_MEMORY_CMD_BITS = 5;
+parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_INVALID,
   CMD_READ,
   CMD_WRITE,
+  CMD_MEM_RESPONSE,
   CMD_CONFIGURE,
   CMD_ENGINE
 } type_memory_cmd;
