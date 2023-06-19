@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_kernel_setup.sv
-// Create : 2023-01-23 16:17:05
-// Revise : 2023-01-23 16:17:05
+// File   : engine_cu_setup.sv
+// Create : 2023-06-18 23:51:34
+// Revise : 2023-06-18 23:53:44
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,12 +21,12 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-// Kernel\_Setup\_Engine
+// CU\_Setup\_Engine
 // --------------------
 
 // ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
 
-// The kernel setup acts like a serial read engine
+// The CU setup acts like a serial read engine
 // sends read commands to the memory control layer.
 // Each read or write requests a chunk of data specified with the
 // "granularity" parameter -- alignment should be honored for a cache line.
@@ -37,7 +37,7 @@ import PKG_CACHE::*;
 
 // uint32_t *serialReadEngine(uint32_t *arrayPointer, uint32_t arraySize, uint32_t startRead, uint32_t endRead, uint32_t stride, uint32_t granularity)
 
-module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
+module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
     input  logic                          ap_clk                  ,
     input  logic                          areset                  ,
@@ -65,8 +65,8 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_kernel_setup_state current_state;
-    engine_kernel_setup_state next_state   ;
+    engine_cu_setup_state current_state;
+    engine_cu_setup_state next_state   ;
 
     logic done_int_reg ;
     logic start_in_reg ;
@@ -157,7 +157,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_engine)
-            current_state <= ENGINE_KERNEL_SETUP_RESET;
+            current_state <= ENGINE_CU_SETUP_RESET;
         else begin
             current_state <= next_state;
         end
@@ -166,53 +166,53 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
     always_comb begin
         next_state = current_state;
         case (current_state)
-            ENGINE_KERNEL_SETUP_RESET : begin
-                next_state = ENGINE_KERNEL_SETUP_IDLE;
+            ENGINE_CU_SETUP_RESET : begin
+                next_state = ENGINE_CU_SETUP_IDLE;
             end
-            ENGINE_KERNEL_SETUP_IDLE : begin
+            ENGINE_CU_SETUP_IDLE : begin
                 if(configuration_reg.valid && start_in_reg)
-                    next_state = ENGINE_KERNEL_SETUP_SETUP;
+                    next_state = ENGINE_CU_SETUP_SETUP;
                 else
-                    next_state = ENGINE_KERNEL_SETUP_IDLE;
+                    next_state = ENGINE_CU_SETUP_IDLE;
             end
-            ENGINE_KERNEL_SETUP_SETUP : begin
-                next_state = ENGINE_KERNEL_SETUP_START;
+            ENGINE_CU_SETUP_SETUP : begin
+                next_state = ENGINE_CU_SETUP_START;
             end
-            ENGINE_KERNEL_SETUP_START : begin
-                next_state = ENGINE_KERNEL_SETUP_BUSY;
+            ENGINE_CU_SETUP_START : begin
+                next_state = ENGINE_CU_SETUP_BUSY;
             end
-            ENGINE_KERNEL_SETUP_BUSY_TRANS : begin
-                next_state = ENGINE_KERNEL_SETUP_BUSY;
+            ENGINE_CU_SETUP_BUSY_TRANS : begin
+                next_state = ENGINE_CU_SETUP_BUSY;
             end
-            ENGINE_KERNEL_SETUP_BUSY : begin
+            ENGINE_CU_SETUP_BUSY : begin
                 if (done_int_reg)
-                    next_state = ENGINE_KERNEL_SETUP_DONE;
+                    next_state = ENGINE_CU_SETUP_DONE;
                 else if (fifo_request_signals_out_int.prog_full | pause_in_reg)
-                    next_state = ENGINE_KERNEL_SETUP_PAUSE_TRANS;
+                    next_state = ENGINE_CU_SETUP_PAUSE_TRANS;
                 else
-                    next_state = ENGINE_KERNEL_SETUP_BUSY;
+                    next_state = ENGINE_CU_SETUP_BUSY;
             end
-            ENGINE_KERNEL_SETUP_PAUSE_TRANS : begin
-                next_state = ENGINE_KERNEL_SETUP_PAUSE;
+            ENGINE_CU_SETUP_PAUSE_TRANS : begin
+                next_state = ENGINE_CU_SETUP_PAUSE;
             end
-            ENGINE_KERNEL_SETUP_PAUSE : begin
+            ENGINE_CU_SETUP_PAUSE : begin
                 if (~fifo_request_signals_out_int.prog_full & ~pause_in_reg)
-                    next_state = ENGINE_KERNEL_SETUP_BUSY_TRANS;
+                    next_state = ENGINE_CU_SETUP_BUSY_TRANS;
                 else
-                    next_state = ENGINE_KERNEL_SETUP_PAUSE;
+                    next_state = ENGINE_CU_SETUP_PAUSE;
             end
-            ENGINE_KERNEL_SETUP_DONE : begin
+            ENGINE_CU_SETUP_DONE : begin
                 if(configuration_reg.valid & start_in_reg)
-                    next_state = ENGINE_KERNEL_SETUP_DONE;
+                    next_state = ENGINE_CU_SETUP_DONE;
                 else
-                    next_state = ENGINE_KERNEL_SETUP_IDLE;
+                    next_state = ENGINE_CU_SETUP_IDLE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            ENGINE_KERNEL_SETUP_RESET : begin
+            ENGINE_CU_SETUP_RESET : begin
                 done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
@@ -224,7 +224,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_IDLE : begin
+            ENGINE_CU_SETUP_IDLE : begin
                 done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b1;
                 done_out_reg               <= 1'b1;
@@ -236,7 +236,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_SETUP : begin
+            ENGINE_CU_SETUP_SETUP : begin
                 done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -248,7 +248,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_stride_value       <= configuration_reg.payload.param.stride;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_START : begin
+            ENGINE_CU_SETUP_START : begin
                 done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -258,7 +258,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= configuration_reg.payload.param.decrement;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_PAUSE_TRANS : begin
+            ENGINE_CU_SETUP_PAUSE_TRANS : begin
                 done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -268,7 +268,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
             end
-            ENGINE_KERNEL_SETUP_BUSY : begin
+            ENGINE_CU_SETUP_BUSY : begin
                 if((counter_count >= configuration_reg.payload.param.end_read)) begin
                     done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
@@ -287,7 +287,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_BUSY_TRANS : begin
+            ENGINE_CU_SETUP_BUSY_TRANS : begin
                 if((counter_count >= configuration_reg.payload.param.end_read)) begin
                     done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
@@ -306,7 +306,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_PAUSE : begin
+            ENGINE_CU_SETUP_PAUSE : begin
                 done_int_reg               <= 1'b0;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -316,7 +316,7 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
                 counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_KERNEL_SETUP_DONE : begin
+            ENGINE_CU_SETUP_DONE : begin
                 done_int_reg               <= 1'b1;
                 ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
@@ -388,19 +388,18 @@ module engine_kernel_setup #(parameter COUNTER_WIDTH      = 32) (
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketRequest (
-        .clk         (ap_clk                                   ),
-        .srst        (areset_fifo                              ),
-        .din         (fifo_request_din                         ),
-        .wr_en       (fifo_request_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_signals_in_int.rd_en        ),
-        .dout        (fifo_request_dout                        ),
-        .full        (fifo_request_signals_out_int.full        ),
-        .empty       (fifo_request_signals_out_int.empty       ),
-        .valid       (fifo_request_signals_out_int.valid       ),
-        .prog_full   (fifo_request_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                  ),
+        .srst       (areset_fifo                             ),
+        .din        (fifo_request_din                        ),
+        .wr_en      (fifo_request_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_signals_in_int.rd_en       ),
+        .dout       (fifo_request_dout                       ),
+        .full       (fifo_request_signals_out_int.full       ),
+        .empty      (fifo_request_signals_out_int.empty      ),
+        .valid      (fifo_request_signals_out_int.valid      ),
+        .prog_full  (fifo_request_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
     );
 
-
-endmodule : engine_kernel_setup
+endmodule : engine_cu_setup
