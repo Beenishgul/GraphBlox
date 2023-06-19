@@ -39,8 +39,8 @@ module xpm_memory_sdpram_wrapper #(
 // Xilinx Parameterized Macro, version 2021.2
 
   xpm_memory_sdpram #(
-    .ADDR_WIDTH_A           (DATA_W           ), // DECIMAL
-    .ADDR_WIDTH_B           (DATA_W           ), // DECIMAL
+    .ADDR_WIDTH_A           (ADDR_W           ), // DECIMAL
+    .ADDR_WIDTH_B           (ADDR_W           ), // DECIMAL
     .AUTO_SLEEP_TIME        (0                ), // DECIMAL
     .BYTE_WRITE_WIDTH_A     (DATA_W           ), // DECIMAL
     .CASCADE_HEIGHT         (0                ), // DECIMAL
