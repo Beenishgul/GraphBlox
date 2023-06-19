@@ -509,9 +509,19 @@ export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.x
 # generate SYSTEM CACHE
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
 # ----------------------------------------------------------------------------
-set SYSTEM_CACHE_SIZE_B 32768
+set SYSTEM_CACHE_SIZE_B   32768
+set SYSTEM_CACHE_NUM_WAYS 4
+set LINE_CACHE_DATA_WIDTH 512 
+set FE_ADDR_WIDTH         64 
+set FE_CACHE_DATA_WIDTH   512 
+set BE_ADDR_WIDTH         63
+set BE_CACHE_DATA_WIDTH   512
+
 set SYSTEM_CACHE_SIZE_KB [expr {${SYSTEM_CACHE_SIZE_B} / 1024}]
-puts "[color 2 "                        Generate SYSTEM CACHE: AXI_system_cache_line512xaddr64_4way_${SYSTEM_CACHE_SIZE_KB}KB"]" 
+puts "[color 2 "                        Generate Kernel Cache: Cache-line: ${LINE_CACHE_DATA_WIDTH}bits | Ways: ${SYSTEM_CACHE_NUM_WAYS} | Size: ${SYSTEM_CACHE_SIZE_KB}KB"]" 
+puts "[color 2 "                                    Front-End: Data width: ${FE_CACHE_DATA_WIDTH}bits | Address width: ${FE_ADDR_WIDTH}bits"]" 
+puts "[color 2 "                                     Back-End: Data width: ${BE_CACHE_DATA_WIDTH}bits | Address width: ${BE_ADDR_WIDTH}bits"]" 
+
 
 set module_name system_cache_512x64
 create_ip -name system_cache            \
@@ -521,29 +531,29 @@ create_ip -name system_cache            \
           -module_name ${module_name}   \
           -dir ${ip_dir} >> $log_file
 
-set_property -dict [list                                             \
-                    CONFIG.C_CACHE_DATA_WIDTH {512}                  \
-                    CONFIG.C_CACHE_SIZE  ${SYSTEM_CACHE_SIZE_B}      \
-                    CONFIG.C_M0_AXI_ADDR_WIDTH {63}                  \
-                    CONFIG.C_M0_AXI_DATA_WIDTH {512}                 \
-                    CONFIG.C_NUM_GENERIC_PORTS {1}                   \
-                    CONFIG.C_NUM_OPTIMIZED_PORTS {0}                 \
-                    CONFIG.C_ENABLE_NON_SECURE {1}                   \
-                    CONFIG.C_ENABLE_ERROR_HANDLING {1}               \
-                    CONFIG.C_NUM_WAYS {4}                            \
-                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH {512}             \
-                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH {64}              \
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {1}      \
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {0}   \
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {1}     \
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {0}  \
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {1}        \
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {0}     \
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {1}       \
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {0}    \
-                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {Automatic}       \
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {URAM}           \
-                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}       \
+set_property -dict [list                                                  \
+                    CONFIG.C_CACHE_DATA_WIDTH ${LINE_CACHE_DATA_WIDTH}    \
+                    CONFIG.C_CACHE_SIZE  ${SYSTEM_CACHE_SIZE_B}           \
+                    CONFIG.C_M0_AXI_ADDR_WIDTH ${BE_ADDR_WIDTH}           \
+                    CONFIG.C_M0_AXI_DATA_WIDTH ${BE_CACHE_DATA_WIDTH}     \
+                    CONFIG.C_NUM_GENERIC_PORTS {1}                        \
+                    CONFIG.C_NUM_OPTIMIZED_PORTS {0}                      \
+                    CONFIG.C_ENABLE_NON_SECURE {1}                        \
+                    CONFIG.C_ENABLE_ERROR_HANDLING {1}                    \
+                    CONFIG.C_NUM_WAYS ${SYSTEM_CACHE_NUM_WAYS}            \
+                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${FE_CACHE_DATA_WIDTH} \
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${FE_ADDR_WIDTH}       \
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {1}           \
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {0}        \
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {1}          \
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {0}       \
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {1}             \
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {0}          \
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {1}            \
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {0}         \
+                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {Automatic}            \
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {URAM}                \
+                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 
 set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
