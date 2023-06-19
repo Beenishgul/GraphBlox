@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_cu_setup.sv
 // Create : 2023-06-18 23:51:34
-// Revise : 2023-06-18 23:53:44
+// Revise : 2023-06-19 00:45:10
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -39,17 +39,17 @@ import PKG_CACHE::*;
 
 module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     // System Signals
-    input  logic                          ap_clk                  ,
-    input  logic                          areset                  ,
-    input  KernelSetupEngineConfiguration configuration_in        ,
-    output MemoryPacket                   request_out             ,
-    input  FIFOStateSignalsInput          fifo_request_signals_in ,
-    output FIFOStateSignalsOutput         fifo_request_signals_out,
-    output logic                          fifo_setup_signal       ,
-    input  logic                          start_in                ,
-    input  logic                          pause_in                ,
-    output logic                          ready_out               ,
-    output logic                          done_out
+    input  logic                      ap_clk                  ,
+    input  logic                      areset                  ,
+    input  CUSetupEngineConfiguration configuration_in        ,
+    output MemoryPacket               request_out             ,
+    input  FIFOStateSignalsInput      fifo_request_signals_in ,
+    output FIFOStateSignalsOutput     fifo_request_signals_out,
+    output logic                      fifo_setup_signal       ,
+    input  logic                      start_in                ,
+    input  logic                      pause_in                ,
+    output logic                      ready_out               ,
+    output logic                      done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -59,8 +59,8 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     logic areset_counter;
     logic areset_fifo   ;
 
-    KernelSetupEngineConfiguration configuration_reg;
-    MemoryPacket                   request_out_int  ;
+    CUSetupEngineConfiguration configuration_reg;
+    MemoryPacket               request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals

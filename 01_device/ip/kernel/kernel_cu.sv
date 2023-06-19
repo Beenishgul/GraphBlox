@@ -19,9 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(
-  `include "kernel_parameters.vh"
-  ) (
+module kernel_cu #(`include "kernel_parameters.vh") (
   input  logic                          ap_clk           ,
   input  logic                          areset           ,
   input  KernelDescriptor               descriptor_in    ,
@@ -164,9 +162,9 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      fifo_setup_signal <= 1'b1;
-      request_out.valid <= 1'b0;
-      done_out          <= 1'b0;
+      fifo_setup_signal           <= 1'b1;
+      kernel_cu_request_out.valid <= 1'b0;
+      done_out                    <= 1'b0;
     end
     else begin
       fifo_setup_signal           <= cu_cache_fifo_setup_signal | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
@@ -279,9 +277,6 @@ module kernel_cu #(
   assign kernel_cu_fifo_response_signals_in.wr_en = 0;
   assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
-  // Kernel_setup
-  assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
-
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI Kernel Cache
 // --------------------------------------------------------------------------------------
@@ -324,9 +319,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(
-    `include"set_cu_parameters.vh"
-    ) inst_cu_bundles (
+  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),

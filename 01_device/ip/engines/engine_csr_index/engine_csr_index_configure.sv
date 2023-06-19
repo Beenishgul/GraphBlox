@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-18 23:23:08
+// Revise : 2023-06-19 00:48:07
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -233,7 +233,7 @@ module engine_csr_index_configure #(
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_push_filter          = ((response_in_reg.payload.meta.subclass.buffer == STRUCT_KERNEL_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+    assign fifo_response_push_filter          = ((response_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
     assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & fifo_response_push_filter;
     assign fifo_response_din                  = response_in_reg.payload;
 
@@ -248,18 +248,18 @@ module engine_csr_index_configure #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacket_response (
-        .clk         (ap_clk                                    ),
-        .srst        (areset_fifo                               ),
-        .din         (fifo_response_din                         ),
-        .wr_en       (fifo_response_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_signals_in_int.rd_en        ),
-        .dout        (fifo_response_dout                        ),
-        .full        (fifo_response_signals_out_int.full        ),
-        .empty       (fifo_response_signals_out_int.empty       ),
-        .valid       (fifo_response_signals_out_int.valid       ),
-        .prog_full   (fifo_response_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_response_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                   ),
+        .srst       (areset_fifo                              ),
+        .din        (fifo_response_din                        ),
+        .wr_en      (fifo_response_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_signals_in_int.rd_en       ),
+        .dout       (fifo_response_dout                       ),
+        .full       (fifo_response_signals_out_int.full       ),
+        .empty      (fifo_response_signals_out_int.empty      ),
+        .valid      (fifo_response_signals_out_int.valid      ),
+        .prog_full  (fifo_response_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -283,18 +283,18 @@ module engine_csr_index_configure #(
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
         .PROG_THRESH     (8                                  )
     ) inst_fifo_MemoryPacket_configuration (
-        .clk         (ap_clk                                         ),
-        .srst        (areset_fifo                                    ),
-        .din         (fifo_configuration_din                         ),
-        .wr_en       (fifo_configuration_signals_in_int.wr_en        ),
-        .rd_en       (fifo_configuration_signals_in_int.rd_en        ),
-        .dout        (fifo_configuration_dout                        ),
-        .full        (fifo_configuration_signals_out_int.full        ),
-        .empty       (fifo_configuration_signals_out_int.empty       ),
-        .valid       (fifo_configuration_signals_out_int.valid       ),
-        .prog_full   (fifo_configuration_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_configuration_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_configuration_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                        ),
+        .srst       (areset_fifo                                   ),
+        .din        (fifo_configuration_din                        ),
+        .wr_en      (fifo_configuration_signals_in_int.wr_en       ),
+        .rd_en      (fifo_configuration_signals_in_int.rd_en       ),
+        .dout       (fifo_configuration_dout                       ),
+        .full       (fifo_configuration_signals_out_int.full       ),
+        .empty      (fifo_configuration_signals_out_int.empty      ),
+        .valid      (fifo_configuration_signals_out_int.valid      ),
+        .prog_full  (fifo_configuration_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_configuration_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_configuration_signals_out_int.rd_rst_busy)
     );
 
 endmodule : engine_csr_index_configure
