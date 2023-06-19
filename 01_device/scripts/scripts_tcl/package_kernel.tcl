@@ -68,26 +68,48 @@ create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
 # Generate Project VIPs
 # =========================================================
-# puts "[color 4 "                        Generate Project VIPs"]" 
-# set argv [list ${part_id} ${kernel_name} ${app_directory} ${vip_directory}]
-# set argc 4
-# source ${app_directory}/${scripts_directory}/scripts_tcl/generate_package_vip.tcl
+puts "[color 4 "                        Add Project VIPs"]"
+# set ip_repo_list [get_property IP_REPO_PATHS [current_project]] 
+set vivado_dir $::env(XILINX_VIVADO)
+set vitis_dir $::env(XILINX_VITIS)
 
+set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
+set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
+set data_ip              [file normalize $vitis_dir/data/ip]
+set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo] 
+set vip_repo             [file normalize $app_directory/$vip_directory] 
+
+set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
+
+set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
+update_ip_catalog >> $log_file
 # =========================================================
 # Add design sources into project
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
-add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
+add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_vh.f]] >> $log_file
+add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_source.f]] >> $log_file
+import_files [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_vh.f]]
+import_files [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_source.f]]
+
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xdc.f]] >> $log_file
+add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xci.f]] >> $log_file
+export_ip_user_files -of_objects  [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xci.f]] -force -quiet
 
 puts "[color 4 "                        Add design sources into sim_1"]" 
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f]] >> $log_file
 add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
 
-puts "[color 4 "                        Set Defines ${ctrl_mode}"]"
-# set_property verilog_define ${ctrl_mode} [get_filesets sources_1]
-# set_property verilog_define ${ctrl_mode} [get_filesets sim_1]
+update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
+
+puts "[color 4 "                        Set Simulator settings"]"
+set_property top ${kernel_name}_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+set_property simulator_language "Mixed" [current_project]
+set_property target_language  "Verilog" [current_project]
+set_property TARGET_SIMULATOR XSim [current_project]
 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1  >> $log_file
@@ -98,9 +120,9 @@ puts "[color 4 "                        Create IP packaging project"]"
 # create IP packaging project
 ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true >> $log_file
 set core [ipx::current_core]
-foreach user_parameter [list C_S_AXI_CONTROL_ADDR_WIDTH C_S_AXI_CONTROL_DATA_WIDTH C_M00_AXI_ADDR_WIDTH C_M00_AXI_DATA_WIDTH] {
-    ::ipx::remove_user_parameter $user_parameter $core
-  }
+# foreach user_parameter [list C_S_AXI_CONTROL_ADDR_WIDTH C_S_AXI_CONTROL_DATA_WIDTH C_M00_AXI_ADDR_WIDTH C_M00_AXI_DATA_WIDTH] {
+#     ::ipx::remove_user_parameter $user_parameter $core
+#   }
 # =========================================================
 # Step 2: Inference clock, reset, AXI interfaces and associate them with clock
 # =========================================================

@@ -62,7 +62,11 @@ utils_include="include"
 iob_include="iob_include"
 portmaps="portmaps"
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.f"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_source.f"
+
+CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xci.f"
+
+CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_vh.f"
 
 generate_package_filelist_f () {
 
@@ -84,7 +88,7 @@ echo $newtext > ${CFG_FILE_NAME}
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME} "vh"
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"  
 
@@ -92,7 +96,7 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_generator}/ ${CFG_FILE_NAME} "sv"  
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_include}/ ${CFG_FILE_NAME} "vh" 
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh" 
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME} "sv" 
 
@@ -150,6 +154,12 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/bram_512x32_asym_512wrt_64rd.xci"
 # echo $newtext >> ${CFG_FILE_NAME}
 
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/slv_m00_axi_vip.xci"
+echo $newtext >> ${CFG_FILE_NAME_XCI}
+
+newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/control_${KERNEL_NAME}_vip.xci"
+echo $newtext >> ${CFG_FILE_NAME_XCI}
+
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
-echo $newtext >> ${CFG_FILE_NAME}
+echo $newtext >> ${CFG_FILE_NAME_XCI}
 
