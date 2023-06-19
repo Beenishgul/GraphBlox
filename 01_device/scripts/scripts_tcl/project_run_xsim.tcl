@@ -24,7 +24,7 @@ open_project $project_var
 set simulator_language "Mixed"
 set target_language  "Verilog"
 # Project properties
-
+set_property SOURCE_SET sources_1 [get_filesets sim_1]
 set_property default_lib xil_defaultlib [current_project]
 set_property simulator_language $simulator_language [current_project]
 set_property target_language $target_language [current_project]

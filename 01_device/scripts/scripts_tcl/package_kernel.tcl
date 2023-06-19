@@ -25,6 +25,7 @@ set xilinx_directory    [lindex $argv 3]
 set active_ip_directory [lindex $argv 4]
 set ctrl_mode           [lindex $argv 5]
 set scripts_directory   [lindex $argv 6]
+set vip_directory       [lindex $argv 7]
 set package_dir      ${app_directory}/${xilinx_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -42,7 +43,6 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
     puts "[color 4 "                             size           "][color 2 "${size_text}"]"
     puts "[color 4 "                             description    "][color 2 "${description_text}"]"
 }
-
 
 # =========================================================
 puts "========================================================="
@@ -66,9 +66,15 @@ puts "[color 3 "                Step 1: Create vivado project and add design sou
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
 create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
 # =========================================================
+# Generate Project VIPs
+# =========================================================
+# puts "[color 4 "                        Generate Project VIPs"]" 
+# set argv [list ${part_id} ${kernel_name} ${app_directory} ${vip_directory}]
+# set argc 4
+# source ${app_directory}/${scripts_directory}/scripts_tcl/generate_package_vip.tcl
 
 # =========================================================
-# add design sources into project
+# Add design sources into project
 # =========================================================
 puts "[color 4 "                        Add design sources into project"]" 
 add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.f]] >> $log_file
