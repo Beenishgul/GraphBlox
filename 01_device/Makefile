@@ -68,15 +68,15 @@ FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
-	PLATFORM ?= xilinx_u280_xdma_201920_3
+	PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
 else ifeq ($(HOST_NAME), jaguar)
 	ALVEO?=  U250
 	PART ?=  xcu250-figd2104-2L-e
 	PLATFORM ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
 else 
-	ALVEO?=  U250
-	PART ?=  xcu250-figd2104-2L-e
-	PLATFORM ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
+# 	ALVEO?=  U250
+# 	PART ?=  xcu250-figd2104-2L-e
+# 	PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 #   ALVEO?=  U200
 #   PART ?=  xcu200-fsgd2104-2-e
@@ -90,9 +90,9 @@ else
 #   PART ?=  xcu55c-fsvh2892-2L-e
 #   PLATFORM ?=  xilinx_u55c_gen3x16_xdma_3_202210_1
 
-#   ALVEO?=  U280
-#   PART ?=  xcu280-fsvh2892-2L-e
-#   PLATFORM ?=  xilinx_u280_gen3x16_xdma_1_202211_1
+	ALVEO?=  U280
+	PART ?=  xcu280-fsvh2892-2L-e
+	PLATFORM ?=  xilinx_u280_gen3x16_xdma_1_202211_1
 endif
 
 # TARGET: set the build target, can be hw or hw_emu
