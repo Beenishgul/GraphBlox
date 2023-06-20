@@ -123,7 +123,9 @@ update_compile_order -fileset sources_1  >> $log_file
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
+puts "[color 4 "                        Update synthsise: synth_1"]"
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+puts "[color 4 "                        Update Incremental Implementation: impl_1"]"
 set_property incremental_checkpoint.directive TimingClosure [get_runs impl_1]
 
 puts "[color 4 "                        Create IP packaging project"]" 
