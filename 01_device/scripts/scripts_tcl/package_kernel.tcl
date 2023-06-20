@@ -26,6 +26,7 @@ set active_ip_directory [lindex $argv 4]
 set ctrl_mode           [lindex $argv 5]
 set scripts_directory   [lindex $argv 6]
 set vip_directory       [lindex $argv 7]
+set vivado_version      2023
 set package_dir      ${app_directory}/${xilinx_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -125,8 +126,43 @@ update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Update synthsise: synth_1"]"
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+
+puts "[color 4 "                        Create Implementation: impl"]"
+create_run impl_Performance_Auto_1 -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_Auto_1   >> $log_file
+create_run impl_Performance_Auto_2 -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_Auto_2  >> $log_file
+create_run impl_Performance_Auto_3 -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_Auto_3  >> $log_file
+create_run impl_Performance_Explore -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_Explore  >> $log_file
+create_run impl_Performance_ExplorePostRoutePhysOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_ExplorePostRoutePhysOpt  >> $log_file
+create_run impl_Performance_ExploreWithRemap -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_ExploreWithRemap >> $log_file
+create_run impl_Performance_WLBlockPlacement -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_WLBlockPlacement >> $log_file
+create_run impl_Performance_WLBlockPlacementFanoutOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_WLBlockPlacementFanoutOpt >> $log_file
+create_run impl_Performance_EarlyBlockPlacement -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_EarlyBlockPlacement >> $log_file
+create_run impl_Performance_NetDelay_high -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_NetDelay_high >> $log_file
+create_run impl_Performance_NetDelay_low -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_NetDelay_low >> $log_file
+create_run impl_Performance_Retiming -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_Retiming >> $log_file
+create_run impl_Performance_ExtraTimingOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_ExtraTimingOpt >> $log_file
+create_run impl_Performance_RefinePlacement -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_RefinePlacement >> $log_file
+create_run impl_Performance_SpreadSLLs -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_SpreadSLLs >> $log_file
+create_run impl_Performance_BalanceSLLs -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_BalanceSLLs >> $log_file
+create_run impl_Performance_BalanceSLRs -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_BalanceSLRs >> $log_file
+create_run impl_Performance_HighUtilSLRs -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Performance_HighUtilSLRs >> $log_file
+create_run impl_Congestion_SpreadLogic_high -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Congestion_SpreadLogic_high >> $log_file
+create_run impl_Congestion_SpreadLogic_medium -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Congestion_SpreadLogic_medium >> $log_file
+create_run impl_Congestion_SpreadLogic_low -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Congestion_SpreadLogic_low >> $log_file
+create_run impl_Congestion_SSI_SpreadLogic_high -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Congestion_SSI_SpreadLogic_high >> $log_file
+create_run impl_Congestion_SSI_SpreadLogic_low -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Congestion_SSI_SpreadLogic_low >> $log_file
+create_run impl_Area_Explore -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Area_Explore >> $log_file
+create_run impl_Area_ExploreSequential -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Area_ExploreSequential >> $log_file
+create_run impl_Area_ExploreWithRemap -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Area_ExploreWithRemap >> $log_file
+create_run impl_Power_DefaultOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Power_DefaultOpt >> $log_file
+create_run impl_Power_ExploreArea -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Power_ExploreArea >> $log_file
+create_run impl_Flow_RunPhysOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Flow_RunPhysOpt >> $log_file
+create_run impl_Flow_RunPostRoutePhysOpt -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Flow_RunPostRoutePhysOpt >> $log_file
+create_run impl_Flow_RuntimeOptimized -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Flow_RuntimeOptimized >> $log_file
+create_run impl_Flow_Quick -parent_run synth_1 -flow {Vivado Implementation 2023} -strategy Flow_Quick >> $log_file
+
 puts "[color 4 "                        Update Incremental Implementation: impl_1"]"
-set_property incremental_checkpoint.directive TimingClosure [get_runs impl_1]
+set_property incremental_checkpoint.directive TimingClosure [get_runs impl*]
 
 puts "[color 4 "                        Create IP packaging project"]" 
 # create IP packaging project
