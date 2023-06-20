@@ -15,12 +15,6 @@ open_project $project_var
 
 set runlist_synth [get_runs synth*]
 
-set i 0
-foreach j $x {
-    puts "$j is item run $i in runlist_synth"
-    incr i
-}
-
 reset_run synth_1
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 launch_runs synth_1

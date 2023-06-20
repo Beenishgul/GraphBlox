@@ -20,6 +20,7 @@ set runlist_synth [get_runs synth*]
 # launch_runs synth_1
 # wait_on_runs synth_1
 
+reset_run impl_1
 set_property incremental_checkpoint.directive TimingClosure [get_runs impl_1]
 launch_runs impl_1 -to_step write_bitstream
 wait_on_runs impl_1
