@@ -36,6 +36,7 @@ SCRIPTS_SHELL       ?= scripts_sh
 SCRIPTS_XDC         ?= scripts_xdc
 IP_DIR              ?= ip
 REPORTS_DIR         ?= reports
+VIVADO_GUI_FLAG     ?= NO
 
 VIVADO_PACKAGE_DIR  = vivado_package_kernel
 VIVADO_SIMULATE_DIR = vivado_simulate_kernel
@@ -260,10 +261,33 @@ run-sim-help: session-info
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR)  $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -help  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
+# =========================================================
+# VIVADO Project Mode
+# =========================================================
 .PHONY: run-sim-project
-run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
-	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(SCRIPTS_DIR_ACTIVE)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
+run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
+
+.PHONY: run-synth-project
+run-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+
+.PHONY: run-impl-project
+run-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+
+.PHONY: run-report-project
+run-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
+
+.PHONY: open-vivado-project
+open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR); \
+	vivado $(KERNEL_NAME)/$(KERNEL_NAME).xpr
 
 # =========================================================
 # XCLBIN V++ Flags
@@ -399,12 +423,12 @@ gen-host-bin:
 	-@$(MAKE) $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 # =========================================================
-# Open Project in Vivado GUI
+# Open Project After VPP flow
 # =========================================================
-.PHONY: open-vivado-project
-open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
-	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR); \
-	vivado $(KERNEL_NAME)/$(KERNEL_NAME).xpr
+.PHONY: open-vitis-project
+open-vitis-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR); \
+	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
 # =========================================================
 #  Report Utilization Metrics

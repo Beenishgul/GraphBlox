@@ -283,6 +283,7 @@ export SCRIPTS_SHELL      = scripts_sh
 export SCRIPTS_XDC        = scripts_xdc
 export IP_DIR             = ip
 export REPORTS_DIR        = reports
+export VIVADO_GUI_FLAG    = NO
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
@@ -461,6 +462,29 @@ run-sim-help:
 .PHONY: run-sim-project
 run-sim-project:
 	-@$(MAKE) run-sim-project $(MAKE_DEVICE)
+
+# =========================================================
+# VIVADO Project Mode
+# =========================================================
+.PHONY: run-sim-project
+run-sim-project:
+	-@$(MAKE) run-sim-project $(MAKE_DEVICE)
+
+.PHONY: run-synth-project
+run-synth-project:
+	-@$(MAKE) run-synth-project $(MAKE_DEVICE)
+
+.PHONY: run-impl-project
+run-impl-project:
+	-@$(MAKE) run-impl-project $(MAKE_DEVICE)
+
+.PHONY: run-report-project
+run-report-project:
+	-@$(MAKE) run-report-project $(MAKE_DEVICE)
+
+.PHONY: run-vivado-project
+run-vivado-project:
+	-@$(MAKE) run-vivado-project $(MAKE_DEVICE)
 
 # =========================================================
 
