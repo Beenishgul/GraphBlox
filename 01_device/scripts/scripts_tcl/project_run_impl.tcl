@@ -20,6 +20,7 @@ reset_run synth_1
 launch_runs synth_1
 wait_on_runs synth_1
 
-if {[regexp -- impl_1 $runlist_impl]} {reset_run impl_1} else {create_run impl_2 -parent_run synth_1 -flow {Vivado Implementation 2022.2}}
-launch_runs impl_1
+# if {[regexp -- impl_1 $runlist_impl]} {reset_run impl_1} else {create_run impl_2 -parent_run synth_1 -flow {Vivado Implementation 2022.2}}
+if {[regexp -- impl_1 $runlist_impl]} {reset_run impl_1} else {create_run impl_2 -parent_run synth_1}}
+launch_runs impl_1 -to_step write_bitstream
 wait_on_runs impl_1
