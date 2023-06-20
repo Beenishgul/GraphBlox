@@ -52,3 +52,4 @@ newtext=""
 echo $newtext > ${CFG_FILE_NAME}
 
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/ ${CFG_FILE_NAME} "xdc" ${ALVEO_PART}
+generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/ ${CFG_FILE_NAME} "xdc" "top"
