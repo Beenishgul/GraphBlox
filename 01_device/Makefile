@@ -265,22 +265,22 @@ run-sim-help: session-info
 # VIVADO Project Mode
 # =========================================================
 .PHONY: run-sim-project
-run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-synth-project
-run-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-impl-project
-run-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-report-project
-run-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
 
