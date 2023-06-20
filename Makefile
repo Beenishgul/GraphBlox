@@ -459,10 +459,6 @@ run-sim-wave:
 run-sim-help:
 	-@$(MAKE) run-sim-help $(MAKE_DEVICE)
 
-.PHONY: run-sim-project
-run-sim-project:
-	-@$(MAKE) run-sim-project $(MAKE_DEVICE)
-
 # =========================================================
 # VIVADO Project Mode
 # =========================================================
@@ -543,9 +539,9 @@ run-fpga-debug:
 # =========================================================
 # STEP 5.a Open Project in Vivado GUI
 # =========================================================
-.PHONY: open-vivado-project
-open-vivado-project: 
-	-@$(MAKE) open-vivado-project $(MAKE_DEVICE)
+.PHONY: open-vitis-project
+open-vitis-project: 
+	-@$(MAKE) open-vitis-project $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
