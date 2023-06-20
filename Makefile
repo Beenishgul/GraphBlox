@@ -478,9 +478,9 @@ run-impl-project:
 run-report-project:
 	-@$(MAKE) run-report-project $(MAKE_DEVICE)
 
-.PHONY: run-vivado-project
-run-vivado-project:
-	-@$(MAKE) run-vivado-project $(MAKE_DEVICE)
+.PHONY: open-vivado-project
+open-vivado-project:
+	-@$(MAKE) open-vivado-project $(MAKE_DEVICE)
 
 # =========================================================
 
