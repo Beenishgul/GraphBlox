@@ -4,7 +4,7 @@
 # create ip project with part name in command line argvs
 # =========================================================
 set project_var         [lindex $argv 0]
-set gui_flag            [lindex $argv 5]
+set gui_flag            [lindex $argv 1]
 # =========================================================
 
 # =========================================================
@@ -25,4 +25,5 @@ update_compile_order -fileset sources_1
 
 launch_simulation -simset sim_1 -mode behavioral
 
+log_wave -r *
 run -all
