@@ -224,7 +224,7 @@ gen-vip: session-info gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR)
 
 # =========================================================
-#  Run Hardware Simulation  
+# VPP Flow: Run Hardware Simulation  
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR):
@@ -290,7 +290,7 @@ open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERN
 	vivado $(KERNEL_NAME)/$(KERNEL_NAME).xpr
 
 # =========================================================
-# XCLBIN V++ Flags
+# VPP Flow: XCLBIN V++ Flags
 # =========================================================
 XOCCFLAGS   =   --platform $(PLATFORM) -t $(TARGET) -s -g
 XOCCLFLAGS  =   --link --optimize 3
@@ -320,7 +320,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACT
 package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
 	
 # =========================================================
-# XCLBIN File Generation
+# VPP Flow: XCLBIN File Generation
 # =========================================================
 .PHONY: $(VIVADO_BUILD_DIR)
 $(VIVADO_BUILD_DIR): session-info
@@ -341,7 +341,7 @@ build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 	
 # =========================================================
-# Run Hardware FPGA
+# VPP Flow: Run Hardware FPGA
 # =========================================================
 .PHONY: $(VIVADO_RUN_DIR)
 $(VIVADO_RUN_DIR):
@@ -381,7 +381,7 @@ run-fpga-debug: DEBUG_CMD=1
 run-fpga-debug: session-info run-fpga-cmd
 	
 # =========================================================
-# Run Hardware Emulation  
+# VPP Flow: Run Hardware Emulation  
 # =========================================================
 .PHONY: run-emu-cmd
 run-emu-cmd: gen-host-bin $(VIVADO_RUN_DIR)
@@ -416,14 +416,14 @@ run-emu-wave: session-info $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEV
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 # =========================================================
-# Application Executable File Generation
+# VPP Flow: Application Executable File Generation
 # =========================================================
 .PHONY: gen-host-bin
 gen-host-bin:
 	-@$(MAKE) $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 # =========================================================
-# Open Project After VPP flow
+# VPP Flow: Open Project
 # =========================================================
 .PHONY: open-vitis-project
 open-vitis-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
@@ -431,7 +431,7 @@ open-vitis-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
 # =========================================================
-#  Report Utilization Metrics
+# VPP Flow: Report Utilization Metrics
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
