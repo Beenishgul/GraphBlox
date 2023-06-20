@@ -35,7 +35,7 @@ generate_xdc_filelist_f () {
   local cfg_filelist_name=$2
   local xdc_type=$3
   local alveo_part=$4
-  local temp_filepath=${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${alveo_part}.${xdc_type}
+  local temp_filepath=${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART}/${alveo_part}.${xdc_type}
 
   for filepath in "$( find ${script_directory} -type f -iname "*${alveo_part}.${xdc_type}" | sort -n )" ; do  
     newtext="${filepath}"
