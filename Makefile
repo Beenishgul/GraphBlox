@@ -281,13 +281,15 @@ export SCRIPTS_PERL       = scripts_pl
 export SCRIPTS_TCL        = scripts_tcl
 export SCRIPTS_SHELL      = scripts_sh
 export SCRIPTS_XDC        = scripts_xdc
-export IP_DIR             = ip
+export IP_DIR_RTL         = ip_rtl
+export IP_DIR_HLS         = ip_hls
 export REPORTS_DIR        = reports
 export VIVADO_GUI_FLAG    = NO
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
-export IP_DIR_ACTIVE      = vivado_$(IP_DIR)
+export IP_DIR_RTL_ACTIVE  = vivado_$(IP_DIR_RTL)
+export IP_DIR_RTL_ACTIVE  = vivado_$(IP_DIR_HLS)
 export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
 # =========================================================
 
