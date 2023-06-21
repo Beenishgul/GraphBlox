@@ -43,6 +43,7 @@ VIVADO_PACKAGE_DIR  = vivado_package_kernel
 VIVADO_SIMULATE_DIR = vivado_simulate_kernel
 VIVADO_RUN_DIR      = vivado_run_$(TARGET)
 VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
+VIVADO_EXPORT_DIR   = vivado_export_$(TARGET)
 VIVADO_VIP_DIR      = vivado_generated_vip
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
@@ -322,7 +323,28 @@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACT
 
 .PHONY: package-kernel
 package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
-	
+
+# =========================================================
+# VPP Flow: Export to vivado flow
+# =========================================================
+.PHONY: $(VIVADO_EXPORT_DIR)
+$(VIVADO_EXPORT_DIR): session-info
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).err 
+
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).vma
+$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: $(VIVADO_EXPORT_DIR) 
+	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
+	export XCL_EMULATION_MODE=$(TARGET) ;\
+	cd $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
+
+PHONY: export-hw
+export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).vma 
+	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+
 # =========================================================
 # VPP Flow: XCLBIN File Generation
 # =========================================================
