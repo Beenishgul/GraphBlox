@@ -44,6 +44,7 @@ proc color {foreground text} {
 # Generate ${kernel_name} IPs..... START!
 # ----------------------------------------------------------------------------
 
+# set_part ${part_id} >> $log_file
 
 # create_project ${kernel_name}_vma_project -part $part_id >> $log_file
 
