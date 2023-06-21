@@ -70,7 +70,7 @@ CFG_FILE_NAME_IP_SV="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xs
 CFG_FILE_NAME_IP_VHDL="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f"
 CFG_FILE_NAME_IP_V="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xsim.ip.v.f"
 
-CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xsim.vh.f"
+CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_dirlist_xsim.vh.f"
 
 
 rm_xsim_filelist_f () {
@@ -95,9 +95,24 @@ generate_xsim_filelist_f () {
 
 }
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
+generate_xsim_dirlist_f () {
 
-generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh" 
+  local ip_directory=$1
+  local cfg_filelist_name=$2
+  local verilog_type=$3
+  local ip_directory=""
+  for filepath in $( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n ) ; do  
+    ip_directory="$(dirname  $(readlink -f "${filepath}"))"
+    newtext="${ip_directory}"
+    echo "$newtext" >> ${cfg_filelist_name}
+  done 
+
+}
+
+# Add include ip_directory
+generate_xsim_dirlist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
+
+generate_xsim_dirlist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh" 
 
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME_SV} "sv"
 
