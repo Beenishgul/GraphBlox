@@ -18,6 +18,7 @@ set runlist_synth [get_runs synth*]
 
 reset_run synth_1
 # set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.INCREMENTAL_MODE aggressive [get_runs synth_1]
 launch_runs synth_1 -jobs $num_jobs
 wait_on_runs synth_1
 
