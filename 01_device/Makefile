@@ -429,8 +429,28 @@ gen-host-bin:
 # =========================================================
 # VPP Flow: Open Project
 # =========================================================
-.PHONY: open-vitis-project
-open-vitis-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+.PHONY: run-vpp-sim-project
+run-vpp-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
+
+.PHONY: run-vpp-synth-project
+run-vpp-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) $(XILINX_JOBS_STRATEGY)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+
+.PHONY: run-vpp-impl-project
+run-vpp-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+
+.PHONY: run-vpp-report-project
+run-vpp-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
+
+.PHONY: open-vpp-vivado-project
+open-vpp-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR); \
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
 
