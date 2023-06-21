@@ -37,56 +37,46 @@ generate_compile_filelist_f () {
 
   local concatinate=""
   
-  # for filepath in "$( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" )" ; do  
-  #   concatinate="-f ${filepath} "
-  #   echo "MSG: 1 $concatinate"
-  # done 
+  for filepath in $( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
+    concatinate+="-f ${filepath} "
+  done 
 
-  for i in `find ${scripts_directory_lp} -type f -name "*${sim_type}*${verilog_type}"`;
-  do
-    echo " -f $i"
-    concatinate+=" -f $i"
-  done
-
-  return $concatinate
+  echo $concatinate
 }
 
 generate_include_filelist_f () {
 
-  local scripts_directory=$1
+  local scripts_directory_lp=$1
   local verilog_type=$2
   local sim_type=$3
 
   local concatinate=""
 
-  for filepath in "$( find ${scripts_directory} -type f -iname "*${sim_type}*${verilog_type}" )" ; do  
-    concatinate+="-i ${filepath} "
-    echo "MSG: $concatinate"
+  for filepath in "$( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" )" ; do  
+    for include in $( cat ${filepath} ) ; do  
+      concatinate+="-i ${include} "
+    done 
   done 
 
-  return $concatinate
+  echo $concatinate
 }
 
 # generate_xsim_filelist_f ${app_directory}/${scripts_directory} "f"
 
-# xvhdl_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "vhdl.f" "xsim")
-# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "v.f" "xsim")
-# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "sv.f" "xsim")
-# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "ip.v.f" "xsim")
-# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "ip.sv.f" "xsim")
-# xvlog_include=$(generate_include_filelist_f ${app_directory}/${scripts_directory} "vh.f" "xsim")
-
+xvhdl_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "vhdl.f" "xsim")
+xvlog_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "sv.f" "xsim")
+xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "v.f" "xsim")
+xvlog_include=$(generate_include_filelist_f ${app_directory}/${scripts_directory} "vh.f" "xsim")
 
 # # Set xvlog options
-xvhdl_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
-xvlog_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f"
+# xvhdl_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
+# xvlog_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f"
 # xvlog_include="-i ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vh.f"
-xvlog_include="-i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps"
+# xvlog_include="-i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps"
 
-
-echo "MSG: vhdl.f file : ${xvhdl_files}" 
-echo "MSG: v.f file : ${xvlog_files}"
-echo "MSG: vh.f file : ${xvlog_include}" 
+echo "MSG: xvhdl_files_f   file : ${xvhdl_files_f}" 
+echo "MSG: xvlog_files_f   file : ${xvlog_files_f}"
+echo "MSG: xvlog_include_f file : ${xvlog_include_f}" 
 
 xvhdl_opts="--incr --relax -L uvm -L xilinx_vip -L system_cache_v5_0_8 ${xvhdl_files}"
 xvlog_opts="--incr --relax -L uvm -L xilinx_vip --sv ${xvlog_files} ${xvlog_include}"
