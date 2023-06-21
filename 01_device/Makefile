@@ -43,8 +43,8 @@ VIVADO_PACKAGE_DIR  = vivado_package_kernel
 VIVADO_SIMULATE_DIR = vivado_simulate_kernel
 VIVADO_RUN_DIR      = vivado_run_$(TARGET)
 VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
-VIVADO_EXPORT_DIR   = vivado_export_hw
-VIVADO_IMPORT_DIR   = vivado_import_hw
+VIVADO_EXPORT_DIR   = vivado_export_vma
+VIVADO_IMPORT_DIR   = vivado_import_vma
 VIVADO_VIP_DIR      = vivado_generated_vip
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
@@ -338,7 +338,7 @@ $(VIVADO_EXPORT_DIR): session-info
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
 $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPORT_DIR) 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
+	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) -s --save-temps $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
 
 PHONY: export-hw
 export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
@@ -353,7 +353,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR):
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 
 .PHONY: import-hw
-import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 	

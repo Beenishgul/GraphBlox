@@ -40,18 +40,26 @@ proc color {foreground text} {
     return [exec tput setaf $foreground]$text[exec tput sgr0]
 }
 
+proc import_archive_if_exists {filename} {
+   if { [file exists ${filename}] == 1} {               
+       vitis::import_archive ${filename}
+   } else {
+      puts "ERROR: \[NOT-FOUND\] ${filename}"
+   }
+}
+
 # ----------------------------------------------------------------------------
 # Generate ${kernel_name} IPs..... START!
 # ----------------------------------------------------------------------------
 
 # set_part ${part_id} >> $log_file
 
-# create_project ${kernel_name}_vma_project -part $part_id >> $log_file
-
 if {${gui_flag} == "YES"} {
   start_gui
 }
 
+# create_project ${kernel_name}_vma_project -part $part_id >> $log_file
+
 open_project $project_var 
 
-vitis::import_archive ${device_directory}/${vma_directory}/${kernel_name}_export.vma 
+import_archive_if_exists ${device_directory}/${vma_directory}/${kernel_name}_export.vma 
