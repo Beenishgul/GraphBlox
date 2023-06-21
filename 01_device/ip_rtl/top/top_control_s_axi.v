@@ -1,7 +1,9 @@
 // ==============================================================
-// Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2022.1.2 (64-bit)
-// Tool Version Limit: 2022.04
+// Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2023.1 (64-bit)
+// Tool Version Limit: 2023.05
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+// Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+//
 // ==============================================================
 `timescale 1ns/1ps
 module top_control_s_axi #(parameter
@@ -62,9 +64,9 @@ module top_control_s_axi #(parameter
 //        bit 0 - enable ap_done interrupt (Read/Write)
 //        bit 1 - enable ap_ready interrupt (Read/Write)
 //        others - reserved
-// 0x0c : IP Interrupt Status Register (Read/COR)
-//        bit 0 - ap_done (Read/COR)
-//        bit 1 - ap_ready (Read/COR)
+// 0x0c : IP Interrupt Status Register (Read/TOW)
+//        bit 0 - ap_done (Read/TOW)
+//        bit 1 - ap_ready (Read/TOW)
 //        others - reserved
 // 0x10 : Data signal of buffer_0
 //        bit 31~0 - buffer_0[31:0] (Read/Write)
@@ -120,48 +122,48 @@ module top_control_s_axi #(parameter
 
 //------------------------Parameter----------------------
     localparam
-        ADDR_AP_CTRL                   = 8'h00,
-        ADDR_GIE                       = 8'h04,
-        ADDR_IER                       = 8'h08,
-        ADDR_ISR                       = 8'h0c,
-        ADDR_BUFFER_0_DATA_0           = 8'h10,
-        ADDR_BUFFER_0_DATA_1           = 8'h14,
-        ADDR_BUFFER_0_CTRL             = 8'h18,
-        ADDR_BUFFER_1_DATA_0           = 8'h1c,
-        ADDR_BUFFER_1_DATA_1           = 8'h20,
-        ADDR_BUFFER_1_CTRL             = 8'h24,
-        ADDR_BUFFER_2_DATA_0           = 8'h28,
-        ADDR_BUFFER_2_DATA_1           = 8'h2c,
-        ADDR_BUFFER_2_CTRL             = 8'h30,
-        ADDR_BUFFER_3_DATA_0           = 8'h34,
-        ADDR_BUFFER_3_DATA_1           = 8'h38,
-        ADDR_BUFFER_3_CTRL             = 8'h3c,
-        ADDR_BUFFER_4_DATA_0           = 8'h40,
-        ADDR_BUFFER_4_DATA_1           = 8'h44,
-        ADDR_BUFFER_4_CTRL             = 8'h48,
-        ADDR_BUFFER_5_DATA_0           = 8'h4c,
-        ADDR_BUFFER_5_DATA_1           = 8'h50,
-        ADDR_BUFFER_5_CTRL             = 8'h54,
-        ADDR_BUFFER_6_DATA_0           = 8'h58,
-        ADDR_BUFFER_6_DATA_1           = 8'h5c,
-        ADDR_BUFFER_6_CTRL             = 8'h60,
-        ADDR_BUFFER_7_DATA_0           = 8'h64,
-        ADDR_BUFFER_7_DATA_1           = 8'h68,
-        ADDR_BUFFER_7_CTRL             = 8'h6c,
-        ADDR_BUFFER_8_DATA_0           = 8'h70,
-        ADDR_BUFFER_8_DATA_1           = 8'h74,
-        ADDR_BUFFER_8_CTRL             = 8'h78,
-        ADDR_BUFFER_9_DATA_0           = 8'h7c,
-        ADDR_BUFFER_9_DATA_1           = 8'h80,
-        ADDR_BUFFER_9_CTRL             = 8'h84,
-        WRIDLE                         = 2'd0,
-        WRDATA                         = 2'd1,
-        WRRESP                         = 2'd2,
-        WRRESET                        = 2'd3,
-        RDIDLE                         = 2'd0,
-        RDDATA                         = 2'd1,
-        RDRESET                        = 2'd2,
-        ADDR_BITS                      = 8;
+        ADDR_AP_CTRL         = 8'h00,
+        ADDR_GIE             = 8'h04,
+        ADDR_IER             = 8'h08,
+        ADDR_ISR             = 8'h0c,
+        ADDR_BUFFER_0_DATA_0 = 8'h10,
+        ADDR_BUFFER_0_DATA_1 = 8'h14,
+        ADDR_BUFFER_0_CTRL   = 8'h18,
+        ADDR_BUFFER_1_DATA_0 = 8'h1c,
+        ADDR_BUFFER_1_DATA_1 = 8'h20,
+        ADDR_BUFFER_1_CTRL   = 8'h24,
+        ADDR_BUFFER_2_DATA_0 = 8'h28,
+        ADDR_BUFFER_2_DATA_1 = 8'h2c,
+        ADDR_BUFFER_2_CTRL   = 8'h30,
+        ADDR_BUFFER_3_DATA_0 = 8'h34,
+        ADDR_BUFFER_3_DATA_1 = 8'h38,
+        ADDR_BUFFER_3_CTRL   = 8'h3c,
+        ADDR_BUFFER_4_DATA_0 = 8'h40,
+        ADDR_BUFFER_4_DATA_1 = 8'h44,
+        ADDR_BUFFER_4_CTRL   = 8'h48,
+        ADDR_BUFFER_5_DATA_0 = 8'h4c,
+        ADDR_BUFFER_5_DATA_1 = 8'h50,
+        ADDR_BUFFER_5_CTRL   = 8'h54,
+        ADDR_BUFFER_6_DATA_0 = 8'h58,
+        ADDR_BUFFER_6_DATA_1 = 8'h5c,
+        ADDR_BUFFER_6_CTRL   = 8'h60,
+        ADDR_BUFFER_7_DATA_0 = 8'h64,
+        ADDR_BUFFER_7_DATA_1 = 8'h68,
+        ADDR_BUFFER_7_CTRL   = 8'h6c,
+        ADDR_BUFFER_8_DATA_0 = 8'h70,
+        ADDR_BUFFER_8_DATA_1 = 8'h74,
+        ADDR_BUFFER_8_CTRL   = 8'h78,
+        ADDR_BUFFER_9_DATA_0 = 8'h7c,
+        ADDR_BUFFER_9_DATA_1 = 8'h80,
+        ADDR_BUFFER_9_CTRL   = 8'h84,
+        WRIDLE               = 2'd0,
+        WRDATA               = 2'd1,
+        WRRESP               = 2'd2,
+        WRRESET              = 2'd3,
+        RDIDLE               = 2'd0,
+        RDDATA               = 2'd1,
+        RDRESET              = 2'd2,
+        ADDR_BITS            = 8;
 
 //------------------------Local signal-------------------
     reg  [                   1:0] wstate = WRRESET;
@@ -529,8 +531,8 @@ module top_control_s_axi #(parameter
         else if (ACLK_EN) begin
             if (int_ier[0] & ap_done)
                 int_isr[0] <= 1'b1;
-            else if (ar_hs && raddr == ADDR_ISR)
-                int_isr[0] <= 1'b0; // clear on read
+            else if (w_hs && waddr == ADDR_ISR && WSTRB[0])
+                int_isr[0] <= int_isr[0] ^ WDATA[0]; // toggle on write
         end
     end
 
@@ -541,8 +543,8 @@ module top_control_s_axi #(parameter
         else if (ACLK_EN) begin
             if (int_ier[1] & ap_ready)
                 int_isr[1] <= 1'b1;
-            else if (ar_hs && raddr == ADDR_ISR)
-                int_isr[1] <= 1'b0; // clear on read
+            else if (w_hs && waddr == ADDR_ISR && WSTRB[0])
+                int_isr[1] <= int_isr[1] ^ WDATA[1]; // toggle on write
         end
     end
 
