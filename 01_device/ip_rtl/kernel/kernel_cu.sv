@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_cu.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-06-21 03:13:08
+// Revise : 2023-06-21 03:29:30
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -26,13 +26,13 @@ module kernel_cu #(
     input  logic                          ap_clk           ,
     input  logic                          areset           ,
     input  KernelDescriptor               descriptor_in    ,
-    (* autopipeline_group="resp" *) 
+    (* autopipeline_group="resp_kernel_cu" *) 
     input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
-    (* autopipeline_group="fwd",autopipeline_limit=24,autopipeline_include="resp" *) 
+    (* autopipeline_group="fwd_kernel_cu",autopipeline_limit=24,autopipeline_include="resp_kernel_cu" *) 
     output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
-    (* autopipeline_group="resp" *) 
+    (* autopipeline_group="resp_kernel_cu" *) 
     input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
-    (* autopipeline_group="fwd",autopipeline_limit=24,autopipeline_include="resp" *) 
+    (* autopipeline_group="fwd_kernel_cu",autopipeline_limit=24,autopipeline_include="resp_kernel_cu" *) 
     output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
     output logic                          fifo_setup_signal,
     output logic                          done_out
