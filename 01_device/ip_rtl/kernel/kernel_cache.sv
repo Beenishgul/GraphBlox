@@ -19,6 +19,7 @@ import PKG_CONTROL::*;
 import PKG_CACHE::*;
 import PKG_MEMORY::*;
 
+(* autopipeline_module="yes" *)
 module kernel_cache (
   // System Signals
   input  logic                          ap_clk            ,
@@ -27,9 +28,13 @@ module kernel_cache (
   input  AXI4SlaveReadInterfaceInput    s_axi_read_in     ,
   output AXI4SlaveWriteInterfaceOutput  s_axi_write_out   ,
   input  AXI4SlaveWriteInterfaceInput   s_axi_write_in    ,
+  (* autopipeline_group="resp_kernel_cache" *) 
   input  AXI4MasterReadInterfaceInput   m_axi_read_in     ,
+  (* autopipeline_group="fwd_kernel_cache",autopipeline_limit=24,autopipeline_include="resp_kernel_cache" *)
   output AXI4MasterReadInterfaceOutput  m_axi_read_out    ,
+  (* autopipeline_group="resp_kernel_cache" *) 
   input  AXI4MasterWriteInterfaceInput  m_axi_write_in    ,
+  (* autopipeline_group="fwd_kernel_cache",autopipeline_limit=24,autopipeline_include="resp_kernel_cache" *)
   output AXI4MasterWriteInterfaceOutput m_axi_write_out   ,
   output logic                          cache_setup_signal
 );
