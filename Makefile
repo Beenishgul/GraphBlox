@@ -276,7 +276,7 @@ export MASK_MODE        = 0
 #                        XILINX ARGS                    
 # =========================================================
 export XILINX_DIR         = xilinx_project
-export SCRIPTS_DIR        = scripts
+export SCRIPTS_DIR        = ip_scripts
 export SCRIPTS_PERL       = scripts_pl
 export SCRIPTS_TCL        = scripts_tcl
 export SCRIPTS_SHELL      = scripts_sh
