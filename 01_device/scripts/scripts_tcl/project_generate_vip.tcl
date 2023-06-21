@@ -15,12 +15,12 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set part_id          [lindex $argv 0]
-set kernel_name      [lindex $argv 1]
-set device_directory [lindex $argv 2]
-set active_directory [lindex $argv 3]
+set part_id              [lindex $argv 0]
+set kernel_name          [lindex $argv 1]
+set app_directory        [lindex $argv 2]
+set active_app_directory [lindex $argv 3]
 
-set ip_dir           ${device_directory}/${active_directory}
+set ip_dir           ${app_directory}/${active_app_directory}
 set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
 
 # ----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ puts "========================================================="
 # set_part ${part_id} >> $log_file
 
 # create_project ${kernel_name}_ip_project -in_memory -force -part $part_id >> $log_file
-current_project
+# current_project
 
 set_property PART $part_id [current_project]
 set_property target_language  Verilog [current_project] 
@@ -81,8 +81,7 @@ create_ip -name axi_vip                 \
           -vendor xilinx.com            \
           -library ip                   \
           -version 1.*                  \
-          -module_name ${module_name}   \
-          -dir ${ip_dir} >> $log_file
+          -module_name ${module_name}   >> $log_file
           
 set_property -dict [list \
                     CONFIG.INTERFACE_MODE {MASTER}              \
@@ -99,11 +98,11 @@ set_property -dict [list \
                     CONFIG.HAS_WSTRB {1}                        \
                     ] [get_ips ${module_name}]
              
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
+generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
+generate_target all                          [get_files ${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -115,8 +114,7 @@ create_ip -name axi_vip                 \
           -vendor xilinx.com            \
           -library ip                   \
           -version 1.*                  \
-          -module_name ${module_name}   \
-          -dir ${ip_dir} >> $log_file
+          -module_name ${module_name}   >> $log_file
           
 set_property -dict [list \
                     CONFIG.INTERFACE_MODE {SLAVE}               \
@@ -135,11 +133,11 @@ set_property -dict [list \
                     CONFIG.ID_WIDTH   {1}                       \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
+generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
+generate_target all                          [get_files ${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE
@@ -164,8 +162,7 @@ create_ip -name system_cache            \
           -vendor xilinx.com            \
           -library ip                   \
           -version 5.*                  \
-          -module_name ${module_name}   \
-          -dir ${ip_dir} >> $log_file
+          -module_name ${module_name}   >> $log_file
 
 set_property -dict [list                                                  \
                     CONFIG.C_CACHE_DATA_WIDTH ${LINE_CACHE_DATA_WIDTH}    \
@@ -192,11 +189,11 @@ set_property -dict [list                                                  \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
-generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
+generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
+generate_target all                          [get_files ${module_name}.xci] >> $log_file
+export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate ${kernel_name} IPs..... DONE! 

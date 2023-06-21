@@ -62,11 +62,19 @@ utils_include="include"
 iob_include="iob_include"
 portmaps="portmaps"
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_source.f"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.src.f"
+CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.xci.f"
+CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.vh.f"
 
-CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xci.f"
+rm_package_filelist_f () {
 
-CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_vh.f"
+  local filename=$1
+ 
+  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+      rm ${filename}
+      echo "MSG: Empty file : ${filename}"
+  fi
+}
 
 generate_package_filelist_f () {
 
@@ -79,12 +87,7 @@ generate_package_filelist_f () {
     echo "$newtext" >> ${cfg_filelist_name}
   done 
 
-  newtext=""
-  echo $newtext >> ${CFG_FILE_NAME}
 }
-
-newtext=""
-echo $newtext > ${CFG_FILE_NAME}
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME} "sv"
 
@@ -154,12 +157,22 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/bram_512x32_asym_512wrt_64rd.xci"
 # echo $newtext >> ${CFG_FILE_NAME}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/slv_m00_axi_vip.xci"
-echo $newtext >> ${CFG_FILE_NAME_XCI}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/slv_m00_axi_vip.xci"
+# echo $newtext >> ${CFG_FILE_NAME_XCI}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/control_${KERNEL_NAME}_vip.xci"
-echo $newtext >> ${CFG_FILE_NAME_XCI}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/control_${KERNEL_NAME}_vip.xci"
+# echo $newtext >> ${CFG_FILE_NAME_XCI}
 
-newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
-echo $newtext >> ${CFG_FILE_NAME_XCI}
+# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
+# echo $newtext >> ${CFG_FILE_NAME_XCI}
 
+generate_package_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
+
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
+echo $newtext >> ${CFG_FILE_NAME_XCI}
+echo $newtext >> ${CFG_FILE_NAME_VH}
+
+rm_package_filelist_f ${CFG_FILE_NAME}
+rm_package_filelist_f ${CFG_FILE_NAME_XCI}
+rm_package_filelist_f ${CFG_FILE_NAME_VH}
