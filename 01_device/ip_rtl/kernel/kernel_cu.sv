@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_cu.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-06-17 17:08:39
+// Revise : 2023-06-21 03:13:08
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -19,19 +19,24 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
+(* autopipeline_module="yes" *)
 module kernel_cu #(
   `include "kernel_parameters.vh"
   ) (
-  input  logic                          ap_clk           ,
-  input  logic                          areset           ,
-  input  KernelDescriptor               descriptor_in    ,
-  input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
-  output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
-  input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
-  output logic                          fifo_setup_signal,
-  output logic                          done_out
-);
+    input  logic                          ap_clk           ,
+    input  logic                          areset           ,
+    input  KernelDescriptor               descriptor_in    ,
+    (* autopipeline_group="resp" *) 
+    input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
+    (* autopipeline_group="fwd",autopipeline_limit=24,autopipeline_include="resp" *) 
+    output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
+    (* autopipeline_group="resp" *) 
+    input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
+    (* autopipeline_group="fwd",autopipeline_limit=24,autopipeline_include="resp" *) 
+    output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
+    output logic                          fifo_setup_signal,
+    output logic                          done_out
+  );
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
