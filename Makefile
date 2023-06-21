@@ -289,7 +289,7 @@ export VIVADO_GUI_FLAG    = NO
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
 export IP_DIR_RTL_ACTIVE  = vivado_$(IP_DIR_RTL)
-export IP_DIR_RTL_ACTIVE  = vivado_$(IP_DIR_HLS)
+export IP_DIR_HLS_ACTIVE  = vivado_$(IP_DIR_HLS)
 export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
 # =========================================================
 
