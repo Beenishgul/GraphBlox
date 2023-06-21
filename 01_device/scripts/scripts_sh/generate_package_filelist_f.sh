@@ -63,7 +63,7 @@ iob_include="iob_include"
 portmaps="portmaps"
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.src.f"
-CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.xci.f"
+# CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.xci.f"
 CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.vh.f"
 
 rm_package_filelist_f () {
@@ -72,7 +72,6 @@ rm_package_filelist_f () {
  
   if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
       rm ${filename}
-      echo "MSG: Empty file : ${filename}"
   fi
 }
 
@@ -166,13 +165,13 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME}
 # newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
 # echo $newtext >> ${CFG_FILE_NAME_XCI}
 
-generate_package_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
+# generate_package_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
-echo $newtext >> ${CFG_FILE_NAME_XCI}
+# echo $newtext >> ${CFG_FILE_NAME_XCI}
 echo $newtext >> ${CFG_FILE_NAME_VH}
 
 rm_package_filelist_f ${CFG_FILE_NAME}
-rm_package_filelist_f ${CFG_FILE_NAME_XCI}
+# rm_package_filelist_f ${CFG_FILE_NAME_XCI}
 rm_package_filelist_f ${CFG_FILE_NAME_VH}

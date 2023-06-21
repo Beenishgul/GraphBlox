@@ -12,7 +12,7 @@ print_usage () {
   echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
   echo "  SCRIPTS_DIR: scripts"
   echo "  KERNEL_NAME: kernel"
-  echo "  ALVEO_PART: U250"
+  echo "  ALVEO_PART: vivado_generated_vip"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -35,7 +35,6 @@ rm_xdc_filelist_f () {
  
   if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
       rm ${filename}
-      echo "MSG: Empty file : ${filename}"
   fi
 }
 
@@ -59,4 +58,6 @@ generate_xdc_filelist_f () {
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" ${ALVEO_PART}
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" "top"
 
+newtext=""
+echo $newtext >> ${CFG_FILE_NAME}
 rm_xdc_filelist_f ${CFG_FILE_NAME}

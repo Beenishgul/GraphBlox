@@ -79,7 +79,6 @@ rm_xsim_filelist_f () {
  
   if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
       rm ${filename}
-      echo "MSG: Empty file : ${filename}"
   fi
 }
 

@@ -221,7 +221,9 @@ $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
 .PHONY: gen-vip
 gen-vip: session-info gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR);\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xci_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_VIP_DIR)
+	
 
 # =========================================================
 # VPP Flow: Run Hardware Simulation  
