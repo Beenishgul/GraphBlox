@@ -338,7 +338,7 @@ $(VIVADO_EXPORT_DIR): session-info
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
 $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPORT_DIR) 
 	cd $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
+	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
 
 PHONY: export-hw
 export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma 
