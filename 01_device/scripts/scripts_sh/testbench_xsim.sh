@@ -31,16 +31,22 @@ tcl_directory=$6
 
 generate_compile_filelist_f () {
 
-  local scripts_directory=$1
+  local scripts_directory_lp=$1
   local verilog_type=$2
   local sim_type=$3
 
   local concatinate=""
   
-  for filepath in "$( find ${scripts_directory} -type f -iname "*${sim_type}.*${verilog_type}" | sort -n )" ; do  
-    concatinate+="-f ${filepath} "
-    echo $concatinate
-  done 
+  # for filepath in "$( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" )" ; do  
+  #   concatinate="-f ${filepath} "
+  #   echo "MSG: 1 $concatinate"
+  # done 
+
+  for i in `find ${scripts_directory_lp} -type f -name "*${sim_type}*${verilog_type}"`;
+  do
+    echo " -f $i"
+    concatinate+=" -f $i"
+  done
 
   return $concatinate
 }
@@ -53,37 +59,41 @@ generate_include_filelist_f () {
 
   local concatinate=""
 
-  for filepath in "$( find ${scripts_directory} -type f -iname "*${sim_type}.*${verilog_type}" | sort -n )" ; do  
+  for filepath in "$( find ${scripts_directory} -type f -iname "*${sim_type}*${verilog_type}" )" ; do  
     concatinate+="-i ${filepath} "
-    echo $concatinate
+    echo "MSG: $concatinate"
   done 
 
   return $concatinate
 }
 
-xvhdl_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "vhdl.f" "xsim")
-xvlog_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "v.f" "xsim")
-xvlog_include=$(generate_include_filelist_f ${app_directory}/${scripts_directory} "vh.f" "xsim")
+# generate_xsim_filelist_f ${app_directory}/${scripts_directory} "f"
+
+# xvhdl_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "vhdl.f" "xsim")
+# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "v.f" "xsim")
+# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "sv.f" "xsim")
+# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "ip.v.f" "xsim")
+# xvlog_files+=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "ip.sv.f" "xsim")
+# xvlog_include=$(generate_include_filelist_f ${app_directory}/${scripts_directory} "vh.f" "xsim")
+
+
+# # Set xvlog options
+xvhdl_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
+xvlog_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f"
+# xvlog_include="-i ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vh.f"
+xvlog_include="-i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps"
+
 
 echo "MSG: vhdl.f file : ${xvhdl_files}" 
 echo "MSG: v.f file : ${xvlog_files}"
 echo "MSG: vh.f file : ${xvlog_include}" 
 
-# # Set xvlog options
-# xvhdl_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f \
-#              -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
-# xvlog_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f \
-#              -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f"
-# xvlog_include="-i ${app_directory}/${ip_directory}/utils/include \
-#                -i ${app_directory}/${ip_directory}/memory/cache/iob_include \
-#                -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps"
-
 xvhdl_opts="--incr --relax -L uvm -L xilinx_vip -L system_cache_v5_0_8 ${xvhdl_files}"
 xvlog_opts="--incr --relax -L uvm -L xilinx_vip --sv ${xvlog_files} ${xvlog_include}"
-xelab_opts="--incr --relax -L uvm -L xilinx_vip -L xpm -L xil_defaultlib -debug typical -L xpm -L system_cache_v5_0_8 -L unisims_ver --mt auto -L axi_infrastructure_v1_1_0 -L axi_vip_v1_1_12 "
+xelab_opts="--incr --relax -L uvm -L xilinx_vip -L xpm -L xil_defaultlib -debug typical -L xpm -L system_cache_v5_0_8 -L unisims_ver --mt auto -L axi_infrastructure_v1_1_0 -L axi_vip_v1_1_14 "
 xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/${tcl_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
 # Script info
-echo -e "${kernel_name}_testbench_xsim.sh - (Vivado v2022.1.2 (64-bit)-id)\n"
+echo -e "MSG: ${kernel_name}_testbench_xsim.sh - (Vivado v2023.1 ML (64-bit)-id)\n"
 
 if [[ "$ctrl_mode" == "USER_MANAGED" ]]
 then
@@ -129,10 +139,7 @@ compile()
   filename_ip_sv="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f"
 
   if [[ -z "$xvlog_files" ]] ; then
-    echo "MSG: Empty file : ${filename_v}" 
-    echo "MSG: Empty file : ${filename_sv}"
-    echo "MSG: Empty file : ${filename_ip_v}" 
-    echo "MSG: Empty file : ${filename_ip_sv}" 
+    echo "MSG: Empty xvlog_files : ${xvlog_files}" 
   else
     echo "Starting Compile [xvlog]"
     echo "Arg: $xvlog_opts"
@@ -140,8 +147,7 @@ compile()
   fi
 
   if [[ -z "$xvhdl_files" ]] ; then
-    echo "MSG: Empty file : ${filename_vhdl}" 
-    echo "MSG: Empty file : ${filename_ip_vhdl}"
+    echo "MSG: Empty xvhdl_files : ${xvhdl_files}" 
   else
     echo "Starting Compile [xvhdl]"
     echo "Arg: $xvhdl_opts"
