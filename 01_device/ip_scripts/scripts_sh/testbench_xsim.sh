@@ -51,10 +51,16 @@ generate_include_filelist_f () {
   local sim_type=$3
 
   local concatinate=""
+  local ip_directory=""
+  local prev_ip_directory=""
 
   for filepath in $( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
     for include_dir in $( cat ${filepath} ) ; do  
-      concatinate+="-i ${include_dir} "
+      prev_ip_directory=$ip_directory
+      ip_directory="$(dirname  $(readlink -f "${include_dir}"))"
+      if [[ "$ip_directory" != "$prev_ip_directory" ]] ; then
+          concatinate+="-i ${ip_directory} " 
+      fi
     done 
   done 
 
