@@ -43,7 +43,8 @@ VIVADO_PACKAGE_DIR  = vivado_package_kernel
 VIVADO_SIMULATE_DIR = vivado_simulate_kernel
 VIVADO_RUN_DIR      = vivado_run_$(TARGET)
 VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
-VIVADO_EXPORT_DIR   = vivado_export_$(TARGET)
+VIVADO_EXPORT_DIR   = vivado_export_hw
+VIVADO_IMPORT_DIR   = vivado_import_hw
 VIVADO_VIP_DIR      = vivado_generated_vip
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
@@ -331,20 +332,31 @@ package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NA
 $(VIVADO_EXPORT_DIR): session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
-	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).err 
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log ;\
+	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.err 
 
-.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).vma
-$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).vma: $(VIVADO_EXPORT_DIR) 
-	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
-	export XCL_EMULATION_MODE=$(TARGET) ;\
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
+$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPORT_DIR) 
 	cd $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
+	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
 
 PHONY: export-hw
-export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).vma 
-	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export).vma 
+	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
+# =========================================================
+# Vivado Flow: Import VITIS vma
+# =========================================================
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR):
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
+	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
+
+.PHONY: import-hw
+import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR)
+	
 # =========================================================
 # VPP Flow: XCLBIN File Generation
 # =========================================================
@@ -365,7 +377,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: $(VIVADO_
 .PHONY: build-hw
 build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin 
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
-	
+
 # =========================================================
 # VPP Flow: Run Hardware FPGA
 # =========================================================
