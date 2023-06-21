@@ -341,7 +341,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPOR
 	nohup $(VPP) $(XOCCLFLAGS) --platform $(PLATFORM) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
 
 PHONY: export-hw
-export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export).vma 
+export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma 
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 # =========================================================
@@ -353,9 +353,9 @@ $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR):
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 
 .PHONY: import-hw
-import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
+import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 	
 # =========================================================
 # VPP Flow: XCLBIN File Generation

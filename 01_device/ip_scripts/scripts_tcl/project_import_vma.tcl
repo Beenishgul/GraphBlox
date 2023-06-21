@@ -20,6 +20,9 @@ set kernel_name      [lindex $argv 1]
 set device_directory [lindex $argv 2]
 set active_directory [lindex $argv 3]
 set vma_directory    [lindex $argv 4]
+set project_var      [lindex $argv 5]
+set gui_flag         [lindex $argv 6]
+
 
 set ip_dir           ${device_directory}/${active_directory}
 set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
@@ -41,33 +44,13 @@ proc color {foreground text} {
 # Generate ${kernel_name} IPs..... START!
 # ----------------------------------------------------------------------------
 
-puts "========================================================="
-puts "\[[color 2 "Import VITIS VMA ${kernel_name} .....""]\] [color 1 "START!"]"
-puts "========================================================="
-puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
-puts "========================================================="
-puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
-puts "========================================================="
-puts "\[[color 4 "XILINX_VIVADO"]\] [color 2 ${vivado_dir}]" 
-puts "\[[color 4 "XILINX_VITIS "]\] [color 2 ${vitis_dir}]" 
-puts "========================================================="
 
-# set_part ${part_id} >> $log_file
+# create_project ${kernel_name}_vma_project -part $part_id >> $log_file
 
-create_project ${kernel_name}_vma_project -part $part_id >> $log_file
+if {${gui_flag} == "YES"} {
+  start_gui
+}
+
+open_project $project_var 
 
 vitis::import_archive ${device_directory}/${vma_directory}/${kernel_name}_export.vma 
-
-puts "========================================================="
-puts "\[[color 4 "Check directory for VIP"]\]"
-puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
-puts "========================================================="
-
-puts "========================================================="
-puts "\[[color 2 [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
-puts "========================================================="
-puts "\[[color 4 "Import VITIS VMA ${kernel_name} ....."]\] [color 1 "DONE!"]"
-puts "========================================================="
-close_project >> $log_file
