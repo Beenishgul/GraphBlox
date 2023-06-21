@@ -18,16 +18,15 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set part_id             [lindex $argv 0]
-set kernel_name         [lindex $argv 1]
-set app_directory       [lindex $argv 2]
-set xilinx_directory    [lindex $argv 3]
-set active_ip_directory [lindex $argv 4]
-set ctrl_mode           [lindex $argv 5]
-set scripts_directory   [lindex $argv 6]
-set vip_directory       [lindex $argv 7]
+set part_id                  [lindex $argv 0]
+set kernel_name              [lindex $argv 1]
+set app_directory            [lindex $argv 2]
+set active_app_directory     [lindex $argv 3]
+set ctrl_mode                [lindex $argv 4]
+set scripts_directory        [lindex $argv 5]
+set vip_directory            [lindex $argv 6]
 set vivado_version      2023
-set package_dir      ${app_directory}/${xilinx_directory}
+set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
 
@@ -45,6 +44,12 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
     puts "[color 4 "                             description    "][color 2 "${description_text}"]"
 }
 
+proc add_filelist_if_exists {group filename log_file} {
+   if { [file exists ${filename}] == 1} {               
+       add_files -fileset $group [read [open ${filename}]] >> $log_file
+   }
+}
+
 # =========================================================
 puts "========================================================="
 puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "START!"]"
@@ -54,7 +59,7 @@ puts "========================================================="
 puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
 puts "\[[color 4 "Kernel    "]\] [color 2 ${kernel_name}]"
 puts "\[[color 4 "CTRL MODE "]\] [color 2 ${ctrl_mode}]"
-puts "\[[color 4 "Project   "]\] [color 2 ${xilinx_directory}]"
+puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
 puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
 puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
@@ -77,7 +82,7 @@ set vitis_dir $::env(XILINX_VITIS)
 set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
 set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
 set data_ip              [file normalize $vitis_dir/data/ip]
-set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo] 
+set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo]
 set vip_repo             [file normalize $app_directory/$vip_directory] 
 
 set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
@@ -85,29 +90,26 @@ set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip
 set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
 # =========================================================
-# Add design sources into project
+# Add IP and design sources into project
 # =========================================================
-puts "[color 4 "                        Add design sources into project"]" 
-add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_vh.f]] >> $log_file
-add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_source.f]] >> $log_file
-import_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_vh.f]]
-import_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_source.f]]
+# puts "[color 4 "                        Add VIP into project"]"
+# set argv [list ${part_id} ${kernel_name} ${app_directory} ${active_app_directory}]
+# set argc 4
+# source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
 
-add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xdc.f]] >> $log_file
-add_files -fileset sources_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xci.f]] >> $log_file
-export_ip_user_files -of_objects  [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xci.f]] -force -quiet
+puts "[color 4 "                        Add design sources into project"]" 
+add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.vh.f $log_file
+add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.src.f $log_file
+# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
+add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
 
 puts "[color 4 "                        Add design sources into sim_1"]" 
-add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f]] >> $log_file
-add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f]] >> $log_file
-add_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
-import_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f]] >> $log_file
-import_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f]] >> $log_file
-import_files -fileset sim_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f]] >> $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
-add_files -fileset constrs_1 [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xdc.f]] >> $log_file
-import_files [read [open ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xdc.f]] >> $log_file
+add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
@@ -124,8 +126,8 @@ update_compile_order -fileset sources_1  >> $log_file
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
-puts "[color 4 "                        Update synthsise: synth_1"]"
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+puts "[color 4 "                        Create synthesis: synth_1"]"
+# set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 
 puts "[color 4 "                        Create Implementation: impl"]"
 set argv [list ${kernel_name}]
@@ -453,7 +455,7 @@ puts "========================================================="
 puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
 puts "\[[color 4 "Kernel    "]\] [color 2 ${kernel_name}]"
 puts "\[[color 4 "CTRL MODE "]\] [color 2 ${ctrl_mode}]"
-puts "\[[color 4 "Project   "]\] [color 2 ${xilinx_directory}]"
+puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
 puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
 puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"

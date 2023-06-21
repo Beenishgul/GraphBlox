@@ -27,7 +27,17 @@ ALVEO_PART=$4
 
 XDC_DIR="scripts_xdc"
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_xdc.f"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.xdc.f"
+
+rm_xdc_filelist_f () {
+
+  local filename=$1
+ 
+  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+      rm ${filename}
+      echo "MSG: Empty file : ${filename}"
+  fi
+}
 
 generate_xdc_filelist_f () {
 
@@ -44,12 +54,9 @@ generate_xdc_filelist_f () {
     fi
   done 
 
-  newtext=""
-  echo $newtext >> ${cfg_filelist_name}
 }
-
-newtext=""
-echo $newtext > ${CFG_FILE_NAME}
 
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" ${ALVEO_PART}
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" "top"
+
+rm_xdc_filelist_f ${CFG_FILE_NAME}
