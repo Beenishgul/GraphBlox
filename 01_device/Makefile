@@ -29,7 +29,7 @@ GRAPH_SUIT ?= TEST
 GRAPH_NAME ?= v51_e1021
 
 XILINX_DIR          ?= xilinx_project
-SCRIPTS_DIR         ?= scripts
+SCRIPTS_DIR         ?= ip_scripts
 SCRIPTS_PERL        ?= scripts_pl
 SCRIPTS_TCL         ?= scripts_tcl
 SCRIPTS_SHELL       ?= scripts_sh
