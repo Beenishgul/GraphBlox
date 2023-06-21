@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 print_usage () {
   echo "Usage: "
   echo "  generate_source_ip.sh ORIGINAL_IP_DIR ACTIVE_IP_DIR CTRL_MODE"
