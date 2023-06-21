@@ -543,9 +543,26 @@ run-fpga-debug:
 # =========================================================
 # STEP 5.a Open Project in Vivado GUI
 # =========================================================
-.PHONY: open-vitis-project
-open-vitis-project: 
-	-@$(MAKE) open-vitis-project $(MAKE_DEVICE)
+.PHONY: run-vpp-sim-project
+run-vpp-sim-project:
+	@$(MAKE) run-vpp-sim-project $(MAKE_DEVICE)
+
+.PHONY: run-vpp-synth-project
+run-vpp-synth-project:
+	@$(MAKE) run-vpp-synth-project $(MAKE_DEVICE)
+
+.PHONY: run-vpp-impl-project
+run-vpp-impl-project:
+	@$(MAKE) run-vpp-impl-project $(MAKE_DEVICE)
+
+.PHONY: run-vpp-report-project
+run-vpp-report-project:
+	@$(MAKE) run-vpp-report-project $(MAKE_DEVICE)
+
+.PHONY: open-vpp-vivado-project
+open-vpp-vivado-project:
+	@$(MAKE) open-vpp-vivado-project $(MAKE_DEVICE)
+
 # =========================================================
 
 # =========================================================
