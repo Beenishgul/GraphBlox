@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : bundle_lanes.sv
 // Create : 2023-06-17 07:15:49
-// Revise : 2023-06-17 07:15:56
+// Revise : 2023-06-21 03:14:18
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -236,7 +236,7 @@ module bundle_lanes #(
             done_out                 <= 1'b1;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_lanes_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lanes_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|lanes_fifo_setup_signal_reg);
+            fifo_setup_signal        <= lane_arbiter_N_to_1_lane_fifo_setup_signal | lane_arbiter_1_to_N_lanes_fifo_setup_signal | fifo_response_lanes_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lanes_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|lanes_fifo_setup_signal_reg);
             request_lanes_out.valid  <= request_engine_out_int.valid ;
             request_memory_out.valid <= request_memory_out_int.valid ;
             done_out                 <= (&lanes_done_out_reg);
