@@ -132,6 +132,11 @@ set argv [list ${kernel_name}]
 set argc 1
 source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_impl.tcl >> $log_file
 
+puts "[color 4 "                        Create IDR Implementation: i_impl"]"
+set argv [list ${kernel_name}]
+set argc 1
+source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tcl >> $log_file
+
 puts "[color 4 "                        Create IP packaging project"]" 
 # create IP packaging project
 ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true >> $log_file
