@@ -513,11 +513,15 @@ gen-host-bin:
 # =========================================================
 
 # =========================================================
-# STEP 3.c Export to vivado flow
+# STEP 3.c Export/Import vitis to vivado flow
 # =========================================================
 .PHONY: export-hw
 export-hw:
 	-@$(MAKE) export-hw $(MAKE_DEVICE)
+
+.PHONY: import-hw
+import-hw:
+	-@$(MAKE) import-hw $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
