@@ -142,11 +142,11 @@ source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tc
 
 puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
-ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true >> $log_file
+ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /KernelIP -import_files -set_current true >> $log_file
 set core [ipx::current_core]
-# foreach user_parameter [list C_S_AXI_CONTROL_ADDR_WIDTH C_S_AXI_CONTROL_DATA_WIDTH C_M00_AXI_ADDR_WIDTH C_M00_AXI_DATA_WIDTH] {
-#     ::ipx::remove_user_parameter $user_parameter $core
-#   }
+foreach user_parameter [ipx::get_user_parameters] {
+    ::ipx::remove_user_parameter $user_parameter $core
+  }
 # =========================================================
 # Step 2: Inference clock, reset, AXI interfaces and associate them with clock
 # =========================================================
