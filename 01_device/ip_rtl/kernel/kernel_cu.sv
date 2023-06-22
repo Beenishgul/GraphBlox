@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : kernel_cu.sv
 // Create : 2023-01-11 23:47:45
-// Revise : 2023-06-21 03:29:30
+// Revise : 2023-06-22 15:43:24
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -19,20 +19,15 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-(* autopipeline_module="yes" *)
 module kernel_cu #(
   `include "kernel_parameters.vh"
   ) (
     input  logic                          ap_clk           ,
     input  logic                          areset           ,
     input  KernelDescriptor               descriptor_in    ,
-    (* autopipeline_group="resp_kernel_cu" *) 
     input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
-    (* autopipeline_group="fwd_kernel_cu",autopipeline_limit=24,autopipeline_include="resp_kernel_cu" *) 
     output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
-    (* autopipeline_group="resp_kernel_cu" *) 
     input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
-    (* autopipeline_group="fwd_kernel_cu",autopipeline_limit=24,autopipeline_include="resp_kernel_cu" *) 
     output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
     output logic                          fifo_setup_signal,
     output logic                          done_out
