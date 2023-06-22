@@ -124,10 +124,13 @@ update_compile_order -fileset sim_1
 
 puts "[color 4 "                        Set Simulator ${kernel_name} settings"]"
 set_property top ${kernel_name}_testbench [get_filesets sim_1]
+
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property simulator_language "Mixed" [current_project]
 set_property target_language  "Verilog" [current_project]
 set_property TARGET_SIMULATOR XSim [current_project]
+set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+set_property -name {xsim.simulate.no_quit} -value {true} -objects [get_filesets sim_1]
 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1  >> $log_file
