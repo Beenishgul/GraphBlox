@@ -24,12 +24,24 @@ KERNEL_NAME=$3
 IMPL_STRATEGY=$4
 JOBS_STRATEGY=$5
 PART=$6
-MAX_THREADS=$7
+PLATFORM=$7
+TARGET=$8
+MAX_THREADS=$9
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_build_hw.cfg"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_rtl_link.cfg"
  
 config=""
- 
+
+config+="platform=${PLATFORM}"
+config+="messageDb=${KERNEL_NAME}.mdb"
+config+="temp_dir=${KERNEL_NAME}.build"
+config+="report_dir=${KERNEL_NAME}.build/reports"
+config+="log_dir=${KERNEL_NAME}.build/logs"
+config+="save-temps=1"
+# config+="target=${TARGET}"
+config+="debug=1"
+config+="link =1"
+
 config+="[connectivity]\n"
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then
