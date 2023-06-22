@@ -26,6 +26,7 @@ set ctrl_mode                [lindex $argv 4]
 set scripts_directory        [lindex $argv 5]
 set vip_directory            [lindex $argv 6]
 set vivado_version           [lindex $argv 7]
+set git_version              [lindex $argv 8]
 set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -47,6 +48,7 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
 proc add_filelist_if_exists {group filename log_file} {
    if { [file exists ${filename}] == 1} {               
        add_files -fileset $group [read [open ${filename}]] >> $log_file
+       import_files -fileset $group [read [open ${filename}]] >> $log_file
    }
 }
 
@@ -63,7 +65,8 @@ puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
 puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
 puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
-puts "\[[color 4 "VIVADO_VER "]\] [color 2 ${vivado_version}]"
+puts "\[[color 4 "VIVADO_VER"]\] [color 2 ${vivado_version}]"
+puts "\[[color 4 "GIT_VER   "]\] [color 2 ${git_version}]"
 puts "========================================================="
 
 # =========================================================
@@ -71,7 +74,7 @@ puts "========================================================="
 # =========================================================
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
-create_project -force $kernel_name ./$kernel_name -part $part_id >> $log_file
+create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
 # =========================================================
 # Generate Project VIPs
 # =========================================================
@@ -142,10 +145,14 @@ source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tc
 
 puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
-ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
+ipx::package_project -root_dir ${package_dir}/${kernel_name} -vendor virginia.edu -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
+# ipx::unload_core ${package_dir}/${kernel_name}/component.xml >> $log_file
+# ipx::edit_ip_in_project -upgrade true -name edit_${kernel_name} -directory ${package_dir}/${kernel_name} ${package_dir}/${kernel_name}/component.xml >> $log_file
 set core [ipx::current_core]
+scan ${git_version} "%c" num_git_version
+set_property core_revision ${num_git_version} $core
 foreach user_parameter [ipx::get_user_parameters] {
-    ::ipx::remove_user_parameter $user_parameter $core
+    ipx::remove_user_parameter $user_parameter $core
   }
 # =========================================================
 # Step 2: Inference clock, reset, AXI interfaces and associate them with clock
@@ -154,26 +161,26 @@ puts "[color 3 "                Step 2: Inference clock, reset, AXI interfaces a
 
 # inference clock and reset signals
 puts "[color 4 "                        Inference clock and reset signals"]" 
-set bif      [::ipx::get_bus_interfaces -of $core  "m00_axi"] 
-set bifparam [::ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
+set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
+set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
 set_property value        64           $bifparam
 set_property value_source constant     $bifparam
-set bifparam [::ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
+set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
 set_property value        32           $bifparam
 set_property value_source constant     $bifparam
-set bifparam [::ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
+set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
 set_property value        32           $bifparam
 set_property value_source constant     $bifparam
 
-::ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
-::ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
+ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
+ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
 
 # =========================================================
 # Specify the freq_hz parameter
 # =========================================================
 puts "[color 4 "                        Specify the freq_hz parameter"]" 
-set clkbif      [::ipx::get_bus_interfaces -of $core "ap_clk"]
-set clkbifparam [::ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
+set clkbif      [ipx::get_bus_interfaces -of $core "ap_clk"]
+set clkbifparam [ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 
 # =========================================================
 # Set desired frequency
@@ -215,9 +222,9 @@ puts "[color 3 "                        including CTRL and user kernel arguments
 puts "[color 4 "                        Add RTL kernel registers"]" 
 ipx::add_register CTRL [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects $core]]
 
-set mem_map    [::ipx::add_memory_map -quiet "s_axi_control" $core]
-set addr_block [::ipx::add_address_block -quiet "reg0" $mem_map]
-set reg        [::ipx::add_register "CTRL" $addr_block]
+set mem_map    [ipx::add_memory_map -quiet "s_axi_control" $core]
+set addr_block [ipx::add_address_block -quiet "reg0" $mem_map]
+set reg        [ipx::add_register "CTRL" $addr_block]
 set field      [ipx::add_field AP_START $reg]
 
 # =========================================================
@@ -226,7 +233,7 @@ set field      [ipx::add_field AP_START $reg]
 puts "[color 4 "                        Set RTL kernel registers property"]" 
 
 puts_reg_info "CTRL" "Control signals" "0x000" 32
-set reg      [::ipx::add_register "CTRL" $addr_block]
+set reg      [ipx::add_register "CTRL" $addr_block]
   set_property description    "Control signals"    $reg
   set_property address_offset 0x000 $reg
   set_property size           32    $reg
@@ -293,19 +300,19 @@ puts_reg_info "AP_CONTINUE" "Control signal Register for ap_continue." "0x010" 1
     set_property READ_ACTION {modify} $field
 
 puts_reg_info "GIER" "Global Interrupt Enable Register" "0x004" 32
-  set reg      [::ipx::add_register "GIER" $addr_block]
+  set reg      [ipx::add_register "GIER" $addr_block]
   set_property description    "Global Interrupt Enable Register"    $reg
   set_property address_offset 0x004 $reg
   set_property size           32    $reg
 
 puts_reg_info "IP_IER" "IP Interrupt Enable Register" "0x008" 32
-  set reg      [::ipx::add_register "IP_IER" $addr_block]
+  set reg      [ipx::add_register "IP_IER" $addr_block]
   set_property description    "IP Interrupt Enable Register"    $reg
   set_property address_offset 0x008 $reg
   set_property size           32    $reg
 
 puts_reg_info "IP_ISR" "IP Interrupt Status Register" "0x00C" 32
-  set reg      [::ipx::add_register "IP_ISR" $addr_block]
+  set reg      [ipx::add_register "IP_ISR" $addr_block]
   set_property description    "IP Interrupt Status Register"    $reg
   set_property address_offset 0x00C $reg
   set_property size           32    $reg
@@ -321,76 +328,76 @@ puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"
 puts "[color 4 "                        Set RTL kernel (${kernel_name}) registers property"]" 
 
 puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_0" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_0" $addr_block]
   set_property address_offset 0x010 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_1" "vertex in degree" "0x01c" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_1" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_1" $addr_block]
   set_property address_offset 0x01c $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_2" "vertex out degree" "0x028" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_2" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_2" $addr_block]
   set_property address_offset 0x028 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_3" "vertex edges CSR index" "0x034" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_3" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_3" $addr_block]
   set_property address_offset 0x034 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_4" "edges array src" "0x040" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_4" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_4" $addr_block]
   set_property address_offset 0x040 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_5" "edges array dest" "0x04c" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_5" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_5" $addr_block]
   set_property address_offset 0x04c $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_6" "edges array weight" "0x058" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_6" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_6" $addr_block]
   set_property address_offset 0x058 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_7" "auxiliary 1" "0x064" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_7" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_7" $addr_block]
   set_property address_offset 0x064 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_8" "auxiliary 2" "0x070" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_8" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_8" $addr_block]
   set_property address_offset 0x070 $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
 puts_reg_info "buffer_9" "auxiliary 3" "0x07c" [expr {8*8}]
-  set reg      [::ipx::add_register -quiet "buffer_9" $addr_block]
+  set reg      [ipx::add_register -quiet "buffer_9" $addr_block]
   set_property address_offset 0x07c $reg
   set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
+  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
   set_property value m00_axi $regparam 
 
-  set_property slave_memory_map_ref "s_axi_control" [::ipx::get_bus_interfaces -of $core "s_axi_control"]
+  set_property slave_memory_map_ref "s_axi_control" [ipx::get_bus_interfaces -of $core "s_axi_control"]
 
   set_property xpm_libraries {XPM_CDC XPM_MEMORY XPM_FIFO} $core
   set_property sdx_kernel true $core
@@ -408,7 +415,6 @@ puts "[color 3 "                Step 5: Package Vivado IP and generate Vitis ker
 puts "[color 4 "                        Set required property for Vitis kernel"]" 
 set_property sdx_kernel true $core
 set_property sdx_kernel_type rtl $core
-ipx::create_xgui_files [ipx::current_core]
 set_property ipi_drc {ignore_freq_hz true} $core
 # set_property vitis_drc {ctrl_protocol USER_MANAGED} $core
 
@@ -426,33 +432,52 @@ if {${ctrl_mode} == "USER_MANAGED"} {
   set_property vitis_drc {ctrl_protocol user_managed} $core
 }
 
+puts "[color 4 "                        Merge project changes"]" 
+update_compile_order -fileset [current_fileset] >> $log_file
+
+ipx::add_bus_parameter FREQ_TOLERANCE_HZ [ipx::get_bus_interfaces ap_clk -of_objects [ipx::current_core]]
+set_property value -1 [ipx::get_bus_parameters FREQ_TOLERANCE_HZ -of_objects [ipx::get_bus_interfaces ap_clk -of_objects [ipx::current_core]]]
+
+ipx::merge_project_changes files [ipx::current_core] >> $log_file
+ipx::merge_project_changes hdl_parameters [ipx::current_core] >> $log_file
+
+puts "[color 4 "                        Synth design RTL test"]" 
+# synth_design -rtl
+
 # =========================================================
 # Packaging Vivado IP
 # =========================================================
 puts "[color 4 "                        Packaging Vivado IP"]" 
-::ipx::update_checksums $core
-::ipx::check_integrity -kernel $core >> $log_file
-::ipx::check_integrity -xrt $core >> $log_file
-::ipx::save_core $core
-::ipx::unload_core $core
-
+ipx::create_xgui_files $core
+ipx::update_checksums $core
+ipx::check_integrity -kernel $core >> $log_file
+ipx::check_integrity -xrt $core >> $log_file
+ipx::save_core $core
+ipx::check_integrity -quiet -kernel $core
+ipx::archive_core ${package_dir}/${kernel_name}/${kernel_name}.zip $core
+ipx::unload_core $core
 # =========================================================
 # Generate Vitis Kernel from Vivado IP
 # =========================================================
 puts "[color 4 "                        Generate Vitis Kernel from Vivado IP"]" 
-# package_xo -force -xo_path ../${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol USER_MANAGED -ip_directory ./${kernel_name}_ip -output_kernel_xml ../${kernel_name}.xml >> $log_file
+# package_xo -force -xo_path .${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol USER_MANAGED -ip_directory ${package_dir}/${kernel_name}_ip -output_kernel_xml .${package_dir}/${kernel_name}.xml >> $log_file
 
 if {${ctrl_mode} == "USER_MANAGED"} {
-  package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
+  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
 } elseif {${ctrl_mode} == "AP_CTRL_HS"} {
-  package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_hs -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
+  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_hs -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
 } elseif {${ctrl_mode} == "AP_CTRL_CHAIN"} { 
-  package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
+  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
 } else {
-  package_xo -force -xo_path ./${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ./${kernel_name}_ip -output_kernel_xml ./${kernel_name}.xml >> $log_file
+  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
 }
-# =========================================================
 
+set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip ${package_dir}]
+
+set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
+update_ip_catalog >> $log_file
+# =========================================================
+close_project
 puts "========================================================="
 puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
 puts "\[[color 4 "Kernel    "]\] [color 2 ${kernel_name}]"
