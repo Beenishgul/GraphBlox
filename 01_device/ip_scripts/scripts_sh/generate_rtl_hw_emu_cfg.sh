@@ -28,7 +28,7 @@ PLATFORM=$7
 TARGET=$8
 MAX_THREADS=$9
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_rtl_link.cfg"
+CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_rtl_${TARGET}.cfg"
  
 config=""
 
@@ -38,9 +38,11 @@ config+="temp_dir=${KERNEL_NAME}.build\n"
 config+="report_dir=${KERNEL_NAME}.build/reports\n"
 config+="log_dir=${KERNEL_NAME}.build/logs\n"
 config+="save-temps=1\n"
-config+="target=${TARGET}\n"
+config+="target=hw_emu\n"
 config+="debug=1\n"
 config+="link =1\n"
+
+config+="\n"
 
 config+="[connectivity]\n"
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
