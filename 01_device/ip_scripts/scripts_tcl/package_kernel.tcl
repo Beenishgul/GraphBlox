@@ -112,6 +112,9 @@ puts "[color 4 "                        Add design sources into sim_1 ${kernel_n
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
@@ -147,11 +150,11 @@ source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tc
 puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
 ipx::package_project -root_dir ${package_dir}/${kernel_name} -vendor virginia.edu -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
+
 set core [ipx::current_core]
 scan ${git_version} "%c" num_git_version
-
-set_property vendor cs.virginia.edu [ipx::current_core]
-set_property library Mezzanine $core
+set_property vendor cs.virginia.edu $core
+set_property library mezzanine $core
 set_property name ${kernel_name} $core
 set_property core_revision ${num_git_version} $core
 
