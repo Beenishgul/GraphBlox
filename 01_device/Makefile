@@ -215,7 +215,7 @@ $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 .PHONY: gen-scripts-dir
 gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) ;\
-	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) $(PART) $(XILINX_MAX_THREADS);\
+	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_build_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) $(PART) $(PLATFORM) $(TARGET) $(XILINX_MAX_THREADS);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_RTL_ACTIVE) $(VIVADO_VIP_DIR) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xdc_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(ALVEO) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_RTL_ACTIVE) $(VIVADO_VIP_DIR) $(TESTBENCH_MODULE)
@@ -301,12 +301,9 @@ open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERN
 # =========================================================
 # VPP Flow: XCLBIN V++ Flags
 # =========================================================
-XOCCFLAGS   =   --platform $(PLATFORM) -g --save-temps
-XOCCLFLAGS  =   --link --optimize 3 
-VPPCONFLAGS =   --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg 
-# 				--temp_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp \
-# 				--log_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_log \
-# 				--report_dir $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_report
+# XOCCFLAGS   =   
+XOCCLFLAGS  =   --optimize 3 
+VPPCONFLAGS =   --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_link.cfg 
 		
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
@@ -341,7 +338,7 @@ $(VIVADO_EXPORT_DIR): session-info
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
 $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPORT_DIR) 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_build_hw.cfg --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
+	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
 
 PHONY: export-hw
 export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
