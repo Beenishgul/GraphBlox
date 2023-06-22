@@ -27,6 +27,7 @@ set scripts_directory        [lindex $argv 5]
 set vip_directory            [lindex $argv 6]
 set vivado_version           [lindex $argv 7]
 set git_version              [lindex $argv 8]
+
 set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -146,11 +147,14 @@ source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tc
 puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
 ipx::package_project -root_dir ${package_dir}/${kernel_name} -vendor virginia.edu -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
-# ipx::unload_core ${package_dir}/${kernel_name}/component.xml >> $log_file
-# ipx::edit_ip_in_project -upgrade true -name edit_${kernel_name} -directory ${package_dir}/${kernel_name} ${package_dir}/${kernel_name}/component.xml >> $log_file
 set core [ipx::current_core]
 scan ${git_version} "%c" num_git_version
+
+set_property vendor cs.virginia.edu [ipx::current_core]
+set_property library Mezzanine $core
+set_property name ${kernel_name} $core
 set_property core_revision ${num_git_version} $core
+
 foreach user_parameter [ipx::get_user_parameters] {
     ipx::remove_user_parameter $user_parameter $core
   }
@@ -441,9 +445,6 @@ set_property value -1 [ipx::get_bus_parameters FREQ_TOLERANCE_HZ -of_objects [ip
 ipx::merge_project_changes files [ipx::current_core] >> $log_file
 ipx::merge_project_changes hdl_parameters [ipx::current_core] >> $log_file
 
-puts "[color 4 "                        Synth design RTL test"]" 
-# synth_design -rtl
-
 # =========================================================
 # Packaging Vivado IP
 # =========================================================
@@ -476,6 +477,9 @@ set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip
 
 set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
+
+puts "[color 4 "                        Synth design RTL test"]" 
+# synth_design -rtl >> $log_file
 # =========================================================
 close_project
 puts "========================================================="
