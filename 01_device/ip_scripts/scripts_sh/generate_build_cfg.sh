@@ -32,15 +32,15 @@ CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_rtl_link.cfg"
  
 config=""
 
-config+="platform=${PLATFORM}"
-config+="messageDb=${KERNEL_NAME}.mdb"
-config+="temp_dir=${KERNEL_NAME}.build"
-config+="report_dir=${KERNEL_NAME}.build/reports"
-config+="log_dir=${KERNEL_NAME}.build/logs"
+config+="platform=${PLATFORM}\n"
+config+="messageDb=${KERNEL_NAME}.mdb\n"
+config+="temp_dir=${KERNEL_NAME}.build\n"
+config+="report_dir=${KERNEL_NAME}.build/reports\n"
+config+="log_dir=${KERNEL_NAME}.build/logs\n"
 config+="save-temps=1"
-# config+="target=${TARGET}"
-config+="debug=1"
-config+="link =1"
+config+="target=${TARGET\n}"
+config+="debug=1\n"
+config+="link =1\n"
 
 config+="[connectivity]\n"
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
