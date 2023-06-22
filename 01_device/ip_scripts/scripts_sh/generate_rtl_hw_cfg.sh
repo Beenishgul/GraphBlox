@@ -103,7 +103,6 @@ if [[ ${IMPL_STRATEGY} -eq 0 ]]
 then
  config+="\n[advanced]\n"
  config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
- echo -e "${config}" >> ${CFG_FILE_NAME}
 elif [[ ${IMPL_STRATEGY} -eq 1 ]]
   then
    config+="\n[advanced]\n"
@@ -115,7 +114,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="synth.jobs=${JOBS_STRATEGY}\n"
    config+="param=general.maxThreads=${MAX_THREADS}\n"
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 2 ]]
   then
    config+="\n[advanced]\n"
@@ -129,7 +127,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="param=general.maxThreads=${MAX_THREADS}\n"
    # config+="prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/opt_pre.tcl}"
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 3 ]]
   then
    config+="\n[advanced]\n"
@@ -153,7 +150,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-no_bufg_opt}\n"
    config+="param=hd.enableClockTrackSelectionEnancement=1\n"
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 4 ]]
   then
    config+="\n[advanced]\n"
@@ -174,7 +170,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 5 ]]
   then
 
@@ -196,7 +191,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n" 
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 6 ]]
   then
    config+="\n[advanced]\n"
@@ -217,7 +211,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n" 
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  elif [[ ${IMPL_STRATEGY} -eq 7 ]]
   then
    config+="\n[advanced]\n"
@@ -238,7 +231,6 @@ elif [[ ${IMPL_STRATEGY} -eq 1 ]]
    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n" 
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
 elif [[ ${IMPL_STRATEGY} -eq 8 ]]
   then
    config+="\n[advanced]\n"
@@ -250,10 +242,9 @@ elif [[ ${IMPL_STRATEGY} -eq 8 ]]
    config+="synth.jobs=${JOBS_STRATEGY}\n"
    config+="param=general.maxThreads=${MAX_THREADS}\n"
 
-   echo -e "${config}" >> ${CFG_FILE_NAME}
  else
    config+="\n[advanced]\n"
    config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
-   echo -e  "${config}" >> ${CFG_FILE_NAME}
  fi
 
+  echo -e  "${config}" > ${CFG_FILE_NAME}
