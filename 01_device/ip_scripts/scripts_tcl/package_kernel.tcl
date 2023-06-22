@@ -25,7 +25,7 @@ set active_app_directory     [lindex $argv 3]
 set ctrl_mode                [lindex $argv 4]
 set scripts_directory        [lindex $argv 5]
 set vip_directory            [lindex $argv 6]
-set vivado_version      2023
+set vivado_version           [lindex $argv 7]
 set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
 # =========================================================
@@ -63,6 +63,7 @@ puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
 puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
 puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
+puts "\[[color 4 "VIVADO_VER "]\] [color 2 ${vivado_version}]"
 puts "========================================================="
 
 # =========================================================
@@ -97,13 +98,13 @@ update_ip_catalog >> $log_file
 # set argc 4
 # source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
 
-puts "[color 4 "                        Add design sources into project"]" 
+puts "[color 4 "                        Add design sources into project ${kernel_name}"]" 
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.src.f $log_file
 # add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
 
-puts "[color 4 "                        Add design sources into sim_1"]" 
+puts "[color 4 "                        Add design sources into sim_1 ${kernel_name}"]" 
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
@@ -114,7 +115,7 @@ add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 
-puts "[color 4 "                        Set Simulator settings"]"
+puts "[color 4 "                        Set Simulator ${kernel_name} settings"]"
 set_property top ${kernel_name}_testbench [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property simulator_language "Mixed" [current_project]
@@ -126,20 +127,20 @@ update_compile_order -fileset sources_1  >> $log_file
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
-puts "[color 4 "                        Create synthesis: synth_1"]"
+puts "[color 4 "                        Create OOC synthesis: synth_1"]"
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 
-puts "[color 4 "                        Create Implementation: impl"]"
-set argv [list ${kernel_name}]
-set argc 1
+puts "[color 4 "                        Create all implementation strategies: impl_strategy"]"
+set argv [list ${kernel_name} ${vivado_version}]
+set argc 2
 source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_impl.tcl >> $log_file
 
-puts "[color 4 "                        Create IDR Implementation: i_impl"]"
-set argv [list ${kernel_name}]
-set argc 1
+puts "[color 4 "                        Create IDR implementation strategies: i_impl_strategies"]"
+set argv [list ${kernel_name} ${vivado_version}]
+set argc 2
 source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tcl >> $log_file
 
-puts "[color 4 "                        Create IP packaging project"]" 
+puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
 ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /UserIP -import_files -set_current true >> $log_file
 set core [ipx::current_core]
@@ -459,6 +460,7 @@ puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
 puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
 puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
 puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
+puts "\[[color 4 "VIVADO_VER "]\] [color 2 ${vivado_version}]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="

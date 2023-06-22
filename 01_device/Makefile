@@ -72,11 +72,13 @@ FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
-	PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
+	PLATFORM   ?= xilinx_u280_gen3x16_xdma_1_202211_1
+	VIVADO_VER ?= 2022
 else ifeq ($(HOST_NAME), jaguar)
 	ALVEO?=  U250
 	PART ?=  xcu250-figd2104-2L-e
-	PLATFORM ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
+	PLATFORM   ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
+	VIVADO_VER ?= 2022
 else 
 # 	ALVEO?=  U250
 # 	PART ?=  xcu250-figd2104-2L-e
@@ -96,7 +98,8 @@ else
 
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
-	PLATFORM ?=  xilinx_u280_gen3x16_xdma_1_202211_1
+	PLATFORM   ?=  xilinx_u280_gen3x16_xdma_1_202211_1
+	VIVADO_VER ?=2023
 endif
 
 # TARGET: set the build target, can be hw or hw_emu
@@ -320,7 +323,7 @@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
 
 $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR)
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(VIVADO_VER)
 
 .PHONY: package-kernel
 package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
