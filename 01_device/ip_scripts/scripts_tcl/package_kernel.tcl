@@ -142,7 +142,7 @@ source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tc
 
 puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
 # create IP packaging project
-ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library user -taxonomy /KernelIP -import_files -set_current true >> $log_file
+ipx::package_project -root_dir ./${kernel_name}_ip -vendor xilinx.com -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
 set core [ipx::current_core]
 foreach user_parameter [ipx::get_user_parameters] {
     ::ipx::remove_user_parameter $user_parameter $core
@@ -408,6 +408,7 @@ puts "[color 3 "                Step 5: Package Vivado IP and generate Vitis ker
 puts "[color 4 "                        Set required property for Vitis kernel"]" 
 set_property sdx_kernel true $core
 set_property sdx_kernel_type rtl $core
+ipx::create_xgui_files [ipx::current_core]
 set_property ipi_drc {ignore_freq_hz true} $core
 # set_property vitis_drc {ctrl_protocol USER_MANAGED} $core
 
