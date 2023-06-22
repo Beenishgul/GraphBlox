@@ -196,7 +196,7 @@ set clkbifparam [ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # Set desired frequency
 # ========================================================= 
 
-set desired_frequency 250000000               
+set desired_frequency 300000000               
 puts "[color 4 "                        Set desired frequency "][color 5 "${desired_frequency} Hz"]"
 set_property value ${desired_frequency} $clkbifparam
 
@@ -455,12 +455,12 @@ ipx::merge_project_changes hdl_parameters [ipx::current_core] >> $log_file
 # Packaging Vivado IP
 # =========================================================
 puts "[color 4 "                        Packaging Vivado IP"]" 
-ipx::create_xgui_files $core
 ipx::update_checksums $core
 ipx::check_integrity -kernel $core >> $log_file
 ipx::check_integrity -xrt $core >> $log_file
 ipx::save_core $core
 ipx::check_integrity -quiet -kernel $core
+ipx::create_xgui_files $core
 ipx::archive_core ${package_dir}/${kernel_name}/${kernel_name}.zip $core
 ipx::unload_core $core
 # =========================================================
