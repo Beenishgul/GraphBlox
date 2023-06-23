@@ -119,8 +119,11 @@ add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 
-update_compile_order -fileset sources_1
-update_compile_order -fileset sim_1
+puts "[color 4 "                        Update compile order: sources_1"]"
+update_compile_order -fileset sources_1 >> $log_file
+
+puts "[color 4 "                        Update compile order: sim_1"]"
+update_compile_order -fileset sim_1 >> $log_file
 
 puts "[color 4 "                        Set Simulator ${kernel_name} settings"]"
 set_property top ${kernel_name}_testbench [get_filesets sim_1]
@@ -134,6 +137,7 @@ set_property -name {xsim.simulate.no_quit} -value {true} -objects [get_filesets 
 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1  >> $log_file
+
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
