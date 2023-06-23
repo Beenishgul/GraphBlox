@@ -339,9 +339,9 @@ else ifeq ($(HOST_NAME), jaguar)
 else
 	export ALVEO =  U250
 	export PART  =  xcu250-figd2104-2L-e
-	export PLATFORM   = xilinx_u250_gen3x16_xdma_4_1_202210_1
-	export VIVADO_VER = 2023
-
+	export PLATFORM       = xilinx_u250_gen3x16_xdma_4_1_202210_1
+	export VIVADO_VER     = 2023
+	export DESIGN_FREQ_HZ = 250000000  
 # 	export ALVEO =  U200
 # 	export PART  =  xcu200-fsgd2104-2-e
 # 	export PLATFORM =  xilinx_u200_gen3x16_xdma_2_202110_1
@@ -577,6 +577,7 @@ run-vpp-report-project:
 .PHONY: open-vpp-vivado-project
 open-vpp-vivado-project:
 	@$(MAKE) open-vpp-vivado-project $(MAKE_DEVICE)
+# =========================================================
 
 # =========================================================
 # STEP 5.b VITIS Flow: Open Project
@@ -584,7 +585,6 @@ open-vpp-vivado-project:
 .PHONY: open-vitis-project
 open-vitis-project:
 	@$(MAKE) open-vitis-project $(MAKE_DEVICE)
-
 # =========================================================
 
 # =========================================================
