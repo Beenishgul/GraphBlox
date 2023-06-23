@@ -75,19 +75,23 @@ ifeq ($(HOST_NAME), panther)
 	PART ?=  xcu280-fsvh2892-2L-e
 	PLATFORM   ?= xilinx_u280_gen3x16_xdma_1_202211_1
 	VIVADO_VER ?= 2022
+	
 	DESIGN_FREQ_HZ ?= 300000000  
-
+	XILINX_JOBS_STRATEGY ?= 4
+    XILINX_MAX_THREADS   ?= 8
 else ifeq ($(HOST_NAME), jaguar)
 	ALVEO?=  U250
 	PART ?=  xcu250-figd2104-2L-e
 	PLATFORM   ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
+	
 	VIVADO_VER ?= 2022
-	DESIGN_FREQ_HZ ?= 300000000  
-
+	DESIGN_FREQ_HZ ?= 250000000  
+	XILINX_JOBS_STRATEGY ?= 4
+    XILINX_MAX_THREADS   ?= 8
 else 
-# 	ALVEO?=  U250
-# 	PART ?=  xcu250-figd2104-2L-e
-# 	PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
+	ALVEO?=  U250
+	PART ?=  xcu250-figd2104-2L-e
+	PLATFORM ?= xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 #   ALVEO?=  U200
 #   PART ?=  xcu200-fsgd2104-2-e
@@ -101,11 +105,14 @@ else
 #   PART ?=  xcu55c-fsvh2892-2L-e
 #   PLATFORM ?=  xilinx_u55c_gen3x16_xdma_3_202210_1
 
-	ALVEO?=  U280
-	PART ?=  xcu280-fsvh2892-2L-e
-	PLATFORM   ?=  xilinx_u280_gen3x16_xdma_1_202211_1
+# 	ALVEO?=  U280
+# 	PART ?=  xcu280-fsvh2892-2L-e
+# 	PLATFORM   ?=  xilinx_u280_gen3x16_xdma_1_202211_1
+	
 	VIVADO_VER ?=2023
-	DESIGN_FREQ_HZ ?= 300000000  
+	DESIGN_FREQ_HZ ?= 250000000  
+	XILINX_JOBS_STRATEGY ?= 4
+    XILINX_MAX_THREADS   ?= 8
 endif
 
 # TARGET: set the build target, can be hw or hw_emu
@@ -114,8 +121,7 @@ TARGET   ?= hw_emu
 
 # Enabling Multiple Strategies For Closing Timing
 XILINX_IMPL_STRATEGY ?= 0
-XILINX_JOBS_STRATEGY ?= 2
-XILINX_MAX_THREADS   ?= $(shell grep -c ^processor /proc/cpuinfo)
+
 
 XILINX_CTRL_MODE     ?= USER_MANAGED
 # XILINX_CTRL_MODE     ?= AP_CTRL_HS
@@ -174,13 +180,14 @@ session-info:
 	$(ECHO) "========================================================="
 	$(ECHO) "${BLUE}Build $(APP_DIR)${NC} -> ${RED}$(MAKECMDGOALS)${NC}"
 	$(ECHO) "========================================================="
-	$(ECHO) "${BLUE}HOST_NAME   ${NC}| ${GREEN}$(HOST_NAME)${NC}"
-	$(ECHO) "${BLUE}KERNEL_NAME ${NC}| ${GREEN}$(KERNEL_NAME)${NC}"
-	$(ECHO) "${BLUE}ALVEO       ${NC}| ${GREEN}$(ALVEO)${NC}"
-	$(ECHO) "${BLUE}PART        ${NC}| ${GREEN}$(PART)${NC}"
-	$(ECHO) "${BLUE}PLATFORM    ${NC}| ${GREEN}$(PLATFORM)${NC}"
-	$(ECHO) "${BLUE}TARGET      ${NC}| ${GREEN}$(TARGET)${NC}"
-	$(ECHO) "${BLUE}CTRL_MODE   ${NC}| ${GREEN}$(XILINX_CTRL_MODE)${NC}"
+	$(ECHO) "${BLUE}HOST_NAME      ${NC}| ${GREEN}$(HOST_NAME)${NC}"
+	$(ECHO) "${BLUE}KERNEL_NAME    ${NC}| ${GREEN}$(KERNEL_NAME)${NC}"
+	$(ECHO) "${BLUE}ALVEO          ${NC}| ${GREEN}$(ALVEO)${NC}"
+	$(ECHO) "${BLUE}PART           ${NC}| ${GREEN}$(PART)${NC}"
+	$(ECHO) "${BLUE}PLATFORM       ${NC}| ${GREEN}$(PLATFORM)${NC}"
+	$(ECHO) "${BLUE}TARGET         ${NC}| ${GREEN}$(TARGET)${NC}"
+	$(ECHO) "${BLUE}CTRL_MODE      ${NC}| ${GREEN}$(XILINX_CTRL_MODE)${NC}"
+	$(ECHO) "${BLUE}DESIGN_FREQ_HZ ${NC}| ${GREEN}$(DESIGN_FREQ_HZ)${NC}"
 	$(ECHO) "========================================================="
 	$(ECHO) "${BLUE}GIT_VER     | ${YELLOW}$(GIT_VER)${NC}"
 	$(ECHO) "========================================================="
