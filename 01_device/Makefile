@@ -46,6 +46,7 @@ VIVADO_BUILD_DIR    = vivado_build_$(TARGET)
 VIVADO_EXPORT_DIR   = vivado_export_vma
 VIVADO_IMPORT_DIR   = vivado_import_vma
 VIVADO_VIP_DIR      = vivado_generated_vip
+VITIS_BUILD_DIR     = vitis_build_$(KERNEL_NAME)
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 ALL_SYSTEM_VERILOG_SOURCES  := $(call rwildcard,$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_RTL)/,*.sv)
@@ -497,6 +498,15 @@ run-vpp-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KER
 open-vpp-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR); \
 	vivado $(KERNEL_NAME)_temp/link/vivado/vpl/prj/prj.xpr 
+
+# =========================================================
+# VITIS Flow: Open Project
+# =========================================================
+.PHONY: open-vitis-project
+open-vitis-project:
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR) ;\
+	cd $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR); \
+	vitis -workspace $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR) 
 
 # =========================================================
 # VPP Flow: Report Utilization Metrics
