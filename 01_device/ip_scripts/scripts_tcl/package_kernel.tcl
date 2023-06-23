@@ -60,15 +60,16 @@ puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
-puts "\[[color 4 "Kernel    "]\] [color 2 ${kernel_name}]"
-puts "\[[color 4 "CTRL MODE "]\] [color 2 ${ctrl_mode}]"
-puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
-puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
-puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
-puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
-puts "\[[color 4 "VIVADO_VER"]\] [color 2 ${vivado_version}]"
-puts "\[[color 4 "GIT_VER   "]\] [color 2 ${git_version}]"
+puts "\[[color 4 "Part ID        "]\] [color 2 ${part_id}]"
+puts "\[[color 4 "Kernel         "]\] [color 2 ${kernel_name}]"
+puts "\[[color 4 "CTRL MODE      "]\] [color 2 ${ctrl_mode}]"
+puts "\[[color 4 "DESIGN_FREQ_HZ "]\] [color 2 ${desired_frequency}]"
+puts "\[[color 4 "Project        "]\] [color 2 ${active_app_directory}]"
+puts "\[[color 4 "Kernel XML     "]\] [color 2 ${kernel_name}.xml]"
+puts "\[[color 4 "Kernel XO      "]\] [color 2 ${kernel_name}.xo]"
+puts "\[[color 4 "Log File       "]\] [color 2 generate_${kernel_name}_package.log]"
+puts "\[[color 4 "VIVADO_VER     "]\] [color 2 ${vivado_version}]"
+puts "\[[color 4 "GIT_VER        "]\] [color 2 ${git_version}]"
 puts "========================================================="
 
 # =========================================================
@@ -201,7 +202,7 @@ set clkbifparam [ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # Set desired frequency
 # ========================================================= 
 
-set desired_frequency 300000000               
+             
 puts "[color 4 "                        Set desired frequency "][color 5 "${desired_frequency} Hz"]"
 set_property value ${desired_frequency} $clkbifparam
 
