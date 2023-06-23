@@ -43,7 +43,7 @@ config+="temp_dir=${KERNEL_NAME}.build\n"
 config+="report_dir=${KERNEL_NAME}.build/reports\n"
 config+="log_dir=${KERNEL_NAME}.build/logs\n"
 config+="save-temps=1\n"
-config+="target=hw\n"
+# config+="target=hw\n"
 config+="debug=1\n"
 config+="link =1\n"
 
