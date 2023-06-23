@@ -11,6 +11,10 @@ print_usage () {
   echo "  IMPL_STRATEGY: 0"
   echo "  JOBS_STRATEGY: 2"
   echo "  PART: xcu280-fsvh2892-2L-e"
+  echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
+  echo "  TARGET: hw"
+  echo "  MAX_THREADS: 8"
+  echo "  DESIGN_FREQ_HZ: 300000000"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -26,7 +30,8 @@ JOBS_STRATEGY=$5
 PART=$6
 PLATFORM=$7
 TARGET=$8
-MAX_THREADS=$9
+DESIGN_FREQ_HZ=$9
+MAX_THREADS=${10}
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_rtl_${TARGET}.cfg"
  
@@ -42,6 +47,9 @@ config+="target=hw_emu\n"
 config+="debug=1\n"
 config+="link =1\n"
 
+config+="\n"
+config+="[clock]\n"
+config+="defaultFreqHz=${DESIGN_FREQ_HZ}\n"
 config+="\n"
 
 config+="[connectivity]\n"
