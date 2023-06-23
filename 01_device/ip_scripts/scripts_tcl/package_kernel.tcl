@@ -466,7 +466,7 @@ ipx::check_integrity -kernel $core >> $log_file
 ipx::check_integrity -xrt $core >> $log_file
 ipx::save_core $core
 ipx::check_integrity -quiet -kernel $core
-ipx::create_xgui_files $core
+# ipx::create_xgui_files $core
 ipx::archive_core ${package_dir}/${kernel_name}/${kernel_name}.zip $core
 ipx::unload_core $core
 # =========================================================
