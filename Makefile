@@ -579,6 +579,13 @@ open-vpp-vivado-project:
 	@$(MAKE) open-vpp-vivado-project $(MAKE_DEVICE)
 
 # =========================================================
+# STEP 5.b VITIS Flow: Open Project
+# =========================================================
+.PHONY: open-vitis-project
+open-vitis-project:
+	@$(MAKE) open-vitis-project $(MAKE_DEVICE)
+
+# =========================================================
 
 # =========================================================
 # STEP 5.b Report Utilization Metrics
