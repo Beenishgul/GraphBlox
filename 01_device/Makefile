@@ -370,10 +370,10 @@ import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)
 # =========================================================
 # VPP Flow: XCLBIN File Generation
 # =========================================================
+# 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)
 .PHONY: $(VIVADO_BUILD_DIR)
 $(VIVADO_BUILD_DIR): session-info
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err 
 
