@@ -27,6 +27,7 @@ set scripts_directory        [lindex $argv 5]
 set vip_directory            [lindex $argv 6]
 set vivado_version           [lindex $argv 7]
 set git_version              [lindex $argv 8]
+set desired_frequency        [lindex $argv 9]
 
 set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
