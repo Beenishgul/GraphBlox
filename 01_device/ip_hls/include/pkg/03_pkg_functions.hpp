@@ -1,0 +1,44 @@
+
+// -----------------------------------------------------------------------------
+//
+//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : PKG_FUNCTIONS.sv
+// Create : 2022-11-29 16:14:59
+// Revise : 2022-11-29 16:14:59
+// Editor : sublime text4, tab size (4)
+// -----------------------------------------------------------------------------
+
+/*
+* Copyright (c) 2008-2009, Kendall Correll
+*
+* Permission to use, copy, modify, and distribute this software for any
+* purpose with or without fee is hereby granted, provided that the above
+* copyright notice and this permission notice appear in all copies.
+*
+* THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+* WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+* MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+* ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+* WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+* ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+
+#ifndef PKG_FUNCTIONS_HPP
+#define PKG_FUNCTIONS_HPP
+
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+using namespace std;
+
+	   #define pkg_clog2(value) ceil(log2(value))
+
+#endif
