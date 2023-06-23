@@ -102,7 +102,7 @@ set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/$
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/.ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -138,7 +138,7 @@ set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/$
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/.ip_user_files/sim_scripts -force >> $log_file
 
 # # ----------------------------------------------------------------------------
 # # generate fifo_942x32_CacheRequestInterfaceInput
@@ -558,7 +558,7 @@ set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/$
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+export_simulation -of_objects [get_files $ip_dir/${module_name}/${module_name}.xci] -directory $ip_dir/.ip_user_files/sim_scripts -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate ${kernel_name} IPs..... DONE! 
