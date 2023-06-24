@@ -82,6 +82,7 @@ puts "[color 4 "                        Create Project Kernel ${kernel_name}"]"
 create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
 
 # set_part $part_id
+set_property PART $part_id [current_project]
 
 if {${alveo_id} == "U250"} {
 

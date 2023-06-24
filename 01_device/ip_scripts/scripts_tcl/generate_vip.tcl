@@ -19,6 +19,7 @@ set part_id          [lindex $argv 0]
 set kernel_name      [lindex $argv 1]
 set device_directory [lindex $argv 2]
 set active_directory [lindex $argv 3]
+set alveo_id         [lindex $argv 4]
 
 set ip_dir           ${device_directory}/${active_directory}
 set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
@@ -55,10 +56,33 @@ puts "========================================================="
 # set_part ${part_id} >> $log_file
 
 create_project ${kernel_name}_ip_project -in_memory -force -part $part_id >> $log_file
+ 
+set_property PART $part_id [current_project] >> $log_file
 
-set_property PART $part_id [current_project]
-set_property target_language  Verilog [current_project] 
-set_property target_simulator XSim    [current_project] 
+if {${alveo_id} == "U250"} {
+
+  set board_part_var "xilinx.com:au250:part0:1.4" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U280"} {
+
+  set board_part_var "xilinx.com:au280:part0:1.2" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U55"} {
+
+  set board_part_var "xilinx.com:au55c:part0:1.0"
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} else {
+
+  set board_part_var "NONE" 
+  puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
+  # set_property board_part $board_part_var [current_project]
+}
+
+set_property target_language  Verilog [current_project]  >> $log_file
+set_property target_simulator XSim    [current_project]  >> $log_file
 
 set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
 set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
@@ -67,7 +91,7 @@ set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_rep
 
 set ip_repo_list [concat $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
 
-set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
+set_property IP_REPO_PATHS "$ip_repo_list" [current_project]  >> $log_file
 update_ip_catalog >> $log_file
 
 # ----------------------------------------------------------------------------
@@ -98,7 +122,7 @@ set_property -dict [list \
                     CONFIG.HAS_WSTRB {1}                        \
                     ] [get_ips ${module_name}]
              
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
@@ -134,7 +158,7 @@ set_property -dict [list \
                     CONFIG.ID_WIDTH   {1}                       \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
@@ -554,7 +578,7 @@ set_property -dict [list                                                  \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci]
+set_property generate_synth_checkpoint false [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target {instantiation_template}     [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 generate_target all                          [get_files $ip_dir/${module_name}/${module_name}.xci] >> $log_file
 export_ip_user_files -of_objects             [get_files $ip_dir/${module_name}/${module_name}.xci] -no_script -force >> $log_file
