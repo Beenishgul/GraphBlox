@@ -85,7 +85,7 @@ create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id 
 
 if {${alveo_id} == "U250"} {
 
-  set board_part_var "xilinx.com:au250:part0:1.3" 
+  set board_part_var "xilinx.com:au250:part0:1.4" 
   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
   set_property board_part $board_part_var [current_project] >> $log_file
 } elseif {${alveo_id} == "U280"} {
@@ -100,7 +100,7 @@ if {${alveo_id} == "U250"} {
   set_property board_part $board_part_var [current_project] >> $log_file
 } else {
 
-  set board_part_var "xilinx.com:au250:part0:1.2" 
+  set board_part_var "NONE" 
   puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
   # set_property board_part $board_part_var [current_project]
 }
