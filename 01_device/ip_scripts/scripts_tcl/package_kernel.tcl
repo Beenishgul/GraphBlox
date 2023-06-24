@@ -84,27 +84,27 @@ create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id 
 # set_part $part_id
 set_property PART $part_id [current_project]
 
-if {${alveo_id} == "U250"} {
+# if {${alveo_id} == "U250"} {
 
-  set board_part_var "xilinx.com:au250:part0:1.3" 
-  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
-  set_property board_part $board_part_var [current_project] >> $log_file
-} elseif {${alveo_id} == "U280"} {
+#   set board_part_var "xilinx.com:au250:part0:1.4" 
+#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
+#   set_property board_part $board_part_var [current_project] >> $log_file
+# } elseif {${alveo_id} == "U280"} {
 
-  set board_part_var "xilinx.com:au280:part0:1.2" 
-  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-  set_property board_part $board_part_var [current_project] >> $log_file
-} elseif {${alveo_id} == "U55"} {
+#   set board_part_var "xilinx.com:au280:part0:1.2" 
+#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+#   set_property board_part $board_part_var [current_project] >> $log_file
+# } elseif {${alveo_id} == "U55"} {
 
-  set board_part_var "xilinx.com:au55c:part0:1.0"
-  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-  set_property board_part $board_part_var [current_project] >> $log_file
-} else {
+#   set board_part_var "xilinx.com:au55c:part0:1.0"
+#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+#   set_property board_part $board_part_var [current_project] >> $log_file
+# } else {
 
-  set board_part_var "NONE" 
-  puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
-  # set_property board_part $board_part_var [current_project]
-}
+#   set board_part_var "NONE" 
+#   puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
+#   # set_property board_part $board_part_var [current_project]
+# }
 
 set_property default_lib xil_defaultlib [current_project] >> $log_file
 
@@ -123,6 +123,7 @@ set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_rep
 set vip_repo             [file normalize $app_directory/$vip_directory] 
 
 set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
+# set ip_repo_list [concat $vip_repo $data_ip]
 
 set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
@@ -490,6 +491,7 @@ ipx::merge_project_changes hdl_parameters [ipx::current_core] >> $log_file
 
 
 puts "[color 4 "                        Upgrade Vivado IPs"]" 
+update_ip_catalog     >> $log_file
 upgrade_ip [get_ips]  >> $log_file
 # =========================================================
 # Packaging Vivado IP
@@ -519,9 +521,9 @@ if {${ctrl_mode} == "USER_MANAGED"} {
   package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
 }
 
-set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip ${package_dir}]
-
-set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
+# set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip ${package_dir}]
+# set ip_repo_list [concat $vip_repo $data_ip]
+# set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
 
 puts "[color 4 "                        Synth design RTL test"]" 

@@ -285,6 +285,7 @@ export IP_DIR_RTL         = ip_rtl
 export IP_DIR_HLS         = ip_hls
 export REPORTS_DIR        = reports
 export VIVADO_GUI_FLAG    = NO
+# export VIVADO_GUI_FLAG    = YES
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
