@@ -28,6 +28,7 @@ set vip_directory            [lindex $argv 6]
 set vivado_version           [lindex $argv 7]
 set git_version              [lindex $argv 8]
 set desired_frequency        [lindex $argv 9]
+set alveo_id                 [lindex $argv 10]
 
 set package_dir      ${app_directory}/${active_app_directory}
 set log_file         ${package_dir}/generate_${kernel_name}_package.log
@@ -60,6 +61,7 @@ puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
+puts "\[[color 4 "ALVEO ID       "]\] [color 2 ${alveo_id}]"
 puts "\[[color 4 "Part ID        "]\] [color 2 ${part_id}]"
 puts "\[[color 4 "Kernel         "]\] [color 2 ${kernel_name}]"
 puts "\[[color 4 "CTRL MODE      "]\] [color 2 ${ctrl_mode}]"
@@ -78,6 +80,33 @@ puts "========================================================="
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
 create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
+
+# set_part $part_id
+
+if {${alveo_id} == "U250"} {
+
+  set board_part_var "xilinx.com:au250:part0:1.3" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U280"} {
+
+  set board_part_var "xilinx.com:au280:part0:1.2" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U55"} {
+
+  set board_part_var "xilinx.com:au55c:part0:1.0"
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} else {
+
+  set board_part_var "xilinx.com:au250:part0:1.2" 
+  puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
+  # set_property board_part $board_part_var [current_project]
+}
+
+set_property default_lib xil_defaultlib [current_project] >> $log_file
+
 # =========================================================
 # Generate Project VIPs
 # =========================================================
@@ -96,6 +125,7 @@ set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip
 
 set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
+
 # =========================================================
 # Add IP and design sources into project
 # =========================================================
@@ -130,7 +160,7 @@ update_compile_order -fileset sim_1 >> $log_file
 puts "[color 4 "                        Set Simulator ${kernel_name} settings"]"
 set_property top ${kernel_name}_testbench [get_filesets sim_1]
 
-set_property top_lib xil_defaultlib [get_filesets sim_1]
+# set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property simulator_language "Mixed" [current_project]
 set_property target_language  "Verilog" [current_project]
 set_property TARGET_SIMULATOR XSim [current_project]
@@ -457,6 +487,9 @@ set_property value -1 [ipx::get_bus_parameters FREQ_TOLERANCE_HZ -of_objects [ip
 ipx::merge_project_changes files [ipx::current_core] >> $log_file
 ipx::merge_project_changes hdl_parameters [ipx::current_core] >> $log_file
 
+
+puts "[color 4 "                        Upgrade Vivado IPs"]" 
+upgrade_ip [get_ips]  >> $log_file
 # =========================================================
 # Packaging Vivado IP
 # =========================================================
