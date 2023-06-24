@@ -326,9 +326,13 @@ ifeq ($(HOST_NAME), panther)
 	export XILINX_JOBS_STRATEGY = 4
 	export XILINX_MAX_THREADS   = 8
 else ifeq ($(HOST_NAME), jaguar)
-	export ALVEO =  U250
-	export PART  =  xcu250-figd2104-2L-e
-	export PLATFORM = xilinx_u250_gen3x16_xdma_4_1_202210_1
+# 	export ALVEO =  U250
+# 	export PART  =  xcu250-figd2104-2L-e
+# 	export PLATFORM = xilinx_u250_gen3x16_xdma_4_1_202210_1
+
+	export ALVEO =  U280
+	export PART  =  xcu280-fsvh2892-2L-e
+	export PLATFORM   = xilinx_u280_gen3x16_xdma_1_202211_1
 
 # 	export ALVEO =  U55
 # 	export PART  = xcu55c-fsvh2892-2L-e
