@@ -94,7 +94,7 @@ config+="log_dir=${KERNEL_NAME}.build/logs\n"
 config+="save-temps=1\n"
 # config+="target=hw\n"
 config+="debug=1\n"
-config+="link =1\n"
+config+="link=1\n"
 
 config+="\n"
 config+="[clock]\n"
