@@ -12,7 +12,7 @@ echo "  IMPL_STRATEGY: 0"
 echo "  JOBS_STRATEGY: 2"
 echo "  PART: xcu280-fsvh2892-2L-e"
 echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
-echo "  TARGET: hw"
+echo "  TARGET: hw_emu"
 echo "  NUM_KERNELS: 2"
 echo "  MAX_THREADS: 8"
 echo "  DESIGN_FREQ_HZ: 300000000"
@@ -23,8 +23,8 @@ then
 print_usage
 fi
 
-generate_connectivity_sp () {
 
+generate_connectivity_sp () {
 
 local kernel_name=$1
 local start_kernel_buffers=$2
@@ -146,10 +146,9 @@ then
  config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
  config+="\n[vivado]\n"
- config+="prop=run.synth_1.STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS={-directive sdx_optimization_effort_high}\n"
- config+="prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true\n"
- config+="prop=run.impl_1.STEPS.POST_PLACE_PHYS_OPT_DESIGN.IS_ENABLED=true\n"
- config+="prop=run.impl_1.STEPS.POST_PLACE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE={AlternateFlowWithRetiming}\n"
+ config+="prop=run.synth_1.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\n"
+ config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+ config+="prop=run.impl_1.{STEPS.POST_PLACE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={ExtraTimingOpt}\n"
  
  config+="impl.jobs=${JOBS_STRATEGY}\n"
  config+="synth.jobs=${JOBS_STRATEGY}\n"

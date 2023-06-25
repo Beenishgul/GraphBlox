@@ -146,10 +146,9 @@ then
  config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
  config+="\n[vivado]\n"
- config+="prop=run.synth_1.STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS={-directive sdx_optimization_effort_high}\n"
- config+="prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true\n"
- config+="prop=run.impl_1.STEPS.POST_PLACE_PHYS_OPT_DESIGN.IS_ENABLED=true\n"
- config+="prop=run.impl_1.STEPS.POST_PLACE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE={AlternateFlowWithRetiming}\n"
+ config+="prop=run.synth_1.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\n"
+ config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+ config+="prop=run.impl_1.{STEPS.POST_PLACE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={ExtraTimingOpt}\n"
  
  config+="impl.jobs=${JOBS_STRATEGY}\n"
  config+="synth.jobs=${JOBS_STRATEGY}\n"
