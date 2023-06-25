@@ -516,6 +516,10 @@ package-kernel:
 .PHONY: build-hw
 build-hw:
 	-@$(MAKE) build-hw $(MAKE_DEVICE)
+
+.PHONY: watch-build-hw
+watch-build-hw:
+	-@$(MAKE) watch-build-hw $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
