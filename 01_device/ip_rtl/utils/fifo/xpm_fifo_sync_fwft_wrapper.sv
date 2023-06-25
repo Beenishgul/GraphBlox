@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : xpm_fifo_sync_fwft_wrapper.sv
 // Create : 2023-06-23 15:07:59
-// Revise : 2023-06-25 00:25:20
+// Revise : 2023-06-25 08:08:25
 // Editor : sublime text4, tab size (3)
 // -----------------------------------------------------------------------------
 
@@ -41,10 +41,11 @@ module xpm_fifo_sync_fwft_wrapper #(
    logic                          will_update_middle, will_update_dout;
 
    assign will_update_middle = fifo_valid && (middle_valid == will_update_dout);
-   assign will_update_dout   = (middle_valid || !fifo_empty) && (rd_en || !dout_valid);
-   assign fifo_rd_en         = fifo_valid && !(middle_valid && dout_valid);
-   assign empty              = !(fifo_valid || middle_valid);
-   assign empty              = dout_valid;
+   assign will_update_dout   = (middle_valid || fifo_valid) && (rd_en || !dout_valid);
+
+   assign fifo_rd_en = !fifo_empty && !(middle_valid && dout_valid);
+   assign empty      = !dout_valid;
+   assign valid      = dout_valid;
 
    always @(posedge clk)
       if (srst)
@@ -61,11 +62,6 @@ module xpm_fifo_sync_fwft_wrapper #(
 
             if (will_update_dout)
                dout <= middle_valid ? middle_dout : fifo_dout;
-
-            if (fifo_rd_en)
-               fifo_valid <= 1;
-            else if (will_update_middle || will_update_dout)
-               fifo_valid <= 0;
 
             if (will_update_middle)
                middle_valid <= 1;
@@ -116,7 +112,7 @@ module xpm_fifo_sync_fwft_wrapper #(
       .prog_empty   (           ),
       .rd_data_count(           ),
       .almost_empty (           ),
-      .data_valid   (           ),
+      .data_valid   (fifo_valid ),
       .underflow    (           ),
       .rd_rst_busy  (rd_rst_busy),
       .injectsbiterr(1'b0       ),
