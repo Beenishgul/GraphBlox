@@ -176,14 +176,15 @@ puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Create OOC synthesis: synth_1"]"
-set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-directive sdx_optimization_effort_high} -objects [get_runs synth_1]
+set_property AUTO_INCREMENTAL_CHECKPOINT 0 [get_runs synth_1]
+set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context -directive sdx_optimization_effort_high} -objects [get_runs synth_1]
+# set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 
 puts "[color 4 "                        Create all implementation strategies: impl_strategy"]"
-set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs impl_1]
+set_property AUTO_INCREMENTAL_CHECKPOINT 0 [get_runs impl_1]
 set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
-set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE ExtraTimingOpt [get_runs impl_1]
+set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
+set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]
 
 
 set argv [list ${kernel_name} ${vivado_version}]
