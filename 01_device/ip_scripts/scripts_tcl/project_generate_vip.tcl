@@ -97,12 +97,16 @@ set_property -dict [list \
                     CONFIG.HAS_PROT {0}                         \
                     CONFIG.HAS_WSTRB {1}                        \
                     ] [get_ips ${module_name}]
-             
-set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
-generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
-generate_target all                          [get_files ${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+
+set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
+set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
+generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
+# catch { config_ip_cache -export [get_ips -all ${module_name}] }
+generate_target all                          [get_files ${files_sources_xci}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -133,11 +137,15 @@ set_property -dict [list \
                     CONFIG.ID_WIDTH   {1}                       \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
-generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
-generate_target all                          [get_files ${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
+set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
+generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
+# catch { config_ip_cache -export [get_ips -all ${module_name}] }
+generate_target all                          [get_files ${files_sources_xci}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE
@@ -189,11 +197,15 @@ set_property -dict [list                                                  \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 
-set_property generate_synth_checkpoint false [get_files ${module_name}.xci]
-generate_target {instantiation_template}     [get_files ${module_name}.xci] >> $log_file
-generate_target all                          [get_files ${module_name}.xci] >> $log_file
-export_ip_user_files -of_objects             [get_files ${module_name}.xci] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${module_name}.xci] -directory $ip_dir/ip_user_files/sim_scripts -force >> $log_file
+set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
+set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
+generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
+# catch { config_ip_cache -export [get_ips -all ${module_name}] }
+generate_target all                          [get_files ${files_sources_xci}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
 
 # ----------------------------------------------------------------------------
 # Generate ${kernel_name} IPs..... DONE! 
@@ -211,4 +223,3 @@ puts "\[[color 2 [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
 puts "\[[color 4 "Generate ${kernel_name} IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="
-close_project >> $log_file
