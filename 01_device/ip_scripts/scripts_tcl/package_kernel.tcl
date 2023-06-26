@@ -84,27 +84,25 @@ create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id 
 # set_part $part_id
 set_property PART $part_id [current_project]
 
-# if {${alveo_id} == "U250"} {
+if {${alveo_id} == "U250"} {
+  set board_part_var "xilinx.com:au250:part0:1.4" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U280"} {
 
-#   set board_part_var "xilinx.com:au250:part0:1.4" 
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U280"} {
+  set board_part_var "xilinx.com:au280:part0:1.3" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U55"} {
 
-#   set board_part_var "xilinx.com:au280:part0:1.2" 
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U55"} {
-
-#   set board_part_var "xilinx.com:au55c:part0:1.0"
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } else {
-
-#   set board_part_var "NONE" 
-#   puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
-#   # set_property board_part $board_part_var [current_project]
-# }
+  set board_part_var "xilinx.com:au55c:part0:1.0"
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} else {
+  set board_part_var "NONE" 
+  puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
+  # set_property board_part $board_part_var [current_project]
+}
 
 set_property default_lib xil_defaultlib [current_project] >> $log_file
 
@@ -139,8 +137,8 @@ update_ip_catalog >> $log_file
 puts "[color 4 "                        Add design sources into project ${kernel_name}"]" 
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.src.f $log_file
-# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
+# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 
 puts "[color 4 "                        Add design sources into sim_1 ${kernel_name}"]" 
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
