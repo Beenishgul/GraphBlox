@@ -74,12 +74,21 @@ FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 
 
-ifeq ($(HOST_NAME), panther)
+ifeq ($(HOST_NAME), default)
+	ALVEO?=  U250
+	PART ?=  xcu250-figd2104-2L-e
+	PLATFORM   ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
+	
+	VIVADO_VER ?= 2022
+	DESIGN_FREQ_HZ ?= 300000000  
+	XILINX_JOBS_STRATEGY ?= 1
+    XILINX_MAX_THREADS   ?= 1
+else ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
 	PLATFORM   ?= xilinx_u280_gen3x16_xdma_1_202211_1
-	VIVADO_VER ?= 2022
 	
+	VIVADO_VER ?= 2022
 	DESIGN_FREQ_HZ ?= 300000000  
 	XILINX_JOBS_STRATEGY ?= 4
     XILINX_MAX_THREADS   ?= 8
@@ -88,7 +97,7 @@ else ifeq ($(HOST_NAME), jaguar)
 	PART ?=  xcu250-figd2104-2L-e
 	PLATFORM   ?=  xilinx_u250_gen3x16_xdma_4_1_202210_1
 	
-	VIVADO_VER ?= 2022
+	VIVADO_VER ?= 2023
 	DESIGN_FREQ_HZ ?= 250000000  
 	XILINX_JOBS_STRATEGY ?= 4
     XILINX_MAX_THREADS   ?= 8
