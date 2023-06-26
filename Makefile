@@ -314,6 +314,7 @@ export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
 export KERNEL_NAME        = glay_kernel
 export DEVICE_INDEX       = 0
 export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
+# export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vitis_build_$(KERNEL_NAME)/$(KERNEL_NAME)_system_hw_link/Emulation-HW/binary_container_1.xclbin
 # =========================================================
 
 # =========================================================
