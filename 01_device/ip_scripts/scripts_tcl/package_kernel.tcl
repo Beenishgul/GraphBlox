@@ -79,7 +79,7 @@ puts "========================================================="
 # =========================================================
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
-create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
+create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id -rtl_kernel >> $log_file
 
 # # set_part $part_id
 # set_property PART $part_id [current_project]
