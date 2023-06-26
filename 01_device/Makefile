@@ -185,7 +185,7 @@ CC      := gcc
 # Starting point of GLay generate IPs and compile Host
 # =========================================================
 .PHONY: start
-start: gen-vip package-kernel
+start: package-kernel
 # =========================================================
 
 # =========================================================

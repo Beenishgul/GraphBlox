@@ -50,7 +50,7 @@ proc puts_reg_info {reg_text description_text address_offset_text size_text} {
 
 proc add_filelist_if_exists {group filename log_file} {
    if { [file exists ${filename}] == 1} {               
-       add_files -fileset $group [read [open ${filename}]] >> $log_file
+       add_files -scan_for_includes -fileset $group [read [open ${filename}]] >> $log_file
        import_files -fileset $group [read [open ${filename}]] >> $log_file
    }
 }
@@ -114,39 +114,42 @@ puts "[color 4 "                        Add Project VIPs"]"
 set vivado_dir $::env(XILINX_VIVADO)
 set vitis_dir $::env(XILINX_VITIS)
 
-set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
-set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
-set data_ip              [file normalize $vitis_dir/data/ip]
-set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo]
-set vip_repo             [file normalize $app_directory/$vip_directory] 
+# set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
+# set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
+# set data_ip              [file normalize $vitis_dir/data/ip]
+# set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo]
+# set vip_repo             [file normalize $app_directory/$vip_directory] 
 
-set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
+# set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
 # set ip_repo_list [concat $vip_repo $data_ip]
 
-set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
-update_ip_catalog >> $log_file
+# set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
+# update_ip_catalog >> $log_file
 
 # =========================================================
 # Add IP and design sources into project
 # =========================================================
-# puts "[color 4 "                        Add VIP into project"]"
-# set argv [list ${part_id} ${kernel_name} ${app_directory} ${active_app_directory}]
-# set argc 4
-# source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
+puts "[color 4 "                        Add VIP into project"]"
+set argv [list ${part_id} ${kernel_name} ${app_directory} ${active_app_directory}]
+set argc 4
+source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
+
+puts "[color 4 "                        Update compile order: sources_1"]"
+update_compile_order -fileset sources_1 >> $log_file
 
 puts "[color 4 "                        Add design sources into project ${kernel_name}"]" 
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.src.f $log_file
-add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
+# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
 # add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
 
 puts "[color 4 "                        Add design sources into sim_1 ${kernel_name}"]" 
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f $log_file
+# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f $log_file
+# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f $log_file
+# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
