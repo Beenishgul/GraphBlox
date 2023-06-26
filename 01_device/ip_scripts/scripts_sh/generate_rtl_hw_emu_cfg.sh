@@ -96,9 +96,9 @@ config+="save-temps=1\n"
 config+="debug=1\n"
 config+="link=1\n"
 
-config+="\n"
-config+="[clock]\n"
-config+="defaultFreqHz=${DESIGN_FREQ_HZ}\n"
+# config+="\n"
+# config+="[clock]\n"
+# config+="defaultFreqHz=${DESIGN_FREQ_HZ}\n"
 config+="\n"
 
 config+="[connectivity]\n"
