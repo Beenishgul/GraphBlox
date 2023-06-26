@@ -59,27 +59,24 @@ create_project ${kernel_name}_ip_project -in_memory -force -part $part_id >> $lo
  
 set_property PART $part_id [current_project] >> $log_file
 
-# if {${alveo_id} == "U250"} {
+if {${alveo_id} == "U250"} {
+  set board_part_var "xilinx.com:au250:part0:1.4" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U280"} {
 
-#   set board_part_var "xilinx.com:au250:part0:1.4" 
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U280"} {
-
-#   set board_part_var "xilinx.com:au280:part0:1.2" 
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U55"} {
-
-#   set board_part_var "xilinx.com:au55c:part0:1.0"
-#   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
-#   set_property board_part $board_part_var [current_project] >> $log_file
-# } else {
-
-#   set board_part_var "NONE" 
-#   puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
-#   # set_property board_part $board_part_var [current_project]
-# }
+  set board_part_var "xilinx.com:au280:part0:1.3" 
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} elseif {${alveo_id} == "U55"} {
+  set board_part_var "xilinx.com:au55c:part0:1.0"
+  puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
+  set_property board_part $board_part_var [current_project] >> $log_file
+} else {
+  set board_part_var "NONE" 
+  puts "[color 4 "                        NOT Set board part "][color 1 ${board_part_var}]"  
+  # set_property board_part $board_part_var [current_project]
+}
 
 set_property target_language  Verilog [current_project]  >> $log_file
 set_property target_simulator XSim    [current_project]  >> $log_file
