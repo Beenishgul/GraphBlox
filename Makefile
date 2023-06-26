@@ -363,13 +363,13 @@ else ifeq ($(HOST_NAME), jaguar)
 # 	export PLATFORM = xilinx_u55c_gen3x16_xdma_3_202210_1
 
 	export VIVADO_VER = 2023
-	export DESIGN_FREQ_HZ = 300000000  
+	export DESIGN_FREQ_HZ = 250000000  
 	export XILINX_JOBS_STRATEGY = 8
 	export XILINX_MAX_THREADS   = 32
 else
 	export ALVEO =  U250
 	export PART  =  xcu250-figd2104-2L-e
-	export PLATFORM       = xilinx_u250_gen3x16_xdma_4_1_202210_1
+	export PLATFORM = xilinx_u250_gen3x16_xdma_4_1_202210_1
 
 # 	export ALVEO =  U200
 # 	export PART  =  xcu200-fsgd2104-2-e
@@ -388,7 +388,7 @@ else
 # 	export PLATFORM =  xilinx_u280_gen3x16_xdma_1_202211_1
 
 	export VIVADO_VER     = 2023
-	export DESIGN_FREQ_HZ = 300000000  
+	export DESIGN_FREQ_HZ = 250000000  
 	export XILINX_JOBS_STRATEGY = 4
 	export XILINX_MAX_THREADS   = 8
 endif
