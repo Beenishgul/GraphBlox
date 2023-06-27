@@ -1,20 +1,17 @@
 #!make
-ENV_HOST   := $(PWD)/host.env
-ENV_DEVICE := $(PWD)/device.env
 
-MAKE_HOST   := $(PWD)/host.mk
-MAKE_DEVICE := $(PWD)/device.mk
+export MAKE_DIR = 00_make
 
-include ./host.env
-include ./device.env
+include ./$(MAKE_DIR)/host.env
+include ./$(MAKE_DIR)/device.env
 export
 
 # print_file_vars:
 #     $($(foreach v, $(.VARIABLES), $(if $(filter file,$(origin $(v))), $(info  set $(v) "$($(v))"))) | tee ./env.tcl) ;\
 #     $($(foreach v, $(.VARIABLES), $(if $(filter file,$(origin $(v))), $(info  $(v)=$($(v))))) | tee ./env.sh)
 
-include ./host.mk
-include ./device.mk
+include ./$(MAKE_DIR)/host.mk
+include ./$(MAKE_DIR)/device.mk
 
 # =========================================================
 # GLay HOST Argument list               
