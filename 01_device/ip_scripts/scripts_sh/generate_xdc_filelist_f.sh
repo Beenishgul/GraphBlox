@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-19 01:31:48
+# @Last Modified time: 2023-06-26 22:13:27
 #!/bin/bash
 
 
@@ -54,6 +54,9 @@ generate_xdc_filelist_f () {
   done 
 
 }
+
+newtext=""
+echo "$newtext" > ${CFG_FILE_NAME}
 
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" ${ALVEO_PART}
 generate_xdc_filelist_f ${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${XDC_DIR}/${ALVEO_PART} ${CFG_FILE_NAME} "xdc" "top"

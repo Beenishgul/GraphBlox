@@ -79,7 +79,7 @@ puts "========================================================="
 # =========================================================
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
 puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
-create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id -rtl_kernel >> $log_file
+create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
 
 # # set_part $part_id
 # set_property PART $part_id [current_project]
@@ -147,6 +147,7 @@ puts "[color 4 "                        Add design sources into sim_1 ${kernel_n
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
+add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vh.f $log_file
 # add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f $log_file
 # add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f $log_file
 # add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f $log_file
@@ -167,6 +168,7 @@ set_property top ${kernel_name}_testbench [get_filesets sim_1]
 set_property simulator_language "Mixed" [current_project]
 set_property target_language  "Verilog" [current_project]
 set_property TARGET_SIMULATOR XSim [current_project]
+set_property INCREMENTAL true [get_filesets sim_1]
 set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
 set_property -name {xsim.simulate.no_quit} -value {true} -objects [get_filesets sim_1]
 
@@ -177,12 +179,12 @@ puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Create OOC synthesis: synth_1"]"
-set_property AUTO_INCREMENTAL_CHECKPOINT 0 [get_runs synth_1]
+set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context -directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 # set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 
 puts "[color 4 "                        Create all implementation strategies: impl_strategy"]"
-set_property AUTO_INCREMENTAL_CHECKPOINT 0 [get_runs impl_1]
+set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs impl_1]
 set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]

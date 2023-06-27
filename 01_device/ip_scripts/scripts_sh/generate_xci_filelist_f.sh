@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-19 01:31:48
+# @Last Modified time: 2023-06-26 22:12:56
 #!/bin/bash
 
 
@@ -48,6 +48,9 @@ generate_xci_filelist_f () {
   done 
 
 }
+
+newtext=""
+echo "$newtext" > ${CFG_FILE_NAME_XCI}
 
 generate_xci_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
 

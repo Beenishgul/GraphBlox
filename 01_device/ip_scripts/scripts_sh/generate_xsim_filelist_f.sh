@@ -109,6 +109,14 @@ generate_xsim_dirlist_f () {
 
 }
 
+newtext=""
+echo $newtext > ${CFG_FILE_NAME_SV}
+echo $newtext > ${CFG_FILE_NAME_VHDL}
+echo $newtext > ${CFG_FILE_NAME_V}
+echo $newtext > ${CFG_FILE_NAME_IP_SV}
+echo $newtext > ${CFG_FILE_NAME_IP_VHDL}
+echo $newtext > ${CFG_FILE_NAME_IP_V}
+
 # Add include ip_directory
 generate_xsim_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
@@ -168,46 +176,6 @@ echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
 echo $newtext >> ${CFG_FILE_NAME_IP_SV}
-
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/simulation/fifo_generator_vlog_beh.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/hdl/fifo_generator_v13_2_rfs.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/sim/fifo_942x32.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16/sim/fifo_942x16.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16_FWFT/sim/fifo_942x16_FWFT.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/sim/fifo_814x16.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/sim/fifo_812x16.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/sim/fifo_512x32_asym_512wrt_64rd.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext=""
-# echo $newtext >> ${CFG_FILE_NAME_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/simulation/blk_mem_gen_v8_4.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/sim/bram_64x256_asym_64wrt_512rd.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/sim/bram_512x32_asym_512wrt_64rd.v"
-# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.vhd"
 echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}

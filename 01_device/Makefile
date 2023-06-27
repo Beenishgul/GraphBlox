@@ -221,17 +221,15 @@ all: gen-vip package-kernel build-hw
 
 .PHONY: $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
 $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) ;\
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_RTL) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(TESTBENCH_MODULE) $(GRAPH_DIR) $(GRAPH_SUIT) $(GRAPH_NAME)
 
 .PHONY: gen-ip-dir
-gen-ip-dir: $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
+gen-ip-dir: | $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
 
 .PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
 $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)  ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)   ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL) ;\
@@ -261,46 +259,43 @@ gen-filelists:
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 
 .PHONY: gen-vip
-gen-vip: session-info gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
+gen-vip: session-info gen-scripts-dir | $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR) $(ALVEO);\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_VIP_DIR) $(SCRIPTS_DIR_ACTIVE) $(ALVEO);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xci_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_VIP_DIR)
 	
-
 # =========================================================
 # VPP Flow: Run Hardware Simulation  
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 
 .PHONY: run-sim 
-run-sim: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
+run-sim: session-info gen-scripts-dir | $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) gen-vip 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-sim-gui
-run-sim-gui: session-info $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
+run-sim-gui: session-info gen-scripts-dir | $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) gen-vip 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -sim_gui | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-sim-noclean
-run-sim-noclean: session-info 
+run-sim-noclean: session-info gen-scripts-dir | $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) gen-vip 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -noclean_files | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-sim-reset
-run-sim-reset: session-info 
+run-sim-reset: session-info gen-scripts-dir | $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR) gen-vip 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -reset_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-sim-wave
-run-sim-wave: session-info  $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)/work.$(KERNEL_NAME)_testbench.wdb
+run-sim-wave: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)/work.$(KERNEL_NAME)_testbench.wdb 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR);\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/testbench_xsim.sh $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL) -wave_run | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
@@ -313,27 +308,27 @@ run-sim-help: session-info
 # VIVADO Project Mode
 # =========================================================
 .PHONY: run-sim-project
-run-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-sim-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr  $(VIVADO_GUI_FLAG) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(SCRIPTS_DIR_ACTIVE) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-synth-project
-run-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-synth-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) $(XILINX_JOBS_STRATEGY)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr  $(VIVADO_GUI_FLAG) $(XILINX_JOBS_STRATEGY)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-impl-project
-run-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-impl-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr  $(VIVADO_GUI_FLAG) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-report-project
-run-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+run-report-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr   $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
 
 .PHONY: open-vivado-project
-open-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+open-vivado-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR); \
 	vivado $(KERNEL_NAME)/$(KERNEL_NAME).xpr
 
@@ -352,36 +347,50 @@ VPPCONFLAGS =   --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xo ;\
-	rm -f $(ACTIVE_APP_DIR)/$(KERNEL_NAME).xml ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 
-$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
-	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
-	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(VIVADO_VER) $(GIT_VER) $(DESIGN_FREQ_HZ) $(ALVEO)
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo && echo -n yes),yes)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+else
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) ;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(VIVADO_VER) $(GIT_VER) $(DESIGN_FREQ_HZ) $(ALVEO) 
+endif
+
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr: | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr && echo -n yes),yes)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+else
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR) ;\
+	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(SCRIPTS_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(VIVADO_VER) $(GIT_VER) $(DESIGN_FREQ_HZ) $(ALVEO) 
+endif
 
 .PHONY: package-kernel
-package-kernel: session-info $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
+package-kernel: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
 
 # =========================================================
 # VPP Flow: Export to vivado flow
 # =========================================================
 .PHONY: $(VIVADO_EXPORT_DIR)
 $(VIVADO_EXPORT_DIR): session-info
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.err 
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
-$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: $(VIVADO_EXPORT_DIR) 
+$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: | $(VIVADO_EXPORT_DIR) 
+ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma && echo -n yes),yes)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)
+else
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
 	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) --export_archive -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_export.log 2> $(KERNEL_NAME)_export.err &
-	
+endif
+
 PHONY: export-hw
 export-hw: TARGET=hw
-export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_hw.cfg
+export-hw: | $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_hw.cfg
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 # =========================================================
@@ -389,14 +398,12 @@ export-hw: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(AC
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR):
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
-
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 
 # bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_vma_xci_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_EXPORT_DIR)/$(KERNEL_NAME).build/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip
 # bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_vma_xci_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_EXPORT_DIR)/$(KERNEL_NAME).build/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip 
 .PHONY: import-hw
-import-hw: session-info $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
+import-hw: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) $(SCRIPTS_DIR_ACTIVE) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 	
@@ -411,18 +418,18 @@ $(VIVADO_BUILD_DIR): session-info
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err 
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
-$(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: $(VIVADO_BUILD_DIR) 
+$(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: | $(VIVADO_BUILD_DIR) 
+ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin && echo -n yes),yes)
+	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)
+else
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
 	cd $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
 	nohup $(VPP) $(XOCCLFLAGS) $(XOCCFLAGS) $(DEBUG_OPT) $(VPPCONFLAGS) -t $(TARGET) -o $@ $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo > $(KERNEL_NAME)_$(TARGET).log 2> $(KERNEL_NAME)_$(TARGET).err &
-	
-.PHONY: build-hw
-build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
-	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
+endif
 
-.PHONY: watch-build-hw
-watch-build-hw: 
+.PHONY: build-hw
+build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin | $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 # =========================================================
@@ -431,20 +438,17 @@ watch-build-hw:
 .PHONY: $(VIVADO_RUN_DIR)
 $(VIVADO_RUN_DIR):
 ifeq ($(TARGET),hw_emu)
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/xrt.ini ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/cmd_xsim.tcl $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/xsim.tcl
 else
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
-	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)
 endif
 
 .PHONY: run-fpga-cmd
-run-fpga-cmd: gen-host-bin $(VIVADO_RUN_DIR)
+run-fpga-cmd: gen-host-bin | $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw)
 	$(UNSET) XCL_EMULATION_MODE ;\
-	rm -rf $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	cd $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
@@ -468,8 +472,8 @@ run-fpga-debug: session-info run-fpga-cmd
 # =========================================================
 # VPP Flow: Run Hardware Emulation  
 # =========================================================
-.PHONY: run-emu-cmd
-run-emu-cmd: gen-host-bin $(VIVADO_RUN_DIR)
+.PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
+$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb : gen-host-bin | $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw_emu)
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
@@ -489,14 +493,14 @@ endif
 
 .PHONY: run-emu
 run-emu: DEBUG_CMD=0
-run-emu: session-info run-emu-cmd
+run-emu: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	
 .PHONY: run-emu-debug
 run-emu-debug: DEBUG_CMD=1
 run-emu-debug: run-emu-cmd
 	
 .PHONY: run-emu-wave
-run-emu-wave: session-info $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
+run-emu-wave: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
@@ -511,27 +515,27 @@ gen-host-bin:
 # VPP Flow: Open Project
 # =========================================================
 .PHONY: run-vpp-sim-project
-run-vpp-sim-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
+run-vpp-sim-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_xsim.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 .PHONY: run-vpp-synth-project
-run-vpp-synth-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
+run-vpp-synth-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_synth.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) $(XILINX_JOBS_STRATEGY)  | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-vpp-impl-project
-run-vpp-impl-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
+run-vpp-impl-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 .PHONY: run-vpp-report-project
-run-vpp-report-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
+run-vpp-report-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR);\
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_run_impl.tcl -notrace -tclargs $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr $(VIVADO_GUI_FLAG) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
 
 .PHONY: open-vpp-vivado-project
-open-vpp-vivado-project: session-info $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
+open-vpp-vivado-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR); \
 	vivado ${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr 
 
@@ -551,7 +555,7 @@ open-vitis-project:
 # utilization metrics.
 # =========================================================
 .PHONY: report_metrics
-report_metrics: session-info $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
+report_metrics: session-info | $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
 ifeq ($(TARGET),hw_emu)
 	$(ECHO) "${RED}ERROR: This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
 else

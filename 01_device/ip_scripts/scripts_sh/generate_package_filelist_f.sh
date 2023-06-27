@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-19 01:31:48
+# @Last Modified time: 2023-06-26 22:12:28
 #!/bin/bash
 
 
@@ -63,7 +63,6 @@ iob_include="iob_include"
 portmaps="portmaps"
 
 CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.src.f"
-# CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.xci.f"
 CFG_FILE_NAME_VH="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_filelist_package.vh.f"
 
 rm_package_filelist_f () {
@@ -87,6 +86,10 @@ generate_package_filelist_f () {
   done 
 
 }
+
+newtext=""
+echo "$newtext" > ${CFG_FILE_NAME}
+echo "$newtext" > ${CFG_FILE_NAME_VH}
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${pkgs}/ ${CFG_FILE_NAME} "sv"
 
@@ -129,49 +132,9 @@ generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${kernel}/ ${CFG_FILE_NA
 
 generate_package_filelist_f ${ACTIVE_APP_DIR}/${IP_DIR}/${top}/ ${CFG_FILE_NAME} "v"
 
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x32/fifo_942x32.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x32/fifo_814x32.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16/fifo_942x16.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_942x16_FWFT/fifo_942x16_FWFT.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_814x16/fifo_814x16.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_812x16/fifo_812x16.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/fifo_512x32_asym_512wrt_64rd/fifo_512x32_asym_512wrt_64rd.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_64x256_asym_64wrt_512rd/bram_64x256_asym_64wrt_512rd.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/bram_512x32_asym_512wrt_64rd/bram_512x32_asym_512wrt_64rd.xci"
-# echo $newtext >> ${CFG_FILE_NAME}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/slv_m00_axi_vip/slv_m00_axi_vip.xci"
-# echo $newtext >> ${CFG_FILE_NAME_XCI}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/control_${KERNEL_NAME}_vip/control_${KERNEL_NAME}_vip.xci"
-# echo $newtext >> ${CFG_FILE_NAME_XCI}
-
-# newtext="${ACTIVE_APP_DIR}/${VIP_DIR}/system_cache_512x64/system_cache_512x64.xci"
-# echo $newtext >> ${CFG_FILE_NAME_XCI}
-
-# generate_package_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
-
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME}
-# echo $newtext >> ${CFG_FILE_NAME_XCI}
 echo $newtext >> ${CFG_FILE_NAME_VH}
 
 rm_package_filelist_f ${CFG_FILE_NAME}
-# rm_package_filelist_f ${CFG_FILE_NAME_XCI}
 rm_package_filelist_f ${CFG_FILE_NAME_VH}

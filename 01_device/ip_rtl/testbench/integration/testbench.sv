@@ -5,7 +5,7 @@
 `timescale 1 ps / 1 ps
 import axi_vip_pkg::*;
 import slv_m00_axi_vip_pkg::*;
-import control_kernel_vip_pkg::*;
+import control___KERNEL___vip_pkg::*;
 
 import PKG_GLOBALS::*;
 import PKG_AXI4::*;
@@ -61,7 +61,7 @@ class GraphCSR;
 
 endclass
 
-module kernel_testbench ();
+module __KERNEL___testbench ();
     parameter integer LP_MAX_LENGTH              = 8192     ;
     parameter integer LP_MAX_TRANSFER_LENGTH     = 16384 / 4;
     parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12       ;
@@ -250,7 +250,7 @@ module kernel_testbench ();
     );
 
 // Master Control instantiation
-    control_kernel_vip inst_control_kernel_vip (
+    control___KERNEL___vip inst_control___KERNEL___vip (
         .aclk         (ap_clk               ),
         .aresetn      (ap_rst_n             ),
         .m_axi_awvalid(s_axi_control_awvalid),
@@ -272,7 +272,7 @@ module kernel_testbench ();
         .m_axi_bresp  (s_axi_control_bresp  )
     );
 
-    control_kernel_vip_mst_t ctrl;
+    control___KERNEL___vip_mst_t ctrl;
 
 // Slave MM VIP instantiation
     slv_m00_axi_vip inst_slv_m00_axi_vip (
@@ -440,7 +440,7 @@ module kernel_testbench ();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Control interface blocking write
-// The task will return when the BRESP has been returned from the kernel.
+// The task will return when the BRESP has been returned from the __KERNEL__.
     task automatic blocking_write_register (input bit [31:0] addr_in, input bit [31:0] data);
         axi_transaction   wr_xfer;
         axi_transaction   wr_rsp;
@@ -454,7 +454,7 @@ module kernel_testbench ();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Control interface blocking read
-// The task will return when the BRESP has been returned from the kernel.
+// The task will return when the BRESP has been returned from the __KERNEL__.
     task automatic read_register (input bit [31:0] addr, output bit [31:0] rddata);
         axi_transaction   rd_xfer;
         axi_transaction   rd_rsp;
@@ -495,7 +495,7 @@ module kernel_testbench ();
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// Write to the control registers to enable the triggering of interrupts for the kernel
+// Write to the control registers to enable the triggering of interrupts for the __KERNEL__
     task automatic enable_interrupts();
         $display("Starting: Enabling Interrupts....");
         write_register(KRNL_GIE_REG_ADDR, GIE_GIE_MASK);
@@ -537,12 +537,12 @@ module kernel_testbench ();
 
         $display("///////////////////////////////////////////////////////////////////////////");
         $display("Control Master: ctrl");
-        ctrl = new("ctrl", kernel_testbench.inst_control_kernel_vip.inst.IF);
+        ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
         ctrl.start_master();
 
         $display("///////////////////////////////////////////////////////////////////////////");
         $display("Starting Memory slave: m00_axi");
-        m00_axi = new("m00_axi", kernel_testbench.inst_slv_m00_axi_vip.inst.IF);
+        m00_axi = new("m00_axi", __KERNEL___testbench.inst_slv_m00_axi_vip.inst.IF);
         m00_axi.start_slave();
 
     endtask
@@ -870,7 +870,7 @@ module kernel_testbench ();
 
     endtask
 
-    function automatic bit check_kernel_result();
+    function automatic bit check___KERNEL___result();
         bit [31:0]        ret_rd_value = 32'h0;
         bit error_found = 0;
         integer error_counter;
@@ -1000,25 +1000,25 @@ module kernel_testbench ();
     endfunction : read_files_graphCSR
 
     task automatic initalize_graph (ref GraphCSR graph);
-        graph.graph_name = "GRAPH_NAME";
+        graph.graph_name = "_GRAPH_NAME_";
 
-        graph.file_ptr_in_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.in_degree", "r");
+        graph.file_ptr_in_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
         else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
 
-        graph.file_ptr_out_degree = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.out_degree", "r");
+        graph.file_ptr_out_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.out_degree", "r");
         if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
         else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
-        graph.file_ptr_edges_idx = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_idx", "r");
+        graph.file_ptr_edges_idx = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_idx", "r");
         if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
         else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
 
-        graph.file_ptr_edges_array_src = $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_src", "r");
+        graph.file_ptr_edges_array_src = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_src", "r");
         if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
         else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
 
-        graph.file_ptr_edges_array_dest= $fopen("GRAPH_DIR/GRAPH_SUIT/GRAPH_NAME/graph.bin.edges_array_dest", "r");
+        graph.file_ptr_edges_array_dest= $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_dest", "r");
         if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
         else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
@@ -1049,7 +1049,7 @@ module kernel_testbench ();
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// Set up the kernel for operation and set the kernel START bit.
+// Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
 // The task will poll the DONE bit and check the results when complete.
     task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
         error_found = 0;
@@ -1075,7 +1075,7 @@ module kernel_testbench ();
             initalize_graph (graph);
             // backdoor_fill_memories();
             backdoor_buffer_fill_memories(graph);
-            // Check that Kernel is IDLE before starting.
+            // Check that __KERNEL__ is IDLE before starting.
             poll_idle_register();
             ///////////////////////////////////////////////////////////////////////////
             //Start transfers
@@ -1096,7 +1096,7 @@ module kernel_testbench ();
             // wait(interrupt == 0);
 
             ///////////////////////////////////////////////////////////////////////////
-            // error_found |= check_kernel_result()   ;
+            // error_found |= check___KERNEL___result()   ;
 
             $display("Finished iteration: %d / %d", iter+1, num_iterations);
         end
@@ -1150,8 +1150,8 @@ module kernel_testbench ();
 // Waveform dump
     `ifdef DUMP_WAVEFORM
         initial begin
-            $dumpfile("kernel_testbench.vcd");
-            $dumpvars(0,kernel_testbench);
+            $dumpfile("__KERNEL___testbench.vcd");
+            $dumpvars(0,__KERNEL___testbench);
         end
     `endif
 
