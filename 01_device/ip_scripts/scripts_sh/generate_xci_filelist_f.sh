@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-26 22:12:56
+# @Last Modified time: 2023-06-26 22:55:13
 #!/bin/bash
 
 
@@ -52,7 +52,7 @@ generate_xci_filelist_f () {
 newtext=""
 echo "$newtext" > ${CFG_FILE_NAME_XCI}
 
-generate_xci_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
+generate_xci_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/ ${CFG_FILE_NAME_XCI} "xci"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME_XCI}
