@@ -207,6 +207,12 @@ session-info:
 	$(ECHO) "========================================================="
 	$(ECHO) "${BLUE}GIT_VER     | ${YELLOW}$(GIT_VER)${NC}"
 	$(ECHO) "========================================================="
+
+.PHONY: sub-session-info
+sub-session-info: 
+	$(ECHO) "========================================================="
+	$(ECHO) "${BLUE}Build $(APP_DIR)${NC} -> ${RED}$(MAKECMDGOALS)${NC}"
+	$(ECHO) "========================================================="
 # =========================================================
 
 # =========================================================
@@ -220,15 +226,15 @@ all: gen-vip package-kernel build-hw
 # =========================================================
 
 .PHONY: $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
-$(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE):
+$(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_source_ip.sh $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_RTL) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) $(XILINX_CTRL_MODE) $(TESTBENCH_MODULE) $(GRAPH_DIR) $(GRAPH_SUIT) $(GRAPH_NAME)
 
 .PHONY: gen-ip-dir
-gen-ip-dir: | $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
+gen-ip-dir: sub-session-info | $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE)
 
 .PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)
-$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
+$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)  ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)   ;\
@@ -240,24 +246,24 @@ $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE):
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/$(SCRIPTS_XDC)/$(ALVEO)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(SCRIPTS_DIR)/$(SCRIPTS_XDC)/$(ALVEO)/$$file $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_XDC)/$(ALVEO)/$$file; done ;\
 
 .PHONY: gen-scripts-dir
-gen-scripts-dir: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) gen-filelists $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
+gen-scripts-dir: sub-session-info $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) $(ACTIVE_APP_DIR)/$(IP_DIR_RTL_ACTIVE) gen-filelists $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
 
 .PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini
-$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini:
+$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini: sub-session-info
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xrt_ini.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_CTRL_MODE) $(SCRIPTS_TCL)
 
 .PHONY: $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
-$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg:
+$(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg: sub-session-info
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_rtl_${TARGET}_cfg.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(XILINX_IMPL_STRATEGY) $(XILINX_JOBS_STRATEGY) $(PART) $(PLATFORM) $(TARGET) $(DESIGN_FREQ_HZ) $(XILINX_MAX_THREADS) $(XILINX_NUM_KERNELS)
 
 .PHONY: gen-filelists
-gen-filelists:
+gen-filelists: sub-session-info
 	$(BASH) $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_package_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_RTL_ACTIVE) $(VIVADO_VIP_DIR) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xdc_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(ALVEO) ;\
 	bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_xsim_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(IP_DIR_RTL_ACTIVE) $(VIVADO_VIP_DIR) $(TESTBENCH_MODULE) 
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
-$(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR):
+$(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_VIP_DIR)
 
 .PHONY: gen-vip
@@ -286,7 +292,7 @@ clean-ip-dir: session-info
 # VPP Flow: Run Hardware Simulation  
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
-$(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR):
+$(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_SIMULATE_DIR)
 
 .PHONY: run-sim 
@@ -365,11 +371,11 @@ VPPCONFLAGS =   --config $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_
 # Package Generation .XO
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
-$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR):
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo
-$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo: sub-session-info | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo && echo -n yes),yes)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 else
@@ -378,7 +384,7 @@ else
 endif
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 
-$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr: | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr: sub-session-info | gen-scripts-dir $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr && echo -n yes),yes)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)
 else
@@ -397,13 +403,13 @@ clean-package-kernel: session-info
 # VPP Flow: Export to vivado flow
 # =========================================================
 .PHONY: $(VIVADO_EXPORT_DIR)
-$(VIVADO_EXPORT_DIR): session-info
+$(VIVADO_EXPORT_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR) ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.err 
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma
-$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: | $(VIVADO_EXPORT_DIR) 
+$(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma: sub-session-info | $(VIVADO_EXPORT_DIR) 
 ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma && echo -n yes),yes)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)
 else
@@ -413,7 +419,7 @@ endif
 
 PHONY: export-hw
 export-hw: TARGET=hw
-export-hw: | $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_hw.cfg
+export-hw: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_hw.cfg
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 PHONY: clean-export-hw
@@ -424,7 +430,7 @@ clean-export-hw: session-info
 # Vivado Flow: Import VITIS vma
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
-$(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR):
+$(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 
 # bash $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_SHELL)/generate_vma_xci_filelist_f.sh $(ACTIVE_APP_DIR) $(SCRIPTS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_EXPORT_DIR)/$(KERNEL_NAME).build/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip
@@ -443,13 +449,13 @@ clean-import-hw: session-info
 # =========================================================
 # 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)
 .PHONY: $(VIVADO_BUILD_DIR)
-$(VIVADO_BUILD_DIR): session-info
+$(VIVADO_BUILD_DIR): sub-session-info
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR) ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
 	touch $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err 
 
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
-$(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: | $(VIVADO_BUILD_DIR) 
+$(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: sub-session-info | $(VIVADO_BUILD_DIR) 
 ifeq ($(shell test -s $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin && echo -n yes),yes)
 	$(CD) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)
 else
@@ -460,7 +466,7 @@ else
 endif
 
 .PHONY: build-hw
-build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin | $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
+build-hw: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 PHONY: clean-build-hw
@@ -471,7 +477,7 @@ clean-build-hw: session-info
 # VPP Flow: Run Hardware FPGA
 # =========================================================
 .PHONY: $(VIVADO_RUN_DIR)
-$(VIVADO_RUN_DIR):
+$(VIVADO_RUN_DIR): sub-session-info
 ifeq ($(TARGET),hw_emu)
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
 	cp $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/xrt.ini ;\
@@ -481,7 +487,7 @@ else
 endif
 
 .PHONY: run-fpga-cmd
-run-fpga-cmd: gen-host-bin | $(VIVADO_RUN_DIR)
+run-fpga-cmd: sub-session-info | gen-host-bin $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw)
 	$(UNSET) XCL_EMULATION_MODE ;\
 	mkdir -p $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR) ;\
@@ -512,7 +518,7 @@ clean-run-fpga: session-info
 # VPP Flow: Run Hardware Emulation  
 # =========================================================
 .PHONY: $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
-$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb : gen-host-bin | $(VIVADO_RUN_DIR)
+$(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb : sub-session-info | gen-host-bin $(VIVADO_RUN_DIR)
 ifeq ($(TARGET),hw_emu)
 	$(EXPORT) XRT_INI_PATH=$(ROOT_DIR)/$(APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt.ini ;\
 	export XCL_EMULATION_MODE=$(TARGET) ;\
@@ -551,7 +557,7 @@ clean-run-emu: session-info
 # VPP Flow: Application Executable File Generation
 # =========================================================
 .PHONY: gen-host-bin
-gen-host-bin:
+gen-host-bin: session-info
 	-@$(MAKE) $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -w -C $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR) -j$(MAKE_NUM_THREADS)
 
 # =========================================================
@@ -589,9 +595,12 @@ clean-vpp-vivado-project: session-info
 # =========================================================
 # VITIS Flow: Open Project
 # =========================================================
+.PHONY: $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)
+$(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR): sub-session-info 
+		$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)
+
 .PHONY: open-vitis-project
-open-vitis-project:
-	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR) ;\
+open-vitis-project: session-info | $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)
 	cd $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR); \
 	vitis -workspace $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)
 
