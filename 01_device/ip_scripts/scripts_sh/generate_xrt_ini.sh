@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 print_usage () {
   echo "Usage: "
   echo "  generate_xrt_ini.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME ctrl_mode"
@@ -35,9 +34,6 @@ timeline_trace="true"
 device_trace="coarse"
 
 
-
-
-  
 config="[Emulation]\n"
 config+="debug_mode=${debug_mode}\n"
 config+="user_pre_sim_script=${user_pre_sim_script}\n"
@@ -54,4 +50,4 @@ then
 fi
 
 
-echo -e "${config}" >> ${CFG_FILE_NAME}
+echo -e "${config}" > ${CFG_FILE_NAME}

@@ -435,18 +435,18 @@ export XILINX_CTRL_MODE     = USER_MANAGED
 # =========================================================
 # Select Testbench for simulation testbench_glay/arbiter
 # =========================================================
-export TESTBENCH_MODULE     = glay
-# export TESTBENCH_MODULE     = arbiter
-# export TESTBENCH_MODULE     = kernel_setup
-# export TESTBENCH_MODULE     = alu_operations
-# export TESTBENCH_MODULE     = conditional_break
-# export TESTBENCH_MODULE     = conditional_continue
-# export TESTBENCH_MODULE     = conditional_filter
-# export TESTBENCH_MODULE     = random_read_engine
-# export TESTBENCH_MODULE     = random_write_engine
-# export TESTBENCH_MODULE     = serial_read_engine
-# export TESTBENCH_MODULE     = serial_write_engine
-# export TESTBENCH_MODULE     = stride_index_generator
+export TESTBENCH_MODULE     = integration
+# export TESTBENCH_MODULE     = unit/arbiter
+# export TESTBENCH_MODULE     = unit/kernel_setup
+# export TESTBENCH_MODULE     = unit/alu_operations
+# export TESTBENCH_MODULE     = unit/conditional_break
+# export TESTBENCH_MODULE     = unit/conditional_continue
+# export TESTBENCH_MODULE     = unit/conditional_filter
+# export TESTBENCH_MODULE     = unit/random_read_engine
+# export TESTBENCH_MODULE     = unit/random_write_engine
+# export TESTBENCH_MODULE     = unit/serial_read_engine
+# export TESTBENCH_MODULE     = unit/serial_write_engine
+# export TESTBENCH_MODULE     = unit/stride_index_generator
 # =========================================================
 
 # =========================================================

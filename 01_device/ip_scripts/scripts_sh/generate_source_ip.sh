@@ -57,55 +57,55 @@ mkdir -p ${ACTIVE_IP_DIR}/${lane}
 mkdir -p ${ACTIVE_IP_DIR}/${utils}
 
 
-cp -r ${ORIGINAL_IP_DIR}/${pkgs}/* ${ACTIVE_IP_DIR}/${pkgs}
-cp -r ${ORIGINAL_IP_DIR}/${engines}/* ${ACTIVE_IP_DIR}/${engines}
-cp -r ${ORIGINAL_IP_DIR}/${kernel}/* ${ACTIVE_IP_DIR}/${kernel}
-cp -r ${ORIGINAL_IP_DIR}/${top}/* ${ACTIVE_IP_DIR}/${top}
-cp -r ${ORIGINAL_IP_DIR}/${memory}/* ${ACTIVE_IP_DIR}/${memory}
-cp -r ${ORIGINAL_IP_DIR}/${bundle}/* ${ACTIVE_IP_DIR}/${bundle}
-cp -r ${ORIGINAL_IP_DIR}/${cu}/* ${ACTIVE_IP_DIR}/${cu}
-cp -r ${ORIGINAL_IP_DIR}/${lane}/* ${ACTIVE_IP_DIR}/${lane}
-cp -r ${ORIGINAL_IP_DIR}/${utils}/* ${ACTIVE_IP_DIR}/${utils}
-cp -r ${ORIGINAL_IP_DIR}/${testbench}/${MODULE}/* ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
+cp -r -u ${ORIGINAL_IP_DIR}/${pkgs}/* ${ACTIVE_IP_DIR}/${pkgs}
+cp -r -u ${ORIGINAL_IP_DIR}/${engines}/* ${ACTIVE_IP_DIR}/${engines}
+cp -r -u ${ORIGINAL_IP_DIR}/${kernel}/* ${ACTIVE_IP_DIR}/${kernel}
+cp -r -u ${ORIGINAL_IP_DIR}/${top}/* ${ACTIVE_IP_DIR}/${top}
+cp -r -u ${ORIGINAL_IP_DIR}/${memory}/* ${ACTIVE_IP_DIR}/${memory}
+cp -r -u ${ORIGINAL_IP_DIR}/${bundle}/* ${ACTIVE_IP_DIR}/${bundle}
+cp -r -u ${ORIGINAL_IP_DIR}/${cu}/* ${ACTIVE_IP_DIR}/${cu}
+cp -r -u ${ORIGINAL_IP_DIR}/${lane}/* ${ACTIVE_IP_DIR}/${lane}
+cp -r -u ${ORIGINAL_IP_DIR}/${utils}/* ${ACTIVE_IP_DIR}/${utils}
+cp -r -u ${ORIGINAL_IP_DIR}/${testbench}/${MODULE}/* ${ACTIVE_IP_DIR}/${testbench}/${MODULE}
 
 
 if [[ "$CTRL_MODE" == "USER_MANAGED" ]]
 then
- cp -r ${ORIGINAL_IP_DIR}/${control}/kernel_control_user_managed.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
+ cp -r -u ${ORIGINAL_IP_DIR}/${control}/kernel_control_user_managed.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
 elif [[ "$CTRL_MODE" == "AP_CTRL_HS" ]]
   then
-   cp -r ${ORIGINAL_IP_DIR}/${control}/kernel_control_ap_ctrl_hs.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
+   cp -r -u ${ORIGINAL_IP_DIR}/${control}/kernel_control_ap_ctrl_hs.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
  elif [[ "$CTRL_MODE" == "AP_CTRL_CHAIN" ]]
   then
-   cp -r ${ORIGINAL_IP_DIR}/${control}/kernel_control_ap_ctrl_chain.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
+   cp -r -u ${ORIGINAL_IP_DIR}/${control}/kernel_control_ap_ctrl_chain.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
  else
   echo "MSG: else |$CTRL_MODE|"
-  cp -r ${ORIGINAL_IP_DIR}/${control}/kernel_control_user_managed.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
+  cp -r -u ${ORIGINAL_IP_DIR}/${control}/kernel_control_user_managed.sv ${ACTIVE_IP_DIR}/${control}/kernel_control.sv
 fi
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
-if [[ "$MODULE" == "glay" ]]
+if [[ "$MODULE" == "integration" ]]
 then
   newtext="${ACTIVE_IP_DIR}/${testbench}/${MODULE}/testbench.sv"
-  search="kernel"
+  search="__KERNEL__"
   replace=${KERNEL_NAME}
   if [[ $search != "" && $replace != "" ]]; then
     sed -i "s/$search/$replace/" $newtext
   fi
 
-  search="GRAPH_DIR"
+  search="_GRAPH_DIR_"
   replace=${GRAPH_DIR}
   if [[ $search != "" && $replace != "" ]]; then
     sed -i "s@$search@$replace@" $newtext
   fi
 
-  search="GRAPH_SUIT"
+  search="_GRAPH_SUIT_"
   replace=${GRAPH_SUIT}
   if [[ $search != "" && $replace != "" ]]; then
     sed -i "s/$search/$replace/" $newtext
   fi
 
-  search="GRAPH_NAME"
+  search="_GRAPH_NAME_"
   replace=${GRAPH_NAME}
   if [[ $search != "" && $replace != "" ]]; then
     sed -i "s/$search/$replace/" $newtext
