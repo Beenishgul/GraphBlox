@@ -285,27 +285,36 @@ export BIN_SIZE         = 1000
 export INOUT_STATS      = 0
 export MASK_MODE        = 0
 # =========================================================
-
+export VIVADO_GUI_FLAG    = NO
+# export VIVADO_GUI_FLAG    = YES
 # =========================================================
 #                        XILINX ARGS                    
 # =========================================================
 export XILINX_DIR         = xilinx_project
-export SCRIPTS_DIR        = ip_scripts
-export SCRIPTS_PERL       = scripts_pl
-export SCRIPTS_TCL        = scripts_tcl
-export SCRIPTS_SHELL      = scripts_sh
-export SCRIPTS_XDC        = scripts_xdc
-export IP_DIR_RTL         = ip_rtl
-export IP_DIR_HLS         = ip_hls
-export REPORTS_DIR        = reports
-export VIVADO_GUI_FLAG    = NO
-# export VIVADO_GUI_FLAG    = YES
+export UTILS_DIR        = utils
+export UTILS_PERL       = utils.pl
+export UTILS_TCL        = utils.tcl
+export UTILS_SHELL      = utils.sh
+export UTILS_XDC        = utils.xdc
+export IP_DIR_RTL       = rtl
+export IP_DIR_HLS       = hls
+export REPORTS_DIR      = rpt
+
+export VIVADO_PACKAGE_DIR  = vivado_$(KERNEL_NAME).pkg
+export VIVADO_SIMULATE_DIR = vivado_$(KERNEL_NAME).sim
+export VIVADO_RUN_DIR      = $(KERNEL_NAME).run
+export VIVADO_BUILD_DIR    = vivado_$(KERNEL_NAME).$(TARGET)
+export VIVADO_VMA_DIR      = vivado_$(KERNEL_NAME).vma
+export VIVADO_EXPORT_DIR   = $(KERNEL_NAME).export
+export VIVADO_IMPORT_DIR   = $(KERNEL_NAME).import
+export VIVADO_VIP_DIR      = vivado_$(KERNEL_NAME).vip
+export VITIS_BUILD_DIR     = vitis_$(KERNEL_NAME).pkg
 
 export XILINX_DIR_ACTIVE  = $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
-export SCRIPTS_DIR_ACTIVE = vivado_$(SCRIPTS_DIR)
-export IP_DIR_RTL_ACTIVE  = vivado_$(IP_DIR_RTL)
-export IP_DIR_HLS_ACTIVE  = vivado_$(IP_DIR_HLS)
-export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
+export UTILS_DIR_ACTIVE   = vivado_$(KERNEL_NAME).$(UTILS_DIR)
+export IP_DIR_RTL_ACTIVE  = vivado_$(KERNEL_NAME).$(IP_DIR_RTL)
+export IP_DIR_HLS_ACTIVE  = vivado_$(KERNEL_NAME).$(IP_DIR_HLS)
+export REPORTS_DIR_ACTIVE = vivado_$(KERNEL_NAME).$(REPORTS_DIR)
 # =========================================================
 
 # =========================================================
@@ -313,7 +322,7 @@ export REPORTS_DIR_ACTIVE = vivado_$(REPORTS_DIR)
 # =========================================================
 export KERNEL_NAME        = glay_kernel
 export DEVICE_INDEX       = 0
-export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
+export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
 # export XCLBIN_PATH        = $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vitis_build_$(KERNEL_NAME)/$(KERNEL_NAME)_system_hw_link/Emulation-HW/binary_container_1.xclbin
 # =========================================================
 

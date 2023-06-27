@@ -3,15 +3,15 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set project_var         [lindex $argv 0]
-set gui_flag            [lindex $argv 1]
+set VIVADO_BUILD_DIR         [lindex $argv 0]
+set VIVADO_GUI_FLAG          [lindex $argv 1]
 # =========================================================
 
-if {${gui_flag} == "YES"} {
+if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project $project_var 
+open_project $VIVADO_BUILD_DIR 
 set runlist [get_runs impl*]
 
 open_run impl_1

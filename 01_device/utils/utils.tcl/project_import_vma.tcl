@@ -15,17 +15,17 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set part_id           [lindex $argv 0]
-set kernel_name       [lindex $argv 1]
-set app_directory     [lindex $argv 2]
-set active_directory  [lindex $argv 3]
-set vma_directory     [lindex $argv 4]
-set project_var       [lindex $argv 5]
-set gui_flag          [lindex $argv 6]
-set scripts_directory [lindex $argv 7]
+set PART               [lindex $argv 0]
+set KERNEL_NAME        [lindex $argv 1]
+set APP_DIR_ACTIVE     [lindex $argv 2]
+set VIVADO_IMPORT_DIR  [lindex $argv 3]
+set VIVADO_EXPORT_DIR  [lindex $argv 4]
+set VIVADO_PACKAGE_DIR [lindex $argv 5]
+set VIVADO_GUI_FLAG    [lindex $argv 6]
+set UTILS_DIR_ACTIVE   [lindex $argv 7]
 
-set ip_dir           ${app_directory}/${active_directory}
-set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
+set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_IMPORT_DIR}
+set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_ip.log
 
 # ----------------------------------------------------------------------------
 # Color function
@@ -57,30 +57,30 @@ proc add_filelist_if_exists {group filename log_file} {
 
 
 # ----------------------------------------------------------------------------
-# Generate ${kernel_name} IPs..... START!
+# Generate ${KERNEL_NAME} IPs..... START!
 # ----------------------------------------------------------------------------
 
-# set_part ${part_id} >> $log_file
+# set_part ${PART} >> $log_file
 
-if {${gui_flag} == "YES"} {
+if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-create_project -force ${kernel_name}_vma -part $part_id >> $log_file
+create_project -force ${KERNEL_NAME}_vma -part $PART >> $log_file
 
 # set board_part_var "xilinx.com:au250:part0:1.4" 
 # set_property board_part $board_part_var [current_project] >> $log_file
 
-set vpl_ip_dir     ${app_directory}/${vma_directory}/${kernel_name}.build/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip
-set vpl_iprepo_dir ${app_directory}/${vma_directory}/${kernel_name}.build/link/vivado/vpl/.local/hw_platform/iprepo/ip_repo
+set vpl_ip_dir     ${APP_DIR_ACTIVE}/${VIVADO_EXPORT_DIR}/${KERNEL_NAME}.build/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip
+set vpl_iprepo_dir ${APP_DIR_ACTIVE}/${VIVADO_EXPORT_DIR}/${KERNEL_NAME}.build/link/vivado/vpl/.local/hw_platform/iprepo/ip_repo
 
-# open_project $project_var >> $log_file
+# open_project $VIVADO_PACKAGE_DIR >> $log_file
 
 # set ip_repo_ert_firmware [file normalize $vivado_dir/data/emulation/hw_em/ip_repo_ert_firmware]
 # set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
 # set data_ip              [file normalize $vitis_dir/data/ip]
 # set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo]
-# set vip_repo             [file normalize $app_directory/$vip_directory]
+# set vip_repo             [file normalize $APP_DIR_ACTIVE/$vip_directory]
 # set vma_iprepo           [file normalize $vpl_ip_dir] 
 # set vma_ip               [file normalize $vpl_iprepo_dir] 
 
@@ -89,8 +89,8 @@ set vpl_iprepo_dir ${app_directory}/${vma_directory}/${kernel_name}.build/link/v
 # set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 # update_ip_catalog >> $log_file
 
-# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_vma_filelist_package.xci.f $log_file
+# add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_vma_filelist_package.xci.f $log_file
 
 # update_compile_order -fileset sources_1 >> $log_file
 
-import_archive_if_exists ${app_directory}/${vma_directory}/${kernel_name}_export.vma 
+import_archive_if_exists ${APP_DIR_ACTIVE}/${VIVADO_EXPORT_DIR}/${KERNEL_NAME}_export.vma 

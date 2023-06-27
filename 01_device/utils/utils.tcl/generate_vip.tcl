@@ -15,15 +15,15 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set part_id              [lindex $argv 0]
-set kernel_name          [lindex $argv 1]
-set app_directory        [lindex $argv 2]
-set active_app_directory [lindex $argv 3]
-set scripts_directory    [lindex $argv 4]
-set alveo_id             [lindex $argv 5]
+set PART                 [lindex $argv 0]
+set KERNEL_NAME          [lindex $argv 1]
+set APP_DIR_ACTIVE       [lindex $argv 2]
+set VIVADO_VIP_DIR       [lindex $argv 3]
+set UTILS_DIR_ACTIVE     [lindex $argv 4]
+set ALVEO                [lindex $argv 5]
 
-set ip_dir           ${app_directory}/${active_app_directory}
-set log_file         ${ip_dir}/generate_${kernel_name}_vip.log
+set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}
+set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_vip.log
 
 # ----------------------------------------------------------------------------
 # Color function
@@ -39,37 +39,37 @@ proc color {foreground text} {
 }
 
 # ----------------------------------------------------------------------------
-# Generate ${kernel_name} IPs..... START!
+# Generate ${KERNEL_NAME} IPs..... START!
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
-puts "\[[color 2 "Generate ${kernel_name} IPs....."]\] [color 1 "START!"]"
+puts "\[[color 2 "Generate ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
+puts "\[[color 4 "Part ID"]\] [color 2 ${PART}]" 
+puts "\[[color 4 "Kernel "]\] [color 2 ${KERNEL_NAME}]" 
 puts "========================================================="
 puts "\[[color 4 "XILINX_VIVADO"]\] [color 2 ${vivado_dir}]" 
 puts "\[[color 4 "XILINX_VITIS "]\] [color 2 ${vitis_dir}]" 
 puts "========================================================="
 
-# set_part ${part_id} >> $log_file
+# set_part ${PART} >> $log_file
 
-create_project -force ${kernel_name} ${ip_dir}/${kernel_name} -part $part_id >> $log_file
+create_project -force ${KERNEL_NAME} ${package_full_dir}/${KERNEL_NAME} -part $PART >> $log_file
  
-set_property PART $part_id [current_project] >> $log_file
+set_property PART $PART [current_project] >> $log_file
 
-# if {${alveo_id} == "U250"} {
+# if {${ALVEO} == "U250"} {
 #   set board_part_var "xilinx.com:au250:part0:1.4" 
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
 #   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U280"} {
+# } elseif {${ALVEO} == "U280"} {
 
 #   set board_part_var "xilinx.com:au280:part0:1.3" 
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
 #   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U55"} {
+# } elseif {${ALVEO} == "U55"} {
 #   set board_part_var "xilinx.com:au55c:part0:1.0"
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
 #   set_property board_part $board_part_var [current_project] >> $log_file
@@ -83,12 +83,12 @@ set_property target_language  Verilog   [current_project]  >> $log_file
 set_property target_simulator XSim      [current_project]  >> $log_file
 
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${part_id} ${kernel_name} ${app_directory} ${active_app_directory}]
+set argv [list ${PART} ${KERNEL_NAME} ${APP_DIR_ACTIVE} ${VIVADO_VIP_DIR}]
 set argc 4
-source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/scripts_tcl/project_generate_vip.tcl 
 
 # ----------------------------------------------------------------------------
-# Generate ${kernel_name} IPs..... DONE! 
+# Generate ${KERNEL_NAME} IPs..... DONE! 
 # ----------------------------------------------------------------------------
 
 close_project >> $log_file

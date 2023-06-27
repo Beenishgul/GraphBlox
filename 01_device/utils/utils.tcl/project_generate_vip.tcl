@@ -15,13 +15,13 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set part_id              [lindex $argv 0]
-set kernel_name          [lindex $argv 1]
-set app_directory        [lindex $argv 2]
-set active_app_directory [lindex $argv 3]
+set PART               [lindex $argv 0]
+set KERNEL_NAME        [lindex $argv 1]
+set APP_DIR_ACTIVE     [lindex $argv 2]
+set VIVADO_PACKAGE_DIR [lindex $argv 3]
 
-set ip_dir           ${app_directory}/${active_app_directory}
-set log_file         ${ip_dir}/generate_${kernel_name}_ip.log
+set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
+set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_ip.log
 
 # ----------------------------------------------------------------------------
 # Color function
@@ -37,27 +37,27 @@ proc color {foreground text} {
 }
 
 # ----------------------------------------------------------------------------
-# Generate ${kernel_name} IPs..... START!
+# Generate ${KERNEL_NAME} IPs..... START!
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
-puts "\[[color 2 "Generate ${kernel_name} IPs....."]\] [color 1 "START!"]"
+puts "\[[color 2 "Generate ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
+puts "\[[color 4 "Part ID"]\] [color 2 ${PART}]" 
+puts "\[[color 4 "Kernel "]\] [color 2 ${KERNEL_NAME}]" 
 puts "========================================================="
 puts "\[[color 4 "XILINX_VIVADO"]\] [color 2 ${vivado_dir}]" 
 puts "\[[color 4 "XILINX_VITIS "]\] [color 2 ${vitis_dir}]" 
 puts "========================================================="
 
-# set_part ${part_id} >> $log_file
+# set_part ${PART} >> $log_file
 
-# create_project ${kernel_name}_ip_project -in_memory -force -part $part_id >> $log_file
+# create_project ${KERNEL_NAME}_ip_project -in_memory -force -part $PART >> $log_file
 # current_project
 
-set_property PART $part_id [current_project]
+set_property PART $PART [current_project]
 set_property target_language  Verilog [current_project] 
 set_property target_simulator XSim    [current_project] 
 
@@ -76,7 +76,7 @@ set_property target_simulator XSim    [current_project]
 # ----------------------------------------------------------------------------
 puts "[color 2 "                        Generate AXI VIP Master"]" 
 
-set module_name control_${kernel_name}_vip
+set module_name control_${KERNEL_NAME}_vip
 create_ip -name axi_vip                 \
           -vendor xilinx.com            \
           -library ip                   \
@@ -98,9 +98,9 @@ set_property -dict [list \
                     CONFIG.HAS_WSTRB {1}                        \
                     ] [get_ips ${module_name}]
 
-set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
-set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
-set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
+set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
 set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
 generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
 # catch { config_ip_cache -export [get_ips -all ${module_name}] }
@@ -137,9 +137,9 @@ set_property -dict [list \
                     CONFIG.ID_WIDTH   {1}                       \
                     ] [get_ips ${module_name}]
 
-set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
-set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
-set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
+set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
 set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
 generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
 # catch { config_ip_cache -export [get_ips -all ${module_name}] }
@@ -197,9 +197,9 @@ set_property -dict [list                                                  \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 
-set files_sources_xci ${ip_dir}/${kernel_name}/${kernel_name}.srcs/sources_1/ip/${module_name}/${module_name}.xci
-set files_ip_user_files_dir     ${ip_dir}/${kernel_name}/${kernel_name}.ip_user_files
-set files_cache_dir     ${ip_dir}/${kernel_name}/${kernel_name}.cache
+set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
+set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
 set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
 generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
 # catch { config_ip_cache -export [get_ips -all ${module_name}] }
@@ -208,18 +208,18 @@ export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -n
 export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# Generate ${kernel_name} IPs..... DONE! 
+# Generate ${KERNEL_NAME} IPs..... DONE! 
 # ----------------------------------------------------------------------------
 
 puts "========================================================="
 puts "\[[color 4 "Check directory for VIP"]\]"
-puts "\[[color 3 ${ip_dir}]\]"
-puts "\[[color 4 "Part ID"]\] [color 2 ${part_id}]" 
-puts "\[[color 4 "Kernel "]\] [color 2 ${kernel_name}]" 
+puts "\[[color 3 ${package_full_dir}]\]"
+puts "\[[color 4 "Part ID"]\] [color 2 ${PART}]" 
+puts "\[[color 4 "Kernel "]\] [color 2 ${KERNEL_NAME}]" 
 puts "========================================================="
 
 puts "========================================================="
 puts "\[[color 2 [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "Generate ${kernel_name} IPs....."]\] [color 1 "DONE!"]"
+puts "\[[color 4 "Generate ${KERNEL_NAME} IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="

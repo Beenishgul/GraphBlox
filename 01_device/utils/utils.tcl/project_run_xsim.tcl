@@ -3,15 +3,15 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set project_var          [lindex $argv 0]
-set gui_flag             [lindex $argv 1]
-set kernel_name          [lindex $argv 2]
-set app_directory        [lindex $argv 3]
-set active_app_directory [lindex $argv 4]
-set scripts_directory    [lindex $argv 5]
+set VIVADO_BUILD_DIR    [lindex $argv 0]
+set VIVADO_GUI_FLAG     [lindex $argv 1]
+set KERNEL_NAME         [lindex $argv 2]
+set APP_DIR_ACTIVE      [lindex $argv 3]
+set VIVADO_PACKAGE_DIR  [lindex $argv 4]
+set UTILS_DIR_ACTIVE    [lindex $argv 5]
 
-set package_dir      ${app_directory}/${active_app_directory}
-set log_file         ${package_dir}/generate_${kernel_name}_xsim.log
+set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
+set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_xsim.log
 # =========================================================
 
 proc update_filelist_if_exists {group filename log_file} {
@@ -34,21 +34,21 @@ proc color {foreground text} {
 # =========================================================
 # Step 1: Open vivado project and add design sources
 # =========================================================
-if {${gui_flag} == "YES"} {
+if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project $project_var 
+open_project ${VIVADO_BUILD_DIR} 
 # =========================================================
 
 # remove_files -fileset sim_1      [get_files] >> $log_file   
 
-puts "[color 4 "                        INFO: Add design sources into sim_1 ${kernel_name}"]" 
+puts "[color 4 "                        INFO: Add design sources into sim_1 ${KERNEL_NAME}"]" 
 set_property SOURCE_SET sources_1 [get_filesets sim_1]
-update_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
-update_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
-update_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
-update_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vh.f $log_file
+update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.v.f $log_file
+update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f $log_file
+update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vhdl.f $log_file
+update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vh.f $log_file
 
 puts "[color 4 "                        INFO: Update compile order: sim_1"]"
 update_compile_order -fileset sim_1 >> $log_file

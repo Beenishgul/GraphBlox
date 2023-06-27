@@ -3,17 +3,17 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set project_var         [lindex $argv 0]
-set gui_flag            [lindex $argv 1]
-set strategy            [lindex $argv 2]
-set num_jobs            [lindex $argv 3]
+set VIVADO_BUILD_DIR         [lindex $argv 0]
+set VIVADO_GUI_FLAG          [lindex $argv 1]
+set XILINX_IMPL_STRATEGY     [lindex $argv 2]
+set XILINX_JOBS_STRATEGY     [lindex $argv 3]
 # =========================================================
 
-if {${gui_flag} == "YES"} {
+if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project $project_var 
+open_project ${VIVADO_BUILD_DIR} 
 
 # set runlist_impl  [get_runs impl*]
 # set runlist_synth [get_runs synth*]
@@ -26,8 +26,8 @@ open_project $project_var
 # launch_runs impl_1 -to_step write_bitstream
 # wait_on_runs impl_1
 
-foreach impl_strategy [list [lindex [get_runs impl*] $strategy]] { 
+foreach impl_strategy [list [lindex [get_runs impl*] ${XILINX_IMPL_STRATEGY}]] { 
   reset_run $impl_strategy
-  launch_runs $impl_strategy -to_step write_bitstream -jobs $num_jobs
+  launch_runs $impl_strategy -to_step write_bitstream -jobs $XILINX_JOBS_STRATEGY
   wait_on_runs $impl_strategy 
 }

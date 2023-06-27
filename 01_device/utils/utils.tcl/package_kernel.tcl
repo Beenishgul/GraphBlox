@@ -18,20 +18,21 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set part_id                  [lindex $argv 0]
-set kernel_name              [lindex $argv 1]
-set app_directory            [lindex $argv 2]
-set active_app_directory     [lindex $argv 3]
-set ctrl_mode                [lindex $argv 4]
-set scripts_directory        [lindex $argv 5]
-set vip_directory            [lindex $argv 6]
-set vivado_version           [lindex $argv 7]
-set git_version              [lindex $argv 8]
-set desired_frequency        [lindex $argv 9]
-set alveo_id                 [lindex $argv 10]
+set PART                  [lindex $argv 0]
+set KERNEL_NAME           [lindex $argv 1]
+set APP_DIR_ACTIVE        [lindex $argv 2]
+set VIVADO_PACKAGE_DIR    [lindex $argv 3]
+set XILINX_CTRL_MODE      [lindex $argv 4]
+set UTILS_DIR_ACTIVE      [lindex $argv 5]
+set VIVADO_VIP_DIR        [lindex $argv 6]
+set VIVADO_VER            [lindex $argv 7]
+set GIT_VER               [lindex $argv 8]
+set DESIGN_FREQ_HZ        [lindex $argv 9]
+set ALVEO                 [lindex $argv 10]
+set UTILS_TCL             [lindex $argv 11]
 
-set package_dir      ${app_directory}/${active_app_directory}
-set log_file         ${package_dir}/generate_${kernel_name}_package.log
+set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
+set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_package.log
 # =========================================================
 
 
@@ -57,43 +58,43 @@ proc add_filelist_if_exists {group filename log_file} {
 
 # =========================================================
 puts "========================================================="
-puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "START!"]"
+puts "\[[color 2 "Packaging ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 4 "ALVEO ID       "]\] [color 2 ${alveo_id}]"
-puts "\[[color 4 "Part ID        "]\] [color 2 ${part_id}]"
-puts "\[[color 4 "Kernel         "]\] [color 2 ${kernel_name}]"
-puts "\[[color 4 "CTRL MODE      "]\] [color 2 ${ctrl_mode}]"
-puts "\[[color 4 "DESIGN_FREQ_HZ "]\] [color 2 ${desired_frequency}]"
-puts "\[[color 4 "Project        "]\] [color 2 ${active_app_directory}]"
-puts "\[[color 4 "Kernel XML     "]\] [color 2 ${kernel_name}.xml]"
-puts "\[[color 4 "Kernel XO      "]\] [color 2 ${kernel_name}.xo]"
-puts "\[[color 4 "Log File       "]\] [color 2 generate_${kernel_name}_package.log]"
-puts "\[[color 4 "VIVADO_VER     "]\] [color 2 ${vivado_version}]"
-puts "\[[color 4 "GIT_VER        "]\] [color 2 ${git_version}]"
+puts "\[[color 4 "ALVEO ID       "]\] [color 2 ${ALVEO}]"
+puts "\[[color 4 "Part ID        "]\] [color 2 ${PART}]"
+puts "\[[color 4 "Kernel         "]\] [color 2 ${KERNEL_NAME}]"
+puts "\[[color 4 "CTRL MODE      "]\] [color 2 ${XILINX_CTRL_MODE}]"
+puts "\[[color 4 "DESIGN_FREQ_HZ "]\] [color 2 ${DESIGN_FREQ_HZ}]"
+puts "\[[color 4 "Project        "]\] [color 2 ${VIVADO_PACKAGE_DIR}]"
+puts "\[[color 4 "Kernel XML     "]\] [color 2 ${KERNEL_NAME}.xml]"
+puts "\[[color 4 "Kernel XO      "]\] [color 2 ${KERNEL_NAME}.xo]"
+puts "\[[color 4 "Log File       "]\] [color 2 generate_${KERNEL_NAME}_package.log]"
+puts "\[[color 4 "VIVADO_VER     "]\] [color 2 ${VIVADO_VER}]"
+puts "\[[color 4 "GIT_VER        "]\] [color 2 ${GIT_VER}]"
 puts "========================================================="
 
 # =========================================================
 # Step 1: create vivado project and add design sources
 # =========================================================
 puts "[color 3 "                Step 1: Create vivado project and add design sources"]" 
-puts "[color 4 "                        Create Project Kernel ${kernel_name}"]" 
-create_project -force $kernel_name ${package_dir}/${kernel_name} -part $part_id >> $log_file
+puts "[color 4 "                        Create Project Kernel ${KERNEL_NAME}"]" 
+create_project -force $KERNEL_NAME ${package_full_dir}/${KERNEL_NAME} -part $PART >> $log_file
 
-# # set_part $part_id
-# set_property PART $part_id [current_project]
+# # set_part $PART
+# set_property PART $PART [current_project]
 
-# if {${alveo_id} == "U250"} {
+# if {${ALVEO} == "U250"} {
 #   set board_part_var "xilinx.com:au250:part0:1.4" 
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]" 
 #   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U280"} {
+# } elseif {${ALVEO} == "U280"} {
 
 #   set board_part_var "xilinx.com:au280:part0:1.3" 
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
 #   set_property board_part $board_part_var [current_project] >> $log_file
-# } elseif {${alveo_id} == "U55"} {
+# } elseif {${ALVEO} == "U55"} {
 
 #   set board_part_var "xilinx.com:au55c:part0:1.0"
 #   puts "[color 4 "                        Set board part "][color 1 ${board_part_var}]"  
@@ -118,7 +119,7 @@ set vitis_dir $::env(XILINX_VITIS)
 # set cache_xilinx         [file normalize $vitis_dir/data/cache/xilinx]
 # set data_ip              [file normalize $vitis_dir/data/ip]
 # set hw_em_ip_repo        [file normalize $vivado_dir/data/emulation/hw_em/ip_repo]
-# set vip_repo             [file normalize $app_directory/$vip_directory] 
+# set vip_repo             [file normalize $APP_DIR_ACTIVE/$VIVADO_VIP_DIR] 
 
 # set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip]
 # set ip_repo_list [concat $vip_repo $data_ip]
@@ -130,30 +131,30 @@ set vitis_dir $::env(XILINX_VITIS)
 # Add IP and design sources into project
 # =========================================================
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${part_id} ${kernel_name} ${app_directory} ${active_app_directory}]
+set argv [list ${PART} ${KERNEL_NAME} ${APP_DIR_ACTIVE} ${VIVADO_PACKAGE_DIR}]
 set argc 4
-source ${app_directory}/${scripts_directory}/scripts_tcl/project_generate_vip.tcl 
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1 >> $log_file
 
-puts "[color 4 "                        Add design sources into project ${kernel_name}"]" 
-add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.vh.f $log_file
-add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.src.f $log_file
-# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xci.f $log_file
-# add_filelist_if_exists sources_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
+puts "[color 4 "                        Add design sources into project ${KERNEL_NAME}"]" 
+add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f $log_file
+add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.src.f $log_file
+# add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
+# add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
 
-puts "[color 4 "                        Add design sources into sim_1 ${kernel_name}"]" 
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f $log_file
-add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vh.f $log_file
-# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f $log_file
-# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f $log_file
-# add_filelist_if_exists sim_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f $log_file
+puts "[color 4 "                        Add design sources into sim_1 ${KERNEL_NAME}"]" 
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.v.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vhdl.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vh.f $log_file
+# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f $log_file
+# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
+# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
-add_filelist_if_exists constrs_1 ${app_directory}/${scripts_directory}/${kernel_name}_filelist_package.xdc.f $log_file
+add_filelist_if_exists constrs_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1 >> $log_file
@@ -161,8 +162,8 @@ update_compile_order -fileset sources_1 >> $log_file
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1 >> $log_file
 
-puts "[color 4 "                        Set Simulator ${kernel_name} settings"]"
-set_property top ${kernel_name}_testbench [get_filesets sim_1]
+puts "[color 4 "                        Set Simulator ${KERNEL_NAME} settings"]"
+set_property top ${KERNEL_NAME}_testbench [get_filesets sim_1]
 
 # set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property simulator_language "Mixed" [current_project]
@@ -190,24 +191,24 @@ set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]
 
 
-set argv [list ${kernel_name} ${vivado_version}]
+set argv [list ${KERNEL_NAME} ${VIVADO_VER}]
 set argc 2
-source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_impl.tcl >> $log_file
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_impl.tcl >> $log_file
 
 puts "[color 4 "                        Create IDR implementation strategies: i_impl_strategies"]"
-set argv [list ${kernel_name} ${vivado_version}]
+set argv [list ${KERNEL_NAME} ${VIVADO_VER}]
 set argc 2
-source ${app_directory}/${scripts_directory}/scripts_tcl/project_all_idr_impl.tcl >> $log_file
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_idr_impl.tcl >> $log_file
 
-puts "[color 4 "                        Create IP packaging project ${kernel_name}_ip"]" 
+puts "[color 4 "                        Create IP packaging project ${KERNEL_NAME}_ip"]" 
 # create IP packaging project
-ipx::package_project -root_dir ${package_dir}/${kernel_name} -vendor virginia.edu -library ${kernel_name} -taxonomy /KernelIP -import_files -set_current true >> $log_file
+ipx::package_project -root_dir ${package_full_dir}/${KERNEL_NAME} -vendor virginia.edu -library ${KERNEL_NAME} -taxonomy /KernelIP -import_files -set_current true >> $log_file
 
 set core [ipx::current_core]
-scan ${git_version} "%c" num_git_version
+scan ${GIT_VER} "%c" num_git_version
 set_property vendor cs.virginia.edu $core
 set_property library mezzanine $core
-set_property name ${kernel_name} $core
+set_property name ${KERNEL_NAME} $core
 set_property core_revision ${num_git_version} $core
 
 foreach user_parameter [ipx::get_user_parameters] {
@@ -246,8 +247,8 @@ set clkbifparam [ipx::add_bus_parameter -quiet "FREQ_HZ" $clkbif]
 # ========================================================= 
 
              
-puts "[color 4 "                        Set desired frequency "][color 5 "${desired_frequency} Hz"]"
-set_property value ${desired_frequency} $clkbifparam
+puts "[color 4 "                        Set desired frequency "][color 5 "${DESIGN_FREQ_HZ} Hz"]"
+set_property value ${DESIGN_FREQ_HZ} $clkbifparam
 
 # =========================================================
 # set value_resolve_type user if the frequency can vary.
@@ -384,7 +385,7 @@ puts "[color 3 "                Step 4: Associate AXI master port to pointer arg
 puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"]" 
 # =========================================================
 
-puts "[color 4 "                        Set RTL kernel (${kernel_name}) registers property"]" 
+puts "[color 4 "                        Set RTL kernel (${KERNEL_NAME}) registers property"]" 
 
 puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
   set reg      [ipx::add_register -quiet "buffer_0" $addr_block]
@@ -477,13 +478,13 @@ set_property sdx_kernel_type rtl $core
 set_property ipi_drc {ignore_freq_hz true} $core
 # set_property vitis_drc {ctrl_protocol USER_MANAGED} $core
 
-if {${ctrl_mode} == "USER_MANAGED"} {
+if {${XILINX_CTRL_MODE} == "USER_MANAGED"} {
   puts "[color 4 "                        Set ctrl mode "][color 1 "USER_MANAGED"]" 
   set_property vitis_drc {ctrl_protocol user_managed} $core
-} elseif {${ctrl_mode} == "AP_CTRL_HS"} {
+} elseif {${XILINX_CTRL_MODE} == "AP_CTRL_HS"} {
   puts "[color 4 "                        Set ctrl mode "][color 1 "AP_CTRL_HS"]"  
   set_property vitis_drc {ctrl_protocol ap_ctrl_hs} $core
-} elseif {${ctrl_mode} == "AP_CTRL_CHAIN"} {
+} elseif {${XILINX_CTRL_MODE} == "AP_CTRL_CHAIN"} {
   puts "[color 4 "                        Set ctrl mode "][color 1 "AP_CTRL_CHAIN"]"  
   set_property vitis_drc {ctrl_protocol ap_ctrl_chain} $core
 } else {
@@ -514,25 +515,25 @@ ipx::check_integrity -xrt $core >> $log_file
 ipx::save_core $core
 ipx::check_integrity -quiet -kernel $core
 # ipx::create_xgui_files $core
-ipx::archive_core ${package_dir}/${kernel_name}/${kernel_name}.zip $core
+ipx::archive_core ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.zip $core
 ipx::unload_core $core
 # =========================================================
 # Generate Vitis Kernel from Vivado IP
 # =========================================================
 puts "[color 4 "                        Generate Vitis Kernel from Vivado IP"]" 
-# package_xo -force -xo_path .${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol USER_MANAGED -ip_directory ${package_dir}/${kernel_name}_ip -output_kernel_xml .${package_dir}/${kernel_name}.xml >> $log_file
+# package_xo -force -xo_path .${package_full_dir}/${KERNEL_NAME}.xo -kernel_name ${KERNEL_NAME} -ctrl_protocol USER_MANAGED -ip_directory ${package_full_dir}/${KERNEL_NAME}_ip -output_kernel_xml .${package_full_dir}/${KERNEL_NAME}.xml >> $log_file
 
-if {${ctrl_mode} == "USER_MANAGED"} {
-  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
-} elseif {${ctrl_mode} == "AP_CTRL_HS"} {
-  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_hs -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
-} elseif {${ctrl_mode} == "AP_CTRL_CHAIN"} { 
-  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol ap_ctrl_chain -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
+if {${XILINX_CTRL_MODE} == "USER_MANAGED"} {
+  package_xo -force -xo_path ${package_full_dir}/${KERNEL_NAME}.xo -kernel_name ${KERNEL_NAME} -ctrl_protocol user_managed -ip_directory ${package_full_dir}/${KERNEL_NAME} -output_kernel_xml ${package_full_dir}/${KERNEL_NAME}.xml >> $log_file
+} elseif {${XILINX_CTRL_MODE} == "AP_CTRL_HS"} {
+  package_xo -force -xo_path ${package_full_dir}/${KERNEL_NAME}.xo -kernel_name ${KERNEL_NAME} -ctrl_protocol ap_ctrl_hs -ip_directory ${package_full_dir}/${KERNEL_NAME} -output_kernel_xml ${package_full_dir}/${KERNEL_NAME}.xml >> $log_file
+} elseif {${XILINX_CTRL_MODE} == "AP_CTRL_CHAIN"} { 
+  package_xo -force -xo_path ${package_full_dir}/${KERNEL_NAME}.xo -kernel_name ${KERNEL_NAME} -ctrl_protocol ap_ctrl_chain -ip_directory ${package_full_dir}/${KERNEL_NAME} -output_kernel_xml ${package_full_dir}/${KERNEL_NAME}.xml >> $log_file
 } else {
-  package_xo -force -xo_path ${package_dir}/${kernel_name}.xo -kernel_name ${kernel_name} -ctrl_protocol user_managed -ip_directory ${package_dir}/${kernel_name} -output_kernel_xml ${package_dir}/${kernel_name}.xml >> $log_file
+  package_xo -force -xo_path ${package_full_dir}/${KERNEL_NAME}.xo -kernel_name ${KERNEL_NAME} -ctrl_protocol user_managed -ip_directory ${package_full_dir}/${KERNEL_NAME} -output_kernel_xml ${package_full_dir}/${KERNEL_NAME}.xml >> $log_file
 }
 
-# set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip ${package_dir}]
+# set ip_repo_list [concat $vip_repo $ip_repo_ert_firmware $cache_xilinx $hw_em_ip_repo $data_ip ${package_full_dir}]
 # set ip_repo_list [concat $vip_repo $data_ip]
 # set_property IP_REPO_PATHS "$ip_repo_list" [current_project] 
 update_ip_catalog >> $log_file
@@ -542,16 +543,16 @@ puts "[color 4 "                        Synth design RTL test"]"
 # =========================================================
 close_project
 puts "========================================================="
-puts "\[[color 4 "Part ID   "]\] [color 2 ${part_id}]"
-puts "\[[color 4 "Kernel    "]\] [color 2 ${kernel_name}]"
-puts "\[[color 4 "CTRL MODE "]\] [color 2 ${ctrl_mode}]"
-puts "\[[color 4 "Project   "]\] [color 2 ${active_app_directory}]"
-puts "\[[color 4 "Kernel XML"]\] [color 2 ${kernel_name}.xml]"
-puts "\[[color 4 "Kernel XO "]\] [color 2 ${kernel_name}.xo]"
-puts "\[[color 4 "Log File  "]\] [color 2 generate_${kernel_name}_package.log]"
-puts "\[[color 4 "VIVADO_VER "]\] [color 2 ${vivado_version}]"
+puts "\[[color 4 "Part ID   "]\] [color 2 ${PART}]"
+puts "\[[color 4 "Kernel    "]\] [color 2 ${KERNEL_NAME}]"
+puts "\[[color 4 "CTRL MODE "]\] [color 2 ${XILINX_CTRL_MODE}]"
+puts "\[[color 4 "Project   "]\] [color 2 ${VIVADO_PACKAGE_DIR}]"
+puts "\[[color 4 "Kernel XML"]\] [color 2 ${KERNEL_NAME}.xml]"
+puts "\[[color 4 "Kernel XO "]\] [color 2 ${KERNEL_NAME}.xo]"
+puts "\[[color 4 "Log File  "]\] [color 2 generate_${KERNEL_NAME}_package.log]"
+puts "\[[color 4 "VIVADO_VER "]\] [color 2 ${VIVADO_VER}]"
 puts "========================================================="
 puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
 puts "========================================================="
-puts "\[[color 2 "Packaging ${kernel_name} IPs....."]\] [color 1 "DONE!"]"
+puts "\[[color 2 "Packaging ${KERNEL_NAME} IPs....."]\] [color 1 "DONE!"]"
 puts "========================================================="

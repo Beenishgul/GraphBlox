@@ -7,12 +7,12 @@
 
 print_usage () {
   echo "Usage: "
-  echo "  generate_xdc_filelist_f.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME IP_DIR VIP_DIR"
+  echo "  generate_xdc_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR VIVADO_EXPORT_DIR"
   echo ""
-  echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  SCRIPTS_DIR: scripts"
+  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+  echo "  UTILS_DIR_ACTIVE: utils"
   echo "  KERNEL_NAME: kernel"
-  echo "  VIP_DIR: U250"
+  echo "  VIVADO_EXPORT_DIR: link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -20,12 +20,12 @@ then
   print_usage
 fi
 
-ACTIVE_APP_DIR=$1
-SCRIPTS_DIR=$2
+APP_DIR_ACTIVE=$1
+UTILS_DIR_ACTIVE=$2
 KERNEL_NAME=$3
-VIP_DIR=$4
+VIVADO_EXPORT_DIR=$4
 
-CFG_FILE_NAME_XCI="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_vma_filelist_package.xci.f"
+CFG_FILE_NAME_XCI="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_vma_filelist_package.xci.f"
 
 rm_xci_filelist_f () {
 
@@ -52,7 +52,7 @@ generate_xci_filelist_f () {
 newtext=""
 echo "$newtext" > ${CFG_FILE_NAME_XCI}
 
-generate_xci_filelist_f ${ACTIVE_APP_DIR}/${VIP_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
+generate_xci_filelist_f ${APP_DIR_ACTIVE}/${VIVADO_EXPORT_DIR}/ ${CFG_FILE_NAME_XCI} "xci"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME_XCI}
