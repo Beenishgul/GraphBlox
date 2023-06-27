@@ -529,6 +529,8 @@ package-kernel:
 clean-package-kernel:
 	-@$(MAKE) clean-package-kernel $(MAKE_DEVICE)
 # =========================================================
+
+# =========================================================
 # STEP 2.b.1 VIVADO Project Mode
 # =========================================================
 .PHONY: run-sim-project
@@ -551,7 +553,9 @@ run-report-project:
 open-vivado-project:
 	-@$(MAKE) open-vivado-project $(MAKE_DEVICE)
 
-# =========================================================
+.PHONY: clean-vivado-project
+clean-vivado-project:
+	-@$(MAKE) clean-vivado-project $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -564,6 +568,10 @@ build-hw:
 .PHONY: watch-build-hw
 watch-build-hw:
 	-@$(MAKE) watch-build-hw $(MAKE_DEVICE)
+
+.PHONY: clean-build-hw
+clean-build-hw:
+	-@$(MAKE) clean-build-hw $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -581,9 +589,17 @@ gen-host-bin:
 export-hw:
 	-@$(MAKE) export-hw $(MAKE_DEVICE)
 
+.PHONY: clean-export-hw
+clean-export-hw:
+	-@$(MAKE) clean-export-hw $(MAKE_DEVICE)
+# =========================================================
 .PHONY: import-hw
 import-hw:
 	-@$(MAKE) import-hw $(MAKE_DEVICE)
+
+.PHONY: clean-import-hw
+clean-import-hw:
+	-@$(MAKE) clean-import-hw $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -600,7 +616,11 @@ run-emu-debug:
 .PHONY: run-emu-wave
 run-emu-wave:
 	-@$(MAKE) run-emu-wave $(MAKE_DEVICE)
-# ================================= ========================
+
+.PHONY: clean-run-emu
+clean-run-emu:
+	-@$(MAKE) clean-run-emu $(MAKE_DEVICE)
+# =========================================================
 
 # =========================================================
 # STEP 4.b Run Hardware FPGA
@@ -612,6 +632,10 @@ run-fpga:
 .PHONY: run-fpga-debug
 run-fpga-debug:
 	-@$(MAKE) run-fpga-debug $(MAKE_DEVICE)
+
+.PHONY: clean-run-fpga
+clean-run-fpga:
+	-@$(MAKE) clean-run-fpga $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -636,6 +660,10 @@ run-vpp-report-project:
 .PHONY: open-vpp-vivado-project
 open-vpp-vivado-project:
 	@$(MAKE) open-vpp-vivado-project $(MAKE_DEVICE)
+
+.PHONY: clean-vpp-vivado-project
+clean-vpp-vivado-project:
+	@$(MAKE) clean-vpp-vivado-project $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -644,6 +672,10 @@ open-vpp-vivado-project:
 .PHONY: open-vitis-project
 open-vitis-project:
 	@$(MAKE) open-vitis-project $(MAKE_DEVICE)
+
+.PHONY: clean-vitis-project
+clean-vitis-project:
+	@$(MAKE) clean-vitis-project $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
@@ -652,9 +684,14 @@ open-vitis-project:
 # If the target is HW, this generates the power and resource
 # utilization metrics.
 # =========================================================
-.PHONY: report_metrics
-report_metrics: 
-	-@$(MAKE) report_metrics $(MAKE_DEVICE)
+.PHONY: report-metrics
+report-metrics: 
+	-@$(MAKE) report-metrics $(MAKE_DEVICE)
+
+.PHONY: clean-report-metrics
+clean-report-metrics: 
+	-@$(MAKE) clean-report-metrics $(MAKE_DEVICE)
+
 # =========================================================
 
 # =========================================================

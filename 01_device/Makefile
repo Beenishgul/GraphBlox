@@ -417,7 +417,7 @@ export-hw: | $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.vma $(
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)/$(KERNEL_NAME)_export.log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 PHONY: clean-export-hw
-clean-export-hw:
+clean-export-hw: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_EXPORT_DIR)
 
 # =========================================================
@@ -435,7 +435,7 @@ import-hw: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR) $(ACTIVE_APP_DI
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/project_import_vma.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(ACTIVE_APP_DIR) $(VIVADO_IMPORT_DIR) $(VIVADO_EXPORT_DIR) $(ACTIVE_APP_DIR)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr $(VIVADO_GUI_FLAG) $(SCRIPTS_DIR_ACTIVE) | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 PHONY: clean-import-hw
-clean-import-hw:
+clean-import-hw: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_IMPORT_DIR)
 
 # =========================================================
@@ -464,7 +464,7 @@ build-hw: $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin 
 	$(TAIL_F) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_impl.pl
 
 PHONY: clean-build-hw
-clean-build-hw:
+clean-build-hw: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)
 
 # =========================================================
@@ -505,7 +505,7 @@ run-fpga-debug: DEBUG_CMD=1
 run-fpga-debug: session-info run-fpga-cmd
 
 PHONY: clean-run-fpga
-clean-run-fpga:
+clean-run-fpga: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)
 	
 # =========================================================
@@ -544,7 +544,7 @@ run-emu-wave: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(D
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_sim.pl
 
 PHONY: clean-run-emu
-clean-run-emu:
+clean-run-emu: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_RUN_DIR)
 
 # =========================================================
@@ -583,7 +583,7 @@ open-vpp-vivado-project: session-info | $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${
 	vivado ${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr 
 
 PHONY: clean-vpp-vivado-project
-clean-vpp-vivado-project:
+clean-vpp-vivado-project: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build
 
 # =========================================================
@@ -596,21 +596,21 @@ open-vitis-project:
 	vitis -workspace $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)
 
 PHONY: clean-vitis-project
-clean-vitis-projectt:
+clean-vitis-projectt: session-info
 	$(RMDIR) $(ACTIVE_APP_DIR)/$(VITIS_BUILD_DIR)/
-	
+
 # =========================================================
 # VPP Flow: Report Utilization Metrics
 # =========================================================
 # If the target is HW, this generates the power and resource
 # utilization metrics.
 # =========================================================
-.PHONY: report_metrics
-report_metrics: session-info | $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
+.PHONY: report-metrics
+report-metrics: session-info | $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE) 
 ifeq ($(TARGET),hw_emu)
 	$(ECHO) "${RED}ERROR: This build target <TARGET=hw> (report-metrics) not valid when design target is <<TARGET=$(TARGET)>> ${NC}"
 else
-	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
+
 	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 	$(CD) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE); \
 	vivado -mode batch -source $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_TCL)/report_metrics.tcl -notrace $(ACTIVE_APP_DIR)/$(VIVADO_BUILD_DIR)/${KERNEL_NAME}.build/link/vivado/vpl/prj/prj.xpr | perl $(ACTIVE_APP_DIR)/$(SCRIPTS_DIR_ACTIVE)/$(SCRIPTS_PERL)/color_tail_report.pl
@@ -619,6 +619,10 @@ else
 	$(ECHO) "####################################"
 	$(ECHO) ""
 endif
+
+.PHONY: clean-report-metrics
+clean-report-metrics: session-info
+	$(RMDIR) $(ACTIVE_APP_DIR)/$(REPORTS_DIR_ACTIVE)
 
 # =========================================================
 #  Help menu
