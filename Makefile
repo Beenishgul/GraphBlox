@@ -472,10 +472,23 @@ gen-scripts-dir:
 .PHONY: gen-ip-dir
 gen-ip-dir: 
 	-@$(MAKE) gen-ip-dir $(MAKE_DEVICE)
+
+.PHONY: clean-vip
+clean-vip:
+	-@$(MAKE) clean-vip $(MAKE_DEVICE)
+
+.PHONY: clean-scripts-dir
+clean-scripts-dir:
+	-@$(MAKE) clean-scripts-dir $(MAKE_DEVICE)
+
+.PHONY: clean-ip-dir
+clean-ip-dir: 
+	-@$(MAKE) clean-ip-dir $(MAKE_DEVICE)
+
 # =========================================================
 
 # =========================================================
-# STEP 2.a Run Hardware Simulation  
+# STEP 1.a Run Hardware Simulation  
 # =========================================================
 .PHONY: run-sim
 run-sim:
@@ -501,8 +514,22 @@ run-sim-wave:
 run-sim-help:
 	-@$(MAKE) run-sim-help $(MAKE_DEVICE)
 
+.PHONY: clean-sim
+clean-sim:
+	-@$(MAKE) clean-sim $(MAKE_DEVICE)
+
 # =========================================================
-# VIVADO Project Mode
+# STEP 2.b Package Generation  
+# =========================================================
+.PHONY: package-kernel
+package-kernel:
+	-@$(MAKE) package-kernel $(MAKE_DEVICE)
+
+.PHONY: clean-package-kernel
+clean-package-kernel:
+	-@$(MAKE) clean-package-kernel $(MAKE_DEVICE)
+# =========================================================
+# STEP 2.b.1 VIVADO Project Mode
 # =========================================================
 .PHONY: run-sim-project
 run-sim-project:
@@ -525,13 +552,6 @@ open-vivado-project:
 	-@$(MAKE) open-vivado-project $(MAKE_DEVICE)
 
 # =========================================================
-
-# =========================================================
-# STEP 2.b Package Generation  
-# =========================================================
-.PHONY: package-kernel
-package-kernel:
-	-@$(MAKE) package-kernel $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================
