@@ -600,7 +600,7 @@ $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR): sub-session-info
 
 .PHONY: open-vitis-project
 open-vitis-project: session-info | $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR)
-	cd $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR); \
+	$(CD) $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR); \
 	vitis -workspace $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR)
 
 PHONY: clean-vitis-project
