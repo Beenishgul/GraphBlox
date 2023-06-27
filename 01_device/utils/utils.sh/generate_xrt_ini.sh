@@ -2,12 +2,12 @@
 
 print_usage () {
   echo "Usage: "
-  echo "  generate_xrt_ini.sh ACTIVE_APP_DIR SCRIPTS_DIR KERNEL_NAME ctrl_mode"
+  echo "  generate_xrt_ini.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME XILINX_CTRL_MODE"
   echo ""
-  echo "  ACTIVE_APP_DIR: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  SCRIPTS_DIR: scripts"
+  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+  echo "  UTILS_DIR_ACTIVE: scripts"
   echo "  KERNEL_NAME: kernel"
-  echo "  ctrl_mode  : USER_MANAGED"
+  echo "  XILINX_CTRL_MODE  : USER_MANAGED"
   echo "" 
 }
 if [ "$1" = "" ]
@@ -15,18 +15,18 @@ then
   print_usage
 fi
 
-ACTIVE_APP_DIR=$1
-SCRIPTS_DIR=$2
+APP_DIR_ACTIVE=$1
+UTILS_DIR_ACTIVE=$2
 KERNEL_NAME=$3
-ctrl_mode=$4
-SCRIPTS_TCL=$5
+XILINX_CTRL_MODE=$4
+UTILS_TCL=$5
 
 
-CFG_FILE_NAME="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${KERNEL_NAME}_xrt.ini"
+CFG_FILE_NAME="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_xrt.ini"
 
 debug_mode="batch"
 # debug_mode="gui"
-user_pre_sim_script="${ACTIVE_APP_DIR}/${SCRIPTS_DIR}/${SCRIPTS_TCL}/cmd_xsim.tcl"
+user_pre_sim_script="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/cmd_xsim.tcl"
 runtime_log="console"
 
 profile="true"
@@ -43,7 +43,7 @@ config+="profile=${profile}\n"
 config+="timeline_trace=${timeline_trace}\n"
 config+="device_trace=${device_trace}\n"
 
-if [[ "$ctrl_mode" == "USER_MANAGED" ]]
+if [[ "$XILINX_CTRL_MODE" == "USER_MANAGED" ]]
 then
    config+="\n[Runtime]\n"
    config+="exclusive_cu_context=true\n"

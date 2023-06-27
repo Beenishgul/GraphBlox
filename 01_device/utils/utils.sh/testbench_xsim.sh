@@ -2,7 +2,7 @@
 #*********************************************************************************************************
 # Vivado (TM) v2022.1.2 (64-bit)
 #
-# Filename    : control_${kernel_name}_vip.sh
+# Filename    : control_${KERNEL_NAME}_vip.sh
 # Simulator   : Xilinx Vivado Simulator
 # Description : Simulation script for compiling, elaborating and verifying the project source files.
 #               The script will automatically create the design libraries sub-directories in the run
@@ -14,30 +14,30 @@
 #
 # Tool Version Limit: 2022.04 
 #
-# usage: ${kernel_name}_testbench_xsim.sh [-help]
-# usage: ${kernel_name}_testbench_xsim.sh [-lib_map_path]
-# usage: ${kernel_name}_testbench_xsim.sh [-noclean_files]
-# usage: ${kernel_name}_testbench_xsim.sh [-reset_run]
+# usage: ${KERNEL_NAME}_testbench_xsim.sh [-help]
+# usage: ${KERNEL_NAME}_testbench_xsim.sh [-lib_map_path]
+# usage: ${KERNEL_NAME}_testbench_xsim.sh [-noclean_files]
+# usage: ${KERNEL_NAME}_testbench_xsim.sh [-reset_run]
 #
 #*********************************************************************************************************
 
 
-kernel_name=$1
-app_directory=$2
-scripts_directory=$3
-ip_directory=$4
-ctrl_mode=$5
-tcl_directory=$6
+KERNEL_NAME=$1
+APP_DIR_ACTIVE=$2
+UTILS_DIR_ACTIVE=$3
+IP_DIR_RTL_ACTIVE=$4
+XILINX_CTRL_MODE=$5
+UTILS_TCL=$6
 
 generate_compile_filelist_f () {
 
-  local scripts_directory_lp=$1
+  local UTILS_DIR_ACTIVE_lp=$1
   local verilog_type=$2
   local sim_type=$3
 
   local concatinate=""
   
-  for filepath in $( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
+  for filepath in $( find ${UTILS_DIR_ACTIVE_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
     concatinate+="-f ${filepath} "
   done 
 
@@ -46,20 +46,20 @@ generate_compile_filelist_f () {
 
 generate_include_filelist_f () {
 
-  local scripts_directory_lp=$1
+  local UTILS_DIR_ACTIVE_lp=$1
   local verilog_type=$2
   local sim_type=$3
 
   local concatinate=""
-  local ip_directory=""
-  local prev_ip_directory=""
+  local IP_DIR_RTL_ACTIVE=""
+  local prev_IP_DIR_RTL_ACTIVE=""
 
-  for filepath in $( find ${scripts_directory_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
+  for filepath in $( find ${UTILS_DIR_ACTIVE_lp} -type f -iname "*${sim_type}*.${verilog_type}" ) ; do  
     for include_dir in $( cat ${filepath} ) ; do  
-      prev_ip_directory=$ip_directory
-      ip_directory="$(dirname  $(readlink -f "${include_dir}"))"
-      if [[ "$ip_directory" != "$prev_ip_directory" ]] ; then
-          concatinate+="-i ${ip_directory} " 
+      prev_IP_DIR_RTL_ACTIVE=$IP_DIR_RTL_ACTIVE
+      IP_DIR_RTL_ACTIVE="$(dirname  $(readlink -f "${include_dir}"))"
+      if [[ "$IP_DIR_RTL_ACTIVE" != "$prev_IP_DIR_RTL_ACTIVE" ]] ; then
+          concatinate+="-i ${IP_DIR_RTL_ACTIVE} " 
       fi
     done 
   done 
@@ -67,18 +67,18 @@ generate_include_filelist_f () {
   echo $concatinate
 }
 
-# generate_xsim_filelist_f ${app_directory}/${scripts_directory} "f"
+# generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE} "f"
 
-xvhdl_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "vhdl.f" "xsim")
-xvlog_files=$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "sv.f" "xsim")
-xvlog_files+=" "$(generate_compile_filelist_f ${app_directory}/${scripts_directory} "v.f" "xsim")
-xvlog_include=$(generate_include_filelist_f ${app_directory}/${scripts_directory} "vh.f" "xsim")
+xvhdl_files=$(generate_compile_filelist_f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE} "vhdl.f" "xsim")
+xvlog_files=$(generate_compile_filelist_f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE} "sv.f" "xsim")
+xvlog_files+=" "$(generate_compile_filelist_f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE} "v.f" "xsim")
+xvlog_include=$(generate_include_filelist_f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE} "vh.f" "xsim")
 
 # # Set xvlog options
-# xvhdl_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
-# xvlog_files="-f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f -f ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f"
-# xvlog_include="-i ${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vh.f"
-# xvlog_include="-i ${app_directory}/${ip_directory}/utils/include -i ${app_directory}/${ip_directory}/memory/cache/iob_include -i ${app_directory}/${ip_directory}/memory/cache/iob_include/portmaps"
+# xvhdl_files="-f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f"
+# xvlog_files="-f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f -f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.v.f -f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f -f ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f"
+# xvlog_include="-i ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vh.f"
+# xvlog_include="-i ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/utils/include -i ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/memory/cache/iob_include -i ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/memory/cache/iob_include/portmaps"
 
 echo "MSG: xvhdl_files_f   file : ${xvhdl_files}" 
 echo "MSG: xvlog_files_f   file : ${xvlog_files}"
@@ -87,21 +87,21 @@ echo "MSG: xvlog_include_f file : ${xvlog_include}"
 xvhdl_opts="--incr --relax -L uvm -L xilinx_vip -L system_cache_v5_0_9 ${xvhdl_files}"
 xvlog_opts="--incr --relax -L uvm -L xilinx_vip --sv ${xvlog_include} ${xvlog_files}"
 xelab_opts="--incr --relax -L uvm -L xilinx_vip -L xpm -L xil_defaultlib -debug typical -L xpm -L system_cache_v5_0_9 -L unisims_ver --mt auto -L axi_infrastructure_v1_1_0 -L axi_vip_v1_1_14 "
-xsim_opts="-tclbatch ${app_directory}/${scripts_directory}/${tcl_directory}/cmd_xsim.tcl --wdb work.${kernel_name}_testbench.wdb work.${kernel_name}_testbench#work.glbl"
+xsim_opts="-tclbatch ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/cmd_xsim.tcl --wdb work.${KERNEL_NAME}_testbench.wdb work.${KERNEL_NAME}_testbench#work.glbl"
 # Script info
-echo -e "MSG: ${kernel_name}_testbench_xsim.sh - (Vivado v2023.1 ML (64-bit)-id)\n"
+echo -e "MSG: ${KERNEL_NAME}_testbench_xsim.sh - (Vivado v2023.1 ML (64-bit)-id)\n"
 
-if [[ "$ctrl_mode" == "USER_MANAGED" ]]
+if [[ "$XILINX_CTRL_MODE" == "USER_MANAGED" ]]
 then
    xvlog_opts+=" --define USER_MANAGED"
-elif [[ "$ctrl_mode" == "AP_CTRL_HS" ]]
+elif [[ "$XILINX_CTRL_MODE" == "AP_CTRL_HS" ]]
 then
    xvlog_opts+=" --define AP_CTRL_HS"
-elif [[ "$ctrl_mode" == "AP_CTRL_CHAIN" ]]
+elif [[ "$XILINX_CTRL_MODE" == "AP_CTRL_CHAIN" ]]
 then
    xvlog_opts+=" --define AP_CTRL_CHAIN"
 else
-  echo "MSG: else |$ctrl_mode|"
+  echo "MSG: else |$XILINX_CTRL_MODE|"
    xvlog_opts+=" --define USER_MANAGED"
 fi
 
@@ -126,13 +126,13 @@ run()
 compile()
 {
 
-  filename_vhdl="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.vhdl.f"
-  filename_v="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.v.f"
-  filename_sv="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.sv.f"
+  filename_vhdl="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vhdl.f"
+  filename_v="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.v.f"
+  filename_sv="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f"
 
-  filename_ip_vhdl="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.vhdl.f"
-  filename_ip_v="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.v.f"
-  filename_ip_sv="${app_directory}/${scripts_directory}/${kernel_name}_filelist_xsim.ip.sv.f"
+  filename_ip_vhdl="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f"
+  filename_ip_v="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f"
+  filename_ip_sv="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f"
 
   if [[ -z "$xvlog_files" ]] ; then
     echo "MSG: Empty xvlog_files : ${xvlog_files}" 
@@ -157,7 +157,7 @@ elaborate()
 
   echo "Starting Elaborate [xelab]"
   echo "Arg: $xelab_opts"
-  xelab ${kernel_name}_testbench glbl $xelab_opts -log elaborate.log
+  xelab ${KERNEL_NAME}_testbench glbl $xelab_opts -log elaborate.log
 
 }
 
@@ -182,8 +182,8 @@ wave_run()
 {
 
   echo "Starting Wave Run [xsim --gui]"
-  echo "Arg: work.${kernel_name}_testbench.wdb"
-  xsim --gui work.${kernel_name}_testbench.wdb
+  echo "Arg: work.${KERNEL_NAME}_testbench.wdb"
+  xsim --gui work.${KERNEL_NAME}_testbench.wdb
 }
 
 # STEP: setup
@@ -194,7 +194,7 @@ setup()
   case $1 in
     "-lib_map_path" )
       if [[ ($2 == "") ]]; then
-        echo -e "ERROR: Simulation library directory path not specified (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
+        echo -e "ERROR: Simulation library directory path not specified (type \"./${KERNEL_NAME}_testbench_xsim.sh -help\" for more information)\n"
         exit 1
       fi
     ;;
@@ -239,7 +239,7 @@ setup()
 # Delete generated data from the previous run
 reset_run()
 {
-  files_to_remove=(xelab.pb xsim.jou xvhdl.log xvlog.log compile.log elaborate.log simulate.log xelab.log xsim.log run.log xvhdl.pb xvlog.pb ${kernel_name}_testbench.wdb xsim.dir)
+  files_to_remove=(xelab.pb xsim.jou xvhdl.log xvlog.log compile.log elaborate.log simulate.log xelab.log xsim.log run.log xvhdl.pb xvlog.pb ${KERNEL_NAME}_testbench.wdb xsim.dir)
   for (( i=0; i<${#files_to_remove[*]}; i++ )); do
     file="${files_to_remove[i]}"
     if [[ -e $file ]]; then
@@ -254,7 +254,7 @@ check_args()
   echo "check_args $1"
   echo "check_args $2"
   if [[ ($1 == 7 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
-    echo -e "ERROR: Unknown option specified '$2' (type \"./${kernel_name}_testbench_xsim.sh -help\" for more information)\n"
+    echo -e "ERROR: Unknown option specified '$2' (type \"./${KERNEL_NAME}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
 
@@ -267,11 +267,11 @@ check_args()
 # Script usage
 usage()
 {
-msg="Usage: ${kernel_name}_testbench_xsim.sh [-help]\n\
-Usage: ${kernel_name}_testbench_xsim.sh [-lib_map_path]\n\
-Usage: ${kernel_name}_testbench_xsim.sh [-reset_run]\n\
-Usage: ${kernel_name}_testbench_xsim.sh [-wave_run]\n\
-Usage: ${kernel_name}_testbench_xsim.sh [-noclean_files]\n\n\
+msg="Usage: ${KERNEL_NAME}_testbench_xsim.sh [-help]\n\
+Usage: ${KERNEL_NAME}_testbench_xsim.sh [-lib_map_path]\n\
+Usage: ${KERNEL_NAME}_testbench_xsim.sh [-reset_run]\n\
+Usage: ${KERNEL_NAME}_testbench_xsim.sh [-wave_run]\n\
+Usage: ${KERNEL_NAME}_testbench_xsim.sh [-noclean_files]\n\n\
 [-help] -- Print help information for this script\n\n\
 [-lib_map_path <path>] -- Compiled simulation library directory path. The simulation library is compiled\n\
 using the compile_simlib tcl command. Please see 'compile_simlib -help' for more information.\n\n\
