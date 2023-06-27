@@ -272,12 +272,12 @@ ifeq ($(shell test -s $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR)/$(KERNEL_NAME)/$(KERNE
 	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR)
 else
 	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR);\
-	vivado -mode batch -source $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(APP_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(UTILS_DIR_ACTIVE) $(ALVEO);\
+	vivado -mode batch -source $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/generate_vip.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(APP_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(UTILS_DIR_ACTIVE) $(ALVEO) $(UTILS_TCL);\
 	bash $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_xci_filelist_f.sh $(APP_DIR_ACTIVE) $(UTILS_DIR_ACTIVE) $(KERNEL_NAME) $(VIVADO_VIP_DIR)
 endif
 
 .PHONY: clean-vip
-clean-gen-vip: session-info
+clean-vip: session-info
 	$(RMDIR) $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR)
 
 .PHONY: clean-utils-dir
