@@ -21,6 +21,7 @@ set APP_DIR_ACTIVE       [lindex $argv 2]
 set VIVADO_VIP_DIR       [lindex $argv 3]
 set UTILS_DIR_ACTIVE     [lindex $argv 4]
 set ALVEO                [lindex $argv 5]
+set UTILS_TCL            [lindex $argv 6]
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_vip.log
@@ -85,7 +86,7 @@ set_property target_simulator XSim      [current_project]  >> $log_file
 puts "[color 4 "                        Add VIP into project"]"
 set argv [list ${PART} ${KERNEL_NAME} ${APP_DIR_ACTIVE} ${VIVADO_VIP_DIR}]
 set argc 4
-source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/scripts_tcl/project_generate_vip.tcl 
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 
 # ----------------------------------------------------------------------------
 # Generate ${KERNEL_NAME} IPs..... DONE! 
