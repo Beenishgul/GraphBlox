@@ -15,14 +15,9 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set PART               [lindex $argv 0]
-set KERNEL_NAME        [lindex $argv 1]
-set APP_DIR_ACTIVE     [lindex $argv 2]
-set VIVADO_IMPORT_DIR  [lindex $argv 3]
-set VIVADO_EXPORT_DIR  [lindex $argv 4]
-set VIVADO_PACKAGE_DIR [lindex $argv 5]
-set VIVADO_GUI_FLAG    [lindex $argv 6]
-set UTILS_DIR_ACTIVE   [lindex $argv 7]
+set PARAMS_TCL_DIR                  [lindex $argv 0]
+
+source ${PARAMS_TCL_DIR}
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_IMPORT_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_ip.log

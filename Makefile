@@ -1,11 +1,19 @@
 #!make
+MAKE_DIR = 00_make
 
-export MAKE_DIR = 00_make
-
+include ./$(MAKE_DIR)/app.env
 include ./$(MAKE_DIR)/host.env
 include ./$(MAKE_DIR)/device.env
+
+PARAMS_TCL = params.tcl
+PARAMS_SH  = params.sh
+
+PARAMS_SH_DIR=$(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR)/$(PARAMS_SH)
+PARAMS_TCL_DIR=$(ROOT_DIR)/$(APP_DIR)/$(MAKE_DIR)/$(PARAMS_TCL)
+
 export
 
+include ./$(MAKE_DIR)/params.mk
 include ./$(MAKE_DIR)/host.mk
 include ./$(MAKE_DIR)/device.mk
 

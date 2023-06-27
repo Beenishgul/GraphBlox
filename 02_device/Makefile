@@ -65,7 +65,7 @@ IP_DIR_RTL_ACTIVE   ?= vivado_$(IP_DIR_RTL)
 IP_DIR_HLS_ACTIVE   ?= vivado_$(IP_DIR_HLS)
 REPORTS_DIR_ACTIVE  ?= vivado_$(REPORTS_DIR)
 
-APP_DIR_ACTIVE      := $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
+APP_DIR_ACTIVE      ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
 KERNEL_NAME         ?= glay_kernel
 DEVICE_INDEX        ?= 0
@@ -144,34 +144,8 @@ XILINX_CTRL_MODE     ?= USER_MANAGED
 # XILINX_CTRL_MODE     ?= ap_ctrl_none
 
 
-TESTBENCH_MODULE     ?= glay
-# TESTBENCH_MODULE     ?= arbiter
-
-# =========================================================
-# CLI COMMANDS                           
-# =========================================================
-RM      :=-@rm -f
-RMDIR   :=-@rm -rf
-CP_RF   :=-@cp -rf
-MKDIR   :=-@mkdir
-MKDIR_P :=-@mkdir -p
-EXPORT  :=-@export
-CD      :=-@cd
-ECHO    :=-@echo
-BASH    :=-@bash
-TAIL_F  :=-@tail -f 
-UNSET   :=-@unset
-NOHUP   :=-@nohup
-EMCONFIGUTIL := $(XILINX_VITIS)/bin/emconfigutil
-
-# =========================================================
-# Color coded messages                      
-# =========================================================
-YELLOW  ?=\033[0;33m
-GREEN   ?=\033[0;32m
-BLUE    ?=\033[0;34m
-RED     ?=\033[0;31m
-NC      ?=\033[0m
+TESTBENCH_MODULE     ?= integration
+# TESTBENCH_MODULE     ?= unit/arbiter
 
 # =========================================================
 # COMPILER FLAGS                         
@@ -380,7 +354,7 @@ ifeq ($(shell test -s $(APP_DIR_ACTIVE)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xo 
 	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_PACKAGE_DIR)
 else
 	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_PACKAGE_DIR) ;\
-	vivado -mode batch -source $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/package_kernel.tcl -notrace -tclargs $(PART) $(KERNEL_NAME) $(APP_DIR_ACTIVE) $(VIVADO_PACKAGE_DIR) $(XILINX_CTRL_MODE) $(UTILS_DIR_ACTIVE) $(VIVADO_VIP_DIR) $(VIVADO_VER) $(GIT_VER) $(DESIGN_FREQ_HZ) $(ALVEO) $(UTILS_TCL)
+	vivado -mode batch -source $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/package_kernel.tcl -notrace -tclargs $(PARAMS_TCL_DIR)
 endif
 
 .PHONY: $(APP_DIR_ACTIVE)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME)/$(KERNEL_NAME).xpr 

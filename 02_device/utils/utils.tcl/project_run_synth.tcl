@@ -3,9 +3,9 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set VIVADO_BUILD_DIR         [lindex $argv 0]
-set VIVADO_GUI_FLAG            [lindex $argv 1]
-set XILINX_JOBS_STRATEGY       [lindex $argv 2]
+set PARAMS_TCL_DIR                  [lindex $argv 0]
+
+source ${PARAMS_TCL_DIR}
 # =========================================================
 
 if {${VIVADO_GUI_FLAG} == "YES"} {
