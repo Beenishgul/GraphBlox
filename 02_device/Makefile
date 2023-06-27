@@ -24,9 +24,9 @@ else
 endif
 
 APP_DIR             ?= $(shell cd .. && pwd | xargs basename )
-HOST_DIR            ?= 00_host
-DEVICE_DIR          ?= 01_device
-BENCH_DIR           ?= 02_test_graphs
+HOST_DIR            ?= 01_host
+DEVICE_DIR          ?= 02_device
+BENCH_DIR           ?= 03_data
 
 GRAPH_DIR  ?= $(ROOT_DIR)/$(APP_DIR)/$(BENCH_DIR)
 GRAPH_SUIT ?= TEST
