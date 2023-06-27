@@ -6,10 +6,6 @@ include ./$(MAKE_DIR)/host.env
 include ./$(MAKE_DIR)/device.env
 export
 
-# print_file_vars:
-#     $($(foreach v, $(.VARIABLES), $(if $(filter file,$(origin $(v))), $(info  set $(v) "$($(v))"))) | tee ./env.tcl) ;\
-#     $($(foreach v, $(.VARIABLES), $(if $(filter file,$(origin $(v))), $(info  $(v)=$($(v))))) | tee ./env.sh)
-
 include ./$(MAKE_DIR)/host.mk
 include ./$(MAKE_DIR)/device.mk
 
