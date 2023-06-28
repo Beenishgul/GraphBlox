@@ -9,7 +9,7 @@ vivado.jou
 vivado.log 
 vivado_pid*.str
 xilinx_* 
-00_make/params.mk
+00_make/params.tcl
 00_make/params.sh
 01_host/*.err
 01_host/*.log
