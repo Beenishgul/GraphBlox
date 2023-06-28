@@ -22,12 +22,16 @@
 #*********************************************************************************************************
 
 
-KERNEL_NAME=$1
-APP_DIR_ACTIVE=$2
-UTILS_DIR_ACTIVE=$3
-IP_DIR_RTL_ACTIVE=$4
-XILINX_CTRL_MODE=$5
-UTILS_TCL=$6
+# KERNEL_NAME=$1
+# APP_DIR_ACTIVE=$2
+# UTILS_DIR_ACTIVE=$3
+# IP_DIR_RTL_ACTIVE=$4
+# XILINX_CTRL_MODE=$5
+# UTILS_TCL=$6
+
+PARAMS_SH_DIR=$1
+
+source ${PARAMS_SH_DIR}
 
 generate_compile_filelist_f () {
 
@@ -105,21 +109,20 @@ else
    xvlog_opts+=" --define USER_MANAGED"
 fi
 
- 
 # Main steps
 run()
 {
   echo "run $#"
-  echo "MSG: Kernel:      $1"
-  echo "MSG: APP DIR      $2"
-  echo "MSG: Scripts DIR: $3"
-  echo "MSG: IP DIR:      $4"
-  echo "MSG: CTRL MODE    $5"
-  echo "MSG: Scripts DIR  $6"
-  echo "MSG: Arguments    $7"
+  echo "MSG: KERNEL_NAME      :   ${KERNEL_NAME}"
+  echo "MSG: APP_DIR_ACTIVE   :   ${APP_DIR_ACTIVE}"
+  echo "MSG: UTILS_DIR_ACTIVE :   ${UTILS_DIR_ACTIVE}"
+  echo "MSG: IP_DIR_RTL_ACTIVE:   ${IP_DIR_RTL_ACTIVE}"
+  echo "MSG: XILINX_CTRL_MODE :   ${XILINX_CTRL_MODE}"
+  echo "MSG: UTILS_TCL        :   ${UTILS_TCL}"
+  echo "MSG: ARGUMENTS        :   $2"
   
-  check_args $# $7
-  setup $7 $8
+  check_args $# $2
+  setup $2 $3
 }
 
 # RUN_STEP: <compile>
@@ -189,8 +192,6 @@ wave_run()
 # STEP: setup
 setup()
 {
-  echo "Setup $1"
-  echo "Setup $2"
   case $1 in
     "-lib_map_path" )
       if [[ ($2 == "") ]]; then
@@ -251,9 +252,7 @@ reset_run()
 # Check command line arguments
 check_args()
 {
-  echo "check_args $1"
-  echo "check_args $2"
-  if [[ ($1 == 7 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
+  if [[ ($1 == 2 ) && ($2 != "-sim_gui" && $2 != "-lib_map_path" && $2 != "-noclean_files" && $2 != "-reset_run" && $2 != "-wave_run" && $2 != "-help" && $2 != "-h") ]]; then
     echo -e "ERROR: Unknown option specified '$2' (type \"./${KERNEL_NAME}_testbench_xsim.sh -help\" for more information)\n"
     exit 1
   fi
@@ -284,4 +283,4 @@ from the previous run will be removed. If you don't want to remove the simulator
 }
 
 # Launch script
-run $1 $2 $3 $4 $5 $6 $7
+run $1 $2

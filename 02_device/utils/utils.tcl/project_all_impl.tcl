@@ -1,5 +1,7 @@
-set KERNEL_NAME         [lindex $argv 0]
-set VIVADO_VER      [lindex $argv 1]
+set PARAMS_TCL_DIR                  [lindex $argv 0]
+
+source ${PARAMS_TCL_DIR}
+
 
 proc create_run_impl {run_name parent_run flow KERNEL_NAME strategy} {
     create_run ${run_name}_${strategy} -parent_run ${parent_run} -flow ${flow} -strategy ${strategy}

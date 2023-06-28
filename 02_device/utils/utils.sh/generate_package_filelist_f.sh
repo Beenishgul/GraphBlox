@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-26 22:12:28
+# @Last Modified time: 2023-06-27 22:25:43
 #!/bin/bash
 
 
@@ -21,11 +21,15 @@ then
   print_usage
 fi
 
-APP_DIR_ACTIVE=$1
-UTILS_DIR_ACTIVE=$2
-KERNEL_NAME=$3
-IP_DIR_RTL_ACTIVE=$4
-VIVADO_VIP_DIR=$5
+# APP_DIR_ACTIVE=$1
+# UTILS_DIR_ACTIVE=$2
+# KERNEL_NAME=$3
+# IP_DIR_RTL_ACTIVE=$4
+# VIVADO_VIP_DIR=$5
+
+PARAMS_SH_DIR=$1
+
+source ${PARAMS_SH_DIR}
 
 pkgs="pkg"
 

@@ -1,4 +1,9 @@
 #!/usr/bin/tclsh
+set PARAMS_TCL_DIR                  [lindex $argv 0]
+
+source ${PARAMS_TCL_DIR}
+
+open_project ${KERNEL_PROJECT_PKG_XPR} 
 
 open_run impl_1
 # open_run impl_Performance_EarlyBlockPlacement

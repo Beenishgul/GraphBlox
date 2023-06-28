@@ -35,7 +35,7 @@ if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project ${VIVADO_BUILD_DIR} 
+open_project ${KERNEL_PROJECT_PKG_XPR} 
 # =========================================================
 
 # remove_files -fileset sim_1      [get_files] >> $log_file   
