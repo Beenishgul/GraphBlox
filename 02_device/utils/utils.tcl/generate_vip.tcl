@@ -80,8 +80,8 @@ set_property target_language  Verilog   [current_project]  >> $log_file
 set_property target_simulator XSim      [current_project]  >> $log_file
 
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PART} ${KERNEL_NAME} ${APP_DIR_ACTIVE} ${VIVADO_VIP_DIR}]
-set argc 4
+set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
+set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 
 # ----------------------------------------------------------------------------

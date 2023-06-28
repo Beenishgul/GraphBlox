@@ -122,12 +122,9 @@ set vitis_dir $::env(XILINX_VITIS)
 # Add IP and design sources into project
 # =========================================================
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PART} ${KERNEL_NAME} ${APP_DIR_ACTIVE} ${VIVADO_PACKAGE_DIR}]
-set argc 4
+set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
+set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
-
-puts "[color 4 "                        Update compile order: sources_1"]"
-update_compile_order -fileset sources_1 >> $log_file
 
 puts "[color 4 "                        Add design sources into project ${KERNEL_NAME}"]" 
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f $log_file
@@ -146,12 +143,6 @@ add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
-
-puts "[color 4 "                        Update compile order: sources_1"]"
-update_compile_order -fileset sources_1 >> $log_file
-
-puts "[color 4 "                        Update compile order: sim_1"]"
-update_compile_order -fileset sim_1 >> $log_file
 
 puts "[color 4 "                        Set Simulator ${KERNEL_NAME} settings"]"
 set_property top ${KERNEL_NAME}_testbench [get_filesets sim_1]
@@ -181,14 +172,13 @@ set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]
 
-
-set argv [list ${KERNEL_NAME} ${VIVADO_VER}]
-set argc 2
+set argv [list ${PARAMS_TCL_DIR}]
+set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_impl.tcl >> $log_file
 
 puts "[color 4 "                        Create IDR implementation strategies: i_impl_strategies"]"
-set argv [list ${KERNEL_NAME} ${VIVADO_VER}]
-set argc 2
+set argv [list ${PARAMS_TCL_DIR}]
+set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_idr_impl.tcl >> $log_file
 
 puts "[color 4 "                        Create IP packaging project ${KERNEL_NAME}_ip"]" 
