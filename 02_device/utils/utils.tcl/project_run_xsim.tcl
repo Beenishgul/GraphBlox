@@ -13,8 +13,8 @@ set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_xsim.log
 
 proc update_filelist_if_exists {group filename log_file} {
    if { [file exists ${filename}] == 1} {       
-       add_files -scan_for_includes -fileset $group [read [open ${filename}]] >> $log_file
-       import_files -fileset $group [read [open ${filename}]] >> $log_file
+       add_files -force -scan_for_includes -fileset $group [read [open ${filename}]] >> $log_file
+       import_files -force -fileset $group [read [open ${filename}]] >> $log_file
    }
 }
 
