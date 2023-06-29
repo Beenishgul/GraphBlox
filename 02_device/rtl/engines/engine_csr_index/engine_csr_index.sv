@@ -22,13 +22,17 @@ import PKG_SETUP::*;
 import PKG_VERTEX::*;
 import PKG_CACHE::*;
 
-module engine_csr_index #(
-    parameter ID_CU            = 0 ,
-    parameter ID_BUNDLE        = 0 ,
-    parameter ID_LANE          = 0 ,
-    parameter ENGINE_SEQ_WIDTH = 11,
-    parameter ENGINE_SEQ_MIN   = 0 ,
-    parameter COUNTER_WIDTH    = 32
+module engine_csr_index #(parameter
+    ID_CU            = 0 ,
+    ID_BUNDLE        = 0 ,
+    ID_LANE          = 0 ,
+    ID_ENGINE        = 0 ,
+    ENGINES_CONFIG   = 0 ,
+    ENGINE_SEQ_WIDTH = 11,
+    ENGINE_SEQ_MIN   = 0 ,
+    FIFO_WRITE_DEPTH = 16,
+    PROG_THRESH      = 8 ,
+    COUNTER_WIDTH    = 32
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -70,6 +74,16 @@ module engine_csr_index #(
     engine_csr_index_state next_state   ;
 
 // --------------------------------------------------------------------------------------
+// Response FIFO
+// --------------------------------------------------------------------------------------
+    MemoryPacketPayload    fifo_response_din                      ;
+    MemoryPacketPayload    fifo_response_dout                     ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int ;
+    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int;
+    logic                  fifo_response_setup_signal_int         ;
+
+// --------------------------------------------------------------------------------------
 // Request FIFO
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_request_din                       ;
@@ -79,15 +93,7 @@ module engine_csr_index #(
     FIFOStateSignalsOutput fifo_request_memory_out_signals_out_int;
     logic                  fifo_request_setup_signal_int          ;
 
-// --------------------------------------------------------------------------------------
-// Response FIFO
-// --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_din                      ;
-    MemoryPacketPayload    fifo_response_dout                     ;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int ;
-    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int;
-    logic                  fifo_response_setup_signal_int         ;
+
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
@@ -104,15 +110,15 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generator
 // --------------------------------------------------------------------------------------
-    MemoryPacket           engine_csr_index_generator_request_memory_out                 ;
-    FIFOStateSignalsOutput engine_csr_index_generator_fifo_request_memory_out_signals_out;
-    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_memory_out_signals_in ;
-    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_signals_reg           ;
-    logic                  engine_csr_index_generator_pause_in                           ;
-    logic                  engine_csr_index_generator_ready_out                          ;
-    logic                  engine_csr_index_generator_done_out                           ;
-    CSRIndexConfiguration  engine_csr_index_generator_configuration_in                   ;
-    logic                  engine_csr_index_generator_fifo_setup_signal                  ;
+    MemoryPacket           engine_csr_index_generator_request_out                 ;
+    FIFOStateSignalsOutput engine_csr_index_generator_fifo_request_out_signals_out;
+    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_out_signals_in ;
+    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_signals_reg    ;
+    logic                  engine_csr_index_generator_pause_in                    ;
+    logic                  engine_csr_index_generator_ready_out                   ;
+    logic                  engine_csr_index_generator_done_out                    ;
+    CSRIndexConfiguration  engine_csr_index_generator_configuration_in            ;
+    logic                  engine_csr_index_generator_fifo_setup_signal           ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -265,7 +271,7 @@ module engine_csr_index #(
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_CSR_INDEX_BUSY : begin
-                done_int_reg                                                   <= engine_csr_index_generator_done_out & engine_csr_index_generator_fifo_request_memory_out_signals_out.empty & fifo_request_memory_out_signals_out_int.empty;
+                done_int_reg                                                   <= engine_csr_index_generator_done_out & engine_csr_index_generator_fifo_request_out_signals_out.empty & fifo_request_memory_out_signals_out_int.empty;
                 engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_memory_out_signals_out_int.prog_full;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
@@ -318,20 +324,20 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
 // CSR engine generator instantiation
 // --------------------------------------------------------------------------------------
-    assign engine_csr_index_generator_configuration_in                   = engine_csr_index_configure_configuration_out;
-    assign engine_csr_index_generator_fifo_request_memory_out_signals_in = engine_csr_index_generator_fifo_request_signals_reg;
+    assign engine_csr_index_generator_configuration_in            = engine_csr_index_configure_configuration_out;
+    assign engine_csr_index_generator_fifo_request_out_signals_in = engine_csr_index_generator_fifo_request_signals_reg;
 
     engine_csr_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_csr_index_generator (
-        .ap_clk                             (ap_clk                                                        ),
-        .areset                             (areset_csr_index_generator                                    ),
-        .configuration_in                   (engine_csr_index_generator_configuration_in                   ),
-        .request_memory_out                 (engine_csr_index_generator_request_memory_out                 ),
-        .fifo_request_memory_out_signals_in (engine_csr_index_generator_fifo_request_memory_out_signals_in ),
-        .fifo_request_memory_out_signals_out(engine_csr_index_generator_fifo_request_memory_out_signals_out),
-        .fifo_setup_signal                  (engine_csr_index_generator_fifo_setup_signal                  ),
-        .pause_in                           (engine_csr_index_generator_pause_in                           ),
-        .ready_out                          (engine_csr_index_generator_ready_out                          ),
-        .done_out                           (engine_csr_index_generator_done_out                           )
+        .ap_clk                      (ap_clk                                                 ),
+        .areset                      (areset_csr_index_generator                             ),
+        .configuration_in            (engine_csr_index_generator_configuration_in            ),
+        .request_out                 (engine_csr_index_generator_request_out                 ),
+        .fifo_request_out_signals_in (engine_csr_index_generator_fifo_request_out_signals_in ),
+        .fifo_request_out_signals_out(engine_csr_index_generator_fifo_request_out_signals_out),
+        .fifo_setup_signal           (engine_csr_index_generator_fifo_setup_signal           ),
+        .pause_in                    (engine_csr_index_generator_pause_in                    ),
+        .ready_out                   (engine_csr_index_generator_ready_out                   ),
+        .done_out                    (engine_csr_index_generator_done_out                    )
     );
 
 // --------------------------------------------------------------------------------------
@@ -341,8 +347,8 @@ module engine_csr_index #(
     assign fifo_request_setup_signal_int = fifo_request_memory_out_signals_out_int.wr_rst_busy | fifo_request_memory_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_memory_out_signals_in_int.wr_en = engine_csr_index_generator_request_memory_out.valid;
-    assign fifo_request_din                             = engine_csr_index_generator_request_memory_out.payload;
+    assign fifo_request_memory_out_signals_in_int.wr_en = engine_csr_index_generator_request_out.valid;
+    assign fifo_request_din                             = engine_csr_index_generator_request_out.payload;
 
     // Pop
     assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en;
