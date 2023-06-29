@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-26 18:21:02
+// Revise : 2023-06-28 20:56:04
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -34,12 +34,18 @@ module engine_csr_index #(
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
     input  KernelDescriptor       descriptor_in                      ,
+    input  MemoryPacket           response_engine_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_out                        ,
-    input  FIFOStateSignalsInput  fifo_request_signals_in            ,
-    output FIFOStateSignalsOutput fifo_request_signals_out           ,
+    output MemoryPacket           request_engine_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
+    output MemoryPacket           request_memory_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
     output logic                  done_out
 );
@@ -54,7 +60,7 @@ module engine_csr_index #(
     KernelDescriptor descriptor_in_reg         ;
     MemoryPacket     response_memory_in_reg    ;
     MemoryPacket     response_out_int          ;
-    MemoryPacket     request_out_int           ;
+    MemoryPacket     request_memory_out_int    ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -66,12 +72,12 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
 // Request FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din             ;
-    MemoryPacketPayload    fifo_request_dout            ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_request_signals_out_int ;
-    logic                  fifo_request_setup_signal_int;
+    MemoryPacketPayload    fifo_request_din                       ;
+    MemoryPacketPayload    fifo_request_dout                      ;
+    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_int ;
+    FIFOStateSignalsOutput fifo_request_memory_out_signals_out_int;
+    logic                  fifo_request_setup_signal_int          ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -98,15 +104,15 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generator
 // --------------------------------------------------------------------------------------
-    MemoryPacket           engine_csr_index_generator_request_out             ;
-    FIFOStateSignalsOutput engine_csr_index_generator_fifo_request_signals_out;
-    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_signals_in ;
-    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_signals_reg;
-    logic                  engine_csr_index_generator_pause_in                ;
-    logic                  engine_csr_index_generator_ready_out               ;
-    logic                  engine_csr_index_generator_done_out                ;
-    CSRIndexConfiguration  engine_csr_index_generator_configuration_in        ;
-    logic                  engine_csr_index_generator_fifo_setup_signal       ;
+    MemoryPacket           engine_csr_index_generator_request_memory_out                 ;
+    FIFOStateSignalsOutput engine_csr_index_generator_fifo_request_memory_out_signals_out;
+    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_memory_out_signals_in ;
+    FIFOStateSignalsInput  engine_csr_index_generator_fifo_request_signals_reg           ;
+    logic                  engine_csr_index_generator_pause_in                           ;
+    logic                  engine_csr_index_generator_ready_out                          ;
+    logic                  engine_csr_index_generator_done_out                           ;
+    CSRIndexConfiguration  engine_csr_index_generator_configuration_in                   ;
+    logic                  engine_csr_index_generator_fifo_setup_signal                  ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -140,12 +146,12 @@ module engine_csr_index #(
     always_ff @(posedge ap_clk) begin
         if (areset_engine_csr_index) begin
             fifo_response_memory_in_signals_in_reg <= 0;
-            fifo_request_signals_in_reg            <= 0;
+            fifo_request_memory_out_signals_in_reg <= 0;
             response_memory_in_reg.valid           <= 1'b0  ;
         end
         else begin
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
-            fifo_request_signals_in_reg            <= fifo_request_signals_in;
+            fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
             response_memory_in_reg.valid           <= response_memory_in.valid;
         end
     end
@@ -161,20 +167,20 @@ module engine_csr_index #(
         if (areset_engine_csr_index) begin
             fifo_setup_signal <= 1'b1  ;
 
-            request_out.valid <= 1'b0;
-            done_out          <= 1'b0;
+            request_memory_out.valid <= 1'b0;
+            done_out                 <= 1'b0;
         end
         else begin
-            fifo_setup_signal <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_csr_index_generator_fifo_setup_signal | engine_csr_index_configure_fifo_setup_signal;
-            request_out.valid <= request_out_int.valid ;
-            done_out          <= done_int_reg;
+            fifo_setup_signal        <= fifo_request_setup_signal_int | fifo_response_setup_signal_int | engine_csr_index_generator_fifo_setup_signal | engine_csr_index_configure_fifo_setup_signal;
+            request_memory_out.valid <= request_memory_out_int.valid ;
+            done_out                 <= done_int_reg;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-        fifo_request_signals_out            <= fifo_request_signals_out_int;
-        request_out.payload                 <= request_out_int.payload;
+        fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_int;
+        request_memory_out.payload          <= request_memory_out_int.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -212,13 +218,13 @@ module engine_csr_index #(
             ENGINE_CSR_INDEX_BUSY : begin
                 if (done_int_reg)
                     next_state = ENGINE_CSR_INDEX_DONE;
-                else if (fifo_request_signals_out_int.prog_full | fifo_response_memory_in_signals_out_int.prog_full)
+                else if (fifo_request_memory_out_signals_out_int.prog_full | fifo_response_memory_in_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_PAUSE;
                 else
                     next_state = ENGINE_CSR_INDEX_BUSY;
             end
             ENGINE_CSR_INDEX_PAUSE : begin
-                if (~(fifo_request_signals_out_int.prog_full | fifo_response_memory_in_signals_out_int.prog_full))
+                if (~(fifo_request_memory_out_signals_out_int.prog_full | fifo_response_memory_in_signals_out_int.prog_full))
                     next_state = ENGINE_CSR_INDEX_BUSY;
                 else
                     next_state = ENGINE_CSR_INDEX_PAUSE;
@@ -259,8 +265,8 @@ module engine_csr_index #(
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
             ENGINE_CSR_INDEX_BUSY : begin
-                done_int_reg                                                   <= engine_csr_index_generator_done_out & engine_csr_index_generator_fifo_request_signals_out.empty & fifo_request_signals_out_int.empty;
-                engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_signals_out_int.prog_full;
+                done_int_reg                                                   <= engine_csr_index_generator_done_out & engine_csr_index_generator_fifo_request_memory_out_signals_out.empty & fifo_request_memory_out_signals_out_int.empty;
+                engine_csr_index_generator_fifo_request_signals_reg.rd_en      <= ~fifo_request_memory_out_signals_out_int.prog_full;
                 engine_csr_index_configure_fifo_configuration_signals_in.rd_en <= 1'b0;
                 engine_csr_index_generator_pause_in                            <= 1'b0;
             end
@@ -312,36 +318,36 @@ module engine_csr_index #(
 // --------------------------------------------------------------------------------------
 // CSR engine generator instantiation
 // --------------------------------------------------------------------------------------
-    assign engine_csr_index_generator_configuration_in        = engine_csr_index_configure_configuration_out;
-    assign engine_csr_index_generator_fifo_request_signals_in = engine_csr_index_generator_fifo_request_signals_reg;
+    assign engine_csr_index_generator_configuration_in                   = engine_csr_index_configure_configuration_out;
+    assign engine_csr_index_generator_fifo_request_memory_out_signals_in = engine_csr_index_generator_fifo_request_signals_reg;
 
     engine_csr_index_generator #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_csr_index_generator (
-        .ap_clk                  (ap_clk                                             ),
-        .areset                  (areset_csr_index_generator                         ),
-        .configuration_in        (engine_csr_index_generator_configuration_in        ),
-        .request_out             (engine_csr_index_generator_request_out             ),
-        .fifo_request_signals_in (engine_csr_index_generator_fifo_request_signals_in ),
-        .fifo_request_signals_out(engine_csr_index_generator_fifo_request_signals_out),
-        .fifo_setup_signal       (engine_csr_index_generator_fifo_setup_signal       ),
-        .pause_in                (engine_csr_index_generator_pause_in                ),
-        .ready_out               (engine_csr_index_generator_ready_out               ),
-        .done_out                (engine_csr_index_generator_done_out                )
+        .ap_clk                             (ap_clk                                                        ),
+        .areset                             (areset_csr_index_generator                                    ),
+        .configuration_in                   (engine_csr_index_generator_configuration_in                   ),
+        .request_memory_out                 (engine_csr_index_generator_request_memory_out                 ),
+        .fifo_request_memory_out_signals_in (engine_csr_index_generator_fifo_request_memory_out_signals_in ),
+        .fifo_request_memory_out_signals_out(engine_csr_index_generator_fifo_request_memory_out_signals_out),
+        .fifo_setup_signal                  (engine_csr_index_generator_fifo_setup_signal                  ),
+        .pause_in                           (engine_csr_index_generator_pause_in                           ),
+        .ready_out                          (engine_csr_index_generator_ready_out                          ),
+        .done_out                           (engine_csr_index_generator_done_out                           )
     );
 
 // --------------------------------------------------------------------------------------
 // FIFO sequence requests out MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
+    assign fifo_request_setup_signal_int = fifo_request_memory_out_signals_out_int.wr_rst_busy | fifo_request_memory_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_signals_in_int.wr_en = engine_csr_index_generator_request_out.valid;
-    assign fifo_request_din                  = engine_csr_index_generator_request_out.payload;
+    assign fifo_request_memory_out_signals_in_int.wr_en = engine_csr_index_generator_request_memory_out.valid;
+    assign fifo_request_din                             = engine_csr_index_generator_request_memory_out.payload;
 
     // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_int.payload           = fifo_request_dout;
+    assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en;
+    assign request_memory_out_int.valid                 = fifo_request_memory_out_signals_out_int.valid;
+    assign request_memory_out_int.payload               = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(16                        ),
@@ -349,18 +355,18 @@ module engine_csr_index #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketRequest (
-        .clk         (ap_clk                                   ),
-        .srst        (areset_fifo                              ),
-        .din         (fifo_request_din                         ),
-        .wr_en       (fifo_request_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_signals_in_int.rd_en        ),
-        .dout        (fifo_request_dout                        ),
-        .full        (fifo_request_signals_out_int.full        ),
-        .empty       (fifo_request_signals_out_int.empty       ),
-        .valid       (fifo_request_signals_out_int.valid       ),
-        .prog_full   (fifo_request_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_request_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_request_din                                   ),
+        .wr_en      (fifo_request_memory_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_memory_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_dout                                  ),
+        .full       (fifo_request_memory_out_signals_out_int.full       ),
+        .empty      (fifo_request_memory_out_signals_out_int.empty      ),
+        .valid      (fifo_request_memory_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -384,18 +390,18 @@ module engine_csr_index #(
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
     ) inst_fifo_MemoryPacketResponse (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_response_din                                   ),
-        .wr_en       (fifo_response_memory_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_memory_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_dout                                  ),
-        .full        (fifo_response_memory_in_signals_out_int.full        ),
-        .empty       (fifo_response_memory_in_signals_out_int.empty       ),
-        .valid       (fifo_response_memory_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_memory_in_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_response_memory_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_memory_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_response_din                                  ),
+        .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_dout                                 ),
+        .full       (fifo_response_memory_in_signals_out_int.full       ),
+        .empty      (fifo_response_memory_in_signals_out_int.empty      ),
+        .valid      (fifo_response_memory_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
     );
 
 endmodule : engine_csr_index

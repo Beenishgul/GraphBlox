@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 01:31:06
+// Revise : 2023-06-28 20:50:03
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_csr_index_configure #(
+module engine_csr_index_configure_memory #(
     parameter ID_CU            = 0                                ,
     parameter ID_BUNDLE        = 0                                ,
     parameter ID_LANE          = 0                                ,
@@ -255,7 +255,7 @@ module engine_csr_index_configure #(
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacket_response (
+    ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                   ),
         .srst       (areset_fifo                              ),
         .din        (fifo_response_din                        ),
@@ -290,7 +290,7 @@ module engine_csr_index_configure #(
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
         .PROG_THRESH     (8                                  )
-    ) inst_fifo_MemoryPacket_configuration (
+    ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                        ),
         .srst       (areset_fifo                                   ),
         .din        (fifo_configuration_din                        ),
@@ -305,4 +305,4 @@ module engine_csr_index_configure #(
         .rd_rst_busy(fifo_configuration_signals_out_int.rd_rst_busy)
     );
 
-endmodule : engine_csr_index_configure
+endmodule : engine_csr_index_configure_memory
