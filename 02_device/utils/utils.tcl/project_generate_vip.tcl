@@ -151,7 +151,7 @@ export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${file
 # generate SYSTEM CACHE
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
 # ----------------------------------------------------------------------------
-set SYSTEM_CACHE_SIZE_B   32768
+set SYSTEM_CACHE_SIZE_B   131072
 set SYSTEM_CACHE_NUM_WAYS 4
 set LINE_CACHE_DATA_WIDTH 512 
 set FE_ADDR_WIDTH         64 
@@ -193,7 +193,7 @@ set_property -dict [list                                                  \
                     CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {1}            \
                     CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {0}         \
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {Automatic}            \
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {URAM}                \
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {Automatic}           \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 

@@ -73,7 +73,7 @@ localparam
 reg [1:0] state;
 
 
-always @(posedge ap_clk, posedge reset)
+always @(posedge ap_clk)
   begin
     if(reset)
 
