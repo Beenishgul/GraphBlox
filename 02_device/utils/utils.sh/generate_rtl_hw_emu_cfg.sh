@@ -2,25 +2,25 @@
 
 
 print_usage () {
-echo "Usage: "
-echo "  generate_build_cfg.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME"
-echo ""
-echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/"
-echo "  UTILS_DIR_ACTIVE: utils"
-echo "  KERNEL_NAME: kernel"
-echo "  XILINX_IMPL_STRATEGY: 0"
-echo "  XILINX_JOBS_STRATEGY: 2"
-echo "  PART: xcu280-fsvh2892-2L-e"
-echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
-echo "  TARGET: hw_emu"
-echo "  XILINX_NUM_KERNELS: 2"
-echo "  XILINX_MAX_THREADS: 8"
-echo "  DESIGN_FREQ_HZ: 300000000"
-echo "" 
+    echo "Usage: "
+    echo "  generate_build_cfg.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/"
+    echo "  UTILS_DIR_ACTIVE: utils"
+    echo "  KERNEL_NAME: kernel"
+    echo "  XILINX_IMPL_STRATEGY: 0"
+    echo "  XILINX_JOBS_STRATEGY: 2"
+    echo "  PART: xcu280-fsvh2892-2L-e"
+    echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
+    echo "  TARGET: hw_emu"
+    echo "  XILINX_NUM_KERNELS: 2"
+    echo "  XILINX_MAX_THREADS: 8"
+    echo "  DESIGN_FREQ_HZ: 300000000"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -43,47 +43,47 @@ NUM_SLR=1
 
 generate_connectivity_sp () {
 
-local kernel_name=$1
-local start_kernel_buffers=$2
-local num_kernel_buffers=$3
-local mem_type=$4
-local start=$5
-local end=$6
-local i=$7
+    local kernel_name=$1
+    local start_kernel_buffers=$2
+    local num_kernel_buffers=$3
+    local mem_type=$4
+    local start=$5
+    local end=$6
+    local i=$7
 
-local config=""
-local ip_directory=""
-local prev_ip_directory=""
+    local config=""
+    local ip_directory=""
+    local prev_ip_directory=""
 
-for j in $(seq ${start_kernel_buffers} ${num_kernel_buffers})
-  do
-    if [[ "$start" == "$end" ]]
-      then
-         config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]\n"
-      else
-         config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]\n"
-      fi
-  done
+    for j in $(seq ${start_kernel_buffers} ${num_kernel_buffers})
+    do
+        if [[ "$start" == "$end" ]]
+        then
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]\n"
+        else
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]\n"
+        fi
+    done
 
-echo $config
+    echo $config
 }
 
 
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then
- NUM_SLR=3
+    NUM_SLR=3
 elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
 then
- NUM_SLR=3
+    NUM_SLR=3
 elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
 then
- NUM_SLR=4
+    NUM_SLR=4
 else
- NUM_SLR=4
+    NUM_SLR=4
 fi
 
 NUM_KERNELS_PER_SLR=4
-NUM_KERNELS_BUFFERS=9 
+NUM_KERNELS_BUFFERS=9
 
 CFG_FILE_NAME="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_rtl_${TARGET}.cfg"
 
@@ -111,184 +111,184 @@ config+=":${XILINX_NUM_KERNELS}:"
 #kernel ID loop
 for i in $(seq 1 ${XILINX_NUM_KERNELS})
 do
-if [[ "$i" == "$XILINX_NUM_KERNELS" ]]; then
-   config+="${KERNEL_NAME}_$i"
-else
-   config+="${KERNEL_NAME}_$i,"
-fi
+    if [[ "$i" == "$XILINX_NUM_KERNELS" ]]; then
+        config+="${KERNEL_NAME}_$i"
+    else
+        config+="${KERNEL_NAME}_$i,"
+    fi
 done
 config+="\n"
 
 #SLR placement loop
 for i in $(seq 1 ${XILINX_NUM_KERNELS})
 do
-  config+="slr=${KERNEL_NAME}_$i:SLR0\n"
-  if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
-  then
-    config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
-  elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
-  then
-    config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
-  elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
-  then
-    config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
-  else
-    config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
-  fi
+    config+="slr=${KERNEL_NAME}_$i:SLR0\n"
+    if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
+    then
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+    elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
+    then
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+    elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
+    then
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
+    else
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
+    fi
 done
 config+="\n"
 
 if [[ ${XILINX_IMPL_STRATEGY} -eq 0 ]]
 then
-config+="\n[advanced]\n"
-config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 1 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="prop=run.synth_1.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\n"
- config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-retiming}\n"
- 
- config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="prop=run.synth_1.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\n"
+    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-retiming}\n"
+
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 2 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
- # config+="prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/opt_pre.tcl}"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    # config+="prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/opt_pre.tcl}"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 3 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
- config+="param=project.writeIntermediateCheckpoints=1\n"
- config+="prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore\n"
- config+="prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.IS_ENABLED=true\n"
- config+="prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n"
- config+="prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=Explore\n"
- config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.MORE OPTIONS}={-tns_cleanup}\n"
+    config+="param=project.writeIntermediateCheckpoints=1\n"
+    config+="prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore\n"
+    config+="prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.IS_ENABLED=true\n"
+    config+="prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n"
+    config+="prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=Explore\n"
+    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.MORE OPTIONS}={-tns_cleanup}\n"
 
- config+="prop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=Explore\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-no_bufg_opt}\n"
- config+="param=hd.enableClockTrackSelectionEnancement=1\n"
+    config+="prop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=Explore\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-no_bufg_opt}\n"
+    config+="param=hd.enableClockTrackSelectionEnancement=1\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 4 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={AltSpreadLogic_high}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
- config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
- config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={AltSpreadLogic_high}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
+    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
+    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 5 ]]
 then
 
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithRemap}\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={EarlyBlockPlacement}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Default}\n"
- config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
- config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n" 
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithRemap}\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={EarlyBlockPlacement}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Default}\n"
+    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
+    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 6 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={AltSpreadLogic_high}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
- config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
- config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n" 
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={AltSpreadLogic_high}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
+    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}\n"
+    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 7 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
 
- config+="\n[vivado]\n"
- config+="impl.strategies=ALL\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=ALL\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY})\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
- config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={EarlyBlockPlacement}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
- config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithHoldFix}\n"
- config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
- config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n" 
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={Explore}\n"
+    config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={EarlyBlockPlacement}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={true}\n"
+    config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE}={ExploreWithHoldFix}\n"
+    config+="prop=run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={Default}\n"
+    config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.IS_ENABLED}={false}\n"
 
 elif [[ ${XILINX_IMPL_STRATEGY} -eq 8 ]]
 then
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
- config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
- config+="\n[vivado]\n"
- config+="impl.strategies=Congestion_SpreadLogic_high\n"
- config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
- config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=0\n"
+    config+="param=compiler.multiStrategiesWaitOnAllRuns=1\n"
+    config+="\n[vivado]\n"
+    config+="impl.strategies=Congestion_SpreadLogic_high\n"
+    config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
+    config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
 
 else
- config+="\n[advanced]\n"
- config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
+    config+="\n[advanced]\n"
+    config+="param=compiler.skipTimingCheckAndFrequencyScaling=1\n"
 fi
 
 echo -e  "${config}" > ${CFG_FILE_NAME}

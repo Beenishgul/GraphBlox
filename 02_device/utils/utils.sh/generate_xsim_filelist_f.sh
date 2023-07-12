@@ -2,20 +2,20 @@
 
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_xsim_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE"
-  echo ""
-  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  UTILS_DIR_ACTIVE: utils"
-  echo "  KERNEL_NAME: kernel"
-  echo "  IP_DIR_RTL_ACTIVE : IP"
-  echo "  VIVADO_VIP_DIR: vivado_generated_vip"
-  echo "  TESTBENCH_MODULE : glay|unit"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_xsim_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  UTILS_DIR_ACTIVE: utils"
+    echo "  KERNEL_NAME: kernel"
+    echo "  IP_DIR_RTL_ACTIVE : IP"
+    echo "  VIVADO_VIP_DIR: vivado_generated_vip"
+    echo "  TESTBENCH_MODULE : glay|unit"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -79,37 +79,37 @@ CFG_FILE_NAME_VH="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_
 
 rm_xsim_filelist_f () {
 
-  local filename=$1
- 
-  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
-      rm ${filename}
-  fi
+    local filename=$1
+
+    if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+        rm ${filename}
+    fi
 }
 
 generate_xsim_filelist_f () {
 
-  local ip_directory=$1
-  local cfg_filelist_name=$2
-  local verilog_type=$3
+    local ip_directory=$1
+    local cfg_filelist_name=$2
+    local verilog_type=$3
 
-  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do  
-    newtext="${filepath}"
-    echo "$newtext" >> ${cfg_filelist_name}
-  done 
+    for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do
+        newtext="${filepath}"
+        echo "$newtext" >> ${cfg_filelist_name}
+    done
 
 }
 
 generate_xsim_dirlist_f () {
 
-  local ip_directory=$1
-  local cfg_filelist_name=$2
-  local verilog_type=$3
-  local ip_directory=""
-  for filepath in $( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n ) ; do  
-    ip_directory="$(dirname  $(readlink -f "${filepath}"))"
-    newtext="${ip_directory}"
-    echo "$newtext" >> ${cfg_filelist_name}
-  done 
+    local ip_directory=$1
+    local cfg_filelist_name=$2
+    local verilog_type=$3
+    local ip_directory=""
+    for filepath in $( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n ) ; do
+        ip_directory="$(dirname  $(readlink -f "${filepath}"))"
+        newtext="${ip_directory}"
+        echo "$newtext" >> ${cfg_filelist_name}
+    done
 
 }
 
@@ -127,21 +127,21 @@ echo $newtext > ${CFG_FILE_NAME_V}
 # Add include ip_directory
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh" 
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME_SV} "sv"  
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME_SV} "sv"  
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME_SV} "sv" 
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME_SV} "sv"  
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME_V} "v" 
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME_V} "v"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME_SV} "sv"  
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME_SV} "sv"
 

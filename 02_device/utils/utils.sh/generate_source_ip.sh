@@ -1,18 +1,18 @@
 #!/bin/bash
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_source_ip.sh FULL_SRC_IP_DIR_RTL FULL_SRC_IP_DIR_RTL_ACTIVE XILINX_CTRL_MODE"
-  echo ""
-  echo "  FULL_SRC_IP_DIR_RTL: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
-  echo "  FULL_SRC_IP_DIR_RTL_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
-  echo "  XILINX_CTRL_MODE: USER_MANAGED"
-  echo "  TESTBENCH_MODULE : glay|arbiter"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_source_ip.sh FULL_SRC_IP_DIR_RTL FULL_SRC_IP_DIR_RTL_ACTIVE XILINX_CTRL_MODE"
+    echo ""
+    echo "  FULL_SRC_IP_DIR_RTL: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
+    echo "  FULL_SRC_IP_DIR_RTL_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
+    echo "  XILINX_CTRL_MODE: USER_MANAGED"
+    echo "  TESTBENCH_MODULE : glay|arbiter"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # FULL_SRC_IP_DIR_RTL=$1
@@ -75,43 +75,43 @@ cp -r -u ${FULL_SRC_IP_DIR_RTL}/${testbench}/${TESTBENCH_MODULE}/* ${FULL_SRC_IP
 
 if [[ "$XILINX_CTRL_MODE" == "USER_MANAGED" ]]
 then
- cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
+    cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 elif [[ "$XILINX_CTRL_MODE" == "AP_CTRL_HS" ]]
-  then
-   cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_ap_ctrl_hs.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
- elif [[ "$XILINX_CTRL_MODE" == "AP_CTRL_CHAIN" ]]
-  then
-   cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_ap_ctrl_chain.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
- else
-  echo "MSG: else |$XILINX_CTRL_MODE|"
-  cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
+then
+    cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_ap_ctrl_hs.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
+elif [[ "$XILINX_CTRL_MODE" == "AP_CTRL_CHAIN" ]]
+then
+    cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_ap_ctrl_chain.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
+else
+    echo "MSG: else |$XILINX_CTRL_MODE|"
+    cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
 if [[ "$TESTBENCH_MODULE" == "integration" ]]
 then
-  newtext="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv"
-  search="__KERNEL__"
-  replace=${KERNEL_NAME}
-  if [[ $search != "" && $replace != "" ]]; then
-    sed -i "s/$search/$replace/" $newtext
-  fi
+    newtext="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv"
+    search="__KERNEL__"
+    replace=${KERNEL_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
 
-  search="_GRAPH_DIR_"
-  replace=${GRAPH_DIR}
-  if [[ $search != "" && $replace != "" ]]; then
-    sed -i "s@$search@$replace@" $newtext
-  fi
+    search="_GRAPH_DIR_"
+    replace=${GRAPH_DIR}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s@$search@$replace@" $newtext
+    fi
 
-  search="_GRAPH_SUIT_"
-  replace=${GRAPH_SUIT}
-  if [[ $search != "" && $replace != "" ]]; then
-    sed -i "s/$search/$replace/" $newtext
-  fi
+    search="_GRAPH_SUIT_"
+    replace=${GRAPH_SUIT}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
 
-  search="_GRAPH_NAME_"
-  replace=${GRAPH_NAME}
-  if [[ $search != "" && $replace != "" ]]; then
-    sed -i "s/$search/$replace/" $newtext
-  fi
+    search="_GRAPH_NAME_"
+    replace=${GRAPH_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
 fi

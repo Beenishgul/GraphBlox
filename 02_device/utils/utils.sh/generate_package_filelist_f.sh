@@ -1,24 +1,24 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-27 22:25:43
+# @Last Modified time: 2023-07-11 20:14:01
 #!/bin/bash
 
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_package_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE VIVADO_VIP_DIR"
-  echo ""
-  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  UTILS_DIR_ACTIVE: utils"
-  echo "  KERNEL_NAME: kernel"
-  echo "  IP_DIR_RTL_ACTIVE: IP"
-  echo "  VIVADO_VIP_DIR: vivado_generated_vip"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_package_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE VIVADO_VIP_DIR"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  UTILS_DIR_ACTIVE: utils"
+    echo "  KERNEL_NAME: kernel"
+    echo "  IP_DIR_RTL_ACTIVE: IP"
+    echo "  VIVADO_VIP_DIR: vivado_generated_vip"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -71,23 +71,23 @@ CFG_FILE_NAME_VH="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_
 
 rm_package_filelist_f () {
 
-  local filename=$1
- 
-  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
-      rm ${filename}
-  fi
+    local filename=$1
+
+    if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+        rm ${filename}
+    fi
 }
 
 generate_package_filelist_f () {
 
-  local ip_directory=$1
-  local cfg_filelist_name=$2
-  local verilog_type=$3
+    local ip_directory=$1
+    local cfg_filelist_name=$2
+    local verilog_type=$3
 
-  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do  
-    newtext="${filepath}"
-    echo "$newtext" >> ${cfg_filelist_name}
-  done 
+    for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do
+        newtext="${filepath}"
+        echo "$newtext" >> ${cfg_filelist_name}
+    done
 
 }
 
@@ -99,19 +99,19 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CF
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"  
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v" 
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME} "sv"  
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh" 
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME} "sv" 
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME} "sv" 
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME} "sv"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME} "sv" 
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME} "sv"
 

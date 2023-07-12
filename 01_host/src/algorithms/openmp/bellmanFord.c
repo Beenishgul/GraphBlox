@@ -526,7 +526,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(struct Arguments *arg
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
-        #pragma omp parallel for private(v) shared(vertices,sorted_edges_array,graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
+    #pragma omp parallel for private(v) shared(vertices,sorted_edges_array,graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -665,7 +665,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(struct Arguments *arg
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
-        #pragma omp parallel for private(v) shared(graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
+    #pragma omp parallel for private(v) shared(graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -832,7 +832,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
-        #pragma omp parallel for private(v,n) shared(vertices,graphPlus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
+    #pragma omp parallel for private(v,n) shared(vertices,graphPlus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(n = 0; n < graphPlus->num_vertices; n++)
         {
 
@@ -862,7 +862,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
             }
         }
 
-        #pragma omp parallel for private(v,n) shared(vertices,graphMinus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
+    #pragma omp parallel for private(v,n) shared(vertices,graphMinus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(n = 0; n < graphMinus->num_vertices; n++)
         {
 
