@@ -1,24 +1,24 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-27 22:27:47
+# @Last Modified time: 2023-07-11 20:14:34
 #!/bin/bash
 
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_xdc_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR VIP_DIR"
-  echo ""
-  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  UTILS_DIR_ACTIVE: utils"
-  echo "  KERNEL_NAME: kernel"
-  echo "  ALVEO_PART: U250"
-  echo "  UTILS_XDC:  utils.xdc"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_xdc_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR VIP_DIR"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  UTILS_DIR_ACTIVE: utils"
+    echo "  KERNEL_NAME: kernel"
+    echo "  ALVEO_PART: U250"
+    echo "  UTILS_XDC:  utils.xdc"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -35,27 +35,27 @@ CFG_FILE_NAME="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_pac
 
 rm_xdc_filelist_f () {
 
-  local filename=$1
- 
-  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
-      rm ${filename}
-  fi
+    local filename=$1
+
+    if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+        rm ${filename}
+    fi
 }
 
 generate_xdc_filelist_f () {
 
-  local script_directory=$1
-  local cfg_filelist_name=$2
-  local xdc_type=$3
-  local alveo_part=$4
-  local temp_filepath=${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_XDC}/${ALVEO_PART}/${alveo_part}.${xdc_type}
+    local script_directory=$1
+    local cfg_filelist_name=$2
+    local xdc_type=$3
+    local alveo_part=$4
+    local temp_filepath=${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_XDC}/${ALVEO_PART}/${alveo_part}.${xdc_type}
 
-  for filepath in "$( find ${script_directory} -type f -iname "*${alveo_part}.${xdc_type}" | sort -n )" ; do  
-    newtext="${filepath}"
-    if [[ "$newtext" == "$temp_filepath" ]]; then
-      echo "$newtext" >> ${cfg_filelist_name}
-    fi
-  done 
+    for filepath in "$( find ${script_directory} -type f -iname "*${alveo_part}.${xdc_type}" | sort -n )" ; do
+        newtext="${filepath}"
+        if [[ "$newtext" == "$temp_filepath" ]]; then
+            echo "$newtext" >> ${cfg_filelist_name}
+        fi
+    done
 
 }
 

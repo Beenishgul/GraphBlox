@@ -1,18 +1,18 @@
 #!/bin/bash
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_xrt_ini.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME XILINX_CTRL_MODE"
-  echo ""
-  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  UTILS_DIR_ACTIVE: scripts"
-  echo "  KERNEL_NAME: kernel"
-  echo "  XILINX_CTRL_MODE  : USER_MANAGED"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_xrt_ini.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME XILINX_CTRL_MODE"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  UTILS_DIR_ACTIVE: scripts"
+    echo "  KERNEL_NAME: kernel"
+    echo "  XILINX_CTRL_MODE  : USER_MANAGED"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -48,8 +48,8 @@ config+="device_trace=${device_trace}\n"
 
 if [[ "$XILINX_CTRL_MODE" == "USER_MANAGED" ]]
 then
-   config+="\n[Runtime]\n"
-   config+="exclusive_cu_context=true\n"
+    config+="\n[Runtime]\n"
+    config+="exclusive_cu_context=true\n"
 fi
 
 

@@ -1,23 +1,23 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-06-27 22:27:31
+# @Last Modified time: 2023-07-11 20:14:24
 #!/bin/bash
 
 
 print_usage () {
-  echo "Usage: "
-  echo "  generate_xdc_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR VIVADO_EXPORT_DIR"
-  echo ""
-  echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-  echo "  UTILS_DIR_ACTIVE: utils"
-  echo "  KERNEL_NAME: kernel"
-  echo "  VIVADO_EXPORT_DIR: link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip"
-  echo "" 
+    echo "Usage: "
+    echo "  generate_xdc_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR VIVADO_EXPORT_DIR"
+    echo ""
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  UTILS_DIR_ACTIVE: utils"
+    echo "  KERNEL_NAME: kernel"
+    echo "  VIVADO_EXPORT_DIR: link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip"
+    echo ""
 }
 if [ "$1" = "" ]
 then
-  print_usage
+    print_usage
 fi
 
 # APP_DIR_ACTIVE=$1
@@ -33,23 +33,23 @@ CFG_FILE_NAME_XCI="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_vma_file
 
 rm_xci_filelist_f () {
 
-  local filename=$1
- 
-  if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
-      rm ${filename}
-  fi
+    local filename=$1
+
+    if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
+        rm ${filename}
+    fi
 }
 
 generate_xci_filelist_f () {
 
-  local ip_directory=$1
-  local cfg_filelist_name=$2
-  local verilog_type=$3
+    local ip_directory=$1
+    local cfg_filelist_name=$2
+    local verilog_type=$3
 
-  for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do  
-    newtext="${filepath}"
-    echo "$newtext" >> ${cfg_filelist_name}
-  done 
+    for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do
+        newtext="${filepath}"
+        echo "$newtext" >> ${cfg_filelist_name}
+    done
 
 }
 
