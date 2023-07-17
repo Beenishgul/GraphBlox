@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 04_pkg_engine.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-06-28 21:34:16
+// Revise : 2023-07-17 14:38:37
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -238,5 +238,29 @@ package PKG_ENGINE;
         logic                             valid  ;
         CUSetupEngineConfigurationPayload payload;
     } CUSetupEngineConfiguration;
+
+// Template Engine Configuration
+    typedef struct packed{
+        logic                               increment    ;
+        logic                               decrement    ;
+        logic                               mode_sequence;
+        logic                               mode_buffer  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+    } EngineConfigurationParameters;
+
+    typedef struct packed{
+        EngineConfigurationParameters param;
+        MemoryPacketMeta              meta ;
+    } EngineConfigurationPayload;
+
+    typedef struct packed{
+        logic                      valid  ;
+        EngineConfigurationPayload payload;
+    } EngineConfiguration;
 
 endpackage

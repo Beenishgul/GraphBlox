@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_csr_index_configure.sv
+// File   : engine_csr_index_configure_engine.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-28 20:50:03
+// Revise : 2023-07-17 16:28:16
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -134,10 +134,14 @@ module engine_csr_index_configure_memory #(
         configuration_meta_int.route.from.id_cu        = ID_CU;
         configuration_meta_int.route.from.id_bundle    = ID_BUNDLE;
         configuration_meta_int.route.from.id_lane      = ID_LANE;
+        configuration_meta_int.route.from.id_engine    = 0;
+        configuration_meta_int.route.from.id_module    = 0;
         configuration_meta_int.route.from.id_buffer    = 0;
         configuration_meta_int.route.to.id_cu          = ID_CU;
         configuration_meta_int.route.to.id_bundle      = ID_BUNDLE;
         configuration_meta_int.route.to.id_lane        = ID_LANE;
+        configuration_meta_int.route.to.id_engine      = 0;
+        configuration_meta_int.route.to.id_module      = 0;
         configuration_meta_int.route.to.id_buffer      = 0;
         configuration_meta_int.address.base            = 0;
         configuration_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);

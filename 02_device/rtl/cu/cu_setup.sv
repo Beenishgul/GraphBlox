@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_setup.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-18 23:51:01
+// Revise : 2023-07-17 16:40:44
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -25,6 +25,8 @@ module cu_setup #(
     parameter ID_CU         = 0 ,
     parameter ID_BUNDLE     = 0 ,
     parameter ID_LANE       = 0 ,
+    parameter ID_ENGINE     = 0 ,
+    parameter ID_MODULE     = 0 ,
     parameter COUNTER_WIDTH = 32
 ) (
     // System Signals
@@ -277,10 +279,14 @@ module cu_setup #(
         configuration_comb.payload.meta.route.from.id_cu        = ID_CU;
         configuration_comb.payload.meta.route.from.id_bundle    = ID_BUNDLE;
         configuration_comb.payload.meta.route.from.id_lane      = ID_LANE;
+        configuration_comb.payload.meta.route.from.id_engine    = ID_ENGINE;
+        configuration_comb.payload.meta.route.from.id_module    = ID_MODULE;
         configuration_comb.payload.meta.route.from.id_buffer    = 0;
         configuration_comb.payload.meta.route.to.id_cu          = ID_CU;
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_lane        = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.to.id_engine      = 0;
+        configuration_comb.payload.meta.route.to.id_module      = 1; // routes to memory configuration modules in engines
         configuration_comb.payload.meta.route.to.id_buffer      = 0;
         configuration_comb.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
         configuration_comb.payload.meta.address.offset          = 0;
