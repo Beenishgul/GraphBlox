@@ -313,7 +313,7 @@ generate
           xpm_memory_spram_parent #(
             .DATA_W(TAG_W           ),
             .ADDR_W(CACHE_LINE_OFF_W),
-            .READ_LATENCY_A(1     )
+            .READ_LATENCY_A(1       )
           ) tag_memory (
             .ap_clk(ap_clk                       ),
             .rsta  (reset                        ),

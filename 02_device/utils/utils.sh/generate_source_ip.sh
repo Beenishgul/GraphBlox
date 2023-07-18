@@ -94,7 +94,7 @@ then
     search="__KERNEL__"
     replace=${KERNEL_NAME}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 
     search="_GRAPH_DIR_"
