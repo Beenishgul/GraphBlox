@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-07-17 16:50:17
+// Revise : 2023-07-17 21:02:34
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -370,6 +370,8 @@ module engine_csr_index #(parameter
     assign template_fifo_response_memory_in_signals_out = configure_memory_fifo_response_memory_in_signals_out;
 
     assign configure_memory_fifo_configure_memory_signals_in.rd_en = 1'b1;
+    assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
+
     engine_csr_index_configure_memory #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
