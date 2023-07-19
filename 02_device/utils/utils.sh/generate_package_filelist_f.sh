@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-07-11 20:14:01
+# @Last Modified time: 2023-07-19 15:27:36
 #!/bin/bash
 
 
@@ -126,7 +126,7 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_template} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_pipeline} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_write} ${CFG_FILE_NAME} "sv"
 # generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_operations} ${CFG_FILE_NAME} "sv"
