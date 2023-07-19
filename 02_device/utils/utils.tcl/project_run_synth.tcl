@@ -12,7 +12,7 @@ if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project ${VIVADO_BUILD_DIR} 
+open_project ${KERNEL_PROJECT_PKG_XPR} 
 
 set runlist_synth [get_runs synth*]
 

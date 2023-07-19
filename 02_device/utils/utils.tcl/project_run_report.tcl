@@ -12,7 +12,7 @@ if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
 }
 
-open_project $VIVADO_BUILD_DIR 
+open_project ${KERNEL_PROJECT_PKG_XPR} 
 set runlist [get_runs impl*]
 
 open_run impl_1
