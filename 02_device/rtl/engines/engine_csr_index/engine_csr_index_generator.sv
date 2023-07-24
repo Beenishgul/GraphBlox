@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-18 21:12:31
+// Revise : 2023-07-24 18:19:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -124,6 +124,7 @@ module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
     end
 
     always_ff @(posedge ap_clk) begin
+        configure_memory_reg.payload <= configure_memory_in.payload;
         configure_memory_reg.payload <= configure_memory_in.payload;
     end
 
