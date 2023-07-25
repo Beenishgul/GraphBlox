@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-07-17 15:30:12
+// Revise : 2023-07-25 19:08:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -20,13 +20,13 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_csr_index_configure_memory #(
-    parameter ID_CU            = 0                                ,
-    parameter ID_BUNDLE        = 0                                ,
-    parameter ID_LANE          = 0                                ,
-    parameter ENGINE_SEQ_WIDTH = 11                               ,
-    parameter ENGINE_SEQ_MIN   = 0                                ,
-    parameter ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
+module engine_csr_index_configure_memory #(parameter
+    ID_CU            = 0                                ,
+    ID_BUNDLE        = 0                                ,
+    ID_LANE          = 0                                ,
+    ENGINE_SEQ_WIDTH = 11                               ,
+    ENGINE_SEQ_MIN   = 0                                ,
+    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
