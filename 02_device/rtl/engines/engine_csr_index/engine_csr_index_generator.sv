@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-25 18:40:23
+// Revise : 2023-07-25 19:08:17
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -34,7 +34,17 @@ import PKG_CACHE::*;
 
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
-module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
+module engine_csr_index_generator #(parameter
+    ID_CU            = 0 ,
+    ID_BUNDLE        = 0 ,
+    ID_LANE          = 0 ,
+    ID_ENGINE        = 0 ,
+    ENGINES_CONFIG   = 0 ,
+    FIFO_WRITE_DEPTH = 16,
+    PROG_THRESH      = 8 ,
+    PIPELINE_STAGES  = 2 ,
+    COUNTER_WIDTH    = 32
+) (
     // System Signals
     input  logic                  ap_clk                  ,
     input  logic                  areset                  ,
