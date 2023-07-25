@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-24 18:19:41
+// Revise : 2023-07-25 18:40:23
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -110,6 +110,7 @@ module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
         if (areset_engine) begin
             fifo_request_signals_in_reg <= 0;
             configure_memory_reg.valid  <= 1'b0;
+            configure_engine_reg.valid  <= 1'b0;
             pause_in_reg                <= 1'b0;
         end
         else begin
@@ -120,12 +121,18 @@ module engine_csr_index_generator #(parameter COUNTER_WIDTH      = 32) (
             end else begin
                 configure_memory_reg.valid <= configure_memory_reg.valid;
             end
+
+            if(ready_out_reg) begin
+                configure_engine_reg.valid <= configure_engine_in.valid;
+            end else begin
+                configure_engine_reg.valid <= configure_engine_reg.valid;
+            end
         end
     end
 
     always_ff @(posedge ap_clk) begin
         configure_memory_reg.payload <= configure_memory_in.payload;
-        configure_memory_reg.payload <= configure_memory_in.payload;
+        configure_engine_reg.payload <= configure_engine_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
