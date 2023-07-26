@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-26 17:44:10
+// Revise : 2023-07-26 18:24:45
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -50,9 +50,20 @@ module engine_csr_index_generator #(parameter
     input  logic                  areset                  ,
     input  CSRIndexConfiguration  configure_memory_in     ,
     input  CSRIndexConfiguration  configure_engine_in     ,
-    output MemoryPacket           request_out             ,
-    input  FIFOStateSignalsInput  fifo_request_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_signals_out,
+    // output MemoryPacket           request_out             ,
+    // input  FIFOStateSignalsInput  fifo_request_signals_in ,
+    // output FIFOStateSignalsOutput fifo_request_signals_out,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
+    input  MemoryPacket           response_memory_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
+    output MemoryPacket           request_engine_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
+    output MemoryPacket           request_memory_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal       ,
     input  logic                  pause_in                ,
     output logic                  ready_out               ,
@@ -144,7 +155,7 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         configure_memory_reg.payload <= configure_memory_in.payload;
-        
+
         if(configure_memory_reg.payload.param.mode_sequence)
             configure_engine_reg.payload <= configure_memory_reg.payload;
         else
