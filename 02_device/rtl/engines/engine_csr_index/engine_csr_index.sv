@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-07-26 18:10:39
+// Revise : 2023-07-26 18:14:12
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -395,8 +395,9 @@ module engine_csr_index #(parameter
         .fifo_configure_memory_signals_out  (configure_memory_fifo_configure_memory_signals_out  ),
         .fifo_setup_signal                  (configure_memory_fifo_setup_signal                  )
     );
+
 // --------------------------------------------------------------------------------------
-// Configuration module - Memory permanent
+// Configuration module - Engine transient
 // --------------------------------------------------------------------------------------
     assign configure_engine_fifo_response_engine_in_signals_in.rd_en = 1'b1;
     assign configure_engine_fifo_configure_engine_signals_in.rd_en   = 1'b1;
@@ -417,6 +418,11 @@ module engine_csr_index #(parameter
         .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
         .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
     );
+
+// --------------------------------------------------------------------------------------
+// Generation module - Memory/Engine Config -> Gen
+// --------------------------------------------------------------------------------------
+
 
 
 
