@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-07-26 18:02:58
+// Revise : 2023-07-26 18:10:39
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -376,10 +376,9 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Configuration module - Memory permanent
 // --------------------------------------------------------------------------------------
-    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = 1'b1;
     assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
-
-    assign configure_memory_response_memory_in = response_memory_in_int;
+    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = 1'b1;
+    assign configure_memory_response_memory_in                       = response_memory_in_int;
 
     engine_csr_index_configure_memory #(
         .ID_CU    (ID_CU    ),
@@ -399,8 +398,8 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Configuration module - Memory permanent
 // --------------------------------------------------------------------------------------
-    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = 1'b1;
-    assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
+    assign configure_engine_fifo_response_engine_in_signals_in.rd_en = 1'b1;
+    assign configure_engine_fifo_configure_engine_signals_in.rd_en   = 1'b1;
     assign configure_engine_response_engine_in                       = response_engine_in_int;
 
     engine_csr_index_configure_engine #(
