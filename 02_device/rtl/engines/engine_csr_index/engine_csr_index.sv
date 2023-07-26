@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-07-25 18:38:31
+// Revise : 2023-07-26 18:02:58
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -54,8 +54,8 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_template_engine;
-    logic areset_fifo           ;
+    logic areset_csr_engine;
+    logic areset_fifo      ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -112,17 +112,17 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
     logic                  areset_template                             ;
     KernelDescriptor       template_descriptor_in                      ;
-    MemoryPacket           configure_engine_response_engine_in         ;
     FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out;
     FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out;
     MemoryPacket           template_request_engine_out                 ;
     MemoryPacket           template_request_memory_out                 ;
-    logic                  template_fifo_setup_signal                  ;
     logic                  template_done_out                           ;
 
 // --------------------------------------------------------------------------------------
 // ENGINE CONFIGURATION AND GENERATION LOGIC
 // --------------------------------------------------------------------------------------
+    logic configure_fifo_setup_signal;
+
     MemoryPacket           configure_memory_response_memory_in                 ;
     FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
     FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
@@ -131,20 +131,29 @@ module engine_csr_index #(parameter
     FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
     logic                  configure_memory_fifo_setup_signal                  ;
 
+    MemoryPacket           configure_engine_response_engine_in                 ;
+    FIFOStateSignalsInput  configure_engine_fifo_response_engine_in_signals_in ;
+    FIFOStateSignalsOutput configure_engine_fifo_response_engine_in_signals_out;
+    CSRIndexConfiguration  configure_engine_out                                ;
+    FIFOStateSignalsInput  configure_engine_fifo_configure_engine_signals_in   ;
+    FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out  ;
+    logic                  configure_engine_fifo_setup_signal                  ;
+
+
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_template_engine <= areset;
-        areset_fifo            <= areset;
+        areset_csr_engine <= areset;
+        areset_fifo       <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_template_engine) begin
+        if (areset_csr_engine) begin
             descriptor_in_reg.valid <= 1'b0;
         end
         else begin
@@ -160,7 +169,7 @@ module engine_csr_index #(parameter
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_template_engine) begin
+        if (areset_csr_engine) begin
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_request_engine_out_signals_in_reg <= 0;
             fifo_response_memory_in_signals_in_reg <= 0;
@@ -187,14 +196,14 @@ module engine_csr_index #(parameter
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_template_engine) begin
+        if (areset_csr_engine) begin
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
             done_out                 <= 1'b1;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
+            fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | configure_fifo_setup_signal;
             request_engine_out.valid <= request_engine_out_int.valid;
             request_memory_out.valid <= request_memory_out_int.valid;
             done_out                 <= template_done_out;
@@ -353,23 +362,24 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Generate Engine - Engine Logic Pipeline
 // --------------------------------------------------------------------------------------
-    assign configure_engine_response_engine_in = response_engine_in_int;
-    assign configure_memory_response_memory_in = response_memory_in_int;
-
-    assign areset_template        = areset_template_engine;
-    assign template_descriptor_in = descriptor_in_reg;
-
-// --------------------------------------------------------------------------------------
-// PIPELINE FIFO signals EMPTY
-// --------------------------------------------------------------------------------------
-    assign template_fifo_setup_signal = configure_memory_fifo_setup_signal;
-    assign template_done_out          = configure_memory_out.valid;
-
     assign template_fifo_response_engine_in_signals_out = fifo_request_engine_out_signals_out_int;
     assign template_fifo_response_memory_in_signals_out = configure_memory_fifo_response_memory_in_signals_out;
 
-    assign configure_memory_fifo_configure_memory_signals_in.rd_en = 1'b1;
+    assign areset_template        = areset_csr_engine;
+    assign template_descriptor_in = descriptor_in_reg;
+
+// --------------------------------------------------------------------------------------
+// Configuration modules
+// --------------------------------------------------------------------------------------
+    assign configure_fifo_setup_signal = configure_memory_fifo_setup_signal | configure_engine_fifo_setup_signal;
+    assign template_done_out           = configure_memory_out.valid;
+// --------------------------------------------------------------------------------------
+// Configuration module - Memory permanent
+// --------------------------------------------------------------------------------------
+    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = 1'b1;
     assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
+
+    assign configure_memory_response_memory_in = response_memory_in_int;
 
     engine_csr_index_configure_memory #(
         .ID_CU    (ID_CU    ),
@@ -386,5 +396,30 @@ module engine_csr_index #(parameter
         .fifo_configure_memory_signals_out  (configure_memory_fifo_configure_memory_signals_out  ),
         .fifo_setup_signal                  (configure_memory_fifo_setup_signal                  )
     );
+// --------------------------------------------------------------------------------------
+// Configuration module - Memory permanent
+// --------------------------------------------------------------------------------------
+    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = 1'b1;
+    assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
+    assign configure_engine_response_engine_in                       = response_engine_in_int;
+
+    engine_csr_index_configure_engine #(
+        .ID_CU    (ID_CU    ),
+        .ID_BUNDLE(ID_BUNDLE),
+        .ID_LANE  (ID_LANE  )
+    ) inst_engine_csr_index_configure_engine (
+        .ap_clk                             (ap_clk                                              ),
+        .areset                             (areset_template                                     ),
+        .response_engine_in                 (configure_engine_response_engine_in                 ),
+        .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
+        .configure_engine_out               (configure_engine_out                                ),
+        .fifo_configure_engine_signals_in   (configure_engine_fifo_configure_engine_signals_in   ),
+        .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
+        .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
+    );
+
+
+
 
 endmodule : engine_csr_index

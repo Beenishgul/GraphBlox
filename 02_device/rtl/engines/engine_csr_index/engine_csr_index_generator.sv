@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-25 19:08:17
+// Revise : 2023-07-26 17:44:10
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -132,7 +132,9 @@ module engine_csr_index_generator #(parameter
                 configure_memory_reg.valid <= configure_memory_reg.valid;
             end
 
-            if(ready_out_reg) begin
+            if(ready_out_reg & configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
+                configure_engine_reg.valid <= configure_memory_reg.valid;
+            end  if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin 
                 configure_engine_reg.valid <= configure_engine_in.valid;
             end else begin
                 configure_engine_reg.valid <= configure_engine_reg.valid;
@@ -142,7 +144,11 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         configure_memory_reg.payload <= configure_memory_in.payload;
-        configure_engine_reg.payload <= configure_engine_in.payload;
+        
+        if(configure_memory_reg.payload.param.mode_sequence)
+            configure_engine_reg.payload <= configure_memory_reg.payload;
+        else
+            configure_engine_reg.payload <= configure_engine_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -186,7 +192,7 @@ module engine_csr_index_generator #(parameter
                 next_state = ENGINE_CSR_INDEX_GEN_IDLE;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
-                if(configure_memory_reg.valid)
+                if(configure_memory_reg.valid & configure_engine_reg.valid)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_IDLE;
@@ -257,7 +263,7 @@ module engine_csr_index_generator #(parameter
                 counter_load               <= 1'b1;
                 counter_incr               <= configure_memory_reg.payload.param.increment;
                 counter_decr               <= configure_memory_reg.payload.param.decrement;
-                counter_load_value         <= configure_memory_reg.payload.param.index_start;
+                counter_load_value         <= configure_engine_reg.payload.param.index_start;
                 counter_stride_value       <= configure_memory_reg.payload.param.stride;
                 fifo_request_din_reg.valid <= 1'b0;
             end
@@ -282,7 +288,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_BUSY : begin
-                if((counter_count >= configure_memory_reg.payload.param.index_end)) begin
+                if((counter_count >= configure_engine_reg.payload.param.index_end)) begin
                     done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
                     counter_decr               <= 1'b0;
@@ -301,7 +307,7 @@ module engine_csr_index_generator #(parameter
                 counter_load   <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_BUSY_TRANS : begin
-                if((counter_count >= configure_memory_reg.payload.param.index_end)) begin
+                if((counter_count >= configure_engine_reg.payload.param.index_end)) begin
                     done_int_reg               <= 1'b1;
                     counter_incr               <= 1'b0;
                     counter_decr               <= 1'b0;
