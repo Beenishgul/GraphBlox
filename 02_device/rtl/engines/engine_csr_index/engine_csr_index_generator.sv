@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-26 18:24:45
+// Revise : 2023-07-28 20:28:27
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -429,5 +429,9 @@ module engine_csr_index_generator #(parameter
         .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
         .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
     );
+
+// --------------------------------------------------------------------------------------
+// FIFO Signals logic
+// --------------------------------------------------------------------------------------
 
 endmodule : engine_csr_index_generator
