@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-28 20:28:27
+// Revise : 2023-08-11 23:26:31
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -46,27 +46,28 @@ module engine_csr_index_generator #(parameter
     COUNTER_WIDTH    = 32
 ) (
     // System Signals
-    input  logic                  ap_clk                  ,
-    input  logic                  areset                  ,
-    input  CSRIndexConfiguration  configure_memory_in     ,
-    input  CSRIndexConfiguration  configure_engine_in     ,
+    input  logic                  ap_clk                             ,
+    input  logic                  areset                             ,
+    input  CSRIndexConfiguration  configure_memory_in                ,
+    input  CSRIndexConfiguration  configure_engine_in                ,
     // output MemoryPacket           request_out             ,
     // input  FIFOStateSignalsInput  fifo_request_signals_in ,
     // output FIFOStateSignalsOutput fifo_request_signals_out,
+    input  MemoryPacket           response_engine_in                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
+    input  FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
+    input  FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output MemoryPacket           request_engine_out                 ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
+    input  FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
     output MemoryPacket           request_memory_out                 ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal       ,
-    input  logic                  pause_in                ,
-    output logic                  ready_out               ,
+    input  FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
+    output logic                  fifo_setup_signal                  ,
+    input  logic                  pause_in                           ,
+    output logic                  ready_out                          ,
     output logic                  done_out
 );
 
@@ -103,6 +104,16 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsInput  fifo_request_signals_in_int  ;
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
     logic                  fifo_request_setup_signal_int;
+
+
+    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
+    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg;
+    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg ;
+    FIFOStateSignalsOutput fifo_request_engine_out_signals_out_reg;
+    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsOutput fifo_request_memory_out_signals_out_reg;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -145,7 +156,7 @@ module engine_csr_index_generator #(parameter
 
             if(ready_out_reg & configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
                 configure_engine_reg.valid <= configure_memory_reg.valid;
-            end  if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin 
+            end  if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
                 configure_engine_reg.valid <= configure_engine_in.valid;
             end else begin
                 configure_engine_reg.valid <= configure_engine_reg.valid;
