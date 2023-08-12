@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-11 23:31:34
+// Revise : 2023-08-11 23:39:22
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -54,8 +54,11 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_csr_engine;
-    logic areset_fifo      ;
+    logic areset_csr_engine      ;
+    logic areset_fifo            ;
+    logic areset_configure_engine;
+    logic areset_configure_memory;
+    logic areset_generator       ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -110,8 +113,6 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
-    logic                  areset_template                             ;
-    KernelDescriptor       template_descriptor_in                      ;
     FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out;
     FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out;
     MemoryPacket           template_request_engine_out                 ;
@@ -166,8 +167,11 @@ module engine_csr_index #(parameter
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_csr_engine <= areset;
-        areset_fifo       <= areset;
+        areset_csr_engine       <= areset;
+        areset_fifo             <= areset;
+        areset_configure_engine <= areset;
+        areset_configure_memory <= areset;
+        areset_generator        <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -386,9 +390,6 @@ module engine_csr_index #(parameter
     assign template_fifo_response_engine_in_signals_out = fifo_request_engine_out_signals_out_int;
     assign template_fifo_response_memory_in_signals_out = configure_memory_fifo_response_memory_in_signals_out;
 
-    assign areset_template        = areset_csr_engine;
-    assign template_descriptor_in = descriptor_in_reg;
-
 // --------------------------------------------------------------------------------------
 // Configuration modules
 // --------------------------------------------------------------------------------------
@@ -408,7 +409,7 @@ module engine_csr_index #(parameter
         .ID_LANE  (ID_LANE  )
     ) inst_engine_csr_index_configure_engine (
         .ap_clk                             (ap_clk                                              ),
-        .areset                             (areset_template                                     ),
+        .areset                             (areset_configure_engine                             ),
         .response_engine_in                 (configure_engine_response_engine_in                 ),
         .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
         .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
@@ -432,7 +433,7 @@ module engine_csr_index #(parameter
         .ID_LANE  (ID_LANE  )
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
-        .areset                             (areset_template                                     ),
+        .areset                             (areset_configure_memory                             ),
         .response_memory_in                 (configure_memory_response_memory_in                 ),
         .fifo_response_memory_in_signals_in (configure_memory_fifo_response_memory_in_signals_in ),
         .fifo_response_memory_in_signals_out(configure_memory_fifo_response_memory_in_signals_out),
@@ -448,7 +449,7 @@ module engine_csr_index #(parameter
     assign generator_engine_configure_engine_in = configure_engine_out;
     assign generator_engine_configure_memory_in = configure_memory_out;
 
-    assign generator_engine_response_engine_in                  = fifo_response_engine_in_dout;
+    assign generator_engine_response_engine_in                  = response_engine_in_int;
     assign generator_engine_fifo_response_engine_in_signals_in  = fifo_response_engine_in_signals_in_reg;
     assign generator_engine_fifo_response_engine_in_signals_out = fifo_response_engine_in_signals_out_int;
     assign generator_engine_response_memory_in                  = response_memory_in_int;
@@ -472,9 +473,10 @@ module engine_csr_index #(parameter
         .PIPELINE_STAGES (PIPELINE_STAGES )
     ) inst_engine_csr_index_generator (
         .ap_clk                             (ap_clk                                              ),
-        .areset                             (areset                                              ),
-        .configure_memory_in                (generator_engine_configure_memory_in                ),
+        .areset                             (areset_generator                                    ),
         .configure_engine_in                (generator_engine_configure_engine_in                ),
+        .configure_memory_in                (generator_engine_configure_memory_in                ),
+        .response_engine_in                 (generator_engine_response_engine_in                 ),
         .fifo_response_engine_in_signals_in (generator_engine_fifo_response_engine_in_signals_in ),
         .fifo_response_engine_in_signals_out(generator_engine_fifo_response_engine_in_signals_out),
         .response_memory_in                 (generator_engine_response_memory_in                 ),
