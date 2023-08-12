@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_engine.sv
 // Create : 2023-07-26 18:06:06
-// Revise : 2023-07-26 18:08:07
+// Revise : 2023-08-11 23:43:18
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -187,7 +187,7 @@ module engine_csr_index_configure_engine #(parameter
                         configure_engine_valid_reg[4]                             <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+5) : begin
-                        configure_engine_reg.payload.meta.subclass.cmd    <= type_engine_cmd'(fifo_response_engine_in_dout_int.payload.data.field_0[TYPE_MEMORY_CMD_BITS-1:0]);
+                        configure_engine_reg.payload.meta.subclass.cmd    <= type_memory_cmd'(fifo_response_engine_in_dout_int.payload.data.field_0[TYPE_MEMORY_CMD_BITS-1:0]);
                         configure_engine_reg.payload.meta.subclass.buffer <= type_data_buffer'(fifo_response_engine_in_dout_int.payload.data.field_0[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
                         configure_engine_valid_reg[5]                     <= 1'b1  ;
                     end
