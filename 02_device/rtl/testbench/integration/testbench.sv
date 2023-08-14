@@ -965,7 +965,6 @@ module __KERNEL___testbench ();
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_5_ptr[63:32]; // 9- BUFFER pointer
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count; // 10 - BUFFER size
 
-
         for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
@@ -1056,7 +1055,6 @@ module __KERNEL___testbench ();
 
         $display("Starting: multiple_iteration");
         for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
-
 
             $display("Starting iteration: %d / %d", iter+1, num_iterations);
             RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
