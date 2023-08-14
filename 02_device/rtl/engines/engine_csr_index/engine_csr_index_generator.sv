@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 15:32:01
+// Revise : 2023-08-14 16:15:25
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -93,6 +93,7 @@ module engine_csr_index_generator #(parameter
     MemoryPacket           fifo_request_din_reg         ;
     MemoryPacketPayload    fifo_request_dout            ;
     MemoryPacket           fifo_request_comb            ;
+    MemoryPacket           fifo_response_comb            ;
     FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_signals_in_int  ;
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
@@ -103,14 +104,10 @@ module engine_csr_index_generator #(parameter
     MemoryPacket request_engine_out_reg;
     MemoryPacket request_memory_out_reg;
 
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
-    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
-    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg;
-    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg ;
-    FIFOStateSignalsOutput fifo_request_engine_out_signals_out_reg;
-    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg ;
-    FIFOStateSignalsOutput fifo_request_memory_out_signals_out_reg;
+    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
+    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
+    FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -139,16 +136,16 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         if (areset_csr_engine) begin
             fifo_response_engine_in_signals_in_reg <= 0;
-            fifo_request_engine_out_signals_in_reg <= 0;
             fifo_response_memory_in_signals_in_reg <= 0;
+            fifo_request_engine_out_signals_in_reg <= 0;
             fifo_request_memory_out_signals_in_reg <= 0;
             response_engine_in_reg.valid           <= 1'b0;
             response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
             fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
-            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
+            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
             fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
             response_engine_in_reg.valid           <= response_engine_in.valid;
             response_memory_in_reg.valid           <= response_memory_in.valid ;
@@ -407,16 +404,17 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
+        fifo_request_comb.valid                     = response_memory_in_reg.valid;
         fifo_request_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
         fifo_request_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_request_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 >> configure_memory_reg.payload.meta.address.shift.amount;
         end
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field_0       = counter_count;
+        fifo_request_comb.payload.data.field_0       = response_memory_in_reg.payload.data.field_0;
         fifo_request_comb.payload.data.field_1       = 0;
         fifo_request_comb.payload.data.field_2       = 0;
         fifo_request_comb.payload.data.field_3       = 0;
@@ -475,37 +473,47 @@ module engine_csr_index_generator #(parameter
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO Signals logic
+// Generator FLow logic
 // --------------------------------------------------------------------------------------
+    always_comb begin
+        fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
+        fifo_response_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
+        if(configure_memory_reg.payload.meta.address.shift.direction) begin
+            fifo_response_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
+        end else begin
+            fifo_response_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
+        end
+        fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
+        fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
+        fifo_response_comb.payload.data.field_0       = counter_count;
+        fifo_response_comb.payload.data.field_1       = 0;
+        fifo_response_comb.payload.data.field_2       = 0;
+        fifo_response_comb.payload.data.field_3       = 0;
+    end
+
     always_ff @(posedge ap_clk) begin
         if (areset_fifo) begin
             fifo_request_signals_in_reg <= 0;
-            request_out.valid           <= 1'b0;
+            request_engine_out_reg      <= 0;
+            request_memory_out_reg      <= 0;
         end
         else begin
             if(seq_flow_reg & ~csr_flow_reg) begin
-
+                fifo_request_signals_in_reg <= fifo_request_engine_out_signals_in_reg;
+                request_engine_out_reg      <= request_out_int;
+                request_memory_out_reg      <= 0;
             end
             else if(~seq_flow_reg & csr_flow_reg) begin
-
+                fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
+                request_engine_out_reg      <= fifo_response_comb;
+                request_memory_out_reg      <= request_out_int;
             end
             else begin
-
+                fifo_request_signals_in_reg <= 0;
+                request_engine_out_reg      <= 0;
+                request_memory_out_reg      <= 0;
             end
         end
     end
-
-    fifo_request_signals_in_reg <= fifo_request_signals_in;
-    request_out.valid <= request_out_int.valid;
-
-    always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out <= fifo_request_signals_out_int;
-        request_out.payload      <= request_out_int.payload;
-    end
-
-    // request_engine_out
-    //     fifo_request_engine_out_signals_in
-    //         request_memory_out
-    //             fifo_request_memory_out_signals_in
 
 endmodule : engine_csr_index_generator
