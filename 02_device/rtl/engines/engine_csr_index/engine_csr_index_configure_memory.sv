@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-07-25 19:08:41
+// Revise : 2023-08-14 14:08:04
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -32,10 +32,8 @@ module engine_csr_index_configure_memory #(parameter
     input  logic                  areset                             ,
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output CSRIndexConfiguration  configure_memory_out               ,
     input  FIFOStateSignalsInput  fifo_configure_memory_signals_in   ,
-    output FIFOStateSignalsOutput fifo_configure_memory_signals_out  ,
     output logic                  fifo_setup_signal
 );
 
@@ -117,8 +115,6 @@ module engine_csr_index_configure_memory #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-        fifo_configure_memory_signals_out   <= fifo_configure_memory_signals_out_int;
         configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
     end
 

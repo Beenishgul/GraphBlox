@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 13:39:43
+// Revise : 2023-08-14 14:10:46
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -46,27 +46,20 @@ module engine_csr_index_generator #(parameter
     COUNTER_WIDTH    = 32
 ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  CSRIndexConfiguration  configure_memory_in                ,
-    input  CSRIndexConfiguration  configure_engine_in                ,
-    // output MemoryPacket           request_out             ,
-    // input  FIFOStateSignalsInput  fifo_request_signals_in ,
-    // output FIFOStateSignalsOutput fifo_request_signals_out,
-    input  MemoryPacket           response_engine_in                 ,
-    output FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    input  FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    output FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    input  FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    output FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    input  FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
-    output MemoryPacket           request_memory_out                 ,
-    output FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    input  FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
-    output logic                  done_out
+    input  logic                 ap_clk                            ,
+    input  logic                 areset                            ,
+    input  CSRIndexConfiguration configure_memory_in               ,
+    input  CSRIndexConfiguration configure_engine_in               ,
+    input  MemoryPacket          response_engine_in                ,
+    input  FIFOStateSignalsInput fifo_response_engine_in_signals_in,
+    input  MemoryPacket          response_memory_in                ,
+    input  FIFOStateSignalsInput fifo_response_memory_in_signals_in,
+    output MemoryPacket          request_engine_out                ,
+    input  FIFOStateSignalsInput fifo_request_engine_out_signals_in,
+    output MemoryPacket          request_memory_out                ,
+    input  FIFOStateSignalsInput fifo_request_memory_out_signals_in,
+    output logic                 fifo_setup_signal                 ,
+    output logic                 done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -87,7 +80,6 @@ module engine_csr_index_generator #(parameter
     engine_csr_index_generator_state next_state   ;
 
     logic done_int_reg ;
-    logic pause_in_reg ;
     logic ready_out_reg;
     logic done_out_reg ;
 
@@ -106,10 +98,10 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
     logic                  fifo_request_setup_signal_int;
 
-    MemoryPacket response_engine_reg;
-    MemoryPacket response_memory_reg;
-    MemoryPacket request_engine_reg ;
-    MemoryPacket request_memory_reg ;
+    MemoryPacket response_engine_in_reg;
+    MemoryPacket response_memory_in_reg;
+    MemoryPacket request_engine_out_reg;
+    MemoryPacket request_memory_out_reg;
 
     FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
     FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg;
@@ -140,22 +132,46 @@ module engine_csr_index_generator #(parameter
         areset_counter <= areset;
         areset_fifo    <= areset;
     end
+
 // --------------------------------------------------------------------------------------
 // Drive input signals
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_csr_engine) begin
+            fifo_response_engine_in_signals_in_reg <= 0;
+            fifo_request_engine_out_signals_in_reg <= 0;
+            fifo_response_memory_in_signals_in_reg <= 0;
+            fifo_request_memory_out_signals_in_reg <= 0;
+            response_engine_in_reg.valid           <= 1'b0;
+            response_memory_in_reg.valid           <= 1'b0;
+        end
+        else begin
+            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
+            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
+            fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
+            fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
+            response_engine_in_reg.valid           <= response_engine_in.valid;
+            response_memory_in_reg.valid           <= response_memory_in.valid ;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        response_engine_in_reg.payload <= response_engine_in.payload;
+        response_memory_in_reg.payload <= response_memory_in.payload;
+    end
+
+// --------------------------------------------------------------------------------------
+// Decide engine flow
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
             configure_memory_reg.valid <= 1'b0;
             configure_engine_reg.valid <= 1'b0;
-            response_engine_reg.valid <= 1'b0;
-            response_memory_reg.valid <= 1'b0;
 
-            pause_in_reg               <= 1'b0;
-            seq_flow_reg               <= 1'b0;
-            csr_flow_reg               <= 1'b0;
+            seq_flow_reg <= 1'b0;
+            csr_flow_reg <= 1'b0;
         end
         else begin
-            pause_in_reg <= pause_in;
             if(ready_out_reg & done_out_reg) begin
                 configure_memory_reg.valid <= configure_memory_in.valid;
             end else begin
