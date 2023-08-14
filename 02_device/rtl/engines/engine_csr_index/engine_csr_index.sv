@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-14 14:11:21
+// Revise : 2023-08-14 15:00:05
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -431,19 +431,13 @@ module engine_csr_index #(parameter
     assign generator_engine_configure_engine_in = configure_engine_out;
     assign generator_engine_configure_memory_in = configure_memory_out;
 
-    assign generator_engine_response_engine_in                  = response_engine_in_int;
-    assign generator_engine_fifo_response_engine_in_signals_in  = fifo_response_engine_in_signals_in_reg;
-    assign generator_engine_fifo_response_engine_in_signals_out = fifo_response_engine_in_signals_out_int;
+    assign generator_engine_response_engine_in                       = response_engine_in_int;
+    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = ~fifo_response_engine_in_signals_out_int.prog_full;
+    assign generator_engine_response_memory_in                       = response_memory_in_int;
+    assign generator_engine_fifo_response_memory_in_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
+    assign generator_engine_fifo_request_engine_out_signals_in.rd_en = ~fifo_response_memory_in_signals_out_int.prog_full;
+    assign generator_engine_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
-    assign generator_engine_response_memory_in                  = response_memory_in_int;
-    assign generator_engine_fifo_response_memory_in_signals_in  = fifo_request_engine_out_signals_in_reg;
-    assign generator_engine_fifo_response_memory_in_signals_out = fifo_request_engine_out_signals_out_int;
-
-    assign generator_engine_fifo_request_engine_out_signals_in  = fifo_response_memory_in_signals_in_reg;
-    assign generator_engine_fifo_request_engine_out_signals_out = fifo_response_memory_in_signals_out_int;
-
-    assign generator_engine_fifo_request_memory_out_signals_in  = fifo_request_memory_out_signals_in_reg;
-    assign generator_engine_fifo_request_memory_out_signals_out = fifo_request_memory_out_signals_out_int;
 
     engine_csr_index_generator #(
         .ID_CU           (ID_CU           ),
