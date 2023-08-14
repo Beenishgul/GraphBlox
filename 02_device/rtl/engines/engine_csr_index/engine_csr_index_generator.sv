@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 14:10:46
+// Revise : 2023-08-14 15:32:01
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -65,9 +65,9 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_engine ;
-    logic areset_counter;
-    logic areset_fifo   ;
+    logic areset_generator;
+    logic areset_counter  ;
+    logic areset_fifo     ;
 
     CSRIndexConfiguration configure_memory_reg;
     CSRIndexConfiguration configure_engine_reg;
@@ -128,9 +128,9 @@ module engine_csr_index_generator #(parameter
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_engine  <= areset;
-        areset_counter <= areset;
-        areset_fifo    <= areset;
+        areset_generator <= areset;
+        areset_counter   <= areset;
+        areset_fifo      <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ module engine_csr_index_generator #(parameter
 // Decide engine flow
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_engine) begin
+        if (areset_generator) begin
             configure_memory_reg.valid <= 1'b0;
             configure_engine_reg.valid <= 1'b0;
 
@@ -208,23 +208,32 @@ module engine_csr_index_generator #(parameter
 // Drive output signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_engine) begin
-            fifo_setup_signal <= 1'b1;
-            ready_out         <= 1'b0;
-            done_out          <= 1'b0;
+        if (areset_generator) begin
+            fifo_setup_signal        <= 1'b1;
+            request_engine_out.valid <= 1'b0;
+            request_memory_out.valid <= 1'b0;
+            ready_out                <= 1'b0;
+            done_out                 <= 1'b0;
         end
         else begin
-            fifo_setup_signal <= fifo_request_setup_signal_int;
-            ready_out         <= ready_out_reg;
-            done_out          <= done_out_reg;
+            fifo_setup_signal        <= fifo_request_setup_signal_int;
+            request_engine_out.valid <= request_engine_out_reg.valid;
+            request_memory_out.valid <= request_memory_out_reg.valid;
+            ready_out                <= ready_out_reg;
+            done_out                 <= done_out_reg;
         end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        request_engine_out.payload <= request_engine_out_reg.payload;
+        request_memory_out.payload <= request_memory_out_reg.payload ;
     end
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_engine)
+        if(areset_generator)
             current_state <= ENGINE_CSR_INDEX_GEN_RESET;
         else begin
             current_state <= next_state;
@@ -477,7 +486,7 @@ module engine_csr_index_generator #(parameter
             if(seq_flow_reg & ~csr_flow_reg) begin
 
             end
-            else if (~seq_flow_reg & csr_flow_reg) begin
+            else if(~seq_flow_reg & csr_flow_reg) begin
 
             end
             else begin
@@ -486,20 +495,17 @@ module engine_csr_index_generator #(parameter
         end
     end
 
-
-
-    fifo_request_signals_in_reg <= fifo_request_signals_in ;
-
-
+    fifo_request_signals_in_reg <= fifo_request_signals_in;
     request_out.valid <= request_out_int.valid;
+
     always_ff @(posedge ap_clk) begin
         fifo_request_signals_out <= fifo_request_signals_out_int;
         request_out.payload      <= request_out_int.payload;
     end
 
-    request_engine_out
-        fifo_request_engine_out_signals_in
-            request_memory_out
-                fifo_request_memory_out_signals_in
+    // request_engine_out
+    //     fifo_request_engine_out_signals_in
+    //         request_memory_out
+    //             fifo_request_memory_out_signals_in
 
-                endmodule : engine_csr_index_generator
+endmodule : engine_csr_index_generator
