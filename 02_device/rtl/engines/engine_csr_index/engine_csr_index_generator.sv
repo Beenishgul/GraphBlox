@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 00:27:24
+// Revise : 2023-08-14 13:39:43
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ module engine_csr_index_generator #(parameter
     // input  FIFOStateSignalsInput  fifo_request_signals_in ,
     // output FIFOStateSignalsOutput fifo_request_signals_out,
     input  MemoryPacket           response_engine_in                 ,
-    output FIFOStateSignalsInput fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
     input  FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
     output FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
@@ -66,8 +66,6 @@ module engine_csr_index_generator #(parameter
     output FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     input  FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
-    input  logic                  pause_in                           ,
-    output logic                  ready_out                          ,
     output logic                  done_out
 );
 
@@ -93,8 +91,8 @@ module engine_csr_index_generator #(parameter
     logic ready_out_reg;
     logic done_out_reg ;
 
-    logic seq_flow_reg ;
-    logic csr_flow_reg ;
+    logic seq_flow_reg;
+    logic csr_flow_reg;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -108,6 +106,10 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
     logic                  fifo_request_setup_signal_int;
 
+    MemoryPacket response_engine_reg;
+    MemoryPacket response_memory_reg;
+    MemoryPacket request_engine_reg ;
+    MemoryPacket request_memory_reg ;
 
     FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
     FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg;
@@ -143,14 +145,17 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_engine) begin
-            fifo_request_signals_in_reg <= 0;
-            configure_memory_reg.valid  <= 1'b0;
-            configure_engine_reg.valid  <= 1'b0;
-            pause_in_reg                <= 1'b0;
+            configure_memory_reg.valid <= 1'b0;
+            configure_engine_reg.valid <= 1'b0;
+            response_engine_reg.valid <= 1'b0;
+            response_memory_reg.valid <= 1'b0;
+
+            pause_in_reg               <= 1'b0;
+            seq_flow_reg               <= 1'b0;
+            csr_flow_reg               <= 1'b0;
         end
         else begin
-            fifo_request_signals_in_reg <= fifo_request_signals_in ;
-            pause_in_reg                <= pause_in;
+            pause_in_reg <= pause_in;
             if(ready_out_reg & done_out_reg) begin
                 configure_memory_reg.valid <= configure_memory_in.valid;
             end else begin
@@ -159,10 +164,16 @@ module engine_csr_index_generator #(parameter
 
             if(ready_out_reg & configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
                 configure_engine_reg.valid <= configure_memory_reg.valid;
-            end  if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
+                seq_flow_reg               <= 1'b0;
+                csr_flow_reg               <= configure_memory_reg.valid;
+            end else if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
                 configure_engine_reg.valid <= configure_engine_in.valid;
+                seq_flow_reg               <= configure_engine_in.valid;
+                csr_flow_reg               <= 1'b0;
             end else begin
                 configure_engine_reg.valid <= configure_engine_reg.valid;
+                seq_flow_reg               <= seq_flow_reg;
+                csr_flow_reg               <= csr_flow_reg;
             end
         end
     end
@@ -170,10 +181,11 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         configure_memory_reg.payload <= configure_memory_in.payload;
 
-        if(configure_memory_reg.payload.param.mode_sequence)
+        if(configure_memory_reg.payload.param.mode_sequence) begin
             configure_engine_reg.payload <= configure_memory_reg.payload;
-        else
+        end else begin
             configure_engine_reg.payload <= configure_engine_in.payload;
+        end
     end
 
 // --------------------------------------------------------------------------------------
@@ -184,19 +196,12 @@ module engine_csr_index_generator #(parameter
             fifo_setup_signal <= 1'b1;
             ready_out         <= 1'b0;
             done_out          <= 1'b0;
-            request_out.valid <= 1'b0;
         end
         else begin
             fifo_setup_signal <= fifo_request_setup_signal_int;
             ready_out         <= ready_out_reg;
             done_out          <= done_out_reg;
-            request_out.valid <= request_out_int.valid;
         end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out <= fifo_request_signals_out_int;
-        request_out.payload      <= request_out_int.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -449,12 +454,14 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_fifo) begin
+            fifo_request_signals_in_reg <= 0;
+            request_out.valid           <= 1'b0;
         end
         else begin
-            if(configure_engine_reg.valid & configure_engine_reg.valid) begin
+            if(seq_flow_reg & ~csr_flow_reg) begin
 
             end
-            else if (configure_engine_reg.valid & ~configure_engine_reg.valid) begin
+            else if (~seq_flow_reg & csr_flow_reg) begin
 
             end
             else begin
@@ -463,4 +470,20 @@ module engine_csr_index_generator #(parameter
         end
     end
 
-endmodule : engine_csr_index_generator
+
+
+    fifo_request_signals_in_reg <= fifo_request_signals_in ;
+
+
+    request_out.valid <= request_out_int.valid;
+    always_ff @(posedge ap_clk) begin
+        fifo_request_signals_out <= fifo_request_signals_out_int;
+        request_out.payload      <= request_out_int.payload;
+    end
+
+    request_engine_out
+        fifo_request_engine_out_signals_in
+            request_memory_out
+                fifo_request_memory_out_signals_in
+
+                endmodule : engine_csr_index_generator
