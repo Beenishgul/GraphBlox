@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 16:15:25
+// Revise : 2023-08-14 16:27:05
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ module engine_csr_index_generator #(parameter
     MemoryPacket           fifo_request_din_reg         ;
     MemoryPacketPayload    fifo_request_dout            ;
     MemoryPacket           fifo_request_comb            ;
-    MemoryPacket           fifo_response_comb            ;
+    MemoryPacket           fifo_response_comb           ;
     FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_signals_in_int  ;
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
@@ -134,7 +134,7 @@ module engine_csr_index_generator #(parameter
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_csr_engine) begin
+        if (areset_generator) begin
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_response_memory_in_signals_in_reg <= 0;
             fifo_request_engine_out_signals_in_reg <= 0;
@@ -404,17 +404,16 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.valid                     = response_memory_in_reg.valid;
         fifo_request_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
         fifo_request_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_request_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_request_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 >> configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
         end
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field_0       = response_memory_in_reg.payload.data.field_0;
+        fifo_request_comb.payload.data.field_0       = counter_count;
         fifo_request_comb.payload.data.field_1       = 0;
         fifo_request_comb.payload.data.field_2       = 0;
         fifo_request_comb.payload.data.field_3       = 0;
@@ -476,23 +475,24 @@ module engine_csr_index_generator #(parameter
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
     always_comb begin
+        fifo_response_comb.valid                     = response_memory_in_reg.valid;
         fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
         fifo_response_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_response_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_response_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 >> configure_memory_reg.payload.meta.address.shift.amount;
         end
         fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_response_comb.payload.data.field_0       = counter_count;
+        fifo_response_comb.payload.data.field_0       = response_memory_in_reg.payload.data.field_0;
         fifo_response_comb.payload.data.field_1       = 0;
         fifo_response_comb.payload.data.field_2       = 0;
         fifo_response_comb.payload.data.field_3       = 0;
     end
 
     always_ff @(posedge ap_clk) begin
-        if (areset_fifo) begin
+        if (areset_generator) begin
             fifo_request_signals_in_reg <= 0;
             request_engine_out_reg      <= 0;
             request_memory_out_reg      <= 0;
