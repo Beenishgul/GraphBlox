@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-11 23:26:31
+// Revise : 2023-08-14 00:27:24
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -54,16 +54,16 @@ module engine_csr_index_generator #(parameter
     // input  FIFOStateSignalsInput  fifo_request_signals_in ,
     // output FIFOStateSignalsOutput fifo_request_signals_out,
     input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsInput fifo_response_engine_in_signals_in ,
     input  FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
+    output FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     input  FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
     input  FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
     output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
+    output FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     input  FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
     input  logic                  pause_in                           ,
@@ -92,6 +92,9 @@ module engine_csr_index_generator #(parameter
     logic pause_in_reg ;
     logic ready_out_reg;
     logic done_out_reg ;
+
+    logic seq_flow_reg ;
+    logic csr_flow_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -444,5 +447,20 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO Signals logic
 // --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_fifo) begin
+        end
+        else begin
+            if(configure_engine_reg.valid & configure_engine_reg.valid) begin
+
+            end
+            else if (configure_engine_reg.valid & ~configure_engine_reg.valid) begin
+
+            end
+            else begin
+
+            end
+        end
+    end
 
 endmodule : engine_csr_index_generator
