@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-14 16:27:05
+// Revise : 2023-08-14 16:29:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -209,14 +209,12 @@ module engine_csr_index_generator #(parameter
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
-            ready_out                <= 1'b0;
             done_out                 <= 1'b0;
         end
         else begin
             fifo_setup_signal        <= fifo_request_setup_signal_int;
             request_engine_out.valid <= request_engine_out_reg.valid;
             request_memory_out.valid <= request_memory_out_reg.valid;
-            ready_out                <= ready_out_reg;
             done_out                 <= done_out_reg;
         end
     end
@@ -261,7 +259,7 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_BUSY : begin
                 if (done_int_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE;
-                else if (fifo_request_signals_out_int.prog_full | pause_in_reg)
+                else if (fifo_request_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY;
@@ -270,7 +268,7 @@ module engine_csr_index_generator #(parameter
                 next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full & ~pause_in_reg)
+                if (~fifo_request_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
