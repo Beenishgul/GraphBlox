@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-14 15:00:05
+// Revise : 2023-08-15 13:02:48
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -416,14 +416,45 @@ module engine_csr_index #(parameter
         .ID_BUNDLE(ID_BUNDLE),
         .ID_LANE  (ID_LANE  )
     ) inst_engine_csr_index_configure_memory (
-        .ap_clk                            (ap_clk                                             ),
-        .areset                            (areset_configure_memory                            ),
-        .response_memory_in                (configure_memory_response_memory_in                ),
-        .fifo_response_memory_in_signals_in(configure_memory_fifo_response_memory_in_signals_in),
-        .configure_memory_out              (configure_memory_out                               ),
-        .fifo_configure_memory_signals_in  (configure_memory_fifo_configure_memory_signals_in  ),
-        .fifo_setup_signal                 (configure_memory_fifo_setup_signal                 )
+        .ap_clk                             (ap_clk                                              ),
+        .areset                             (areset_configure_engine                             ),
+        .response_engine_in                 (configure_engine_response_engine_in                 ),
+        .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
+        .configure_engine_out               (configure_engine_out                                ),
+        .fifo_configure_engine_signals_in   (configure_engine_fifo_configure_engine_signals_in   ),
+        .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
+        .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
     );
+
+// --------------------------------------------------------------------------------------
+// Generate Lanes - Signals
+// --------------------------------------------------------------------------------------
+// Generate Lanes - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    assign configure_arbiter_1_to_N_memory_response_in = response_memory_in_int;
+    generate
+        for (i=0; i<2; i++) begin : generate_configure_arbiter_1_to_N_memory_response
+            assign configure_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_memory_in_signals_out[i].prog_full;
+            assign modules_response_memory_in[i] = configure_arbiter_1_to_N_memory_response_out[i];
+            assign modules_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+        end
+    endgenerate
+
+// --------------------------------------------------------------------------------------
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(2        ),
+        .ID_LEVEL            (4        )
+    ) inst_configure_arbiter_1_to_N_memory_response_in (
+        .ap_clk                   (ap_clk                                              ),
+        .areset                   (areset_configure_arbiter_1_to_N_memory                   ),
+        .response_in              (configure_arbiter_1_to_N_memory_response_in              ),
+        .fifo_response_signals_in (configure_arbiter_1_to_N_memory_fifo_response_signals_in ),
+        .fifo_response_signals_out(configure_arbiter_1_to_N_memory_fifo_response_signals_out),
+        .response_out             (configure_arbiter_1_to_N_memory_response_out             ),
+        .fifo_setup_signal        (configure_arbiter_1_to_N_memory_fifo_setup_signal        )
+    );
+
 
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
