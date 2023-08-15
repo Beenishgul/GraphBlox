@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_engine.sv
 // Create : 2023-07-26 18:06:06
-// Revise : 2023-08-14 14:08:24
+// Revise : 2023-08-15 10:48:08
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -32,8 +32,10 @@ module engine_csr_index_configure_engine #(parameter
     input  logic                  areset                             ,
     input  MemoryPacket           response_engine_in                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     output CSRIndexConfiguration  configure_engine_out               ,
     input  FIFOStateSignalsInput  fifo_configure_engine_signals_in   ,
+    output FIFOStateSignalsOutput fifo_configure_engine_signals_out  ,
     output logic                  fifo_setup_signal
 );
 
@@ -115,6 +117,8 @@ module engine_csr_index_configure_engine #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
+        fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
+        fifo_configure_engine_signals_out   <= fifo_configure_engine_signals_out_int;
         configure_engine_out.payload        <= fifo_configure_engine_dout_int.payload;
     end
 
