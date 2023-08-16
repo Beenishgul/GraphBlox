@@ -52,6 +52,7 @@ module engine_csr_index #(parameter
     output logic                  done_out
 );
 
+    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -140,16 +141,16 @@ module engine_csr_index #(parameter
 
     MemoryPacket           generator_engine_response_engine_in                 ;
     FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
-    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
+
     MemoryPacket           generator_engine_response_memory_in                 ;
     FIFOStateSignalsInput  generator_engine_fifo_response_memory_in_signals_in ;
-    FIFOStateSignalsOutput generator_engine_fifo_response_memory_in_signals_out;
+
     MemoryPacket           generator_engine_request_engine_out                 ;
     FIFOStateSignalsInput  generator_engine_fifo_request_engine_out_signals_in ;
-    FIFOStateSignalsOutput generator_engine_fifo_request_engine_out_signals_out;
+
     MemoryPacket           generator_engine_request_memory_out                 ;
     FIFOStateSignalsInput  generator_engine_fifo_request_memory_out_signals_in ;
-    FIFOStateSignalsOutput generator_engine_fifo_request_memory_out_signals_out;
+
     logic                  generator_engine_fifo_setup_signal                  ;
     logic                  generator_engine_done_out                           ;
 
@@ -467,10 +468,10 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
     assign configure_engine_fifo_response_engine_in_signals_in.rd_en = generator_engine_done_out;
 
-    assign configure_engine_response_engine_in                       = modules_response_engine_in[0];
-    assign configure_engine_fifo_configure_engine_signals_in.rd_en   = modules_fifo_response_engine_in_signals_in[0].rd_en;
+    assign configure_engine_response_engine_in                     = modules_response_engine_in[0];
+    assign configure_engine_fifo_configure_engine_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[0].rd_en;
 
-    assign modules_fifo_response_engine_in_signals_out[0]            = configure_engine_fifo_configure_engine_signals_out;
+    assign modules_fifo_response_engine_in_signals_out[0] = configure_engine_fifo_configure_engine_signals_out;
 
     engine_csr_index_configure_engine #(
         .ID_CU    (ID_CU    ),
@@ -491,12 +492,12 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Configuration module - Memory permanent
 // --------------------------------------------------------------------------------------
-    assign configure_memory_fifo_configure_memory_signals_in.rd_en   = generator_engine_done_out;
+    assign configure_memory_fifo_configure_memory_signals_in.rd_en = generator_engine_done_out;
 
     assign configure_memory_response_memory_in                       = modules_response_memory_in[0];
     assign configure_memory_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[0].rd_en;
 
-    assign modules_fifo_response_memory_in_signals_out[0]            = configure_memory_fifo_configure_memory_signals_out;
+    assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_configure_memory_signals_out;
 
     engine_csr_index_configure_memory #(
         .ID_CU    (ID_CU    ),
