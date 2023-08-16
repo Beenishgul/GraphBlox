@@ -475,13 +475,15 @@ module engine_csr_index #(parameter
         .ID_BUNDLE(ID_BUNDLE),
         .ID_LANE  (ID_LANE  )
     ) inst_engine_csr_index_configure_engine (
-        .ap_clk                            (ap_clk                                             ),
-        .areset                            (areset_configure_engine                            ),
-        .response_engine_in                (configure_engine_response_engine_in                ),
-        .fifo_response_engine_in_signals_in(configure_engine_fifo_response_engine_in_signals_in),
-        .configure_engine_out              (configure_engine_out                               ),
-        .fifo_configure_engine_signals_in  (configure_engine_fifo_configure_engine_signals_in  ),
-        .fifo_setup_signal                 (configure_engine_fifo_setup_signal                 )
+        .ap_clk                             (ap_clk                                              ),
+        .areset                             (areset_configure_engine                             ),
+        .response_engine_in                 (configure_engine_response_engine_in                 ),
+        .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
+        .configure_engine_out               (configure_engine_out                                ),
+        .fifo_configure_engine_signals_in   (configure_engine_fifo_configure_engine_signals_in   ),
+        .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
+        .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
     );
 
 // --------------------------------------------------------------------------------------
@@ -497,14 +499,14 @@ module engine_csr_index #(parameter
         .ID_LANE  (ID_LANE  )
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
-        .areset                             (areset_configure_engine                             ),
-        .response_engine_in                 (configure_engine_response_engine_in                 ),
-        .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
-        .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
-        .configure_engine_out               (configure_engine_out                                ),
-        .fifo_configure_engine_signals_in   (configure_engine_fifo_configure_engine_signals_in   ),
-        .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
-        .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
+        .areset                             (areset_configure_memory                             ),
+        .response_engine_in                 (configure_memory_response_engine_in                 ),
+        .fifo_response_engine_in_signals_in (configure_memory_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(configure_memory_fifo_response_engine_in_signals_out),
+        .configure_engine_out               (configure_memory_out                                ),
+        .fifo_configure_engine_signals_in   (configure_memory_fifo_configure_engine_signals_in   ),
+        .fifo_configure_engine_signals_out  (configure_memory_fifo_configure_engine_signals_out  ),
+        .fifo_setup_signal                  (configure_memory_fifo_setup_signal                  )
     );
 
 // --------------------------------------------------------------------------------------
