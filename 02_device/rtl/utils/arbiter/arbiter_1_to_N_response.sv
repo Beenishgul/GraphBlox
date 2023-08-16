@@ -153,22 +153,22 @@ module arbiter_1_to_N_response #(
 
           case (ID_LEVEL)
             0       : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_cu[i] & fifo_response_dout_int.valid;
             end
             1       : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_bundle[i] & fifo_response_dout_int.valid;
             end
             2       : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_lane[i] & fifo_response_dout_int.valid;
             end
             3       : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_engine[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_engine[i] & fifo_response_dout_int.valid;
             end
             4       : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_module[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_module[i] & fifo_response_dout_int.valid;
             end
             default : begin
-              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
+              demux_bus_data_in_valid[i] <= fifo_response_dout_int.payload.meta.route.to.id_cu[i] & fifo_response_dout_int.valid;
             end
           endcase
         end
@@ -184,22 +184,22 @@ module arbiter_1_to_N_response #(
 
       case (ID_LEVEL)
         0       : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0];
         end
         1       : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_bundle[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0];
         end
         2       : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_lane[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0];
         end
         3       : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_engine[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0];
         end
         4       : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_module[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_module[NUM_MEMORY_REQUESTOR-1:0];
         end
         default : begin
-          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0];
+          demux_bus_sel_in <= fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0];
         end
       endcase
     end
