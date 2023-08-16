@@ -61,9 +61,9 @@
     parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},
     parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}},
 
-    parameter int CU_BUNDLES_COUNT_ARRAY[NUM_CUS_MAX] = '{2,4},
-    parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX] = '{'{2,4,6,6},'{4,4,6,6}},
-    parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}},'{'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}}},
+    parameter int CU_BUNDLES_COUNT_ARRAY[NUM_CUS_MAX] = '{1,4},
+    parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX] = '{'{1,4,6,6},'{4,4,6,6}},
+    parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{'{1,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}},'{'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2},'{3,3,3,3,2,2}}},
     parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_CUS_MAX][NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{'{2,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}},'{'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}},'{'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0},'{0,0,0}}}}
 
 
