@@ -52,7 +52,7 @@ module arbiter_1_to_N_response #(
   MemoryPacket                     fifo_response_dout_int               ;
   MemoryPacketPayload              fifo_response_dout                   ;
   logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en   ;
-  logic                            fifo_response_signals_in_reg_peek_int;
+  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_peek_int;
   FIFOStateSignalsInput            fifo_response_signals_in_int         ;
   FIFOStateSignalsOutput           fifo_response_signals_out_int        ;
   logic                            fifo_response_setup_signal_int       ;
@@ -101,26 +101,28 @@ module arbiter_1_to_N_response #(
       end
     end
 
+ for (i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_fifo_response_signals_in_reg_peek_int
     case (ID_LEVEL)
       0 : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_cu[i]);
       end
       1 : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_bundle[i]);
       end
       2 : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_lane[i]);
       end
       3 : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_engine[i]);
       end
       4 : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_module[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_module[i]);
       end
       default : begin
-        assign fifo_response_signals_in_reg_peek_int = (fifo_response_signals_in_reg_rd_en == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_reg_peek_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_cu[i]);
       end
     endcase
+  end
   endgenerate
 
 // --------------------------------------------------------------------------------------
@@ -229,8 +231,8 @@ module arbiter_1_to_N_response #(
   assign fifo_response_din                  = response_in_reg.payload;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg_peek_int;
-  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg_peek_int;
+  assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & (fifo_response_signals_in_reg_peek_int == demux_bus_data_in_valid);
+  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & ~fifo_response_signals_out_int.empty & (|fifo_response_signals_in_reg_peek_int);
   assign fifo_response_dout_int.payload     = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
