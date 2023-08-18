@@ -758,7 +758,7 @@ module __KERNEL___testbench ();
         buffer_5_ptr[62:0] = get_random_ptr();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr = 1;
-        buffer_8_ptr = 32;
+        buffer_8_ptr = 1;
         buffer_9_ptr = 0;
 
         ///////////////////////////////////////////////////////////////////////////
