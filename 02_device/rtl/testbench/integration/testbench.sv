@@ -758,7 +758,7 @@ module __KERNEL___testbench ();
         buffer_5_ptr[62:0] = get_random_ptr();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr = 1;
-        buffer_8_ptr = 1;
+        buffer_8_ptr = 32;
         buffer_9_ptr = 0;
 
         ///////////////////////////////////////////////////////////////////////////
@@ -943,7 +943,7 @@ module __KERNEL___testbench ();
         //CSR/StrideIndexGeneratorConfiguration
         setup_temp[0] = 1'b1;
         setup_temp[1] = 1'b0;
-        setup_temp[2] = 1'b1;
+        setup_temp[2] = 1'b0; // sequence mode
         setup_temp[3] = 1'b0;
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;                       // 0 - increment/decrement
         setup_temp = 0;
