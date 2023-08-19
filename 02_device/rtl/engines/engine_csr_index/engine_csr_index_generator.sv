@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-18 23:45:34
+// Revise : 2023-08-19 00:02:57
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -169,7 +169,9 @@ module engine_csr_index_generator #(parameter
             csr_flow_reg <= 1'b0;
         end
         else begin
-            if(ready_out_reg & done_out_reg) begin
+            if (ready_out_reg & done_out_reg & configure_memory_reg.valid) begin
+                configure_memory_reg.valid <= 1'b0;
+            end else if(ready_out_reg & done_out_reg & ~configure_memory_reg.valid) begin
                 configure_memory_reg.valid <= configure_memory_in.valid;
             end else begin
                 configure_memory_reg.valid <= configure_memory_reg.valid;
