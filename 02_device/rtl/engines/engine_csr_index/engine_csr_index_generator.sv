@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-20 00:24:33
+// Revise : 2023-08-20 00:26:33
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -310,6 +310,8 @@ module engine_csr_index_generator #(parameter
                 counter_load_value         <= 0;
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
+                seq_flow_reg               <= 1'b0;
+                csr_flow_reg               <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
@@ -322,6 +324,8 @@ module engine_csr_index_generator #(parameter
                 counter_load_value         <= 0;
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
+                seq_flow_reg               <= 1'b0;
+                csr_flow_reg               <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP : begin
                 done_int_reg               <= 1'b0;
