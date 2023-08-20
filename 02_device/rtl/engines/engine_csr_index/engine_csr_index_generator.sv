@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-20 00:18:07
+// Revise : 2023-08-20 00:24:33
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -110,10 +110,12 @@ module engine_csr_index_generator #(parameter
     MemoryPacket request_engine_out_reg    ;
     MemoryPacket request_memory_out_reg    ;
 
-    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
-    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
-    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
-    FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
+    FIFOStateSignalsInput fifo_configure_engine_in_signals_in_reg;
+    FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
+    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
+    FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -141,20 +143,24 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_response_engine_in_signals_in_reg <= 0;
-            fifo_response_memory_in_signals_in_reg <= 0;
-            fifo_request_engine_out_signals_in_reg <= 0;
-            fifo_request_memory_out_signals_in_reg <= 0;
-            response_engine_in_reg.valid           <= 1'b0;
-            response_memory_in_reg.valid           <= 1'b0;
+            fifo_configure_engine_in_signals_in_reg <= 0;
+            fifo_configure_memory_in_signals_in_reg <= 0;
+            fifo_response_engine_in_signals_in_reg  <= 0;
+            fifo_response_memory_in_signals_in_reg  <= 0;
+            fifo_request_engine_out_signals_in_reg  <= 0;
+            fifo_request_memory_out_signals_in_reg  <= 0;
+            response_engine_in_reg.valid            <= 1'b0;
+            response_memory_in_reg.valid            <= 1'b0;
         end
         else begin
-            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
-            fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
-            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
-            fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
-            response_engine_in_reg.valid           <= response_engine_in.valid;
-            response_memory_in_reg.valid           <= response_memory_in.valid ;
+            fifo_configure_engine_in_signals_in_reg <= fifo_configure_engine_in_signals_in;
+            fifo_configure_memory_in_signals_in_reg <= fifo_configure_memory_in_signals_in;
+            fifo_response_engine_in_signals_in_reg  <= fifo_response_engine_in_signals_in;
+            fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
+            fifo_request_engine_out_signals_in_reg  <= fifo_request_engine_out_signals_in;
+            fifo_request_memory_out_signals_in_reg  <= fifo_request_memory_out_signals_in;
+            response_engine_in_reg.valid            <= response_engine_in.valid;
+            response_memory_in_reg.valid            <= response_memory_in.valid ;
         end
     end
 
