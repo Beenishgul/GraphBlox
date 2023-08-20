@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-19 00:02:57
+// Revise : 2023-08-20 00:18:07
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@ module engine_csr_index_generator #(parameter
     COUNTER_WIDTH    = 32
 ) (
     // System Signals
-    input  logic                 ap_clk                            ,
-    input  logic                 areset                            ,
-    input  CSRIndexConfiguration configure_memory_in               ,
-    input  CSRIndexConfiguration configure_engine_in               ,
-    input  MemoryPacket          response_engine_in                ,
-    input  FIFOStateSignalsInput fifo_response_engine_in_signals_in,
-    input  MemoryPacket          response_memory_in                ,
-    input  FIFOStateSignalsInput fifo_response_memory_in_signals_in,
-    output MemoryPacket          request_engine_out                ,
-    input  FIFOStateSignalsInput fifo_request_engine_out_signals_in,
-    output MemoryPacket          request_memory_out                ,
-    input  FIFOStateSignalsInput fifo_request_memory_out_signals_in,
-    output logic                 fifo_setup_signal                 ,
+    input  logic                 ap_clk                             ,
+    input  logic                 areset                             ,
+    input  CSRIndexConfiguration configure_engine_in                ,
+    input  FIFOStateSignalsInput fifo_configure_engine_in_signals_in,
+    input  CSRIndexConfiguration configure_memory_in                ,
+    input  FIFOStateSignalsInput fifo_configure_memory_in_signals_in,
+    input  MemoryPacket          response_engine_in                 ,
+    input  FIFOStateSignalsInput fifo_response_engine_in_signals_in ,
+    input  MemoryPacket          response_memory_in                 ,
+    input  FIFOStateSignalsInput fifo_response_memory_in_signals_in ,
+    output MemoryPacket          request_engine_out                 ,
+    input  FIFOStateSignalsInput fifo_request_engine_out_signals_in ,
+    output MemoryPacket          request_memory_out                 ,
+    input  FIFOStateSignalsInput fifo_request_memory_out_signals_in ,
+    output logic                 fifo_setup_signal                  ,
+    output logic                 configure_memory_setup             ,
+    output logic                 configure_engine_setup             ,
     output logic                 done_out
 );
 
@@ -99,10 +103,12 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutput fifo_request_signals_out_int ;
     logic                  fifo_request_setup_signal_int;
 
-    MemoryPacket response_engine_in_reg;
-    MemoryPacket response_memory_in_reg;
-    MemoryPacket request_engine_out_reg;
-    MemoryPacket request_memory_out_reg;
+    MemoryPacket response_engine_in_reg    ;
+    MemoryPacket response_memory_in_reg    ;
+    logic        configure_engine_setup_reg;
+    logic        configure_memory_setup_reg;
+    MemoryPacket request_engine_out_reg    ;
+    MemoryPacket request_memory_out_reg    ;
 
     FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
     FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
@@ -211,12 +217,16 @@ module engine_csr_index_generator #(parameter
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
+            configure_memory_setup   <= 1'b0;
+            configure_engine_setup   <= 1'b0;
             done_out                 <= 1'b0;
         end
         else begin
             fifo_setup_signal        <= fifo_request_setup_signal_int;
             request_engine_out.valid <= request_engine_out_reg.valid;
             request_memory_out.valid <= request_memory_out_reg.valid;
+            configure_memory_setup   <= configure_memory_setup_reg;
+            configure_engine_setup   <= configure_engine_setup_reg;
             done_out                 <= done_out_reg;
         end
     end
