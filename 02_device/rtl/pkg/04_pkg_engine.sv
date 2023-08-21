@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 04_pkg_engine.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-08-19 23:38:43
+// Revise : 2023-08-21 01:26:54
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -96,12 +96,16 @@ package PKG_ENGINE;
         ENGINE_CSR_INDEX_DONE
     } engine_csr_index_state;
 
-    typedef enum logic[8:0] {
+    typedef enum logic[14:0] {
         ENGINE_CSR_INDEX_GEN_RESET,
         ENGINE_CSR_INDEX_GEN_IDLE,
-        ENGINE_CSR_INDEX_GEN_FLOW_0,
-        ENGINE_CSR_INDEX_GEN_FLOW_1,
-        ENGINE_CSR_INDEX_GEN_SETUP,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE,
+        ENGINE_CSR_INDEX_GEN_START_TRANS,
         ENGINE_CSR_INDEX_GEN_START,
         ENGINE_CSR_INDEX_GEN_BUSY_TRANS,
         ENGINE_CSR_INDEX_GEN_BUSY,
