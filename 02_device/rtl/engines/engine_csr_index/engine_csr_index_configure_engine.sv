@@ -7,8 +7,8 @@
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_engine.sv
-// Create : 2023-07-26 18:06:06
-// Revise : 2023-08-15 10:48:08
+// Create : 2023-07-17 15:02:02
+// Revise : 2023-08-21 09:48:40
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,13 +21,10 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_csr_index_configure_engine #(parameter
-    ID_CU            = 0                                ,
-    ID_BUNDLE        = 0                                ,
-    ID_LANE          = 0                                ,
-    ID_ENGINE        = 0                                ,
-    ENGINE_SEQ_WIDTH = 11                               ,
-    ENGINE_SEQ_MIN   = 0                                ,
-    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
+    ID_CU     = 0,
+    ID_BUNDLE = 0,
+    ID_LANE   = 0,
+    ID_ENGINE = 0
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -46,13 +43,10 @@ module engine_csr_index_configure_engine #(parameter
     logic areset_csr_index_generator;
     logic areset_fifo               ;
 
-    MemoryPacket                      response_engine_in_reg                          ;
-    MemoryPacketMeta                  configure_engine_meta_int                       ;
-    CSRIndexConfiguration             configure_engine_reg                            ;
-    logic [     ENGINE_SEQ_WIDTH-1:0] configure_engine_valid_reg                      ;
-    logic                             configure_engine_valid_int                      ;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_engine_in_reg_offset_sequence          ;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] fifo_response_engine_in_dout_int_offset_sequence;
+    MemoryPacket          response_engine_in_reg    ;
+    CSRIndexConfiguration configure_engine_reg      ;
+    logic                 configure_engine_valid_reg;
+    logic                 configure_engine_valid_int;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -123,108 +117,31 @@ module engine_csr_index_configure_engine #(parameter
         configure_engine_out.payload        <= fifo_configure_engine_dout_int.payload;
     end
 
-
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
-    assign configure_engine_valid_int                       = &configure_engine_valid_reg;
-    assign response_engine_in_reg_offset_sequence           = (response_engine_in_reg.payload.meta.address.offset >> response_engine_in_reg.payload.meta.address.shift.amount);
-    assign fifo_response_engine_in_dout_int_offset_sequence = (fifo_response_engine_in_dout_int.payload.meta.address.offset >> fifo_response_engine_in_dout_int.payload.meta.address.shift.amount);
-
-    always_comb begin
-        configure_engine_meta_int.route.from.id_cu        = ID_CU;
-        configure_engine_meta_int.route.from.id_bundle    = ID_BUNDLE;
-        configure_engine_meta_int.route.from.id_lane      = ID_LANE;
-        configure_engine_meta_int.route.from.id_buffer    = 0;
-        configure_engine_meta_int.route.to.id_cu          = ID_CU;
-        configure_engine_meta_int.route.to.id_bundle      = ID_BUNDLE;
-        configure_engine_meta_int.route.to.id_lane        = ID_LANE;
-        configure_engine_meta_int.route.to.id_buffer      = 0;
-        configure_engine_meta_int.address.base            = 0;
-        configure_engine_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
-        configure_engine_meta_int.address.shift.amount    = 0;
-        configure_engine_meta_int.address.shift.direction = 1'b1;
-        configure_engine_meta_int.subclass.cmd            = CMD_INVALID;
-        configure_engine_meta_int.subclass.buffer         = STRUCT_INVALID;
-        configure_engine_meta_int.subclass.operand        = OP_LOCATION_0;
-        configure_engine_meta_int.subclass.filter         = FILTER_NOP;
-        configure_engine_meta_int.subclass.alu            = ALU_NOP;
-    end
+    assign configure_engine_valid_int = configure_engine_valid_reg;
 
     always_ff @(posedge ap_clk) begin
         if(areset_csr_index_generator) begin
             configure_engine_reg       <= 0;
             configure_engine_valid_reg <= 0;
         end else begin
-            configure_engine_reg.valid                   <= configure_engine_valid_int;
-            configure_engine_reg.payload.meta.route.from <= configure_engine_meta_int.route.from;
-            configure_engine_reg.payload.meta.address    <= configure_engine_meta_int.address;
+            configure_engine_reg.valid <= configure_engine_valid_int;
 
             if(fifo_response_engine_in_dout_int.valid) begin
-                case (fifo_response_engine_in_dout_int_offset_sequence)
-                    (ENGINE_SEQ_MIN+0) : begin
-                        configure_engine_reg.payload.param.increment     <= fifo_response_engine_in_dout_int.payload.data.field_0[0];
-                        configure_engine_reg.payload.param.decrement     <= fifo_response_engine_in_dout_int.payload.data.field_0[1];
-                        configure_engine_reg.payload.param.mode_sequence <= fifo_response_engine_in_dout_int.payload.data.field_0[2];
-                        configure_engine_reg.payload.param.mode_buffer   <= fifo_response_engine_in_dout_int.payload.data.field_0[3];
-                        configure_engine_valid_reg[0]                    <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+1) : begin
-                        configure_engine_reg.payload.param.index_start <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[1]                  <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+2) : begin
-                        configure_engine_reg.payload.param.index_end <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[2]                <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+3) : begin
-                        configure_engine_reg.payload.param.stride <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[3]             <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+4) : begin
-                        configure_engine_reg.payload.param.granularity            <= fifo_response_engine_in_dout_int.payload.data.field_0[CACHE_FRONTEND_DATA_W-2:0];
-                        configure_engine_reg.payload.meta.address.shift.amount    <= fifo_response_engine_in_dout_int.payload.data.field_0[CACHE_FRONTEND_DATA_W-2:0];
-                        configure_engine_reg.payload.meta.address.shift.direction <= fifo_response_engine_in_dout_int.payload.data.field_0[CACHE_FRONTEND_DATA_W-1];
-                        configure_engine_valid_reg[4]                             <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+5) : begin
-                        configure_engine_reg.payload.meta.subclass.cmd    <= type_memory_cmd'(fifo_response_engine_in_dout_int.payload.data.field_0[TYPE_MEMORY_CMD_BITS-1:0]);
-                        configure_engine_reg.payload.meta.subclass.buffer <= type_data_buffer'(fifo_response_engine_in_dout_int.payload.data.field_0[(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
-                        configure_engine_valid_reg[5]                     <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+6) : begin
-                        configure_engine_reg.payload.meta.subclass.operand <= type_engine_operand'(fifo_response_engine_in_dout_int.payload.data.field_0[TYPE_ENGINE_OPERAND_BITS-1:0]);
-                        configure_engine_reg.payload.meta.subclass.filter  <= type_filter_operation'(fifo_response_engine_in_dout_int.payload.data.field_0[(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
-                        configure_engine_reg.payload.meta.subclass.alu     <= type_ALU_operation'(fifo_response_engine_in_dout_int.payload.data.field_0[(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
-                        configure_engine_valid_reg[6]                      <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+7) : begin
-                        configure_engine_reg.payload.meta.route.to.id_cu     <= fifo_response_engine_in_dout_int.payload.data.field_0[(KERNEL_CU_COUNT_WIDTH_BITS)-1:0];
-                        configure_engine_reg.payload.meta.route.to.id_bundle <= fifo_response_engine_in_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:KERNEL_CU_COUNT_WIDTH_BITS];
-                        configure_engine_reg.payload.meta.route.to.id_lane   <= fifo_response_engine_in_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
-                        configure_engine_reg.payload.meta.route.to.id_buffer <= fifo_response_engine_in_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
-                        configure_engine_valid_reg[7]                        <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+8) : begin
-                        configure_engine_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[8]                                                 <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+9) : begin
-                        configure_engine_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[9]                                                                       <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+10) : begin
-                        configure_engine_reg.payload.param.array_size <= fifo_response_engine_in_dout_int.payload.data.field_0;
-                        configure_engine_valid_reg[10]                <= 1'b1  ;
-                    end
-                    default : begin
-                        configure_engine_reg.payload.param <= configure_engine_reg.payload.param;
-                        if(configure_engine_valid_int)
-                            configure_engine_valid_reg <= 0;
-                        else
-                            configure_engine_valid_reg <= configure_engine_valid_reg;
-                    end
-                endcase
+                configure_engine_reg.payload.meta                <= fifo_response_engine_in_dout_int.payload.meta;
+                configure_engine_reg.payload.param.increment     <= 0;
+                configure_engine_reg.payload.param.decrement     <= 0;
+                configure_engine_reg.payload.param.mode_sequence <= 0;
+                configure_engine_reg.payload.param.mode_buffer   <= 0;
+                configure_engine_reg.payload.param.index_start   <= fifo_response_engine_in_dout_int.payload.data.field_0;
+                configure_engine_reg.payload.param.index_end     <= fifo_response_engine_in_dout_int.payload.data.field_1;
+                configure_engine_reg.payload.param.stride        <= 0;
+                configure_engine_reg.payload.param.granularity   <= 0;
+                configure_engine_reg.payload.param.array_pointer <= 0;
+                configure_engine_reg.payload.param.array_size    <= fifo_response_engine_in_dout_int.payload.data.field_3;
+                configure_engine_valid_reg                       <= 1'b1  ;
             end else begin
                 configure_engine_reg.payload.param <= configure_engine_reg.payload.param;
                 if(configure_engine_valid_int)
@@ -242,7 +159,7 @@ module engine_csr_index_configure_engine #(parameter
     assign fifo_response_engine_in_setup_signal_int = fifo_response_engine_in_signals_out_int.wr_rst_busy  | fifo_response_engine_in_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_response_engine_in_push_filter          = ((response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_engine_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_engine_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+    assign fifo_response_engine_in_push_filter          = ((response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
     assign fifo_response_engine_in_signals_in_int.wr_en = response_engine_in_reg.valid & fifo_response_engine_in_push_filter;
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 

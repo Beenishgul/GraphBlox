@@ -997,19 +997,19 @@ module __KERNEL___testbench ();
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 8-BUFFER pointer
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_5_ptr[31:0];  
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];  
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 9-BUFFER pointer
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_5_ptr[63:32]; 
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32]; 
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // 10-BUFFER size
         // param.array_size
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count;   
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;   
         // --------------------------------------------------------------------------------------
 
         for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
