@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-21 03:20:00
+// Revise : 2023-08-21 03:31:08
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -400,10 +400,14 @@ module engine_csr_index_generator #(parameter
                 configure_engine_param_int.index_end   <= configure_engine_reg.payload.param.index_end;
             end
             ENGINE_CSR_INDEX_GEN_START_TRANS : begin
-                done_int_reg   <= 1'b0;
-                done_out_reg   <= 1'b0;
-                counter_enable <= 1'b1;
-                counter_load   <= 1'b1;
+                done_int_reg         <= 1'b0;
+                done_out_reg         <= 1'b0;
+                counter_enable       <= 1'b1;
+                counter_load         <= 1'b1;
+                counter_incr         <= configure_engine_param_int.increment;
+                counter_decr         <= configure_engine_param_int.decrement;
+                counter_load_value   <= configure_engine_param_int.index_start;
+                counter_stride_value <= configure_engine_param_int.stride;
             end
             ENGINE_CSR_INDEX_GEN_START : begin
                 counter_enable <= 1'b1;
