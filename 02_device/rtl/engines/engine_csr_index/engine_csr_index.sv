@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-21 03:02:32
+// Revise : 2023-08-21 03:54:04
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -483,7 +483,8 @@ module engine_csr_index #(parameter
     engine_csr_index_configure_engine #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  )
+        .ID_LANE  (ID_LANE  ),
+        .ID_ENGINE(ID_ENGINE)
     ) inst_engine_csr_index_configure_engine (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_engine                             ),
@@ -509,7 +510,8 @@ module engine_csr_index #(parameter
     engine_csr_index_configure_memory #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  )
+        .ID_LANE  (ID_LANE  ),
+        .ID_ENGINE(ID_ENGINE)
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),

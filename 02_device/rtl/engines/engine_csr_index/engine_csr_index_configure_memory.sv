@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-15 10:47:49
+// Revise : 2023-08-21 03:53:01
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@ module engine_csr_index_configure_memory #(parameter
     ID_CU            = 0                                ,
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
+    ID_ENGINE        = 0                                ,
     ENGINE_SEQ_WIDTH = 11                               ,
     ENGINE_SEQ_MIN   = 0                                ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
@@ -134,10 +135,14 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_meta_int.route.from.id_cu        = ID_CU;
         configure_memory_meta_int.route.from.id_bundle    = ID_BUNDLE;
         configure_memory_meta_int.route.from.id_lane      = ID_LANE;
+        configure_memory_meta_int.route.from.id_engine    = ID_ENGINE;
+        configure_memory_meta_int.route.from.id_module    = 1;
         configure_memory_meta_int.route.from.id_buffer    = 0;
         configure_memory_meta_int.route.to.id_cu          = ID_CU;
         configure_memory_meta_int.route.to.id_bundle      = ID_BUNDLE;
         configure_memory_meta_int.route.to.id_lane        = ID_LANE;
+        configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
+        configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
