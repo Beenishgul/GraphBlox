@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-21 02:15:57
+// Revise : 2023-08-21 02:19:41
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -536,7 +536,7 @@ module engine_csr_index_generator #(parameter
         end
         fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_response_comb.payload.data.field_0       = response_memory_in_reg.payload.data
+        fifo_response_comb.payload.data               = response_memory_in_reg.payload.data;
     end
 
     always_ff @(posedge ap_clk) begin
