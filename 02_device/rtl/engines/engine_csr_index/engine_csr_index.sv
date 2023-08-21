@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-20 00:21:02
+// Revise : 2023-08-21 02:29:52
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -142,11 +142,13 @@ module engine_csr_index #(parameter
     CSRIndexConfiguration generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput generator_engine_fifo_configure_memory_in_signals_in;
 
-    MemoryPacket          generator_engine_response_engine_in                ;
-    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_in;
+    MemoryPacket          generator_engine_response_engine_in                 ;
+    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_in ;
+    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_out;
 
-    MemoryPacket          generator_engine_response_memory_in                ;
-    FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_in;
+    MemoryPacket          generator_engine_response_memory_in                 ;
+    FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_in ;
+    FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_out;
 
     MemoryPacket          generator_engine_request_engine_out                ;
     FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
@@ -530,11 +532,11 @@ module engine_csr_index #(parameter
     assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
 
     assign generator_engine_response_engine_in                       = modules_response_engine_in[1];
-    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[1].rd_en;
+    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[1].rd_en & generator_engine_fifo_response_engine_in_signals_out.rd_en;
     assign modules_fifo_response_engine_in_signals_out[1]            = fifo_response_engine_in_signals_out_int;
 
     assign generator_engine_response_memory_in                       = modules_response_memory_in[1];;
-    assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en;
+    assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en & generator_engine_fifo_response_memory_in_signals_out.rd_en;
     assign modules_fifo_response_memory_in_signals_out[1]            = fifo_response_memory_in_signals_out_int;
 
 
@@ -554,14 +556,17 @@ module engine_csr_index #(parameter
     ) inst_engine_csr_index_generator (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_generator                                    ),
+        .descriptor_in                      (descriptor_in_reg                                   ),
         .configure_engine_in                (generator_engine_configure_engine_in                ),
         .fifo_configure_engine_in_signals_in(generator_engine_fifo_configure_engine_in_signals_in),
         .configure_memory_in                (generator_engine_configure_memory_in                ),
         .fifo_configure_memory_in_signals_in(generator_engine_fifo_configure_memory_in_signals_in),
         .response_engine_in                 (generator_engine_response_engine_in                 ),
         .fifo_response_engine_in_signals_in (generator_engine_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(generator_engine_fifo_response_engine_in_signals_out),
         .response_memory_in                 (generator_engine_response_memory_in                 ),
         .fifo_response_memory_in_signals_in (generator_engine_fifo_response_memory_in_signals_in ),
+        .fifo_response_memory_in_signals_out(generator_engine_fifo_response_memory_in_signals_out),
         .request_engine_out                 (generator_engine_request_engine_out                 ),
         .fifo_request_engine_out_signals_in (generator_engine_fifo_request_engine_out_signals_in ),
         .request_memory_out                 (generator_engine_request_memory_out                 ),

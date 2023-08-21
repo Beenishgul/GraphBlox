@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-21 02:19:41
+// Revise : 2023-08-21 02:39:42
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -55,8 +55,10 @@ module engine_csr_index_generator #(parameter
     input  FIFOStateSignalsInput fifo_configure_memory_in_signals_in,
     input  MemoryPacket          response_engine_in                 ,
     input  FIFOStateSignalsInput fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsInput fifo_response_engine_in_signals_out,
     input  MemoryPacket          response_memory_in                 ,
     input  FIFOStateSignalsInput fifo_response_memory_in_signals_in ,
+    output FIFOStateSignalsInput fifo_response_memory_in_signals_out,
     output MemoryPacket          request_engine_out                 ,
     input  FIFOStateSignalsInput fifo_request_engine_out_signals_in ,
     output MemoryPacket          request_memory_out                 ,
@@ -110,6 +112,9 @@ module engine_csr_index_generator #(parameter
 
     MemoryPacket request_engine_out_reg;
     MemoryPacket request_memory_out_reg;
+
+    FIFOStateSignalsInput fifo_response_engine_in_signals_out_reg;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_out_reg;
 
     FIFOStateSignalsInput fifo_configure_engine_in_signals_in_reg;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
@@ -208,20 +213,24 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_setup_signal        <= 1'b1;
-            request_engine_out.valid <= 1'b0;
-            request_memory_out.valid <= 1'b0;
-            configure_memory_setup   <= 1'b0;
-            configure_engine_setup   <= 1'b0;
-            done_out                 <= 1'b0;
+            fifo_setup_signal                   <= 1'b1;
+            request_engine_out.valid            <= 1'b0;
+            request_memory_out.valid            <= 1'b0;
+            configure_memory_setup              <= 1'b0;
+            configure_engine_setup              <= 1'b0;
+            done_out                            <= 1'b0;
+            fifo_response_engine_in_signals_out <= 0;
+            fifo_response_memory_in_signals_out <= 0;
         end
         else begin
-            fifo_setup_signal        <= fifo_request_setup_signal_int;
-            request_engine_out.valid <= request_engine_out_reg.valid;
-            request_memory_out.valid <= request_memory_out_reg.valid;
-            configure_memory_setup   <= configure_memory_setup_reg;
-            configure_engine_setup   <= configure_engine_setup_reg;
-            done_out                 <= done_out_reg;
+            fifo_setup_signal                   <= fifo_request_setup_signal_int;
+            request_engine_out.valid            <= request_engine_out_reg.valid;
+            request_memory_out.valid            <= request_memory_out_reg.valid;
+            configure_memory_setup              <= configure_memory_setup_reg;
+            configure_engine_setup              <= configure_engine_setup_reg;
+            done_out                            <= done_out_reg;
+            fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
+            fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
     end
 
@@ -539,22 +548,31 @@ module engine_csr_index_generator #(parameter
         fifo_response_comb.payload.data               = response_memory_in_reg.payload.data;
     end
 
+
+
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             fifo_request_signals_in_reg <= 0;
             request_engine_out_reg      <= 0;
             request_memory_out_reg      <= 0;
+            fifo_response_engine_in_signals_out_reg <= 0;
+            fifo_response_memory_in_signals_out_reg <= 0;
         end
         else begin
-            if(configure_engine_param_int.mode_buffer) begin
+            if(configure_engine_param_int.mode_buffer) begin // (0) memory_buffer (1) engine buffer
                 fifo_request_signals_in_reg <= fifo_request_engine_out_signals_in_reg;
+                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b1;
+                fifo_response_memory_in_signals_out_reg.rd_en <= 1'b1;
                 request_engine_out_reg      <= request_out_int;
                 request_memory_out_reg      <= 0;
             end
-            else if(~configure_engine_param_int.mode_buffer) begin
+            else if(~configure_engine_param_int.mode_buffer) begin // response from memory -> request engine 
                 fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
-                request_engine_out_reg      <= fifo_response_comb;
                 request_memory_out_reg      <= request_out_int;
+
+                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b1;
+                fifo_response_memory_in_signals_out_reg.rd_en <= fifo_response_memory_in_signals_in_reg.rd_en;
+                request_engine_out_reg      <= fifo_response_comb;
             end
         end
     end
