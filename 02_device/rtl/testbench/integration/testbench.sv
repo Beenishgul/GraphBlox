@@ -943,8 +943,8 @@ module __KERNEL___testbench ();
         //CSR/StrideIndexGeneratorConfiguration
         setup_temp[0] = 1'b1;
         setup_temp[1] = 1'b0;
-        setup_temp[2] = 1'b0; // (0) direct mode (1) indirect mode
-        setup_temp[3] = 1'b0; // (0) engine buffer (1) memory buffer
+        setup_temp[2] = 1'b0; // (0) direct mode   (1) indirect mode
+        setup_temp[3] = 1'b1; // (0) engine buffer (1) memory buffer
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;                       // 0 - increment/decrement
         setup_temp = 0;
 
@@ -957,7 +957,8 @@ module __KERNEL___testbench ();
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp; // 4 - shift direction 1-left 0-right | (granularity - log2 value for shifting)
         setup_temp = 0;
 
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_READ}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {10'b000000000000,8'b00000111,8'b00000001,6'b000001}; // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
 

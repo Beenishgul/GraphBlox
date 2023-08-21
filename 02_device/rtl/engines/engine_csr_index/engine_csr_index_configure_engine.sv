@@ -24,6 +24,7 @@ module engine_csr_index_configure_engine #(parameter
     ID_CU            = 0                                ,
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
+    ID_ENGINE        = 0                                ,
     ENGINE_SEQ_WIDTH = 11                               ,
     ENGINE_SEQ_MIN   = 0                                ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
