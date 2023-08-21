@@ -151,7 +151,7 @@ export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${file
 # generate SYSTEM CACHE
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
 # ----------------------------------------------------------------------------
-set SYSTEM_CACHE_SIZE_B   131072
+# set SYSTEM_CACHE_SIZE_B   65536
 set SYSTEM_CACHE_NUM_WAYS 4
 set LINE_CACHE_DATA_WIDTH 512 
 set FE_ADDR_WIDTH         64 
