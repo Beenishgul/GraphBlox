@@ -247,14 +247,18 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
 
     if(algorithm == 1)
     {
-        overlay_configuration[0] = 1; // 0 - increment/decrement
-        overlay_configuration[1] = 0; // 1 - index_start
-        overlay_configuration[2] = graph->num_vertices; // 2 - index_end
-        overlay_configuration[3] = 1; // 3 - stride
-        overlay_configuration[4] = 0x80000002; // 4 - granularity - log2 value for shifting
-        overlay_configuration[5] = 0x000002C5; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
-        overlay_configuration[6] = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
-        overlay_configuration[7] = 0x00007011;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        overlay_configuration[0]  = 0x00000009; // 0 - increment/decrement
+        overlay_configuration[1]  = 0x00000000; // 1 - index_start
+        overlay_configuration[2]  = graph->num_vertices; // 2 - index_end
+        overlay_configuration[3]  = 0x00000001; // 3 - stride
+        overlay_configuration[4]  = 0x80000002; // 4 - granularity - log2 value for shifting
+        overlay_configuration[5]  = 0x00000101; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+        overlay_configuration[6]  = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
+        overlay_configuration[7]  = 0x0001c041;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        overlay_configuration[8]  = 0xabcb8000;//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        overlay_configuration[9]  = xrt_buffer_device[1];//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        overlay_configuration[10] = xrt_buffer_device[1] >> 32;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        overlay_configuration[11] = graph->num_vertices;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
     }
 }
 

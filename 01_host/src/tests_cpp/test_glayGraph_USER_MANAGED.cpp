@@ -326,7 +326,15 @@ main (int argc, char **argv)
 
     startGLAYUserManaged(arguments->glayHandle);
 
+    Start(timer);
     waitGLAYUserManaged(arguments->glayHandle);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
     // closeGLAYUserManaged(arguments->glayHandle);
 
