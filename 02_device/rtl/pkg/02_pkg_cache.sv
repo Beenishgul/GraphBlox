@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 02_pkg_cache.sv
 // Create : 2022-11-16 19:43:34
-// Revise : 2023-06-18 22:43:03
+// Revise : 2023-08-21 04:07:30
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 `timescale 1 ns / 1 ps
@@ -39,7 +39,7 @@ package PKG_CACHE;
 	parameter CACHE_FRONTEND_ADDR_W = GLOBAL_ADDR_WIDTH_BITS; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter CACHE_FRONTEND_DATA_W = GLOBAL_DATA_WIDTH_BITS; //Data width - word size used for the cache
 	parameter CACHE_N_WAYS          = 1                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 10                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_LINE_OFF_W      = 5                     ; //Line-Offset Width - 2**NLINE_W total cache lines
 	parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)            ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
