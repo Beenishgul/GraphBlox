@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-20 00:26:33
+// Revise : 2023-08-21 02:15:57
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ module engine_csr_index_generator #(parameter
     // System Signals
     input  logic                 ap_clk                             ,
     input  logic                 areset                             ,
+    input  KernelDescriptor      descriptor_in                      ,
     input  CSRIndexConfiguration configure_engine_in                ,
     input  FIFOStateSignalsInput fifo_configure_engine_in_signals_in,
     input  CSRIndexConfiguration configure_memory_in                ,
@@ -73,6 +74,8 @@ module engine_csr_index_generator #(parameter
     logic areset_counter  ;
     logic areset_fifo     ;
 
+    KernelDescriptor descriptor_in_reg;
+
     CSRIndexConfiguration configure_memory_reg;
     CSRIndexConfiguration configure_engine_reg;
     MemoryPacket          request_out_int     ;
@@ -83,13 +86,8 @@ module engine_csr_index_generator #(parameter
     engine_csr_index_generator_state current_state;
     engine_csr_index_generator_state next_state   ;
 
-    logic done_int_reg ;
-    logic ready_out_reg;
-    logic done_out_reg ;
-
-    logic seq_flow_reg;
-    logic csr_flow_reg;
-
+    logic done_int_reg;
+    logic done_out_reg;
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
@@ -107,8 +105,11 @@ module engine_csr_index_generator #(parameter
     MemoryPacket response_memory_in_reg    ;
     logic        configure_engine_setup_reg;
     logic        configure_memory_setup_reg;
-    MemoryPacket request_engine_out_reg    ;
-    MemoryPacket request_memory_out_reg    ;
+
+    CSRIndexConfigurationParameters configure_engine_param_int;
+
+    MemoryPacket request_engine_out_reg;
+    MemoryPacket request_memory_out_reg;
 
     FIFOStateSignalsInput fifo_configure_engine_in_signals_in_reg;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
@@ -137,7 +138,21 @@ module engine_csr_index_generator #(parameter
         areset_counter   <= areset;
         areset_fifo      <= areset;
     end
+// --------------------------------------------------------------------------------------
+// READ Descriptor
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            descriptor_in_reg.valid <= 1'b0;
+        end
+        else begin
+            descriptor_in_reg.valid <= descriptor_in.valid;
+        end
+    end
 
+    always_ff @(posedge ap_clk) begin
+        descriptor_in_reg.payload <= descriptor_in.payload;
+    end
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
@@ -170,49 +185,22 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-// Decide engine flow
+// Configure Engine
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            configure_memory_reg.valid <= 1'b0;
             configure_engine_reg.valid <= 1'b0;
-
-            seq_flow_reg <= 1'b0;
-            csr_flow_reg <= 1'b0;
+            configure_memory_reg.valid <= 1'b0;
         end
         else begin
-            if (ready_out_reg & done_out_reg & configure_memory_reg.valid) begin
-                configure_memory_reg.valid <= 1'b0;
-            end else if(ready_out_reg & done_out_reg & ~configure_memory_reg.valid) begin
-                configure_memory_reg.valid <= configure_memory_in.valid;
-            end else begin
-                configure_memory_reg.valid <= configure_memory_reg.valid;
-            end
-
-            if(ready_out_reg & configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid ) begin
-                configure_engine_reg.valid <= configure_engine_in.valid;
-                seq_flow_reg               <= 1'b0;
-                csr_flow_reg               <= configure_engine_in.valid;
-            end else if(ready_out_reg & ~configure_memory_reg.payload.param.mode_sequence & configure_memory_reg.valid) begin
-                configure_engine_reg.valid <= configure_memory_reg.valid;
-                seq_flow_reg               <= configure_memory_reg.valid;
-                csr_flow_reg               <= 1'b0;
-            end else begin
-                configure_engine_reg.valid <= configure_engine_reg.valid;
-                seq_flow_reg               <= seq_flow_reg;
-                csr_flow_reg               <= csr_flow_reg;
-            end
+            configure_engine_reg.valid <= configure_engine_in.valid;
+            configure_memory_reg.valid <= configure_memory_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
+        configure_engine_reg.payload <= configure_engine_in.payload;
         configure_memory_reg.payload <= configure_memory_in.payload;
-
-        if(configure_memory_reg.payload.param.mode_sequence) begin
-            configure_engine_reg.payload <= configure_engine_in.payload;
-        end else begin
-            configure_engine_reg.payload <= configure_memory_reg.payload;
-        end
     end
 
 // --------------------------------------------------------------------------------------
@@ -260,12 +248,44 @@ module engine_csr_index_generator #(parameter
                 next_state = ENGINE_CSR_INDEX_GEN_IDLE;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
-                if(configure_memory_reg.valid & configure_engine_reg.valid)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP;
+                if(descriptor_in_reg.valid)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_IDLE;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP : begin
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
+                if(fifo_configure_memory_in_signals_in.rd_en)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
+                next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
+                if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) // (1) indirect mode (get count from other engines)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) // (0) direct mode (get count from memory)
+                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
+                if(fifo_configure_engine_in_signals_in.rd_en)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS : begin
+                next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE : begin
+                if(configure_engine_reg.valid) // (1) indirect mode (get count from other engines)
+                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE;
+            end
+            ENGINE_CSR_INDEX_GEN_START_TRANS : begin
                 next_state = ENGINE_CSR_INDEX_GEN_START;
             end
             ENGINE_CSR_INDEX_GEN_START : begin
@@ -292,7 +312,10 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
-                next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                if (configure_engine_param_int.mode_sequence)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
             end
         endcase
     end // always_comb
@@ -301,7 +324,6 @@ module engine_csr_index_generator #(parameter
         case (current_state)
             ENGINE_CSR_INDEX_GEN_RESET : begin
                 done_int_reg               <= 1'b1;
-                ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
@@ -310,12 +332,13 @@ module engine_csr_index_generator #(parameter
                 counter_load_value         <= 0;
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
-                seq_flow_reg               <= 1'b0;
-                csr_flow_reg               <= 1'b0;
+
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_setup_reg <= 1'b0;
+                configure_engine_param_int <= 0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
-                ready_out_reg              <= 1'b1;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
@@ -324,97 +347,104 @@ module engine_csr_index_generator #(parameter
                 counter_load_value         <= 0;
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
-                seq_flow_reg               <= 1'b0;
-                csr_flow_reg               <= 1'b0;
+
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_setup_reg <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP : begin
-                done_int_reg               <= 1'b0;
-                ready_out_reg              <= 1'b0;
-                done_out_reg               <= 1'b0;
-                counter_enable             <= 1'b1;
-                counter_load               <= 1'b1;
-                counter_incr               <= configure_memory_reg.payload.param.increment;
-                counter_decr               <= configure_memory_reg.payload.param.decrement;
-                counter_load_value         <= configure_engine_reg.payload.param.index_start;
-                counter_stride_value       <= configure_memory_reg.payload.param.stride;
-                fifo_request_din_reg.valid <= 1'b0;
-            end
-            ENGINE_CSR_INDEX_GEN_START : begin
-                done_int_reg               <= 1'b0;
-                ready_out_reg              <= 1'b0;
-                done_out_reg               <= 1'b0;
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
-                counter_incr               <= configure_memory_reg.payload.param.increment;
-                counter_decr               <= configure_memory_reg.payload.param.decrement;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
+                configure_memory_setup_reg <= 1'b1;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_param_int <= configure_memory_reg.payload.param;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b1;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
+                fifo_request_din_reg.valid <= 1'b0;
+                configure_engine_setup_reg <= 1'b0;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS : begin
+                configure_engine_setup_reg <= 1'b1;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE : begin
+                configure_engine_setup_reg             <= 1'b0;
+                configure_engine_param_int.index_start <= configure_engine_reg.payload.param.index_start;
+                configure_engine_param_int.index_end   <= configure_engine_reg.payload.param.index_end;
+            end
+            ENGINE_CSR_INDEX_GEN_START_TRANS : begin
+                counter_enable <= 1'b1;
+                counter_load   <= 1'b1;
+            end
+            ENGINE_CSR_INDEX_GEN_START : begin
+                counter_enable <= 1'b1;
+                counter_load   <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
                 done_int_reg               <= 1'b0;
-                ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
-                counter_incr               <= 1'b0;
-                counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_BUSY : begin
-                if((counter_count >= configure_engine_reg.payload.param.index_end)) begin
+                if((counter_count >= configure_engine_param_int.index_end)) begin
                     done_int_reg               <= 1'b1;
-                    counter_incr               <= 1'b0;
-                    counter_decr               <= 1'b0;
+                    counter_enable             <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
                     done_int_reg               <= 1'b0;
                     counter_enable             <= 1'b1;
-                    counter_incr               <= configure_memory_reg.payload.param.increment;
-                    counter_decr               <= configure_memory_reg.payload.param.decrement;
                     fifo_request_din_reg.valid <= 1'b1;
                 end
-                ready_out_reg  <= 1'b0;
-                done_out_reg   <= 1'b0;
-                counter_enable <= 1'b1;
-                counter_load   <= 1'b0;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_BUSY_TRANS : begin
-                if((counter_count >= configure_engine_reg.payload.param.index_end)) begin
+                if((counter_count >= configure_engine_param_int.index_end)) begin
                     done_int_reg               <= 1'b1;
-                    counter_incr               <= 1'b0;
-                    counter_decr               <= 1'b0;
+                    counter_enable             <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
                     done_int_reg               <= 1'b0;
                     counter_enable             <= 1'b1;
-                    counter_incr               <= configure_memory_reg.payload.param.increment;
-                    counter_decr               <= configure_memory_reg.payload.param.decrement;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
-                ready_out_reg  <= 1'b0;
-                done_out_reg   <= 1'b0;
-                counter_enable <= 1'b1;
-                counter_load   <= 1'b0;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
                 done_int_reg               <= 1'b0;
-                ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
-                counter_incr               <= 1'b0;
-                counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
                 done_int_reg               <= 1'b1;
-                ready_out_reg              <= 1'b0;
                 done_out_reg               <= 1'b1;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
-                counter_incr               <= 1'b0;
-                counter_decr               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
         endcase
@@ -425,18 +455,19 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_comb begin
         fifo_request_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
-        fifo_request_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
+        fifo_request_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
             fifo_request_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
         end
+
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
         fifo_request_comb.payload.data.field_0       = counter_count;
-        fifo_request_comb.payload.data.field_1       = 0;
-        fifo_request_comb.payload.data.field_2       = 0;
-        fifo_request_comb.payload.data.field_3       = 0;
+        fifo_request_comb.payload.data.field_1       = counter_count;
+        fifo_request_comb.payload.data.field_2       = counter_count;
+        fifo_request_comb.payload.data.field_3       = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -497,7 +528,7 @@ module engine_csr_index_generator #(parameter
     always_comb begin
         fifo_response_comb.valid                     = response_memory_in_reg.valid;
         fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.address.base = configure_memory_reg.payload.param.index_start;
+        fifo_response_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
             fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
@@ -505,10 +536,7 @@ module engine_csr_index_generator #(parameter
         end
         fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_response_comb.payload.data.field_0       = response_memory_in_reg.payload.data.field_0;
-        fifo_response_comb.payload.data.field_1       = 0;
-        fifo_response_comb.payload.data.field_2       = 0;
-        fifo_response_comb.payload.data.field_3       = 0;
+        fifo_response_comb.payload.data.field_0       = response_memory_in_reg.payload.data
     end
 
     always_ff @(posedge ap_clk) begin
@@ -518,20 +546,15 @@ module engine_csr_index_generator #(parameter
             request_memory_out_reg      <= 0;
         end
         else begin
-            if(seq_flow_reg & ~csr_flow_reg) begin
+            if(configure_engine_param_int.mode_buffer) begin
                 fifo_request_signals_in_reg <= fifo_request_engine_out_signals_in_reg;
                 request_engine_out_reg      <= request_out_int;
                 request_memory_out_reg      <= 0;
             end
-            else if(~seq_flow_reg & csr_flow_reg) begin
+            else if(~configure_engine_param_int.mode_buffer) begin
                 fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
                 request_engine_out_reg      <= fifo_response_comb;
                 request_memory_out_reg      <= request_out_int;
-            end
-            else begin
-                fifo_request_signals_in_reg <= 0;
-                request_engine_out_reg      <= 0;
-                request_memory_out_reg      <= 0;
             end
         end
     end

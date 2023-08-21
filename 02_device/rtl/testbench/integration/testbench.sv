@@ -943,8 +943,8 @@ module __KERNEL___testbench ();
         //CSR/StrideIndexGeneratorConfiguration
         setup_temp[0] = 1'b1;
         setup_temp[1] = 1'b0;
-        setup_temp[2] = 1'b0; // (0) sequence mode (1) csr mode
-        setup_temp[3] = 1'b0;
+        setup_temp[2] = 1'b0; // (0) direct mode (1) indirect mode
+        setup_temp[3] = 1'b0; // (0) memory_buffer (1) engine buffer
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;                       // 0 - increment/decrement
         setup_temp = 0;
 
