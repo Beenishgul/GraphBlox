@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_setup.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-07-17 16:40:44
+// Revise : 2023-08-24 23:25:50
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -292,7 +292,7 @@ module cu_setup #(
         configuration_comb.payload.meta.address.offset          = 0;
         configuration_comb.payload.meta.address.shift.amount    = $clog2(CACHE_FRONTEND_DATA_W/8);
         configuration_comb.payload.meta.address.shift.direction = 1'b1;
-        configuration_comb.payload.meta.subclass.cmd            = CMD_READ;
+        configuration_comb.payload.meta.subclass.cmd            = CMD_MEM_READ;
         configuration_comb.payload.meta.subclass.buffer         = STRUCT_CU_SETUP;
         configuration_comb.payload.meta.subclass.operand        = OP_LOCATION_0;
         configuration_comb.payload.meta.subclass.filter         = FILTER_NOP;

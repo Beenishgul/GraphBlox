@@ -141,7 +141,7 @@ module cache_generator_request #(
     fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field_0;
 
     case (arbiter_bus_out.payload.meta.subclass.cmd)
-      CMD_WRITE : begin
+      CMD_MEM_WRITE : begin
         fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
       end
       default : begin

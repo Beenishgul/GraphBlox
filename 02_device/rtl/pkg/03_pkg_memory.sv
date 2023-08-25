@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 03_pkg_memory.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-07-17 16:20:04
+// Revise : 2023-08-24 23:26:33
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -46,10 +46,10 @@ typedef struct packed {
 parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_INVALID,
-  CMD_READ,
-  CMD_WRITE,
+  CMD_MEM_READ,
+  CMD_MEM_WRITE,
   CMD_MEM_RESPONSE,
-  CMD_CONFIGURE,
+  CMD_MEM_CONFIGURE,
   CMD_ENGINE
 } type_memory_cmd;
 
