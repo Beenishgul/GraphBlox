@@ -968,13 +968,13 @@ module __KERNEL___testbench ();
         setup_temp = 0;
         // --------------------------------------------------------------------------------------
 
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_MEM_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 
         // --------------------------------------------------------------------------------------
         // subclass.cmd
         // subclass.buffer
-        // 5 - STRUCT_ENGINE_SETUP | CMD_CONFIGURE
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_READ};
+        // 5 - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_MEM_READ};
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
