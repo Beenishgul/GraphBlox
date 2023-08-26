@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-17 03:16:08
+// Revise : 2023-08-26 00:38:28
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,9 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(
-    `include "lane_parameters.vh"
-    ) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -100,6 +98,28 @@ module lane_template #(
     FIFOStateSignalsInput  fifo_request_memory_out_signals_in_int  ;
     FIFOStateSignalsOutput fifo_request_memory_out_signals_out_int ;
     logic                  fifo_request_memory_out_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: Memory Request Generator
+// --------------------------------------------------------------------------------------
+    logic                   areset_engine_arbiter_N_to_1_memory                                    ;
+    MemoryPacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engine_arbiter_N_to_1_memory_fifo_request_signals_in                   ;
+    FIFOStateSignalsOutput  engine_arbiter_N_to_1_memory_fifo_request_signals_out                  ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_request_in                 ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_grant_out                  ;
+    MemoryPacket            engine_arbiter_N_to_1_memory_request_out                               ;
+    logic                   engine_arbiter_N_to_1_memory_fifo_setup_signal                         ;
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    logic                  areset_engine_arbiter_1_to_N_memory                                    ;
+    MemoryPacket           engine_arbiter_1_to_N_memory_response_in                               ;
+    FIFOStateSignalsInput  engine_arbiter_1_to_N_memory_fifo_response_signals_in [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput engine_arbiter_1_to_N_memory_fifo_response_signals_out                 ;
+    MemoryPacket           engine_arbiter_1_to_N_memory_response_out             [NUM_ENGINES-1:0];
+    logic                  engine_arbiter_1_to_N_memory_fifo_setup_signal                         ;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines
@@ -343,7 +363,6 @@ module lane_template #(
         .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
     );
 
-
 // --------------------------------------------------------------------------------------
 // Generate Engines
 // --------------------------------------------------------------------------------------
@@ -394,27 +413,75 @@ module lane_template #(
 // Generate Engines - in->[0]->[1]->[2]->[3]->[4]->out
 // --------------------------------------------------------------------------------------
     assign engines_response_lane_in[0] = response_lane_in_int;
-    assign engines_response_memory_in[0] = response_memory_in_int;
     assign engines_fifo_response_lane_in_signals_in[0].rd_en = 1'b1;
-    assign engines_fifo_response_memory_in_signals_in[0].rd_en = 1'b1;
 
     generate
         for (i=1; i<NUM_ENGINES; i++) begin : generate_lane_template_intra_signals
-            assign engines_response_lane_in[i]   = engines_request_lane_out[i-1];
-            assign engines_response_memory_in[i] = engines_request_memory_out[i-1];
-
+            assign engines_response_lane_in[i] = engines_request_lane_out[i-1];
             assign engines_fifo_request_lane_out_signals_in[i-1].rd_en = ~engines_fifo_response_lane_in_signals_out[i].prog_full;
-            assign engines_fifo_request_memory_out_signals_in[i-1].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full;
-
             assign engines_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
+        end
+    endgenerate
+
+    assign engines_request_lane_out_int = engines_request_lane_out[NUM_ENGINES-1];
+    assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = ~fifo_request_lane_out_signals_out_int.prog_full;
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Memory Arbitration
+// --------------------------------------------------------------------------------------
+// Generate Engines - Signals
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: Memory Request Generator
+// --------------------------------------------------------------------------------------
+    generate
+        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
+            assign engine_arbiter_N_to_1_memory_request_in[i]                = engines_request_memory_out[i];
+            assign engine_arbiter_N_to_1_memory_engine_arbiter_request_in[i] = ~engines_fifo_request_memory_out_signals_out[i].empty & ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+            assign engines_fifo_request_memory_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i];
+        end
+    endgenerate
+
+    assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
+// --------------------------------------------------------------------------------------
+    arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_ENGINES)) inst_engine_arbiter_N_to_1_memory_request_out (
+        .ap_clk                  (ap_clk                                                ),
+        .areset                  (areset_engine_arbiter_N_to_1_memory                   ),
+        .request_in              (engine_arbiter_N_to_1_memory_request_in               ),
+        .fifo_request_signals_in (engine_arbiter_N_to_1_memory_fifo_request_signals_in  ),
+        .fifo_request_signals_out(engine_arbiter_N_to_1_memory_fifo_request_signals_out ),
+        .arbiter_request_in      (engine_arbiter_N_to_1_memory_engine_arbiter_request_in),
+        .arbiter_grant_out       (engine_arbiter_N_to_1_memory_engine_arbiter_grant_out ),
+        .request_out             (engine_arbiter_N_to_1_memory_request_out              ),
+        .fifo_setup_signal       (engine_arbiter_N_to_1_memory_fifo_setup_signal        )
+    );
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Signals
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    assign engine_arbiter_1_to_N_memory_response_in = response_memory_in_int;
+    generate
+        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_memory_response
+            assign engine_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full;
+            assign engines_response_memory_in[i] = engine_arbiter_1_to_N_memory_response_out[i];
             assign engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 
-    assign engines_request_lane_out_int   = engines_request_lane_out[NUM_ENGINES-1];
-    assign engines_request_memory_out_int = engines_request_memory_out[NUM_ENGINES-1];
-    assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = ~fifo_request_lane_out_signals_out_int.prog_full;
-    assign engines_fifo_request_memory_out_signals_in[NUM_ENGINES-1].rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
+// --------------------------------------------------------------------------------------
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(NUM_ENGINES),
+        .ID_LEVEL            (3          )
+    ) inst_engine_arbiter_1_to_N_memory_response_in (
+        .ap_clk                   (ap_clk                                                ),
+        .areset                   (areset_engine_arbiter_1_to_N_memory                   ),
+        .response_in              (engine_arbiter_1_to_N_memory_response_in              ),
+        .fifo_response_signals_in (engine_arbiter_1_to_N_memory_fifo_response_signals_in ),
+        .fifo_response_signals_out(engine_arbiter_1_to_N_memory_fifo_response_signals_out),
+        .response_out             (engine_arbiter_1_to_N_memory_response_out             ),
+        .fifo_setup_signal        (engine_arbiter_1_to_N_memory_fifo_setup_signal        )
+    );
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - instants
