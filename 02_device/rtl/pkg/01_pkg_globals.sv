@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 01_pkg_globals.sv
 // Create : 2022-11-16 19:43:34
-// Revise : 2023-06-17 00:42:31
+// Revise : 2023-08-26 00:27:01
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 `timescale 1 ns / 1 ps
@@ -25,13 +25,13 @@ package PKG_GLOBALS;
 	parameter CU_BUFFER_COUNT = 10;
 
 // Maximum supported engines/lanes/bundles/buffers
-	parameter KERNEL_CU_COUNT_TOTAL = 64;
+	parameter CU_KERNEL_COUNT_TOTAL = 8 ;
 	parameter CU_BUNDLE_COUNT_TOTAL = 8 ;
 	parameter CU_LANE_COUNT_TOTAL   = 8 ;
 	parameter CU_ENGINE_COUNT_TOTAL = 8 ;
 	parameter CU_BUFFER_COUNT_TOTAL = 10;
 
-	parameter KERNEL_CU_COUNT_WIDTH_BITS = $clog2(KERNEL_CU_COUNT_TOTAL); // 5
+	parameter CU_KERNEL_COUNT_WIDTH_BITS = CU_KERNEL_COUNT_TOTAL; // 5
 	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL        ;
 	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_LANE_COUNT_TOTAL          ;
 	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL        ;

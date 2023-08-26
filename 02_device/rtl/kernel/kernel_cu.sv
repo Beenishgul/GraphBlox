@@ -302,7 +302,7 @@ module kernel_cu #(
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
   cu_setup #(
-    .ID_CU    ({KERNEL_CU_COUNT_WIDTH_BITS{1'b1}}),
+    .ID_CU    ({CU_KERNEL_COUNT_WIDTH_BITS{1'b1}}),
     .ID_BUNDLE({CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}}),
     .ID_LANE  ({CU_LANE_COUNT_WIDTH_BITS{1'b1}}  )
   ) inst_cu_setup (

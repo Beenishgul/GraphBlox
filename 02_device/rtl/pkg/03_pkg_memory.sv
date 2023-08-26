@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 03_pkg_memory.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-08-24 23:26:33
+// Revise : 2023-08-26 00:27:04
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -104,7 +104,7 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [KERNEL_CU_COUNT_WIDTH_BITS-1:0] id_cu    ; // SIZE = 4 bits  - up to 4 vertex cu - pending
+  logic [CU_KERNEL_COUNT_WIDTH_BITS-1:0] id_cu    ; // SIZE = 4 bits  - up to 4 vertex cu - pending
   logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
   logic [  CU_LANE_COUNT_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
   logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle

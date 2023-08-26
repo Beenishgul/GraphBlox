@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-21 03:53:01
+// Revise : 2023-08-26 00:27:01
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -203,10 +203,10 @@ module engine_csr_index_configure_memory #(parameter
                         configure_memory_valid_reg[6]                      <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
-                        configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field_0[(KERNEL_CU_COUNT_WIDTH_BITS)-1:0];
-                        configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:KERNEL_CU_COUNT_WIDTH_BITS];
-                        configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
-                        configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+KERNEL_CU_COUNT_WIDTH_BITS)];
+                        configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
+                        configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
+                        configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                        configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field_0[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
                         configure_memory_valid_reg[7]                        <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+8) : begin
