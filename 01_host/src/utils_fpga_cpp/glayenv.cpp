@@ -86,7 +86,7 @@ void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 
 GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex)
 {
-    overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t); // (each engine can take 32bytes configuration 8 engines per 4 bundles) // 16 Cachelines
+    overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t);// (each engine can take 32bytes configuration 8 engines per 4 bundles) // 16 Cachelines
 
     InitializeGLAYOverlayConfiguration(overlay_buffer_size_in_bytes, 1, graph);
 
@@ -108,16 +108,16 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     // ********************************************************************************************
     // ***************                  Allocate Device buffers                      **************
     // ********************************************************************************************
-    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, bankGroupIndex); // graph overlay_configuration program
-    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, bankGroupIndex); // V | vertex in degree
-    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, bankGroupIndex); // V | vertex out degree
-    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, bankGroupIndex); // V | vertex edges CSR index
-    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex); // E | edges array src
-    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex); // E | edges array dest
-    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex); // E | edges array weight
-    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 1
-    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 2
-    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex); // auxiliary 3
+    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, bankGroupIndex);// graph overlay_configuration program
+    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, bankGroupIndex);// V | vertex in degree
+    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, bankGroupIndex);// V | vertex out degree
+    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, bankGroupIndex);// V | vertex edges CSR index
+    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex);// E | edges array src
+    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex);// E | edges array dest
+    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex);// E | edges array weight
+    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 1
+    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 2
+    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 3
 
     // ********************************************************************************************
     // ***************                  Setup Device pointers                        **************
@@ -238,7 +238,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
 void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph)
 {
     // initialize overlay_configuration
-    overlay_configuration = (uint32_t *) malloc(overlayBufferSizeInBytes);
+    overlay_configuration = (uint32_t *) my_malloc(overlayBufferSizeInBytes);
 
     for (uint32_t i = 0; i < (overlayBufferSizeInBytes / sizeof(uint32_t)); ++i)
     {
@@ -247,18 +247,51 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
 
     if(algorithm == 1)
     {
-        overlay_configuration[0]  = 0x00000009; // 0 - increment/decrement
-        overlay_configuration[1]  = 0x00000000; // 1 - index_start
-        overlay_configuration[2]  = graph->num_vertices; // 2 - index_end
-        overlay_configuration[3]  = 0x00000001; // 3 - stride
-        overlay_configuration[4]  = 0x80000002; // 4 - granularity - log2 value for shifting
-        overlay_configuration[5]  = 0x00000101; // 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
-        overlay_configuration[6]  = 0x00000000; // 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
+        overlay_configuration[0]  = 0x00000009;// 0 - increment/decrement
+        overlay_configuration[1]  = 0x00000000;// 1 - index_start
+        overlay_configuration[2]  = graph->num_vertices;// 2 - index_end
+        overlay_configuration[3]  = 0x00000001;// 3 - stride
+        overlay_configuration[4]  = 0x80000002;// 4 - granularity - log2 value for shifting
+        overlay_configuration[5]  = 0x00000101;// 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+        overlay_configuration[6]  = 0x00000000;// 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
         overlay_configuration[7]  = 0x0001c041;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
         overlay_configuration[8]  = 0xabcb8000;//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
         overlay_configuration[9]  = xrt_buffer_device[1];//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
         overlay_configuration[10] = xrt_buffer_device[1] >> 32;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
         overlay_configuration[11] = graph->num_vertices;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    }
+
+    std::ifstream file("input.txt");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return;
+    }
+
+    std::string line;
+    std::vector<uint32_t> values;
+
+    while (std::getline(file, line)) {
+        size_t comment_pos = line.find("\\");
+        if (comment_pos != std::string::npos) {
+            line = line.substr(0, comment_pos);
+        }
+
+        uint32_t value;
+        if (sscanf(line.c_str(), "0x%8x", &value) == 1) {
+            values.push_back(value);
+        }
+    }
+
+    overlay_buffer_size_in_bytes = values.size() * sizeof(uint32_t);
+    overlay_configuration = (uint32_t *)aligned_alloc(4096, overlay_buffer_size_in_bytes);  // Assuming 4096-byte alignment
+
+    if (!overlay_configuration) {
+        std::cerr << "Memory alignment error." << std::endl;
+        return;
+    }
+
+    for (size_t i = 0; i < values.size(); i++) {
+        overlay_configuration[i] = values[i];
     }
 }
 
