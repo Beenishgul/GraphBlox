@@ -1,5 +1,5 @@
 [![Build Status](https://app.travis-ci.com/atmughrabi/GLay.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GLay)
-[<p align="center"><img src="./04_docs/fig/logo.png" width="300" ></p>](#GLay-benchmark-suite)
+[<p align="center"><img src="./05_docs/fig/logo.png" width="300" ></p>](#GLay-benchmark-suite)
 
 GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
@@ -26,27 +26,27 @@ GLay has been evaluated on a variety of graph algorithms, including breadth-firs
 
 GLay is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
 
-![Figure 1: Graph Overlay (GLay) Contributions](./04_docs/fig/glay_gist.png "Figure 1: Graph Overlay (GLay) Contributions")
+![Figure 1: Graph Overlay (GLay) Contributions](./05_docs/fig/glay_gist.png "Figure 1: Graph Overlay (GLay) Contributions")
 
 # GLay Benchmark Suite
 
 ## Overview
 
-![End-to-End Evaluation](./04_docs/fig/theme.png "GLay")
+![End-to-End Evaluation](./05_docs/fig/theme.png "GLay")
 
 * Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
   * Preprocessing two steps (third one is optional) :
-    1. [[Sorting the edge-list](./04_docs/02_preprocessing_countsort.pdf)], using count-sort or radix-sort.
-    2. [[Building the graph structure](./04_docs/03_preprocessing_DataStructures.pdf)]. CSR, Gird, Adjacency-Linked-List, and Adjacency-Array-List.
+    1. [[Sorting the edge-list](./05_docs/02_preprocessing_countsort.pdf)], using count-sort or radix-sort.
+    2. [[Building the graph structure](./05_docs/03_preprocessing_DataStructures.pdf)]. CSR, Gird, Adjacency-Linked-List, and Adjacency-Array-List.
         * [Ref](https://github.com/thu-pacman/GridGraph): Xiaowei Zhu, Wentao Han and Wenguang Chen. [GridGraph: Large-Scale Graph Processing on a Single Machine Using 2-Level Hierarchical Partitioning](https://www.usenix.org/system/files/conference/atc15/atc15-paper-zhu.pdf). Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
         * [Ref](https://github.com/epfl-labos/EverythingGraph): Malicevic, Jasmina, Baptiste Lepers, and Willy Zwaenepoel. "Everything you always wanted to know about multicore graph processing but were afraid to ask." 2017 USENIX Annual Technical Conference. Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
-    3. [[Relabeling the graph](./04_docs/01_algorithm_PR_cache.pdf)], this step achieves better cache locality (better performance) with preprocessing overhead.
+    3. [[Relabeling the graph](./05_docs/01_algorithm_PR_cache.pdf)], this step achieves better cache locality (better performance) with preprocessing overhead.
         * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
         * [Ref](https://github.com/faldupriyank/dbg):P. Faldu and J. Diamond and B. Grot, "A Closer Look at Lightweight Graph Reordering," in Proceedings of the International Symposium on Workload Characterization (IISWC), November 2019.
   * Graph Algorithm step depends on the direction of the data (Push/Pull):
-    1. [[BFS example](./04_docs/00_algorithm_BFS.pdf)], although it doesn't show direction optimized. But we discusses the Push and Pull approach separately.
+    1. [[BFS example](./05_docs/00_algorithm_BFS.pdf)], although it doesn't show direction optimized. But we discusses the Push and Pull approach separately.
         * [[Ref](https://github.com/sbeamer/gapbs)]: Scott Beamer, Krste Asanović, David Patterson. [The GAP Benchmark Suite](http://arxiv.org/abs/1508.03619). arXiv:1508.03619 [cs.DC], 2015.
-    2. [[Page-Rank (PR) example](./04_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
+    2. [[Page-Rank (PR) example](./05_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
 
 
@@ -113,7 +113,7 @@ user@host:~GLay$ make
     user@host:~GLay$ make run-emu-waves TARGET=hw_emu
     ```
 
-## Xilinx Flow [<img src="./04_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
+## Xilinx Flow [<img src="./05_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
 * You can pass parameters or modify `Makefile` parameters (easiest way) at GLay root directory, to control the FPGA development flow and support.
 
@@ -203,7 +203,7 @@ user@host:~GLay$ make report_metrics
 user@host:~GLay$ make open-vivado-project
 ```
 
-## CPU Flow [<img src="./04_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+## CPU Flow [<img src="./05_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
 ### Initial compilation for the Graph framework with OpenMP
 
@@ -330,13 +330,13 @@ user@host:~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-form
 GLay can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
 
 ## Regular unsorted Edge-list as input.
-<p align="center"><img src="./04_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
+<p align="center"><img src="./05_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
 
-##  CSR (Compressed Sparse Row)
-<p align="center"><img src="./04_docs/fig/datastructures/csr.png" width ="450" ></p>
+## CSR (Compressed Sparse Row)
+<p align="center"><img src="./05_docs/fig/datastructures/csr.png" width ="450" ></p>
 
-##  CSR Segmented Format
-<p align="center"><img src="./04_docs/fig/datastructures/csr_segmented.png" width ="450" ></p>
+## CSR Segmented Format
+<p align="center"><img src="./05_docs/fig/datastructures/csr_segmented.png" width ="450" ></p>
 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
@@ -365,16 +365,16 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/glay/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
+![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./05_docs/fig/glay/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/glay/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
+![Figure 3: Breadth-First Search (BFS) algorithm](./05_docs/fig/glay/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
 
 
-![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/glay/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
+![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./05_docs/fig/glay/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
 
 
-![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./05_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
 GLay Architecture 
@@ -405,7 +405,7 @@ the graph neighbor list from the CSR structure. Finally, in steps E and
 F, a conditional break halts the engine from processing the vertex
 neighbor list and updates the frontier data.
 
-![Figure 6: BFS algorithm on GLay](./04_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
+![Figure 6: BFS algorithm on GLay](./05_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
 
 GLay Graph Description Language (GGDL)
 ======================================
@@ -518,7 +518,7 @@ Example Graph Algorithm GGDL Transformations
 BFS
 ---
 
-![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
+![Figure 7: Transforming BFS algorithm to GGDL](./05_docs/fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
 
 
 # GLay Options
@@ -757,7 +757,7 @@ Usage: glay-openmp [OPTION...]
 │           │           ├── pkgs
 │           │           └── top
 │           └── scripts
-├── 04_docs
+├── 05_docs
 │           └── fig
 │               ├── datastructures
 │               └── glay
@@ -826,4 +826,4 @@ Usage: glay-openmp [OPTION...]
 Report bugs to:
 - <atmughrabi@gmail.com>
 - <atmughra@virginia.edu>
-[<p align="right"> <img src="./04_docs/fig/logo1.png" width="100" ></p>](#GLay-benchmark-suite)
+[<p align="right"> <img src="./05_docs/fig/logo1.png" width="100" ></p>](#GLay-benchmark-suite)

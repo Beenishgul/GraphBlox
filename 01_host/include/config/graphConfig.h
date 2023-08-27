@@ -53,6 +53,7 @@ struct Arguments
     char *kernel_name;
     int device_index;
     char *xclbin_path;
+    char *overlay_path;
     struct xrtGLAYHandle *glayHandle;
 };
 

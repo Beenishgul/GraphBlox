@@ -178,6 +178,10 @@ static struct argp_option options[] =
         "\nHardware overlay (XCLBIN) file for hw or hw_emu mode.\n"
     },
     {
+        "overlay-path",            'X', "[DEFAULT:NULL]\n",      0,
+        "\nHardware overlay algorithm configuration path file filename.ol.\n"
+    },
+    {
         "device-index",             'q', "[DEFAULT:0]\n",      0,
         "\nDevice ID of your target card use \"xbutil list\" command.\n"
     },
@@ -293,6 +297,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
         arguments->xclbin_path  = strcpy (arguments->xclbin_path, arg);
         break;
+    case 'X':
+        arguments->overlay_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
+        arguments->overlay_path  = strcpy (arguments->overlay_path, arg);
+        break;
+
     default:
         return ARGP_ERR_UNKNOWN;
     }

@@ -32,6 +32,8 @@ void argumentsFree (struct Arguments *arguments)
             free(arguments->kernel_name);
         if(arguments->xclbin_path)
             free(arguments->xclbin_path);
+        if(arguments->overlay_path)
+            free(arguments->overlay_path);
         free(arguments);
     }
 }
@@ -85,6 +87,7 @@ struct Arguments *argumentsNew()
     arguments->kernel_name = NULL;
     arguments->device_index = 0;
     arguments->xclbin_path = NULL;
+    arguments->overlay_path = NULL;
     arguments->glayHandle = NULL;
 
     return arguments;
@@ -94,10 +97,10 @@ struct Arguments *argumentsNew()
 
 void argumentsCopy (struct Arguments *argFrom, struct Arguments *argTo)
 {
-    argTo->wflag = argFrom->wflag ;
+    argTo->wflag = argFrom->wflag;
     argTo->xflag = argFrom->xflag;
     argTo->sflag = argFrom->sflag;
-    argTo->Sflag = argFrom->Sflag ;
+    argTo->Sflag = argFrom->Sflag;
     argTo->dflag = argFrom->dflag;
     argTo->binSize = argFrom->binSize;
     argTo->verbosity = argFrom->verbosity;
@@ -118,9 +121,9 @@ void argumentsCopy (struct Arguments *argFrom, struct Arguments *argTo)
 
     argTo->symmetric = argFrom->symmetric;
     argTo->weighted = argFrom->weighted;
-    argTo->delta = argFrom->delta ;
+    argTo->delta = argFrom->delta;
     argTo->pre_numThreads  = argFrom->pre_numThreads;
-    argTo->algo_numThreads = argFrom->algo_numThreads ;
+    argTo->algo_numThreads = argFrom->algo_numThreads;
     argTo->ker_numThreads  = argFrom->ker_numThreads;
 
     argTo->fnameb = (char *) malloc((strlen(argFrom->fnameb) + 10) * sizeof(char));
