@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : cu_cache.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-06-18 23:44:35
+// Revise : 2023-08-28 18:21:31
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -256,11 +256,12 @@ module cu_cache (
   assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
   assign cache_request_mem.meta            = fifo_request_dout.meta;
 
-  xpm_fifo_sync_fwft_wrapper #(
+  xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(16                        ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
-    .PROG_THRESH     (8                         )
+    .PROG_THRESH     (8                         ),
+    .READ_MODE       ("fwft"                    ) //string; "std" or "fwft";
   ) inst_fifo_CacheRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
