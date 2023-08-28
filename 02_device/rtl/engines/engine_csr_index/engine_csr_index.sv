@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-28 15:38:01
+// Revise : 2023-08-28 15:49:58
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@ module engine_csr_index #(parameter
     ID_LANE          = 0 ,
     ID_ENGINE        = 0 ,
     ID_RELATIVE      = 0 ,
+    ENGINES_CONFIG   = 0 ,
     FIFO_WRITE_DEPTH = 16,
     PROG_THRESH      = 8 ,
     NUM_MODULES      = 2 ,
