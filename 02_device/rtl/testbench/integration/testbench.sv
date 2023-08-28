@@ -758,7 +758,7 @@ module __KERNEL___testbench ();
         buffer_5_ptr[62:0] = get_random_ptr();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr = 1;
-        buffer_8_ptr = 32;
+        buffer_8_ptr = (16*4);
         buffer_9_ptr = 0;
 
         ///////////////////////////////////////////////////////////////////////////
@@ -982,7 +982,7 @@ module __KERNEL___testbench ();
         // subclass.filter
         // subclass.alu
         // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0}; 
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0};
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
@@ -991,25 +991,25 @@ module __KERNEL___testbench ();
         // route.to.id_lane
         // route.to.id_buffer
         // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {8'b0000000000,8'b00000111,8'b00000001,8'b00000001}; 
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {8'b0000000000,8'b00000111,8'b00000001,8'b00000001};
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 8-BUFFER pointer
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];  
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 9-BUFFER pointer
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32]; 
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // 10-BUFFER size
         // param.array_size
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;   
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
         // --------------------------------------------------------------------------------------
 
         for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
