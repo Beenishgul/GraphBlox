@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : lane_template.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-26 00:38:28
+// Revise : 2023-08-28 14:16:13
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(`include "lane_parameters.vh") (
+module lane_template #(
+    `include "lane_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,

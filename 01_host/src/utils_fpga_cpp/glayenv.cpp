@@ -261,38 +261,38 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
         overlay_configuration[11] = graph->num_vertices;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
     }
 
-    std::ifstream file("input.txt");
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file." << std::endl;
-        return;
-    }
+    // std::ifstream file("input.txt");
+    // if (!file.is_open()) {
+    //     std::cerr << "Failed to open file." << std::endl;
+    //     return;
+    // }
 
-    std::string line;
-    std::vector<uint32_t> values;
+    // std::string line;
+    // std::vector<uint32_t> values;
 
-    while (std::getline(file, line)) {
-        size_t comment_pos = line.find("\\");
-        if (comment_pos != std::string::npos) {
-            line = line.substr(0, comment_pos);
-        }
+    // while (std::getline(file, line)) {
+    //     size_t comment_pos = line.find("\\");
+    //     if (comment_pos != std::string::npos) {
+    //         line = line.substr(0, comment_pos);
+    //     }
 
-        uint32_t value;
-        if (sscanf(line.c_str(), "0x%8x", &value) == 1) {
-            values.push_back(value);
-        }
-    }
+    //     uint32_t value;
+    //     if (sscanf(line.c_str(), "0x%8x", &value) == 1) {
+    //         values.push_back(value);
+    //     }
+    // }
 
-    overlay_buffer_size_in_bytes = values.size() * sizeof(uint32_t);
-    overlay_configuration = (uint32_t *)aligned_alloc(4096, overlay_buffer_size_in_bytes);  // Assuming 4096-byte alignment
+    // overlay_buffer_size_in_bytes = values.size() * sizeof(uint32_t);
+    // overlay_configuration = (uint32_t *)aligned_alloc(4096, overlay_buffer_size_in_bytes);  // Assuming 4096-byte alignment
 
-    if (!overlay_configuration) {
-        std::cerr << "Memory alignment error." << std::endl;
-        return;
-    }
+    // if (!overlay_configuration) {
+    //     std::cerr << "Memory alignment error." << std::endl;
+    //     return;
+    // }
 
-    for (size_t i = 0; i < values.size(); i++) {
-        overlay_configuration[i] = values[i];
-    }
+    // for (size_t i = 0; i < values.size(); i++) {
+    //     overlay_configuration[i] = values[i];
+    // }
 }
 
 void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()
