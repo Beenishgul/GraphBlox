@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_pipeline.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-06-28 21:33:13
+// Revise : 2023-08-28 15:36:57
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -26,6 +26,7 @@ module engine_pipeline #(parameter
     ID_BUNDLE        = 0 ,
     ID_LANE          = 0 ,
     ID_ENGINE        = 0 ,
+    ID_RELATIVE      = 0 ,
     ENGINES_CONFIG   = 0 ,
     FIFO_WRITE_DEPTH = 16,
     PROG_THRESH      = 8 ,

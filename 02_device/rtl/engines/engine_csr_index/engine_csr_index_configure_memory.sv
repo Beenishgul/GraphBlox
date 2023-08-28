@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-26 00:27:01
+// Revise : 2023-08-28 15:42:14
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -25,8 +25,9 @@ module engine_csr_index_configure_memory #(parameter
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
     ID_ENGINE        = 0                                ,
-    ENGINE_SEQ_WIDTH = 11                               ,
-    ENGINE_SEQ_MIN   = 0                                ,
+    ID_RELATIVE      = 0                                ,
+    ENGINE_SEQ_WIDTH = 16                               ,
+    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
     input  logic                  ap_clk                             ,
@@ -220,6 +221,21 @@ module engine_csr_index_configure_memory #(parameter
                     (ENGINE_SEQ_MIN+10) : begin
                         configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_int.payload.data.field_0;
                         configure_memory_valid_reg[10]                <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+11) : begin
+                        configure_memory_valid_reg[11] <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+12) : begin
+                        configure_memory_valid_reg[12] <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+13) : begin
+                        configure_memory_valid_reg[13] <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+14) : begin
+                        configure_memory_valid_reg[14] <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+15) : begin
+                        configure_memory_valid_reg[15] <= 1'b1  ;
                     end
                     default : begin
                         configure_memory_reg.payload.param <= configure_memory_reg.payload.param;

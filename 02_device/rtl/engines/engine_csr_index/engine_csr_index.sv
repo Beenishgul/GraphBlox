@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-21 03:54:04
+// Revise : 2023-08-28 15:38:01
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ module engine_csr_index #(parameter
     ID_BUNDLE        = 0 ,
     ID_LANE          = 0 ,
     ID_ENGINE        = 0 ,
-    ENGINES_CONFIG   = 0 ,
+    ID_RELATIVE      = 0 ,
     FIFO_WRITE_DEPTH = 16,
     PROG_THRESH      = 8 ,
     NUM_MODULES      = 2 ,
@@ -508,10 +508,11 @@ module engine_csr_index #(parameter
     assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_response_memory_in_signals_out;
 
     engine_csr_index_configure_memory #(
-        .ID_CU    (ID_CU    ),
-        .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  ),
-        .ID_ENGINE(ID_ENGINE)
+        .ID_CU      (ID_CU      ),
+        .ID_BUNDLE  (ID_BUNDLE  ),
+        .ID_LANE    (ID_LANE    ),
+        .ID_ENGINE  (ID_ENGINE  ),
+        .ID_RELATIVE(ID_RELATIVE)
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
