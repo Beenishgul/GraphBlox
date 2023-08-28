@@ -991,7 +991,7 @@ module __KERNEL___testbench ();
         // route.to.id_lane
         // route.to.id_buffer
         // 7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {10'b000000000000,8'b00000111,8'b00000001,6'b000001}; 
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {8'b0000000000,8'b00000111,8'b00000001,8'b00000001}; 
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
