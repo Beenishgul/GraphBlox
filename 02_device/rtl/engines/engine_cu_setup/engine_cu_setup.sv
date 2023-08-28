@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_cu_setup.sv
 // Create : 2023-06-18 23:51:34
-// Revise : 2023-06-19 00:45:10
+// Revise : 2023-08-28 15:57:37
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -345,9 +345,9 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
         fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
         fifo_request_comb.payload.data.field_0       = counter_count;
-        fifo_request_comb.payload.data.field_1       = 0;
-        fifo_request_comb.payload.data.field_2       = 0;
-        fifo_request_comb.payload.data.field_3       = 0;
+        fifo_request_comb.payload.data.field_1       = counter_count;
+        fifo_request_comb.payload.data.field_2       = counter_count;
+        fifo_request_comb.payload.data.field_3       = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
