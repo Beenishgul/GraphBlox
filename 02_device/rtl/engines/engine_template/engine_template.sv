@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_template.sv
 // Create : 2023-06-14 20:53:28
-// Revise : 2023-07-17 16:58:48
+// Revise : 2023-08-28 15:36:13
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -366,6 +366,7 @@ module engine_template #(
                     .ID_BUNDLE       (ID_BUNDLE       ),
                     .ID_LANE         (ID_LANE         ),
                     .ID_ENGINE       (ID_ENGINE       ),
+                    .ID_RELATIVE     (ID_RELATIVE     ),
                     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
                     .PROG_THRESH     (PROG_THRESH     ),
                     .ENGINES_CONFIG  (ENGINES_CONFIG  )
@@ -433,6 +434,7 @@ module engine_template #(
                     .ID_BUNDLE       (ID_BUNDLE       ),
                     .ID_LANE         (ID_LANE         ),
                     .ID_ENGINE       (ID_ENGINE       ),
+                    .ID_RELATIVE     (ID_RELATIVE     ),
                     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
                     .PROG_THRESH     (PROG_THRESH     ),
                     .ENGINES_CONFIG  (ENGINES_CONFIG  )

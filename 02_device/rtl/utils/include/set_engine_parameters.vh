@@ -2,6 +2,7 @@
 .ID_BUNDLE                           (ID_BUNDLE                           ),
 .ID_LANE                             (ID_LANE                             ),
 .ID_ENGINE                           (i                                   ),
+.ID_RELATIVE                         (ENGINES_ENGINE_ID_ARRAY[i]          ),
 .ENGINES_CONFIG                      (ENGINES_CONFIG_ARRAY[i]             ),
 .NUM_BUNDLES                         (NUM_BUNDLES                         ),
 .NUM_LANES                           (NUM_LANES                           ),
@@ -10,9 +11,13 @@
 .ENGINES_COUNT_ARRAY                 (ENGINES_COUNT_ARRAY                 ),
 .LANES_ENGINES_COUNT_ARRAY           (LANES_ENGINES_COUNT_ARRAY           ),
 .ENGINES_CONFIG_ARRAY                (ENGINES_CONFIG_ARRAY                ),
+.ENGINES_ENGINE_ID_ARRAY             (ENGINES_ENGINE_ID_ARRAY             ),
 .LANES_CONFIG_ARRAY                  (LANES_CONFIG_ARRAY                  ),
+.LANES_ENGINE_ID_ARRAY               (LANES_ENGINE_ID_ARRAY               ),
 .BUNDLES_CONFIG_ARRAY                (BUNDLES_CONFIG_ARRAY                ),
+.BUNDLES_ENGINE_ID_ARRAY             (BUNDLES_ENGINE_ID_ARRAY             ),
 .CU_BUNDLES_COUNT_ARRAY              (CU_BUNDLES_COUNT_ARRAY              ),
 .CU_BUNDLES_LANES_COUNT_ARRAY        (CU_BUNDLES_LANES_COUNT_ARRAY        ),
 .CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY),
-.CU_BUNDLES_CONFIG_ARRAY             (CU_BUNDLES_CONFIG_ARRAY             )
+.CU_BUNDLES_CONFIG_ARRAY             (CU_BUNDLES_CONFIG_ARRAY             ),
+.CU_BUNDLES_ENGINE_ID_ARRAY          (CU_BUNDLES_ENGINE_ID_ARRAY          )
