@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_csr_index.sv
+// File   : engine_merge_data.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-28 15:49:58
+// Revise : 2023-08-30 13:17:45
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module engine_csr_index #(parameter
+module engine_merge_data #(parameter
     ID_CU            = 0 ,
     ID_BUNDLE        = 0 ,
     ID_LANE          = 0 ,
@@ -481,12 +481,12 @@ module engine_csr_index #(parameter
 
     assign modules_fifo_response_engine_in_signals_out[0] = configure_engine_fifo_response_engine_in_signals_out;
 
-    engine_csr_index_configure_engine #(
+    engine_merge_data_configure_engine #(
         .ID_CU    (ID_CU    ),
         .ID_BUNDLE(ID_BUNDLE),
         .ID_LANE  (ID_LANE  ),
         .ID_ENGINE(ID_ENGINE)
-    ) inst_engine_csr_index_configure_engine (
+    ) inst_engine_merge_data_configure_engine (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_engine                             ),
         .response_engine_in                 (configure_engine_response_engine_in                 ),
@@ -508,13 +508,13 @@ module engine_csr_index #(parameter
 
     assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_response_memory_in_signals_out;
 
-    engine_csr_index_configure_memory #(
+    engine_merge_data_configure_memory #(
         .ID_CU      (ID_CU      ),
         .ID_BUNDLE  (ID_BUNDLE  ),
         .ID_LANE    (ID_LANE    ),
         .ID_ENGINE  (ID_ENGINE  ),
         .ID_RELATIVE(ID_RELATIVE)
-    ) inst_engine_csr_index_configure_memory (
+    ) inst_engine_merge_data_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
         .response_memory_in                 (configure_memory_response_memory_in                 ),
@@ -547,7 +547,7 @@ module engine_csr_index #(parameter
 
     assign generator_engine_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
-    engine_csr_index_generator #(
+    engine_merge_data_generator #(
         .ID_CU           (ID_CU           ),
         .ID_BUNDLE       (ID_BUNDLE       ),
         .ID_LANE         (ID_LANE         ),
@@ -556,7 +556,7 @@ module engine_csr_index #(parameter
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
         .PROG_THRESH     (PROG_THRESH     ),
         .PIPELINE_STAGES (PIPELINE_STAGES )
-    ) inst_engine_csr_index_generator (
+    ) inst_engine_merge_data_generator (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_generator                                    ),
         .descriptor_in                      (descriptor_in_reg                                   ),
@@ -580,4 +580,4 @@ module engine_csr_index #(parameter
         .done_out                           (generator_engine_done_out                           )
     );
 
-endmodule : engine_csr_index
+endmodule : engine_merge_data

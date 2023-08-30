@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_csr_index_generator.sv
+// File   : engine_stride_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-21 03:31:08
+// Revise : 2023-08-30 13:19:52
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ import PKG_CACHE::*;
 
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
-module engine_csr_index_generator #(parameter
+module engine_stride_index_generator #(parameter
     ID_CU            = 0 ,
     ID_BUNDLE        = 0 ,
     ID_LANE          = 0 ,
@@ -85,8 +85,8 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_csr_index_generator_state current_state;
-    engine_csr_index_generator_state next_state   ;
+    engine_stride_index_generator_state current_state;
+    engine_stride_index_generator_state next_state   ;
 
     logic done_int_reg;
     logic done_out_reg;
@@ -583,4 +583,4 @@ module engine_csr_index_generator #(parameter
         end
     end
 
-endmodule : engine_csr_index_generator
+endmodule : engine_stride_index_generator
