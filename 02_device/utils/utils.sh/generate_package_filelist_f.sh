@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-07-19 15:27:36
+# @Last Modified time: 2023-08-30 01:04:56
 #!/bin/bash
 
 
@@ -34,15 +34,16 @@ source ${PARAMS_SH_DIR}
 pkgs="pkg"
 
 engines="engines"
-engine_template="engine_template"
+engine_alu_ops="engine_alu_ops"
+engine_csr_index="engine_csr_index"
 engine_cu_setup="engine_cu_setup"
-engine_alu_operations="engine_alu_operations"
-engine_conditional="engine_conditional"
+engine_filter_cond="engine_filter_cond"
+engine_forward_data="engine_forward_data"
+engine_merge_data="engine_merge_data"
+engine_pipeline="engine_pipeline"
 engine_read_write="engine_read_write"
 engine_stride_index="engine_stride_index"
-engine_csr_index="engine_csr_index"
-engine_write="engine_write"
-engine_pipeline="engine_pipeline"
+engine_template="engine_template"
 
 kernel="kernel"
 top="top"
@@ -121,16 +122,17 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${lane}/ ${CF
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${control}/ ${CFG_FILE_NAME} "sv"
 
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/ ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_cu_setup} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_template} ${CFG_FILE_NAME} "sv"
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_pipeline} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_write} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_operations} ${CFG_FILE_NAME} "sv"
-# generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_conditional} ${CFG_FILE_NAME} "sv"
+
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index}    ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_stride_index} ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write}   ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_ops}      ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_filter_cond}  ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_forward_data} ${CFG_FILE_NAME} "sv"
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_merge_data}   ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/ ${CFG_FILE_NAME} "sv"
 
