@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-21 03:31:08
+// Revise : 2023-08-30 16:21:14
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -83,13 +83,20 @@ module engine_csr_index_generator #(parameter
     MemoryPacket          request_out_int     ;
 
 // --------------------------------------------------------------------------------------
-//   Setup state machine signals
+//  Setup state machine signals
 // --------------------------------------------------------------------------------------
     engine_csr_index_generator_state current_state;
     engine_csr_index_generator_state next_state   ;
 
     logic done_int_reg;
     logic done_out_reg;
+
+// --------------------------------------------------------------------------------------
+//  Response Counter
+// --------------------------------------------------------------------------------------
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_counter;
+    logic                             done_response_reg      ;
+
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
@@ -143,6 +150,7 @@ module engine_csr_index_generator #(parameter
         areset_counter   <= areset;
         areset_fifo      <= areset;
     end
+
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
@@ -158,6 +166,7 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         descriptor_in_reg.payload <= descriptor_in.payload;
     end
+
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
@@ -237,6 +246,28 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
         request_memory_out.payload <= request_memory_out_reg.payload ;
+    end
+
+
+// --------------------------------------------------------------------------------------
+// Response Counter
+// --------------------------------------------------------------------------------------
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_counter;
+    logic                             done_response_reg      ;
+
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            done_response_reg       <= 1'b0;
+            response_memory_counter <= 0;
+        end
+        else begin
+            if((response_memory_counter >= configure_engine_param_int.index_end))
+                done_response_reg <= 1'b1;
+            else
+                done_response_reg <= 1'b0;
+
+            response_memory_counter <= configure_memory_reg.valid + response_memory_counter;
+        end
     end
 
 // --------------------------------------------------------------------------------------
