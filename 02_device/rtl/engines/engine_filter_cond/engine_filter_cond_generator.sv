@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_filter_cond_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-30 13:16:31
+// Revise : 2023-08-30 13:56:23
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -85,8 +85,8 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_filter_cond_generator_state current_state;
-    engine_filter_cond_generator_state next_state   ;
+    engine_csr_index_generator_state current_state;
+    engine_csr_index_generator_state next_state   ;
 
     logic done_int_reg;
     logic done_out_reg;
