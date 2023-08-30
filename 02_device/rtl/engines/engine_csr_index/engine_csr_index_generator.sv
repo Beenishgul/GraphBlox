@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-30 16:21:14
+// Revise : 2023-08-30 16:25:24
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -237,7 +237,7 @@ module engine_csr_index_generator #(parameter
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             configure_engine_setup              <= configure_engine_setup_reg;
-            done_out                            <= done_out_reg;
+            done_out                            <= done_out_reg & done_response_reg;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
@@ -252,9 +252,6 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Response Counter
 // --------------------------------------------------------------------------------------
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_counter;
-    logic                             done_response_reg      ;
-
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             done_response_reg       <= 1'b0;
