@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-08-30 16:25:24
+// Revise : 2023-09-01 17:17:03
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -115,7 +115,9 @@ module engine_csr_index_generator #(parameter
     logic        configure_engine_setup_reg;
     logic        configure_memory_setup_reg;
 
-    CSRIndexConfigurationParameters configure_engine_param_int;
+
+    logic                           configure_engine_param_valid;
+    CSRIndexConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket request_engine_out_reg;
     MemoryPacket request_memory_out_reg;
@@ -237,7 +239,7 @@ module engine_csr_index_generator #(parameter
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             configure_engine_setup              <= configure_engine_setup_reg;
-            done_out                            <= done_out_reg & done_response_reg;
+            done_out                            <= done_out_reg;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
@@ -254,16 +256,12 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            done_response_reg       <= 1'b0;
             response_memory_counter <= 0;
         end
         else begin
-            if((response_memory_counter >= configure_engine_param_int.index_end))
-                done_response_reg <= 1'b1;
-            else
-                done_response_reg <= 1'b0;
-
-            response_memory_counter <= configure_memory_reg.valid + response_memory_counter;
+            if(configure_engine_param_valid) begin
+                response_memory_counter <= response_memory_in_reg.valid + response_memory_counter;
+            end
         end
     end
 
@@ -370,13 +368,30 @@ module engine_csr_index_generator #(parameter
                 counter_stride_value       <= 0;
                 fifo_request_din_reg.valid <= 1'b0;
 
-                configure_memory_setup_reg <= 1'b0;
-                configure_engine_setup_reg <= 1'b0;
-                configure_engine_param_int <= 0;
+                configure_memory_setup_reg   <= 1'b0;
+                configure_engine_setup_reg   <= 1'b0;
+                configure_engine_param_int   <= 0;
+                configure_engine_param_valid <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b1;
+                done_out_reg               <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                counter_incr               <= 1'b0;
+                counter_decr               <= 1'b0;
+                counter_load_value         <= 0;
+                counter_stride_value       <= 0;
+                fifo_request_din_reg.valid <= 1'b0;
+
+                configure_memory_setup_reg   <= 1'b0;
+                configure_engine_setup_reg   <= 1'b0;
+                configure_engine_param_int   <= 0;
+                configure_engine_param_valid <= 1'b0;
+            end
+            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
@@ -386,30 +401,18 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid <= 1'b0;
 
                 configure_memory_setup_reg <= 1'b0;
-                configure_engine_setup_reg <= 1'b0;
-            end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
-                done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b1;
-                counter_enable             <= 1'b1;
-                counter_load               <= 1'b0;
-                counter_incr               <= 1'b0;
-                counter_decr               <= 1'b0;
-                counter_load_value         <= 0;
-                counter_stride_value       <= 0;
-                fifo_request_din_reg.valid <= 1'b0;
-                configure_memory_setup_reg <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
-                configure_memory_setup_reg <= 1'b0;
-                configure_engine_param_int <= configure_memory_reg.payload.param;
+                configure_memory_setup_reg   <= 1'b0;
+                configure_engine_param_valid <= 1'b1;
+                configure_engine_param_int   <= configure_memory_reg.payload.param;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
                 done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b1;
+                done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
                 counter_incr               <= 1'b0;
@@ -484,11 +487,12 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
-                done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b1;
-                counter_enable             <= 1'b1;
-                counter_load               <= 1'b0;
-                fifo_request_din_reg.valid <= 1'b0;
+                done_int_reg                 <= 1'b1;
+                done_out_reg                 <= 1'b0;
+                counter_enable               <= 1'b1;
+                counter_load                 <= 1'b0;
+                fifo_request_din_reg.valid   <= 1'b0;
+                configure_engine_param_valid <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
