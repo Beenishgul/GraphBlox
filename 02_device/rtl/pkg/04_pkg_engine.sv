@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : 04_pkg_engine.sv
 // Create : 2022-11-29 16:14:59
-// Revise : 2023-08-21 01:26:54
+// Revise : 2023-09-07 23:45:46
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -111,6 +111,7 @@ package PKG_ENGINE;
         ENGINE_CSR_INDEX_GEN_BUSY,
         ENGINE_CSR_INDEX_GEN_PAUSE_TRANS,
         ENGINE_CSR_INDEX_GEN_PAUSE,
+        ENGINE_CSR_INDEX_GEN_DONE_TRANS,
         ENGINE_CSR_INDEX_GEN_DONE
     } engine_csr_index_generator_state;
 

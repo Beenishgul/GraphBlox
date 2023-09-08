@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_csr_index_generator.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-09-01 17:17:03
+// Revise : 2023-09-07 23:47:05
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -88,8 +88,9 @@ module engine_csr_index_generator #(parameter
     engine_csr_index_generator_state current_state;
     engine_csr_index_generator_state next_state   ;
 
-    logic done_int_reg;
-    logic done_out_reg;
+    logic done_int_reg ;
+    logic done_out_reg ;
+    logic done_resp_reg;
 
 // --------------------------------------------------------------------------------------
 //  Response Counter
@@ -257,10 +258,19 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             response_memory_counter <= 0;
+            done_resp_reg           <= 1'b0;
         end
         else begin
             if(configure_engine_param_valid) begin
                 response_memory_counter <= response_memory_in_reg.valid + response_memory_counter;
+
+                if(response_memory_counter >= configure_engine_param_int.index_end) begin
+                    done_resp_reg <= 1'b1;
+                end else begin
+                    done_resp_reg <= 1'b0;
+                end
+            end else begin
+                done_resp_reg <= 1'b1;
             end
         end
     end
@@ -331,7 +341,7 @@ module engine_csr_index_generator #(parameter
             end
             ENGINE_CSR_INDEX_GEN_BUSY : begin
                 if (done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE;
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
                 else if (fifo_request_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE_TRANS;
                 else
@@ -346,11 +356,19 @@ module engine_csr_index_generator #(parameter
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
-            ENGINE_CSR_INDEX_GEN_DONE : begin
-                if (configure_engine_param_int.mode_sequence)
+            ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
+                if (configure_engine_param_int.mode_sequence & done_int_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
-                else
+                else if (~configure_engine_param_int.mode_sequence & done_int_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE;
+            end
+            ENGINE_CSR_INDEX_GEN_DONE : begin
+                if (done_int_reg)
+                    next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE;
             end
         endcase
     end // always_comb
@@ -486,9 +504,16 @@ module engine_csr_index_generator #(parameter
                 counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
+            ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
+                done_int_reg               <= done_resp_reg;
+                done_out_reg               <= 1'b0;
+                counter_enable             <= 1'b1;
+                counter_load               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b0;
+            end
             ENGINE_CSR_INDEX_GEN_DONE : begin
                 done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b0;
+                done_out_reg                 <= 1'b1;
                 counter_enable               <= 1'b1;
                 counter_load                 <= 1'b0;
                 fifo_request_din_reg.valid   <= 1'b0;
