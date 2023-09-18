@@ -21,9 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(
-    `include "lane_parameters.vh"
-    ) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -151,8 +149,10 @@ module lane_template #(
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_lane_template <= areset;
-        areset_fifo          <= areset;
+        areset_lane_template                <= areset;
+        areset_fifo                         <= areset;
+        areset_engine_arbiter_N_to_1_memory <= areset;
+        areset_engine_arbiter_1_to_N_memory <= areset;
     end
 
 // --------------------------------------------------------------------------------------
