@@ -337,8 +337,8 @@ module lane_template #(`include "lane_parameters.vh") (
     assign fifo_request_memory_out_setup_signal_int = fifo_request_memory_out_signals_out_int.wr_rst_busy | fifo_request_memory_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_memory_out_signals_in_int.wr_en = engines_request_memory_out_int.valid;
-    assign fifo_request_memory_out_din                  = engines_request_memory_out_int.payload;
+    assign fifo_request_memory_out_signals_in_int.wr_en = engine_arbiter_N_to_1_memory_request_out.valid;
+    assign fifo_request_memory_out_din                  = engine_arbiter_N_to_1_memory_request_out.payload;
 
     // Pop
     assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en;
