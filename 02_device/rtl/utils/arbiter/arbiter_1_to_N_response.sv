@@ -94,44 +94,44 @@ module arbiter_1_to_N_response #(
     for (i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_fifo_response_signals_in_reg_mask_int
       case (ID_LEVEL)
         0 : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_cu[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_cu[i]);
         end
         1 : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_bundle[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_bundle[i]);
         end
         2 : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_lane[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_lane[i]);
         end
         3 : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_engine[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_engine[i]);
         end
         4 : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_module[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_module[i]);
         end
         default : begin
-          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.to.id_cu[i]);
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_cu[i]);
         end
       endcase
     end
 
     case (ID_LEVEL)
       0 : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
       end
       1 : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
       end
       2 : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
       end
       3 : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
       end
       4 : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_module[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_module[NUM_MEMORY_REQUESTOR-1:0]);
       end
       default : begin
-        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
       end
     endcase
   endgenerate
@@ -161,22 +161,22 @@ module arbiter_1_to_N_response #(
         end else begin
           case (ID_LEVEL)
             0       : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_cu[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
             end
             1       : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_bundle[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
             end
             2       : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_lane[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
             end
             3       : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_engine[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_engine[i] & fifo_response_dout_int.valid;
             end
             4       : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_module[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_module[i] & fifo_response_dout_int.valid;
             end
             default : begin
-              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.to.id_cu[i] & fifo_response_dout_int.valid;
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
             end
           endcase
         end
