@@ -277,10 +277,10 @@ module cu_setup #(
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
         configuration_comb.payload.meta.route.from.id_cu        = ID_CU;
-        configuration_comb.payload.meta.route.from.id_bundle    = ID_BUNDLE;
-        configuration_comb.payload.meta.route.from.id_lane      = ID_LANE;
-        configuration_comb.payload.meta.route.from.id_engine    = ID_ENGINE;
-        configuration_comb.payload.meta.route.from.id_module    = ID_MODULE;
+        configuration_comb.payload.meta.route.from.id_bundle    = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_lane      = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_engine    = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_module    = 1;
         configuration_comb.payload.meta.route.from.id_buffer    = 0;
         configuration_comb.payload.meta.route.to.id_cu          = ID_CU;
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};

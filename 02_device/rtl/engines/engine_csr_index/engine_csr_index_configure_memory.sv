@@ -133,10 +133,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = ID_ENGINE;
+        configure_memory_meta_int.route.from.id_cu        = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.from.id_bundle    = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.from.id_lane      = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.from.id_engine    = 1'b1 << ID_ENGINE;
         configure_memory_meta_int.route.from.id_module    = 1;
         configure_memory_meta_int.route.from.id_buffer    = 0;
         configure_memory_meta_int.route.to.id_cu          = ID_CU;
