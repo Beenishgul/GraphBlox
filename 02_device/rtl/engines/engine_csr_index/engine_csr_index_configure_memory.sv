@@ -26,6 +26,7 @@ module engine_csr_index_configure_memory #(parameter
     ID_LANE          = 0                                ,
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
+    ID_MODULE        = 0                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
@@ -137,12 +138,12 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_meta_int.route.from.id_bundle    = 1'b1 << ID_BUNDLE;
         configure_memory_meta_int.route.from.id_lane      = 1'b1 << ID_LANE;
         configure_memory_meta_int.route.from.id_engine    = 1'b1 << ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1;
+        configure_memory_meta_int.route.from.id_module    = 1'b1 << ID_MODULE;
         configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = ID_CU;
-        configure_memory_meta_int.route.to.id_bundle      = ID_BUNDLE;
-        configure_memory_meta_int.route.to.id_lane        = ID_LANE;
-        configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
+        configure_memory_meta_int.route.to.id_cu          = 0;
+        configure_memory_meta_int.route.to.id_bundle      = 0;
+        configure_memory_meta_int.route.to.id_lane        = 0;
+        configure_memory_meta_int.route.to.id_engine      = 0;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
         configure_memory_meta_int.address.base            = 0;

@@ -513,7 +513,8 @@ module engine_csr_index #(parameter
         .ID_BUNDLE  (ID_BUNDLE  ),
         .ID_LANE    (ID_LANE    ),
         .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE)
+        .ID_RELATIVE(ID_RELATIVE),
+        .ID_MODULE  (0          )
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
@@ -552,6 +553,7 @@ module engine_csr_index #(parameter
         .ID_BUNDLE       (ID_BUNDLE       ),
         .ID_LANE         (ID_LANE         ),
         .ID_ENGINE       (ID_ENGINE       ),
+        .ID_MODULE       (1               ),
         .ENGINES_CONFIG  (ENGINES_CONFIG  ),
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
         .PROG_THRESH     (PROG_THRESH     ),

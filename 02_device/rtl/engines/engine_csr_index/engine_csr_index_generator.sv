@@ -39,6 +39,7 @@ module engine_csr_index_generator #(parameter
     ID_BUNDLE        = 0 ,
     ID_LANE          = 0 ,
     ID_ENGINE        = 0 ,
+    ID_MODULE        = 0 ,
     ENGINES_CONFIG   = 0 ,
     FIFO_WRITE_DEPTH = 16,
     PROG_THRESH      = 8 ,
@@ -526,8 +527,9 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
-        fifo_request_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
+        fifo_request_comb.payload.meta.route                = configure_memory_reg.payload.meta.route;
+        fifo_request_comb.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
+        fifo_request_comb.payload.meta.address.base         = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
