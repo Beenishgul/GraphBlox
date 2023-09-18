@@ -25,16 +25,19 @@ package PKG_GLOBALS;
 	parameter CU_BUFFER_COUNT = 10;
 
 // Maximum supported engines/lanes/bundles/buffers
-	parameter CU_KERNEL_COUNT_TOTAL = 8 ;
-	parameter CU_BUNDLE_COUNT_TOTAL = 8 ;
-	parameter CU_LANE_COUNT_TOTAL   = 8 ;
-	parameter CU_ENGINE_COUNT_TOTAL = 8 ;
-	parameter CU_BUFFER_COUNT_TOTAL = 8 ;
+	parameter CU_KERNEL_COUNT_TOTAL = 8;
+	parameter CU_BUNDLE_COUNT_TOTAL = 8;
+	parameter CU_LANE_COUNT_TOTAL   = 8;
+	parameter CU_ENGINE_COUNT_TOTAL = 8;
+	parameter CU_MODULE_COUNT_TOTAL = 8;
+	parameter CU_BUFFER_COUNT_TOTAL = 8;
+
 
 	parameter CU_KERNEL_COUNT_WIDTH_BITS = CU_KERNEL_COUNT_TOTAL        ; // 5
 	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL        ;
 	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_LANE_COUNT_TOTAL          ;
 	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL        ;
+	parameter CU_MODULE_COUNT_WIDTH_BITS = CU_MODULE_COUNT_TOTAL        ;
 	parameter CU_BUFFER_COUNT_WIDTH_BITS = CU_BUFFER_COUNT_TOTAL        ;
 
 // --------------------------------------------------------------------------------------
