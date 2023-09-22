@@ -257,7 +257,7 @@ module engine_csr_index_generator #(parameter
 // Response Counter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
+        if (areset_generator | done_out_reg) begin
             response_memory_counter <= 0;
             done_resp_reg           <= 1'b0;
         end
@@ -359,9 +359,9 @@ module engine_csr_index_generator #(parameter
             end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
                 if (configure_engine_param_int.mode_sequence & done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
-                else if (~configure_engine_param_int.mode_sequence & done_int_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                else if (~configure_engine_param_int.mode_sequence & done_int_reg)
+                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_DONE;
             end
