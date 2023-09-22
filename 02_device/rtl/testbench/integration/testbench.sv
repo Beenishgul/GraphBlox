@@ -944,7 +944,7 @@ module __KERNEL___testbench ();
         //CSR/StrideIndexGeneratorConfiguration
         setup_temp[0] = 1'b1; // param.increment
         setup_temp[1] = 1'b0; // param.decrement
-        setup_temp[2] = 1'b0; // param.mode_sequence
+        setup_temp[2] = 1'b0; // param.mode_sequence // (1) indirect mode (get count from other engines)  // (0) direct mode (get count from memory)
         setup_temp[3] = 1'b1; // param.mode_buffer
         // --------------------------------------------------------------------------------------
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;                       // 0 - increment/decrement
