@@ -97,7 +97,6 @@ module engine_csr_index_generator #(parameter
 //  Response Counter
 // --------------------------------------------------------------------------------------
     logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_counter;
-    logic                             done_response_reg      ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -262,10 +261,10 @@ module engine_csr_index_generator #(parameter
             done_resp_reg           <= 1'b0;
         end
         else begin
-            if(configure_engine_param_valid) begin
+            if(configure_engine_param_valid & |configure_engine_param_int.index_end) begin
                 response_memory_counter <= response_memory_in_reg.valid + response_memory_counter;
 
-                if(response_memory_counter >= configure_engine_param_int.index_end) begin
+                if(response_memory_counter >= (configure_engine_param_int.index_end-1)) begin
                     done_resp_reg <= 1'b1;
                 end else begin
                     done_resp_reg <= 1'b0;
@@ -358,12 +357,12 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
-                if (configure_engine_param_int.mode_sequence & done_int_reg)
+                if (configure_engine_param_int.mode_sequence & done_int_reg & done_resp_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
-                else if (~configure_engine_param_int.mode_sequence & done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
-                else
+                else if (~configure_engine_param_int.mode_sequence & done_int_reg & done_resp_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
                 if (done_int_reg)
@@ -426,7 +425,7 @@ module engine_csr_index_generator #(parameter
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b1;
+                configure_engine_param_valid <= 1'b0;
                 configure_engine_param_int   <= configure_memory_reg.payload.param;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
@@ -458,6 +457,10 @@ module engine_csr_index_generator #(parameter
                 counter_decr         <= configure_engine_param_int.decrement;
                 counter_load_value   <= configure_engine_param_int.index_start;
                 counter_stride_value <= configure_engine_param_int.stride;
+
+                if(~configure_memory_reg.payload.param.mode_sequence) begin
+                    configure_engine_param_valid <= 1'b1;
+                end
             end
             ENGINE_CSR_INDEX_GEN_START : begin
                 counter_enable <= 1'b1;
@@ -506,7 +509,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
-                done_int_reg               <= done_resp_reg;
+                done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 counter_load               <= 1'b0;
