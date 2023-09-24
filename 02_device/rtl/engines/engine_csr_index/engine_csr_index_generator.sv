@@ -35,16 +35,16 @@ import PKG_CACHE::*;
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
 module engine_csr_index_generator #(parameter
-    ID_CU            = 0 ,
-    ID_BUNDLE        = 0 ,
-    ID_LANE          = 0 ,
-    ID_ENGINE        = 0 ,
-    ID_MODULE        = 0 ,
-    ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
-    PIPELINE_STAGES  = 2 ,
-    COUNTER_WIDTH    = 32
+    ID_CU            = 0                    ,
+    ID_BUNDLE        = 0                    ,
+    ID_LANE          = 0                    ,
+    ID_ENGINE        = 0                    ,
+    ID_MODULE        = 0                    ,
+    ENGINES_CONFIG   = 0                    ,
+    FIFO_WRITE_DEPTH = 16                   ,
+    PROG_THRESH      = 8                    ,
+    PIPELINE_STAGES  = 2                    ,
+    COUNTER_WIDTH    = CACHE_FRONTEND_ADDR_W
 ) (
     // System Signals
     input  logic                 ap_clk                             ,
@@ -144,6 +144,9 @@ module engine_csr_index_generator #(parameter
     logic [COUNTER_WIDTH-1:0] counter_load_value  ;
     logic [COUNTER_WIDTH-1:0] counter_stride_value;
     logic [COUNTER_WIDTH-1:0] counter_count       ;
+
+    logic                             response_memory_counter_is_zero;
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_counter_       ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -551,7 +554,7 @@ module engine_csr_index_generator #(parameter
         fifo_request_din_reg.payload <= fifo_request_comb.payload;
     end
 
-    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (
+    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_request_counter (
         .ap_clk      (ap_clk              ),
         .ap_clken    (counter_enable      ),
         .areset      (areset_counter      ),
@@ -562,6 +565,22 @@ module engine_csr_index_generator #(parameter
         .stride_value(counter_stride_value),
         .count       (counter_count       ),
         .is_zero     (counter_is_zero     )
+    );
+
+// --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
+        .ap_clk      (ap_clk                         ),
+        .ap_clken    (1'b1                           ),
+        .areset      (areset_counter                 ),
+        .load        (counter_load                   ),
+        .incr        (1'b0                           ),
+        .decr        (response_memory_in_reg.valid   ),
+        .load_value  (counter_load_value             ),
+        .stride_value({COUNTER_WIDTH-1{1'b0},{1'b1}} ),
+        .count       (response_memory_counter_       ),
+        .is_zero     (response_memory_counter_is_zero)
     );
 
 // --------------------------------------------------------------------------------------
