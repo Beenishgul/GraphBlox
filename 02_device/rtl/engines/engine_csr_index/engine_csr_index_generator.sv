@@ -89,8 +89,8 @@ module engine_csr_index_generator #(parameter
     engine_csr_index_generator_state current_state;
     engine_csr_index_generator_state next_state   ;
 
-    logic done_int_reg ;
-    logic done_out_reg ;
+    logic done_int_reg;
+    logic done_out_reg;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -426,16 +426,19 @@ module engine_csr_index_generator #(parameter
                 configure_engine_param_int.index_end   <= configure_engine_reg.payload.param.index_end;
             end
             ENGINE_CSR_INDEX_GEN_START_TRANS : begin
-                done_int_reg                       <= 1'b0;
-                done_out_reg                       <= 1'b0;
-                counter_enable                     <= 1'b1;
-                counter_load                       <= 1'b1;
-                counter_incr                       <= configure_engine_param_int.increment;
-                counter_decr                       <= configure_engine_param_int.decrement;
-                counter_load_value                 <= configure_engine_param_int.index_start;
-                response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
-                counter_stride_value               <= configure_engine_param_int.stride;
+                done_int_reg         <= 1'b0;
+                done_out_reg         <= 1'b0;
+                counter_enable       <= 1'b1;
+                counter_load         <= 1'b1;
+                counter_incr         <= configure_engine_param_int.increment;
+                counter_decr         <= configure_engine_param_int.decrement;
+                counter_load_value   <= configure_engine_param_int.index_start;
+                counter_stride_value <= configure_engine_param_int.stride;
 
+                if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
+                    response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
+                end
+                    
                 if(~configure_memory_reg.payload.param.mode_sequence) begin
                     configure_engine_param_valid <= 1'b1;
                 end
