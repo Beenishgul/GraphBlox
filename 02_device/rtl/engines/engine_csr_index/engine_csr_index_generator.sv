@@ -91,7 +91,6 @@ module engine_csr_index_generator #(parameter
 
     logic done_int_reg ;
     logic done_out_reg ;
-    logic done_resp_reg;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -110,7 +109,6 @@ module engine_csr_index_generator #(parameter
     MemoryPacket response_memory_in_reg    ;
     logic        configure_engine_setup_reg;
     logic        configure_memory_setup_reg;
-
 
     logic                           configure_engine_param_valid;
     CSRIndexConfigurationParameters configure_engine_param_int  ;
