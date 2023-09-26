@@ -136,6 +136,7 @@ struct __attribute__((__packed__)) GLAYGraphCSRxrtBufferHandlePerBank
 struct xrtGLAYHandle
 {
     char *xclbinPath;
+    char *overlayPath;
     char *kernelName;
     int deviceIndex;
     xrtDeviceHandle deviceHandle;

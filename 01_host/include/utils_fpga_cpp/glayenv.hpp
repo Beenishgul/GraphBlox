@@ -185,6 +185,7 @@ struct xrtGLAYHandle
     int ctrlMode;
     char *kernelName;
     char *xclbinPath;
+    char *overlayPath;
     unsigned int deviceIndex;
     xrt::device deviceHandle;
     xrt::xclbin xclbinHandle;
@@ -197,7 +198,7 @@ struct xrtGLAYHandle
     xrt::ip::interrupt interruptHandle;
 };
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName, int ctrlMode);
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode);
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle);
 
 // ********************************************************************************************
