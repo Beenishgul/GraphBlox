@@ -212,11 +212,11 @@ module engine_csr_index_configure_memory #(parameter
                         configure_memory_valid_reg[7]                        <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+8) : begin
-                        configure_memory_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_memory_in_dout_int.payload.data.field_0;
+                        configure_memory_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_memory_in_dout_int.payload.data.field_0;
                         configure_memory_valid_reg[8]                                                                       <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+9) : begin
-                        configure_memory_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_memory_in_dout_int.payload.data.field_0;
+                        configure_memory_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_memory_in_dout_int.payload.data.field_0;
                         configure_memory_valid_reg[9]                                                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+10) : begin
