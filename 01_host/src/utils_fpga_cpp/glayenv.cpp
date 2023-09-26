@@ -24,11 +24,11 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 {
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
-    glayHandle->xclbinPath = xclbinPath;
-    glayHandle->kernelName = kernelName;
-    glayHandle->ctrlMode  = ctrlMode;
+    glayHandle->xclbinPath  = xclbinPath;
+    glayHandle->kernelName  = kernelName;
+    glayHandle->ctrlMode    = ctrlMode;
     glayHandle->overlayPath = overlayPath;
-    
+
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
 
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
@@ -87,7 +87,7 @@ void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 
 GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex)
 {
-    overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t);// (each engine can take 32bytes configuration 8 engines per 4 bundles) // 16 Cachelines
+    overlay_buffer_size_in_bytes  = 64 * 8 * sizeof(uint32_t);// (each engine can take 64bytes configuration 8 engines per 4 bundles) // 32 Cachelines
 
     xrt_buffer_size[0] = overlay_buffer_size_in_bytes;
     xrt_buffer_size[1] = graph->num_vertices * sizeof(uint32_t);
@@ -139,6 +139,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     // ********************************************************************************************
     // ***************                  Setup Host pointers                          **************
     // ********************************************************************************************
+    InitializeGLAYOverlayConfiguration(overlay_buffer_size_in_bytes, 1, graph, glayHandle->overlayPath);
     xrt_buffer_host[0] = overlay_configuration;
     xrt_buffer_host[1] = graph->vertices->in_degree;
     xrt_buffer_host[2] = graph->vertices->out_degree;
@@ -154,7 +155,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_host[8] = &xrt_buffer_device[8]; // sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
     xrt_buffer_host[9] = &xrt_buffer_device[9];
 
-    InitializeGLAYOverlayConfiguration(overlay_buffer_size_in_bytes, 1, graph);
+
 }
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
@@ -236,7 +237,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
     return 0;
 }
 
-void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph)
+void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
     // initialize overlay_configuration
     overlay_configuration = (uint32_t *) my_malloc(overlayBufferSizeInBytes);
@@ -246,54 +247,66 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
         overlay_configuration[i] = i;
     }
 
-    if(algorithm == 1)
+    // if(algorithm == 1)
+    // {
+    //     overlay_configuration[0]  = 0x00000009;// 0 - increment/decrement
+    //     overlay_configuration[1]  = 0x00000000;// 1 - index_start
+    //     overlay_configuration[2]  = graph->num_vertices;// 2 - index_end
+    //     overlay_configuration[3]  = 0x00000001;// 3 - stride
+    //     overlay_configuration[4]  = 0x80000002;// 4 - granularity - log2 value for shifting
+    //     overlay_configuration[5]  = 0x00000101;// 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
+    //     overlay_configuration[6]  = 0x00070101;// 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
+    //     overlay_configuration[7]  = 0xcf257000;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    //     overlay_configuration[8]  = xrt_buffer_device[1];//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    //     overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    //     overlay_configuration[10] = graph->num_vertices;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    //     overlay_configuration[11] = 0;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    // }
+
+
+    std::ifstream file(overlayPath);
+    if (!file.is_open())
     {
-        overlay_configuration[0]  = 0x00000009;// 0 - increment/decrement
-        overlay_configuration[1]  = 0x00000000;// 1 - index_start
-        overlay_configuration[2]  = graph->num_vertices;// 2 - index_end
-        overlay_configuration[3]  = 0x00000001;// 3 - stride
-        overlay_configuration[4]  = 0x80000002;// 4 - granularity - log2 value for shifting
-        overlay_configuration[5]  = 0x00000101;// 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
-        overlay_configuration[6]  = 0x00070101;// 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
-        overlay_configuration[7]  = 0xcf257000;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        overlay_configuration[8]  = xrt_buffer_device[1];//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        overlay_configuration[10] = graph->num_vertices;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-        overlay_configuration[11] = 0;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+        std::cerr << "Failed to open file." << std::endl;
+        return;
     }
 
-    // std::ifstream file("input.txt");
-    // if (!file.is_open()) {
-    //     std::cerr << "Failed to open file." << std::endl;
-    //     return;
-    // }
+    std::string line;
+    std::vector<uint32_t> values;
 
-    // std::string line;
-    // std::vector<uint32_t> values;
+    while (std::getline(file, line))
+    {
+        size_t comment_pos = line.find("\\");
+        if (comment_pos != std::string::npos)
+        {
+            line = line.substr(0, comment_pos);
+        }
 
-    // while (std::getline(file, line)) {
-    //     size_t comment_pos = line.find("\\");
-    //     if (comment_pos != std::string::npos) {
-    //         line = line.substr(0, comment_pos);
-    //     }
+        uint32_t value;
+        if (sscanf(line.c_str(), "0x%8x", &value) == 1)
+        {
+            values.push_back(value);
+        }
+    }
 
-    //     uint32_t value;
-    //     if (sscanf(line.c_str(), "0x%8x", &value) == 1) {
-    //         values.push_back(value);
-    //     }
-    // }
+    overlay_buffer_size_in_bytes = values.size() * sizeof(uint32_t);
+    overlay_configuration = (uint32_t *)aligned_alloc(4096, overlay_buffer_size_in_bytes);  // Assuming 4096-byte alignment
 
-    // overlay_buffer_size_in_bytes = values.size() * sizeof(uint32_t);
-    // overlay_configuration = (uint32_t *)aligned_alloc(4096, overlay_buffer_size_in_bytes);  // Assuming 4096-byte alignment
+    if (!overlay_configuration)
+    {
+        std::cerr << "Memory alignment error." << std::endl;
+        return;
+    }
 
-    // if (!overlay_configuration) {
-    //     std::cerr << "Memory alignment error." << std::endl;
-    //     return;
-    // }
+    for (size_t i = 0; i < values.size(); i++)
+    {
+        overlay_configuration[i] = values[i];
+    }
 
-    // for (size_t i = 0; i < values.size(); i++) {
-    //     overlay_configuration[i] = values[i];
-    // }
+    overlay_configuration[2]  = graph->num_vertices       ;// 2 - index_end
+    overlay_configuration[8]  = xrt_buffer_device[1]      ;//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    overlay_configuration[10] = graph->num_vertices       ;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
 }
 
 void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()
@@ -316,14 +329,22 @@ void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank
         {
             engine_id = i;
             printf("ENGINE-ID [%-2u] \n", engine_id);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 0]);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 1]);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 2]);
-            printf("[0x%08X]\n", overlay_configuration[j * 64 + i * 8 + 3]);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 4]);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 5]);
-            printf("[0x%08X]  ", overlay_configuration[j * 64 + i * 8 + 6]);
-            printf("[0x%08X]\n", overlay_configuration[j * 64 + i * 8 + 7]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (0)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (1)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (2)]);
+            printf("[0x%08X]\n", overlay_configuration[(j * (16 * 8)) + (i * 16) + (3)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (4)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (5)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (6)]);
+            printf("[0x%08X]\n", overlay_configuration[(j * (16 * 8)) + (i * 16) + (7)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (8)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (9)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (10)]);
+            printf("[0x%08X]\n", overlay_configuration[(j * (16 * 8)) + (i * 16) + (11)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (12)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (13)]);
+            printf("[0x%08X]  ", overlay_configuration[(j * (16 * 8)) + (i * 16) + (14)]);
+            printf("[0x%08X]\n", overlay_configuration[(j * (16 * 8)) + (i * 16) + (15)]);
         }
     }
 }
