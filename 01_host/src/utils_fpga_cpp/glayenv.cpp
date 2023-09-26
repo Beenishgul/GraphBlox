@@ -20,14 +20,15 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *kernelName, int ctrlMode)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode)
 {
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
     glayHandle->xclbinPath = xclbinPath;
     glayHandle->kernelName = kernelName;
     glayHandle->ctrlMode  = ctrlMode;
-
+    glayHandle->overlayPath = overlayPath;
+    
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
 
     glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
@@ -87,8 +88,6 @@ void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex)
 {
     overlay_buffer_size_in_bytes  = 64 * 4 * sizeof(uint32_t);// (each engine can take 32bytes configuration 8 engines per 4 bundles) // 16 Cachelines
-
-    InitializeGLAYOverlayConfiguration(overlay_buffer_size_in_bytes, 1, graph);
 
     xrt_buffer_size[0] = overlay_buffer_size_in_bytes;
     xrt_buffer_size[1] = graph->num_vertices * sizeof(uint32_t);
@@ -154,6 +153,8 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_host[7] = &xrt_buffer_device[7]; // endian mode 0-big endian 1-little endian
     xrt_buffer_host[8] = &xrt_buffer_device[8]; // sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
     xrt_buffer_host[9] = &xrt_buffer_device[9];
+
+    InitializeGLAYOverlayConfiguration(overlay_buffer_size_in_bytes, 1, graph);
 }
 
 int GLAYGraphCSRxrtBufferHandlePerBank::writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
