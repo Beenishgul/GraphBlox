@@ -370,7 +370,7 @@ module __KERNEL___testbench ();
 // Backdoor fill the input buffer AXI vip memory model with 32-bit words
     function void  m00_axi_buffer_fill_memory(
             input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-            input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
+            input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
             input bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] words_data[$],      // data source to fill memory
             input integer offset,                 // start index of data source
             input integer words                   // number of words to fill
@@ -758,7 +758,7 @@ module __KERNEL___testbench ();
         buffer_5_ptr[62:0] = get_random_ptr();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr = 1;
-        buffer_8_ptr = (16*4);
+        buffer_8_ptr = (16*8);
         buffer_9_ptr = 0;
 
         ///////////////////////////////////////////////////////////////////////////
@@ -864,9 +864,9 @@ module __KERNEL___testbench ();
         m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_edge_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_edge_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edge_count);
 
     endtask
 
@@ -1021,24 +1021,27 @@ module __KERNEL___testbench ();
 
         realcount = 0;
 
+        // $display("MSG: Starting graph.mem512_vertex_count: %0d\n", graph.mem512_vertex_count);
+        // $display("MSG: Starting graph.mem512_edge_count: %0d\n", graph.mem512_edge_count);
+
         for (int i = 0; i < graph.mem512_vertex_count; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
                 graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_out_degree;
-                $display("Starting temp_out_degree: %0d\n", temp_out_degree);
+                $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS]);
                 graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
                 graph.in_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_in_degree;
-                $display("Starting temp_out_degree: %0d\n", temp_in_degree);
+                // $display("MSG: Starting temp_in_degree: %0d\n", temp_in_degree);
                 graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
                 graph.edges_idx[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_idx;
-                $display("Starting temp_out_degree: %0d\n", temp_edges_idx);
+                // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
             end
         end
 
         realcount = 0;
 
         for (int i = 0; i < graph.mem512_edge_count; i++) begin
-            for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/8); j++) begin
+            for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
                 graph.edges_array_src[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_edges_array_src;
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
@@ -1076,8 +1079,8 @@ module __KERNEL___testbench ();
 
         graph.mem512_overlay_program_size = int'(buffer_8_ptr); // cachelines
 
-        graph.mem512_vertex_count = $ceil(graph.vertex_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_edge_count = $ceil(graph.edge_count / M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_vertex_count = ((graph.vertex_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_edge_count = ((graph.edge_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
         graph.out_degree = new [graph.mem512_vertex_count];
         graph.in_degree  = new [graph.mem512_vertex_count];

@@ -303,7 +303,7 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
         overlay_configuration[i] = values[i];
     }
 
-    overlay_configuration[2]  = graph->num_vertices       ;// 2 - index_end
+    overlay_configuration[2]  = graph->num_vertices       ;//  2 - index_end
     overlay_configuration[8]  = xrt_buffer_device[1]      ;//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
     overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
     overlay_configuration[10] = graph->num_vertices       ;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
