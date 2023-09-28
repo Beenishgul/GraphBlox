@@ -162,9 +162,10 @@ module engine_csr_index_configure_memory #(parameter
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
-            configure_memory_reg.valid                   <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.from <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.address    <= configure_memory_meta_int.address;
+            configure_memory_reg.valid                       <= configure_memory_valid_int;
+            configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
+            configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
 
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
@@ -213,11 +214,11 @@ module engine_csr_index_configure_memory #(parameter
                     end
                     (ENGINE_SEQ_MIN+8) : begin
                         configure_memory_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_memory_in_dout_int.payload.data.field_0;
-                        configure_memory_valid_reg[8]                                                                       <= 1'b1  ;
+                        configure_memory_valid_reg[8]                                                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+9) : begin
                         configure_memory_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_memory_in_dout_int.payload.data.field_0;
-                        configure_memory_valid_reg[9]                                                 <= 1'b1  ;
+                        configure_memory_valid_reg[9]                                                                       <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+10) : begin
                         configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_int.payload.data.field_0;
@@ -273,10 +274,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -308,10 +309,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                                 ),
+        .FIFO_WRITE_DEPTH(32                                 ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (8                                  )
+        .PROG_THRESH     (16                                 )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),

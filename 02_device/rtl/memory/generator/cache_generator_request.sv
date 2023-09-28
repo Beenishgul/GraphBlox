@@ -181,10 +181,10 @@ module cache_generator_request #(
   assign request_out_int.payload.meta      = fifo_request_dout.meta;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(16                        ),
+    .FIFO_WRITE_DEPTH(32                        ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
-    .PROG_THRESH     (8                         )
+    .PROG_THRESH     (16                        )
   ) inst_fifo_CacheRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
