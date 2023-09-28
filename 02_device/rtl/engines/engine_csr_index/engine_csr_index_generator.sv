@@ -577,10 +577,10 @@ module engine_csr_index_generator #(parameter
     assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
@@ -612,8 +612,6 @@ module engine_csr_index_generator #(parameter
         fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
         fifo_response_comb.payload.data               = response_memory_in_reg.payload.data;
     end
-
-
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin

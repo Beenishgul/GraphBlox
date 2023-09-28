@@ -241,10 +241,10 @@ module cu_bundles #(
     assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                         )
     ) inst_fifo_MemoryPacketResponseInput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),
@@ -276,10 +276,10 @@ module cu_bundles #(
     assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketRequestOutput (
         .clk         (ap_clk                                              ),
         .srst        (areset_fifo                                         ),

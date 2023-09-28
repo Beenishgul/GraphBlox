@@ -1028,7 +1028,7 @@ module __KERNEL___testbench ();
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
                 graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_out_degree;
-                $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS]);
+                // $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:GLOBAL_DATA_WIDTH_BITS]);
                 graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
                 graph.in_degree[i][j+:GLOBAL_DATA_WIDTH_BITS] = temp_in_degree;
                 // $display("MSG: Starting temp_in_degree: %0d\n", temp_in_degree);

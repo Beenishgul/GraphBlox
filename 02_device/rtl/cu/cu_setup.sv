@@ -338,10 +338,10 @@ module cu_setup #(
     assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
@@ -373,10 +373,10 @@ module cu_setup #(
     assign response_out_int.payload           = fifo_response_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketResponse (
         .clk        (ap_clk                                   ),
         .srst       (areset_fifo                              ),
