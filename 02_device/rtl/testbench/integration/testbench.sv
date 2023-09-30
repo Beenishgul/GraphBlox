@@ -22,6 +22,7 @@ class GraphCSR;
     integer mem512_overlay_program_size;
 
     integer file_error               ;
+    integer file_ptr_overlay_program ;
     integer file_ptr_edges_idx       ;
     integer file_ptr_in_degree       ;
     integer file_ptr_out_degree      ;
@@ -38,16 +39,17 @@ class GraphCSR;
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_array_weight[];
 
     function new ();
-        this.file_error    = 0;
-        this.file_ptr_edges_idx  = 0;
-        this.file_ptr_in_degree  = 0;
-        this.file_ptr_out_degree  = 0;
+        this.file_error                = 0;
+        this.file_ptr_overlay_program  = 0;
+        this.file_ptr_edges_idx        = 0;
+        this.file_ptr_in_degree        = 0;
+        this.file_ptr_out_degree       = 0;
         this.file_ptr_edges_array_src  = 0;
-        this.file_ptr_edges_array_dest= 0;
-        this.vertex_count = 0;
-        this.edge_count = 0;
-        this.mem512_vertex_count = 0;
-        this.mem512_edge_count = 0;
+        this.file_ptr_edges_array_dest = 0;
+        this.vertex_count              = 0;
+        this.edge_count                = 0;
+        this.mem512_vertex_count       = 0;
+        this.mem512_edge_count         = 0;
         this.mem512_overlay_program_size = 4;
     endfunction
 
@@ -909,6 +911,21 @@ module __KERNEL___testbench ();
 
     GraphCSR graph;
 
+    // Helper function to find the index of a substring within a string
+    function int find_str(string str, string substr);
+        automatic int i;
+        automatic int str_len = str.len();
+        automatic int substr_len = substr.len();
+        find_str = -1; // Initialize as -1 (not found)
+        for(i = 0; i <= str_len - substr_len; i++) begin
+            if (str.substr(i, i + substr_len - 1) == substr) begin
+                find_str = i; // Found
+                break;
+            end
+        end
+    endfunction
+
+
     function automatic void read_files_graphCSR(ref GraphCSR graph);
 
         // graph.overlay_program[0] = 0;
@@ -929,6 +946,7 @@ module __KERNEL___testbench ();
         // graph.overlay_program[1][(64)+:64] = 1;
 
         int          realcount                 = 0;
+        bit [32-1:0] temp_overlay_program         ;
         bit [32-1:0] temp_out_degree              ;
         bit [32-1:0] temp_in_degree               ;
         bit [32-1:0] temp_edges_idx               ;
@@ -1019,6 +1037,35 @@ module __KERNEL___testbench ();
             end
         end
 
+        while (!$feof(graph.file_ptr_overlay_program)) begin
+            string line;
+            string hex_str;
+            int comment_index;
+
+            // read a line from the file
+            if (!$fgets(line, graph.file_ptr_overlay_program))
+                break;
+
+            // find the comment start position using $strstr
+            comment_index = find_str(line, "//");
+            if (comment_index != -1)
+                line = line.substr(0, comment_index - 1); // discarding the comment
+
+            // remove leading and trailing spaces using a loop
+            while (line.len() > 0 && {line[0]} == " ")
+                line = line.substr(1, line.len() - 1);
+
+            while (line.len() > 0 && {line[line.len() - 1]} == " ")
+                line = line.substr(0, line.len() - 2);
+
+            // parse hex number from the line
+            if (line.len() > 0) begin
+                int num_read = $sscanf(line, "%0h", temp_overlay_program); // Notice the format specifier used here
+                if(num_read == 1)
+                    $display("MSG: Hex number: 32'h%0h", temp_overlay_program);
+            end
+        end
+
         realcount = 0;
 
         // $display("MSG: Starting graph.mem512_vertex_count: %0d\n", graph.mem512_vertex_count);
@@ -1053,6 +1100,10 @@ module __KERNEL___testbench ();
 
     task automatic initalize_graph (ref GraphCSR graph);
         graph.graph_name = "_GRAPH_NAME_";
+
+        graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ALGORITHM_NAME_.ol", "r");
+        if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
+        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
 
         graph.file_ptr_in_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
@@ -1091,6 +1142,7 @@ module __KERNEL___testbench ();
 
         read_files_graphCSR(graph);
 
+        $fclose(graph.file_ptr_overlay_program);
         $fclose(graph.file_ptr_in_degree);
         $fclose(graph.file_ptr_out_degree);
         $fclose(graph.file_ptr_edges_idx);
