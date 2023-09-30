@@ -268,10 +268,10 @@ module bundle_lanes #(
     assign response_engine_in_int.payload              = fifo_response_lanes_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseLanesInput (
         .clk        (ap_clk                                            ),
         .srst       (areset_fifo                                       ),
@@ -303,10 +303,10 @@ module bundle_lanes #(
     assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -338,10 +338,10 @@ module bundle_lanes #(
     assign request_engine_out_int.payload              = fifo_request_lanes_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestLanesOutput (
         .clk        (ap_clk                                            ),
         .srst       (areset_fifo                                       ),
@@ -373,10 +373,10 @@ module bundle_lanes #(
     assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestMemoryOutput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),

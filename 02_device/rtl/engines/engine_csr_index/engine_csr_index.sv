@@ -28,8 +28,8 @@ module engine_csr_index #(parameter
     ID_ENGINE        = 0 ,
     ID_RELATIVE      = 0 ,
     ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
+    FIFO_WRITE_DEPTH = 32,
+    PROG_THRESH      = 16,
     NUM_MODULES      = 2 ,
     PIPELINE_STAGES  = 2
 ) (
