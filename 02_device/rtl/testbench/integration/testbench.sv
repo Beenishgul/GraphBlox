@@ -1037,6 +1037,8 @@ module __KERNEL___testbench ();
             end
         end
 
+        // $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
+
         while (!$feof(graph.file_ptr_overlay_program)) begin
             string line;
             string hex_str;
@@ -1058,6 +1060,7 @@ module __KERNEL___testbench ();
             while (line.len() > 0 && {line[line.len() - 1]} == " ")
                 line = line.substr(0, line.len() - 2);
 
+            $display("MSG: Hex number: 32'h%0h", line);
             // parse hex number from the line
             if (line.len() > 0) begin
                 int num_read = $sscanf(line, "%0h", temp_overlay_program); // Notice the format specifier used here
@@ -1103,27 +1106,27 @@ module __KERNEL___testbench ();
 
         graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ALGORITHM_NAME_.ol", "r");
         if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
-        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
+        else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
 
         graph.file_ptr_in_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
-        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
+        else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
 
         graph.file_ptr_out_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.out_degree", "r");
         if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
-        else                    $display("File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
+        else                    $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
         graph.file_ptr_edges_idx = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_idx", "r");
         if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
-        else                   $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
+        else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
 
         graph.file_ptr_edges_array_src = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_src", "r");
         if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
-        else                         $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
+        else                         $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
 
         graph.file_ptr_edges_array_dest= $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_dest", "r");
         if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
-        else                          $display("File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
+        else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
         graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
