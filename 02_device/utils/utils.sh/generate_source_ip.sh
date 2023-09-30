@@ -114,4 +114,23 @@ then
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s/$search/$replace/" $newtext
     fi
+
+    # search="_DIR_OVERLAY_"
+    # replace=${FULL_SRC_IP_DIR_OVERLAY}
+    # if [[ $search != "" && $replace != "" ]]; then
+    #     sed -i "s/$search/$replace/" $newtext
+    # fi
+
+    search="_FULL_SRC_IP_DIR_OVERLAY_"
+    replace=${FULL_SRC_IP_DIR_OVERLAY}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s~$search~$replace~" $newtext
+    fi
+
+
+    search="_ALGORITHM_NAME_"
+    replace=${ALGORITHM_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
 fi

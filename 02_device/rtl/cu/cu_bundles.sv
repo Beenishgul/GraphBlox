@@ -241,23 +241,23 @@ module cu_bundles #(
     assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseInput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_response_memory_in_din                         ),
-        .wr_en       (fifo_response_memory_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_memory_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_memory_in_dout                        ),
-        .full        (fifo_response_memory_in_signals_out_int.full        ),
-        .empty       (fifo_response_memory_in_signals_out_int.empty       ),
-        .valid       (fifo_response_memory_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_memory_in_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_response_memory_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_memory_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_response_memory_in_din                        ),
+        .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_memory_in_dout                       ),
+        .full       (fifo_response_memory_in_signals_out_int.full       ),
+        .empty      (fifo_response_memory_in_signals_out_int.empty      ),
+        .valid      (fifo_response_memory_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -276,23 +276,23 @@ module cu_bundles #(
     assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                        )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestOutput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_request_memory_out_din                         ),
-        .wr_en       (fifo_request_memory_out_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_memory_out_signals_in_int.rd_en        ),
-        .dout        (fifo_request_memory_out_dout                        ),
-        .full        (fifo_request_memory_out_signals_out_int.full        ),
-        .empty       (fifo_request_memory_out_signals_out_int.empty       ),
-        .valid       (fifo_request_memory_out_signals_out_int.valid       ),
-        .prog_full   (fifo_request_memory_out_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_request_memory_out_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_memory_out_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_request_memory_out_din                        ),
+        .wr_en      (fifo_request_memory_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_memory_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_memory_out_dout                       ),
+        .full       (fifo_request_memory_out_signals_out_int.full       ),
+        .empty      (fifo_request_memory_out_signals_out_int.empty      ),
+        .valid      (fifo_request_memory_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -422,7 +422,7 @@ module cu_bundles #(
         for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
             bundle_lanes #(
                 `include"set_bundle_parameters.vh"
-                ) inst_bundle_lanes (
+            ) inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
                 .areset                             (areset_bundle[i]                             ),
                 .descriptor_in                      (bundle_descriptor_in[i]                      ),
