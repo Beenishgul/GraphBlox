@@ -946,6 +946,7 @@ module __KERNEL___testbench ();
         // graph.overlay_program[1][(64)+:64] = 1;
 
         int          realcount                 = 0;
+        int o,l;
         bit [32-1:0] temp_overlay_program         ;
         bit [32-1:0] temp_out_degree              ;
         bit [32-1:0] temp_in_degree               ;
@@ -1030,19 +1031,22 @@ module __KERNEL___testbench ();
         graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
         // --------------------------------------------------------------------------------------
 
-        for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
-                graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
-                realcount++;
-            end
-        end
+        // for (int i = 1; i < graph.mem512_overlay_program_size; i++) begin
+        //     for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
+        //         graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
+        //         realcount++;
+        //     end
+        // end
 
         // $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
 
+        o=0;
+        l=0;
         while (!$feof(graph.file_ptr_overlay_program)) begin
             string line;
             string hex_str;
             int comment_index;
+            int num_read;
 
             // read a line from the file
             if (!$fgets(line, graph.file_ptr_overlay_program))
@@ -1059,13 +1063,19 @@ module __KERNEL___testbench ();
 
             while (line.len() > 0 && {line[line.len() - 1]} == " ")
                 line = line.substr(0, line.len() - 2);
-
-            $display("MSG: Hex number: 32'h%0h", line);
             // parse hex number from the line
             if (line.len() > 0) begin
-                int num_read = $sscanf(line, "%0h", temp_overlay_program); // Notice the format specifier used here
-                if(num_read == 1)
-                    $display("MSG: Hex number: 32'h%0h", temp_overlay_program);
+                num_read = $sscanf(line, "0x%h", temp_overlay_program); // Notice the format specifier used here
+                if(num_read == 1) begin
+                    // $display("MSG: %d %d Hex number: 32'h%0h",l,o, temp_overlay_program);
+                    graph.overlay_program[l][o] = temp_overlay_program;
+                    o++;
+                    if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+
             end
         end
 
