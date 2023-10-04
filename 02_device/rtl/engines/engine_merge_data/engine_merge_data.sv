@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_merge_data.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-30 13:17:45
+// Revise : 2023-08-28 15:49:58
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -28,8 +28,8 @@ module engine_merge_data #(parameter
     ID_ENGINE        = 0 ,
     ID_RELATIVE      = 0 ,
     ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
+    FIFO_WRITE_DEPTH = 32,
+    PROG_THRESH      = 16,
     NUM_MODULES      = 2 ,
     PIPELINE_STAGES  = 2
 ) (
@@ -513,7 +513,8 @@ module engine_merge_data #(parameter
         .ID_BUNDLE  (ID_BUNDLE  ),
         .ID_LANE    (ID_LANE    ),
         .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE)
+        .ID_RELATIVE(ID_RELATIVE),
+        .ID_MODULE  (0          )
     ) inst_engine_merge_data_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
@@ -552,6 +553,7 @@ module engine_merge_data #(parameter
         .ID_BUNDLE       (ID_BUNDLE       ),
         .ID_LANE         (ID_LANE         ),
         .ID_ENGINE       (ID_ENGINE       ),
+        .ID_MODULE       (1               ),
         .ENGINES_CONFIG  (ENGINES_CONFIG  ),
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
         .PROG_THRESH     (PROG_THRESH     ),
