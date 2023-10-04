@@ -554,7 +554,7 @@ module engine_csr_index_generator #(parameter
         .areset      (areset_counter                    ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
-        .decr        (response_memory_in_reg.valid      ),
+        .decr        (request_engine_out_reg.valid      ),
         .load_value  (response_memory_counter_load_value),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
         .count       (response_memory_counter_          ),
