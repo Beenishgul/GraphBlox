@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_merge_data_configure_engine.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-30 13:17:54
+// Revise : 2023-08-21 09:48:40
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -21,10 +21,12 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_merge_data_configure_engine #(parameter
-    ID_CU     = 0,
-    ID_BUNDLE = 0,
-    ID_LANE   = 0,
-    ID_ENGINE = 0
+    ID_CU            = 0 ,
+    ID_BUNDLE        = 0 ,
+    ID_LANE          = 0 ,
+    ID_ENGINE        = 0 ,
+    FIFO_WRITE_DEPTH = 32,
+    PROG_THRESH      = 16
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -169,10 +171,10 @@ module engine_merge_data_configure_engine #(parameter
     assign fifo_response_engine_in_dout_int.payload     = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -204,10 +206,10 @@ module engine_merge_data_configure_engine #(parameter
     assign fifo_configure_engine_dout_int.payload     = fifo_configure_engine_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                                 ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (8                                  )
+        .PROG_THRESH     (PROG_THRESH                        )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),

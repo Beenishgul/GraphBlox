@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_merge_data_configure_memory.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-30 13:18:02
+// Revise : 2023-08-28 15:42:14
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -26,9 +26,12 @@ module engine_merge_data_configure_memory #(parameter
     ID_LANE          = 0                                ,
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
+    ID_MODULE        = 0                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
-    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
+    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN,
+    FIFO_WRITE_DEPTH = 32                               ,
+    PROG_THRESH      = 16
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -133,16 +136,16 @@ module engine_merge_data_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1;
+        configure_memory_meta_int.route.from.id_cu        = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.from.id_bundle    = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.from.id_lane      = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.from.id_engine    = 1'b1 << ID_ENGINE;
+        configure_memory_meta_int.route.from.id_module    = 1'b1 << ID_MODULE;
         configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = ID_CU;
-        configure_memory_meta_int.route.to.id_bundle      = ID_BUNDLE;
-        configure_memory_meta_int.route.to.id_lane        = ID_LANE;
-        configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
+        configure_memory_meta_int.route.to.id_cu          = 0;
+        configure_memory_meta_int.route.to.id_bundle      = 0;
+        configure_memory_meta_int.route.to.id_lane        = 0;
+        configure_memory_meta_int.route.to.id_engine      = 0;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
         configure_memory_meta_int.address.base            = 0;
@@ -161,9 +164,10 @@ module engine_merge_data_configure_memory #(parameter
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
-            configure_memory_reg.valid                   <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.from <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.address    <= configure_memory_meta_int.address;
+            configure_memory_reg.valid                       <= configure_memory_valid_int;
+            configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
+            configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
 
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
@@ -272,10 +276,10 @@ module engine_merge_data_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -307,10 +311,10 @@ module engine_merge_data_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                                 ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (8                                  )
+        .PROG_THRESH     (PROG_THRESH                        )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
