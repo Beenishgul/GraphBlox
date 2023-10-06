@@ -33,7 +33,7 @@ module engine_merge_data_configure_engine #(parameter
     input  MemoryPacket           response_engine_in                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    output CSRIndexConfiguration  configure_engine_out               ,
+    output MergeDataConfiguration configure_engine_out               ,
     input  FIFOStateSignalsInput  fifo_configure_engine_signals_in   ,
     output FIFOStateSignalsOutput fifo_configure_engine_signals_out  ,
     output logic                  fifo_setup_signal
@@ -45,10 +45,10 @@ module engine_merge_data_configure_engine #(parameter
     logic areset_csr_index_generator;
     logic areset_fifo               ;
 
-    MemoryPacket          response_engine_in_reg    ;
-    CSRIndexConfiguration configure_engine_reg      ;
-    logic                 configure_engine_valid_reg;
-    logic                 configure_engine_valid_int;
+    MemoryPacket           response_engine_in_reg    ;
+    MergeDataConfiguration configure_engine_reg      ;
+    logic                  configure_engine_valid_reg;
+    logic                  configure_engine_valid_int;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -65,13 +65,13 @@ module engine_merge_data_configure_engine #(parameter
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    CSRIndexConfigurationPayload fifo_configure_engine_din             ;
-    CSRIndexConfiguration        fifo_configure_engine_dout_int        ;
-    CSRIndexConfigurationPayload fifo_configure_engine_dout            ;
-    FIFOStateSignalsInput        fifo_configure_engine_signals_in_reg  ;
-    FIFOStateSignalsInput        fifo_configure_engine_signals_in_int  ;
-    FIFOStateSignalsOutput       fifo_configure_engine_signals_out_int ;
-    logic                        fifo_configure_engine_setup_signal_int;
+    MergeDataConfigurationPayload fifo_configure_engine_din             ;
+    MergeDataConfiguration        fifo_configure_engine_dout_int        ;
+    MergeDataConfigurationPayload fifo_configure_engine_dout            ;
+    FIFOStateSignalsInput         fifo_configure_engine_signals_in_reg  ;
+    FIFOStateSignalsInput         fifo_configure_engine_signals_in_int  ;
+    FIFOStateSignalsOutput        fifo_configure_engine_signals_out_int ;
+    logic                         fifo_configure_engine_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -206,10 +206,10 @@ module engine_merge_data_configure_engine #(parameter
     assign fifo_configure_engine_dout_int.payload     = fifo_configure_engine_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
-        .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
-        .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (PROG_THRESH                        )
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                    ),
+        .WRITE_DATA_WIDTH($bits(MergeDataConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(MergeDataConfigurationPayload)),
+        .PROG_THRESH     (PROG_THRESH                         )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
