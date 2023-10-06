@@ -10,7 +10,7 @@ extern "C" {
 #include <stdint.h>
 #include "mt19937.h"
 
-#define WEIGHTED 0
+#define WEIGHTED 1
 #define DIRECTED 0
 #define DYNAMIC  0
 

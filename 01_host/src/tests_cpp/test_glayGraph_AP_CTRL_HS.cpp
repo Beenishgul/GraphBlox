@@ -41,6 +41,7 @@ extern "C" {
 
 #include "graphCSRSegments.h"
 #include "edgeList.h"
+// #include "glayGDL_emu.h"
 
 const char *argp_program_version =
     "GLay v1.0";
@@ -177,6 +178,10 @@ static struct argp_option options[] =
         "\nHardware overlay (XCLBIN) file for hw or hw_emu mode.\n"
     },
     {
+        "overlay-path",            'X', "[DEFAULT:NULL]\n",      0,
+        "\nHardware overlay algorithm configuration path file filename.ol.\n"
+    },
+    {
         "device-index",             'q', "[DEFAULT:0]\n",      0,
         "\nDevice ID of your target card use \"xbutil list\" command.\n"
     },
@@ -292,6 +297,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
         arguments->xclbin_path  = strcpy (arguments->xclbin_path, arg);
         break;
+    case 'X':
+        arguments->overlay_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
+        arguments->overlay_path  = strcpy (arguments->overlay_path, arg);
+        break;
+
     default:
         return ARGP_ERR_UNKNOWN;
     }
@@ -309,7 +319,7 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
-    int bank_grp_idx = 1;
+    int bank_grp_idx = 0;
     struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
     arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 1);
@@ -325,7 +335,15 @@ main (int argc, char **argv)
 
     startGLAYCtrlHs(arguments->glayHandle);
 
+    Start(timer);
     waitGLAYCtrlHs(arguments->glayHandle);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
     // closeGLAYUserManaged(arguments->glayHandle);
 
