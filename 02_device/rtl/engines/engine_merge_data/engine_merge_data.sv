@@ -28,6 +28,7 @@ module engine_merge_data #(parameter
     ID_ENGINE        = 0 ,
     ID_RELATIVE      = 0 ,
     ENGINES_CONFIG   = 0 ,
+    MERGE_WIDTH      = 0 ,
     FIFO_WRITE_DEPTH = 32,
     PROG_THRESH      = 16,
     NUM_MODULES      = 2 ,
