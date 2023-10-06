@@ -138,6 +138,56 @@ package PKG_ENGINE;
         CSRIndexConfigurationPayload payload;
     } CSRIndexConfiguration;
 
+// Merge\_Data\_Engine
+// Forward the data in a lane and merges it with other data from other lanes
+// Keeps the original meta data for that lane
+
+    typedef enum logic[8:0] {
+        ENGINE_MERGE_DATA_RESET,
+        ENGINE_MERGE_DATA_IDLE,
+        ENGINE_MERGE_DATA_SETUP,
+        ENGINE_MERGE_DATA_START,
+        ENGINE_MERGE_DATA_START_TRANS,
+        ENGINE_MERGE_DATA_BUSY,
+        ENGINE_MERGE_DATA_PAUSE_TRANS,
+        ENGINE_MERGE_DATA_PAUSE,
+        ENGINE_MERGE_DATA_DONE
+    } engine_merge_data_state;
+
+    typedef enum logic[14:0] {
+        ENGINE_MERGE_DATA_GEN_RESET,
+        ENGINE_MERGE_DATA_GEN_IDLE,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY,
+        ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE,
+        ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS,
+        ENGINE_MERGE_DATA_GEN_SETUP_ENGINE,
+        ENGINE_MERGE_DATA_GEN_START_TRANS,
+        ENGINE_MERGE_DATA_GEN_START,
+        ENGINE_MERGE_DATA_GEN_BUSY_TRANS,
+        ENGINE_MERGE_DATA_GEN_BUSY,
+        ENGINE_MERGE_DATA_GEN_PAUSE_TRANS,
+        ENGINE_MERGE_DATA_GEN_PAUSE,
+        ENGINE_MERGE_DATA_GEN_DONE_TRANS,
+        ENGINE_MERGE_DATA_GEN_DONE
+    } engine_merge_data_generator_state;
+
+    typedef struct packed{
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] merge_mask;
+                logic                               mode_buffer  ;
+    } MergeDataConfigurationParameters;
+
+    typedef struct packed{
+        MergeDataConfigurationParameters param;
+        MemoryPacketMeta                 meta ;
+    } MergeDataConfigurationPayload;
+
+    typedef struct packed{
+        logic                         valid  ;
+        MergeDataConfigurationPayload payload;
+    } MergeDataConfiguration;
+
 // Read\_Write\_Engine
 // --------------------
 
