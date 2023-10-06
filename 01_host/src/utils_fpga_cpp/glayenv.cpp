@@ -239,31 +239,6 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
 
 void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
-    // initialize overlay_configuration
-    overlay_configuration = (uint32_t *) my_malloc(overlayBufferSizeInBytes);
-
-    for (uint32_t i = 0; i < (overlayBufferSizeInBytes / sizeof(uint32_t)); ++i)
-    {
-        overlay_configuration[i] = i;
-    }
-
-    // if(algorithm == 1)
-    // {
-    //     overlay_configuration[0]  = 0x00000009;// 0 - increment/decrement
-    //     overlay_configuration[1]  = 0x00000000;// 1 - index_start
-    //     overlay_configuration[2]  = graph->num_vertices;// 2 - index_end
-    //     overlay_configuration[3]  = 0x00000001;// 3 - stride
-    //     overlay_configuration[4]  = 0x80000002;// 4 - granularity - log2 value for shifting
-    //     overlay_configuration[5]  = 0x00000101;// 5 - STRUCT_ENGINE_SETUP - CMD_CONFIGURE
-    //     overlay_configuration[6]  = 0x00070101;// 6 - ALU_NOP - FILTER_NOP - OP_LOCATION_0
-    //     overlay_configuration[7]  = 0xcf257000;//  7 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    //     overlay_configuration[8]  = xrt_buffer_device[1];//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    //     overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    //     overlay_configuration[10] = graph->num_vertices;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    //     overlay_configuration[11] = 0;// 11 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    // }
-
-
     std::ifstream file(overlayPath);
     if (!file.is_open())
     {
@@ -303,10 +278,10 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
         overlay_configuration[i] = values[i];
     }
 
-    overlay_configuration[2]  = graph->num_vertices       ;//  2 - index_end
-    overlay_configuration[8]  = xrt_buffer_device[1]      ;//  8 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    overlay_configuration[9]  = xrt_buffer_device[1] >> 32;//  9 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
-    overlay_configuration[10] = graph->num_vertices       ;//  10 - BUFFER | Configure first 3 engines | BUNDLE | VERTEX
+    overlay_configuration[2]  = graph->num_vertices       ;//  2  - Index_end
+    overlay_configuration[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS
+    overlay_configuration[9]  = xrt_buffer_device[2] >> 32;//  9  - BUFFER Array Pointer RHS
+    overlay_configuration[10] = graph->num_vertices       ;//  10 - BUFFER size
 }
 
 void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()

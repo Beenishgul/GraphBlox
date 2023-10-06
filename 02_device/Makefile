@@ -503,7 +503,7 @@ ifeq ($(TARGET),hw_emu)
 	if [ $(DEBUG_CMD) -eq 1 ]; then \
 		gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	else \
-		./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) | perl $(COLOR_TAIL_EMU_SUB_PL);\
+		./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
 	fi
 else
 	$(ECHO) "${RED}ERROR: This build target <TARGET=hw_emu> not valid when design target is <<TARGET=$(TARGET)>> ${NC}" | perl $(COLOR_TAIL_EMU_PL)
@@ -518,8 +518,9 @@ run-emu-debug: DEBUG_CMD=1
 run-emu-debug: run-emu-cmd
 	
 .PHONY: run-emu-wave
+run-emu-wave: DEBUG_CMD=0
 run-emu-wave: session-info | $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
-	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_RUN_DIR) ;\
+	$(CD) $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(VIVADO_RUN_DIR) ;\
 	xsim --gui $(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb | perl $(COLOR_TAIL_SIM_PL)
 
 PHONY: clean-run-emu
