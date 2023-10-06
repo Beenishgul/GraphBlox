@@ -37,12 +37,11 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     switch (glayHandle->ctrlMode)
     {
-    case 1:
-    case 2:
     case 0:
         glayHandle->ipHandle = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
         break;
-    case 3:
+    case 1:
+    case 2:
         glayHandle->kernelHandle = xrt::kernel(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
         break;
     default:
@@ -383,7 +382,7 @@ void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle)
     do
     {
         glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-        printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
+        // printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
     }
     while(!(glay_control_read & CONTROL_IDLE));
 
@@ -439,7 +438,7 @@ GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHan
 {
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank = new GLAYGraphCSRxrtBufferHandlePerBank(glayHandle, graph, bankGroupIndex);
     glayGraphCSRxrtBufferHandlePerBank->writeGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, graph, glayGraph, glayGraphCSRxrtBufferHandlePerBank);
-    glayGraphCSRxrtBufferHandlePerBank->writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle);
+    glayGraphCSRxrtBufferHandlePerBank->setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(glayHandle, glayGraphCSRxrtBufferHandlePerBank);
 
     return glayGraphCSRxrtBufferHandlePerBank;
 }
