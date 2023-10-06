@@ -122,7 +122,7 @@ module engine_merge_data #(parameter
     MemoryPacket           configure_engine_response_engine_in                 ;
     FIFOStateSignalsInput  configure_engine_fifo_response_engine_in_signals_in ;
     FIFOStateSignalsOutput configure_engine_fifo_response_engine_in_signals_out;
-    CSRIndexConfiguration  configure_engine_out                                ;
+    MergeDataConfiguration configure_engine_out                                ;
     FIFOStateSignalsInput  configure_engine_fifo_configure_engine_signals_in   ;
     FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out  ;
     logic                  configure_engine_fifo_setup_signal                  ;
@@ -130,7 +130,7 @@ module engine_merge_data #(parameter
     MemoryPacket           configure_memory_response_memory_in                 ;
     FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
     FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
-    CSRIndexConfiguration  configure_memory_out                                ;
+    MergeDataConfiguration configure_memory_out                                ;
     FIFOStateSignalsInput  configure_memory_fifo_configure_memory_signals_in   ;
     FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
     logic                  configure_memory_fifo_setup_signal                  ;
@@ -138,11 +138,11 @@ module engine_merge_data #(parameter
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-    CSRIndexConfiguration generator_engine_configure_engine_in                ;
-    FIFOStateSignalsInput generator_engine_fifo_configure_engine_in_signals_in;
+    MergeDataConfiguration generator_engine_configure_engine_in                ;
+    FIFOStateSignalsInput  generator_engine_fifo_configure_engine_in_signals_in;
 
-    CSRIndexConfiguration generator_engine_configure_memory_in                ;
-    FIFOStateSignalsInput generator_engine_fifo_configure_memory_in_signals_in;
+    MergeDataConfiguration generator_engine_configure_memory_in                ;
+    FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
 
     MemoryPacket          generator_engine_response_engine_in                 ;
     FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_in ;

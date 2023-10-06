@@ -47,27 +47,27 @@ module engine_merge_data_generator #(parameter
     COUNTER_WIDTH    = CACHE_FRONTEND_ADDR_W
 ) (
     // System Signals
-    input  logic                 ap_clk                             ,
-    input  logic                 areset                             ,
-    input  KernelDescriptor      descriptor_in                      ,
-    input  CSRIndexConfiguration configure_engine_in                ,
-    input  FIFOStateSignalsInput fifo_configure_engine_in_signals_in,
-    input  CSRIndexConfiguration configure_memory_in                ,
-    input  FIFOStateSignalsInput fifo_configure_memory_in_signals_in,
-    input  MemoryPacket          response_engine_in                 ,
-    input  FIFOStateSignalsInput fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsInput fifo_response_engine_in_signals_out,
-    input  MemoryPacket          response_memory_in                 ,
-    input  FIFOStateSignalsInput fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsInput fifo_response_memory_in_signals_out,
-    output MemoryPacket          request_engine_out                 ,
-    input  FIFOStateSignalsInput fifo_request_engine_out_signals_in ,
-    output MemoryPacket          request_memory_out                 ,
-    input  FIFOStateSignalsInput fifo_request_memory_out_signals_in ,
-    output logic                 fifo_setup_signal                  ,
-    output logic                 configure_memory_setup             ,
-    output logic                 configure_engine_setup             ,
-    output logic                 done_out
+    input  logic                  ap_clk                             ,
+    input  logic                  areset                             ,
+    input  KernelDescriptor       descriptor_in                      ,
+    input  MergeDataConfiguration configure_engine_in                ,
+    input  FIFOStateSignalsInput  fifo_configure_engine_in_signals_in,
+    input  MergeDataConfiguration configure_memory_in                ,
+    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in,
+    input  MemoryPacket           response_engine_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
+    output FIFOStateSignalsInput  fifo_response_engine_in_signals_out,
+    input  MemoryPacket           response_memory_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
+    output FIFOStateSignalsInput  fifo_response_memory_in_signals_out,
+    output MemoryPacket           request_engine_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output MemoryPacket           request_memory_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
+    output logic                  fifo_setup_signal                  ,
+    output logic                  configure_memory_setup             ,
+    output logic                  configure_engine_setup             ,
+    output logic                  done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ module engine_merge_data_generator #(parameter
 
     KernelDescriptor descriptor_in_reg;
 
-    CSRIndexConfiguration configure_memory_reg;
-    CSRIndexConfiguration configure_engine_reg;
-    MemoryPacket          request_out_int     ;
+    MergeDataConfiguration configure_memory_reg;
+    MergeDataConfiguration configure_engine_reg;
+    MemoryPacket           request_out_int     ;
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -110,8 +110,8 @@ module engine_merge_data_generator #(parameter
     logic        configure_engine_setup_reg;
     logic        configure_memory_setup_reg;
 
-    logic                           configure_engine_param_valid;
-    CSRIndexConfigurationParameters configure_engine_param_int  ;
+    logic                            configure_engine_param_valid;
+    MergeDataConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket request_engine_out_reg;
     MemoryPacket request_memory_out_reg;
