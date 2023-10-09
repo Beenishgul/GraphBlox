@@ -21,7 +21,7 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 // ------------------------
-// CSR\_Index\_Generator
+// MERGE\_Data\_Generator
 // ---------------------
 
 // ### Input: array\_pointer, array\_size, offset, degree
@@ -253,7 +253,7 @@ module engine_merge_data_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_generator)
-            current_state <= ENGINE_CSR_INDEX_GEN_RESET;
+            current_state <= ENGINE_MERGE_DATA_GEN_RESET;
         else begin
             current_state <= next_state;
         end
@@ -262,93 +262,93 @@ module engine_merge_data_generator #(parameter
     always_comb begin
         next_state = current_state;
         case (current_state)
-            ENGINE_CSR_INDEX_GEN_RESET : begin
-                next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+            ENGINE_MERGE_DATA_GEN_RESET : begin
+                next_state = ENGINE_MERGE_DATA_GEN_IDLE;
             end
-            ENGINE_CSR_INDEX_GEN_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_IDLE : begin
                 if(descriptor_in_reg.valid)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_IDLE;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE : begin
                 if(fifo_configure_memory_in_signals_in.rd_en)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY;
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS : begin
+                next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
                 if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) // (1) indirect mode (get count from other engines)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
                 else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) // (0) direct mode (get count from memory)
-                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_START_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE : begin
                 if(fifo_configure_engine_in_signals_in.rd_en)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE;
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS : begin
+                next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE : begin
                 if(configure_engine_reg.valid) // (1) indirect mode (get count from other engines)
-                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_START_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE;
             end
-            ENGINE_CSR_INDEX_GEN_START_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_START;
+            ENGINE_MERGE_DATA_GEN_START_TRANS : begin
+                next_state = ENGINE_MERGE_DATA_GEN_START;
             end
-            ENGINE_CSR_INDEX_GEN_START : begin
-                next_state = ENGINE_CSR_INDEX_GEN_BUSY;
+            ENGINE_MERGE_DATA_GEN_START : begin
+                next_state = ENGINE_MERGE_DATA_GEN_BUSY;
             end
-            ENGINE_CSR_INDEX_GEN_BUSY_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_BUSY;
+            ENGINE_MERGE_DATA_GEN_BUSY_TRANS : begin
+                next_state = ENGINE_MERGE_DATA_GEN_BUSY;
             end
-            ENGINE_CSR_INDEX_GEN_BUSY : begin
+            ENGINE_MERGE_DATA_GEN_BUSY : begin
                 if (done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
                 else if (fifo_request_signals_out_int.prog_full)
-                    next_state = ENGINE_CSR_INDEX_GEN_PAUSE_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_PAUSE_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_BUSY;
+                    next_state = ENGINE_MERGE_DATA_GEN_BUSY;
             end
-            ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
+            ENGINE_MERGE_DATA_GEN_PAUSE_TRANS : begin
+                next_state = ENGINE_MERGE_DATA_GEN_PAUSE;
             end
-            ENGINE_CSR_INDEX_GEN_PAUSE : begin
+            ENGINE_MERGE_DATA_GEN_PAUSE : begin
                 if (~fifo_request_signals_out_int.prog_full)
-                    next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_BUSY_TRANS;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
+                    next_state = ENGINE_MERGE_DATA_GEN_PAUSE;
             end
-            ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
                 if (configure_engine_param_int.mode_sequence & done_int_reg & response_memory_counter_is_zero)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
                 else if (~configure_engine_param_int.mode_sequence & done_int_reg & response_memory_counter_is_zero)
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE;
+                    next_state = ENGINE_MERGE_DATA_GEN_DONE;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
+                    next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
             end
-            ENGINE_CSR_INDEX_GEN_DONE : begin
+            ENGINE_MERGE_DATA_GEN_DONE : begin
                 if (done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                    next_state = ENGINE_MERGE_DATA_GEN_IDLE;
                 else
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE;
+                    next_state = ENGINE_MERGE_DATA_GEN_DONE;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            ENGINE_CSR_INDEX_GEN_RESET : begin
+            ENGINE_MERGE_DATA_GEN_RESET : begin
                 done_int_reg                       <= 1'b1;
                 done_out_reg                       <= 1'b1;
                 counter_enable                     <= 1'b0;
@@ -365,7 +365,7 @@ module engine_merge_data_generator #(parameter
                 configure_engine_param_int   <= 0;
                 configure_engine_param_valid <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_IDLE : begin
                 done_int_reg                       <= 1'b1;
                 done_out_reg                       <= 1'b0;
                 counter_enable                     <= 1'b1;
@@ -382,7 +382,7 @@ module engine_merge_data_generator #(parameter
                 configure_engine_param_int   <= 0;
                 configure_engine_param_valid <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE : begin
                 done_int_reg                       <= 1'b1;
                 done_out_reg                       <= 1'b0;
                 counter_enable                     <= 1'b1;
@@ -396,15 +396,15 @@ module engine_merge_data_generator #(parameter
 
                 configure_memory_setup_reg <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg   <= 1'b0;
                 configure_engine_param_valid <= 1'b0;
                 configure_engine_param_int   <= configure_memory_reg.payload.param;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE : begin
                 done_int_reg                       <= 1'b1;
                 done_out_reg                       <= 1'b0;
                 counter_enable                     <= 1'b1;
@@ -417,15 +417,15 @@ module engine_merge_data_generator #(parameter
                 fifo_request_din_reg.valid         <= 1'b0;
                 configure_engine_setup_reg         <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS : begin
                 configure_engine_setup_reg <= 1'b1;
             end
-            ENGINE_CSR_INDEX_GEN_SETUP_ENGINE : begin
+            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE : begin
                 configure_engine_setup_reg             <= 1'b0;
                 configure_engine_param_int.index_start <= configure_engine_reg.payload.param.index_start;
                 configure_engine_param_int.index_end   <= configure_engine_reg.payload.param.index_end;
             end
-            ENGINE_CSR_INDEX_GEN_START_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_START_TRANS : begin
                 done_int_reg         <= 1'b0;
                 done_out_reg         <= 1'b0;
                 counter_enable       <= 1'b1;
@@ -443,18 +443,18 @@ module engine_merge_data_generator #(parameter
                     configure_engine_param_valid <= 1'b1;
                 end
             end
-            ENGINE_CSR_INDEX_GEN_START : begin
+            ENGINE_MERGE_DATA_GEN_START : begin
                 counter_enable <= 1'b1;
                 counter_load   <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_PAUSE_TRANS : begin
                 done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
             end
-            ENGINE_CSR_INDEX_GEN_BUSY : begin
+            ENGINE_MERGE_DATA_GEN_BUSY : begin
                 if((counter_count >= configure_engine_param_int.index_end)) begin
                     done_int_reg               <= 1'b1;
                     counter_enable             <= 1'b0;
@@ -468,7 +468,7 @@ module engine_merge_data_generator #(parameter
                 done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_BUSY_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_BUSY_TRANS : begin
                 if((counter_count >= configure_engine_param_int.index_end)) begin
                     done_int_reg               <= 1'b1;
                     counter_enable             <= 1'b0;
@@ -482,21 +482,21 @@ module engine_merge_data_generator #(parameter
                 done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_PAUSE : begin
+            ENGINE_MERGE_DATA_GEN_PAUSE : begin
                 done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
+            ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
                 done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
-            ENGINE_CSR_INDEX_GEN_DONE : begin
+            ENGINE_MERGE_DATA_GEN_DONE : begin
                 done_int_reg                 <= 1'b1;
                 done_out_reg                 <= 1'b1;
                 counter_enable               <= 1'b0;
