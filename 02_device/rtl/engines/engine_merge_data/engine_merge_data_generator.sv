@@ -281,10 +281,8 @@ module engine_merge_data_generator #(parameter
                 next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
             end
             ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
-                if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) // (1) indirect mode (get count from other engines)
+                if(configure_memory_reg.valid) // (1) indirect mode (get merged data from other engines)
                     next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
-                else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) // (0) direct mode (get count from memory)
-                    next_state = ENGINE_MERGE_DATA_GEN_START_TRANS;
                 else
                     next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
             end
