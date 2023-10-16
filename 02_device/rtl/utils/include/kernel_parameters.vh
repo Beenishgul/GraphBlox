@@ -32,13 +32,14 @@
 // --------------------------------------------------------------------------------------
 // ENGINE CONFIG TYPES ORDERED in pipeline
 // --------------------------------------------------------------------------------------
-// (0) ENGINE EMPTY
+// (0) ENGINE PIPELINE
 // (1) ENGINE MEMORY R/W Generator
 // (2) ENGINE CSR
-// (3) ENGINE ALU
+// (3) ENGINE STRIDE
 // (4) ENGINE FILTER
-// (5) ENGINE MERGE
-// (6) ENGINE FORWARD BUFFER
+// (5) ENGINE MERGE DATA
+// (6) ENGINE ALU
+// (7) ENGINE FORWARD BUFFER
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
