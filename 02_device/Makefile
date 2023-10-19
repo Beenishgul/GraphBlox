@@ -210,10 +210,12 @@ gen-ip-dir: sub-session-info | $(APP_DIR_ACTIVE)/$(IP_DIR_RTL_ACTIVE)
 .PHONY: $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)
 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE): sub-session-info
 	$(MKDIR_P) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE) ;\
-	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PERL)  ;\
-	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)   ;\
-	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL) ;\
+	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)  ;\
+	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PERL)    ;\
+	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)     ;\
+	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)   ;\
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_XDC)/$(ALVEO)   ;\
+	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/$$file; done    ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PERL)/$$file; done    ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_TCL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_TCL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/$$file; done       ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_SHELL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_SHELL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/$$file; done ;\
