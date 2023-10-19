@@ -87,8 +87,8 @@ else
     cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
 
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_RTL} ${utils} "include";\
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} "include";\
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL} ${utils} "include";\
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} "include";\
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
 if [[ "$TESTBENCH_MODULE" == "integration" ]]
