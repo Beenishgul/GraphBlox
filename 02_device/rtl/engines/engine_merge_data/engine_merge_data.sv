@@ -28,29 +28,29 @@ module engine_merge_data #(parameter
     ID_ENGINE        = 0 ,
     ID_RELATIVE      = 0 ,
     ENGINES_CONFIG   = 0 ,
-    MERGE_WIDTH      = 0 ,
+    MERGE_WIDTH      = 1 ,
     FIFO_WRITE_DEPTH = 32,
     PROG_THRESH      = 16,
     NUM_MODULES      = 2 ,
     PIPELINE_STAGES  = 2
 ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                                          ,
+    input  logic                  areset                                          ,
+    input  KernelDescriptor       descriptor_in                                   ,
+    input  MemoryPacket           response_engine_in[MERGE_WIDTH]                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[MERGE_WIDTH] ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[MERGE_WIDTH],
+    input  MemoryPacket           response_memory_in                              ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in              ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out             ,
+    output MemoryPacket           request_engine_out                              ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in              ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out             ,
+    output MemoryPacket           request_memory_out                              ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in              ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out             ,
+    output logic                  fifo_setup_signal                               ,
     output logic                  done_out
 );
 
@@ -229,17 +229,17 @@ module engine_merge_data #(parameter
             response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
-            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
+            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in[0];
             fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
             fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
-            response_engine_in_reg.valid           <= response_engine_in.valid;
+            response_engine_in_reg.valid           <= response_engine_in[0].valid;
             response_memory_in_reg.valid           <= response_memory_in.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        response_engine_in_reg.payload <= response_engine_in.payload;
+        response_engine_in_reg.payload <= response_engine_in[0].payload;
         response_memory_in_reg.payload <= response_memory_in.payload;
     end
 
@@ -262,12 +262,12 @@ module engine_merge_data #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
-        fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_int;
-        fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-        fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_int;
-        request_engine_out.payload          <= request_engine_out_int.payload;
-        request_memory_out.payload          <= request_memory_out_int.payload ;
+        fifo_response_engine_in_signals_out[0] <= fifo_response_engine_in_signals_out_int;
+        fifo_request_engine_out_signals_out    <= fifo_request_engine_out_signals_out_int;
+        fifo_response_memory_in_signals_out    <= fifo_response_memory_in_signals_out_int;
+        fifo_request_memory_out_signals_out    <= fifo_request_memory_out_signals_out_int;
+        request_engine_out.payload             <= request_engine_out_int.payload;
+        request_memory_out.payload             <= request_memory_out_int.payload ;
     end
 
 // --------------------------------------------------------------------------------------
