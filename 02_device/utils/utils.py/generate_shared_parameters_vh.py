@@ -59,6 +59,7 @@ NUM_LANES = NUM_LANES_MAX
 NUM_ENGINES = NUM_ENGINES_MAX
 
 
+
 # Padding function for connect array
 def pad_connect_array(connect_array, max_cast):
     padded_array = connect_array.copy()
@@ -71,6 +72,11 @@ def pad_engines(lane, max_engines):
     while len(padded_lane) < max_engines:
         padded_lane.append(0)
     return padded_lane
+
+def pad_engines_cast(lane, max_engines):
+    while len(lane) < max_engines:
+        lane.append([0] * NUM_CAST_MAX)
+    return lane
 
 # Modified pad_data to accept a default pad value
 def pad_data(data, max_length, default_val=0):
@@ -99,11 +105,18 @@ def get_connect_array(engine_name):
         return list(range(start, end + 1))
     return []
 
+def vhdl_format(array):
+    if not isinstance(array, list):
+        return str(array)
+    return "'{" + ", ".join(vhdl_format(subarray) for subarray in array) + "}\n"
+
+# output_str = "parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ";"
+
+
 # Step 1: Determine NUM_CAST_MAX
 NUM_CAST_MAX = max(
     [max(engine) if engine else 0 for bundle in CU_BUNDLES_CONFIG_ARRAY for lane in bundle for engine in [get_connect_array(engine_name) for engine_name in lane]]
 ) + 1  # Added 1 because the values are 0-indexed
-
 
 CU_BUNDLES_ENGINE_ID_ARRAY = []
 
@@ -130,7 +143,7 @@ CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY = [
 # Create the CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY with the correct padding
 CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY = [
     [
-        pad_engines(
+        pad_engines_cast(
             [pad_connect_array(get_connect_array(engine), NUM_CAST_MAX) for engine in lane], 
             NUM_ENGINES_MAX
         ) 
@@ -210,5 +223,5 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = " + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = " + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + "\n")
-    # file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + str(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY).replace("[", "'{").replace("]", "}\n").replace("'", "") + "\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + "\n")
