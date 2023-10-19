@@ -32,7 +32,8 @@ output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "sh
 # Given data
 CU_BUNDLES_CONFIG_ARRAY = [
     [
-        ["ENGINE_CSR"]
+        ["ENGINE_CSR", "ENGINE_MERGE_DATA(W:2)"],
+        ["ENGINE_CSR(C:0:0)"]
     ]
 ]
 
