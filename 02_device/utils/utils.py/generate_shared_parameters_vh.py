@@ -2,51 +2,23 @@
 import re
 import sys
 import os
+import ast
+import json
 
 # Assuming the script name is the first argument, and the directories follow after.
-script_name, FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR = sys.argv
+script_name, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR = sys.argv
 
 # Construct the full path for the file
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "shared_parameters.vh")
+config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, "architecture.json")
 
-# Given data
-# CU_BUNDLES_CONFIG_ARRAY = [
-#     [
-#         ["ENGINE_MEMORY_R_W_Generator", "ENGINE_MERGE_DATA(W:4)", "ENGINE_FILTER"],
-#         ["ENGINE_MEMORY_R_W_Generator(C:0:0)", "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER"],
-#         ["ENGINE_MEMORY_R_W_Generator(C:0:1)", "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER"],
-#         ["ENGINE_CSR(C:0:2)", "ENGINE_FILTER"],
-#         ["ENGINE_ALU", "ENGINE_FILTER"],
-#         ["ENGINE_FORWARD_BUFFER", "ENGINE_FILTER"]
-#     ],
-#     [
-#         ["ENGINE_MEMORY_R_W_Generator", "ENGINE_MERGE_DATA(W:4)", "ENGINE_FILTER"],
-#         ["ENGINE_MEMORY_R_W_Generator(C:0:0)", "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER"],
-#         ["ENGINE_MEMORY_R_W_Generator(C:0:1)", "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER"],
-#         ["ENGINE_CSR(C:0:2)", "ENGINE_FILTER"],
-#         ["ENGINE_ALU", "ENGINE_FILTER"],
-#         ["ENGINE_FORWARD_BUFFER", "ENGINE_FILTER"]
-#     ]
-# ]
+with open(config_file_path, "r") as file:
+    config_data = json.load(file)
 
-# Given data
-CU_BUNDLES_CONFIG_ARRAY = [
-    [
-        ["ENGINE_CSR", "ENGINE_MERGE_DATA(W:2)"],
-        ["ENGINE_CSR(C:0:0)"]
-    ]
-]
+mapping = config_data["mapping"]
 
-mapping = {
-    "ENGINE_PIPELINE": 0,
-    "ENGINE_MEMORY_R_W_Generator": 1,
-    "ENGINE_CSR": 2,
-    "ENGINE_STRIDE": 3,
-    "ENGINE_FILTER": 4,
-    "ENGINE_MERGE_DATA": 5,
-    "ENGINE_ALU": 6,
-    "ENGINE_FORWARD_BUFFER": 7
-}
+# Extract bundles and transform to the desired format
+CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
 
 # Compute values based on CU_BUNDLES_CONFIG_ARRAY
 NUM_CUS_MAX = 1  # As there's only one CU
@@ -58,8 +30,6 @@ NUM_CUS = NUM_CUS_MAX
 NUM_BUNDLES = NUM_BUNDLES_MAX
 NUM_LANES = NUM_LANES_MAX
 NUM_ENGINES = NUM_ENGINES_MAX
-
-
 
 # Padding function for connect array
 def pad_connect_array(connect_array, max_cast):
