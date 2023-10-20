@@ -81,7 +81,38 @@ def vhdl_format(array):
         return str(array)
     return "'{" + ", ".join(vhdl_format(subarray) for subarray in array) + "}\n"
 
-# output_str = "parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ";"
+def extract_cast_width(token):
+    """Extracts the cast width value from a token in the form (C:x:y)."""
+    if "(C:" in token:
+        start = token.find("(C:") + 3
+        end = token.find(")")
+        return int(token[start:end].split(":")[-1])
+    return 0
+
+def generate_config_cast_width_array():
+    """Generates the CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY based on CU_BUNDLES_CONFIG_ARRAY."""
+    cu_bundles_config_cast_width_array = []
+
+    for bundle in CU_BUNDLES_CONFIG_ARRAY:
+        lane_list = []
+        for lane in bundle:
+            engine_list = [extract_cast_width(engine) for engine in lane]
+
+            # Pad the engine list with zeros up to NUM_ENGINES_MAX
+            while len(engine_list) < NUM_ENGINES_MAX:
+                engine_list.append(0)
+            
+            lane_list.append(engine_list)
+
+        # Pad the lane list with zeros up to NUM_LANES_MAX
+        while len(lane_list) < NUM_LANES_MAX:
+            lane_list.append([0] * NUM_ENGINES_MAX)
+        
+        cu_bundles_config_cast_width_array.append(lane_list)
+
+    return cu_bundles_config_cast_width_array
+
+cu_bundles_config_cast_width_array = generate_config_cast_width_array()
 
 
 # Step 1: Determine NUM_CAST_MAX
@@ -195,4 +226,6 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = " + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = " + str(cu_bundles_config_cast_width_array).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + "\n")
+    
