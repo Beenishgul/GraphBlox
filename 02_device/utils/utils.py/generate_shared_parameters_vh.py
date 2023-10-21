@@ -59,6 +59,11 @@ def pad_data(data, max_length, default_val=0):
 def pad_lane(bundle):
     return pad_data(bundle, NUM_LANES_MAX, [0] * NUM_ENGINES_MAX)
 
+def pad_bundle(bundle):
+    while len(bundle) < NUM_LANES_MAX:
+        bundle.append([[0]*NUM_CAST_MAX]*NUM_ENGINES_MAX)
+    return bundle
+
 def get_width(engine_name):
     match = re.search(r'W:(\d+)', engine_name)
     if match:
@@ -79,7 +84,8 @@ def get_connect_array(engine_name):
 def vhdl_format(array):
     if not isinstance(array, list):
         return str(array)
-    return "'{" + ", ".join(vhdl_format(subarray) for subarray in array) + "}\n"
+    inner_data = ", ".join(vhdl_format(subarray) for subarray in array)
+    return "'{" + inner_data + "}\n"
 
 def extract_cast_width(token):
     """Extracts the cast width value from a token in the form (C:x:y)."""
@@ -128,7 +134,7 @@ CU_BUNDLES_COUNT_ARRAY = [len(bundle) for bundle in CU_BUNDLES_CONFIG_ARRAY]
 # Calculate number of lanes per bundle for each CU
 CU_BUNDLES_LANES_COUNT_ARRAY = [[len(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_ARRAY]
 
-CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY = [[len(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_ARRAY]
+CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY = [pad_data([len(lane) for lane in bundle],NUM_LANES_MAX) for bundle in CU_BUNDLES_CONFIG_ARRAY]
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_ENGINE_CONFIG_ARRAY = [
@@ -144,13 +150,13 @@ CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY = [
 
 # Create the CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY with the correct padding
 CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY = [
-    [
+    pad_bundle([
         pad_engines_cast(
             [pad_connect_array(get_connect_array(engine), NUM_CAST_MAX) for engine in lane], 
             NUM_ENGINES_MAX
         ) 
         for lane in bundle
-    ]
+    ])
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
