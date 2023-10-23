@@ -44,7 +44,7 @@ module bundle_lanes #(
     output logic                  done_out
 );
 
-    genvar i;
+    genvar i,j;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -557,6 +557,11 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lanes
+            for (j=0; j< LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[i]; j++) begin : generate_wire_response_engine_in
+                assign lanes_response_engine_in[i][j+1] = lanes_request_lane_out[i][j+1];
+                assign lanes_fifo_response_lane_in_signals_in[i][j+1] = ~lanes_fifo_response_lane_in_signals_out[i][j+1].prog_full;
+            end
+
             lane_template #(
                 `include"set_lane_parameters.vh"
             ) inst_lane_template (
