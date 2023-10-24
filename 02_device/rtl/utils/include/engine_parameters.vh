@@ -4,6 +4,10 @@
     parameter ID_ENGINE          = 0,
     parameter ID_RELATIVE        = 0,
     parameter ENGINES_CONFIG     = 0,
+    parameter LANE_CAST_WIDTH    = 1,
+    parameter LANE_MERGE_WIDTH   = 1,
+    parameter ENGINE_CAST_WIDTH  = 1,
+    parameter ENGINE_MERGE_WIDTH = 1,
 // --------------------------------------------------------------------------------------
 // CU SETTINGS
 // --------------------------------------------------------------------------------------
