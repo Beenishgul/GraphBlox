@@ -361,14 +361,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_pipeline #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_pipeline (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -407,14 +409,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_read_write #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_read_write (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -453,14 +457,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_csr_index #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_csr_index (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -499,14 +505,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_stride_index #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_stride_index (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -545,14 +553,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_filter_cond #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_filter_cond (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -591,14 +601,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_merge_data #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_merge_data (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -637,14 +649,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_alu_ops #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_alu_ops (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -683,14 +697,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_forward_data #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_forward_data (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
@@ -729,14 +745,16 @@ module engine_template #(
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
                 engine_forward_data #(
-                    .ID_CU           (ID_CU           ),
-                    .ID_BUNDLE       (ID_BUNDLE       ),
-                    .ID_LANE         (ID_LANE         ),
-                    .ID_ENGINE       (ID_ENGINE       ),
-                    .ID_RELATIVE     (ID_RELATIVE     ),
-                    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-                    .PROG_THRESH     (PROG_THRESH     ),
-                    .ENGINES_CONFIG  (ENGINES_CONFIG  )
+                    .ID_CU             (ID_CU             ),
+                    .ID_BUNDLE         (ID_BUNDLE         ),
+                    .ID_LANE           (ID_LANE           ),
+                    .ID_ENGINE         (ID_ENGINE         ),
+                    .ID_RELATIVE       (ID_RELATIVE       ),
+                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+                    .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_forward_data (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),

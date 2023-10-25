@@ -22,16 +22,18 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_csr_index #(parameter
-    ID_CU            = 0 ,
-    ID_BUNDLE        = 0 ,
-    ID_LANE          = 0 ,
-    ID_ENGINE        = 0 ,
-    ID_RELATIVE      = 0 ,
-    ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 32,
-    PROG_THRESH      = 16,
-    NUM_MODULES      = 2 ,
-    PIPELINE_STAGES  = 2
+    ID_CU              = 0 ,
+    ID_BUNDLE          = 0 ,
+    ID_LANE            = 0 ,
+    ID_ENGINE          = 0 ,
+    ID_RELATIVE        = 0 ,
+    ENGINE_CAST_WIDTH  = 1 ,
+    ENGINE_MERGE_WIDTH = 1 ,
+    ENGINES_CONFIG     = 0 ,
+    FIFO_WRITE_DEPTH   = 32,
+    PROG_THRESH        = 16,
+    NUM_MODULES        = 2 ,
+    PIPELINE_STAGES    = 2
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
