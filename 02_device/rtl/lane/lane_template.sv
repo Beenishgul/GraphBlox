@@ -25,22 +25,22 @@ module lane_template #(
     `include "lane_parameters.vh"
     ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_lane_in                   ,
-    input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in   ,
-    output FIFOStateSignalsOutput fifo_response_lane_in_signals_out  ,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_lane_out                   ,
-    input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in   ,
-    output FIFOStateSignalsOutput fifo_request_lane_out_signals_out  ,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                                                     ,
+    input  logic                  areset                                                     ,
+    input  KernelDescriptor       descriptor_in                                              ,
+    input  MemoryPacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                 ,
+    input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in[(1+LANE_MERGE_WIDTH)-1:0] ,
+    output FIFOStateSignalsOutput fifo_response_lane_in_signals_out[(1+LANE_MERGE_WIDTH)-1:0],
+    input  MemoryPacket           response_memory_in                                         ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                         ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                        ,
+    output MemoryPacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                 ,
+    input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in[ (1+LANE_CAST_WIDTH)-1:0] ,
+    output FIFOStateSignalsOutput fifo_request_lane_out_signals_out[ (1+LANE_CAST_WIDTH)-1:0],
+    output MemoryPacket           request_memory_out                                         ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                         ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                        ,
+    output logic                  fifo_setup_signal                                          ,
     output logic                  done_out
 );
 
@@ -186,17 +186,17 @@ module lane_template #(
             response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
-            fifo_response_lane_in_signals_in_reg   <= fifo_response_lane_in_signals_in;
-            fifo_request_lane_out_signals_in_reg   <= fifo_request_lane_out_signals_in;
+            fifo_response_lane_in_signals_in_reg   <= fifo_response_lane_in_signals_in[0];
+            fifo_request_lane_out_signals_in_reg   <= fifo_request_lane_out_signals_in[0];
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
             fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
-            response_lane_in_reg.valid             <= response_lane_in.valid;
+            response_lane_in_reg.valid             <= response_lane_in[0].valid;
             response_memory_in_reg.valid           <= response_memory_in.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        response_lane_in_reg.payload   <= response_lane_in.payload;
+        response_lane_in_reg.payload   <= response_lane_in[0].payload;
         response_memory_in_reg.payload <= response_memory_in.payload;
     end
 
@@ -205,26 +205,26 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_lane_template) begin
-            fifo_setup_signal        <= 1'b1;
-            request_lane_out.valid   <= 1'b0;
-            request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            fifo_setup_signal         <= 1'b1;
+            request_lane_out[0].valid <= 1'b0;
+            request_memory_out.valid  <= 1'b0;
+            done_out                  <= 1'b1;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
-            request_lane_out.valid   <= request_lane_out_int.valid ;
-            request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= (&engines_done_out_reg);
+            fifo_setup_signal         <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
+            request_lane_out[0].valid <= request_lane_out_int.valid ;
+            request_memory_out.valid  <= request_memory_out_int.valid;
+            done_out                  <= (&engines_done_out_reg);
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_lane_in_signals_out   <= fifo_response_lane_in_signals_out_int;
-        fifo_request_lane_out_signals_out   <= fifo_request_lane_out_signals_out_int;
-        fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-        fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_int;
-        request_lane_out.payload            <= request_lane_out_int.payload;
-        request_memory_out.payload          <= request_memory_out_int.payload ;
+        fifo_response_lane_in_signals_out[0] <= fifo_response_lane_in_signals_out_int;
+        fifo_request_lane_out_signals_out[0] <= fifo_request_lane_out_signals_out_int;
+        fifo_response_memory_in_signals_out  <= fifo_response_memory_in_signals_out_int;
+        fifo_request_memory_out_signals_out  <= fifo_request_memory_out_signals_out_int;
+        request_lane_out[0].payload          <= request_lane_out_int.payload;
+        request_memory_out.payload           <= request_memory_out_int.payload ;
     end
 
 // --------------------------------------------------------------------------------------
