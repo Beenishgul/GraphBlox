@@ -44,7 +44,7 @@ module bundle_lanes #(
     output logic                  done_out
 );
 
-    genvar i,j;
+    genvar i,j,k;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -555,34 +555,31 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes
 // --------------------------------------------------------------------------------------
-
-
-
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lane_template
-            
+
             `include"set_lane_wires.vh"
 
             lane_template #(
                 `include"set_lane_parameters.vh"
             ) inst_lane_template (
-                .ap_clk                             (ap_clk                                      ),
-                .areset                             (areset_lane[i]                              ),
-                .descriptor_in                      (lanes_descriptor_in[i]                      ),
-                .response_lane_in                   (lanes_response_engine_in[i]                 ),
-                .fifo_response_lane_in_signals_in   (lanes_fifo_response_lane_in_signals_in[i]   ),
-                .fifo_response_lane_in_signals_out  (lanes_fifo_response_lane_in_signals_out[i]  ),
-                .response_memory_in                 (lanes_response_memory_in[i]                 ),
-                .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[i] ),
-                .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[i]),
-                .request_lane_out                   (lanes_request_lane_out[i]                   ),
-                .fifo_request_lane_out_signals_in   (lanes_fifo_request_lane_out_signals_in[i]   ),
-                .fifo_request_lane_out_signals_out  (lanes_fifo_request_lane_out_signals_out[i]  ),
-                .request_memory_out                 (lanes_request_memory_out[i]                 ),
-                .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[i] ),
-                .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[i]),
-                .fifo_setup_signal                  (lanes_fifo_setup_signal[i]                  ),
-                .done_out                           (lanes_done_out[i]                           )
+                .ap_clk                             (ap_clk                                       ),
+                .areset                             (areset_lane[i]                               ),
+                .descriptor_in                      (lanes_descriptor_in[i]                       ),
+                .response_lane_in                   (lanes_response_merge_engine_in               ),
+                .fifo_response_lane_in_signals_in   (lanes_fifo_response_merge_lane_in_signals_in ),
+                .fifo_response_lane_in_signals_out  (lanes_fifo_response_merge_lane_in_signals_out),
+                .response_memory_in                 (lanes_response_memory_in[i]                  ),
+                .fifo_response_memory_in_signals_in (lanes_fifo_response_memory_in_signals_in[i]  ),
+                .fifo_response_memory_in_signals_out(lanes_fifo_response_memory_in_signals_out[i] ),
+                .request_lane_out                   (lanes_request_cast_lane_out                  ),
+                .fifo_request_lane_out_signals_in   (lanes_fifo_request_cast_lane_out_signals_in  ),
+                .fifo_request_lane_out_signals_out  (lanes_fifo_request_cast_lane_out_signals_out ),
+                .request_memory_out                 (lanes_request_memory_out[i]                  ),
+                .fifo_request_memory_out_signals_in (lanes_fifo_request_memory_out_signals_in[i]  ),
+                .fifo_request_memory_out_signals_out(lanes_fifo_request_memory_out_signals_out[i] ),
+                .fifo_setup_signal                  (lanes_fifo_setup_signal[i]                   ),
+                .done_out                           (lanes_done_out[i]                            )
             );
         end
     endgenerate
