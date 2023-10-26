@@ -419,7 +419,7 @@ module cu_bundles #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundles
+        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_lanes
             bundle_lanes #(
                 `include"set_bundle_parameters.vh"
             ) inst_bundle_lanes (
