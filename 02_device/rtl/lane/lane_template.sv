@@ -491,7 +491,7 @@ module lane_template #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_ENGINES; i++) begin : generate_bundles
+        for (i=0; i< NUM_ENGINES; i++) begin : generate_engine_template
             engine_template #(
                 `include"set_engine_parameters.vh"
             ) inst_engine_template (
