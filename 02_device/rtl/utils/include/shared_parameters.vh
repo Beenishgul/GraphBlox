@@ -82,7 +82,7 @@ parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][N
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{0, 2, 0}
 , '{0, 0, 0}
 }
@@ -96,7 +96,7 @@ parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{2, 4, 0}
 , '{0, 0, 0}
 }
@@ -164,7 +164,7 @@ parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{0, 2, 0}
 , '{0, 0, 0}
 }
@@ -192,7 +192,7 @@ parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LAN
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{2, 4, 0}
 , '{0, 0, 0}
 }
@@ -277,7 +277,7 @@ parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_M
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{0, 2, 0}
 , '{0, 0, 0}
 }
@@ -305,7 +305,7 @@ parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{0, 1, 0}
+, '{'{0, 2, 0}
 , '{2, 4, 0}
 , '{0, 0, 0}
 }
