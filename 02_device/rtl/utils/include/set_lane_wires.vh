@@ -33,6 +33,7 @@ assign lanes_fifo_request_lane_out_signals_out[i]     = lanes_fifo_request_cast_
 
 for (j=0; j< NUM_LANES; j++) begin
     if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j] != 0 && j != i && LANE_MERGE_WIDTH_LOCAL != 0) begin
-        // generate_lane_template[i]/
+        initial $display("MSG: Iteration number: %0d - %0d - %0d", i, j, LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]);
     end
 end
+
