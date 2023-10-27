@@ -81,14 +81,27 @@ def get_engine_id(engine_name):
 #         return list(range(start, end + 1))
 #     return []
 
+# def get_connect_array(engine_name):
+#     match = re.search(r'C:(\d+):(\d+)', engine_name)
+#     if match:
+#         start, end = int(match.group(1)), int(match.group(2))
+#         return list(range(start, end + 1))
+#     match_explicit = re.search(r'C:([\d,]+)', engine_name)
+#     if match_explicit:
+#         return [int(x) for x in match_explicit.group(1).split(',')]
+#     return []
+
 def get_connect_array(engine_name):
     match = re.search(r'C:(\d+):(\d+)', engine_name)
     if match:
         start, end = int(match.group(1)), int(match.group(2))
         return list(range(start, end + 1))
+    
     match_explicit = re.search(r'C:([\d,]+)', engine_name)
     if match_explicit:
-        return [int(x) for x in match_explicit.group(1).split(',')]
+        values = [int(x) for x in match_explicit.group(1).split(',')]
+        return values
+
     return []
 
 def vhdl_format(array):
