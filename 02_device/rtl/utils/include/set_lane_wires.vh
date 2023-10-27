@@ -31,9 +31,17 @@ assign lanes_request_lane_out[i]                      = lanes_request_cast_lane_
 assign lanes_fifo_request_cast_lane_out_signals_in[0] = lanes_fifo_request_lane_out_signals_in[i];
 assign lanes_fifo_request_lane_out_signals_out[i]     = lanes_fifo_request_cast_lane_out_signals_out [0];
 
-for (j=0; j< NUM_LANES; j++) begin
+for (j = 0; j < NUM_LANES; j++) begin
     if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j] != 0 && j != i && LANE_MERGE_WIDTH_LOCAL != 0) begin
-        initial $display("MSG: Iteration number: %0d - %0d - %0d", i, j, LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]);
+        initial $display("MSG: - Lane number j: %0d - ENGINES_COUNT_ARRAY = %0d", j, ENGINES_COUNT_ARRAY[j]);
+        for (k = 0; k < ENGINES_COUNT_ARRAY[j]; k++) begin
+            initial $display("MSG: ++ Engine number k: %0d - LANES_CONFIG_CAST_WIDTH_ARRAY = %0d", k, LANES_CONFIG_CAST_WIDTH_ARRAY[j][k]);
+            for (l = 0; l < LANES_CONFIG_CAST_WIDTH_ARRAY[j][k]; l++) begin
+                initial $display("MSG: *** Cast number l: %0d - LANES_CONFIG_MERGE_CONNECT_ARRAY = %0d",l, LANES_CONFIG_MERGE_CONNECT_ARRAY[j][k][l]);
+            end
+        end
     end
 end
+
+
 
