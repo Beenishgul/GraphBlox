@@ -74,23 +74,6 @@ def get_engine_id(engine_name):
     base_name = engine_name.split("(")[0]
     return mapping.get(base_name, 0)
 
-# def get_connect_array(engine_name):
-#     match = re.search(r'C:(\d+):(\d+)', engine_name)
-#     if match:
-#         start, end = int(match.group(1)), int(match.group(2))
-#         return list(range(start, end + 1))
-#     return []
-
-# def get_connect_array(engine_name):
-#     match = re.search(r'C:(\d+):(\d+)', engine_name)
-#     if match:
-#         start, end = int(match.group(1)), int(match.group(2))
-#         return list(range(start, end + 1))
-#     match_explicit = re.search(r'C:([\d,]+)', engine_name)
-#     if match_explicit:
-#         return [int(x) for x in match_explicit.group(1).split(',')]
-#     return []
-
 def get_connect_array(engine_name):
     match = re.search(r'C:(\d+):(\d+)', engine_name)
     if match:
@@ -109,14 +92,6 @@ def vhdl_format(array):
         return str(array)
     inner_data = ", ".join(vhdl_format(subarray) for subarray in array)
     return "'{" + inner_data + "}\n"
-
-# def extract_cast_width(token):
-#     """Extracts the cast width value from a token in the form (C:x:y)."""
-#     if "(C:" in token:
-#         start = token.find("(C:") + 3
-#         end = token.find(")")
-#         return int(token[start:end].split(":")[-1])
-#     return 0
 
 def extract_cast_width(token):
     """Extracts the cast width value from a token in the form (C:x:y) or (C:x,y,z,...)."""
@@ -217,6 +192,14 @@ CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY = [
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
+CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY = [
+    max(lane) for lane in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
+]
+
+CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = [
+    max(lane) for lane in CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY
+]
+
 counter = 0
 for cu in CU_BUNDLES_CONFIG_ARRAY:
     cu_list = []
@@ -305,6 +288,8 @@ with open(output_file_path, "w") as file:
     file.write("parameter int LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[0]) + ",\n")
     file.write("parameter int LANES_CONFIG_CAST_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                         = " + str(cu_bundles_config_cast_width_array[0]).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                     = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[0]) + ",\n")
+    file.write("parameter int LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY                                                = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[0]) + ",\n")
+    file.write("parameter int LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY                                               = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[0]) + ",\n")
     file.write("parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX]        = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[0]) + ",\n")
     file.write("parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[0]) + ",\n")
     
@@ -317,6 +302,8 @@ with open(output_file_path, "w") as file:
     file.write("parameter int BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY) + ",\n")
     file.write("parameter int BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = " + str(cu_bundles_config_cast_width_array).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY) + ",\n")
+    file.write("parameter int BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY) + ",\n")
+    file.write("parameter int BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY) + ",\n")
     file.write("parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
     file.write("parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + ",\n")
     
@@ -333,7 +320,8 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = " + str(cu_bundles_config_cast_width_array).replace("[", "'{").replace("]", "}\n") + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY) + ",\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY) + ",\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + "\n")
-    
-
+   
