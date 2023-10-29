@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module bundle_lanes #(`include "bundle_parameters.vh") (
+module bundle_lanes #(
+    `include "bundle_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -45,7 +47,7 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
     genvar i;
     int j,k,l,m,n = 0;
     integer c[0:NUM_LANES] = '{default: 0};
-
+    
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -556,12 +558,12 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
 // --------------------------------------------------------------------------------------
 // Generate Lanes
 // --------------------------------------------------------------------------------------
-    MemoryPacket           lanes_response_merge_engine_in               [NUM_LANES-1:0][(1+4)-1:0];
-    FIFOStateSignalsInput  lanes_fifo_response_merge_lane_in_signals_in [NUM_LANES-1:0][(1+4)-1:0];
-    FIFOStateSignalsOutput lanes_fifo_response_merge_lane_in_signals_out[NUM_LANES-1:0][(1+4)-1:0];
-    MemoryPacket           lanes_request_cast_lane_out                  [NUM_LANES-1:0][ (1+4)-1:0];
-    FIFOStateSignalsInput  lanes_fifo_request_cast_lane_out_signals_in  [NUM_LANES-1:0][ (1+4)-1:0];
-    FIFOStateSignalsOutput lanes_fifo_request_cast_lane_out_signals_out [NUM_LANES-1:0][ (1+4)-1:0];
+    MemoryPacket           lanes_response_merge_engine_in               [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsInput  lanes_fifo_response_merge_lane_in_signals_in [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsOutput lanes_fifo_response_merge_lane_in_signals_out[NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    MemoryPacket           lanes_request_cast_lane_out                  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsInput  lanes_fifo_request_cast_lane_out_signals_in  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsOutput lanes_fifo_request_cast_lane_out_signals_out [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
 
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lane_template
@@ -576,7 +578,9 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
             assign lanes_fifo_request_cast_lane_out_signals_in[i][0] = lanes_fifo_request_lane_out_signals_in[i];
             assign lanes_fifo_request_lane_out_signals_out[i]        = lanes_fifo_request_cast_lane_out_signals_out [i][0];
 
-            lane_template #(`include"set_lane_parameters.vh") inst_lane_template (
+            lane_template #(
+                `include"set_lane_parameters.vh"
+                ) inst_lane_template (
                 .ap_clk                             (ap_clk                                                                    ),
                 .areset                             (areset_lane[i]                                                            ),
                 .descriptor_in                      (lanes_descriptor_in[i]                                                    ),
@@ -595,6 +599,12 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
                 .fifo_setup_signal                  (lanes_fifo_setup_signal[i]                                                ),
                 .done_out                           (lanes_done_out[i]                                                         )
             );
+
+
+
+
+
+
         end
     endgenerate
 
@@ -613,10 +623,10 @@ module bundle_lanes #(`include "bundle_parameters.vh") (
                                     if(LANES_CONFIG_MERGE_CONNECT_ARRAY[j][k][l] == i) begin
                                         m    = m + 1;
                                         c[j] = c[j] + 1;
-                                        $display("MSG: >>> %0d -> %0d i:%0d j:%0d",j,i,m, c[j]);
-                                        lanes_response_merge_engine_in[i][m]                                         =lanes_request_cast_lane_out[j][ c[j]];
-                                        // lanes_fifo_response_merge_lane_in_signals_in[m]                           = generate_lane_template[j].lanes_fifo_request_cast_lane_out_signals_in[ c[j]] ;
-                                        // generate_lane_template[j].lanes_fifo_request_cast_lane_out_signals_out[c[j]] = lanes_fifo_response_merge_lane_in_signals_out[m];
+                                        $display("MSG: >>> j:%0d -> i:%0d m:%0d c[%0d]:%0d",j,i,m, j,c[j]);
+                                        lanes_response_merge_engine_in[i][m]                                         = lanes_request_cast_lane_out[j][ c[j]];
+                                        lanes_fifo_response_merge_lane_in_signals_in[i][m].rd_en                     = ~lanes_fifo_request_cast_lane_out_signals_out[j][c[j]].empty;
+                                        lanes_fifo_request_cast_lane_out_signals_in[j][ c[j]].rd_en                  = ~lanes_fifo_response_merge_lane_in_signals_out[i][m].prog_full;
                                     end
                                 end
                             end
