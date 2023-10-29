@@ -517,3 +517,51 @@ module lane_template #(
     endgenerate
 
 endmodule : lane_template
+
+
+    // MemoryPacket           lanes_response_merge_engine_in               [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    // FIFOStateSignalsInput  lanes_fifo_response_merge_lane_in_signals_in [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    // FIFOStateSignalsOutput lanes_fifo_response_merge_lane_in_signals_out[NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    // MemoryPacket           lanes_request_cast_lane_out                  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
+    // FIFOStateSignalsInput  lanes_fifo_request_cast_lane_out_signals_in  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
+    // FIFOStateSignalsOutput lanes_fifo_request_cast_lane_out_signals_out [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
+
+// always_comb begin : generate_lane_topology
+//     int lane_merge,lane_cast,engine_idx,cast_idx,merge_count= 0;
+//     integer cast_count[0:NUM_LANES] = '{default: 0};
+
+//     for (lane_merge=0; lane_merge< NUM_LANES; lane_merge++) begin
+
+//         lanes_response_merge_engine_in[lane_merge][0]               = lanes_response_engine_in[lane_merge];
+//         lanes_fifo_response_merge_lane_in_signals_in[lane_merge][0] = lanes_fifo_response_lane_in_signals_in[lane_merge];
+//         lanes_fifo_response_lane_in_signals_out[lane_merge]         = lanes_fifo_response_merge_lane_in_signals_out[lane_merge][0];
+
+//         lanes_request_lane_out[lane_merge]                         = lanes_request_cast_lane_out[lane_merge][0];
+//         lanes_fifo_request_cast_lane_out_signals_in[lane_merge][0] = lanes_fifo_request_lane_out_signals_in[lane_merge];
+//         lanes_fifo_request_lane_out_signals_out[lane_merge]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge][0];
+
+//         if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge] != 0) begin
+//             merge_count = 0;
+//             for (lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
+//                 if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast] != 0 && lane_cast != lane_merge) begin
+//                     $display("MSG: - Lane number lane_cast: %0d - ENGINES_COUNT_ARRAY = %0d", lane_cast, ENGINES_COUNT_ARRAY[lane_cast]);
+//                     for (engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY[lane_cast]; engine_idx++) begin
+//                         $display("MSG: ++ Engine number engine_idx: %0d - LANES_CONFIG_CAST_WIDTH_ARRAY = %0d", engine_idx, LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]);
+//                         for (cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]; cast_idx++) begin
+//                             $display("MSG: *** Cast number cast_idx: %0d - LANES_CONFIG_MERGE_CONNECT_ARRAY = %0d",cast_idx, LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx]);
+//                             if(LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx] == lane_merge) begin
+//                                 merge_count                                             = merge_count + 1;
+//                                 cast_count[lane_cast]                                   = cast_count[lane_cast] + 1;
+//                                 $display("MSG: >>> lane_cast:%0d -> lane_merge:%0d merge_count:%0d cast_count[%0d]:%0d",lane_cast,lane_merge,merge_count, lane_cast,cast_count[lane_cast]);
+//                                 lanes_response_merge_engine_in[lane_merge][merge_count]                                = lanes_request_cast_lane_out[lane_cast][ cast_count[lane_cast]];
+//                                 lanes_fifo_response_merge_lane_in_signals_in[lane_merge][merge_count].rd_en            = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast][cast_count[lane_cast]].empty;
+//                                 lanes_fifo_request_cast_lane_out_signals_in[lane_cast][ cast_count[lane_cast]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge][merge_count].prog_full;
+//                             end
+//                         end
+//                     end
+//                 end
+//             end
+//         end
+//     end
+// end
+    

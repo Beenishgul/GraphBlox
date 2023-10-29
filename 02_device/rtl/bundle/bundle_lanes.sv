@@ -45,9 +45,7 @@ module bundle_lanes #(
 );
 
     genvar i;
-    int j,k,l,m,n = 0;
-    integer c[0:NUM_LANES] = '{default: 0};
-    
+
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -570,14 +568,6 @@ module bundle_lanes #(
             localparam int LANE_CAST_WIDTH_LOCAL  = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[i] ;
             localparam int LANE_MERGE_WIDTH_LOCAL = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[i];
 
-            assign lanes_response_merge_engine_in[i][0]               = lanes_response_engine_in[i];
-            assign lanes_fifo_response_merge_lane_in_signals_in[i][0] = lanes_fifo_response_lane_in_signals_in[i];
-            assign lanes_fifo_response_lane_in_signals_out[i]         = lanes_fifo_response_merge_lane_in_signals_out[i][0];
-
-            assign lanes_request_lane_out[i]                         = lanes_request_cast_lane_out[i][0];
-            assign lanes_fifo_request_cast_lane_out_signals_in[i][0] = lanes_fifo_request_lane_out_signals_in[i];
-            assign lanes_fifo_request_lane_out_signals_out[i]        = lanes_fifo_request_cast_lane_out_signals_out [i][0];
-
             lane_template #(
                 `include"set_lane_parameters.vh"
                 ) inst_lane_template (
@@ -600,42 +590,48 @@ module bundle_lanes #(
                 .done_out                           (lanes_done_out[i]                                                         )
             );
 
-
-
-
-
-
         end
     endgenerate
 
-    generate
-        for (i=0; i< NUM_LANES; i++) begin : generate_lane_topology
-            always_comb begin
-                if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[i] != 0) begin
-                    m = 0;
-                    for (j = 0; j < NUM_LANES; j++) begin
-                        if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j] != 0 && j != i) begin
-                            $display("MSG: - Lane number j: %0d - ENGINES_COUNT_ARRAY = %0d", j, ENGINES_COUNT_ARRAY[j]);
-                            for (k = 0; k < ENGINES_COUNT_ARRAY[j]; k++) begin
-                                $display("MSG: ++ Engine number k: %0d - LANES_CONFIG_CAST_WIDTH_ARRAY = %0d", k, LANES_CONFIG_CAST_WIDTH_ARRAY[j][k]);
-                                for (l = 0; l < LANES_CONFIG_CAST_WIDTH_ARRAY[j][k]; l++) begin
-                                    $display("MSG: *** Cast number l: %0d - LANES_CONFIG_MERGE_CONNECT_ARRAY = %0d",l, LANES_CONFIG_MERGE_CONNECT_ARRAY[j][k][l]);
-                                    if(LANES_CONFIG_MERGE_CONNECT_ARRAY[j][k][l] == i) begin
-                                        m    = m + 1;
-                                        c[j] = c[j] + 1;
-                                        $display("MSG: >>> j:%0d -> i:%0d m:%0d c[%0d]:%0d",j,i,m, j,c[j]);
-                                        lanes_response_merge_engine_in[i][m]                                         = lanes_request_cast_lane_out[j][ c[j]];
-                                        lanes_fifo_response_merge_lane_in_signals_in[i][m].rd_en                     = ~lanes_fifo_request_cast_lane_out_signals_out[j][c[j]].empty;
-                                        lanes_fifo_request_cast_lane_out_signals_in[j][ c[j]].rd_en                  = ~lanes_fifo_response_merge_lane_in_signals_out[i][m].prog_full;
-                                    end
-                                end
+    
+always_comb begin : generate_lane_topology
+    int lane_merge,lane_cast,engine_idx,cast_idx,merge_count= 0;
+    integer cast_count[0:NUM_LANES] = '{default: 0};
+
+    for (lane_merge=0; lane_merge< NUM_LANES; lane_merge++) begin
+
+        lanes_response_merge_engine_in[lane_merge][0]               = lanes_response_engine_in[lane_merge];
+        lanes_fifo_response_merge_lane_in_signals_in[lane_merge][0] = lanes_fifo_response_lane_in_signals_in[lane_merge];
+        lanes_fifo_response_lane_in_signals_out[lane_merge]         = lanes_fifo_response_merge_lane_in_signals_out[lane_merge][0];
+
+        lanes_request_lane_out[lane_merge]                         = lanes_request_cast_lane_out[lane_merge][0];
+        lanes_fifo_request_cast_lane_out_signals_in[lane_merge][0] = lanes_fifo_request_lane_out_signals_in[lane_merge];
+        lanes_fifo_request_lane_out_signals_out[lane_merge]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge][0];
+
+        if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge] != 0) begin
+            merge_count = 0;
+            for (lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
+                if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast] != 0 && lane_cast != lane_merge) begin
+                    // $display("MSG: - Lane number lane_cast: %0d - ENGINES_COUNT_ARRAY = %0d", lane_cast, ENGINES_COUNT_ARRAY[lane_cast]);
+                    for (engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY[lane_cast]; engine_idx++) begin
+                        // $display("MSG: ++ Engine number engine_idx: %0d - LANES_CONFIG_CAST_WIDTH_ARRAY = %0d", engine_idx, LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]);
+                        for (cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]; cast_idx++) begin
+                            // $display("MSG: *** Cast number cast_idx: %0d - LANES_CONFIG_MERGE_CONNECT_ARRAY = %0d",cast_idx, LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx]);
+                            if(LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx] == lane_merge) begin
+                                merge_count                                             = merge_count + 1;
+                                cast_count[lane_cast]                                   = cast_count[lane_cast] + 1;
+                                // $display("MSG: >>> lane_cast:%0d -> lane_merge:%0d merge_count:%0d cast_count[%0d]:%0d",lane_cast,lane_merge,merge_count, lane_cast,cast_count[lane_cast]);
+                                lanes_response_merge_engine_in[lane_merge][merge_count]                                = lanes_request_cast_lane_out[lane_cast][ cast_count[lane_cast]];
+                                lanes_fifo_response_merge_lane_in_signals_in[lane_merge][merge_count].rd_en            = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast][cast_count[lane_cast]].empty;
+                                lanes_fifo_request_cast_lane_out_signals_in[lane_cast][ cast_count[lane_cast]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge][merge_count].prog_full;
                             end
                         end
                     end
                 end
             end
         end
-    endgenerate
-
+    end
+end
+    
 
 endmodule : bundle_lanes
