@@ -54,6 +54,8 @@ parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAS
 , '{0, 0, 0}
 }
 ,
+parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = 2,
+parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = 0,
 parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = '{'{2, 2, 2}
 , '{2, 2, 0}
 , '{2, 0, 0}
