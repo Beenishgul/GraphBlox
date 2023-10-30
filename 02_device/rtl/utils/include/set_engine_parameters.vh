@@ -58,7 +58,7 @@
 .ID_RELATIVE                             (ENGINES_ENGINE_ID_ARRAY[i]                       ),
 .LANE_CAST_WIDTH                         (LANE_CAST_WIDTH                                  ),
 .LANE_MERGE_WIDTH                        (LANE_MERGE_WIDTH                                 ),
-.ENGINE_CAST_WIDTH                       (LANES_CONFIG_CAST_WIDTH_ARRAY[i]                 ),
+.ENGINE_CAST_WIDTH                       (ENGINES_CONFIG_CAST_WIDTH_ARRAY[i]               ),
 .ENGINE_MERGE_WIDTH                      (ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]              ),
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
