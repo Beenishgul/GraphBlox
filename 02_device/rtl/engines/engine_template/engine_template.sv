@@ -159,8 +159,8 @@ module engine_template #(
             response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
-            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
-            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
+            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in[0];
+            fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in[0];
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
             fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
             response_engine_in_reg.valid           <= response_engine_in[0].valid;
@@ -178,16 +178,16 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_template_engine) begin
-            fifo_setup_signal        <= 1'b1;
+            fifo_setup_signal           <= 1'b1;
             request_engine_out[0].valid <= 1'b0;
-            request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            request_memory_out.valid    <= 1'b0;
+            done_out                    <= 1'b1;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
+            fifo_setup_signal           <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
             request_engine_out[0].valid <= request_engine_out_int.valid;
-            request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= template_done_out;
+            request_memory_out.valid    <= request_memory_out_int.valid;
+            done_out                    <= template_done_out;
         end
     end
 
