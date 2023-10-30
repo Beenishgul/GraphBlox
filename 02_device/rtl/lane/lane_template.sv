@@ -540,13 +540,13 @@ module lane_template #(
             engines_fifo_request_cast_lane_out_signals_in[engine_idx][0] = engines_fifo_request_lane_out_signals_in[engine_idx];
             engines_fifo_request_lane_out_signals_out[engine_idx]        = engines_fifo_request_cast_lane_out_signals_out [engine_idx][0];
 
-            for (int engine_merge=0; engine_merge < ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx]; engine_merge++) begin
+            for (int engine_merge=1; engine_merge < ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx]; engine_merge++) begin
                 merge_count++;
                 engines_response_merge_lane_in[engine_idx][engine_merge]                 = response_lane_in[merge_count];
                 engines_fifo_response_merge_lane_in_signals_in[engine_idx][engine_merge] = fifo_response_lane_in_signals_in[merge_count];
                 fifo_response_lane_in_signals_out[merge_count]                           = engines_fifo_response_merge_lane_in_signals_out[engine_idx][engine_merge];
             end
-            for (int engine_cast=0; engine_cast < ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast++) begin
+            for (int engine_cast=1; engine_cast < ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast++) begin
                 cast_count++;
                 engines_request_lane_out[engine_idx][engine_cast]                      = request_lane_out[cast_count];
                 engines_fifo_request_cast_lane_out_signals_in[engine_idx][engine_cast] = fifo_request_lane_out_signals_in[cast_count];
