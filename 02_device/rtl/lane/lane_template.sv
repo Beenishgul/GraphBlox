@@ -205,16 +205,16 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_lane_template) begin
-            fifo_setup_signal         <= 1'b1;
+            fifo_setup_signal        <= 1'b1;
             request_lane_out[0].valid <= 1'b0;
-            request_memory_out.valid  <= 1'b0;
-            done_out                  <= 1'b1;
+            request_memory_out.valid <= 1'b0;
+            done_out                 <= 1'b1;
         end
         else begin
-            fifo_setup_signal         <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
+            fifo_setup_signal        <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
             request_lane_out[0].valid <= request_lane_out_int.valid ;
-            request_memory_out.valid  <= request_memory_out_int.valid;
-            done_out                  <= (&engines_done_out_reg);
+            request_memory_out.valid <= request_memory_out_int.valid;
+            done_out                 <= (&engines_done_out_reg);
         end
     end
 
@@ -490,6 +490,13 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
+    MemoryPacket           engines_response_merge_lane_in                 [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsInput  engines_fifo_response_merge_lane_in_signals_in [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsOutput engines_fifo_response_merge_lane_in_signals_out[NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    MemoryPacket           engines_request_cast_lane_out                  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsInput  engines_fifo_request_cast_lane_out_signals_in  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsOutput engines_fifo_request_cast_lane_out_signals_out [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+
     generate
         for (i=0; i< NUM_ENGINES; i++) begin : generate_engine_template
             engine_template #(
@@ -498,15 +505,15 @@ module lane_template #(
                 .ap_clk                             (ap_clk                                        ),
                 .areset                             (areset_engine[i]                              ),
                 .descriptor_in                      (engines_descriptor_in[i]                      ),
-                .response_engine_in                 (engines_response_lane_in[i]                   ),
-                .fifo_response_engine_in_signals_in (engines_fifo_response_lane_in_signals_in[i]   ),
-                .fifo_response_engine_in_signals_out(engines_fifo_response_lane_in_signals_out[i]  ),
+                .response_engine_in                 (engines_response_merge_lane_in[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0]                    ),
+                .fifo_response_engine_in_signals_in (engines_fifo_response_merge_lane_in_signals_in[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0]    ),
+                .fifo_response_engine_in_signals_out(engines_fifo_response_merge_lane_in_signals_out[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0]   ),
                 .response_memory_in                 (engines_response_memory_in[i]                 ),
                 .fifo_response_memory_in_signals_in (engines_fifo_response_memory_in_signals_in[i] ),
                 .fifo_response_memory_in_signals_out(engines_fifo_response_memory_in_signals_out[i]),
-                .request_engine_out                 (engines_request_lane_out[i]                   ),
-                .fifo_request_engine_out_signals_in (engines_fifo_request_lane_out_signals_in[i]   ),
-                .fifo_request_engine_out_signals_out(engines_fifo_request_lane_out_signals_out[i]  ),
+                .request_engine_out                 (engines_request_cast_lane_out[i][LANES_CONFIG_CAST_WIDTH_ARRAY[i]:0]                    ),
+                .fifo_request_engine_out_signals_in (engines_fifo_request_cast_lane_out_signals_in[i][LANES_CONFIG_CAST_WIDTH_ARRAY[i]:0]    ),
+                .fifo_request_engine_out_signals_out(engines_fifo_request_cast_lane_out_signals_out[i][LANES_CONFIG_CAST_WIDTH_ARRAY[i]:0]   ),
                 .request_memory_out                 (engines_request_memory_out[i]                 ),
                 .fifo_request_memory_out_signals_in (engines_fifo_request_memory_out_signals_in[i] ),
                 .fifo_request_memory_out_signals_out(engines_fifo_request_memory_out_signals_out[i]),
@@ -516,60 +523,36 @@ module lane_template #(
         end
     endgenerate
 
+    // --------------------------------------------------------------------------------------
+    // Generate Lanes MERGE/CAST wires
+    // --------------------------------------------------------------------------------------
+    always_comb begin : generate_engine_topology
+        int cast_count = 0;
+        int merge_count = 0;
 
-    MemoryPacket           engines_response_merge_engine_in               [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsInput  engines_fifo_response_merge_lane_in_signals_in [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsOutput engines_fifo_response_merge_lane_in_signals_out[NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    MemoryPacket           engines_request_cast_lane_out                  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsInput  engines_fifo_request_cast_lane_out_signals_in  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsOutput engines_fifo_request_cast_lane_out_signals_out [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+        for (int engine_idx=0; engine_idx < NUM_ENGINES; engine_idx++) begin
+
+            engines_response_merge_lane_in[engine_idx][0]                 = engines_response_engine_in[engine_idx];
+            engines_fifo_response_merge_lane_in_signals_in[engine_idx][0] = engines_fifo_response_lane_in_signals_in[engine_idx];
+            engines_fifo_response_lane_in_signals_out[engine_idx]         = engines_fifo_response_merge_lane_in_signals_out[engine_idx][0];
+
+            engines_request_lane_out[engine_idx]                         = engines_request_cast_lane_out[engine_idx][0];
+            engines_fifo_request_cast_lane_out_signals_in[engine_idx][0] = engines_fifo_request_lane_out_signals_in[engine_idx];
+            engines_fifo_request_lane_out_signals_out[engine_idx]        = engines_fifo_request_cast_lane_out_signals_out [engine_idx][0];
+
+            for (int engine_merge=0; engine_merge < ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx]; engine_merge++) begin
+                merge_count++;
+                engines_response_merge_lane_in[engine_idx][engine_merge]                 = response_lane_in[merge_count];
+                engines_fifo_response_merge_lane_in_signals_in[engine_idx][engine_merge] = fifo_response_lane_in_signals_in[merge_count];
+                fifo_response_lane_in_signals_out[merge_count]                           = engines_fifo_response_merge_lane_in_signals_out[engine_idx][engine_merge];
+            end
+            for (int engine_cast=0; engine_cast < LANES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast++) begin
+                cast_count++;
+                engines_request_lane_out[engine_idx][engine_cast]                      = request_lane_out[cast_count];
+                engines_fifo_request_cast_lane_out_signals_in[engine_idx][engine_cast] = fifo_request_lane_out_signals_in[cast_count];
+                fifo_request_lane_out_signals_out[cast_count]                          = engines_fifo_request_cast_lane_out_signals_out[engine_idx][engine_cast];
+            end
+        end
+    end
 
 endmodule : lane_template
-
-
-    // MemoryPacket           lanes_response_merge_engine_in               [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    // FIFOStateSignalsInput  lanes_fifo_response_merge_lane_in_signals_in [NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    // FIFOStateSignalsOutput lanes_fifo_response_merge_lane_in_signals_out[NUM_LANES-1:0][(1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)-1:0];
-    // MemoryPacket           lanes_request_cast_lane_out                  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
-    // FIFOStateSignalsInput  lanes_fifo_request_cast_lane_out_signals_in  [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
-    // FIFOStateSignalsOutput lanes_fifo_request_cast_lane_out_signals_out [NUM_LANES-1:0][ (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)-1:0];
-
-// always_comb begin : generate_lane_topology
-//     int lane_merge,lane_cast,engine_idx,cast_idx,merge_count= 0;
-//     integer cast_count[0:NUM_LANES] = '{default: 0};
-
-//     for (lane_merge=0; lane_merge< NUM_LANES; lane_merge++) begin
-
-//         lanes_response_merge_engine_in[lane_merge][0]               = lanes_response_engine_in[lane_merge];
-//         lanes_fifo_response_merge_lane_in_signals_in[lane_merge][0] = lanes_fifo_response_lane_in_signals_in[lane_merge];
-//         lanes_fifo_response_lane_in_signals_out[lane_merge]         = lanes_fifo_response_merge_lane_in_signals_out[lane_merge][0];
-
-//         lanes_request_lane_out[lane_merge]                         = lanes_request_cast_lane_out[lane_merge][0];
-//         lanes_fifo_request_cast_lane_out_signals_in[lane_merge][0] = lanes_fifo_request_lane_out_signals_in[lane_merge];
-//         lanes_fifo_request_lane_out_signals_out[lane_merge]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge][0];
-
-//         if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge] != 0) begin
-//             merge_count = 0;
-//             for (lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
-//                 if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast] != 0 && lane_cast != lane_merge) begin
-//                     $display("MSG: - Lane number lane_cast: %0d - ENGINES_COUNT_ARRAY = %0d", lane_cast, ENGINES_COUNT_ARRAY[lane_cast]);
-//                     for (engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY[lane_cast]; engine_idx++) begin
-//                         $display("MSG: ++ Engine number engine_idx: %0d - LANES_CONFIG_CAST_WIDTH_ARRAY = %0d", engine_idx, LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]);
-//                         for (cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]; cast_idx++) begin
-//                             $display("MSG: *** Cast number cast_idx: %0d - LANES_CONFIG_MERGE_CONNECT_ARRAY = %0d",cast_idx, LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx]);
-//                             if(LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx] == lane_merge) begin
-//                                 merge_count                                             = merge_count + 1;
-//                                 cast_count[lane_cast]                                   = cast_count[lane_cast] + 1;
-//                                 $display("MSG: >>> lane_cast:%0d -> lane_merge:%0d merge_count:%0d cast_count[%0d]:%0d",lane_cast,lane_merge,merge_count, lane_cast,cast_count[lane_cast]);
-//                                 lanes_response_merge_engine_in[lane_merge][merge_count]                                = lanes_request_cast_lane_out[lane_cast][ cast_count[lane_cast]];
-//                                 lanes_fifo_response_merge_lane_in_signals_in[lane_merge][merge_count].rd_en            = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast][cast_count[lane_cast]].empty;
-//                                 lanes_fifo_request_cast_lane_out_signals_in[lane_cast][ cast_count[lane_cast]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge][merge_count].prog_full;
-//                             end
-//                         end
-//                     end
-//                 end
-//             end
-//         end
-//     end
-// end
-    

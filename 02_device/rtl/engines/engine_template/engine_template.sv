@@ -25,22 +25,22 @@ module engine_template #(
     `include "engine_parameters.vh"
     ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                                                         ,
+    input  logic                  areset                                                         ,
+    input  KernelDescriptor       descriptor_in                                                  ,
+    input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0] ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
+    input  MemoryPacket           response_memory_in                                             ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
+    output MemoryPacket           request_engine_out[(1+ENGINE_CAST_WIDTH)-1:0]                  ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in[(1+ENGINE_CAST_WIDTH)-1:0]  ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out[(1+ENGINE_CAST_WIDTH)-1:0] ,
+    output MemoryPacket           request_memory_out                                             ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                            ,
+    output logic                  fifo_setup_signal                                              ,
     output logic                  done_out
 );
 
@@ -163,13 +163,13 @@ module engine_template #(
             fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
             fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
-            response_engine_in_reg.valid           <= response_engine_in.valid;
+            response_engine_in_reg.valid           <= response_engine_in[0].valid;
             response_memory_in_reg.valid           <= response_memory_in.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        response_engine_in_reg.payload <= response_engine_in.payload;
+        response_engine_in_reg.payload <= response_engine_in[0].payload;
         response_memory_in_reg.payload <= response_memory_in.payload;
     end
 
@@ -179,25 +179,25 @@ module engine_template #(
     always_ff @(posedge ap_clk) begin
         if (areset_template_engine) begin
             fifo_setup_signal        <= 1'b1;
-            request_engine_out.valid <= 1'b0;
+            request_engine_out[0].valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
             done_out                 <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
-            request_engine_out.valid <= request_engine_out_int.valid;
+            request_engine_out[0].valid <= request_engine_out_int.valid;
             request_memory_out.valid <= request_memory_out_int.valid;
             done_out                 <= template_done_out;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
-        fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_int;
-        fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-        fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_int;
-        request_engine_out.payload          <= request_engine_out_int.payload;
-        request_memory_out.payload          <= request_memory_out_int.payload ;
+        fifo_response_engine_in_signals_out[0] <= fifo_response_engine_in_signals_out_int;
+        fifo_request_engine_out_signals_out[0] <= fifo_request_engine_out_signals_out_int;
+        fifo_response_memory_in_signals_out    <= fifo_response_memory_in_signals_out_int;
+        fifo_request_memory_out_signals_out    <= fifo_request_memory_out_signals_out_int;
+        request_engine_out[0].payload          <= request_engine_out_int.payload;
+        request_memory_out.payload             <= request_memory_out_int.payload ;
     end
 
 // --------------------------------------------------------------------------------------
