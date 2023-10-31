@@ -21,9 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(
-    `include "lane_parameters.vh"
-    ) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                                                     ,
     input  logic                  areset                                                     ,
@@ -548,7 +546,7 @@ module lane_template #(
             end
             for (int engine_cast=1; engine_cast < ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast++) begin
                 cast_count++;
-                engines_request_lane_out[engine_idx][engine_cast]                      = request_lane_out[cast_count];
+                request_lane_out[cast_count]                                           = engines_request_lane_out[engine_idx][engine_cast];
                 engines_fifo_request_cast_lane_out_signals_in[engine_idx][engine_cast] = fifo_request_lane_out_signals_in[cast_count];
                 fifo_request_lane_out_signals_out[cast_count]                          = engines_fifo_request_cast_lane_out_signals_out[engine_idx][engine_cast];
             end
