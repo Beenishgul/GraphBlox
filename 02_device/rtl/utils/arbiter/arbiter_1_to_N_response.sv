@@ -62,7 +62,7 @@ module arbiter_1_to_N_response #(
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 
-  assign id_mask = {NUM_MEMORY_REQUESTOR{1'b1}};
+  assign id_mask = ~0;
 
   always_ff @(posedge ap_clk) begin
     areset_control <= areset;

@@ -37,22 +37,22 @@ module engine_merge_data #(parameter
     PIPELINE_STAGES    = 2
 ) (
     // System Signals
-    input  logic                  ap_clk                                                 ,
-    input  logic                  areset                                                 ,
-    input  KernelDescriptor       descriptor_in                                          ,
-    input  MemoryPacket           response_engine_in[ENGINE_MERGE_WIDTH]                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[ENGINE_MERGE_WIDTH] ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[ENGINE_MERGE_WIDTH],
-    input  MemoryPacket           response_memory_in                                     ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                     ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                    ,
-    output MemoryPacket           request_engine_out                                     ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                     ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                    ,
-    output MemoryPacket           request_memory_out                                     ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                     ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                    ,
-    output logic                  fifo_setup_signal                                      ,
+    input  logic                  ap_clk                                                         ,
+    input  logic                  areset                                                         ,
+    input  KernelDescriptor       descriptor_in                                                  ,
+    input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0] ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
+    input  MemoryPacket           response_memory_in                                             ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
+    output MemoryPacket           request_engine_out                                             ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                            ,
+    output MemoryPacket           request_memory_out                                             ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                            ,
+    output logic                  fifo_setup_signal                                              ,
     output logic                  done_out
 );
 
