@@ -527,8 +527,8 @@ module lane_template #(
     // Generate Lanes MERGE/CAST wires
     // --------------------------------------------------------------------------------------
     always_comb begin : generate_engine_topology
-        int cast_count = 0;
-        int merge_count = 0;
+        automatic int cast_count = 0;
+        automatic int merge_count = 0;
 
         for (int engine_idx=0; engine_idx < NUM_ENGINES; engine_idx++) begin
 
