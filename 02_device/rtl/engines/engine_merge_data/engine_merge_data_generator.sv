@@ -108,6 +108,7 @@ module engine_merge_data_generator #(parameter
     FIFOStateSignalsInput              fifo_response_engine_in_signals_in_int  [(1+ENGINE_MERGE_WIDTH)-1:0];
     FIFOStateSignalsOutput             fifo_response_engine_in_signals_out_int [(1+ENGINE_MERGE_WIDTH)-1:0];
     logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_response_engine_in_setup_signal_int                            ;
+    logic [(1+ENGINE_MERGE_WIDTH)-1:0] response_engine_in_rd_en_mask_int                                   ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine OUTPUT Request MemoryPacket
@@ -204,7 +205,7 @@ module engine_merge_data_generator #(parameter
             done_out                 <= 1'b0;
         end
         else begin
-            fifo_setup_signal        <= fifo_request_setup_signal_int;
+            fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_request_engine_out_setup_signal_int;
             request_engine_out.valid <= request_engine_out_int.valid;
             configure_memory_setup   <= configure_memory_setup_reg;
             done_out                 <= done_out_reg;
@@ -236,7 +237,7 @@ module engine_merge_data_generator #(parameter
             assign fifo_response_engine_in_din[i] = response_engine_in_reg[i].payload;
 
             // Pop
-            assign fifo_response_engine_in_signals_in_int[i].rd_en = ~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
+            assign fifo_response_engine_in_signals_in_int[i].rd_en = ~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en;
             assign response_engine_in_int[i].valid                 = fifo_response_engine_in_signals_out_int[i].valid;
             assign response_engine_in_int[i].payload               = fifo_response_engine_in_dout[i];
 
@@ -259,6 +260,12 @@ module engine_merge_data_generator #(parameter
                 .wr_rst_busy(fifo_response_engine_in_signals_out_int[i].wr_rst_busy),
                 .rd_rst_busy(fifo_response_engine_in_signals_out_int[i].rd_rst_busy)
             );
+        end
+    endgenerate
+
+    generate
+        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_response_engine_in_rd_en_mask_int
+            assign response_engine_in_rd_en_mask_int[i] = (response_engine_in_int[i].valid & ~fifo_response_engine_in_signals_out_int[i].empty & ~fifo_request_engine_out_signals_out_int.prog_full & fifo_response_engine_in_signals_in_reg[i].rd_en);
         end
     endgenerate
 
@@ -410,14 +417,13 @@ module engine_merge_data_generator #(parameter
         endcase
     end // always_ff @(posedge ap_clk)
 
-
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     assign generator_engine_request_engine_int = 0;
 
     always_ff @(posedge ap_clk) begin
-        if (areset_csr_engine) begin
+        if (areset_generator) begin
             generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
@@ -429,6 +435,9 @@ module engine_merge_data_generator #(parameter
         generator_engine_request_engine_reg.payload <= generator_engine_request_engine_int.payload;
     end
 
+    if(configure_engine_param_valid)begin
+
+    end
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engine requests MemoryPacket

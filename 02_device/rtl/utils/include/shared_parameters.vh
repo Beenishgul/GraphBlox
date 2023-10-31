@@ -31,7 +31,7 @@ parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                
 parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = '{'{2, 2, 1}
 }
 ,
-parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = '{2, 2}
+parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = '{2, 5}
 ,
 parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = '{0, 1}
 ,
@@ -53,8 +53,8 @@ parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAS
 ,
 parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = 2,
 parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = 0,
-parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = '{'{2, 2}
-, '{2, 2}
+parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = '{'{2, 5}
+, '{2, 5}
 , '{2, 0}
 }
 ,
@@ -106,8 +106,8 @@ parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES
 }
 ,
 parameter BUNDLES_COUNT_ARRAY                                                                                  = 1,
-parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{2, 2}
-, '{2, 2}
+parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{2, 5}
+, '{2, 5}
 , '{2, 0}
 }
 }
@@ -182,8 +182,8 @@ parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{3},
 parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{2, 2, 1}
 }
 ,
-parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{2, 2}
-, '{2, 2}
+parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{2, 5}
+, '{2, 5}
 , '{2, 0}
 }
 }
