@@ -273,7 +273,7 @@ module lane_template #(
     assign fifo_response_memory_in_din                  = response_memory_in_reg.payload;
 
     // Pop
-    assign fifo_response_memory_in_signals_in_int.rd_en = ~fifo_response_memory_in_signals_out_int.empty & fifo_response_memory_in_signals_in_reg.rd_en & ~engines_fifo_response_memory_in_signals_out[0].prog_full;
+    assign fifo_response_memory_in_signals_in_int.rd_en = ~fifo_response_memory_in_signals_out_int.empty & fifo_response_memory_in_signals_in_reg.rd_en & ~engine_arbiter_1_to_N_memory_fifo_response_signals_out.prog_full;
     assign response_memory_in_int.valid                 = fifo_response_memory_in_signals_out_int.valid;
     assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 

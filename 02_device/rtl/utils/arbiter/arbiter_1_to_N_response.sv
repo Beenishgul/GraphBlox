@@ -39,10 +39,11 @@ module arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 // Cache response variables
 // --------------------------------------------------------------------------------------
-  logic areset_control  ;
-  logic areset_fifo     ;
+  logic areset_control;
+  logic areset_fifo   ;
 
-  MemoryPacket response_in_reg;
+  MemoryPacket                     response_in_reg;
+  logic [NUM_MEMORY_REQUESTOR-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -60,9 +61,12 @@ module arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
+
+  assign id_mask = {NUM_MEMORY_REQUESTOR{1'b1}};
+
   always_ff @(posedge ap_clk) begin
-    areset_control   <= areset;
-    areset_fifo      <= areset;
+    areset_control <= areset;
+    areset_fifo    <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -108,6 +112,9 @@ module arbiter_1_to_N_response #(
         4 : begin
           assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_module[i]);
         end
+        5 : begin
+          assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & id_mask);
+        end
         default : begin
           assign fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.from.id_cu[i]);
         end
@@ -129,6 +136,9 @@ module arbiter_1_to_N_response #(
       end
       4 : begin
         assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_module[NUM_MEMORY_REQUESTOR-1:0]);
+      end
+      5 : begin
+        assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == id_mask[NUM_MEMORY_REQUESTOR-1:0]);
       end
       default : begin
         assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_int == fifo_response_dout_int.payload.meta.route.from.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
@@ -174,6 +184,9 @@ module arbiter_1_to_N_response #(
             end
             4       : begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_module[i] & fifo_response_dout_int.valid;
+            end
+            5       : begin
+              response_out[i].valid <= id_mask[i] & fifo_response_dout_int.valid;
             end
             default : begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
