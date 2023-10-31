@@ -180,8 +180,7 @@ module engine_merge_data_configure_memory #(parameter
                         configure_memory_valid_reg[1]                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+2) : begin
-                        configure_memory_reg.payload.param.mode_buffer <= fifo_response_memory_in_dout_int.payload.data.field_0[0];
-                        configure_memory_valid_reg[2]                  <= 1'b1  ;
+                        configure_memory_valid_reg[2] <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+3) : begin
                         configure_memory_valid_reg[3] <= 1'b1  ;

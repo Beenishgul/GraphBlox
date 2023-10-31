@@ -176,7 +176,6 @@ package PKG_ENGINE;
     typedef struct packed{
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] merge_mask ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] merge_type ;
-        logic                               mode_buffer;
     } MergeDataConfigurationParameters;
 
     typedef struct packed{
