@@ -123,9 +123,9 @@ module engine_merge_data #(parameter
     MergeDataConfiguration generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
 
-    MemoryPacket           generator_engine_response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                  ;
-    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]  ;
-    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0] ;
+    MemoryPacket           generator_engine_response_engine_in                 [(1+ENGINE_MERGE_WIDTH)-1:0];
+    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in [(1+ENGINE_MERGE_WIDTH)-1:0];
+    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0];
 
     MemoryPacket          generator_engine_request_engine_out                ;
     FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
@@ -181,7 +181,7 @@ module engine_merge_data #(parameter
     end
 
     generate
-        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_merge_engine_in
+        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_response_engine_in_reg
             always_ff @(posedge ap_clk) begin
                 if (areset_csr_engine) begin
                     fifo_response_engine_in_signals_in_reg[i] <= 0;
@@ -222,7 +222,7 @@ module engine_merge_data #(parameter
     end
 
     generate
-        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_merge_engine_out
+        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_fifo_response_engine_in_signals_out
             always_ff @(posedge ap_clk) begin
                 fifo_response_engine_in_signals_out[i] <= fifo_response_engine_in_signals_out_int[i];
             end
@@ -233,7 +233,7 @@ module engine_merge_data #(parameter
 // FIFO INPUT Engine Response MemoryPacket
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_merge_engine_out
+        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_fifo_response_engine_in_din
             // FIFO is resetting
             assign fifo_response_engine_in_setup_signal_int[i] = fifo_response_engine_in_signals_out_int[i].wr_rst_busy | fifo_response_engine_in_signals_out_int[i].rd_rst_busy;
 
@@ -377,8 +377,12 @@ module engine_merge_data #(parameter
     assign generator_engine_configure_memory_in                       = configure_memory_out;
     assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
 
-    assign generator_engine_response_engine_in                       = response_engine_in_int;
-    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = 1'b1;
+    generate
+        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_generator_engine_response_engine_in
+            assign generator_engine_response_engine_in[i] = response_engine_in_int[i] ;
+            assign generator_engine_fifo_response_engine_in_signals_in[i] .rd_en = 1'b1;
+        end
+    endgenerate
 
     assign generator_engine_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
 
