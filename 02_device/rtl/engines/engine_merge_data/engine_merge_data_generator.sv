@@ -225,7 +225,7 @@ module engine_merge_data_generator #(parameter
             assign fifo_response_engine_in_din[i] = response_engine_in_reg[i].payload;
 
             // Pop
-            assign fifo_response_engine_in_signals_in_int[i].rd_en = ~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & ~generator_engine_fifo_response_engine_in_signals_out[i].prog_full;
+            assign fifo_response_engine_in_signals_in_int[i].rd_en = ~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
             assign response_engine_in_int[i].valid                 = fifo_response_engine_in_signals_out_int[i].valid;
             assign response_engine_in_int[i].payload               = fifo_response_engine_in_dout[i];
 
@@ -284,27 +284,10 @@ module engine_merge_data_generator #(parameter
                 next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
             end
             ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
-                if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) // (1) indirect mode (get count from other engines)
-                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
-                else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) // (0) direct mode (get count from memory)
+                if(configure_memory_reg.valid) // (0) direct mode (get count from memory)
                     next_state = ENGINE_MERGE_DATA_GEN_START_TRANS;
                 else
                     next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY;
-            end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE : begin
-                if(fifo_configure_engine_in_signals_in.rd_en)
-                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS;
-                else
-                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
-            end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS : begin
-                next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE;
-            end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE : begin
-                if(configure_engine_reg.valid) // (1) indirect mode (get count from other engines)
-                    next_state = ENGINE_MERGE_DATA_GEN_START_TRANS;
-                else
-                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE;
             end
             ENGINE_MERGE_DATA_GEN_START_TRANS : begin
                 next_state = ENGINE_MERGE_DATA_GEN_START;
@@ -318,7 +301,7 @@ module engine_merge_data_generator #(parameter
             ENGINE_MERGE_DATA_GEN_BUSY : begin
                 if (done_int_reg)
                     next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
-                else if (fifo_request_signals_out_int.prog_full)
+                else if (fifo_request_engine_out_signals_in_reg.rd_en)
                     next_state = ENGINE_MERGE_DATA_GEN_PAUSE_TRANS;
                 else
                     next_state = ENGINE_MERGE_DATA_GEN_BUSY;
@@ -327,15 +310,13 @@ module engine_merge_data_generator #(parameter
                 next_state = ENGINE_MERGE_DATA_GEN_PAUSE;
             end
             ENGINE_MERGE_DATA_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full)
+                if (~fifo_request_engine_out_signals_in_reg.rd_en)
                     next_state = ENGINE_MERGE_DATA_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_MERGE_DATA_GEN_PAUSE;
             end
             ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
-                if (configure_engine_param_int.mode_sequence & done_int_reg & response_memory_counter_is_zero)
-                    next_state = ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE;
-                else if (~configure_engine_param_int.mode_sequence & done_int_reg & response_memory_counter_is_zero)
+                if (done_int_reg)
                     next_state = ENGINE_MERGE_DATA_GEN_DONE;
                 else
                     next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
@@ -352,51 +333,18 @@ module engine_merge_data_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_MERGE_DATA_GEN_RESET : begin
-                done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b1;
-                counter_enable                     <= 1'b0;
-                counter_load                       <= 1'b0;
-                counter_incr                       <= 1'b0;
-                counter_decr                       <= 1'b0;
-                counter_load_value                 <= 0;
-                counter_stride_value               <= 0;
-                response_memory_counter_load_value <= 0;
-                fifo_request_din_reg.valid         <= 1'b0;
-
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_setup_reg   <= 1'b0;
-                configure_engine_param_int   <= 0;
-                configure_engine_param_valid <= 1'b0;
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b1;
+                configure_memory_setup_reg <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_IDLE : begin
-                done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b0;
-                counter_enable                     <= 1'b1;
-                counter_load                       <= 1'b0;
-                counter_incr                       <= 1'b0;
-                counter_decr                       <= 1'b0;
-                counter_load_value                 <= 0;
-                counter_stride_value               <= 0;
-                response_memory_counter_load_value <= 0;
-                fifo_request_din_reg.valid         <= 1'b0;
-
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_setup_reg   <= 1'b0;
-                configure_engine_param_int   <= 0;
-                configure_engine_param_valid <= 1'b0;
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE : begin
-                done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b0;
-                counter_enable                     <= 1'b1;
-                counter_load                       <= 1'b0;
-                counter_incr                       <= 1'b0;
-                counter_decr                       <= 1'b0;
-                counter_load_value                 <= 0;
-                counter_stride_value               <= 0;
-                response_memory_counter_load_value <= 0;
-                fifo_request_din_reg.valid         <= 1'b0;
-
+                done_int_reg               <= 1'b1;
+                done_out_reg               <= 1'b0;
                 configure_memory_setup_reg <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS : begin
@@ -407,242 +355,54 @@ module engine_merge_data_generator #(parameter
                 configure_engine_param_valid <= 1'b0;
                 configure_engine_param_int   <= configure_memory_reg.payload.param;
             end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_IDLE : begin
-                done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b0;
-                counter_enable                     <= 1'b1;
-                counter_load                       <= 1'b0;
-                counter_incr                       <= 1'b0;
-                counter_decr                       <= 1'b0;
-                counter_load_value                 <= 0;
-                counter_stride_value               <= 0;
-                response_memory_counter_load_value <= 0;
-                fifo_request_din_reg.valid         <= 1'b0;
-                configure_engine_setup_reg         <= 1'b0;
-            end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE_TRANS : begin
-                configure_engine_setup_reg <= 1'b1;
-            end
-            ENGINE_MERGE_DATA_GEN_SETUP_ENGINE : begin
-                configure_engine_setup_reg             <= 1'b0;
-                configure_engine_param_int.index_start <= configure_engine_reg.payload.param.index_start;
-                configure_engine_param_int.index_end   <= configure_engine_reg.payload.param.index_end;
-            end
             ENGINE_MERGE_DATA_GEN_START_TRANS : begin
-                done_int_reg         <= 1'b0;
-                done_out_reg         <= 1'b0;
-                counter_enable       <= 1'b1;
-                counter_load         <= 1'b1;
-                counter_incr         <= configure_engine_param_int.increment;
-                counter_decr         <= configure_engine_param_int.decrement;
-                counter_load_value   <= configure_engine_param_int.index_start;
-                counter_stride_value <= configure_engine_param_int.stride;
-
-                if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
-                    response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
-                end
-
-                if(~configure_memory_reg.payload.param.mode_sequence) begin
-                    configure_engine_param_valid <= 1'b1;
-                end
+                done_int_reg                 <= 1'b0;
+                done_out_reg                 <= 1'b0;
+                configure_engine_param_valid <= 1'b1;
             end
             ENGINE_MERGE_DATA_GEN_START : begin
-                counter_enable <= 1'b1;
-                counter_load   <= 1'b0;
+                done_int_reg                 <= 1'b0;
+                done_out_reg                 <= 1'b0;
+                configure_engine_param_valid <= 1'b1;
             end
             ENGINE_MERGE_DATA_GEN_PAUSE_TRANS : begin
                 done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
-                counter_enable             <= 1'b0;
-                counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
             end
             ENGINE_MERGE_DATA_GEN_BUSY : begin
-                if((counter_count >= configure_engine_param_int.index_end)) begin
-                    done_int_reg               <= 1'b1;
-                    counter_enable             <= 1'b0;
-                    fifo_request_din_reg.valid <= 1'b0;
-                end
-                else begin
-                    done_int_reg               <= 1'b0;
-                    counter_enable             <= 1'b1;
-                    fifo_request_din_reg.valid <= 1'b1;
-                end
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
+                done_int_reg               <= 1'b0;
+                done_out_reg               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b1;
             end
             ENGINE_MERGE_DATA_GEN_BUSY_TRANS : begin
-                if((counter_count >= configure_engine_param_int.index_end)) begin
-                    done_int_reg               <= 1'b1;
-                    counter_enable             <= 1'b0;
-                    fifo_request_din_reg.valid <= 1'b0;
-                end
-                else begin
-                    done_int_reg               <= 1'b0;
-                    counter_enable             <= 1'b1;
-                    fifo_request_din_reg.valid <= 1'b0;
-                end
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
+                done_int_reg               <= 1'b0;
+                done_out_reg               <= 1'b0;
+                fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_PAUSE : begin
                 done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
-                counter_enable             <= 1'b0;
-                counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
                 done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
-                counter_enable             <= 1'b0;
-                counter_load               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
             end
             ENGINE_MERGE_DATA_GEN_DONE : begin
                 done_int_reg                 <= 1'b1;
                 done_out_reg                 <= 1'b1;
-                counter_enable               <= 1'b0;
-                counter_load                 <= 1'b0;
                 fifo_request_din_reg.valid   <= 1'b0;
                 configure_engine_param_valid <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
 
-// --------------------------------------------------------------------------------------
-// Serial Read Engine Generate
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        fifo_request_comb.payload.meta.route                = configure_memory_reg.payload.meta.route;
-        fifo_request_comb.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
-        fifo_request_comb.payload.meta.address.base         = configure_engine_param_int.array_pointer;
-        if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
-        end else begin
-            fifo_request_comb.payload.meta.address.offset = counter_count >> configure_memory_reg.payload.meta.address.shift.amount;
-        end
-
-        fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
-        fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field_0       = counter_count;
-        fifo_request_comb.payload.data.field_1       = counter_count;
-        fifo_request_comb.payload.data.field_2       = counter_count;
-        fifo_request_comb.payload.data.field_3       = counter_count;
-    end
-
-    always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg.payload <= fifo_request_comb.payload;
-    end
-
-    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_request_counter (
-        .ap_clk      (ap_clk              ),
-        .ap_clken    (counter_enable      ),
-        .areset      (areset_counter      ),
-        .load        (counter_load        ),
-        .incr        (counter_incr        ),
-        .decr        (counter_decr        ),
-        .load_value  (counter_load_value  ),
-        .stride_value(counter_stride_value),
-        .count       (counter_count       ),
-        .is_zero     (counter_is_zero     )
-    );
 
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
+// Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
-        .ap_clk      (ap_clk                            ),
-        .ap_clken    (1'b1                              ),
-        .areset      (areset_counter                    ),
-        .load        (counter_load                      ),
-        .incr        (1'b0                              ),
-        .decr        (request_engine_out_reg.valid      ),
-        .load_value  (response_memory_counter_load_value),
-        .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
-        .count       (response_memory_counter_          ),
-        .is_zero     (response_memory_counter_is_zero   )
-    );
-
-// --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_814x16_MemoryPacket
-// --------------------------------------------------------------------------------------
-    // FIFO is resetting
-    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
-
-    // Push
-    assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
-    assign fifo_request_din                  = fifo_request_din_reg.payload;
-
-    // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_int.payload           = fifo_request_dout;
-
-    xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                        )
-    ) inst_fifo_MemoryPacketRequest (
-        .clk        (ap_clk                                  ),
-        .srst       (areset_fifo                             ),
-        .din        (fifo_request_din                        ),
-        .wr_en      (fifo_request_signals_in_int.wr_en       ),
-        .rd_en      (fifo_request_signals_in_int.rd_en       ),
-        .dout       (fifo_request_dout                       ),
-        .full       (fifo_request_signals_out_int.full       ),
-        .empty      (fifo_request_signals_out_int.empty      ),
-        .valid      (fifo_request_signals_out_int.valid      ),
-        .prog_full  (fifo_request_signals_out_int.prog_full  ),
-        .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
-        .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
-    );
-
-// --------------------------------------------------------------------------------------
-// Generator FLow logic
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        fifo_response_comb.valid                     = response_memory_in_reg.valid;
-        fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
-        if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
-        end else begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 >> configure_memory_reg.payload.meta.address.shift.amount;
-        end
-        fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
-        fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_response_comb.payload.data               = response_memory_in_reg.payload.data;
-    end
-
-    always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
-            fifo_request_signals_in_reg             <= 0;
-            request_engine_out_reg                  <= 0;
-            request_memory_out_reg                  <= 0;
-            fifo_response_engine_in_signals_out_reg <= 0;
-            fifo_response_memory_in_signals_out_reg <= 0;
-        end
-        else begin
-            if(~configure_engine_param_int.mode_buffer) begin // (0) engine buffer (1) memory buffer
-                fifo_request_signals_in_reg                   <= fifo_request_engine_out_signals_in_reg;
-                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
-                fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
-                request_engine_out_reg                        <= request_out_int;
-                request_memory_out_reg                        <= 0;
-            end
-            else if(configure_engine_param_int.mode_buffer) begin // response from memory -> request engine
-                fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
-                request_memory_out_reg      <= request_out_int;
-
-                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
-                fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
-                request_engine_out_reg                        <= fifo_response_comb;
-            end
-        end
-    end
-
 
 
 endmodule : engine_merge_data_generator
