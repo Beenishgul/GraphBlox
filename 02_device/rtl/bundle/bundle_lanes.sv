@@ -598,7 +598,7 @@ module bundle_lanes #(
 // Generate Lanes MERGE/CAST wires
 // --------------------------------------------------------------------------------------
     always_comb begin : generate_lane_topology
-        integer cast_count[0:NUM_LANES] = '{default: 0};
+        automatic integer cast_count[0:NUM_LANES] = '{default: 0};
 
         for (int lane_merge=0; lane_merge < NUM_LANES; lane_merge++) begin
 
@@ -611,7 +611,7 @@ module bundle_lanes #(
             lanes_fifo_request_lane_out_signals_out[lane_merge]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge][0];
 
             if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge] != 0) begin
-                int merge_count = 0;
+                automatic int merge_count = 0;
                 for (int lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
                     if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast] != 0 && lane_cast != lane_merge) begin
                         for (int engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY[lane_cast]; engine_idx++) begin
