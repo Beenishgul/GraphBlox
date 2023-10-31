@@ -123,9 +123,9 @@ module engine_merge_data #(parameter
     MergeDataConfiguration generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
 
-    MemoryPacket           generator_engine_response_engine_in                 ;
-    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
-    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
+    MemoryPacket           generator_engine_response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                  ;
+    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]  ;
+    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0] ;
 
     MemoryPacket          generator_engine_request_engine_out                ;
     FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
@@ -232,7 +232,6 @@ module engine_merge_data #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
 // --------------------------------------------------------------------------------------
-
     generate
         for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_merge_engine_out
             // FIFO is resetting
