@@ -435,9 +435,13 @@ module engine_merge_data_generator #(parameter
         generator_engine_request_engine_reg.payload <= generator_engine_request_engine_int.payload;
     end
 
-    if(configure_engine_param_valid)begin
+ // always_comb begin
+ //    if(configure_engine_param_valid)begin
 
-    end
+
+ //    end
+ // end
+
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engine requests MemoryPacket
