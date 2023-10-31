@@ -103,7 +103,6 @@ module engine_merge_data_generator #(parameter
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload                fifo_response_engine_in_din             [(1+ENGINE_MERGE_WIDTH)-1:0];
     MemoryPacketPayload                fifo_response_engine_in_dout            [(1+ENGINE_MERGE_WIDTH)-1:0];
-    FIFOStateSignalsInput              fifo_response_engine_in_signals_in_reg  [(1+ENGINE_MERGE_WIDTH)-1:0];
     FIFOStateSignalsInput              fifo_response_engine_in_signals_in_int  [(1+ENGINE_MERGE_WIDTH)-1:0];
     FIFOStateSignalsOutput             fifo_response_engine_in_signals_out_int [(1+ENGINE_MERGE_WIDTH)-1:0];
     logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_response_engine_in_setup_signal_int                            ;
