@@ -382,32 +382,32 @@ module engine_merge_data #(parameter
 
     assign generator_engine_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
 
-    // engine_merge_data_generator #(
-    //     .ID_CU             (ID_CU             ),
-    //     .ID_BUNDLE         (ID_BUNDLE         ),
-    //     .ID_LANE           (ID_LANE           ),
-    //     .ID_ENGINE         (ID_ENGINE         ),
-    //     .ID_MODULE         (1                 ),
-    //     .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-    //     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-    //     .ENGINES_CONFIG    (ENGINES_CONFIG    ),
-    //     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-    //     .PROG_THRESH       (PROG_THRESH       ),
-    //     .PIPELINE_STAGES   (PIPELINE_STAGES   )
-    // ) inst_engine_merge_data_generator (
-    //     .ap_clk                             (ap_clk                                              ),
-    //     .areset                             (areset_generator                                    ),
-    //     .descriptor_in                      (descriptor_in_reg                                   ),
-    //     .configure_memory_in                (generator_engine_configure_memory_in                ),
-    //     .fifo_configure_memory_in_signals_in(generator_engine_fifo_configure_memory_in_signals_in),
-    //     .response_engine_in                 (generator_engine_response_engine_in                 ),
-    //     .fifo_response_engine_in_signals_in (generator_engine_fifo_response_engine_in_signals_in ),
-    //     .fifo_response_engine_in_signals_out(generator_engine_fifo_response_engine_in_signals_out),
-    //     .request_engine_out                 (generator_engine_request_engine_out                 ),
-    //     .fifo_request_engine_out_signals_in (generator_engine_fifo_request_engine_out_signals_in ),
-    //     .fifo_setup_signal                  (generator_engine_fifo_setup_signal                  ),
-    //     .configure_memory_setup             (generator_engine_configure_memory_setup             ),
-    //     .done_out                           (generator_engine_done_out                           )
-    // );
+    engine_merge_data_generator #(
+        .ID_CU             (ID_CU             ),
+        .ID_BUNDLE         (ID_BUNDLE         ),
+        .ID_LANE           (ID_LANE           ),
+        .ID_ENGINE         (ID_ENGINE         ),
+        .ID_MODULE         (1                 ),
+        .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
+        .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
+        .ENGINES_CONFIG    (ENGINES_CONFIG    ),
+        .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
+        .PROG_THRESH       (PROG_THRESH       ),
+        .PIPELINE_STAGES   (PIPELINE_STAGES   )
+    ) inst_engine_merge_data_generator (
+        .ap_clk                             (ap_clk                                              ),
+        .areset                             (areset_generator                                    ),
+        .descriptor_in                      (descriptor_in_reg                                   ),
+        .configure_memory_in                (generator_engine_configure_memory_in                ),
+        .fifo_configure_memory_in_signals_in(generator_engine_fifo_configure_memory_in_signals_in),
+        .response_engine_in                 (generator_engine_response_engine_in                 ),
+        .fifo_response_engine_in_signals_in (generator_engine_fifo_response_engine_in_signals_in ),
+        .fifo_response_engine_in_signals_out(generator_engine_fifo_response_engine_in_signals_out),
+        .request_engine_out                 (generator_engine_request_engine_out                 ),
+        .fifo_request_engine_out_signals_in (generator_engine_fifo_request_engine_out_signals_in ),
+        .fifo_setup_signal                  (generator_engine_fifo_setup_signal                  ),
+        .configure_memory_setup             (generator_engine_configure_memory_setup             ),
+        .done_out                           (generator_engine_done_out                           )
+    );
 
 endmodule : engine_merge_data
