@@ -150,10 +150,10 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
   assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
   assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
-  assign fifo_response_dout_int.payload.data.field_0 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_1 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_2 = fifo_response_dout.iob.rdata;
-  assign fifo_response_dout_int.payload.data.field_3 = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field[0] = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field[1] = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field[2] = fifo_response_dout.iob.rdata;
+  assign fifo_response_dout_int.payload.data.field[3] = fifo_response_dout.iob.rdata;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                         ),

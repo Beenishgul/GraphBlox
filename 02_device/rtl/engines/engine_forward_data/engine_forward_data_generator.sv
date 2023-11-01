@@ -479,10 +479,10 @@ module engine_forward_data_generator #(parameter
 
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field_0       = counter_count;
-        fifo_request_comb.payload.data.field_1       = counter_count;
-        fifo_request_comb.payload.data.field_2       = counter_count;
-        fifo_request_comb.payload.data.field_3       = counter_count;
+        fifo_request_comb.payload.data.field[0]       = counter_count;
+        fifo_request_comb.payload.data.field[1]       = counter_count;
+        fifo_request_comb.payload.data.field[2]       = counter_count;
+        fifo_request_comb.payload.data.field[3]       = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -545,9 +545,9 @@ module engine_forward_data_generator #(parameter
         fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
         fifo_response_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 << configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field[0] << configure_memory_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field_0 >> configure_memory_reg.payload.meta.address.shift.amount;
+            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field[0] >> configure_memory_reg.payload.meta.address.shift.amount;
         end
         fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;

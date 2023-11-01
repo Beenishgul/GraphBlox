@@ -155,7 +155,7 @@ module cu_bundles #(
                     // if(lanes_stride_index_request_out.valid & (lanes_stride_index_request_out.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) begin
                     counter <= counter + 1;
                     // if (counter == 0)
-                    //     $display("MSG:  VERTEX ID -> %0d", lanes_stride_index_request_out.payload.data.field_0);
+                    //     $display("MSG:  VERTEX ID -> %0d", lanes_stride_index_request_out.payload.data.field[0]);
                     // end else
                     // counter <= counter;
                 end

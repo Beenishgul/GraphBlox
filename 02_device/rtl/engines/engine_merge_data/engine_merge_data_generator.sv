@@ -435,12 +435,16 @@ module engine_merge_data_generator #(parameter
         generator_engine_request_engine_reg.payload <= generator_engine_request_engine_int.payload;
     end
 
- // always_comb begin
- //    if(configure_engine_param_valid)begin
+
+    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] configure_memory_valid_reg;
+    logic                                   configure_memory_valid_int;
+
+    // always_comb begin
+    //    if(configure_engine_param_valid)begin
 
 
- //    end
- // end
+    //    end
+    // end
 
 
 // --------------------------------------------------------------------------------------
