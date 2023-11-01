@@ -380,7 +380,7 @@ module engine_merge_data #(parameter
     generate
         for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_generator_engine_response_engine_in
             assign generator_engine_response_engine_in[i] = response_engine_in_int[i] ;
-            assign generator_engine_fifo_response_engine_in_signals_in[i] .rd_en = 1'b1;
+            assign generator_engine_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
         end
     endgenerate
 

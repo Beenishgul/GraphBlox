@@ -138,7 +138,7 @@ module cache_generator_request #(
     fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
     fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
     fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address.base + arbiter_bus_out.payload.meta.address.offset;
-    fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field_0;
+    fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
 
     case (arbiter_bus_out.payload.meta.subclass.cmd)
       CMD_MEM_WRITE : begin
