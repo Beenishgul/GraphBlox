@@ -641,7 +641,7 @@ module engine_template #(
                 assign template_fifo_response_memory_in_signals_in.rd_en = 1'b1;
 
                 assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
-                assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
+                assign template_fifo_request_memory_out_signals_in.rd_en = 1'b0;
 
                 assign template_response_merge_engine_in[0]                 = template_response_engine_in;
                 assign template_fifo_response_merge_engine_in_signals_in[0] = template_fifo_response_engine_in_signals_in;
