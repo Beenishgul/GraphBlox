@@ -1095,25 +1095,25 @@ module __KERNEL___testbench ();
                 // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 8-BUFFER pointer
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 9-BUFFER pointer
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
         // --------------------------------------------------------------------------------------
 
                 // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 8-BUFFER pointer
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
         // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
         // param.array_pointer
         // 9-BUFFER pointer
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
         // --------------------------------------------------------------------------------------
 
         realcount = 0;
