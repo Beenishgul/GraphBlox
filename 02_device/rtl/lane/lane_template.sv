@@ -556,6 +556,24 @@ module lane_template #(
                 fifo_request_lane_out_signals_out[cast_count]                            = engines_fifo_request_cast_lane_out_signals_out[engine_idx][engine_cast+1];
             end
         end
+
+        cast_count = 0;
+        merge_count = 0;
+
+        for (int engine_idx=0; engine_idx < NUM_ENGINES; engine_idx++) begin
+            for (int engine_merge=ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx]; engine_merge < ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY-ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx]; engine_merge++) begin
+                merge_count++;
+                engines_response_merge_lane_in[engine_idx][engine_merge+1]                 = 0;
+                engines_fifo_response_merge_lane_in_signals_in[engine_idx][engine_merge+1] = 0;
+                fifo_response_lane_in_signals_out[merge_count]                             = 0;
+            end
+            for (int engine_cast=ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast < ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY-ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx]; engine_cast++) begin
+                cast_count++;
+                request_lane_out[cast_count]                                             = 0;
+                engines_fifo_request_cast_lane_out_signals_in[engine_idx][engine_cast+1] = 0;
+                fifo_request_lane_out_signals_out[cast_count]                            = 0;
+            end
+        end
     end
 
 endmodule : lane_template
