@@ -58,7 +58,8 @@ module engine_merge_data #(parameter
 
     genvar i;
 
-    assign fifo_request_memory_out_signals_out = 0;
+    assign request_memory_out = 0;
+    assign fifo_request_memory_out_signals_out = 6'b010000;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
