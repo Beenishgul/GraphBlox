@@ -338,9 +338,9 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
-                if (done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_IDLE;
-                else
+                // if (done_int_reg)
+                //     next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                // else
                     next_state = ENGINE_CSR_INDEX_GEN_DONE;
             end
         endcase
