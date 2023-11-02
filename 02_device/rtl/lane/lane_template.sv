@@ -539,27 +539,27 @@ module lane_template #(
             automatic int ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L = ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx_l];
             automatic int ENGINES_CONFIG_CAST_WIDTH_ARRAY_L  = ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx_l];
 
-            engines_response_merge_lane_in[engine_idx_l][0]                 = engines_response_lane_in[engine_idx_l];
-            engines_fifo_response_merge_lane_in_signals_in[engine_idx_l][0] = engines_fifo_response_lane_in_signals_in[engine_idx_l];
-            engines_fifo_response_lane_in_signals_out[engine_idx_l]         = engines_fifo_response_merge_lane_in_signals_out[engine_idx_l][0];
+            engines_response_merge_lane_in[engine_idx_l][0]         = engines_response_lane_in[engine_idx_l];
+            engines_fifo_response_merge_lane_in_signals_in[engine_idx_l][0].rd_en = 1'b1;
+            engines_fifo_response_lane_in_signals_out[engine_idx_l] = engines_fifo_response_merge_lane_in_signals_out[engine_idx_l][0];
 
-            engines_request_lane_out[engine_idx_l]                         = engines_request_cast_lane_out[engine_idx_l][0];
-            engines_fifo_request_cast_lane_out_signals_in[engine_idx_l][0] = engines_fifo_request_lane_out_signals_in[engine_idx_l];
-            engines_fifo_request_lane_out_signals_out[engine_idx_l]        = engines_fifo_request_cast_lane_out_signals_out [engine_idx_l][0];
+            engines_request_lane_out[engine_idx_l]                  = engines_request_cast_lane_out[engine_idx_l][0];
+            engines_fifo_request_cast_lane_out_signals_in[engine_idx_l][0].rd_en = engines_fifo_request_lane_out_signals_in[engine_idx_l].rd_en ;
+            engines_fifo_request_lane_out_signals_out[engine_idx_l] = engines_fifo_request_cast_lane_out_signals_out [engine_idx_l][0];
 
             for (int engine_merge=0; engine_merge < ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L; engine_merge++) begin
                 automatic int engine_merge_l                                                                 = engine_merge;
                 merge_count++;
-                engines_response_merge_lane_in[engine_idx_l][engine_merge_l+1]                 = response_lane_in[merge_count];
-                engines_fifo_response_merge_lane_in_signals_in[engine_idx_l][engine_merge_l+1] = fifo_response_lane_in_signals_in[merge_count];
-                fifo_response_lane_in_signals_out[merge_count]                                 = engines_fifo_response_merge_lane_in_signals_out[engine_idx_l][engine_merge_l+1];
+                engines_response_merge_lane_in[engine_idx_l][engine_merge_l+1] = response_lane_in[merge_count];
+                engines_fifo_response_merge_lane_in_signals_in[engine_idx_l][engine_merge_l+1].rd_en = 1'b1;
+                fifo_response_lane_in_signals_out[merge_count]                 = engines_fifo_response_merge_lane_in_signals_out[engine_idx_l][engine_merge_l+1];
             end
             for (int engine_cast=0; engine_cast < ENGINES_CONFIG_CAST_WIDTH_ARRAY_L; engine_cast++) begin
                 automatic int engine_cast_l                                                                = engine_cast;
                 cast_count++;
-                request_lane_out[cast_count]                                                 = engines_request_cast_lane_out[engine_idx_l][engine_cast_l+1];
-                engines_fifo_request_cast_lane_out_signals_in[engine_idx_l][engine_cast_l+1] = fifo_request_lane_out_signals_in[cast_count];
-                fifo_request_lane_out_signals_out[cast_count]                                = engines_fifo_request_cast_lane_out_signals_out[engine_idx_l][engine_cast_l+1];
+                request_lane_out[cast_count]                  = engines_request_cast_lane_out[engine_idx_l][engine_cast_l+1];
+                engines_fifo_request_cast_lane_out_signals_in[engine_idx_l][engine_cast_l+1].rd_en = fifo_request_lane_out_signals_in[cast_count].rd_en;
+                fifo_request_lane_out_signals_out[cast_count] = engines_fifo_request_cast_lane_out_signals_out[engine_idx_l][engine_cast_l+1];
             end
         end
     end

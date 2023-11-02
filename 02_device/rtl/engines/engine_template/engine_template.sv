@@ -638,8 +638,6 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
 // ENGINE MERGE DATA
 // --------------------------------------------------------------------------------------
-
-
                 assign areset_template = areset_engine;
 
                 assign template_descriptor_in                            = descriptor_in_reg;
@@ -657,7 +655,7 @@ module engine_template #(
 
                 for (i=1; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
                     assign template_response_merge_engine_in[i] = response_engine_in[i];
-                    assign template_fifo_response_merge_engine_in_signals_in[i] = fifo_response_engine_in_signals_in[i];
+                    assign template_fifo_response_merge_engine_in_signals_in[i] = 1'b1;
                     assign fifo_response_engine_in_signals_out[i]               = template_fifo_response_merge_engine_in_signals_out[i];
                 end
 
