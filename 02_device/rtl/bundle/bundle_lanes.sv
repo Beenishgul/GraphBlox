@@ -632,7 +632,7 @@ module bundle_lanes #(
                                     merge_count++;
                                     cast_count[lane_cast_l]++;
                                     lanes_response_merge_engine_in[lane_merge_l][merge_count] = lanes_request_cast_lane_out[lane_cast_l][ cast_count[lane_cast_l]];
-                                    lanes_fifo_response_merge_lane_in_signals_in[lane_merge_l][merge_count].rd_en              = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast_l][cast_count[lane_cast_l]].empty;
+                                    lanes_fifo_response_merge_lane_in_signals_in[lane_merge_l][merge_count].rd_en              = 1'b1;
                                     lanes_fifo_request_cast_lane_out_signals_in[lane_cast_l][ cast_count[lane_cast_l]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge_l][merge_count].prog_full;
                                     // $display("MSG: lanes_fifo_request_cast_lane_out_signals_in[%0d][%0d].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[%0d][%0d].prog_full",lane_cast_l,cast_count[lane_cast_l],lane_merge_l,merge_count);
                                 end
