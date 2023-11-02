@@ -599,30 +599,42 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     always_comb begin : generate_lane_topology
         automatic integer cast_count[0:NUM_LANES] = '{default: 0};
-
         for (int lane_merge=0; lane_merge < NUM_LANES; lane_merge++) begin
 
-            lanes_response_merge_engine_in[lane_merge][0]               = lanes_response_engine_in[lane_merge];
-            lanes_fifo_response_merge_lane_in_signals_in[lane_merge][0] = lanes_fifo_response_lane_in_signals_in[lane_merge];
-            lanes_fifo_response_lane_in_signals_out[lane_merge]         = lanes_fifo_response_merge_lane_in_signals_out[lane_merge][0];
+            automatic integer lane_merge_l = lane_merge;
+            automatic integer LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge_l];
+            lanes_response_merge_engine_in[lane_merge_l][0]               = lanes_response_engine_in[lane_merge_l];
+            lanes_fifo_response_merge_lane_in_signals_in[lane_merge_l][0] = lanes_fifo_response_lane_in_signals_in[lane_merge_l];
+            lanes_fifo_response_lane_in_signals_out[lane_merge_l]         = lanes_fifo_response_merge_lane_in_signals_out[lane_merge_l][0];
 
-            lanes_request_lane_out[lane_merge]                         = lanes_request_cast_lane_out[lane_merge][0];
-            lanes_fifo_request_cast_lane_out_signals_in[lane_merge][0] = lanes_fifo_request_lane_out_signals_in[lane_merge];
-            lanes_fifo_request_lane_out_signals_out[lane_merge]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge][0];
+            lanes_request_lane_out[lane_merge_l]                         = lanes_request_cast_lane_out[lane_merge_l][0];
+            lanes_fifo_request_cast_lane_out_signals_in[lane_merge_l][0] = lanes_fifo_request_lane_out_signals_in[lane_merge_l];
+            lanes_fifo_request_lane_out_signals_out[lane_merge_l]        = lanes_fifo_request_cast_lane_out_signals_out [lane_merge_l][0];
 
-            if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge] != 0) begin
+            if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L != 0) begin
                 automatic int merge_count = 0;
                 for (int lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
-                    if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast] != 0 && lane_cast != lane_merge) begin
-                        for (int engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY[lane_cast]; engine_idx++) begin
-                            for (int cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast][engine_idx]; cast_idx++) begin
-                                if(LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast][engine_idx][cast_idx] == lane_merge) begin
+                    automatic integer lane_cast_l = lane_cast;
+                    automatic integer LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l];
+                    automatic integer ENGINES_COUNT_ARRAY_L = ENGINES_COUNT_ARRAY[lane_cast_l];
+
+                    if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0 && lane_cast_l != lane_merge_l) begin
+       
+                        for (int engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY_L; engine_idx++) begin
+                            automatic integer engine_idx_l = engine_idx;
+                            automatic integer LANES_CONFIG_CAST_WIDTH_ARRAY_L = LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l];
+                            
+                            for (int cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY_L; cast_idx++) begin
+                                automatic integer cast_idx_l = cast_idx;
+                                automatic integer LANES_CONFIG_MERGE_CONNECT_ARRAY_L = LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][engine_idx_l][cast_idx_l];
+                                
+                                if(LANES_CONFIG_MERGE_CONNECT_ARRAY_L == lane_merge_l) begin
                                     merge_count++;
-                                    cast_count[lane_cast]++;
-                                    lanes_response_merge_engine_in[lane_merge][merge_count] = lanes_request_cast_lane_out[lane_cast][ cast_count[lane_cast]];
-                                    lanes_fifo_response_merge_lane_in_signals_in[lane_merge][merge_count].rd_en            = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast][cast_count[lane_cast]].empty;
-                                    lanes_fifo_request_cast_lane_out_signals_in[lane_cast][ cast_count[lane_cast]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge][merge_count].prog_full;
-                                    $display("lanes_fifo_request_cast_lane_out_signals_in[%0d][%0d].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[%0d][%0d].prog_full",lane_cast,cast_count[lane_cast],lane_merge,merge_count);
+                                    cast_count[lane_cast_l]++;
+                                    lanes_response_merge_engine_in[lane_merge_l][merge_count] = lanes_request_cast_lane_out[lane_cast_l][ cast_count[lane_cast_l]];
+                                    lanes_fifo_response_merge_lane_in_signals_in[lane_merge_l][merge_count].rd_en              = ~lanes_fifo_request_cast_lane_out_signals_out[lane_cast_l][cast_count[lane_cast_l]].empty;
+                                    lanes_fifo_request_cast_lane_out_signals_in[lane_cast_l][ cast_count[lane_cast_l]].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[lane_merge_l][merge_count].prog_full;
+                                    // $display("MSG: lanes_fifo_request_cast_lane_out_signals_in[%0d][%0d].rd_en   = ~lanes_fifo_response_merge_lane_in_signals_out[%0d][%0d].prog_full",lane_cast_l,cast_count[lane_cast_l],lane_merge_l,merge_count);
                                 end
                             end
                         end
