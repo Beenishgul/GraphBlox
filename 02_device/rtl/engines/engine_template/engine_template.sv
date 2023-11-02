@@ -653,10 +653,10 @@ module engine_template #(
                 assign template_fifo_response_merge_engine_in_signals_in[0] = template_fifo_response_engine_in_signals_in;
                 assign template_fifo_response_engine_in_signals_out         = template_fifo_response_merge_engine_in_signals_out[0];
 
-                for (i=1; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
-                    assign template_response_merge_engine_in[i] = response_engine_in[i];
-                    assign template_fifo_response_merge_engine_in_signals_in[i] = 1'b1;
-                    assign fifo_response_engine_in_signals_out[i]               = template_fifo_response_merge_engine_in_signals_out[i];
+                for (i=0; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
+                    assign template_response_merge_engine_in[i+1] = response_engine_in[i+1];
+                    assign template_fifo_response_merge_engine_in_signals_in[i+1] = 1'b1;
+                    assign fifo_response_engine_in_signals_out[i+1]               = template_fifo_response_merge_engine_in_signals_out[i+1];
                 end
 
                 engine_merge_data #(
