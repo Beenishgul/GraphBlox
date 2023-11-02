@@ -84,7 +84,6 @@ module engine_merge_data_generator #(parameter
 
     MemoryPacket          generator_engine_request_engine_reg    ;
     MemoryPacket          request_engine_out_int                 ;
-    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------

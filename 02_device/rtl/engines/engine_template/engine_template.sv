@@ -643,15 +643,15 @@ module engine_template #(
                 assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
-                assign template_response_merge_engine_in[0]                  = template_response_engine_in;
-                assign template_fifo_response_merge_engine_in_signals_in[0]  = template_fifo_response_engine_in_signals_in;
-                assign template_fifo_response_merge_engine_in_signals_out[0] = template_fifo_response_engine_in_signals_out;
+                assign template_response_merge_engine_in[0]                 = template_response_engine_in;
+                assign template_fifo_response_merge_engine_in_signals_in[0] = template_fifo_response_engine_in_signals_in;
+                assign template_fifo_response_engine_in_signals_out         = template_fifo_response_merge_engine_in_signals_out[0];
 
-    
+
                 for (i=1; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
-                    assign template_response_merge_engine_in[i]                  = response_engine_in[i];
-                    assign template_fifo_response_merge_engine_in_signals_in[i]  = fifo_response_engine_in_signals_in[i];
-                    assign template_fifo_response_merge_engine_in_signals_out[i] = fifo_response_engine_in_signals_out[i];
+                    assign template_response_merge_engine_in[i] = response_engine_in[i];
+                    assign template_fifo_response_merge_engine_in_signals_in[i] = fifo_response_engine_in_signals_in[i];
+                    assign fifo_response_engine_in_signals_out[i]               = template_fifo_response_merge_engine_in_signals_out[i];
                 end
 
                 engine_merge_data #(
