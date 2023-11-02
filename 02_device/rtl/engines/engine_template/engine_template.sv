@@ -61,6 +61,7 @@ module engine_template #(
     MemoryPacket request_memory_out_int;
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
+
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------
@@ -70,6 +71,13 @@ module engine_template #(
     FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_request_signals_out                       ;
     MemoryPacket           engine_cast_arbiter_1_to_N_request_out             [ENGINE_CAST_WIDTH-1:0];
     logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal                              ;
+
+// --------------------------------------------------------------------------------------
+// Drive Merge output signals
+// --------------------------------------------------------------------------------------
+    MemoryPacket           template_response_merge_engine_in                 [(1+ENGINE_MERGE_WIDTH)-1:0];
+    FIFOStateSignalsInput  template_fifo_response_merge_engine_in_signals_in [(1+ENGINE_MERGE_WIDTH)-1:0];
+    FIFOStateSignalsOutput template_fifo_response_merge_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0];
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -130,6 +138,8 @@ module engine_template #(
     FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out;
     logic                  template_fifo_setup_signal                  ;
     logic                  template_done_out                           ;
+
+
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -628,9 +638,7 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
 // ENGINE MERGE DATA
 // --------------------------------------------------------------------------------------
-                MemoryPacket           template_response_merge_engine_in                 [(1+ENGINE_MERGE_WIDTH)-1:0];
-                FIFOStateSignalsInput  template_fifo_response_merge_engine_in_signals_in [(1+ENGINE_MERGE_WIDTH)-1:0];
-                FIFOStateSignalsOutput template_fifo_response_merge_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0];
+
 
                 assign areset_template = areset_engine;
 
@@ -646,7 +654,6 @@ module engine_template #(
                 assign template_response_merge_engine_in[0]                 = template_response_engine_in;
                 assign template_fifo_response_merge_engine_in_signals_in[0] = template_fifo_response_engine_in_signals_in;
                 assign template_fifo_response_engine_in_signals_out         = template_fifo_response_merge_engine_in_signals_out[0];
-
 
                 for (i=1; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
                     assign template_response_merge_engine_in[i] = response_engine_in[i];
