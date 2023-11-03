@@ -228,7 +228,7 @@ module engine_merge_data_generator #(parameter
             assign fifo_response_engine_in_din[i] = response_engine_in_reg[i].payload;
 
             // Pop
-            assign fifo_response_engine_in_signals_in_int[i].rd_en = (~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & ~merge_data_response_engine_in_valid_reg[i]) | ~configure_engine_param_int.merge_mask[i] ;
+            assign fifo_response_engine_in_signals_in_int[i].rd_en = (~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & ~merge_data_response_engine_in_valid_reg[i] & ~response_engine_in_int[i].valid ) | ~configure_engine_param_int.merge_mask[i] ;
             assign response_engine_in_int[i].valid                 = fifo_response_engine_in_signals_out_int[i].valid;
             assign response_engine_in_int[i].payload               = fifo_response_engine_in_dout[i];
 
@@ -359,7 +359,8 @@ module engine_merge_data_generator #(parameter
             ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg   <= 1'b0;
                 configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= configure_memory_reg.payload.param;
+                if(configure_memory_reg.valid)
+                    configure_engine_param_int <= configure_memory_reg.payload.param;
             end
             ENGINE_MERGE_DATA_GEN_START_TRANS : begin
                 done_int_reg                 <= 1'b0;
