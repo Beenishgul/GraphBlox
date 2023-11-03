@@ -342,7 +342,6 @@ module engine_merge_data_generator #(parameter
                 configure_engine_param_valid          <= 1'b0;
                 configure_engine_param_int.merge_mask <= ~0;
                 configure_engine_param_int.merge_type <= 0;
-
             end
             ENGINE_MERGE_DATA_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
