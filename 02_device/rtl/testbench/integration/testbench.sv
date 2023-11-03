@@ -1116,6 +1116,42 @@ module __KERNEL___testbench ();
         graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
         // --------------------------------------------------------------------------------------
 
+                // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 8-BUFFER pointer
+        graph.overlay_program[0+5][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
+        // --------------------------------------------------------------------------------------
+
+        // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 9-BUFFER pointer
+        graph.overlay_program[0+5][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
+        // --------------------------------------------------------------------------------------
+
+                // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 8-BUFFER pointer
+        graph.overlay_program[2+5][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        // --------------------------------------------------------------------------------------
+
+        // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 9-BUFFER pointer
+        graph.overlay_program[2+5][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+        // --------------------------------------------------------------------------------------
+
+                // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 8-BUFFER pointer
+        graph.overlay_program[4+5][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
+        // --------------------------------------------------------------------------------------
+
+        // --------------------------------------------------------------------------------------
+        // param.array_pointer
+        // 9-BUFFER pointer
+        graph.overlay_program[4+5][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
+        // --------------------------------------------------------------------------------------
+
         realcount = 0;
 
         // $display("MSG: Starting graph.mem512_vertex_count: %0d\n", graph.mem512_vertex_count);
