@@ -213,7 +213,7 @@ module arbiter_1_to_N_response #(
 
   // Pop
   assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_int_rd_en;
-  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
+  assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & fifo_response_signals_in_int_rd_en;
   assign fifo_response_dout_int.payload     = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
