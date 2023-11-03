@@ -11,8 +11,14 @@
     },
     "bundle": {
         "0": [
-            ["ENGINE_CSR"       , "ENGINE_MERGE_DATA(W:1)"],
-            ["ENGINE_CSR(C:0)" ]
+            ["ENGINE_CSR"       , "ENGINE_MERGE_DATA(W:2)"],
+            ["ENGINE_CSR(C:0)"  , "ENGINE_MERGE_DATA(W:1)"],
+            ["ENGINE_CSR(C:0,1)" ]
+        ],
+        "1": [
+            ["ENGINE_CSR"       , "ENGINE_MERGE_DATA(W:2)"],
+            ["ENGINE_CSR(C:0)"  , "ENGINE_MERGE_DATA(W:1)"],
+            ["ENGINE_CSR(C:0,1)" ]
         ]
     }
 }
