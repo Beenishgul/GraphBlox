@@ -159,8 +159,8 @@ package PKG_ENGINE;
     } engine_merge_data_generator_state;
 
     typedef struct packed{
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] merge_mask;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] merge_type;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] merge_mask;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] merge_type;
     } MergeDataConfigurationParameters;
 
     typedef struct packed{

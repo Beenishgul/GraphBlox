@@ -172,11 +172,11 @@ module engine_merge_data_configure_memory #(parameter
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
                     (ENGINE_SEQ_MIN+0) : begin
-                        configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
                         configure_memory_valid_reg[0]                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+1) : begin
-                        configure_memory_reg.payload.param.merge_type <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_reg.payload.param.merge_type <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
                         configure_memory_valid_reg[1]                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+2) : begin
