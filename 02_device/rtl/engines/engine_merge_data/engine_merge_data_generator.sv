@@ -336,11 +336,13 @@ module engine_merge_data_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_MERGE_DATA_GEN_RESET : begin
-                done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b1;
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= 0;
+                done_int_reg                          <= 1'b1;
+                done_out_reg                          <= 1'b1;
+                configure_memory_setup_reg            <= 1'b0;
+                configure_engine_param_valid          <= 1'b0;
+                configure_engine_param_int.merge_mask <= ~0;
+                configure_engine_param_int.merge_type <= 0;
+
             end
             ENGINE_MERGE_DATA_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
@@ -391,8 +393,11 @@ module engine_merge_data_generator #(parameter
                 done_out_reg <= 1'b1;
             end
             ENGINE_MERGE_DATA_GEN_DONE : begin
-                done_int_reg <= 1'b1;
-                done_out_reg <= 1'b1;
+                done_int_reg                          <= 1'b1;
+                done_out_reg                          <= 1'b1;
+                configure_engine_param_valid          <= 1'b0;
+                configure_engine_param_int.merge_mask <= ~0;
+                configure_engine_param_int.merge_type <= 0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
