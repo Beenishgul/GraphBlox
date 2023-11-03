@@ -229,7 +229,7 @@ module engine_template #(
     assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
     generate
         for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
-            assign engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en;
+            assign engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
             assign request_engine_out[i+1]                  = engine_cast_arbiter_1_to_N_request_out[i];
             assign fifo_request_engine_out_signals_out[i+1] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
         end
