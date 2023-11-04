@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_merge_data_configure_memory.sv
+// File   : engine_alu_ops_configure_memory.sv
 // Create : 2023-07-17 15:02:02
 // Revise : 2023-08-28 15:42:14
 // Editor : sublime text4, tab size (4)
@@ -20,7 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_merge_data_configure_memory #(parameter
+module engine_alu_ops_configure_memory #(parameter
     ID_CU            = 0                                ,
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
@@ -38,7 +38,7 @@ module engine_merge_data_configure_memory #(parameter
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MergeDataConfiguration configure_memory_out               ,
+    output ALUOConfiguration      configure_memory_out               ,
     input  FIFOStateSignalsInput  fifo_configure_memory_signals_in   ,
     output FIFOStateSignalsOutput fifo_configure_memory_signals_out  ,
     output logic                  fifo_setup_signal
@@ -52,7 +52,7 @@ module engine_merge_data_configure_memory #(parameter
 
     MemoryPacket                      response_memory_in_reg                          ;
     MemoryPacketMeta                  configure_memory_meta_int                       ;
-    MergeDataConfiguration            configure_memory_reg                            ;
+    ALUOConfiguration                 configure_memory_reg                            ;
     logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
     logic                             configure_memory_valid_int                      ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
@@ -73,13 +73,13 @@ module engine_merge_data_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    MergeDataConfigurationPayload fifo_configure_memory_din             ;
-    MergeDataConfiguration        fifo_configure_memory_dout_int        ;
-    MergeDataConfigurationPayload fifo_configure_memory_dout            ;
-    FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg  ;
-    FIFOStateSignalsInput         fifo_configure_memory_signals_in_int  ;
-    FIFOStateSignalsOutput        fifo_configure_memory_signals_out_int ;
-    logic                         fifo_configure_memory_setup_signal_int;
+    ALUOConfigurationPayload fifo_configure_memory_din             ;
+    ALUOConfiguration        fifo_configure_memory_dout_int        ;
+    ALUOConfigurationPayload fifo_configure_memory_dout            ;
+    FIFOStateSignalsInput    fifo_configure_memory_signals_in_reg  ;
+    FIFOStateSignalsInput    fifo_configure_memory_signals_in_int  ;
+    FIFOStateSignalsOutput   fifo_configure_memory_signals_out_int ;
+    logic                    fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -174,27 +174,32 @@ module engine_merge_data_configure_memory #(parameter
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
                     (ENGINE_SEQ_MIN+0) : begin
-                        configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
-                        configure_memory_valid_reg[0]                 <= 1'b1  ;
+                        configure_memory_reg.payload.param.alu_operation <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                        configure_memory_valid_reg[0]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+1) : begin
-                        configure_memory_reg.payload.param.merge_type <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
-                        configure_memory_valid_reg[1]                 <= 1'b1  ;
+                        configure_memory_reg.payload.param.data.field[0] <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_valid_reg[1]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+2) : begin
-                        configure_memory_valid_reg[2] <= 1'b1  ;
+                        configure_memory_reg.payload.param.data.field[1] <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_valid_reg[2]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+3) : begin
-                        configure_memory_valid_reg[3] <= 1'b1  ;
+                        configure_memory_reg.payload.param.data.field[2] <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_valid_reg[3]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+4) : begin
-                        configure_memory_valid_reg[4] <= 1'b1  ;
+                        configure_memory_reg.payload.param.data.field[3] <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_valid_reg[4]                    <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+5) : begin
-                        configure_memory_valid_reg[5] <= 1'b1  ;
+                        configure_memory_reg.payload.param.alu_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                        configure_memory_valid_reg[5]               <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_valid_reg[6] <= 1'b1  ;
+                        configure_memory_reg.payload.param.field_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                        configure_memory_valid_reg[6]                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
                         configure_memory_valid_reg[7] <= 1'b1  ;
@@ -293,10 +298,10 @@ module engine_merge_data_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                    ),
-        .WRITE_DATA_WIDTH($bits(MergeDataConfigurationPayload)),
-        .READ_DATA_WIDTH ($bits(MergeDataConfigurationPayload)),
-        .PROG_THRESH     (PROG_THRESH                         )
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH               ),
+        .WRITE_DATA_WIDTH($bits(ALUOConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(ALUOConfigurationPayload)),
+        .PROG_THRESH     (PROG_THRESH                    )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
@@ -312,4 +317,4 @@ module engine_merge_data_configure_memory #(parameter
         .rd_rst_busy(fifo_configure_memory_signals_out_int.rd_rst_busy)
     );
 
-endmodule : engine_merge_data_configure_memory
+endmodule : engine_alu_ops_configure_memory
