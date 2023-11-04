@@ -404,11 +404,11 @@ module engine_forward_data_generator #(parameter
             generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.from     <= response_engine_in_int.payload.meta.from;
-                generator_engine_request_engine_reg.payload.meta.to       <= response_engine_in_int.payload.meta.to;
-                generator_engine_request_engine_reg.payload.meta.address  <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data          <= response_engine_in_int.payload.data;
+                generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
+                generator_engine_request_engine_reg.payload.meta.route.to   <= response_engine_in_int.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
+                generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
+                generator_engine_request_engine_reg.payload.data            <= response_engine_in_int.payload.data;
 
                 if (response_engine_in_int.payload.meta.route.forward_value >= configure_engine_param_int.forward_value) begin
                     generator_engine_request_engine_reg.payload.meta.route.forward_value <= response_engine_in_int.payload.meta.route.forward_value - configure_engine_param_int.forward_value;
@@ -423,8 +423,7 @@ module engine_forward_data_generator #(parameter
 
                 forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.forward_value);
             end else begin
-                generator_engine_request_engine_reg.payload.meta       <= generator_engine_request_engine_reg.payload.meta ;
-                generator_engine_request_engine_reg.payload.data.field <= generator_engine_request_engine_reg.payload.data.field;
+                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
                 if(forward_data_response_engine_in_valid_flag)
                     forward_data_response_engine_in_valid_reg <= 1'b0;
                 else
