@@ -173,6 +173,40 @@ package PKG_ENGINE;
         MergeDataConfigurationPayload payload;
     } MergeDataConfiguration;
 
+// Forward\_Data\_Engine
+// Forward the data in a lane it with other data from other lanes
+// Keeps the original meta data for that lane
+
+    typedef enum logic[12:0] {
+        ENGINE_FORWARD_DATA_GEN_RESET,
+        ENGINE_FORWARD_DATA_GEN_IDLE,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY,
+        ENGINE_FORWARD_DATA_GEN_START_TRANS,
+        ENGINE_FORWARD_DATA_GEN_START,
+        ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS,
+        ENGINE_FORWARD_DATA_GEN_BUSY,
+        ENGINE_FORWARD_DATA_GEN_BUSY_TRANS,
+        ENGINE_FORWARD_DATA_GEN_PAUSE,
+        ENGINE_FORWARD_DATA_GEN_DONE_TRANS,
+        ENGINE_FORWARD_DATA_GEN_DONE
+    } engine_forward_data_generator_state;
+
+    typedef struct packed{
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] forward_value;
+    } ForwardDataConfigurationParameters;
+
+    typedef struct packed{
+        ForwardDataConfigurationParameters param;
+        MemoryPacketMeta                   meta ;
+    } ForwardDataConfigurationPayload;
+
+    typedef struct packed{
+        logic                           valid  ;
+        ForwardDataConfigurationPayload payload;
+    } ForwardDataConfiguration;
+
 // Read\_Write\_Engine
 // --------------------
 

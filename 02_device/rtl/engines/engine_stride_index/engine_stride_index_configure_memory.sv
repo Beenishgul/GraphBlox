@@ -139,12 +139,14 @@ module engine_stride_index_configure_memory #(parameter
         configure_memory_meta_int.route.from.id_engine    = ID_ENGINE;
         configure_memory_meta_int.route.from.id_module    = 1;
         configure_memory_meta_int.route.from.id_buffer    = 0;
+        configure_memory_meta_int.route.from.id_forward   = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.route.to.id_cu          = ID_CU;
         configure_memory_meta_int.route.to.id_bundle      = ID_BUNDLE;
         configure_memory_meta_int.route.to.id_lane        = ID_LANE;
         configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
+        configure_memory_meta_int.route.to.id_forward     = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
         configure_memory_meta_int.address.shift.amount    = 0;
