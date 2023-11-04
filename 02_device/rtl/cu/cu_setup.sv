@@ -282,14 +282,14 @@ module cu_setup #(
         configuration_comb.payload.meta.route.from.id_engine    = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.from.id_module    = 1;
         configuration_comb.payload.meta.route.from.id_buffer    = 0;
-        configuration_comb.payload.meta.route.from.id_forward   = CU_BUNDLE_COUNT_WIDTH_BITS;
+        configuration_comb.payload.meta.route.forward_value     = CU_BUNDLE_COUNT_WIDTH_BITS;
         configuration_comb.payload.meta.route.to.id_cu          = ID_CU;
         configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_lane        = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_engine      = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
         configuration_comb.payload.meta.route.to.id_module      = 1; // routes to memory configuration modules in engines
         configuration_comb.payload.meta.route.to.id_buffer      = 0;
-        configuration_comb.payload.meta.route.to.id_forward     = CU_BUNDLE_COUNT_WIDTH_BITS;
+        configuration_comb.payload.meta.route.forward_value     = CU_BUNDLE_COUNT_WIDTH_BITS;
         configuration_comb.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
         configuration_comb.payload.meta.address.offset          = 0;
         configuration_comb.payload.meta.address.shift.amount    = $clog2(CACHE_FRONTEND_DATA_W/8);

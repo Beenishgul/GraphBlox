@@ -21,18 +21,18 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_forward_data_generator #(parameter
-    ID_CU                = 0                    ,
-    ID_BUNDLE            = 0                    ,
-    ID_LANE              = 0                    ,
-    ID_ENGINE            = 0                    ,
-    ID_MODULE            = 0                    ,
-    ENGINE_CAST_WIDTH    = 0                    ,
-    ENGINE_MERGE_WIDTH   = 0                    ,
-    ENGINES_CONFIG       = 0                    ,
-    FIFO_WRITE_DEPTH     = 16                   ,
-    PROG_THRESH          = 8                    ,
-    PIPELINE_STAGES      = 2                    ,
-    COUNTER_WIDTH        = CACHE_FRONTEND_ADDR_W
+    ID_CU              = 0                    ,
+    ID_BUNDLE          = 0                    ,
+    ID_LANE            = 0                    ,
+    ID_ENGINE          = 0                    ,
+    ID_MODULE          = 0                    ,
+    ENGINE_CAST_WIDTH  = 0                    ,
+    ENGINE_MERGE_WIDTH = 0                    ,
+    ENGINES_CONFIG     = 0                    ,
+    FIFO_WRITE_DEPTH   = 16                   ,
+    PROG_THRESH        = 8                    ,
+    PIPELINE_STAGES    = 2                    ,
+    COUNTER_WIDTH      = CACHE_FRONTEND_ADDR_W
 ) (
     // System Signals
     input  logic                    ap_clk                             ,
@@ -404,9 +404,24 @@ module engine_forward_data_generator #(parameter
             generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta       <= response_engine_in_int.payload.meta;
-                generator_engine_request_engine_reg.payload.data.field <= response_engine_in_int.payload.data.field;
-                forward_data_response_engine_in_valid_reg              <= (|response_engine_in_int.payload.meta.route.to.id_forward);
+                generator_engine_request_engine_reg.payload.meta.from     <= response_engine_in_int.payload.meta.from;
+                generator_engine_request_engine_reg.payload.meta.to       <= response_engine_in_int.payload.meta.to;
+                generator_engine_request_engine_reg.payload.meta.address  <= response_engine_in_int.payload.meta.address;
+                generator_engine_request_engine_reg.payload.meta.subclass <= response_engine_in_int.payload.meta.subclass;
+                generator_engine_request_engine_reg.payload.data          <= response_engine_in_int.payload.data;
+
+                if (response_engine_in_int.payload.meta.route.forward_value >= configure_engine_param_int.forward_value) begin
+                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= response_engine_in_int.payload.meta.route.forward_value - configure_engine_param_int.forward_value;
+                end else begin
+                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= 0;
+                end
+                if (response_engine_in_int.payload.meta.route.forward_value >= configure_engine_param_int.forward_value) begin
+                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= response_engine_in_int.payload.meta.route.forward_value - configure_engine_param_int.forward_value;
+                end else begin
+                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= 0;
+                end
+
+                forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.forward_value);
             end else begin
                 generator_engine_request_engine_reg.payload.meta       <= generator_engine_request_engine_reg.payload.meta ;
                 generator_engine_request_engine_reg.payload.data.field <= generator_engine_request_engine_reg.payload.data.field;
@@ -415,19 +430,6 @@ module engine_forward_data_generator #(parameter
                 else
                     forward_data_response_engine_in_valid_reg <= forward_data_response_engine_in_valid_reg;
             end
-        end
-    end
-
-    always_comb begin
-        if (response_engine_in_int.payload.meta.route.from.id_forward >= configure_engine_param_int.forward_value) begin
-            response_engine_in_int.payload.meta.route.from.id_forward = response_engine_in_int.payload.meta.route.from.id_forward - configure_engine_param_int.forward_value;
-        end else begin
-            response_engine_in_int.payload.meta.route.from.id_forward <= 0;
-        end
-        if (response_engine_in_int.payload.meta.route.to.id_forward >= configure_engine_param_int.forward_value) begin
-            response_engine_in_int.payload.meta.route.to.id_forward = response_engine_in_int.payload.meta.route.to.id_forward - configure_engine_param_int.forward_value;
-        end else begin
-            response_engine_in_int.payload.meta.route.to.id_forward <= 0;
         end
     end
 

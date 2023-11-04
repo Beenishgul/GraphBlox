@@ -140,14 +140,13 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_meta_int.route.from.id_engine    = 1'b1 << ID_ENGINE;
         configure_memory_meta_int.route.from.id_module    = 1'b1 << ID_MODULE;
         configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.from.id_forward   = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.route.to.id_cu          = 0;
         configure_memory_meta_int.route.to.id_bundle      = 0;
         configure_memory_meta_int.route.to.id_lane        = 0;
         configure_memory_meta_int.route.to.id_engine      = 0;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
-        configure_memory_meta_int.route.to.id_forward     = CU_BUNDLE_COUNT_WIDTH_BITS;
+        configure_memory_meta_int.route.forward_value     = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
         configure_memory_meta_int.address.shift.amount    = 0;
