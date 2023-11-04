@@ -27,7 +27,7 @@ module engine_forward_data_generator #(parameter
     ID_ENGINE            = 0                    ,
     ID_MODULE            = 0                    ,
     ENGINE_CAST_WIDTH    = 0                    ,
-    ENGINE_FORWARD_WIDTH = 0                    ,
+    ENGINE_MERGE_WIDTH   = 0                    ,
     ENGINES_CONFIG       = 0                    ,
     FIFO_WRITE_DEPTH     = 16                   ,
     PROG_THRESH          = 8                    ,
