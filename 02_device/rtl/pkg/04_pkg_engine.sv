@@ -207,6 +207,42 @@ package PKG_ENGINE;
         ForwardDataConfigurationPayload payload;
     } ForwardDataConfiguration;
 
+// ALU\_Ops\_Engine
+// Forward the data in a lane and operate
+// Keeps the original meta data for that lane
+
+    typedef enum logic[12:0] {
+        ENGINE_ALU_OPS_GEN_RESET,
+        ENGINE_ALU_OPS_GEN_IDLE,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY,
+        ENGINE_ALU_OPS_GEN_START_TRANS,
+        ENGINE_ALU_OPS_GEN_START,
+        ENGINE_ALU_OPS_GEN_PAUSE_TRANS,
+        ENGINE_ALU_OPS_GEN_BUSY,
+        ENGINE_ALU_OPS_GEN_BUSY_TRANS,
+        ENGINE_ALU_OPS_GEN_PAUSE,
+        ENGINE_ALU_OPS_GEN_DONE_TRANS,
+        ENGINE_ALU_OPS_GEN_DONE
+    } engine_alu_ops_generator_state;
+
+    typedef struct packed{
+        type_ALU_operation                      alu_operation;
+        MemoryPacketData                        data         ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] alu_mask     ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] field_mask   ;
+    } ALUOpsConfigurationParameters;
+
+    typedef struct packed{
+        ALUOpsConfigurationParameters param;
+        MemoryPacketMeta              meta ;
+    } ALUOpsConfigurationPayload;
+
+    typedef struct packed{
+        logic                      valid  ;
+        ALUOpsConfigurationPayload payload;
+    } ALUOpsConfiguration;
 // Read\_Write\_Engine
 // --------------------
 
