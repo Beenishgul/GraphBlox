@@ -406,7 +406,7 @@ module engine_forward_data_generator #(parameter
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 generator_engine_request_engine_reg.payload.meta       <= response_engine_in_int.payload.meta;
                 generator_engine_request_engine_reg.payload.data.field <= response_engine_in_int.payload.data.field;
-                forward_data_response_engine_in_valid_reg              <= 1'b1;
+                forward_data_response_engine_in_valid_reg              <= (|response_engine_in_int.payload.meta.route.to.id_forward);
             end else begin
                 generator_engine_request_engine_reg.payload.meta       <= generator_engine_request_engine_reg.payload.meta ;
                 generator_engine_request_engine_reg.payload.data.field <= generator_engine_request_engine_reg.payload.data.field;

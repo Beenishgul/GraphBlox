@@ -167,7 +167,7 @@ module bundle_lanes #(
     FIFOStateSignalsOutput lanes_fifo_request_memory_out_signals_out[NUM_LANES-1:0];
     logic                  lanes_fifo_setup_signal                  [NUM_LANES-1:0];
     logic                  lanes_done_out                           [NUM_LANES-1:0];
-    
+
     logic [NUM_LANES-1:0] lanes_fifo_setup_signal_reg;
     logic [NUM_LANES-1:0] lanes_done_out_reg         ;
 
@@ -496,8 +496,7 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
         .NUM_MEMORY_REQUESTOR(NUM_LANES),
-        .ID_LEVEL            (2        ),
-        .ID_BUNDLE           (ID_BUNDLE),
+        .ID_LEVEL            (2        )
     ) inst_lane_arbiter_1_to_N_engine_response_in (
         .ap_clk                   (ap_clk                                             ),
         .areset                   (areset_lane_arbiter_1_to_N_lanes                   ),
@@ -571,7 +570,7 @@ module bundle_lanes #(
     generate
         for (i=0; i< NUM_LANES; i++) begin : generate_lane_template
             lane_template #(
-            `include"set_lane_parameters.vh"
+                `include"set_lane_parameters.vh"
             ) inst_lane_template (
                 .ap_clk                             (ap_clk                                                                                    ),
                 .areset                             (areset_lane[i]                                                                            ),
@@ -620,15 +619,15 @@ module bundle_lanes #(
                     automatic integer ENGINES_COUNT_ARRAY_L = ENGINES_COUNT_ARRAY[lane_cast_l];
 
                     if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0 && lane_cast_l != lane_merge_l) begin
-       
+
                         for (int engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY_L; engine_idx++) begin
                             automatic integer engine_idx_l = engine_idx;
                             automatic integer LANES_CONFIG_CAST_WIDTH_ARRAY_L = LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l];
-                            
+
                             for (int cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY_L; cast_idx++) begin
                                 automatic integer cast_idx_l = cast_idx;
                                 automatic integer LANES_CONFIG_MERGE_CONNECT_ARRAY_L = LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][engine_idx_l][cast_idx_l];
-                                
+
                                 if(LANES_CONFIG_MERGE_CONNECT_ARRAY_L == lane_merge_l) begin
                                     merge_count++;
                                     cast_count[lane_cast_l]++;
