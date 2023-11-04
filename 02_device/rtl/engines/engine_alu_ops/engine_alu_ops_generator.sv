@@ -329,14 +329,18 @@ module engine_alu_ops_generator #(parameter
         endcase
     end // always_comb
 
+
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_ALU_OPS_GEN_RESET : begin
-                done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b1;
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= 0;
+                done_int_reg                             <= 1'b1;
+                done_out_reg                             <= 1'b1;
+                configure_memory_setup_reg               <= 1'b0;
+                configure_engine_param_valid             <= 1'b0;
+                configure_engine_param_int.alu_operation <= ALU_NOP;
+                configure_engine_param_int.data          <= 0;
+                configure_engine_param_int.alu_mask      <= 0;
+                configure_engine_param_int.field_mask    <= 0;
             end
             ENGINE_ALU_OPS_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
@@ -388,10 +392,13 @@ module engine_alu_ops_generator #(parameter
                 done_out_reg <= 1'b1;
             end
             ENGINE_ALU_OPS_GEN_DONE : begin
-                done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b1;
-                configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= 0;
+                done_int_reg                             <= 1'b1;
+                done_out_reg                             <= 1'b1;
+                configure_engine_param_valid             <= 1'b0;
+                configure_engine_param_int.alu_operation <= ALU_NOP;
+                configure_engine_param_int.data          <= 0;
+                configure_engine_param_int.alu_mask      <= 0;
+                configure_engine_param_int.field_mask    <= 0;
             end
         endcase
     end // always_ff @(posedge ap_clk)

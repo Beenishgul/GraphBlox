@@ -38,7 +38,7 @@ module engine_alu_ops_configure_memory #(parameter
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output ALUOConfiguration      configure_memory_out               ,
+    output ALUOpsConfiguration    configure_memory_out               ,
     input  FIFOStateSignalsInput  fifo_configure_memory_signals_in   ,
     output FIFOStateSignalsOutput fifo_configure_memory_signals_out  ,
     output logic                  fifo_setup_signal
@@ -52,7 +52,7 @@ module engine_alu_ops_configure_memory #(parameter
 
     MemoryPacket                      response_memory_in_reg                          ;
     MemoryPacketMeta                  configure_memory_meta_int                       ;
-    ALUOConfiguration                 configure_memory_reg                            ;
+    ALUOpsConfiguration               configure_memory_reg                            ;
     logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
     logic                             configure_memory_valid_int                      ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
@@ -73,13 +73,13 @@ module engine_alu_ops_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    ALUOConfigurationPayload fifo_configure_memory_din             ;
-    ALUOConfiguration        fifo_configure_memory_dout_int        ;
-    ALUOConfigurationPayload fifo_configure_memory_dout            ;
-    FIFOStateSignalsInput    fifo_configure_memory_signals_in_reg  ;
-    FIFOStateSignalsInput    fifo_configure_memory_signals_in_int  ;
-    FIFOStateSignalsOutput   fifo_configure_memory_signals_out_int ;
-    logic                    fifo_configure_memory_setup_signal_int;
+    ALUOpsConfigurationPayload fifo_configure_memory_din             ;
+    ALUOpsConfiguration        fifo_configure_memory_dout_int        ;
+    ALUOpsConfigurationPayload fifo_configure_memory_dout            ;
+    FIFOStateSignalsInput      fifo_configure_memory_signals_in_reg  ;
+    FIFOStateSignalsInput      fifo_configure_memory_signals_in_int  ;
+    FIFOStateSignalsOutput     fifo_configure_memory_signals_out_int ;
+    logic                      fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -298,10 +298,10 @@ module engine_alu_ops_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH               ),
-        .WRITE_DATA_WIDTH($bits(ALUOConfigurationPayload)),
-        .READ_DATA_WIDTH ($bits(ALUOConfigurationPayload)),
-        .PROG_THRESH     (PROG_THRESH                    )
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                 ),
+        .WRITE_DATA_WIDTH($bits(ALUOpsConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(ALUOpsConfigurationPayload)),
+        .PROG_THRESH     (PROG_THRESH                      )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),

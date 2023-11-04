@@ -183,7 +183,6 @@ module engine_alu_ops #(parameter
         response_memory_in_reg.payload <= response_memory_in.payload;
     end
 
-
     always_ff @(posedge ap_clk) begin
         if (areset_csr_engine) begin
             fifo_response_engine_in_signals_in_reg <= 0;
@@ -198,7 +197,6 @@ module engine_alu_ops #(parameter
     always_ff @(posedge ap_clk) begin
         response_engine_in_reg.payload <= response_engine_in.payload;
     end
-
 
 // --------------------------------------------------------------------------------------
 // Drive output signals
