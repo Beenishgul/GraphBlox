@@ -337,7 +337,7 @@ module engine_alu_ops_generator #(parameter
                 done_out_reg                             <= 1'b1;
                 configure_memory_setup_reg               <= 1'b0;
                 configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.alu_operation <= ALU_NOP;
+                configure_engine_param_int.alu_operation <= type_ALU_operation'(ALU_NOP);
                 configure_engine_param_int.data          <= 0;
                 configure_engine_param_int.alu_mask      <= 0;
                 configure_engine_param_int.field_mask    <= 0;
@@ -395,7 +395,7 @@ module engine_alu_ops_generator #(parameter
                 done_int_reg                             <= 1'b1;
                 done_out_reg                             <= 1'b1;
                 configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.alu_operation <= ALU_NOP;
+                configure_engine_param_int.alu_operation <= type_ALU_operation'(ALU_NOP);
                 configure_engine_param_int.data          <= 0;
                 configure_engine_param_int.alu_mask      <= 0;
                 configure_engine_param_int.field_mask    <= 0;
