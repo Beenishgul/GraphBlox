@@ -249,9 +249,13 @@ module arbiter_1_to_N_request #(
             end
           end else begin
             for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-              if((i == (NUM_MEMORY_REQUESTOR-1)) && fifo_forward_signals_in_int_rd_en) begin
-                request_out[i].valid <= fifo_request_dout_int.valid;
-              end else begin
+              if(fifo_forward_signals_in_int_rd_en) begin
+                if((i == (NUM_MEMORY_REQUESTOR-1))) begin
+                  request_out[i].valid <= fifo_request_dout_int.valid;
+                end else  begin
+                  request_out[i].valid <= 1'b0;
+                end
+              end else  begin
                 request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_lane[i] & fifo_request_dout_int.valid;
               end
             end
