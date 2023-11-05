@@ -55,6 +55,7 @@ module engine_alu_ops_generator #(parameter
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_generator;
+    logic areset_kernel   ;
     logic areset_counter  ;
     logic areset_fifo     ;
 
@@ -115,6 +116,7 @@ module engine_alu_ops_generator #(parameter
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
+        areset_kernel    <= areset;
         areset_generator <= areset;
         areset_counter   <= areset;
         areset_fifo      <= areset;
@@ -166,24 +168,20 @@ module engine_alu_ops_generator #(parameter
         end
     end
 
-    generate
-        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_response_engine_in_reg
-            always_ff @(posedge ap_clk) begin
-                if (areset_generator) begin
-                    fifo_response_engine_in_signals_in_reg <= 0;
-                    response_engine_in_reg.valid           <= 1'b0;
-                end
-                else begin
-                    fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
-                    response_engine_in_reg.valid           <= response_engine_in.valid;
-                end
-            end
-
-            always_ff @(posedge ap_clk) begin
-                response_engine_in_reg.payload <= response_engine_in.payload;
-            end
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            fifo_response_engine_in_signals_in_reg <= 0;
+            response_engine_in_reg.valid           <= 1'b0;
         end
-    endgenerate
+        else begin
+            fifo_response_engine_in_signals_in_reg <= fifo_response_engine_in_signals_in;
+            response_engine_in_reg.valid           <= response_engine_in.valid;
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        response_engine_in_reg.payload <= response_engine_in.payload;
+    end
 
 // --------------------------------------------------------------------------------------
 // Drive output signals
@@ -207,13 +205,11 @@ module engine_alu_ops_generator #(parameter
         request_engine_out.payload <= request_engine_out_int.payload;
     end
 
-    generate
-        for (i=0; i<= ENGINE_MERGE_WIDTH; i++) begin : generate_fifo_response_engine_in_signals_out
-            always_ff @(posedge ap_clk) begin
-                fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
-            end
-        end
-    endgenerate
+
+    always_ff @(posedge ap_clk) begin
+        fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
+    end
+
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
@@ -329,18 +325,14 @@ module engine_alu_ops_generator #(parameter
         endcase
     end // always_comb
 
-
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_ALU_OPS_GEN_RESET : begin
-                done_int_reg                             <= 1'b1;
-                done_out_reg                             <= 1'b1;
-                configure_memory_setup_reg               <= 1'b0;
-                configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.alu_operation <= type_ALU_operation'(ALU_NOP);
-                configure_engine_param_int.data          <= 0;
-                configure_engine_param_int.alu_mask      <= 0;
-                configure_engine_param_int.field_mask    <= 0;
+                done_int_reg                 <= 1'b1;
+                done_out_reg                 <= 1'b1;
+                configure_memory_setup_reg   <= 1'b0;
+                configure_engine_param_valid <= 1'b0;
+                configure_engine_param_int   <= 0;
             end
             ENGINE_ALU_OPS_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
@@ -392,13 +384,10 @@ module engine_alu_ops_generator #(parameter
                 done_out_reg <= 1'b1;
             end
             ENGINE_ALU_OPS_GEN_DONE : begin
-                done_int_reg                             <= 1'b1;
-                done_out_reg                             <= 1'b1;
-                configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.alu_operation <= type_ALU_operation'(ALU_NOP);
-                configure_engine_param_int.data          <= 0;
-                configure_engine_param_int.alu_mask      <= 0;
-                configure_engine_param_int.field_mask    <= 0;
+                done_int_reg                 <= 1'b1;
+                done_out_reg                 <= 1'b1;
+                configure_engine_param_valid <= 1'b0;
+                configure_engine_param_int   <= 0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -416,20 +405,34 @@ module engine_alu_ops_generator #(parameter
         else begin
             generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
 
-            if(response_engine_in_int.valid & configure_engine_param_valid & configure_engine_param_int.merge_mask) begin
-                generator_engine_request_engine_reg.payload.meta       <= response_engine_in_int.payload.meta;
-                generator_engine_request_engine_reg.payload.data.field <= response_engine_in_int.payload.data.field;
-                alu_ops_response_engine_in_valid_reg                   <= 1'b1;
+            if(response_engine_in_int.valid & configure_engine_param_valid) begin
+                generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
+                generator_engine_request_engine_reg.payload.meta.route.to   <= response_engine_in_int.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
+                generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
+                generator_engine_request_engine_reg.payload.data            <= result;
+
+                alu_ops_response_engine_in_valid_reg <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload.meta       <= generator_engine_request_engine_reg.payload.meta ;
-                generator_engine_request_engine_reg.payload.data.field <= generator_engine_request_engine_reg.payload.data.field;
+                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
                 if(alu_ops_response_engine_in_valid_flag)
-                    alu_ops_response_engine_in_valid_reg <= 1'b0 | ~configure_engine_param_int.merge_mask;
+                    alu_ops_response_engine_in_valid_reg <= 1'b0;
                 else
                     alu_ops_response_engine_in_valid_reg <= alu_ops_response_engine_in_valid_reg;
             end
         end
     end
+
+    engine_alu_ops_kernel inst_engine_alu_ops_kernel (
+        .ap_clk             (ap_clk                                                        ),
+        .areset             (areset_kernel                                                 ),
+        .clear              (~(response_engine_in_int.valid & configure_engine_param_valid)),
+        .config_params_valid(configure_engine_param_valid                                  ),
+        .config_params      (configure_engine_param_valid                                  ),
+        .data_valid         (response_engine_in_int.valid                                  ),
+        .data               (response_engine_in_int.payload.data                           ),
+        .result             (generator_engine_request_engine_reg.payload.data              )
+    );
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engine requests MemoryPacket

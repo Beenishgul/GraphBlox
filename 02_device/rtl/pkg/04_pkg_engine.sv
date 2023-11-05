@@ -228,10 +228,11 @@ package PKG_ENGINE;
     } engine_alu_ops_generator_state;
 
     typedef struct packed{
-        type_ALU_operation                      alu_operation;
-        MemoryPacketData                        data         ;
-        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] alu_mask     ;
-        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] field_mask   ;
+        type_ALU_operation                      alu_operation      ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] alu_mask           ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] field_mask         ;
+        logic [      CACHE_FRONTEND_DATA_W-1:0] constant_value     ;
+        logic                                   operate_on_constant;
     } ALUOpsConfigurationParameters;
 
     typedef struct packed{

@@ -167,6 +167,8 @@ module engine_forward_data_configure_memory #(parameter
         end else begin
             configure_memory_reg.valid                       <= configure_memory_valid_int;
             configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.route.to       <= configure_memory_meta_int.route.to;
+            configure_memory_reg.payload.meta.route.hops     <= configure_memory_meta_int.route.hops;
             configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
             configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
 

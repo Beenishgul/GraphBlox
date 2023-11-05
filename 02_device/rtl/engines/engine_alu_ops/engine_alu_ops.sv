@@ -220,9 +220,11 @@ module engine_alu_ops #(parameter
         request_engine_out.payload          <= request_engine_out_int.payload;
     end
 
+
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
     end
+
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
@@ -329,7 +331,6 @@ module engine_alu_ops #(parameter
         .rd_rst_busy(fifo_request_engine_out_signals_out_int.rd_rst_busy)
     );
 
-
 // --------------------------------------------------------------------------------------
 // Configuration modules
 // --------------------------------------------------------------------------------------
@@ -367,6 +368,7 @@ module engine_alu_ops #(parameter
 // --------------------------------------------------------------------------------------
     assign generator_engine_configure_memory_in                       = configure_memory_out;
     assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
+
 
     assign generator_engine_response_engine_in                       = response_engine_in_int ;
     assign generator_engine_fifo_response_engine_in_signals_in.rd_en = 1'b1;
