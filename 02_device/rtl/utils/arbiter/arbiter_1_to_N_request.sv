@@ -36,7 +36,6 @@ module arbiter_1_to_N_request #(
   output logic                  fifo_setup_signal
 );
 
-  genvar i;
 // --------------------------------------------------------------------------------------
 // Cache request variables
 // --------------------------------------------------------------------------------------
@@ -93,43 +92,74 @@ module arbiter_1_to_N_request #(
     request_in_reg.payload <= request_in.payload;
   end
 
-  generate
-    for (i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_fifo_request_signals_in_reg_rd_en
-      always_ff @(posedge ap_clk ) begin
-        if(areset_control) begin
-          fifo_request_signals_in_reg_rd_en[i] <= 1'b0;
-        end else begin
-          fifo_request_signals_in_reg_rd_en[i] <= fifo_request_signals_in[i].rd_en;
-        end
+  always_ff @(posedge ap_clk ) begin
+    if(areset_control) begin
+      for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+        fifo_request_signals_in_reg_rd_en[i] <= 1'b0;
+      end
+    end else begin
+      for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+        fifo_request_signals_in_reg_rd_en[i] <= fifo_request_signals_in[i].rd_en;
       end
     end
+  end
 
-    for (i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_fifo_request_signals_in_reg_mask_int
-      case (ID_LEVEL)
-        0 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_cu[i]);
+  generate
+    case (ID_LEVEL)
+      0 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_cu[i]);
+          end
         end
-        1 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_bundle[i]);
+      end
+      1 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_bundle[i]);
+          end
         end
-        2 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_lane[i]);
+      end
+      2 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_lane[i]);
+          end
         end
-        3 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_engine[i]);
+      end
+      3 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_engine[i]);
+          end
         end
-        4 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_module[i]);
+      end
+      4 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_module[i]);
+          end
         end
-        5 : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & id_mask);
+      end
+      5 : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & id_mask);
+          end
         end
-        default : begin
-          assign fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_cu[i]);
+      end
+      default : begin
+        always_comb begin
+          for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+            fifo_request_signals_in_reg_mask_int[i] = (fifo_request_signals_in_reg_rd_en[i] & fifo_request_dout_int.payload.meta.route.to.id_cu[i]);
+          end
         end
-      endcase
-    end
+      end
+    endcase
+  endgenerate
 
+
+  generate
     case (ID_LEVEL)
       0 : begin
         assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
@@ -179,47 +209,116 @@ module arbiter_1_to_N_request #(
 // --------------------------------------------------------------------------------------
 //  Demux Logic and arbitration
 // --------------------------------------------------------------------------------------
+
+
   generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_request_out
-      always_ff @(posedge ap_clk ) begin
-        if(areset_control) begin
-          request_out[i].valid       <= 1'b0;
-        end else begin
-          case (ID_LEVEL)
-            0       : begin
+    case (ID_LEVEL)
+      0       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_cu[i]     & fifo_request_dout_int.valid;
             end
-            1       : begin
+          end
+        end
+
+      end
+      1       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_bundle[i] & fifo_request_dout_int.valid;
             end
-            2       : begin
+          end
+        end
+
+      end
+      2       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
               if((i == (NUM_MEMORY_REQUESTOR-1)) && fifo_forward_signals_in_int_rd_en) begin
                 request_out[i].valid <= fifo_request_dout_int.valid;
               end else begin
                 request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_lane[i] & fifo_request_dout_int.valid;
               end
             end
-            3       : begin
-              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_engine[i] & fifo_request_dout_int.valid;
-            end
-            4       : begin
-              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_module[i] & fifo_request_dout_int.valid;
-            end
-            5       : begin
-              request_out[i].valid <= id_mask[i] & fifo_request_dout_int.valid;
-            end
-            default : begin
-              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_cu[i] & fifo_request_dout_int.valid;
-            end
-          endcase
+          end
         end
       end
-
-      always_ff @(posedge ap_clk) begin
-        request_out[i].payload <= fifo_request_dout_int.payload;
+      3       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_engine[i] & fifo_request_dout_int.valid;
+            end
+          end
+        end
       end
-    end
+      4       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_module[i] & fifo_request_dout_int.valid;
+            end
+          end
+        end
+      end
+      5       : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid <= id_mask[i] & fifo_request_dout_int.valid;
+            end
+          end
+        end
+      end
+      default : begin
+        always_ff @(posedge ap_clk ) begin
+          if(areset_control) begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid       <= 1'b0;
+            end
+          end else begin
+            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+              request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_cu[i] & fifo_request_dout_int.valid;
+            end
+          end
+        end
+      end
+    endcase
   endgenerate
+
+  always_ff @(posedge ap_clk) begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      request_out[i].payload <= fifo_request_dout_int.payload;
+    end
+  end
+
 
 // --------------------------------------------------------------------------------------
 // FIFO memory request out fifo MemoryPacket
