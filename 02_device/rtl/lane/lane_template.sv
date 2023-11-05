@@ -44,7 +44,7 @@ module lane_template #(
     output logic                  done_out
 );
 
-    genvar i;
+    genvar j;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -505,27 +505,27 @@ module lane_template #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_ENGINES; i++) begin : generate_engine_template
+        for (j=0; j< NUM_ENGINES; j++) begin : generate_engine_template
             engine_template #(
                 `include"set_engine_parameters.vh"
             ) inst_engine_template (
                 .ap_clk                             (ap_clk                                                                                   ),
-                .areset                             (areset_engine[i]                                                                         ),
-                .descriptor_in                      (engines_descriptor_in[i]                                                                 ),
-                .response_engine_in                 (engines_response_merge_lane_in[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0]                 ),
-                .fifo_response_engine_in_signals_in (engines_fifo_response_merge_lane_in_signals_in[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0] ),
-                .fifo_response_engine_in_signals_out(engines_fifo_response_merge_lane_in_signals_out[i][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[i]:0]),
-                .response_memory_in                 (engines_response_memory_in[i]                                                            ),
-                .fifo_response_memory_in_signals_in (engines_fifo_response_memory_in_signals_in[i]                                            ),
-                .fifo_response_memory_in_signals_out(engines_fifo_response_memory_in_signals_out[i]                                           ),
-                .request_engine_out                 (engines_request_cast_lane_out[i][ENGINES_CONFIG_CAST_WIDTH_ARRAY[i]:0]                   ),
-                .fifo_request_engine_out_signals_in (engines_fifo_request_cast_lane_out_signals_in[i][ENGINES_CONFIG_CAST_WIDTH_ARRAY[i]:0]   ),
-                .fifo_request_engine_out_signals_out(engines_fifo_request_cast_lane_out_signals_out[i][ENGINES_CONFIG_CAST_WIDTH_ARRAY[i]:0]  ),
-                .request_memory_out                 (engines_request_memory_out[i]                                                            ),
-                .fifo_request_memory_out_signals_in (engines_fifo_request_memory_out_signals_in[i]                                            ),
-                .fifo_request_memory_out_signals_out(engines_fifo_request_memory_out_signals_out[i]                                           ),
-                .fifo_setup_signal                  (engines_fifo_setup_signal[i]                                                             ),
-                .done_out                           (engines_done_out[i]                                                                      )
+                .areset                             (areset_engine[j]                                                                         ),
+                .descriptor_in                      (engines_descriptor_in[j]                                                                 ),
+                .response_engine_in                 (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
+                .fifo_response_engine_in_signals_in (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
+                .fifo_response_engine_in_signals_out(engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
+                .response_memory_in                 (engines_response_memory_in[j]                                                            ),
+                .fifo_response_memory_in_signals_in (engines_fifo_response_memory_in_signals_in[j]                                            ),
+                .fifo_response_memory_in_signals_out(engines_fifo_response_memory_in_signals_out[j]                                           ),
+                .request_engine_out                 (engines_request_cast_lane_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]                   ),
+                .fifo_request_engine_out_signals_in (engines_fifo_request_cast_lane_out_signals_in[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]   ),
+                .fifo_request_engine_out_signals_out(engines_fifo_request_cast_lane_out_signals_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]  ),
+                .request_memory_out                 (engines_request_memory_out[j]                                                            ),
+                .fifo_request_memory_out_signals_in (engines_fifo_request_memory_out_signals_in[j]                                            ),
+                .fifo_request_memory_out_signals_out(engines_fifo_request_memory_out_signals_out[j]                                           ),
+                .fifo_setup_signal                  (engines_fifo_setup_signal[j]                                                             ),
+                .done_out                           (engines_done_out[j]                                                                      )
             );
         end
     endgenerate

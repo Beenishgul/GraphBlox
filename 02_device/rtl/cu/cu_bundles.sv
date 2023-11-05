@@ -38,7 +38,7 @@ module cu_bundles #(
     output logic                  done_out
 );
 
-    genvar i;
+    genvar j;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -423,27 +423,27 @@ module cu_bundles #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (i=0; i< NUM_BUNDLES; i++) begin : generate_bundle_lanes
+        for (j=0; j< NUM_BUNDLES; j++) begin : generate_bundle_lanes
             bundle_lanes #(
                 `include"set_bundle_parameters.vh"
             ) inst_bundle_lanes (
                 .ap_clk                             (ap_clk                                       ),
-                .areset                             (areset_bundle[i]                             ),
-                .descriptor_in                      (bundle_descriptor_in[i]                      ),
-                .response_lanes_in                  (bundle_response_lanes_in[i]                  ),
-                .fifo_response_lanes_in_signals_in  (bundle_fifo_response_lanes_in_signals_in[i]  ),
-                .fifo_response_lanes_in_signals_out (bundle_fifo_response_lanes_in_signals_out[i] ),
-                .response_memory_in                 (bundle_response_memory_in[i]                 ),
-                .fifo_response_memory_in_signals_in (bundle_fifo_response_memory_in_signals_in[i] ),
-                .fifo_response_memory_in_signals_out(bundle_fifo_response_memory_in_signals_out[i]),
-                .request_lanes_out                  (bundle_request_lanes_out[i]                  ),
-                .fifo_request_lanes_out_signals_in  (bundle_fifo_request_lanes_out_signals_in[i]  ),
-                .fifo_request_lanes_out_signals_out (bundle_fifo_request_lanes_out_signals_out[i] ),
-                .request_memory_out                 (bundle_request_memory_out[i]                 ),
-                .fifo_request_memory_out_signals_in (bundle_fifo_request_memory_out_signals_in[i] ),
-                .fifo_request_memory_out_signals_out(bundle_fifo_request_memory_out_signals_out[i]),
-                .fifo_setup_signal                  (bundle_fifo_setup_signal[i]                  ),
-                .done_out                           (bundle_done_out[i]                           )
+                .areset                             (areset_bundle[j]                             ),
+                .descriptor_in                      (bundle_descriptor_in[j]                      ),
+                .response_lanes_in                  (bundle_response_lanes_in[j]                  ),
+                .fifo_response_lanes_in_signals_in  (bundle_fifo_response_lanes_in_signals_in[j]  ),
+                .fifo_response_lanes_in_signals_out (bundle_fifo_response_lanes_in_signals_out[j] ),
+                .response_memory_in                 (bundle_response_memory_in[j]                 ),
+                .fifo_response_memory_in_signals_in (bundle_fifo_response_memory_in_signals_in[j] ),
+                .fifo_response_memory_in_signals_out(bundle_fifo_response_memory_in_signals_out[j]),
+                .request_lanes_out                  (bundle_request_lanes_out[j]                  ),
+                .fifo_request_lanes_out_signals_in  (bundle_fifo_request_lanes_out_signals_in[j]  ),
+                .fifo_request_lanes_out_signals_out (bundle_fifo_request_lanes_out_signals_out[j] ),
+                .request_memory_out                 (bundle_request_memory_out[j]                 ),
+                .fifo_request_memory_out_signals_in (bundle_fifo_request_memory_out_signals_in[j] ),
+                .fifo_request_memory_out_signals_out(bundle_fifo_request_memory_out_signals_out[j]),
+                .fifo_setup_signal                  (bundle_fifo_setup_signal[j]                  ),
+                .done_out                           (bundle_done_out[j]                           )
             );
         end
     endgenerate
