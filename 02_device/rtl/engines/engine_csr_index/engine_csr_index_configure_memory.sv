@@ -146,7 +146,7 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_meta_int.route.to.id_engine      = 0;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
-        configure_memory_meta_int.route.hops     = CU_BUNDLE_COUNT_WIDTH_BITS;
+        configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
         configure_memory_meta_int.address.shift.amount    = 0;
@@ -165,6 +165,7 @@ module engine_csr_index_configure_memory #(parameter
         end else begin
             configure_memory_reg.valid                       <= configure_memory_valid_int;
             configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.route.hops     <= configure_memory_meta_int.route.hops;
             configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
             configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
 
