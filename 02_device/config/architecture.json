@@ -6,7 +6,7 @@
         "ENGINE_STRIDE"              : 3,
         "ENGINE_FILTER"              : 4,
         "ENGINE_MERGE_DATA"          : 5,
-        "ENGINE_ALU"                 : 6,
+        "ENGINE_ALU_OPS"              : 6,
         "ENGINE_FORWARD_DATA"        : 7
     },
     "bundle": {
@@ -14,12 +14,14 @@
             ["ENGINE_CSR"       , "ENGINE_MERGE_DATA(W:2)"],
             ["ENGINE_CSR(C:0)"  , "ENGINE_MERGE_DATA(W:1)"],
             ["ENGINE_CSR(C:0,1)"   ],
+            ["ENGINE_ALU_OPS"      ],
             ["ENGINE_FORWARD_DATA" ]
         ],
         "1": [
             ["ENGINE_CSR"       , "ENGINE_MERGE_DATA(W:2)"],
             ["ENGINE_CSR(C:0)"  , "ENGINE_MERGE_DATA(W:1)"],
             ["ENGINE_CSR(C:0,1)"   ],
+            ["ENGINE_ALU_OPS"      ],
             ["ENGINE_FORWARD_DATA" ]
         ]
     }

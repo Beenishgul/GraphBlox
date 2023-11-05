@@ -95,9 +95,28 @@
 0x00000000 //  12 - Reserved 
 0x00000000 //  13 - Reserved 
 0x00000000 //  14 - Reserved 
+0x00000000 //  15 - Reserved
+// --------------------------------------------------------------------------------------
+// ENGINE 5 ENGINE_ALU_OPS
+// --------------------------------------------------------------------------------------
+0x00000001 //  0  - alu_operation
+0x00000003 //  1  - alu_mask
+0x00000000 //  2  - constant_value
+0x00000000 //  3  - operate_on_constant
+0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  5  - Reserved
+0x00000000 //  6  - Reserved
+0x00000000 //  7  - Reserved
+0x00000000 //  8  - Reserved
+0x00000000 //  9  - Reserved
+0x00000000 //  10 - Reserved
+0x00000000 //  11 - Reserved 
+0x00000000 //  12 - Reserved 
+0x00000000 //  13 - Reserved 
+0x00000000 //  14 - Reserved 
 0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// ENGINE 5 ENGINE_FORWARD_DATA
+// ENGINE 6 ENGINE_FORWARD_DATA
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - number of hops (forward till discards)
 0x00000000 //  1  - Reserved
@@ -214,7 +233,26 @@
 0x00000000 //  14 - Reserved 
 0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// ENGINE 5 ENGINE_FORWARD_DATA
+// ENGINE 5 ENGINE_ALU_OPS
+// --------------------------------------------------------------------------------------
+0x00000001 //  0  - alu_operation
+0x00000003 //  1  - alu_mask
+0x00000000 //  2  - constant_value
+0x00000000 //  3  - operate_on_constant
+0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  5  - Reserved
+0x00000000 //  6  - Reserved
+0x00000000 //  7  - Reserved
+0x00000000 //  8  - Reserved
+0x00000000 //  9  - Reserved
+0x00000000 //  10 - Reserved
+0x00000000 //  11 - Reserved 
+0x00000000 //  12 - Reserved 
+0x00000000 //  13 - Reserved 
+0x00000000 //  14 - Reserved 
+0x00000000 //  15 - Reserved 
+// --------------------------------------------------------------------------------------
+// ENGINE 6 ENGINE_FORWARD_DATA
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - number of hops subtract count (forward till discards)
 0x00000000 //  1  - Reserved
