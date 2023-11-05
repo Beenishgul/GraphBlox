@@ -227,13 +227,13 @@ module engine_template #(
 // Generate CAST - Arbiter Signals: CAST Request Generator
 // --------------------------------------------------------------------------------------
     assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
-    generate
-        for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
-            assign engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
-            assign request_engine_out[i+1]                  = engine_cast_arbiter_1_to_N_request_out[i];
-            assign fifo_request_engine_out_signals_out[i+1] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
+    always_comb begin
+        for (int i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
+            engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
+            request_engine_out[i+1]                  = engine_cast_arbiter_1_to_N_request_out[i];
+            fifo_request_engine_out_signals_out[i+1] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
@@ -654,9 +654,9 @@ module engine_template #(
                 assign template_fifo_response_engine_in_signals_out         = template_fifo_response_merge_engine_in_signals_out[0];
 
                 for (i=0; i<ENGINE_MERGE_WIDTH; i++) begin : response_merge_engine_in
-                    assign template_response_merge_engine_in[i+1]                       = response_engine_in[i+1];
+                    assign template_response_merge_engine_in[i+1] = response_engine_in[i+1];
                     assign template_fifo_response_merge_engine_in_signals_in[i+1].rd_en = 1'b1;
-                    assign fifo_response_engine_in_signals_out[i+1]                     = template_fifo_response_merge_engine_in_signals_out[i+1];
+                    assign fifo_response_engine_in_signals_out[i+1] = template_fifo_response_merge_engine_in_signals_out[i+1];
                 end
 
                 engine_merge_data #(

@@ -23,13 +23,13 @@ module arbiter_N_to_1_response #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)
 ) (
-  input  logic                            ap_clk                               ,
-  input  logic                            areset                               ,
+  input  logic                            ap_clk                                ,
+  input  logic                            areset                                ,
   input  MemoryPacket                     response_in [NUM_MEMORY_REQUESTOR-1:0],
   input  FIFOStateSignalsInput            fifo_response_signals_in              ,
   output FIFOStateSignalsOutput           fifo_response_signals_out             ,
   input  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_response_in                   ,
-  output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                    ,
+  output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                     ,
   output MemoryPacket                     response_out                          ,
   output logic                            fifo_setup_signal
 );
@@ -63,10 +63,10 @@ module arbiter_N_to_1_response #(
   MemoryPacket arbiter_bus_out                           ;
   MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
-  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant      ;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant       ;
   logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_response    ;
   logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_response_reg;
-  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid  ;
+  logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid   ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -91,38 +91,39 @@ module arbiter_N_to_1_response #(
     end
   end
 
-  genvar i;
-  generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_response_in_reg
-      always_ff @(posedge ap_clk) begin
-        if (areset_control) begin
-          response_in_reg[i].valid  <= 1'b0;
-        end
-        else begin
-          response_in_reg[i].valid  <= response_in[i].valid;
-        end
-      end
-
-      always_ff @(posedge ap_clk) begin
-        response_in_reg[i].payload  <= response_in[i].payload ;
+  always_ff @(posedge ap_clk) begin
+    if (areset_control) begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        response_in_reg[i].valid  <= 1'b0;
       end
     end
-  endgenerate
+    else begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        response_in_reg[i].valid  <= response_in[i].valid;
+      end
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      response_in_reg[i].payload  <= response_in[i].payload ;
+    end
+  end
 
 // --------------------------------------------------------------------------------------
 // Drive output
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      fifo_setup_signal        <= 1'b1;
+      fifo_setup_signal         <= 1'b1;
       fifo_response_signals_out <= 0;
-      arbiter_grant_out        <= 0;
+      arbiter_grant_out         <= 0;
       response_out.valid        <= 1'b0;
     end
     else begin
-      fifo_setup_signal        <= fifo_response_setup_signal_int;
+      fifo_setup_signal         <= fifo_response_setup_signal_int;
       fifo_response_signals_out <= fifo_response_signals_out_int;
-      arbiter_grant_out        <= arbiter_grant;
+      arbiter_grant_out         <= arbiter_grant;
       response_out.valid        <= response_out_int.valid;
     end
   end
@@ -174,8 +175,8 @@ module arbiter_N_to_1_response #(
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
     .PROG_THRESH     (16                        )
   ) inst_fifo_MemoryPacket (
-    .clk        (ap_clk                                  ),
-    .srst       (areset_fifo                             ),
+    .clk        (ap_clk                                   ),
+    .srst       (areset_fifo                              ),
     .din        (fifo_response_din                        ),
     .wr_en      (fifo_response_signals_in_int.wr_en       ),
     .rd_en      (fifo_response_signals_in_int.rd_en       ),
@@ -191,22 +192,19 @@ module arbiter_N_to_1_response #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for responses fifo_942x16_MemoryPacket
 // --------------------------------------------------------------------------------------
-  generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
-      always_comb begin
-        arbiter_bus_in[i]    = response_in_reg[i];
-        arbiter_bus_valid[i] = response_in_reg[i].valid;
-        arbiter_response[i]   = arbiter_response_reg[i];
-      end
+  always_comb begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
+      arbiter_bus_in[i]    = response_in_reg[i];
+      arbiter_bus_valid[i] = response_in_reg[i].valid;
+      arbiter_response[i]  = arbiter_response_reg[i];
     end
-    for (i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
-      always_comb begin
-        arbiter_bus_in[i]    = 0;
-        arbiter_bus_valid[i] = 0;
-        arbiter_response[i]   = 0;
-      end
+
+    for (int i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
+      arbiter_bus_in[i]    = 0;
+      arbiter_bus_valid[i] = 0;
+      arbiter_response[i]  = 0;
     end
-  endgenerate
+  end
 
   arbiter_bus_N_in_1_out #(
     .WIDTH    (NUM_MEMORY_REQUESTOR),
@@ -214,7 +212,7 @@ module arbiter_N_to_1_response #(
   ) inst_arbiter_bus_N_in_1_out (
     .ap_clk           (ap_clk           ),
     .areset           (areset_arbiter   ),
-    .arbiter_req      (arbiter_response  ),
+    .arbiter_req      (arbiter_response ),
     .arbiter_bus_valid(arbiter_bus_valid),
     .arbiter_bus_in   (arbiter_bus_in   ),
     .arbiter_grant    (arbiter_grant    ),
