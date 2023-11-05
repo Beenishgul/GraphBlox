@@ -19,9 +19,9 @@ package PKG_ENGINE;
     import PKG_MEMORY::*;
     import PKG_CACHE::*;
 
+// --------------------------------------------------------------------------------------
 // Stride\_Index\_Generator
-// ------------------------
-
+// --------------------------------------------------------------------------------------
 // ### Input: index\_start, index\_end, stride, granularity
 
 // The stride index generator serves two purposes. First, it generates a
@@ -73,9 +73,9 @@ package PKG_ENGINE;
         StrideIndexConfigurationPayload payload;
     } StrideIndexConfiguration;
 
+// --------------------------------------------------------------------------------------
 // CSR\_Index\_Generator
-// ---------------------
-
+// --------------------------------------------------------------------------------------
 // ### Input: array\_pointer, array\_size, offset, degree
 
 // When reading the edge list of the Graph CSR structure, a sequence of
@@ -138,7 +138,9 @@ package PKG_ENGINE;
         CSRIndexConfigurationPayload payload;
     } CSRIndexConfiguration;
 
+// --------------------------------------------------------------------------------------
 // Merge\_Data\_Engine
+// --------------------------------------------------------------------------------------
 // Forward the data in a lane and merges it with other data from other lanes
 // Keeps the original meta data for that lane
 
@@ -173,7 +175,9 @@ package PKG_ENGINE;
         MergeDataConfigurationPayload payload;
     } MergeDataConfiguration;
 
+// --------------------------------------------------------------------------------------
 // Forward\_Data\_Engine
+// --------------------------------------------------------------------------------------
 // Forward the data in a lane it with other data from other lanes
 // Keeps the original meta data for that lane
 
@@ -207,7 +211,9 @@ package PKG_ENGINE;
         ForwardDataConfigurationPayload payload;
     } ForwardDataConfiguration;
 
+// --------------------------------------------------------------------------------------
 // ALU\_Ops\_Engine
+// --------------------------------------------------------------------------------------
 // Forward the data in a lane and operate
 // Keeps the original meta data for that lane
 
@@ -244,9 +250,10 @@ package PKG_ENGINE;
         logic                      valid  ;
         ALUOpsConfigurationPayload payload;
     } ALUOpsConfiguration;
-// Read\_Write\_Engine
-// --------------------
 
+// --------------------------------------------------------------------------------------
+// Read\_Write\_Engine
+// --------------------------------------------------------------------------------------
 // ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity, mode
 
 // The read/write recieves a sequence and trnsformes it to memory commands
@@ -303,10 +310,9 @@ package PKG_ENGINE;
         ReadWriteEngineConfigurationPayload payload;
     } ReadWriteEngineConfiguration;
 
-
+// --------------------------------------------------------------------------------------
 // CU\_Setup\_Engine
-// --------------------
-
+// --------------------------------------------------------------------------------------
 // ### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
 
 // The cu setup acts like a serial read engine

@@ -11,7 +11,7 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x01020801 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
@@ -147,7 +147,7 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x01000801 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
