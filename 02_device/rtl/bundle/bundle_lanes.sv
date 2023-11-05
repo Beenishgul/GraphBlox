@@ -503,7 +503,7 @@ module bundle_lanes #(
         .NUM_MEMORY_REQUESTOR(NUM_LANES),
         .ID_LEVEL            (2        ),
         .ID_BUNDLE           (ID_BUNDLE)
-    ) inst_arbiter_1_to_N_request (
+    ) inst_lane_arbiter_1_to_N_engine_response_in (
         .ap_clk                  (ap_clk                                             ),
         .areset                  (areset_lane_arbiter_1_to_N_lanes                   ),
         .request_in              (lane_arbiter_1_to_N_lanes_response_in              ),
