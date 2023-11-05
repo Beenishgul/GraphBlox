@@ -214,11 +214,11 @@ module arbiter_1_to_N_request #(
       0       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_cu[i]     & fifo_request_dout_int.valid;
             end
           end
@@ -227,11 +227,11 @@ module arbiter_1_to_N_request #(
       1       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_bundle[i] & fifo_request_dout_int.valid;
             end
           end
@@ -240,11 +240,11 @@ module arbiter_1_to_N_request #(
       2       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               if(fifo_forward_signals_in_int_rd_en) begin
                 if((i == (NUM_MEMORY_REQUESTOR-1))) begin
                   request_out[i].valid <= fifo_request_dout_int.valid;
@@ -261,11 +261,11 @@ module arbiter_1_to_N_request #(
       3       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_engine[i] & fifo_request_dout_int.valid;
             end
           end
@@ -274,11 +274,11 @@ module arbiter_1_to_N_request #(
       4       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_module[i] & fifo_request_dout_int.valid;
             end
           end
@@ -287,11 +287,11 @@ module arbiter_1_to_N_request #(
       5       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= id_mask[i] & fifo_request_dout_int.valid;
             end
           end
@@ -300,11 +300,11 @@ module arbiter_1_to_N_request #(
       default : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               request_out[i].valid <= fifo_request_dout_int.payload.meta.route.to.id_cu[i] & fifo_request_dout_int.valid;
             end
           end
@@ -314,7 +314,7 @@ module arbiter_1_to_N_request #(
   endgenerate
 
   always_ff @(posedge ap_clk) begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
       request_out[i].payload <= fifo_request_dout_int.payload;
     end
   end

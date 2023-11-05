@@ -411,26 +411,26 @@ module bundle_lanes #(
 // Generate Lanes - Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        for (int i=0; i< NUM_LANES; i++) begin
+        for (int i=0; i<NUM_LANES; i++) begin
             areset_lane[i] <= areset;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         if (areset_lanes) begin
-            for (int i=0; i< NUM_LANES; i++) begin
+            for (int i=0; i<NUM_LANES; i++) begin
                 lanes_descriptor_in[i].valid <= 0;
             end
         end
         else begin
-            for (int i=0; i< NUM_LANES; i++) begin
+            for (int i=0; i<NUM_LANES; i++) begin
                 lanes_descriptor_in[i].valid <= descriptor_in_reg.valid;
             end
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        for (int i=0; i< NUM_LANES; i++) begin
+        for (int i=0; i<NUM_LANES; i++) begin
             lanes_descriptor_in[i].payload <= descriptor_in_reg.payload;
         end
     end
@@ -440,13 +440,13 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_lanes) begin
-            for (int i=0; i< NUM_LANES; i++) begin
+            for (int i=0; i<NUM_LANES; i++) begin
                 lanes_fifo_setup_signal_reg[i] <= 1'b1;
                 lanes_done_out_reg[i]          <= 1'b1;
             end
         end
         else begin
-            for (int i=0; i< NUM_LANES; i++) begin
+            for (int i=0; i<NUM_LANES; i++) begin
                 lanes_fifo_setup_signal_reg[i] <= lanes_fifo_setup_signal[i];
                 lanes_done_out_reg[i]          <= lanes_done_out[i];
             end
@@ -574,7 +574,7 @@ module bundle_lanes #(
 // Generate Lanes
 // --------------------------------------------------------------------------------------
     generate
-        for (j=0; j< NUM_LANES; j++) begin : generate_lane_template
+        for (j=0; j<NUM_LANES; j++) begin : generate_lane_template
             lane_template #(
                 `include"set_lane_parameters.vh"
             ) inst_lane_template (
@@ -604,7 +604,7 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
     always_comb begin : generate_lane_topology
         automatic integer cast_count[0:NUM_LANES] = '{default: 0};
-        for (int lane_merge=0; lane_merge < NUM_LANES; lane_merge++) begin
+        for (int lane_merge=0; lane_merge<NUM_LANES; lane_merge++) begin
 
             automatic integer lane_merge_l = lane_merge;
             automatic integer LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge_l];
@@ -618,18 +618,18 @@ module bundle_lanes #(
 
             if(LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L != 0) begin
                 automatic int merge_count = 0;
-                for (int lane_cast = 0; lane_cast < NUM_LANES; lane_cast++) begin
+                for (int lane_cast = 0; lane_cast<NUM_LANES; lane_cast++) begin
                     automatic integer lane_cast_l = lane_cast;
                     automatic integer LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l];
                     automatic integer ENGINES_COUNT_ARRAY_L = ENGINES_COUNT_ARRAY[lane_cast_l];
 
                     if(LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0 && lane_cast_l != lane_merge_l) begin
 
-                        for (int engine_idx = 0; engine_idx < ENGINES_COUNT_ARRAY_L; engine_idx++) begin
+                        for (int engine_idx = 0; engine_idx<ENGINES_COUNT_ARRAY_L; engine_idx++) begin
                             automatic integer engine_idx_l = engine_idx;
                             automatic integer LANES_CONFIG_CAST_WIDTH_ARRAY_L = LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l];
 
-                            for (int cast_idx = 0; cast_idx < LANES_CONFIG_CAST_WIDTH_ARRAY_L; cast_idx++) begin
+                            for (int cast_idx = 0; cast_idx<LANES_CONFIG_CAST_WIDTH_ARRAY_L; cast_idx++) begin
                                 automatic integer cast_idx_l = cast_idx;
                                 automatic integer LANES_CONFIG_MERGE_CONNECT_ARRAY_L = LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][engine_idx_l][cast_idx_l];
 
