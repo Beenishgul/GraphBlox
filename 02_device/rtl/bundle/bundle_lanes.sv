@@ -411,44 +411,48 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Drive input signals
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i< NUM_LANES; i++) begin : generate_lanes_reg_input
-            always_ff @(posedge ap_clk) begin
-                areset_lane[i] <= areset;
-            end
+    always_ff @(posedge ap_clk) begin
+        for (int i=0; i< NUM_LANES; i++) begin
+            areset_lane[i] <= areset;
+        end
+    end
 
-            always_ff @(posedge ap_clk) begin
-                if (areset_lanes) begin
-                    lanes_descriptor_in[i].valid <= 0;
-                end
-                else begin
-                    lanes_descriptor_in[i].valid <= descriptor_in_reg.valid;
-                end
-            end
-
-            always_ff @(posedge ap_clk) begin
-                lanes_descriptor_in[i].payload <= descriptor_in_reg.payload;
+    always_ff @(posedge ap_clk) begin
+        if (areset_lanes) begin
+            for (int i=0; i< NUM_LANES; i++) begin
+                lanes_descriptor_in[i].valid <= 0;
             end
         end
-    endgenerate
+        else begin
+            for (int i=0; i< NUM_LANES; i++) begin
+                lanes_descriptor_in[i].valid <= descriptor_in_reg.valid;
+            end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        for (int i=0; i< NUM_LANES; i++) begin
+            lanes_descriptor_in[i].payload <= descriptor_in_reg.payload;
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Drive output signals
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i< NUM_LANES; i++) begin : generate_lanes_reg_output
-            always_ff @(posedge ap_clk) begin
-                if (areset_lanes) begin
-                    lanes_fifo_setup_signal_reg[i] <= 1'b1;
-                    lanes_done_out_reg[i]          <= 1'b1;
-                end
-                else begin
-                    lanes_fifo_setup_signal_reg[i] <= lanes_fifo_setup_signal[i];
-                    lanes_done_out_reg[i]          <= lanes_done_out[i];
-                end
+    always_ff @(posedge ap_clk) begin
+        if (areset_lanes) begin
+            for (int i=0; i< NUM_LANES; i++) begin
+                lanes_fifo_setup_signal_reg[i] <= 1'b1;
+                lanes_done_out_reg[i]          <= 1'b1;
             end
         end
-    endgenerate
+        else begin
+            for (int i=0; i< NUM_LANES; i++) begin
+                lanes_fifo_setup_signal_reg[i] <= lanes_fifo_setup_signal[i];
+                lanes_done_out_reg[i]          <= lanes_done_out[i];
+            end
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Lanes Arbitration
@@ -457,13 +461,13 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_engine_request_in
-            assign lane_arbiter_N_to_1_lane_request_in[i]              = lanes_request_lane_out[i];
-            assign lane_arbiter_N_to_1_lane_lane_arbiter_request_in[i] = ~lanes_fifo_request_lane_out_signals_out[i].empty & ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full;
-            assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
+    always_comb begin : generate_lane_arbiter_N_to_1_engine_request_in
+        for (int i=0; i<NUM_LANES; i++) begin
+            lane_arbiter_N_to_1_lane_request_in[i]              = lanes_request_lane_out[i];
+            lane_arbiter_N_to_1_lane_lane_arbiter_request_in[i] = ~lanes_fifo_request_lane_out_signals_out[i].empty & ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full;
+            lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
         end
-    endgenerate
+    end
 
     assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = ~fifo_request_lanes_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
@@ -485,13 +489,14 @@ module bundle_lanes #(
 // Generate Lanes - Arbiter Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
     assign lane_arbiter_1_to_N_lanes_response_in = response_engine_in_int;
-    generate
-        for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_engine_response
-            assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full;
-            assign lanes_response_engine_in[i] = lane_arbiter_1_to_N_lanes_response_out[i];
-            assign lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
+
+    always_comb begin : generate_lane_arbiter_1_to_N_engine_response
+        for (int i=0; i<NUM_LANES; i++) begin
+            lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full;
+            lanes_response_engine_in[i] = lane_arbiter_1_to_N_lanes_response_out[i];
+            lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_request #(
@@ -515,13 +520,13 @@ module bundle_lanes #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_memory_request_in
-            assign lane_arbiter_N_to_1_memory_request_in[i]              = lanes_request_memory_out[i];
-            assign lane_arbiter_N_to_1_memory_lane_arbiter_request_in[i] = ~lanes_fifo_request_memory_out_signals_out[i].empty & ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
-            assign lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i];
+    always_comb begin : generate_lane_arbiter_N_to_1_memory_request_in
+        for (int i=0; i<NUM_LANES; i++) begin
+            lane_arbiter_N_to_1_memory_request_in[i]              = lanes_request_memory_out[i];
+            lane_arbiter_N_to_1_memory_lane_arbiter_request_in[i] = ~lanes_fifo_request_memory_out_signals_out[i].empty & ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+            lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i];
         end
-    endgenerate
+    end
 
     assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
@@ -543,13 +548,14 @@ module bundle_lanes #(
 // Generate Lanes - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
     assign lane_arbiter_1_to_N_memory_response_in = response_memory_in_int;
-    generate
-        for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_memory_response
-            assign lane_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_memory_in_signals_out[i].prog_full;
-            assign lanes_response_memory_in[i] = lane_arbiter_1_to_N_memory_response_out[i];
-            assign lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+
+    always_comb begin : generate_lane_arbiter_1_to_N_memory_response
+        for (int i=0; i<NUM_LANES; i++) begin
+            lane_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_memory_in_signals_out[i].prog_full;
+            lanes_response_memory_in[i] = lane_arbiter_1_to_N_memory_response_out[i];
+            lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
@@ -593,7 +599,6 @@ module bundle_lanes #(
             );
         end
     endgenerate
-
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes MERGE/CAST wires
