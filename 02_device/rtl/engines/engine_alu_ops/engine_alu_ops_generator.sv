@@ -395,6 +395,8 @@ module engine_alu_ops_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
+    MemoryPacketData result;
+
     assign alu_ops_response_engine_in_valid_flag = &alu_ops_response_engine_in_valid_reg;
 
     always_ff @(posedge ap_clk) begin
@@ -431,7 +433,7 @@ module engine_alu_ops_generator #(parameter
         .config_params      (configure_engine_param_valid                                  ),
         .data_valid         (response_engine_in_int.valid                                  ),
         .data               (response_engine_in_int.payload.data                           ),
-        .result             (generator_engine_request_engine_reg.payload.data              )
+        .result             (result                                                        )
     );
 
 // --------------------------------------------------------------------------------------
