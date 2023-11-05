@@ -1,11 +1,3 @@
-import PKG_AXI4::*;
-import PKG_GLOBALS::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_MEMORY::*;
-import PKG_ENGINE::*;
-import PKG_CACHE::*;
-
 module engine_alu_ops_kernel (
   input  logic                         ap_clk             ,
   input  logic                         areset             ,
@@ -14,7 +6,7 @@ module engine_alu_ops_kernel (
   input  ALUOpsConfigurationParameters config_params      ,
   input  logic                         data_valid         ,
   input  MemoryPacketData              data               ,
-  output MemoryPacketData              result              
+  output MemoryPacketData              result
 );
 
   // Define internal signals
@@ -35,7 +27,7 @@ module engine_alu_ops_kernel (
   end
 
   // ALU operations logic
-  always_ff @(posedge ap_clk or posedge areset) begin
+  always_ff @(posedge ap_clk) begin
     if (areset || clear) begin
       alu_result <= 0;
     end else begin
@@ -48,7 +40,7 @@ module engine_alu_ops_kernel (
             alu_result <= field_values[0];
             for (int i = 1; i < NUM_FIELDS_MEMORYPACKETDATA; i++) begin
               if (config_params.alu_mask[i]) begin
-                alu_result = alu_result + field_values[i];
+                alu_result <= alu_result + field_values[i];
               end
             end
           end
@@ -57,7 +49,7 @@ module engine_alu_ops_kernel (
             alu_result <= field_values[0];
             for (int i = 1; i < NUM_FIELDS_MEMORYPACKETDATA; i++) begin
               if (config_params.alu_mask[i]) begin
-                alu_result = alu_result - field_values[i];
+                alu_result <= alu_result - field_values[i];
               end
             end
           end
@@ -72,7 +64,7 @@ module engine_alu_ops_kernel (
             alu_result <= alu_result + field_values[0];
             for (int i = 1; i < NUM_FIELDS_MEMORYPACKETDATA; i++) begin
               if (config_params.alu_mask[i]) begin
-                alu_result = alu_result + field_values[i];
+                alu_result <= alu_result + field_values[i];
               end
             end
           end
@@ -96,10 +88,9 @@ module engine_alu_ops_kernel (
     end else begin
       // Assign the ALU result to the output MemoryPacketData
       for (int i = 0; i < NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        result.field[i] <= alu_result[CACHE_FRONTEND_DATA_W*i+:CACHE_FRONTEND_DATA_W];
+        result.field[i] <= alu_result[CACHE_FRONTEND_DATA_W * i +: CACHE_FRONTEND_DATA_W];
       end
     end
   end
 
 endmodule : engine_alu_ops_kernel
-
