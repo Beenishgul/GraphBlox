@@ -94,22 +94,23 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
 // --------------------------------------------------------------------------------------
 // drive Responses
 // --------------------------------------------------------------------------------------
-  genvar i;
-  generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_response_out
-      always_ff @(posedge ap_clk ) begin
-        if(areset_control) begin
-          response_out[i].valid <= 0;
-        end else begin
-          response_out[i].valid <= response_out_reg[i].valid;
-        end
+  always_ff @(posedge ap_clk ) begin
+    if(areset_control) begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        response_out[i].valid <= 0;
       end
-
-      always_ff @(posedge ap_clk) begin
-        response_out[i].payload <= response_out_reg[i].payload;
+    end else begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        response_out[i].valid <= response_out_reg[i].valid;
       end
     end
-  endgenerate
+  end
+
+  always_ff @(posedge ap_clk) begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      response_out[i].payload <= response_out_reg[i].payload;
+    end
+  end
 
   always_comb begin
     if(fifo_response_dout_int.valid) begin
@@ -147,9 +148,9 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_din.meta.subclass.cmd     = CMD_MEM_RESPONSE;
 
   // Pop
-  assign fifo_response_signals_in_int.rd_en          = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-  assign fifo_response_dout_int.valid                = fifo_response_signals_out_int.valid;
-  assign fifo_response_dout_int.payload.meta         = fifo_response_dout.meta;
+  assign fifo_response_signals_in_int.rd_en           = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+  assign fifo_response_dout_int.valid                 = fifo_response_signals_out_int.valid;
+  assign fifo_response_dout_int.payload.meta          = fifo_response_dout.meta;
   assign fifo_response_dout_int.payload.data.field[0] = fifo_response_dout.iob.rdata;
   assign fifo_response_dout_int.payload.data.field[1] = fifo_response_dout.iob.rdata;
   assign fifo_response_dout_int.payload.data.field[2] = fifo_response_dout.iob.rdata;

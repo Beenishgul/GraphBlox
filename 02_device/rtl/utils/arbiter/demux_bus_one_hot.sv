@@ -73,11 +73,11 @@ module demux_bus_one_hot #(
   assign data_out_reg       = data_out_int;
   assign data_out_valid_reg = data_out_valid_int;
   // Use parallelization in the demux logic.
-  generate
-    for (genvar i = 0; i < BUS_WIDTH; i++) begin : generate_demux_one_hot
-      assign data_out_valid_int[i] = sel_in_int[i] & data_in_valid_int[i];
-      assign data_out_int[i]       = data_in_int;
+  always_comb begin
+    for (int i = 0; i < BUS_WIDTH; i++) begin : generate_demux_one_hot
+      data_out_valid_int[i] = sel_in_int[i] & data_in_valid_int[i];
+      data_out_int[i]       = data_in_int;
     end
-  endgenerate
+  end
 
 endmodule : demux_bus_one_hot

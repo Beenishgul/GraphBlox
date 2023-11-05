@@ -426,13 +426,13 @@ module engine_csr_index #(parameter
 // Generate Response - Arbiter Signals: Engine Response Generator
 // --------------------------------------------------------------------------------------
     assign arbiter_1_to_N_engine_response_in = response_engine_in_int;
-    generate
-        for (i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_engine_response
-            assign arbiter_1_to_N_engine_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_engine_in_signals_out[i].prog_full;
-            assign modules_response_engine_in[i] = arbiter_1_to_N_engine_response_out[i];
-            assign modules_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_engine_response
+            arbiter_1_to_N_engine_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_engine_in_signals_out[i].prog_full;
+            modules_response_engine_in[i] = arbiter_1_to_N_engine_response_out[i];
+            modules_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
@@ -451,13 +451,13 @@ module engine_csr_index #(parameter
 // Generate Response - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
     assign arbiter_1_to_N_memory_response_in = response_memory_in_int;
-    generate
-        for (i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_memory_response
-            assign arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_memory_in_signals_out[i].prog_full;
-            assign modules_response_memory_in[i] = arbiter_1_to_N_memory_response_out[i];
-            assign modules_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_memory_response
+            arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_memory_in_signals_out[i].prog_full;
+            modules_response_memory_in[i] = arbiter_1_to_N_memory_response_out[i];
+            modules_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(

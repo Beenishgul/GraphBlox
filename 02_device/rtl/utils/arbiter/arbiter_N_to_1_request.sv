@@ -91,23 +91,24 @@ module arbiter_N_to_1_request #(
     end
   end
 
-  genvar i;
-  generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_request_in_reg
-      always_ff @(posedge ap_clk) begin
-        if (areset_control) begin
-          request_in_reg[i].valid  <= 1'b0;
-        end
-        else begin
-          request_in_reg[i].valid  <= request_in[i].valid;
-        end
-      end
-
-      always_ff @(posedge ap_clk) begin
-        request_in_reg[i].payload  <= request_in[i].payload ;
+  always_ff @(posedge ap_clk) begin
+    if (areset_control) begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        request_in_reg[i].valid  <= 1'b0;
       end
     end
-  endgenerate
+    else begin
+      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+        request_in_reg[i].valid  <= request_in[i].valid;
+      end
+    end
+  end
+
+  always_ff @(posedge ap_clk) begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      request_in_reg[i].payload  <= request_in[i].payload ;
+    end
+  end
 
 // --------------------------------------------------------------------------------------
 // Drive output
@@ -191,22 +192,18 @@ module arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_942x16_MemoryPacket
 // --------------------------------------------------------------------------------------
-  generate
-    for (i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
-      always_comb begin
-        arbiter_bus_in[i]    = request_in_reg[i];
-        arbiter_bus_valid[i] = request_in_reg[i].valid;
-        arbiter_request[i]   = arbiter_request_reg[i];
-      end
+  always_comb begin
+    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
+      arbiter_bus_in[i]    = request_in_reg[i];
+      arbiter_bus_valid[i] = request_in_reg[i].valid;
+      arbiter_request[i]   = arbiter_request_reg[i];
     end
-    for (i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
-      always_comb begin
-        arbiter_bus_in[i]    = 0;
-        arbiter_bus_valid[i] = 0;
-        arbiter_request[i]   = 0;
-      end
+    for (int i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
+      arbiter_bus_in[i]    = 0;
+      arbiter_bus_valid[i] = 0;
+      arbiter_request[i]   = 0;
     end
-  endgenerate
+  end
 
   arbiter_bus_N_in_1_out #(
     .WIDTH    (NUM_MEMORY_REQUESTOR),
