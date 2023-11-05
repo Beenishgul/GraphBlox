@@ -170,7 +170,7 @@ module arbiter_1_to_N_request #(
       end
       2 : begin
         assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en = (current_module_id_bundle != fifo_request_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = (current_module_id_bundle != fifo_request_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
       end
       3 : begin
         assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
