@@ -24,7 +24,8 @@ module arbiter_1_to_N_response #(
   parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload),
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
-  parameter ID_LEVEL             = 1                        
+  parameter ID_LEVEL             = 1                         ,
+  parameter ID_BUNDLE            = 0        
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,

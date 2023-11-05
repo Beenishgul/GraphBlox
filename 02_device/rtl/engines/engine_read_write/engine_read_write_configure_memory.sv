@@ -145,7 +145,7 @@ module engine_read_write_configure_memory #(parameter
         configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
         configure_memory_meta_int.route.to.id_module      = 1;
         configure_memory_meta_int.route.to.id_buffer      = 0;
-        configure_memory_meta_int.route.forward_value     = CU_BUNDLE_COUNT_WIDTH_BITS;
+        configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
         configure_memory_meta_int.address.shift.amount    = 0;

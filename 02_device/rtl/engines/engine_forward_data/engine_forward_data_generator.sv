@@ -326,11 +326,11 @@ module engine_forward_data_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_FORWARD_DATA_GEN_RESET : begin
-                done_int_reg                             <= 1'b1;
-                done_out_reg                             <= 1'b1;
-                configure_memory_setup_reg               <= 1'b0;
-                configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.forward_value <= ~0;
+                done_int_reg                    <= 1'b1;
+                done_out_reg                    <= 1'b1;
+                configure_memory_setup_reg      <= 1'b0;
+                configure_engine_param_valid    <= 1'b0;
+                configure_engine_param_int.hops <= ~0;
             end
             ENGINE_FORWARD_DATA_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
@@ -382,10 +382,10 @@ module engine_forward_data_generator #(parameter
                 done_out_reg <= 1'b1;
             end
             ENGINE_FORWARD_DATA_GEN_DONE : begin
-                done_int_reg                             <= 1'b1;
-                done_out_reg                             <= 1'b1;
-                configure_engine_param_valid             <= 1'b0;
-                configure_engine_param_int.forward_value <= ~0;
+                done_int_reg                    <= 1'b1;
+                done_out_reg                    <= 1'b1;
+                configure_engine_param_valid    <= 1'b0;
+                configure_engine_param_int.hops <= ~0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -410,18 +410,18 @@ module engine_forward_data_generator #(parameter
                 generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
                 generator_engine_request_engine_reg.payload.data            <= response_engine_in_int.payload.data;
 
-                if (response_engine_in_int.payload.meta.route.forward_value >= configure_engine_param_int.forward_value) begin
-                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= response_engine_in_int.payload.meta.route.forward_value - configure_engine_param_int.forward_value;
+                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
+                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
                 end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= 0;
+                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
                 end
-                if (response_engine_in_int.payload.meta.route.forward_value >= configure_engine_param_int.forward_value) begin
-                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= response_engine_in_int.payload.meta.route.forward_value - configure_engine_param_int.forward_value;
+                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
+                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
                 end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.forward_value <= 0;
+                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
                 end
 
-                forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.forward_value);
+                forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.hops);
             end else begin
                 generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
                 if(forward_data_response_engine_in_valid_flag)
