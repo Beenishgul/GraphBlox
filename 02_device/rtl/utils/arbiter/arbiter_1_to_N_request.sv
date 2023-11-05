@@ -158,7 +158,6 @@ module arbiter_1_to_N_request #(
     endcase
   endgenerate
 
-
   generate
     case (ID_LEVEL)
       0 : begin
@@ -206,11 +205,10 @@ module arbiter_1_to_N_request #(
   always_ff @(posedge ap_clk) begin
     fifo_request_signals_out <= fifo_request_signals_out_int;
   end
+
 // --------------------------------------------------------------------------------------
 //  Demux Logic and arbitration
 // --------------------------------------------------------------------------------------
-
-
   generate
     case (ID_LEVEL)
       0       : begin
@@ -225,7 +223,6 @@ module arbiter_1_to_N_request #(
             end
           end
         end
-
       end
       1       : begin
         always_ff @(posedge ap_clk ) begin
@@ -239,7 +236,6 @@ module arbiter_1_to_N_request #(
             end
           end
         end
-
       end
       2       : begin
         always_ff @(posedge ap_clk ) begin
@@ -322,7 +318,6 @@ module arbiter_1_to_N_request #(
       request_out[i].payload <= fifo_request_dout_int.payload;
     end
   end
-
 
 // --------------------------------------------------------------------------------------
 // FIFO memory request out fifo MemoryPacket
