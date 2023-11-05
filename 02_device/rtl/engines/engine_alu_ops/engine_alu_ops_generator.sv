@@ -430,7 +430,7 @@ module engine_alu_ops_generator #(parameter
         .areset             (areset_kernel                                                 ),
         .clear              (~(response_engine_in_int.valid & configure_engine_param_valid)),
         .config_params_valid(configure_engine_param_valid                                  ),
-        .config_params      (configure_engine_param_valid                                  ),
+        .config_params      (configure_engine_param_int                                    ),
         .data_valid         (response_engine_in_int.valid                                  ),
         .data               (response_engine_in_int.payload.data                           ),
         .result             (result                                                        )
