@@ -194,7 +194,7 @@ package PKG_ENGINE;
     } engine_forward_data_generator_state;
 
     typedef struct packed{
-        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] forward_value;
+        logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
     } ForwardDataConfigurationParameters;
 
     typedef struct packed{

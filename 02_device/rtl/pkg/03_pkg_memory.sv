@@ -113,9 +113,9 @@ typedef struct packed{
 } MemoryPacketArbitrate;
 
 typedef struct packed{
-  MemoryPacketArbitrate                  from         ;
-  MemoryPacketArbitrate                  to           ;
-  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] forward_value; // SIZE = 8 bits  - up to 8 bundles
+  MemoryPacketArbitrate                  from;
+  MemoryPacketArbitrate                  to  ;
+  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
 } MemoryPacketRoute;
 
 typedef struct packed{

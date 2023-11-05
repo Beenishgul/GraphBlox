@@ -494,17 +494,18 @@ module bundle_lanes #(
     endgenerate
 
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(
+    arbiter_1_to_N_request #(
         .NUM_MEMORY_REQUESTOR(NUM_LANES),
-        .ID_LEVEL            (2        )
-    ) inst_lane_arbiter_1_to_N_engine_response_in (
-        .ap_clk                   (ap_clk                                             ),
-        .areset                   (areset_lane_arbiter_1_to_N_lanes                   ),
-        .response_in              (lane_arbiter_1_to_N_lanes_response_in              ),
-        .fifo_response_signals_in (lane_arbiter_1_to_N_lanes_fifo_response_signals_in ),
-        .fifo_response_signals_out(lane_arbiter_1_to_N_lanes_fifo_response_signals_out),
-        .response_out             (lane_arbiter_1_to_N_lanes_response_out             ),
-        .fifo_setup_signal        (lane_arbiter_1_to_N_lanes_fifo_setup_signal        )
+        .ID_LEVEL            (2        ),
+        .ID_BUNDLE           (ID_BUNDLE)
+    ) inst_arbiter_1_to_N_request (
+        .ap_clk                  (ap_clk                                             ),
+        .areset                  (areset_lane_arbiter_1_to_N_lanes                   ),
+        .request_in              (lane_arbiter_1_to_N_lanes_response_in              ),
+        .fifo_request_signals_in (lane_arbiter_1_to_N_lanes_fifo_response_signals_in ),
+        .fifo_request_signals_out(lane_arbiter_1_to_N_lanes_fifo_response_signals_out),
+        .request_out             (lane_arbiter_1_to_N_lanes_response_out             ),
+        .fifo_setup_signal       (lane_arbiter_1_to_N_lanes_fifo_setup_signal        )
     );
 
 // --------------------------------------------------------------------------------------
