@@ -408,8 +408,9 @@ module engine_alu_ops_generator #(parameter
             generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to   <= response_engine_in_int.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.route.from <= configure_memory_reg.payload.meta.route.from;
+                generator_engine_request_engine_reg.payload.meta.route.to   <= configure_memory_reg.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.route.hops <= configure_memory_reg.payload.meta.route.hops;
                 generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
                 generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
                 generator_engine_request_engine_reg.payload.data            <= result;
@@ -447,7 +448,7 @@ module engine_alu_ops_generator #(parameter
     assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
-    assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;
+    assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & configure_engine_param_valid;
     assign request_engine_out_int.valid                 = fifo_request_engine_out_signals_out_int.valid;
     assign request_engine_out_int.payload               = fifo_request_engine_out_dout;
 
