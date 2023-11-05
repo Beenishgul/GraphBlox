@@ -382,44 +382,48 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
 // Generate Engines - Drive input signals
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i< NUM_ENGINES; i++) begin : generate_engines_reg_input
-            always_ff @(posedge ap_clk) begin
-                areset_engine[i] <= areset;
-            end
+    always_ff @(posedge ap_clk) begin
+        for (int i=0; i< NUM_ENGINES; i++) begin
+            areset_engine[i] <= areset;
+        end
+    end
 
-            always_ff @(posedge ap_clk) begin
-                if (areset_lane_template) begin
-                    engines_descriptor_in[i].valid <= 0;
-                end
-                else begin
-                    engines_descriptor_in[i].valid <= descriptor_in_reg.valid;
-                end
-            end
-
-            always_ff @(posedge ap_clk) begin
-                engines_descriptor_in[i].payload <= descriptor_in_reg.payload;
+    always_ff @(posedge ap_clk) begin
+        if (areset_lane_template) begin
+            for (int i=0; i< NUM_ENGINES; i++) begin
+                engines_descriptor_in[i].valid <= 0;
             end
         end
-    endgenerate
+        else begin
+            for (int i=0; i< NUM_ENGINES; i++) begin
+                engines_descriptor_in[i].valid <= descriptor_in_reg.valid;
+            end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        for (int i=0; i< NUM_ENGINES; i++) begin
+            engines_descriptor_in[i].payload <= descriptor_in_reg.payload;
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Drive output signals
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i< NUM_ENGINES; i++) begin : generate_engines_reg_output
-            always_ff @(posedge ap_clk) begin
-                if (areset_lane_template) begin
-                    engines_fifo_setup_signal_reg[i] <= 1'b1;
-                    engines_done_out_reg[i]          <= 1'b1;
-                end
-                else begin
-                    engines_fifo_setup_signal_reg[i] <= engines_fifo_setup_signal[i];
-                    engines_done_out_reg[i]          <= engines_done_out[i];
-                end
+    always_ff @(posedge ap_clk) begin
+        if (areset_lane_template) begin
+            for (int i=0; i< NUM_ENGINES; i++) begin
+                engines_fifo_setup_signal_reg[i] <= 1'b1;
+                engines_done_out_reg[i]          <= 1'b1;
             end
         end
-    endgenerate
+        else begin
+            for (int i=0; i< NUM_ENGINES; i++) begin
+                engines_fifo_setup_signal_reg[i] <= engines_fifo_setup_signal[i];
+                engines_done_out_reg[i]          <= engines_done_out[i];
+            end
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Drive Intra-signals
@@ -429,13 +433,13 @@ module lane_template #(
     assign engines_response_lane_in[0] = response_lane_in_int;
     assign engines_fifo_response_lane_in_signals_in[0].rd_en = 1'b1;
 
-    generate
-        for (i=1; i<NUM_ENGINES; i++) begin : generate_lane_template_intra_signals
-            assign engines_response_lane_in[i] = engines_request_lane_out[i-1];
-            assign engines_fifo_request_lane_out_signals_in[i-1].rd_en = ~engines_fifo_response_lane_in_signals_out[i].prog_full;
-            assign engines_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=1; i<NUM_ENGINES; i++) begin : generate_lane_template_intra_signals
+            engines_response_lane_in[i] = engines_request_lane_out[i-1];
+            engines_fifo_request_lane_out_signals_in[i-1].rd_en = ~engines_fifo_response_lane_in_signals_out[i].prog_full;
+            engines_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
     assign engines_request_lane_out_int = engines_request_lane_out[NUM_ENGINES-1];
     assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = ~fifo_request_lane_out_signals_out_int.prog_full;
@@ -447,13 +451,13 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-    generate
-        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
-            assign engine_arbiter_N_to_1_memory_request_in[i]                = engines_request_memory_out[i];
-            assign engine_arbiter_N_to_1_memory_engine_arbiter_request_in[i] = ~engines_fifo_request_memory_out_signals_out[i].empty & ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
-            assign engines_fifo_request_memory_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i];
+    always_comb begin
+        for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
+            engine_arbiter_N_to_1_memory_request_in[i]                = engines_request_memory_out[i];
+            engine_arbiter_N_to_1_memory_engine_arbiter_request_in[i] = ~engines_fifo_request_memory_out_signals_out[i].empty & ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+            engines_fifo_request_memory_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i];
         end
-    endgenerate
+    end
 
     assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
@@ -475,13 +479,13 @@ module lane_template #(
 // Generate Engines - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
     assign engine_arbiter_1_to_N_memory_response_in = response_memory_in_int;
-    generate
-        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_memory_response
-            assign engine_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full;
-            assign engines_response_memory_in[i] = engine_arbiter_1_to_N_memory_response_out[i];
-            assign engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_memory_response
+            engine_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full;
+            engines_response_memory_in[i] = engine_arbiter_1_to_N_memory_response_out[i];
+            engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
