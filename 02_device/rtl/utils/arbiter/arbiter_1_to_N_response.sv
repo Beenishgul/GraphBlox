@@ -25,7 +25,7 @@ module arbiter_1_to_N_response #(
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter ID_LEVEL             = 1                         ,
-  parameter ID_BUNDLE            = 0        
+  parameter ID_BUNDLE            = 0
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
@@ -43,7 +43,7 @@ module arbiter_1_to_N_response #(
   logic areset_fifo   ;
 
   MemoryPacket                     response_in_reg;
-  logic [NUM_MEMORY_REQUESTOR-1:0] id_mask       ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -199,11 +199,11 @@ module arbiter_1_to_N_response #(
       0       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_cu[i]     & fifo_response_dout_int.valid;
             end
           end
@@ -212,11 +212,11 @@ module arbiter_1_to_N_response #(
       1       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_bundle[i] & fifo_response_dout_int.valid;
             end
           end
@@ -225,12 +225,12 @@ module arbiter_1_to_N_response #(
       2       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-                response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+              response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_lane[i] & fifo_response_dout_int.valid;
             end
           end
         end
@@ -238,11 +238,11 @@ module arbiter_1_to_N_response #(
       3       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_engine[i] & fifo_response_dout_int.valid;
             end
           end
@@ -251,11 +251,11 @@ module arbiter_1_to_N_response #(
       4       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_module[i] & fifo_response_dout_int.valid;
             end
           end
@@ -264,11 +264,11 @@ module arbiter_1_to_N_response #(
       5       : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= id_mask[i] & fifo_response_dout_int.valid;
             end
           end
@@ -277,11 +277,11 @@ module arbiter_1_to_N_response #(
       default : begin
         always_ff @(posedge ap_clk ) begin
           if(areset_control) begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid       <= 1'b0;
             end
           end else begin
-            for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+            for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
               response_out[i].valid <= fifo_response_dout_int.payload.meta.route.from.id_cu[i] & fifo_response_dout_int.valid;
             end
           end
@@ -291,7 +291,7 @@ module arbiter_1_to_N_response #(
   endgenerate
 
   always_ff @(posedge ap_clk) begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
       response_out[i].payload <= fifo_response_dout_int.payload;
     end
   end
@@ -318,8 +318,8 @@ module arbiter_1_to_N_response #(
     .PROG_THRESH     (16                        ),
     .READ_MODE       ("fwft"                    )
   ) inst_fifo_MemoryPacket (
-    .clk        (ap_clk                                  ),
-    .srst       (areset_fifo                             ),
+    .clk        (ap_clk                                   ),
+    .srst       (areset_fifo                              ),
     .din        (fifo_response_din                        ),
     .wr_en      (fifo_response_signals_in_int.wr_en       ),
     .rd_en      (fifo_response_signals_in_int.rd_en       ),

@@ -303,26 +303,26 @@ module cu_bundles #(
 // Generate Bundles - Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        for (int i=0; i< NUM_BUNDLES; i++) begin
+        for (int i=0; i<NUM_BUNDLES; i++) begin
             areset_bundle[i] <= areset;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         if (areset_cu_bundles) begin
-            for (int i=0; i< NUM_BUNDLES; i++) begin
+            for (int i=0; i<NUM_BUNDLES; i++) begin
                 bundle_descriptor_in[i].valid <= 0;
             end
         end
         else begin
-            for (int i=0; i< NUM_BUNDLES; i++) begin
+            for (int i=0; i<NUM_BUNDLES; i++) begin
                 bundle_descriptor_in[i].valid <= descriptor_in_reg.valid;
             end
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        for (int i=0; i< NUM_BUNDLES; i++) begin
+        for (int i=0; i<NUM_BUNDLES; i++) begin
             bundle_descriptor_in[i].payload <= descriptor_in_reg.payload;
         end
     end
@@ -332,13 +332,13 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_cu_bundles) begin
-            for (int i=0; i< NUM_BUNDLES; i++) begin
+            for (int i=0; i<NUM_BUNDLES; i++) begin
                 bundle_fifo_setup_signal_reg[i] <= 1'b1;
                 bundle_done_out_reg[i]          <= 1'b1;
             end
         end
         else begin
-            for (int i=0; i< NUM_BUNDLES; i++) begin
+            for (int i=0; i<NUM_BUNDLES; i++) begin
                 bundle_fifo_setup_signal_reg[i] <= bundle_fifo_setup_signal[i];
                 bundle_done_out_reg[i]          <= bundle_done_out[i];
             end
@@ -423,7 +423,7 @@ module cu_bundles #(
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
-        for (j=0; j< NUM_BUNDLES; j++) begin : generate_bundle_lanes
+        for (j=0; j<NUM_BUNDLES; j++) begin : generate_bundle_lanes
             bundle_lanes #(
                 `include"set_bundle_parameters.vh"
             ) inst_bundle_lanes (

@@ -93,19 +93,19 @@ module arbiter_N_to_1_request #(
 
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin
-      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
         request_in_reg[i].valid  <= 1'b0;
       end
     end
     else begin
-      for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+      for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
         request_in_reg[i].valid  <= request_in[i].valid;
       end
     end
   end
 
   always_ff @(posedge ap_clk) begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
       request_in_reg[i].payload  <= request_in[i].payload ;
     end
   end
@@ -193,12 +193,12 @@ module arbiter_N_to_1_request #(
 // Bus arbiter for requests fifo_942x16_MemoryPacket
 // --------------------------------------------------------------------------------------
   always_comb begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
+    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
       arbiter_bus_in[i]    = request_in_reg[i];
       arbiter_bus_valid[i] = request_in_reg[i].valid;
       arbiter_request[i]   = arbiter_request_reg[i];
     end
-    for (int i=NUM_MEMORY_REQUESTOR; i <  NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
+    for (int i=NUM_MEMORY_REQUESTOR; i<NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
       arbiter_bus_in[i]    = 0;
       arbiter_bus_valid[i] = 0;
       arbiter_request[i]   = 0;
