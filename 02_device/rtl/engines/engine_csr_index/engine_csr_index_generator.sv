@@ -514,8 +514,17 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_request_comb.payload.meta.route                = configure_memory_reg.payload.meta.route;
+        fifo_request_comb.payload.meta.route.to             = configure_memory_reg.payload.meta.route.to;
+        fifo_request_comb.payload.meta.route.hops           = configure_memory_reg.payload.meta.route.hops;
+
         fifo_request_comb.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
+
+        fifo_request_comb.payload.meta.route.from.id_cu        = configure_memory_reg.payload.meta.route.from.id_cu ;
+        fifo_request_comb.payload.meta.route.from.id_bundle    = configure_memory_reg.payload.meta.route.from.id_bundle;
+        fifo_request_comb.payload.meta.route.from.id_lane      = configure_memory_reg.payload.meta.route.from.id_lane;
+        fifo_request_comb.payload.meta.route.from.id_engine    = configure_memory_reg.payload.meta.route.from.id_engine;
+        fifo_request_comb.payload.meta.route.from.id_buffer    = configure_memory_reg.payload.meta.route.from.id_buffer;
+
         fifo_request_comb.payload.meta.address.base         = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_memory_reg.payload.meta.address.shift.amount;
