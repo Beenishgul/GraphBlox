@@ -189,9 +189,7 @@ module engine_filter_cond_kernel (
       result_data <= 0;
       result_flag <= 1;
     end else begin
-      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        result_data.field[i] <= result_data_int.field[i];
-      end
+      result_data <= result_data_int;
       result_flag <= result_flag_int;
     end
   end
