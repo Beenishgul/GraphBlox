@@ -56,8 +56,6 @@ module engine_alu_ops #(parameter
     output logic                  done_out
 );
 
-    genvar i;
-
     assign request_memory_out                  = 0;
     assign fifo_request_memory_out_signals_out = 6'b010000;
 // --------------------------------------------------------------------------------------
@@ -224,7 +222,6 @@ module engine_alu_ops #(parameter
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
     end
-
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket

@@ -127,7 +127,6 @@ module engine_alu_ops_configure_memory #(parameter
         configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
     end
 
-
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------

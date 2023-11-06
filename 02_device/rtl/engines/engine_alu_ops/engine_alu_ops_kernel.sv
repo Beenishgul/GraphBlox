@@ -60,10 +60,17 @@ module engine_alu_ops_kernel (
   // ALU operations logic
   always_comb begin
     // Process the ALU operation if both config_params and data are valid
+
+    if(config_params.alu_operation == ALU_ACC) begin
+      result_int = result_int;
+    end else begin
+      result_int = 0;
+    end
+
     if (config_params_valid & data_valid) begin
       case (config_params.alu_operation)
         ALU_NOP : begin
-          result_int = ops_value_reg.field[0]; // No operation
+          result_int = ops_value_reg; // No operation
         end
 
         ALU_ADD : begin
