@@ -43,7 +43,7 @@ module engine_alu_ops_kernel (
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params.const_mask[i] & config_params_valid) begin
-          ops_value_reg.field[i] <= config_params.constant_value;
+          ops_value_reg.field[i] <= config_params.const_value;
         end else if (data_valid & config_params_valid) begin
           for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             if(config_params.ops_mask[i][j]) begin
@@ -60,7 +60,7 @@ module engine_alu_ops_kernel (
   // ALU operations logic
   always_comb begin
     // Process the ALU operation if both config_params and data are valid
-    if (config_params_valid && data_valid) begin
+    if (config_params_valid & data_valid) begin
       case (config_params.alu_operation)
         ALU_NOP : begin
           result_int = ops_value_reg.field[0]; // No operation
