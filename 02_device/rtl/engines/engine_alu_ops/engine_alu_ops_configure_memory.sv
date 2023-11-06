@@ -182,22 +182,23 @@ module engine_alu_ops_configure_memory #(parameter
                         configure_memory_valid_reg[1]               <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+2) : begin
-                        configure_memory_reg.payload.param.constant_value <= fifo_response_memory_in_dout_int.payload.data.field[0];
-                        configure_memory_valid_reg[2]                     <= 1'b1  ;
+                        configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                        configure_memory_valid_reg[2]                 <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+3) : begin
-                        configure_memory_reg.payload.param.operate_on_constant <= fifo_response_memory_in_dout_int.payload.data.field[0][0];
-                        configure_memory_valid_reg[3]                          <= 1'b1  ;
+                        configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_int.payload.data.field[0];
+                        configure_memory_valid_reg[3]                  <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+4) : begin
+                        configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][(NUM_FIELDS_MEMORYPACKETDATA*NUM_FIELDS_MEMORYPACKETDATA)-1:0];
+                        configure_memory_valid_reg[4]               <= 1'b1  ;
+                    end
+                    (ENGINE_SEQ_MIN+5) : begin
                         configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
                         configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
                         configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
                         configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                        configure_memory_valid_reg[4]                        <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+5) : begin
-                        configure_memory_valid_reg[5] <= 1'b1  ;
+                        configure_memory_valid_reg[5]                        <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
                         configure_memory_valid_reg[6] <= 1'b1  ;

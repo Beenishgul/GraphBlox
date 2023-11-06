@@ -67,12 +67,17 @@ typedef enum logic[TYPE_ENGINE_OPERAND_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
-parameter TYPE_FILTER_OPERATION_BITS = 4;
+parameter TYPE_FILTER_OPERATION_BITS = 9;
 typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
   FILTER_NOP,
   FILTER_GT,
   FILTER_LT,
-  FILTER_EQ
+  FILTER_EQ,
+  FILTER_NOT_EQ,
+  FILTER_GT_TERN,
+  FILTER_LT_TERN,
+  FILTER_EQ_TERN,
+  FILTER_NOT_EQ_TERN
 } type_filter_operation;
 
 // --------------------------------------------------------------------------------------

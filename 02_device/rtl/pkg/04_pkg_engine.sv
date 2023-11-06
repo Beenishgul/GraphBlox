@@ -234,11 +234,11 @@ package PKG_ENGINE;
     } engine_alu_ops_generator_state;
 
     typedef struct packed{
-        type_ALU_operation                      alu_operation      ;
-        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] alu_mask           ;
-        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] field_mask         ;
-        logic [      CACHE_FRONTEND_DATA_W-1:0] constant_value     ;
-        logic                                   operate_on_constant;
+        type_ALU_operation                                                       alu_operation;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  alu_mask     ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask   ;
+        logic [      CACHE_FRONTEND_DATA_W-1:0]                                  const_value  ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask     ;
     } ALUOpsConfigurationParameters;
 
     typedef struct packed{
@@ -250,6 +250,47 @@ package PKG_ENGINE;
         logic                      valid  ;
         ALUOpsConfigurationPayload payload;
     } ALUOpsConfiguration;
+
+// --------------------------------------------------------------------------------------
+// Filter\_Cond\_Engine
+// --------------------------------------------------------------------------------------
+// Forward the data in a lane and operate if condition is true
+// Keeps the original meta data for that lane
+
+    typedef enum logic[12:0] {
+        ENGINE_FILTER_COND_GEN_RESET,
+        ENGINE_FILTER_COND_GEN_IDLE,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY,
+        ENGINE_FILTER_COND_GEN_START_TRANS,
+        ENGINE_FILTER_COND_GEN_START,
+        ENGINE_FILTER_COND_GEN_PAUSE_TRANS,
+        ENGINE_FILTER_COND_GEN_BUSY,
+        ENGINE_FILTER_COND_GEN_BUSY_TRANS,
+        ENGINE_FILTER_COND_GEN_PAUSE,
+        ENGINE_FILTER_COND_GEN_DONE_TRANS,
+        ENGINE_FILTER_COND_GEN_DONE
+    } engine_filter_cond_generator_state;
+
+    typedef struct packed{
+        type_filter_operation                                                    filter_operation;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  filter_mask     ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask      ;
+        logic [      CACHE_FRONTEND_DATA_W-1:0]                                  const_value     ;
+        logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask        ;
+        logic                                                                    break_flag      ;
+    } FilterCondConfigurationParameters;
+
+    typedef struct packed{
+        FilterCondConfigurationParameters param;
+        MemoryPacketMeta                  meta ;
+    } FilterCondConfigurationPayload;
+
+    typedef struct packed{
+        logic                          valid  ;
+        FilterCondConfigurationPayload payload;
+    } FilterCondConfiguration;
 
 // --------------------------------------------------------------------------------------
 // Read\_Write\_Engine
