@@ -83,7 +83,6 @@ module engine_filter_cond_generator #(parameter
     FilterCondConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket          generator_engine_request_engine_reg    ;
-    MemoryPacket          generator_engine_request_engine_reg_S2 ;
     MemoryPacket          request_engine_out_int                 ;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
@@ -406,10 +405,9 @@ module engine_filter_cond_generator #(parameter
         if (areset_generator) begin
             filter_cond_response_engine_in_valid_reg <= 0;
             generator_engine_request_engine_reg      <= 0;
-            generator_engine_request_engine_reg_S2   <= 0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= filter_cond_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.valid <= filter_cond_response_engine_in_valid_flag & (result_flag);
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
@@ -417,7 +415,7 @@ module engine_filter_cond_generator #(parameter
                 generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops;
                 generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
                 generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data            <= response_engine_in_int.payload.data;
+                generator_engine_request_engine_reg.payload.data            <= result_data;
 
                 filter_cond_response_engine_in_valid_reg <= 1'b1;
             end else begin
@@ -427,10 +425,6 @@ module engine_filter_cond_generator #(parameter
                 else
                     filter_cond_response_engine_in_valid_reg <= filter_cond_response_engine_in_valid_reg;
             end
-
-            generator_engine_request_engine_reg_S2.valid        <= generator_engine_request_engine_reg.valid & (result_flag);
-            generator_engine_request_engine_reg_S2.payload.meta <= generator_engine_request_engine_reg.payload.meta;
-            generator_engine_request_engine_reg_S2.payload.data <= result_data;
         end
     end
 
@@ -453,8 +447,8 @@ module engine_filter_cond_generator #(parameter
     assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
-    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
+    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg.valid;
+    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
     assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;
