@@ -430,7 +430,7 @@ module engine_filter_cond_generator #(parameter
                     filter_cond_response_engine_in_valid_reg <= filter_cond_response_engine_in_valid_reg;
             end
 
-            generator_engine_request_engine_reg_S2.valid;       <= generator_engine_request_engine_reg.valid;;
+            generator_engine_request_engine_reg_S2.valid        <= generator_engine_request_engine_reg.valid;
             generator_engine_request_engine_reg_S2.payload.meta <= generator_engine_request_engine_reg.payload.meta;
             generator_engine_request_engine_reg_S2.payload.data <= generator_engine_request_engine_reg.payload.data;
 
@@ -459,8 +459,8 @@ module engine_filter_cond_generator #(parameter
     assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
-    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
+    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S3.valid;
+    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S3.payload;
 
     // Pop
     assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;

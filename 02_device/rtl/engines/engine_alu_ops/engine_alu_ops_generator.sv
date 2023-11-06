@@ -425,7 +425,7 @@ module engine_alu_ops_generator #(parameter
                 else
                     alu_ops_response_engine_in_valid_reg <= alu_ops_response_engine_in_valid_reg;
             end
-            generator_engine_request_engine_reg_S2.valid;       <= generator_engine_request_engine_reg.valid;;
+            generator_engine_request_engine_reg_S2.valid        <= generator_engine_request_engine_reg.valid;
             generator_engine_request_engine_reg_S2.payload.meta <= generator_engine_request_engine_reg.payload.meta;
             generator_engine_request_engine_reg_S2.payload.data <= generator_engine_request_engine_reg.payload.data;
 
