@@ -62,4 +62,6 @@
 .ENGINE_MERGE_WIDTH                      (ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]              ),
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
+.FIFO_WRITE_DEPTH 					     (16                                               ),
+.PROG_THRESH      						 (8                                                ),
 .NUM_LANES                               (NUM_LANES                                        )
