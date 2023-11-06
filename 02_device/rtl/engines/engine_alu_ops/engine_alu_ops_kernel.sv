@@ -31,18 +31,28 @@ module engine_alu_ops_kernel (
 );
 
   // Define internal signals
-  MemoryPacketData                      values_reg;
-  MemoryPacketData                      result_int;
+  MemoryPacketData ops_value_reg;
+  MemoryPacketData result_int   ;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
     if (areset) begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        values_reg.field[i] <= 0;
+        ops_value_reg.field[i] <= 0;
       end
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        values_reg.field[i] <= config_params.operate_on_constant&&config_params_valid?config_params.constant_value:data_valid?data.field[i] : 0;
+        if(config_params.const_mask[i] & config_params_valid) begin
+          ops_value_reg.field[i] <= config_params.constant_value;
+        end else if (data_valid & config_params_valid) begin
+          for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+            if(config_params.ops_mask[i][j]) begin
+              ops_value_reg.field[i] <= data.field[j];
+            end
+          end
+        end else begin
+          ops_value_reg.field[i] <= 0;
+        end
       end
     end
   end
@@ -53,14 +63,14 @@ module engine_alu_ops_kernel (
     if (config_params_valid && data_valid) begin
       case (config_params.alu_operation)
         ALU_NOP : begin
-          result_int = values_reg.field[0]; // No operation
+          result_int = ops_value_reg.field[0]; // No operation
         end
 
         ALU_ADD : begin
-          result_int = values_reg.field[0];
+          result_int = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int = result_int + values_reg.field[i];
+              result_int = result_int + ops_value_reg.field[i];
             end else begin
               result_int = result_int;
             end
@@ -68,10 +78,10 @@ module engine_alu_ops_kernel (
         end
 
         ALU_SUB : begin
-          result_int = values_reg.field[0];
+          result_int = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int = result_int - values_reg.field[i];
+              result_int = result_int - ops_value_reg.field[i];
             end else begin
               result_int = result_int;
             end
@@ -79,10 +89,10 @@ module engine_alu_ops_kernel (
         end
 
         ALU_MUL : begin
-          result_int = values_reg.field[0];
+          result_int = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int = result_int * values_reg.field[i];
+              result_int = result_int * ops_value_reg.field[i];
             end else begin
               result_int = result_int;
             end
@@ -90,10 +100,10 @@ module engine_alu_ops_kernel (
         end
 
         ALU_ACC : begin
-          result_int = result_int + values_reg.field[0];
+          result_int = result_int + ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int = result_int + values_reg.field[i];
+              result_int = result_int + ops_value_reg.field[i];
             end else begin
               result_int = result_int;
             end
@@ -101,8 +111,8 @@ module engine_alu_ops_kernel (
         end
 
         ALU_DIV : begin
-          result_int = values_reg.field[0];
-          result_int = result_int >> values_reg.field[1]; // Undefined operations reset result
+          result_int = ops_value_reg.field[0];
+          result_int = result_int >> ops_value_reg.field[1]; // Undefined operations reset result
         end
 
         default : begin

@@ -101,10 +101,10 @@
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - alu_operation
 0x00000003 //  1  - alu_mask
-0x00000000 //  2  - constant_value
-0x00000000 //  3  - operate_on_constant
+0x00000001 //  2  - const_mask
+0x00000003 //  3  - const_value
+0x00000041 //  5  - ops_mask
 0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  5  - Reserved
 0x00000000 //  6  - Reserved
 0x00000000 //  7  - Reserved
 0x00000000 //  8  - Reserved
@@ -237,10 +237,10 @@
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - alu_operation
 0x00000003 //  1  - alu_mask
-0x00000000 //  2  - constant_value
-0x00000000 //  3  - operate_on_constant
+0x00000000 //  2  - const_mask
+0x00000000 //  3  - const_value
+0x00000041 //  5  - ops_mask
 0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  5  - Reserved
 0x00000000 //  6  - Reserved
 0x00000000 //  7  - Reserved
 0x00000000 //  8  - Reserved
