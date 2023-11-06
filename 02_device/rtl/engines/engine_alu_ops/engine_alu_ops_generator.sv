@@ -84,6 +84,7 @@ module engine_alu_ops_generator #(parameter
     ALUOpsConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket          generator_engine_request_engine_reg    ;
+    MemoryPacket          generator_engine_request_engine_reg_S2 ;
     MemoryPacket          request_engine_out_int                 ;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
@@ -401,8 +402,9 @@ module engine_alu_ops_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            alu_ops_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg  <= 0;
+            alu_ops_response_engine_in_valid_reg   <= 0;
+            generator_engine_request_engine_reg    <= 0;
+            generator_engine_request_engine_reg_S2 <= 0;
         end
         else begin
             generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
@@ -423,18 +425,22 @@ module engine_alu_ops_generator #(parameter
                 else
                     alu_ops_response_engine_in_valid_reg <= alu_ops_response_engine_in_valid_reg;
             end
+
+            generator_engine_request_engine_reg_S2.valid        <= generator_engine_request_engine_reg.valid;
+            generator_engine_request_engine_reg_S2.payload.meta <= generator_engine_request_engine_reg.payload.meta;
+            generator_engine_request_engine_reg_S2.payload.data <= result;
         end
     end
 
     engine_alu_ops_kernel inst_engine_alu_ops_kernel (
-        .ap_clk             (ap_clk                                                        ),
-        .areset             (areset_kernel                                                 ),
-        .clear              (~(response_engine_in_int.valid & configure_engine_param_valid)),
-        .config_params_valid(configure_engine_param_valid                                  ),
-        .config_params      (configure_engine_param_int                                    ),
-        .data_valid         (response_engine_in_int.valid                                  ),
-        .data               (response_engine_in_int.payload.data                           ),
-        .result             (result                                                        )
+        .ap_clk             (ap_clk                             ),
+        .areset             (areset_kernel                      ),
+        .clear              (~(configure_engine_param_valid)    ),
+        .config_params_valid(configure_engine_param_valid       ),
+        .config_params      (configure_engine_param_int         ),
+        .data_valid         (response_engine_in_int.valid       ),
+        .data               (response_engine_in_int.payload.data),
+        .result             (result                             )
     );
 
 // --------------------------------------------------------------------------------------
@@ -444,8 +450,8 @@ module engine_alu_ops_generator #(parameter
     assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg.valid;
-    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg.payload;
+    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
+    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
 
     // Pop
     assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;
