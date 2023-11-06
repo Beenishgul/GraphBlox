@@ -32,7 +32,7 @@ module engine_alu_ops_kernel (
 
   // Define internal signals
   MemoryPacketData                      values_reg;
-  logic [(CACHE_FRONTEND_DATA_W*4)-1:0] result_int;
+  MemoryPacketData                      result_int;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
@@ -115,12 +115,10 @@ module engine_alu_ops_kernel (
   // Output assignment logic
   always_ff @(posedge ap_clk) begin
     if (areset || clear) begin
-      // Clear all result fields on reset or clear
       result <= 0;
     end else begin
-      // Assign the ALU result to the output MemoryPacketData
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        result.field[i] <= result_int[CACHE_FRONTEND_DATA_W * i +: CACHE_FRONTEND_DATA_W];
+        result.field[i] <= result_int.field[i];
       end
     end
   end
