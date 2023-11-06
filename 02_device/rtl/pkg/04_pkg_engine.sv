@@ -274,8 +274,8 @@ package PKG_ENGINE;
     } engine_filter_cond_generator_state;
 
     typedef struct packed{
-        MemoryPacketArbitrate                  if  ;
-        MemoryPacketArbitrate                  else;
+        MemoryPacketArbitrate                  _if  ;
+        MemoryPacketArbitrate                  _else;
         logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
     } FilterCondMemoryPacketRoute;
 
@@ -289,7 +289,7 @@ package PKG_ENGINE;
         logic                                                                    continue_flag   ;
         logic                                                                    ternary_flag    ;
         logic                                                                    conditional_flag;
-        FilterCondMemoryPacketRoute                                              conditional_route    ;
+        FilterCondMemoryPacketRoute                                              filter_route    ;
     } FilterCondConfigurationParameters;
 
     typedef struct packed{
