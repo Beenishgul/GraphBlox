@@ -164,12 +164,13 @@ module engine_filter_cond_configure_memory #(parameter
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
-            configure_memory_reg.valid                       <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.to       <= configure_memory_meta_int.route.to;
-            configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.route.hops     <= configure_memory_meta_int.route.hops;
-            configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
-            configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
+            configure_memory_reg.valid                                <= configure_memory_valid_int;
+            configure_memory_reg.payload.meta.route.to                <= configure_memory_meta_int.route.to;
+            configure_memory_reg.payload.meta.route.from              <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.route.hops              <= configure_memory_meta_int.route.hops;
+            configure_memory_reg.payload.meta.address.base            <= configure_memory_meta_int.address.base;
+            configure_memory_reg.payload.meta.address.offset          <= configure_memory_meta_int.address.offset;
+            configure_memory_reg.payload.param.conditional_route.hops <= configure_memory_meta_int.route.hops;
 
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
@@ -194,16 +195,25 @@ module engine_filter_cond_configure_memory #(parameter
                         configure_memory_valid_reg[4]               <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+5) : begin
-                        configure_memory_reg.payload.param.break_flag    <= fifo_response_memory_in_dout_int.payload.data.field[0][0];
-                        configure_memory_reg.payload.param.continue_flag <= fifo_response_memory_in_dout_int.payload.data.field[0][1];
-                        configure_memory_reg.payload.param.ternary_flag  <= fifo_response_memory_in_dout_int.payload.data.field[0][2];
-                        configure_memory_valid_reg[5]                            <= 1'b1  ;
+                        configure_memory_reg.payload.param.break_flag       <= fifo_response_memory_in_dout_int.payload.data.field[0][0];
+                        configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_int.payload.data.field[0][1];
+                        configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_int.payload.data.field[0][2];
+                        configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_int.payload.data.field[0][3];
+                        configure_memory_valid_reg[5]                       <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_valid_reg[6] <= 1'b1  ;
+                        configure_memory_reg.payload.param.conditional_route.if.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
+                        configure_memory_reg.payload.param.conditional_route.if.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
+                        configure_memory_reg.payload.param.conditional_route.if.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                        configure_memory_reg.payload.param.conditional_route.if.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                        configure_memory_valid_reg[6]                                     <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
-                        configure_memory_valid_reg[7] <= 1'b1  ;
+                        configure_memory_reg.payload.param.conditional_route.else.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
+                        configure_memory_reg.payload.param.conditional_route.else.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
+                        configure_memory_reg.payload.param.conditional_route.else.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                        configure_memory_reg.payload.param.conditional_route.else.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                        configure_memory_valid_reg[7]                                       <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+8) : begin
                         configure_memory_valid_reg[8] <= 1'b1  ;
