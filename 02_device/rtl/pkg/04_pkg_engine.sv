@@ -280,6 +280,8 @@ package PKG_ENGINE;
         logic [      CACHE_FRONTEND_DATA_W-1:0]                                  const_value     ;
         logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask        ;
         logic                                                                    break_flag      ;
+        logic                                                                    continue_flag   ;
+        logic                                                                    ternary_flag    ;
     } FilterCondConfigurationParameters;
 
     typedef struct packed{

@@ -253,8 +253,8 @@ with open(output_file_path, "w") as file:
     file.write("// FIFO SETTINGS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
 
-    file.write("parameter FIFO_WRITE_DEPTH = 32,\n")
-    file.write("parameter PROG_THRESH      = 16,\n\n")
+    file.write("parameter FIFO_WRITE_DEPTH = 16,\n")
+    file.write("parameter PROG_THRESH      = 8,\n\n")
 
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// CU CONFIGURATIONS SETTINGS\n")

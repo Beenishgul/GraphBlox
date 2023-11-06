@@ -50,7 +50,6 @@ module engine_alu_ops_generator #(parameter
     output logic                  done_out
 );
 
-    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -210,7 +209,6 @@ module engine_alu_ops_generator #(parameter
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
     end
-
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
