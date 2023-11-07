@@ -483,10 +483,12 @@ module engine_csr_index #(parameter
     assign modules_fifo_response_engine_in_signals_out[0] = configure_engine_fifo_response_engine_in_signals_out;
 
     engine_csr_index_configure_engine #(
-        .ID_CU    (ID_CU    ),
-        .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  ),
-        .ID_ENGINE(ID_ENGINE)
+        .ID_CU           (ID_CU           ),
+        .ID_BUNDLE       (ID_BUNDLE       ),
+        .ID_LANE         (ID_LANE         ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
+        .PROG_THRESH     (PROG_THRESH     ),
+        .ID_ENGINE       (ID_ENGINE       )
     ) inst_engine_csr_index_configure_engine (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_engine                             ),
@@ -510,12 +512,14 @@ module engine_csr_index #(parameter
     assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_response_memory_in_signals_out;
 
     engine_csr_index_configure_memory #(
-        .ID_CU      (ID_CU      ),
-        .ID_BUNDLE  (ID_BUNDLE  ),
-        .ID_LANE    (ID_LANE    ),
-        .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE),
-        .ID_MODULE  (0          )
+        .ID_CU           (ID_CU           ),
+        .ID_BUNDLE       (ID_BUNDLE       ),
+        .ID_LANE         (ID_LANE         ),
+        .ID_ENGINE       (ID_ENGINE       ),
+        .ID_RELATIVE     (ID_RELATIVE     ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
+        .PROG_THRESH     (PROG_THRESH     ),
+        .ID_MODULE       (0               )
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),

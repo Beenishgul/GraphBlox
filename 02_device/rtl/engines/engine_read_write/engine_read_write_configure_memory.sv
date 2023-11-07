@@ -27,6 +27,8 @@ module engine_read_write_configure_memory #(parameter
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
     ID_MODULE        = 0                                ,
+    FIFO_WRITE_DEPTH = 16                               ,
+    PROG_THRESH      = 8                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
@@ -279,10 +281,10 @@ module engine_read_write_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                        )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -314,10 +316,10 @@ module engine_read_write_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                                  ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                    ),
         .WRITE_DATA_WIDTH($bits(ReadWriteConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(ReadWriteConfigurationPayload)),
-        .PROG_THRESH     (16                                  )
+        .PROG_THRESH     (PROG_THRESH                         )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
