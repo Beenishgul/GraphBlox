@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_csr_index_configure_engine.sv
+// File   : engine_read_write_configure_engine.sv
 // Create : 2023-07-17 15:02:02
 // Revise : 2023-08-21 09:48:40
 // Editor : sublime text4, tab size (4)
@@ -20,7 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_csr_index_configure_engine #(parameter
+module engine_read_write_configure_engine #(parameter
     ID_CU     = 0,
     ID_BUNDLE = 0,
     ID_LANE   = 0,
@@ -40,8 +40,8 @@ module engine_csr_index_configure_engine #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_csr_index_generator;
-    logic areset_fifo               ;
+    logic areset_read_write_generator;
+    logic areset_fifo                ;
 
     MemoryPacket           response_engine_in_reg    ;
     ReadWriteConfiguration configure_engine_reg      ;
@@ -75,15 +75,15 @@ module engine_csr_index_configure_engine #(parameter
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_csr_index_generator <= areset;
-        areset_fifo                <= areset;
+        areset_read_write_generator <= areset;
+        areset_fifo                 <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             response_engine_in_reg.valid           <= 1'b0;
             fifo_response_engine_in_signals_in_reg <= 0;
             fifo_configure_engine_signals_in_reg   <= 0;
@@ -102,7 +102,7 @@ module engine_csr_index_configure_engine #(parameter
 // Drive output
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             fifo_setup_signal          <= 1'b1;
             configure_engine_out.valid <= 0;
         end else begin
@@ -123,7 +123,7 @@ module engine_csr_index_configure_engine #(parameter
     assign configure_engine_valid_int = configure_engine_valid_reg;
 
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             configure_engine_reg       <= 0;
             configure_engine_valid_reg <= 0;
         end else begin
@@ -223,4 +223,4 @@ module engine_csr_index_configure_engine #(parameter
         .rd_rst_busy(fifo_configure_engine_signals_out_int.rd_rst_busy)
     );
 
-endmodule : engine_csr_index_configure_engine
+endmodule : engine_read_write_configure_engine
