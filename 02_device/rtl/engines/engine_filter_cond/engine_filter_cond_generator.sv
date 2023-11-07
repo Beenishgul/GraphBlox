@@ -416,11 +416,13 @@ module engine_filter_cond_generator #(parameter
             generator_engine_request_engine_reg.payload.data <= result_data_int;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to   <= response_engine_in_int.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops;
-                generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
+                generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
+                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
+                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
+                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
 
                 filter_cond_response_engine_in_valid_reg <= 1'b1;
             end else begin

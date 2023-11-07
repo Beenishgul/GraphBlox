@@ -342,12 +342,14 @@ module engine_alu_ops #(parameter
     assign configure_memory_fifo_response_memory_in_signals_in.rd_en = 1'b1;
 
     engine_alu_ops_configure_memory #(
-        .ID_CU      (ID_CU      ),
-        .ID_BUNDLE  (ID_BUNDLE  ),
-        .ID_LANE    (ID_LANE    ),
-        .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE),
-        .ID_MODULE  (0          )
+        .ID_CU           (ID_CU           ),
+        .ID_BUNDLE       (ID_BUNDLE       ),
+        .ID_LANE         (ID_LANE         ),
+        .ID_ENGINE       (ID_ENGINE       ),
+        .ID_RELATIVE     (ID_RELATIVE     ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
+        .PROG_THRESH     (PROG_THRESH     ),
+        .ID_MODULE       (0               )
     ) inst_engine_alu_ops_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),

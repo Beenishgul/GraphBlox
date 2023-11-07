@@ -26,6 +26,8 @@ module engine_csr_index_configure_memory #(parameter
     ID_LANE          = 0                                ,
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
+    FIFO_WRITE_DEPTH = 16                               ,
+    PROG_THRESH      = 8                                ,
     ID_MODULE        = 0                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
@@ -208,7 +210,7 @@ module engine_csr_index_configure_memory #(parameter
                         configure_memory_valid_reg[5]                     <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_valid_reg[6]                      <= 1'b1  ;
+                        configure_memory_valid_reg[6] <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
                         configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
@@ -279,10 +281,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (16                        )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -314,10 +316,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                                 ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (16                                 )
+        .PROG_THRESH     (PROG_THRESH                        )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),

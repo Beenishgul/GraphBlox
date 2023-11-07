@@ -404,11 +404,13 @@ module engine_forward_data_generator #(parameter
             generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to   <= response_engine_in_int.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data            <= response_engine_in_int.payload.data;
+                generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
+                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
+                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
+                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
+                generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data;
 
                 if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
                     generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
