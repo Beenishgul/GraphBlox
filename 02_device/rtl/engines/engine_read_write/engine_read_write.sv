@@ -55,7 +55,6 @@ module engine_read_write #(parameter
     output logic                  done_out
 );
 
-    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -120,13 +119,8 @@ module engine_read_write #(parameter
 // --------------------------------------------------------------------------------------
     logic configure_fifo_setup_signal;
 
-    MemoryPacket           configure_engine_response_engine_in                 ;
-    FIFOStateSignalsInput  configure_engine_fifo_response_engine_in_signals_in ;
-    FIFOStateSignalsOutput configure_engine_fifo_response_engine_in_signals_out;
-    ReadWriteConfiguration configure_engine_out                                ;
-    FIFOStateSignalsInput  configure_engine_fifo_configure_engine_signals_in   ;
-    FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out  ;
-    logic                  configure_engine_fifo_setup_signal                  ;
+    ReadWriteConfiguration configure_engine_out                              ;
+    FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out;
 
     MemoryPacket           configure_memory_response_memory_in                 ;
     FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
@@ -167,13 +161,6 @@ module engine_read_write #(parameter
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Response/Engine Generator
 // --------------------------------------------------------------------------------------
-    logic                  areset_arbiter_1_to_N_engine                                    ;
-    MemoryPacket           arbiter_1_to_N_engine_response_in                               ;
-    FIFOStateSignalsInput  arbiter_1_to_N_engine_fifo_response_signals_in [NUM_MODULES-1:0];
-    FIFOStateSignalsOutput arbiter_1_to_N_engine_fifo_response_signals_out                 ;
-    MemoryPacket           arbiter_1_to_N_engine_response_out             [NUM_MODULES-1:0];
-    logic                  arbiter_1_to_N_engine_fifo_setup_signal                         ;
-
     logic                  areset_arbiter_1_to_N_memory                                    ;
     MemoryPacket           arbiter_1_to_N_memory_response_in                               ;
     FIFOStateSignalsInput  arbiter_1_to_N_memory_fifo_response_signals_in [NUM_MODULES-1:0];
@@ -181,9 +168,6 @@ module engine_read_write #(parameter
     MemoryPacket           arbiter_1_to_N_memory_response_out             [NUM_MODULES-1:0];
     logic                  arbiter_1_to_N_memory_fifo_setup_signal                         ;
 
-    MemoryPacket           modules_response_engine_in                 [NUM_MODULES-1:0];
-    FIFOStateSignalsInput  modules_fifo_response_engine_in_signals_in [NUM_MODULES-1:0];
-    FIFOStateSignalsOutput modules_fifo_response_engine_in_signals_out[NUM_MODULES-1:0];
     MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1:0];
     FIFOStateSignalsInput  modules_fifo_response_memory_in_signals_in [NUM_MODULES-1:0];
     FIFOStateSignalsOutput modules_fifo_response_memory_in_signals_out[NUM_MODULES-1:0];
@@ -197,7 +181,6 @@ module engine_read_write #(parameter
         areset_configure_engine      <= areset;
         areset_configure_memory      <= areset;
         areset_generator             <= areset;
-        areset_arbiter_1_to_N_engine <= areset;
         areset_arbiter_1_to_N_memory <= areset;
     end
 
@@ -282,7 +265,7 @@ module engine_read_write #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~arbiter_1_to_N_engine_fifo_response_signals_out.prog_full;
+    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~generator_engine_fifo_response_engine_in_signals_out.prog_full;
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -418,36 +401,11 @@ module engine_read_write #(parameter
 // --------------------------------------------------------------------------------------
 // Configuration modules
 // --------------------------------------------------------------------------------------
-    assign configure_fifo_setup_signal = configure_memory_fifo_setup_signal | configure_engine_fifo_setup_signal | arbiter_1_to_N_memory_fifo_setup_signal | arbiter_1_to_N_engine_fifo_setup_signal;
+    assign configure_fifo_setup_signal = configure_memory_fifo_setup_signal | arbiter_1_to_N_memory_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
 // Generate Response - Signals
 // --------------------------------------------------------------------------------------
-// Generate Response - Arbiter Signals: Engine Response Generator
-// --------------------------------------------------------------------------------------
-    assign arbiter_1_to_N_engine_response_in = response_engine_in_int;
-    always_comb begin
-        for (int i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_engine_response
-            arbiter_1_to_N_engine_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_engine_in_signals_out[i].prog_full;
-            modules_response_engine_in[i] = arbiter_1_to_N_engine_response_out[i];
-            modules_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
-        end
-    end
-
-// --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(
-        .NUM_MEMORY_REQUESTOR(NUM_MODULES),
-        .ID_LEVEL            (4          )
-    ) inst_arbiter_1_to_N_engine_response_in (
-        .ap_clk                   (ap_clk                                         ),
-        .areset                   (areset_arbiter_1_to_N_engine                   ),
-        .response_in              (arbiter_1_to_N_engine_response_in              ),
-        .fifo_response_signals_in (arbiter_1_to_N_engine_fifo_response_signals_in ),
-        .fifo_response_signals_out(arbiter_1_to_N_engine_fifo_response_signals_out),
-        .response_out             (arbiter_1_to_N_engine_response_out             ),
-        .fifo_setup_signal        (arbiter_1_to_N_engine_fifo_setup_signal        )
-    );
-
 // Generate Response - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
     assign arbiter_1_to_N_memory_response_in = response_memory_in_int;
@@ -471,33 +429,6 @@ module engine_read_write #(parameter
         .fifo_response_signals_out(arbiter_1_to_N_memory_fifo_response_signals_out),
         .response_out             (arbiter_1_to_N_memory_response_out             ),
         .fifo_setup_signal        (arbiter_1_to_N_memory_fifo_setup_signal        )
-    );
-
-// --------------------------------------------------------------------------------------
-// Configuration module - Engine transient
-// --------------------------------------------------------------------------------------
-    assign configure_engine_fifo_response_engine_in_signals_in.rd_en = generator_engine_configure_engine_setup;
-
-    assign configure_engine_response_engine_in                     = modules_response_engine_in[0];
-    assign configure_engine_fifo_configure_engine_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[0].rd_en;
-
-    assign modules_fifo_response_engine_in_signals_out[0] = configure_engine_fifo_response_engine_in_signals_out;
-
-    engine_read_write_configure_engine #(
-        .ID_CU    (ID_CU    ),
-        .ID_BUNDLE(ID_BUNDLE),
-        .ID_LANE  (ID_LANE  ),
-        .ID_ENGINE(ID_ENGINE)
-    ) inst_engine_read_write_configure_engine (
-        .ap_clk                             (ap_clk                                              ),
-        .areset                             (areset_configure_engine                             ),
-        .response_engine_in                 (configure_engine_response_engine_in                 ),
-        .fifo_response_engine_in_signals_in (configure_engine_fifo_response_engine_in_signals_in ),
-        .fifo_response_engine_in_signals_out(configure_engine_fifo_response_engine_in_signals_out),
-        .configure_engine_out               (configure_engine_out                                ),
-        .fifo_configure_engine_signals_in   (configure_engine_fifo_configure_engine_signals_in   ),
-        .fifo_configure_engine_signals_out  (configure_engine_fifo_configure_engine_signals_out  ),
-        .fifo_setup_signal                  (configure_engine_fifo_setup_signal                  )
     );
 
 // --------------------------------------------------------------------------------------
@@ -538,9 +469,8 @@ module engine_read_write #(parameter
     assign generator_engine_configure_memory_in                       = configure_memory_out;
     assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
 
-    assign generator_engine_response_engine_in                       = modules_response_engine_in[1];
-    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[1].rd_en;
-    assign modules_fifo_response_engine_in_signals_out[1].prog_full  = generator_engine_fifo_response_engine_in_signals_out.rd_en;
+    assign generator_engine_response_engine_in                       = response_engine_in_int;
+    assign generator_engine_fifo_response_engine_in_signals_in.rd_en = 1'b1;
 
     assign generator_engine_response_memory_in                       = modules_response_memory_in[1];
     assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en;
@@ -564,8 +494,6 @@ module engine_read_write #(parameter
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_generator                                    ),
         .descriptor_in                      (descriptor_in_reg                                   ),
-        .configure_engine_in                (generator_engine_configure_engine_in                ),
-        .fifo_configure_engine_in_signals_in(generator_engine_fifo_configure_engine_in_signals_in),
         .configure_memory_in                (generator_engine_configure_memory_in                ),
         .fifo_configure_memory_in_signals_in(generator_engine_fifo_configure_memory_in_signals_in),
         .response_engine_in                 (generator_engine_response_engine_in                 ),
