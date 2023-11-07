@@ -114,8 +114,10 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Filter data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic            result_flag;
-    MemoryPacketData result_data;
+    logic            result_flag_int;
+    logic            result_flag_reg;
+    MemoryPacketData result_data_int;
+    MemoryPacketData result_data_reg;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -399,15 +401,19 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    assign filter_cond_response_engine_in_valid_flag = &filter_cond_response_engine_in_valid_reg;
+    assign filter_cond_response_engine_in_valid_flag = filter_cond_response_engine_in_valid_reg & result_flag_int;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             filter_cond_response_engine_in_valid_reg <= 0;
             generator_engine_request_engine_reg      <= 0;
+            result_flag_reg                          <= 0;
+            result_data_reg                          <= 0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= filter_cond_response_engine_in_valid_flag & result_flag;
+            result_data_reg                                  <= result_data_int;
+            generator_engine_request_engine_reg.valid        <= filter_cond_response_engine_in_valid_flag ;
+            generator_engine_request_engine_reg.payload.data <= result_data_reg;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 generator_engine_request_engine_reg.payload.meta.route.from <= response_engine_in_int.payload.meta.route.from;
@@ -415,11 +421,10 @@ module engine_filter_cond_generator #(parameter
                 generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops;
                 generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
                 generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data            <= result_data;
 
                 filter_cond_response_engine_in_valid_reg <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
+                generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
                 if(filter_cond_response_engine_in_valid_flag)
                     filter_cond_response_engine_in_valid_reg <= 1'b0;
                 else
@@ -436,8 +441,8 @@ module engine_filter_cond_generator #(parameter
         .config_params      (configure_engine_param_int         ),
         .data_valid         (response_engine_in_int.valid       ),
         .data               (response_engine_in_int.payload.data),
-        .result_flag        (result_flag                        ),
-        .result_data        (result_data                        )
+        .result_flag        (result_flag_int                    ),
+        .result_data        (result_data_int                    )
     );
 
 // --------------------------------------------------------------------------------------
