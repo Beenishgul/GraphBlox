@@ -393,17 +393,21 @@ module engine_alu_ops_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    MemoryPacketData result;
+    MemoryPacketData result_int;
+    MemoryPacketData result_reg;
 
-    assign alu_ops_response_engine_in_valid_flag = &alu_ops_response_engine_in_valid_reg;
+    assign alu_ops_response_engine_in_valid_flag = alu_ops_response_engine_in_valid_reg;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            alu_ops_response_engine_in_valid_reg   <= 0;
-            generator_engine_request_engine_reg    <= 0;
+            alu_ops_response_engine_in_valid_reg <= 0;
+            generator_engine_request_engine_reg  <= 0;
+            result_reg                           <= 0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
+            result_reg                                       <= result_int;
+            generator_engine_request_engine_reg.valid        <= alu_ops_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.payload.data <= result_reg;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 generator_engine_request_engine_reg.payload.meta.route.from <= configure_memory_reg.payload.meta.route.from;
@@ -411,11 +415,10 @@ module engine_alu_ops_generator #(parameter
                 generator_engine_request_engine_reg.payload.meta.route.hops <= configure_memory_reg.payload.meta.route.hops;
                 generator_engine_request_engine_reg.payload.meta.address    <= response_engine_in_int.payload.meta.address;
                 generator_engine_request_engine_reg.payload.meta.subclass   <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data            <= result;
 
                 alu_ops_response_engine_in_valid_reg <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
+                generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
                 if(alu_ops_response_engine_in_valid_flag)
                     alu_ops_response_engine_in_valid_reg <= 1'b0;
                 else
@@ -432,7 +435,7 @@ module engine_alu_ops_generator #(parameter
         .config_params      (configure_engine_param_int         ),
         .data_valid         (response_engine_in_int.valid       ),
         .data               (response_engine_in_int.payload.data),
-        .result             (result                             )
+        .result             (result_int                         )
     );
 
 // --------------------------------------------------------------------------------------
