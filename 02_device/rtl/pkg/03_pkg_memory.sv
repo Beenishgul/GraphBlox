@@ -54,17 +54,6 @@ typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
-//   Generic Memory Operand location
-// --------------------------------------------------------------------------------------
-parameter TYPE_ENGINE_OPERAND_BITS = 4;
-typedef enum logic[TYPE_ENGINE_OPERAND_BITS-1:0] {
-  OP_LOCATION_0,
-  OP_LOCATION_1,
-  OP_LOCATION_2,
-  OP_LOCATION_3
-} type_engine_operand;
-
-// --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
 parameter TYPE_FILTER_OPERATION_BITS = 9;
@@ -106,6 +95,16 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0]{
 } type_data_buffer;
 
 // --------------------------------------------------------------------------------------
+//   Graph CSR structure types
+// --------------------------------------------------------------------------------------
+parameter TYPE_SEQUENCE_STATE_BITS = 3;
+typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0]{
+  SEQUENCE_INVALID,
+  SEQUENCE_RUNNING,
+  SEQUENCE_DONE
+} type_sequence_state;
+
+// --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
@@ -118,9 +117,11 @@ typedef struct packed{
 } MemoryPacketArbitrate;
 
 typedef struct packed{
-  MemoryPacketArbitrate                  from;
-  MemoryPacketArbitrate                  to  ;
-  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
+  MemoryPacketArbitrate                  from     ;
+  MemoryPacketArbitrate                  to       ;
+  MemoryPacketArbitrate                  seq_src  ;
+  type_sequence_state                    seq_state;
+  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops     ;
 } MemoryPacketRoute;
 
 typedef struct packed{
@@ -137,9 +138,6 @@ typedef struct packed{
 typedef struct packed{
   type_memory_cmd       cmd    ; // SIZE = 5 bits
   type_data_buffer      buffer ; // SIZE = 12 bits
-  type_engine_operand   operand; // SIZE = 6 bits
-  type_filter_operation filter ; // SIZE = 6 bits
-  type_ALU_operation    alu    ; // SIZE = 6 bits
 } MemoryPacketType;
 
 typedef struct packed{

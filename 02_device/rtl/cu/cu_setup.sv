@@ -276,18 +276,28 @@ module cu_setup #(
         configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
-        configuration_comb.payload.meta.route.from.id_cu        = ID_CU;
-        configuration_comb.payload.meta.route.from.id_bundle    = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.from.id_lane      = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.from.id_engine    = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.from.id_module    = 1;
-        configuration_comb.payload.meta.route.from.id_buffer    = 0;
-        configuration_comb.payload.meta.route.to.id_cu          = ID_CU;
-        configuration_comb.payload.meta.route.to.id_bundle      = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.to.id_lane        = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.to.id_engine      = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
-        configuration_comb.payload.meta.route.to.id_module      = 1; // routes to memory configuration modules in engines
-        configuration_comb.payload.meta.route.to.id_buffer      = 0;
+        configuration_comb.payload.meta.route.from.id_cu     = ID_CU;
+        configuration_comb.payload.meta.route.from.id_bundle = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_lane   = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_engine = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.from.id_module = 1;
+        configuration_comb.payload.meta.route.from.id_buffer = 0;
+
+        configuration_comb.payload.meta.route.to.id_cu     = ID_CU;
+        configuration_comb.payload.meta.route.to.id_bundle = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.to.id_lane   = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.to.id_engine = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.to.id_module = 1; // routes to memory configuration modules in engines
+        configuration_comb.payload.meta.route.to.id_buffer = 0;
+
+        configuration_comb.payload.meta.route.seq_src.id_cu     = ID_CU;
+        configuration_comb.payload.meta.route.seq_src.id_bundle = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.seq_src.id_lane   = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.seq_src.id_engine = {CU_ENGINE_COUNT_WIDTH_BITS{1'b1}};
+        configuration_comb.payload.meta.route.seq_src.id_module = 1;
+        configuration_comb.payload.meta.route.seq_src.id_buffer = 0;
+        configuration_comb.payload.meta.route.seq_state         = SEQUENCE_INVALID;
+
         configuration_comb.payload.meta.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configuration_comb.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
         configuration_comb.payload.meta.address.offset          = 0;
@@ -295,9 +305,6 @@ module cu_setup #(
         configuration_comb.payload.meta.address.shift.direction = 1'b1;
         configuration_comb.payload.meta.subclass.cmd            = CMD_MEM_READ;
         configuration_comb.payload.meta.subclass.buffer         = STRUCT_CU_SETUP;
-        configuration_comb.payload.meta.subclass.operand        = OP_LOCATION_0;
-        configuration_comb.payload.meta.subclass.filter         = FILTER_NOP;
-        configuration_comb.payload.meta.subclass.alu            = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin

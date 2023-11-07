@@ -57,17 +57,6 @@ typedef enum ap_uint<TYPE_MEMORY_CMD_BITS> {
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
-//   Generic Memory Operand location
-// --------------------------------------------------------------------------------------
-#define TYPE_ENGINE_OPERAND_BITS 4
-typedef enum ap_uint<TYPE_ENGINE_OPERAND_BITS> {
-  OP_LOCATION_0,
-  OP_LOCATION_1,
-  OP_LOCATION_2,
-  OP_LOCATION_3
-} type_engine_operand;
-
-// --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
 // --------------------------------------------------------------------------------------
 #define TYPE_FILTER_OPERATION_BITS 4
@@ -133,9 +122,6 @@ typedef struct{
 typedef struct{
   type_memory_cmd       cmd    ; // SIZE 5bits
   type_data_buffer      buffer ; // SIZE 1 bits
-  type_engine_operand   operand; // SIZE 6bits
-  type_filter_operation filter ; // SIZE 6bits
-  type_ALU_operation    alu    ; // SIZE 6bits
 } MemoryPacketType;
 
 typedef struct{
