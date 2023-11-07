@@ -525,12 +525,7 @@ module engine_csr_index_generator #(parameter
         fifo_request_comb.payload.meta.route.from.id_lane   = configure_memory_reg.payload.meta.route.from.id_lane;
         fifo_request_comb.payload.meta.route.from.id_engine = configure_memory_reg.payload.meta.route.from.id_engine;
         fifo_request_comb.payload.meta.route.from.id_buffer = configure_memory_reg.payload.meta.route.from.id_buffer;
-
-        if((counter_count >= configure_engine_param_int.index_end)) begin
-            fifo_request_comb.payload.meta.route.seq_state = SEQUENCE_DONE;
-        end else begin
-            fifo_request_comb.payload.meta.route.seq_state = SEQUENCE_RUNNING;
-        end
+        fifo_request_comb.payload.meta.route.from.seq_state = configure_memory_reg.payload.meta.route.from.seq_state;
 
         fifo_request_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
@@ -620,7 +615,19 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_comb begin
         fifo_response_comb.valid                     = response_memory_in_reg.valid;
-        fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
+        // fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
+
+        fifo_response_comb.payload.meta.route.from    = configure_memory_reg.payload.meta.route.from;
+        fifo_response_comb.payload.meta.route.to      = configure_memory_reg.payload.meta.route.to;
+        fifo_response_comb.payload.meta.route.hops    = configure_memory_reg.payload.meta.route.hops;
+        fifo_response_comb.payload.meta.route.seq_src = configure_memory_reg.payload.meta.route.seq_src;
+
+        if(response_memory_counter_is_zero) begin
+            fifo_response_comb.payload.meta.route.seq_state = SEQUENCE_DONE;
+        end else begin
+            fifo_response_comb.payload.meta.route.seq_state = SEQUENCE_RUNNING;
+        end
+
         fifo_response_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
             fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field[0] << configure_memory_reg.payload.meta.address.shift.amount;
