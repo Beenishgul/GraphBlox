@@ -136,18 +136,28 @@ module engine_forward_data_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = 1'b1 << ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = 1'b1 << ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = 1'b1 << ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = 1'b1 << ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1'b1 << ID_MODULE;
-        configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = 0;
-        configure_memory_meta_int.route.to.id_bundle      = 0;
-        configure_memory_meta_int.route.to.id_lane        = 0;
-        configure_memory_meta_int.route.to.id_engine      = 0;
-        configure_memory_meta_int.route.to.id_module      = 1;
-        configure_memory_meta_int.route.to.id_buffer      = 0;
+        configure_memory_meta_int.route.from.id_cu     = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.from.id_bundle = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.from.id_lane   = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.from.id_engine = 1'b1 << ID_ENGINE;
+        configure_memory_meta_int.route.from.id_module = 1'b1 << ID_MODULE;
+        configure_memory_meta_int.route.from.id_buffer = 0;
+
+        configure_memory_meta_int.route.to.id_cu     = 0;
+        configure_memory_meta_int.route.to.id_bundle = 0;
+        configure_memory_meta_int.route.to.id_lane   = 0;
+        configure_memory_meta_int.route.to.id_engine = 0;
+        configure_memory_meta_int.route.to.id_module = 1;
+        configure_memory_meta_int.route.to.id_buffer = 0;
+
+        configure_memory_meta_int.route.seq_src.id_cu     = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.seq_src.id_bundle = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.seq_src.id_lane   = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.seq_src.id_engine = 1'b1 << ID_ENGINE;
+        configure_memory_meta_int.route.seq_src.id_module = 1'b1 << ID_MODULE;
+        configure_memory_meta_int.route.seq_src.id_buffer = 0;
+        configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+
         configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
@@ -155,9 +165,6 @@ module engine_forward_data_configure_memory #(parameter
         configure_memory_meta_int.address.shift.direction = 1'b1;
         configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
         configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
-        configure_memory_meta_int.subclass.operand        = OP_LOCATION_0;
-        configure_memory_meta_int.subclass.filter         = FILTER_NOP;
-        configure_memory_meta_int.subclass.alu            = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -165,12 +172,14 @@ module engine_forward_data_configure_memory #(parameter
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
-            configure_memory_reg.valid                       <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.from     <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.route.to       <= configure_memory_meta_int.route.to;
-            configure_memory_reg.payload.meta.route.hops     <= configure_memory_meta_int.route.hops;
-            configure_memory_reg.payload.meta.address.base   <= configure_memory_meta_int.address.base;
-            configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
+            configure_memory_reg.valid                        <= configure_memory_valid_int;
+            configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.route.to        <= configure_memory_meta_int.route.to;
+            configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
+            configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+            configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
+            configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
+            configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;
 
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)

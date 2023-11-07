@@ -8,7 +8,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : engine_read_write.sv
 // Create : 2023-07-17 14:42:46
-// Revise : 2023-08-30 13:18:39
+// Revise : 2023-08-28 15:49:58
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -22,16 +22,18 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_read_write #(parameter
-    ID_CU            = 0 ,
-    ID_BUNDLE        = 0 ,
-    ID_LANE          = 0 ,
-    ID_ENGINE        = 0 ,
-    ID_RELATIVE      = 0 ,
-    ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
-    NUM_MODULES      = 2 ,
-    PIPELINE_STAGES  = 2
+    ID_CU              = 0 ,
+    ID_BUNDLE          = 0 ,
+    ID_LANE            = 0 ,
+    ID_ENGINE          = 0 ,
+    ID_RELATIVE        = 0 ,
+    ENGINE_CAST_WIDTH  = 1 ,
+    ENGINE_MERGE_WIDTH = 1 ,
+    ENGINES_CONFIG     = 0 ,
+    FIFO_WRITE_DEPTH   = 32,
+    PROG_THRESH        = 16,
+    NUM_MODULES        = 2 ,
+    PIPELINE_STAGES    = 2
 ) (
     // System Signals
     input  logic                  ap_clk                             ,
@@ -424,13 +426,13 @@ module engine_read_write #(parameter
 // Generate Response - Arbiter Signals: Engine Response Generator
 // --------------------------------------------------------------------------------------
     assign arbiter_1_to_N_engine_response_in = response_engine_in_int;
-    generate
-        for (i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_engine_response
-            assign arbiter_1_to_N_engine_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_engine_in_signals_out[i].prog_full;
-            assign modules_response_engine_in[i] = arbiter_1_to_N_engine_response_out[i];
-            assign modules_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_engine_response
+            arbiter_1_to_N_engine_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_engine_in_signals_out[i].prog_full;
+            modules_response_engine_in[i] = arbiter_1_to_N_engine_response_out[i];
+            modules_fifo_response_engine_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
@@ -449,13 +451,13 @@ module engine_read_write #(parameter
 // Generate Response - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
     assign arbiter_1_to_N_memory_response_in = response_memory_in_int;
-    generate
-        for (i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_memory_response
-            assign arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_memory_in_signals_out[i].prog_full;
-            assign modules_response_memory_in[i] = arbiter_1_to_N_memory_response_out[i];
-            assign modules_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+    always_comb begin
+        for (int i=0; i<NUM_MODULES; i++) begin : generate_arbiter_1_to_N_memory_response
+            arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~modules_fifo_response_memory_in_signals_out[i].prog_full;
+            modules_response_memory_in[i] = arbiter_1_to_N_memory_response_out[i];
+            modules_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
         end
-    endgenerate
+    end
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
@@ -513,7 +515,8 @@ module engine_read_write #(parameter
         .ID_BUNDLE  (ID_BUNDLE  ),
         .ID_LANE    (ID_LANE    ),
         .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE)
+        .ID_RELATIVE(ID_RELATIVE),
+        .ID_MODULE  (0          )
     ) inst_engine_read_write_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
@@ -552,6 +555,7 @@ module engine_read_write #(parameter
         .ID_BUNDLE       (ID_BUNDLE       ),
         .ID_LANE         (ID_LANE         ),
         .ID_ENGINE       (ID_ENGINE       ),
+        .ID_MODULE       (1               ),
         .ENGINES_CONFIG  (ENGINES_CONFIG  ),
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
         .PROG_THRESH     (PROG_THRESH     ),

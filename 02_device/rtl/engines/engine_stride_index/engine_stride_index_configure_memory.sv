@@ -26,9 +26,12 @@ module engine_stride_index_configure_memory #(parameter
     ID_LANE          = 0                                ,
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
+    ID_MODULE        = 0                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
-    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
+    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN,
+    FIFO_WRITE_DEPTH = 32                               ,
+    PROG_THRESH      = 16
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -133,18 +136,28 @@ module engine_stride_index_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
     always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1;
-        configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = ID_CU;
-        configure_memory_meta_int.route.to.id_bundle      = ID_BUNDLE;
-        configure_memory_meta_int.route.to.id_lane        = ID_LANE;
-        configure_memory_meta_int.route.to.id_engine      = ID_ENGINE;
-        configure_memory_meta_int.route.to.id_module      = 1;
-        configure_memory_meta_int.route.to.id_buffer      = 0;
+        configure_memory_meta_int.route.from.id_cu     = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.from.id_bundle = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.from.id_lane   = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.from.id_engine = 1'b1 << ID_ENGINE;
+        configure_memory_meta_int.route.from.id_module = 1'b1 << ID_MODULE;
+        configure_memory_meta_int.route.from.id_buffer = 0;
+
+        configure_memory_meta_int.route.to.id_cu     = ID_CU;
+        configure_memory_meta_int.route.to.id_bundle = ID_BUNDLE;
+        configure_memory_meta_int.route.to.id_lane   = ID_LANE;
+        configure_memory_meta_int.route.to.id_engine = ID_ENGINE;
+        configure_memory_meta_int.route.to.id_module = 1;
+        configure_memory_meta_int.route.to.id_buffer = 0;
+
+        configure_memory_meta_int.route.seq_src.id_cu     = 1'b1 << ID_CU;
+        configure_memory_meta_int.route.seq_src.id_bundle = 1'b1 << ID_BUNDLE;
+        configure_memory_meta_int.route.seq_src.id_lane   = 1'b1 << ID_LANE;
+        configure_memory_meta_int.route.seq_src.id_engine = 1'b1 << ID_ENGINE;
+        configure_memory_meta_int.route.seq_src.id_module = 1'b1 << ID_MODULE;
+        configure_memory_meta_int.route.seq_src.id_buffer = 0;
+        configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+
         configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
@@ -152,9 +165,6 @@ module engine_stride_index_configure_memory #(parameter
         configure_memory_meta_int.address.shift.direction = 1'b1;
         configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
         configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
-        configure_memory_meta_int.subclass.operand        = OP_LOCATION_0;
-        configure_memory_meta_int.subclass.filter         = FILTER_NOP;
-        configure_memory_meta_int.subclass.alu            = ALU_NOP;
     end
 
     always_ff @(posedge ap_clk) begin
@@ -162,9 +172,11 @@ module engine_stride_index_configure_memory #(parameter
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
-            configure_memory_reg.valid                   <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.from <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.address    <= configure_memory_meta_int.address;
+            configure_memory_reg.valid                        <= configure_memory_valid_int;
+            configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
+            configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
+            configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+            configure_memory_reg.payload.meta.address         <= configure_memory_meta_int.address;
 
             if(fifo_response_memory_in_dout_int.valid) begin
                 case (fifo_response_memory_in_dout_int_offset_sequence)
@@ -199,10 +211,7 @@ module engine_stride_index_configure_memory #(parameter
                         configure_memory_valid_reg[5]                     <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_reg.payload.meta.subclass.operand <= type_engine_operand'(fifo_response_memory_in_dout_int.payload.data.field[0][TYPE_ENGINE_OPERAND_BITS-1:0]);
-                        configure_memory_reg.payload.meta.subclass.filter  <= type_filter_operation'(fifo_response_memory_in_dout_int.payload.data.field[0][(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:TYPE_ENGINE_OPERAND_BITS]);
-                        configure_memory_reg.payload.meta.subclass.alu     <= type_ALU_operation'(fifo_response_memory_in_dout_int.payload.data.field[0][(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)-1:(TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS)]);
-                        configure_memory_valid_reg[6]                      <= 1'b1  ;
+                        configure_memory_valid_reg[6] <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
                         configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
@@ -273,10 +282,10 @@ module engine_stride_index_configure_memory #(parameter
     assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -308,10 +317,10 @@ module engine_stride_index_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                                 ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (8                                  )
+        .PROG_THRESH     (PROG_THRESH                        )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),

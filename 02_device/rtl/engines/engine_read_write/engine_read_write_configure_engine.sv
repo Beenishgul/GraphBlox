@@ -6,9 +6,9 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_read_write_configure_engine.sv
+// File   : engine_csr_index_configure_engine.sv
 // Create : 2023-07-17 15:02:02
-// Revise : 2023-08-30 13:18:48
+// Revise : 2023-08-21 09:48:40
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_read_write_configure_engine #(parameter
+module engine_csr_index_configure_engine #(parameter
     ID_CU     = 0,
     ID_BUNDLE = 0,
     ID_LANE   = 0,
@@ -169,10 +169,10 @@ module engine_read_write_configure_engine #(parameter
     assign fifo_response_engine_in_dout_int.payload     = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
+        .FIFO_WRITE_DEPTH(32                        ),
         .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
+        .PROG_THRESH     (16                        )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -204,10 +204,10 @@ module engine_read_write_configure_engine #(parameter
     assign fifo_configure_engine_dout_int.payload     = fifo_configure_engine_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                                 ),
+        .FIFO_WRITE_DEPTH(32                                 ),
         .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
         .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (8                                  )
+        .PROG_THRESH     (16                                 )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
@@ -223,4 +223,4 @@ module engine_read_write_configure_engine #(parameter
         .rd_rst_busy(fifo_configure_engine_signals_out_int.rd_rst_busy)
     );
 
-endmodule : engine_read_write_configure_engine
+endmodule : engine_csr_index_configure_engine

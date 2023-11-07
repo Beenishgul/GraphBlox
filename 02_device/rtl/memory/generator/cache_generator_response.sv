@@ -142,9 +142,6 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_din.meta.address          = response_in_reg.payload.meta.address ;
   assign fifo_response_din.meta.route            = response_in_reg.payload.meta.route;
   assign fifo_response_din.meta.subclass.buffer  = response_in_reg.payload.meta.subclass.buffer;
-  assign fifo_response_din.meta.subclass.operand = response_in_reg.payload.meta.subclass.operand ;
-  assign fifo_response_din.meta.subclass.filter  = response_in_reg.payload.meta.subclass.filter ;
-  assign fifo_response_din.meta.subclass.alu     = response_in_reg.payload.meta.subclass.alu ;
   assign fifo_response_din.meta.subclass.cmd     = CMD_MEM_RESPONSE;
 
   // Pop
