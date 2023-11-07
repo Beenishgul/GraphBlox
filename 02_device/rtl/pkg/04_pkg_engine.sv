@@ -31,18 +31,6 @@ package PKG_ENGINE;
 // (Compute Units) would get eight vertex IDs in chunks.
 
     typedef enum logic[8:0] {
-        ENGINE_STRIDE_INDEX_RESET,
-        ENGINE_STRIDE_INDEX_IDLE,
-        ENGINE_STRIDE_INDEX_SETUP,
-        ENGINE_STRIDE_INDEX_START,
-        ENGINE_STRIDE_INDEX_START_TRANS,
-        ENGINE_STRIDE_INDEX_BUSY,
-        ENGINE_STRIDE_INDEX_PAUSE_TRANS,
-        ENGINE_STRIDE_INDEX_PAUSE,
-        ENGINE_STRIDE_INDEX_DONE
-    } engine_stride_index_state;
-
-    typedef enum logic[8:0] {
         ENGINE_STRIDE_INDEX_GEN_RESET,
         ENGINE_STRIDE_INDEX_GEN_IDLE,
         ENGINE_STRIDE_INDEX_GEN_SETUP,
@@ -83,18 +71,6 @@ package PKG_ENGINE;
 // the processed vertex. The read engines can connect to the
 // CSR\_Index\_Generator to acquire the neighbor IDs for further
 // processing, in this scenario reading the data of the vertex neighbors.
-
-    typedef enum logic[8:0] {
-        ENGINE_CSR_INDEX_RESET,
-        ENGINE_CSR_INDEX_IDLE,
-        ENGINE_CSR_INDEX_SETUP,
-        ENGINE_CSR_INDEX_START,
-        ENGINE_CSR_INDEX_START_TRANS,
-        ENGINE_CSR_INDEX_BUSY,
-        ENGINE_CSR_INDEX_PAUSE_TRANS,
-        ENGINE_CSR_INDEX_PAUSE,
-        ENGINE_CSR_INDEX_DONE
-    } engine_csr_index_state;
 
     typedef enum logic[15:0] {
         ENGINE_CSR_INDEX_GEN_RESET,
@@ -276,7 +252,7 @@ package PKG_ENGINE;
     typedef struct packed{
         MemoryPacketArbitrate                  _if  ;
         MemoryPacketArbitrate                  _else;
-        logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
+        logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops ;
     } FilterCondMemoryPacketRoute;
 
     typedef struct packed{
@@ -316,50 +292,47 @@ package PKG_ENGINE;
 // related to reading CSR structure data, for example, reading the offsets
 // array. Mode parameter would decide the engine read/write mode.
 
-    typedef enum logic[8:0] {
-        ENGINE_READ_WRITE_RESET,
-        ENGINE_READ_WRITE_IDLE,
-        ENGINE_READ_WRITE_SETUP,
-        ENGINE_READ_WRITE_START,
-        ENGINE_READ_WRITE_START_TRANS,
-        ENGINE_READ_WRITE_BUSY,
-        ENGINE_READ_WRITE_PAUSE_TRANS,
-        ENGINE_READ_WRITE_PAUSE,
-        ENGINE_READ_WRITE_DONE
-    } engine_read_write_state;
-
-    typedef enum logic[8:0] {
+    typedef enum logic[15:0] {
         ENGINE_READ_WRITE_GEN_RESET,
         ENGINE_READ_WRITE_GEN_IDLE,
-        ENGINE_READ_WRITE_GEN_SETUP,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_IDLE,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_TRANS,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE,
+        ENGINE_READ_WRITE_GEN_START_TRANS,
         ENGINE_READ_WRITE_GEN_START,
         ENGINE_READ_WRITE_GEN_BUSY_TRANS,
         ENGINE_READ_WRITE_GEN_BUSY,
         ENGINE_READ_WRITE_GEN_PAUSE_TRANS,
         ENGINE_READ_WRITE_GEN_PAUSE,
+        ENGINE_READ_WRITE_GEN_DONE_TRANS,
         ENGINE_READ_WRITE_GEN_DONE
     } engine_read_write_generator_state;
 
     typedef struct packed{
         logic                               increment    ;
         logic                               decrement    ;
-        logic                               mode         ;
+        logic                               mode_sequence;
+        logic                               mode_buffer  ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
+        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
         logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
-    } ReadWriteEngineConfigurationParameters;
+    } ReadWriteConfigurationParameters;
 
     typedef struct packed{
-        ReadWriteEngineConfigurationParameters param;
-        MemoryPacketMeta                       meta ;
-    } ReadWriteEngineConfigurationPayload;
-
+        ReadWriteConfigurationParameters param;
+        MemoryPacketMeta                 meta ;
+    } ReadWriteConfigurationPayload;
 
     typedef struct packed{
-        logic                               valid  ;
-        ReadWriteEngineConfigurationPayload payload;
-    } ReadWriteEngineConfiguration;
+        logic                         valid  ;
+        ReadWriteConfigurationPayload payload;
+    } ReadWriteConfiguration;
 
 // --------------------------------------------------------------------------------------
 // CU\_Setup\_Engine

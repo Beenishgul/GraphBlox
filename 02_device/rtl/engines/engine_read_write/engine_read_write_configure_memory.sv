@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_csr_index_configure_memory.sv
+// File   : engine_read_write_configure_memory.sv
 // Create : 2023-07-17 15:02:02
 // Revise : 2023-08-28 15:42:14
 // Editor : sublime text4, tab size (4)
@@ -20,7 +20,7 @@ import PKG_MEMORY::*;
 import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
-module engine_csr_index_configure_memory #(parameter
+module engine_read_write_configure_memory #(parameter
     ID_CU            = 0                                ,
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
@@ -36,7 +36,7 @@ module engine_csr_index_configure_memory #(parameter
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output CSRIndexConfiguration  configure_memory_out               ,
+    output ReadWriteConfiguration configure_memory_out               ,
     input  FIFOStateSignalsInput  fifo_configure_memory_signals_in   ,
     output FIFOStateSignalsOutput fifo_configure_memory_signals_out  ,
     output logic                  fifo_setup_signal
@@ -45,12 +45,12 @@ module engine_csr_index_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_csr_index_generator;
-    logic areset_fifo               ;
+    logic areset_read_write_generator;
+    logic areset_fifo                ;
 
     MemoryPacket                      response_memory_in_reg                          ;
     MemoryPacketMeta                  configure_memory_meta_int                       ;
-    CSRIndexConfiguration             configure_memory_reg                            ;
+    ReadWriteConfiguration            configure_memory_reg                            ;
     logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
     logic                             configure_memory_valid_int                      ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
@@ -71,27 +71,27 @@ module engine_csr_index_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    CSRIndexConfigurationPayload fifo_configure_memory_din             ;
-    CSRIndexConfiguration        fifo_configure_memory_dout_int        ;
-    CSRIndexConfigurationPayload fifo_configure_memory_dout            ;
-    FIFOStateSignalsInput        fifo_configure_memory_signals_in_reg  ;
-    FIFOStateSignalsInput        fifo_configure_memory_signals_in_int  ;
-    FIFOStateSignalsOutput       fifo_configure_memory_signals_out_int ;
-    logic                        fifo_configure_memory_setup_signal_int;
+    ReadWriteConfigurationPayload fifo_configure_memory_din             ;
+    ReadWriteConfiguration        fifo_configure_memory_dout_int        ;
+    ReadWriteConfigurationPayload fifo_configure_memory_dout            ;
+    FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg  ;
+    FIFOStateSignalsInput         fifo_configure_memory_signals_in_int  ;
+    FIFOStateSignalsOutput        fifo_configure_memory_signals_out_int ;
+    logic                         fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_csr_index_generator <= areset;
-        areset_fifo                <= areset;
+        areset_read_write_generator <= areset;
+        areset_fifo                 <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             response_memory_in_reg.valid           <= 1'b0;
             fifo_response_memory_in_signals_in_reg <= 0;
             fifo_configure_memory_signals_in_reg   <= 0;
@@ -110,7 +110,7 @@ module engine_csr_index_configure_memory #(parameter
 // Drive output
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             fifo_setup_signal          <= 1'b1;
             configure_memory_out.valid <= 0;
         end else begin
@@ -163,7 +163,7 @@ module engine_csr_index_configure_memory #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_read_write_generator) begin
             configure_memory_reg       <= 0;
             configure_memory_valid_reg <= 0;
         end else begin
@@ -208,7 +208,7 @@ module engine_csr_index_configure_memory #(parameter
                         configure_memory_valid_reg[5]                     <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_valid_reg[6]                      <= 1'b1  ;
+                        configure_memory_valid_reg[6] <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+7) : begin
                         configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
@@ -314,10 +314,10 @@ module engine_csr_index_configure_memory #(parameter
     assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                                 ),
-        .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
-        .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-        .PROG_THRESH     (16                                 )
+        .FIFO_WRITE_DEPTH(32                                  ),
+        .WRITE_DATA_WIDTH($bits(ReadWriteConfigurationPayload)),
+        .READ_DATA_WIDTH ($bits(ReadWriteConfigurationPayload)),
+        .PROG_THRESH     (16                                  )
     ) inst_fifo_MemoryPacketResponseConigurationInput (
         .clk        (ap_clk                                           ),
         .srst       (areset_fifo                                      ),
@@ -333,4 +333,4 @@ module engine_csr_index_configure_memory #(parameter
         .rd_rst_busy(fifo_configure_memory_signals_out_int.rd_rst_busy)
     );
 
-endmodule : engine_csr_index_configure_memory
+endmodule : engine_read_write_configure_memory
