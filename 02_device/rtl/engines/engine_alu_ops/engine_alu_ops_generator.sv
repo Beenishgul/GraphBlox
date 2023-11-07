@@ -407,7 +407,7 @@ module engine_alu_ops_generator #(parameter
         else begin
             result_reg                                       <= result_int;
             generator_engine_request_engine_reg.valid        <= alu_ops_response_engine_in_valid_flag;
-            generator_engine_request_engine_reg.payload.data <= result_reg;
+            generator_engine_request_engine_reg.payload.data <= result_int;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 generator_engine_request_engine_reg.payload.meta.route.from <= configure_memory_reg.payload.meta.route.from;
