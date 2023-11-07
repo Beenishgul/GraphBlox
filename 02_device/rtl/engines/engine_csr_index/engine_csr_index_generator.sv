@@ -525,7 +525,7 @@ module engine_csr_index_generator #(parameter
         fifo_request_comb.payload.meta.route.from.id_lane   = configure_memory_reg.payload.meta.route.from.id_lane;
         fifo_request_comb.payload.meta.route.from.id_engine = configure_memory_reg.payload.meta.route.from.id_engine;
         fifo_request_comb.payload.meta.route.from.id_buffer = configure_memory_reg.payload.meta.route.from.id_buffer;
-        fifo_request_comb.payload.meta.route.from.seq_state = configure_memory_reg.payload.meta.route.from.seq_state;
+        fifo_request_comb.payload.meta.route.seq_state      = configure_memory_reg.payload.meta.route.seq_state;
 
         fifo_request_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
         if(configure_memory_reg.payload.meta.address.shift.direction) begin
@@ -614,7 +614,7 @@ module engine_csr_index_generator #(parameter
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_response_comb.valid                     = response_memory_in_reg.valid;
+        fifo_response_comb.valid = response_memory_in_reg.valid;
         // fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
 
         fifo_response_comb.payload.meta.route.from    = configure_memory_reg.payload.meta.route.from;
