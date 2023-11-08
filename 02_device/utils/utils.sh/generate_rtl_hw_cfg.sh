@@ -122,7 +122,7 @@ config+="\n"
 #SLR placement loop
 for i in $(seq 1 ${XILINX_NUM_KERNELS})
 do
-    config+="slr=${KERNEL_NAME}_$i:SLR0\n"
+    config+="slr=${KERNEL_NAME}_$i:SLR$((i - 1))\n"
     if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
     then
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
@@ -131,9 +131,9 @@ do
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
     elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
     then
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     else
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "0" "0" $i)
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     fi
 done
 config+="\n"
