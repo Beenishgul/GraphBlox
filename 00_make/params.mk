@@ -110,6 +110,8 @@ $(shell echo 'XILINX_NUM_KERNELS=$(XILINX_NUM_KERNELS)' >> $(PARAMS_SH_DIR))
 $(shell echo 'XILINX_VITIS_DIR=$(XILINX_VITIS_DIR)' >> $(PARAMS_SH_DIR))
 $(shell echo 'XILINX_VIVADO_DIR=$(XILINX_VIVADO_DIR)' >> $(PARAMS_SH_DIR))
 $(shell echo 'SYSTEM_CACHE_SIZE_B=$(SYSTEM_CACHE_SIZE_B)' >> $(PARAMS_SH_DIR))
+$(shell echo 'ARCHITECTURE=$(ARCHITECTURE)' >> $(PARAMS_SH_DIR))
+$(shell echo 'CAPABILITY=$(CAPABILITY)' >> $(PARAMS_SH_DIR))
 
 # =========================================================
 #                        TCL ARGS                    
@@ -221,5 +223,7 @@ $(shell echo 'set XILINX_MAX_THREADS $(XILINX_MAX_THREADS)' >> $(PARAMS_TCL_DIR)
 $(shell echo 'set XILINX_NUM_KERNELS $(XILINX_NUM_KERNELS)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set XILINX_VITIS_DIR $(XILINX_VITIS_DIR)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set XILINX_VIVADO_DIR $(XILINX_VIVADO_DIR)' >> $(PARAMS_TCL_DIR))
-$(shell echo 'set SYSTEM_CACHE_SIZE_B $(SYSTEM_CACHE_SIZE_B)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set ARCHITECTURE $(ARCHITECTURE)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set CAPABILITY $(CAPABILITY)' >> $(PARAMS_TCL_DIR))
+
 

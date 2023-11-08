@@ -5,12 +5,26 @@ import os
 import ast
 import json
 
+
+# Validate the number of arguments
+if len(sys.argv) != 8:
+    print("Usage: <script> <FULL_SRC_IP_DIR_CONFIG> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
+    sys.exit(1)
+
 # Assuming the script name is the first argument, and the directories follow after.
-script_name, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
+
+# Define the filename based on the CAPABILITY
+if CAPABILITY == "Single":
+    config_filename = f"architecture.{ALGORITHM_NAME}.json"
+else:
+    config_filename = "architecture.json"
+
+config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "shared_parameters.vh")
-config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, "architecture.json")
+config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
