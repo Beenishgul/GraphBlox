@@ -22,14 +22,16 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_pipeline #(parameter
-    ID_CU            = 0 ,
-    ID_BUNDLE        = 0 ,
-    ID_LANE          = 0 ,
-    ID_ENGINE        = 0 ,
-    ID_RELATIVE      = 0 ,
-    ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
+    ID_CU            = 0                             ,
+    ID_BUNDLE        = 0                             ,
+    ID_LANE          = 0                             ,
+    ID_ENGINE        = 0                             ,
+    ID_RELATIVE      = 0                             ,
+    ENGINES_CONFIG   = 0                             ,
+    FIFO_WRITE_DEPTH = 16                            ,
+    PROG_THRESH      = 8                             ,
+    ENGINE_SEQ_WIDTH = 16                            ,
+    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH,
     PIPELINE_STAGES  = 2
 ) (
     // System Signals
@@ -221,18 +223,18 @@ module engine_pipeline #(parameter
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseEngineInput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_response_engine_in_din                         ),
-        .wr_en       (fifo_response_engine_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_engine_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_engine_in_dout                        ),
-        .full        (fifo_response_engine_in_signals_out_int.full        ),
-        .empty       (fifo_response_engine_in_signals_out_int.empty       ),
-        .valid       (fifo_response_engine_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_engine_in_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_response_engine_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_engine_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_response_engine_in_din                        ),
+        .wr_en      (fifo_response_engine_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_engine_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_engine_in_dout                       ),
+        .full       (fifo_response_engine_in_signals_out_int.full       ),
+        .empty      (fifo_response_engine_in_signals_out_int.empty      ),
+        .valid      (fifo_response_engine_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_engine_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_engine_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_engine_in_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -256,18 +258,18 @@ module engine_pipeline #(parameter
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketResponseMemoryInput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_response_memory_in_din                         ),
-        .wr_en       (fifo_response_memory_in_signals_in_int.wr_en        ),
-        .rd_en       (fifo_response_memory_in_signals_in_int.rd_en        ),
-        .dout        (fifo_response_memory_in_dout                        ),
-        .full        (fifo_response_memory_in_signals_out_int.full        ),
-        .empty       (fifo_response_memory_in_signals_out_int.empty       ),
-        .valid       (fifo_response_memory_in_signals_out_int.valid       ),
-        .prog_full   (fifo_response_memory_in_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_response_memory_in_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_response_memory_in_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_response_memory_in_din                        ),
+        .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_memory_in_dout                       ),
+        .full       (fifo_response_memory_in_signals_out_int.full       ),
+        .empty      (fifo_response_memory_in_signals_out_int.empty      ),
+        .valid      (fifo_response_memory_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -291,18 +293,18 @@ module engine_pipeline #(parameter
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestEngineOutput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_request_engine_out_din                         ),
-        .wr_en       (fifo_request_engine_out_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_engine_out_signals_in_int.rd_en        ),
-        .dout        (fifo_request_engine_out_dout                        ),
-        .full        (fifo_request_engine_out_signals_out_int.full        ),
-        .empty       (fifo_request_engine_out_signals_out_int.empty       ),
-        .valid       (fifo_request_engine_out_signals_out_int.valid       ),
-        .prog_full   (fifo_request_engine_out_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_request_engine_out_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_engine_out_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_request_engine_out_din                        ),
+        .wr_en      (fifo_request_engine_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_engine_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_engine_out_dout                       ),
+        .full       (fifo_request_engine_out_signals_out_int.full       ),
+        .empty      (fifo_request_engine_out_signals_out_int.empty      ),
+        .valid      (fifo_request_engine_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_engine_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_engine_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_engine_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -326,18 +328,18 @@ module engine_pipeline #(parameter
         .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_MemoryPacketRequestMemoryOutput (
-        .clk         (ap_clk                                              ),
-        .srst        (areset_fifo                                         ),
-        .din         (fifo_request_memory_out_din                         ),
-        .wr_en       (fifo_request_memory_out_signals_in_int.wr_en        ),
-        .rd_en       (fifo_request_memory_out_signals_in_int.rd_en        ),
-        .dout        (fifo_request_memory_out_dout                        ),
-        .full        (fifo_request_memory_out_signals_out_int.full        ),
-        .empty       (fifo_request_memory_out_signals_out_int.empty       ),
-        .valid       (fifo_request_memory_out_signals_out_int.valid       ),
-        .prog_full   (fifo_request_memory_out_signals_out_int.prog_full   ),
-        .wr_rst_busy (fifo_request_memory_out_signals_out_int.wr_rst_busy ),
-        .rd_rst_busy (fifo_request_memory_out_signals_out_int.rd_rst_busy )
+        .clk        (ap_clk                                             ),
+        .srst       (areset_fifo                                        ),
+        .din        (fifo_request_memory_out_din                        ),
+        .wr_en      (fifo_request_memory_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_memory_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_memory_out_dout                       ),
+        .full       (fifo_request_memory_out_signals_out_int.full       ),
+        .empty      (fifo_request_memory_out_signals_out_int.empty      ),
+        .valid      (fifo_request_memory_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
     );
 
 

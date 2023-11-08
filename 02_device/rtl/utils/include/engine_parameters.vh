@@ -8,6 +8,8 @@
     parameter LANE_MERGE_WIDTH   = 1,
     parameter ENGINE_CAST_WIDTH  = 1,
     parameter ENGINE_MERGE_WIDTH = 1,
+    parameter ENGINE_SEQ_WIDTH             = 16,
+    parameter ENGINE_SEQ_MIN               = ID_RELATIVE * ENGINE_SEQ_WIDTH,
 // --------------------------------------------------------------------------------------
 // CU SETTINGS
 // --------------------------------------------------------------------------------------
