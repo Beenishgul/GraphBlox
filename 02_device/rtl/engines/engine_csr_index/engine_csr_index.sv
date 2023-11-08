@@ -22,17 +22,19 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_csr_index #(parameter
-    ID_CU              = 0 ,
-    ID_BUNDLE          = 0 ,
-    ID_LANE            = 0 ,
-    ID_ENGINE          = 0 ,
-    ID_RELATIVE        = 0 ,
-    ENGINE_CAST_WIDTH  = 1 ,
-    ENGINE_MERGE_WIDTH = 1 ,
-    ENGINES_CONFIG     = 0 ,
-    FIFO_WRITE_DEPTH   = 32,
-    PROG_THRESH        = 16,
-    NUM_MODULES        = 2 ,
+    ID_CU              = 0                             ,
+    ID_BUNDLE          = 0                             ,
+    ID_LANE            = 0                             ,
+    ID_ENGINE          = 0                             ,
+    ID_RELATIVE        = 0                             ,
+    ENGINE_CAST_WIDTH  = 1                             ,
+    ENGINE_MERGE_WIDTH = 1                             ,
+    ENGINES_CONFIG     = 0                             ,
+    FIFO_WRITE_DEPTH   = 32                            ,
+    PROG_THRESH        = 16                            ,
+    NUM_MODULES        = 2                             ,
+    ENGINE_SEQ_WIDTH   = 16                            ,
+    ENGINE_SEQ_MIN     = ID_RELATIVE * ENGINE_SEQ_WIDTH,
     PIPELINE_STAGES    = 2
 ) (
     // System Signals
@@ -519,6 +521,8 @@ module engine_csr_index #(parameter
         .ID_RELATIVE     (ID_RELATIVE     ),
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
         .PROG_THRESH     (PROG_THRESH     ),
+        .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
+        .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  ),
         .ID_MODULE       (0               )
     ) inst_engine_csr_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),

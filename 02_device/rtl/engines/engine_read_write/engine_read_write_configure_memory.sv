@@ -230,9 +230,7 @@ module engine_read_write_configure_memory #(parameter
                     configure_memory_reg.payload.meta.subclass.cmd    <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[0][TYPE_MEMORY_CMD_BITS-1:0]);
                     configure_memory_reg.payload.meta.subclass.buffer <= type_data_buffer'(fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
                 end
-                // (1'b1 << 6) : begin
-                // end
-                (1'b1 << 7) : begin
+                (1'b1 << 6) : begin
                     configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
                     configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
                     configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
@@ -240,15 +238,17 @@ module engine_read_write_configure_memory #(parameter
                     configure_memory_reg.payload.meta.route.to.id_module <= 1;
                     configure_memory_reg.payload.meta.route.to.id_buffer <= 0;
                 end
-                (1'b1 << 8) : begin
+                (1'b1 << 7) : begin
                     configure_memory_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
-                (1'b1 << 9) : begin
+                (1'b1 << 8) : begin
                     configure_memory_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
-                (1'b1 << 10) : begin
+                (1'b1 << 9) : begin
                     configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
+                // (1'b1 << 10) : begin
+                // end
                 // (1'b1 << 11) : begin
                 // end
                 // (1'b1 << 12) : begin

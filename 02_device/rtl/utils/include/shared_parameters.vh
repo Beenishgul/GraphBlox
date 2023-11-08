@@ -34,6 +34,10 @@ parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]         
 ,
 parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = '{1, 5, 4}
 ,
+parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_ENGINES_MAX]                           ='{10, 2, 8}
+,
+parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_ENGINES_MAX]                             ='{0, 10, 12}
+,
 parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = '{0, 1, 2}
 ,
 parameter int ENGINES_CONFIG_MERGE_WIDTH_ARRAY[NUM_ENGINES_MAX]                              = '{0, 2, 0}
@@ -61,6 +65,20 @@ parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                
 , '{2, 4, 0}
 , '{6, 4, 0}
 , '{7, 4, 0}
+}
+,
+parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   ='{'{10, 2, 8}
+, '{10, 2, 8}
+, '{11, 8, 0}
+, '{6, 8, 0}
+, '{1, 8, 0}
+}
+,
+parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     ='{'{0, 10, 12}
+, '{20, 30, 32}
+, '{40, 51, 59}
+, '{59, 65, 73}
+, '{73, 74, 82}
 }
 ,
 parameter int LANES_ENGINE_ID_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                 = '{'{0, 1, 2}
@@ -150,6 +168,34 @@ parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_M
 , '{2, 4, 0}
 , '{6, 4, 0}
 , '{7, 4, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{10, 2, 8}
+, '{10, 2, 8}
+, '{11, 8, 0}
+, '{6, 8, 0}
+, '{1, 8, 0}
+}
+, '{'{10, 2, 8}
+, '{10, 2, 8}
+, '{11, 8, 0}
+, '{6, 8, 0}
+, '{1, 8, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 10, 12}
+, '{20, 30, 32}
+, '{40, 51, 59}
+, '{59, 65, 73}
+, '{73, 74, 82}
+}
+, '{'{82, 92, 94}
+, '{102, 112, 114}
+, '{122, 133, 141}
+, '{141, 147, 155}
+, '{155, 156, 164}
 }
 }
 ,
@@ -328,6 +374,34 @@ parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINE
 , '{2, 4, 0}
 , '{6, 4, 0}
 , '{7, 4, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{10, 2, 8}
+, '{10, 2, 8}
+, '{11, 8, 0}
+, '{6, 8, 0}
+, '{1, 8, 0}
+}
+, '{'{10, 2, 8}
+, '{10, 2, 8}
+, '{11, 8, 0}
+, '{6, 8, 0}
+, '{1, 8, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 10, 12}
+, '{20, 30, 32}
+, '{40, 51, 59}
+, '{59, 65, 73}
+, '{73, 74, 82}
+}
+, '{'{82, 92, 94}
+, '{102, 112, 114}
+, '{122, 133, 141}
+, '{141, 147, 155}
+, '{155, 156, 164}
 }
 }
 ,

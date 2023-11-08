@@ -22,15 +22,17 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module engine_stride_index #(parameter
-    ID_CU            = 0 ,
-    ID_BUNDLE        = 0 ,
-    ID_LANE          = 0 ,
-    ID_ENGINE        = 0 ,
-    ID_RELATIVE      = 0 ,
-    ENGINES_CONFIG   = 0 ,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8 ,
-    NUM_MODULES      = 2 ,
+    ID_CU            = 0                             ,
+    ID_BUNDLE        = 0                             ,
+    ID_LANE          = 0                             ,
+    ID_ENGINE        = 0                             ,
+    ID_RELATIVE      = 0                             ,
+    ENGINES_CONFIG   = 0                             ,
+    FIFO_WRITE_DEPTH = 16                            ,
+    PROG_THRESH      = 8                             ,
+    NUM_MODULES      = 2                             ,
+    ENGINE_SEQ_WIDTH = 16                            ,
+    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH,
     PIPELINE_STAGES  = 2
 ) (
     // System Signals
@@ -509,11 +511,16 @@ module engine_stride_index #(parameter
     assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_response_memory_in_signals_out;
 
     engine_stride_index_configure_memory #(
-        .ID_CU      (ID_CU      ),
-        .ID_BUNDLE  (ID_BUNDLE  ),
-        .ID_LANE    (ID_LANE    ),
-        .ID_ENGINE  (ID_ENGINE  ),
-        .ID_RELATIVE(ID_RELATIVE)
+        .ID_CU           (ID_CU           ),
+        .ID_BUNDLE       (ID_BUNDLE       ),
+        .ID_LANE         (ID_LANE         ),
+        .ID_ENGINE       (ID_ENGINE       ),
+        .ID_RELATIVE     (ID_RELATIVE     ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
+        .PROG_THRESH     (PROG_THRESH     ),
+        .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
+        .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  ),
+        .ID_MODULE       (0               )
     ) inst_engine_stride_index_configure_memory (
         .ap_clk                             (ap_clk                                              ),
         .areset                             (areset_configure_memory                             ),
