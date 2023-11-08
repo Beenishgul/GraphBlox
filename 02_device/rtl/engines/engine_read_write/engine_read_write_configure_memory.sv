@@ -173,15 +173,15 @@ module engine_read_write_configure_memory #(parameter
         end else begin
             configure_memory_valid_int             <= configure_memory_valid_reg[15];
             configure_memory_reg.valid             <= configure_memory_valid_int;
-            fifo_response_memory_in_dout_reg.valid <= fifo_response_memory_in_dout_int.valid
+            fifo_response_memory_in_dout_reg.valid <= fifo_response_memory_in_dout_int.valid;
 
-                if(fifo_response_memory_in_dout_int.valid) begin
-                    if (fifo_response_memory_in_dout_int_offset_sequence == ENGINE_SEQ_MIN) begin
-                        configure_memory_valid_reg[0] <= 1'b1  ;
-                    end else begin
-                        configure_memory_valid_reg <= configure_memory_valid_reg << 1'b1;
-                    end
+            if(fifo_response_memory_in_dout_int.valid) begin
+                if (fifo_response_memory_in_dout_int_offset_sequence == ENGINE_SEQ_MIN) begin
+                    configure_memory_valid_reg[0] <= 1'b1  ;
                 end else begin
+                    configure_memory_valid_reg <= configure_memory_valid_reg << 1'b1;
+                end
+            end else begin
                 if(configure_memory_valid_int)
                     configure_memory_valid_reg <= 0;
                 else
