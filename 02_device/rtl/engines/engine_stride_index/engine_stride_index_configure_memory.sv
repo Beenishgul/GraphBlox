@@ -245,7 +245,7 @@ module engine_stride_index_configure_memory #(parameter
                         configure_memory_valid_reg[14] <= 1'b1  ;
                     end
                     (ENGINE_SEQ_MIN+15) : begin
-                        configure_memory_valid_reg[15] <= 1'b1  ;
+                        configure_memory_valid_reg[(ENGINE_SEQ_WIDTH-1)] <= 1'b1  ;
                     end
                     default : begin
                         configure_memory_reg.payload.param <= configure_memory_reg.payload.param;
