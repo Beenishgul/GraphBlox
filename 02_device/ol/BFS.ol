@@ -4,7 +4,7 @@
 // --------------------------------------------------------------------------------------
 // ** LANE 0 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 0 ENGINE_READ_WRITE
+// --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -13,57 +13,30 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0x00080101 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00080101 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 1 ENGINE_MERGE_DATA(W:2)
+// --- ENGINE 1 ENGINE_MERGE_DATA(W:2) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000007 //  0  - merge mask (W:2)
 0x00000000 //  1  - merge type (Serial|Parallel|Both)
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 2 ENGINE_FILTER
+// --- ENGINE 2 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 1 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 3 ENGINE_READ_WRITE(C:0)
+// --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -72,57 +45,30 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 4 ENGINE_MERGE_DATA(W:1)
+// --- ENGINE 4 ENGINE_MERGE_DATA(W:1) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000003 //  0  - merge mask (W:1)
 0x00000000 //  1  - merge type (Serial|Parallel|Both)
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 5 ENGINE_FILTER
+// --- ENGINE 5 ENGINE_FILTER_COND  - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 2 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 6 ENGINE_CSR(C:0,1)
+// --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -131,121 +77,67 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved
 // --------------------------------------------------------------------------------------
-// --- ENGINE 7 ENGINE_FILTER
+// --- ENGINE 7 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 3 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 8 ENGINE_ALU_OPS
+// --- ENGINE 8 ENGINE_ALU_OPS - PROGRAM 6-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - alu_operation
 0x00000003 //  1  - alu_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0xcf257000 //  4  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
-// --- ENGINE 9 ENGINE_FILTER
+// --- ENGINE 9 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 4 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 10 ENGINE_FORWARD_DATA
+// --- ENGINE 10 ENGINE_FORWARD_DATA - PROGRAM 1-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - number of hops (forward till discards)
-0x00000000 //  1  - Reserved
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 11 ENGINE_FILTER
+// --- ENGINE 11 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// + BUNDLE 0
+// + BUNDLE 1
 // --------------------------------------------------------------------------------------
 // ** LANE 0 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 0 ENGINE_CSR
+// --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -254,57 +146,30 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0x00080101 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00080101 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 1 ENGINE_MERGE_DATA(W:2)
+// --- ENGINE 1 ENGINE_MERGE_DATA(W:2) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000007 //  0  - merge mask (W:2)
 0x00000000 //  1  - merge type (Serial|Parallel|Both)
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 2 ENGINE_FILTER
+// --- ENGINE 2 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 1 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 3 ENGINE_CSR(C:0)
+// --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -313,57 +178,30 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 4 ENGINE_MERGE_DATA(W:1)
+// --- ENGINE 4 ENGINE_MERGE_DATA(W:1) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000003 //  0  - merge mask (W:1)
 0x00000000 //  1  - merge type (Serial|Parallel|Both)
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 5 ENGINE_FILTER
+// --- ENGINE 5 ENGINE_FILTER_COND  - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 2 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 6 ENGINE_CSR(C:0,1)
+// --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000009 //  0  - Increment/Decrement
 0x00000000 //  1  - Index_start
@@ -372,112 +210,58 @@
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
 0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  8  - BUFFER Array Pointer LHS
 0x00000000 //  9  - BUFFER Array Pointer RHS
 0x00000033 //  10 - BUFFER size
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved
 // --------------------------------------------------------------------------------------
-// --- ENGINE 7 ENGINE_FILTER
+// --- ENGINE 7 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 3 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 8 ENGINE_ALU_OPS
+// --- ENGINE 8 ENGINE_ALU_OPS - PROGRAM 6-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - alu_operation
 0x00000003 //  1  - alu_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0xcf257000 //  4  - BUFFER  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0xcf257000 //  4  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
-// --- ENGINE 9 ENGINE_FILTER
+// --- ENGINE 9 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // ** LANE 4 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 10 ENGINE_FORWARD_DATA
+// --- ENGINE 10 ENGINE_FORWARD_DATA - PROGRAM 1-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000001 //  0  - number of hops (forward till discards)
-0x00000000 //  1  - Reserved
-0x00000000 //  2  - Reserved
-0x00000000 //  3  - Reserved
-0x00000000 //  4  - Reserved
-0x00000000 //  5  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
 // --------------------------------------------------------------------------------------
-// --- ENGINE 11 ENGINE_FILTER
+// --- ENGINE 11 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
 0x00000000 //  0  - filter_operation
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
 0x00000041 //  5  - ops_mask
-0x00000000 //  4  - Reserved
-0x00000000 //  6  - Reserved
-0x00000000 //  7  - Reserved
-0x00000000 //  8  - Reserved
-0x00000000 //  9  - Reserved
-0x00000000 //  10 - Reserved
-0x00000000 //  11 - Reserved 
-0x00000000 //  12 - Reserved 
-0x00000000 //  13 - Reserved 
-0x00000000 //  14 - Reserved 
-0x00000000 //  15 - Reserved 
+0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
