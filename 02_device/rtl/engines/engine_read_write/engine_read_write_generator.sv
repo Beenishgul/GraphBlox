@@ -530,21 +530,13 @@ module engine_read_write_generator #(parameter
             fifo_response_memory_in_signals_out_reg <= 0;
         end
         else begin
-            if(~configure_engine_param_int.mode_buffer) begin // (0) engine buffer (1) memory buffer
-                fifo_request_signals_in_reg                   <= fifo_request_engine_out_signals_in_reg;
-                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
-                fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
-                request_engine_out_reg                        <= request_out_int;
-                request_memory_out_reg                        <= 0;
-            end
-            else if(configure_engine_param_int.mode_buffer) begin // response from memory -> request engine
-                fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
-                request_memory_out_reg      <= request_out_int;
 
-                fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
-                fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
-                request_engine_out_reg                        <= fifo_response_comb;
-            end
+            fifo_request_signals_in_reg                   <= fifo_request_memory_out_signals_in_reg;
+            request_memory_out_reg                        <= request_out_int;
+            fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
+            fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
+            request_engine_out_reg                        <= fifo_response_comb;
+
         end
     end
 
