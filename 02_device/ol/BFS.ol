@@ -12,11 +12,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0x00080101 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0x00080101 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 1 ENGINE_MERGE_DATA(W:2) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
@@ -44,11 +43,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0xcf257000 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 4 ENGINE_MERGE_DATA(W:1) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
@@ -76,11 +74,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0xcf257000 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 7 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
@@ -145,11 +142,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0x00080101 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0x00080101 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 1 ENGINE_MERGE_DATA(W:2) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
@@ -177,11 +173,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0xcf257000 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 4 ENGINE_MERGE_DATA(W:1) - PROGRAM 2-CYCLES
 // --------------------------------------------------------------------------------------
@@ -209,11 +204,10 @@
 0x00000001 //  3  - Stride
 0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000101 //  5  - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-0x00070101 //  6  - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-0xcf257000 //  7  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  8  - BUFFER Array Pointer LHS
-0x00000000 //  9  - BUFFER Array Pointer RHS
-0x00000033 //  10 - BUFFER size
+0xcf257000 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 //  7  - BUFFER Array Pointer LHS
+0x00000000 //  8  - BUFFER Array Pointer RHS
+0x00000033 //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --- ENGINE 7 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
