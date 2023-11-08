@@ -54,7 +54,7 @@ module engine_read_write_generator #(parameter
     input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in,
     input  MemoryPacket           response_engine_in                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsInput  fifo_response_engine_in_signals_out,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsInput  fifo_response_memory_in_signals_out,
@@ -94,9 +94,7 @@ module engine_read_write_generator #(parameter
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_request_din             ;
-    MemoryPacket           fifo_request_din_reg         ;
     MemoryPacketPayload    fifo_request_dout            ;
-    MemoryPacket           fifo_request_comb            ;
     MemoryPacket           fifo_response_comb           ;
     FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_signals_in_int  ;
@@ -105,14 +103,13 @@ module engine_read_write_generator #(parameter
 
     MemoryPacket response_engine_in_reg    ;
     MemoryPacket response_memory_in_reg    ;
-    logic        configure_engine_setup_reg;
     logic        configure_memory_setup_reg;
 
     logic                            configure_engine_param_valid;
     ReadWriteConfigurationParameters configure_engine_param_int  ;
 
-
     MemoryPacket generator_engine_request_engine_reg;
+    MemoryPacket generator_engine_request_engine_int;
     MemoryPacket request_engine_out_reg             ;
     MemoryPacket request_memory_out_reg             ;
 
@@ -126,20 +123,20 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
-//   Transaction Counter Signals
+// Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic                     counter_enable      ;
-    logic                     counter_load        ;
-    logic                     counter_incr        ;
-    logic                     counter_decr        ;
-    logic                     counter_is_zero     ;
-    logic [COUNTER_WIDTH-1:0] counter_load_value  ;
-    logic [COUNTER_WIDTH-1:0] counter_stride_value;
-    logic [COUNTER_WIDTH-1:0] counter_count       ;
+    logic read_write_response_engine_in_valid_reg ;
+    logic read_write_response_engine_in_valid_flag;
 
-    logic                     response_memory_counter_is_zero   ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_load_value;
+// --------------------------------------------------------------------------------------
+// FIFO Engine INPUT Response MemoryPacket
+// --------------------------------------------------------------------------------------
+    MemoryPacket           response_engine_in_int                  ;
+    MemoryPacketPayload    fifo_response_engine_in_din             ;
+    MemoryPacketPayload    fifo_response_engine_in_dout            ;
+    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_int ;
+    logic                  fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -221,17 +218,15 @@ module engine_read_write_generator #(parameter
             request_engine_out.valid            <= 1'b0;
             request_memory_out.valid            <= 1'b0;
             configure_memory_setup              <= 1'b0;
-            configure_engine_setup              <= 1'b0;
             done_out                            <= 1'b0;
             fifo_response_engine_in_signals_out <= 0;
             fifo_response_memory_in_signals_out <= 0;
         end
         else begin
-            fifo_setup_signal                   <= fifo_request_setup_signal_int;
+            fifo_setup_signal                   <= fifo_request_setup_signal_int | fifo_response_engine_in_setup_signal_int;
             request_engine_out.valid            <= request_engine_out_reg.valid;
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
-            configure_engine_setup              <= configure_engine_setup_reg;
             done_out                            <= done_out_reg;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
@@ -242,21 +237,6 @@ module engine_read_write_generator #(parameter
         request_engine_out.payload <= request_engine_out_reg.payload;
         request_memory_out.payload <= request_memory_out_reg.payload ;
     end
-
-// --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-    logic read_write_response_engine_in_valid_reg ;
-    logic read_write_response_engine_in_valid_flag;
-
-// --------------------------------------------------------------------------------------
-// FIFO Engine INPUT Response MemoryPacket
-// --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_engine_in_din             ;
-    MemoryPacketPayload    fifo_response_engine_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_int ;
-    logic                  fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
@@ -444,43 +424,49 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign read_write_response_engine_in_valid_flag = &read_write_response_engine_in_valid_reg;
 
+    always_comb begin
+        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+            generator_engine_request_engine_int.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
+            generator_engine_request_engine_int.payload.meta.route.from.id_cu     = configure_memory_reg.payload.meta.route.from.id_cu ;
+            generator_engine_request_engine_int.payload.meta.route.from.id_bundle = configure_memory_reg.payload.meta.route.from.id_bundle;
+            generator_engine_request_engine_int.payload.meta.route.from.id_lane   = configure_memory_reg.payload.meta.route.from.id_lane;
+            generator_engine_request_engine_int.payload.meta.route.from.id_engine = configure_memory_reg.payload.meta.route.from.id_engine;
+            generator_engine_request_engine_int.payload.meta.route.from.id_buffer = configure_memory_reg.payload.meta.route.from.id_buffer;
+            generator_engine_request_engine_int.payload.meta.address.base         = configure_memory_reg.payload.param.array_pointer;
+            generator_engine_request_engine_int.payload.meta.route.to             = response_engine_in_int.payload.meta.route.to;
+            generator_engine_request_engine_int.payload.meta.route.seq_src        = response_engine_in_int.payload.meta.route.seq_src;
+            generator_engine_request_engine_int.payload.meta.route.seq_state      = response_engine_in_int.payload.meta.route.seq_state;
+            generator_engine_request_engine_int.payload.meta.subclass             = response_engine_in_int.payload.meta.subclass;
+            generator_engine_request_engine_int.payload.data                      = response_engine_in_int.payload.data;
+
+            if(configure_memory_reg.payload.meta.address.shift.direction) begin
+                generator_engine_request_engine_int.payload.meta.address.offset = response_engine_in_int.payload.data[0] << configure_memory_reg.payload.meta.address.shift.amount;
+            end else begin
+                generator_engine_request_engine_int.payload.meta.address.offset = response_engine_in_int.payload.data[0] >> configure_memory_reg.payload.meta.address.shift.amount;
+            end
+            generator_engine_request_engine_int.valid = 1'b1;
+        end else begin
+            generator_engine_request_engine_int.payload = generator_engine_request_engine_int.payload;
+            if(read_write_response_engine_in_valid_flag)
+                generator_engine_request_engine_int.valid = 1'b0;
+            else
+                generator_engine_request_engine_int.valid = generator_engine_request_engine_int.valid;
+        end
+    end
+
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            read_write_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg     <= 0;
+            read_write_response_engine_in_valid_reg   <= 1'b0;
+            generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
+            read_write_response_engine_in_valid_reg   <= generator_engine_request_engine_int.valid;
             generator_engine_request_engine_reg.valid <= read_write_response_engine_in_valid_flag;
-
-            if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data;
-
-                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
-                end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-                end
-                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
-                end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-                end
-
-                read_write_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.hops);
-            end else begin
-                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
-                if(read_write_response_engine_in_valid_flag)
-                    read_write_response_engine_in_valid_reg <= 1'b0;
-                else
-                    read_write_response_engine_in_valid_reg <= read_write_response_engine_in_valid_reg;
-            end
         end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg.payload <= generator_engine_request_engine_int.payload;
     end
 
 // --------------------------------------------------------------------------------------
