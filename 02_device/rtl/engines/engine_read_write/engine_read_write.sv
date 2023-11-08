@@ -139,9 +139,9 @@ module engine_read_write #(parameter
     ReadWriteConfiguration generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
 
-    MemoryPacket          generator_engine_response_engine_in                 ;
-    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_in ;
-    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_out;
+    MemoryPacket           generator_engine_response_engine_in                 ;
+    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
+    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
 
     MemoryPacket          generator_engine_response_memory_in                 ;
     FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_in ;
