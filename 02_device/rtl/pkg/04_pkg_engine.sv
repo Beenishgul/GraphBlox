@@ -20,48 +20,6 @@ package PKG_ENGINE;
     import PKG_CACHE::*;
 
 // --------------------------------------------------------------------------------------
-// Stride\_Index\_Generator
-// --------------------------------------------------------------------------------------
-// ### Input: index\_start, index\_end, stride, granularity
-
-// The stride index generator serves two purposes. First, it generates a
-// sequence of indices or Vertex-IDs scheduled to the Vertex Compute Units
-// (CUs). For each Vertex-CU, a batch of Vertex-IDs is sent to be processed
-// based on the granularity. For example, if granularity is (8), each CU
-// (Compute Units) would get eight vertex IDs in chunks.
-
-    typedef enum logic[8:0] {
-        ENGINE_STRIDE_INDEX_GEN_RESET,
-        ENGINE_STRIDE_INDEX_GEN_IDLE,
-        ENGINE_STRIDE_INDEX_GEN_SETUP,
-        ENGINE_STRIDE_INDEX_GEN_START,
-        ENGINE_STRIDE_INDEX_GEN_BUSY_TRANS,
-        ENGINE_STRIDE_INDEX_GEN_BUSY,
-        ENGINE_STRIDE_INDEX_GEN_PAUSE_TRANS,
-        ENGINE_STRIDE_INDEX_GEN_PAUSE,
-        ENGINE_STRIDE_INDEX_GEN_DONE
-    } engine_stride_index_generator_state;
-
-    typedef struct packed{
-        logic                               increment  ;
-        logic                               decrement  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride     ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity;
-    } StrideIndexConfigurationParameters;
-
-    typedef struct packed{
-        StrideIndexConfigurationParameters param;
-        MemoryPacketMeta                   meta ;
-    } StrideIndexConfigurationPayload;
-
-    typedef struct packed{
-        logic                           valid  ;
-        StrideIndexConfigurationPayload payload;
-    } StrideIndexConfiguration;
-
-// --------------------------------------------------------------------------------------
 // CSR\_Index\_Generator
 // --------------------------------------------------------------------------------------
 // ### Input: array\_pointer, array\_size, offset, degree

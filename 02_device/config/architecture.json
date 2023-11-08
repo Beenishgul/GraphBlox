@@ -1,5 +1,5 @@
 {
-    "mapping": { // check engine_template to update mapping
+    "mapping": { 
         "ENGINE_PIPELINE"            : 0,
         "ENGINE_READ_WRITE"          : 1,
         "ENGINE_CSR_INDEX"           : 2,
@@ -8,7 +8,7 @@
         "ENGINE_ALU_OPS"             : 5,
         "ENGINE_FORWARD_DATA"        : 6
     },
-    "cycles": { // each cycle reads a 4-byte configuration frame
+    "cycles": { 
         "ENGINE_PIPELINE"            : 0,
         "ENGINE_READ_WRITE"          : 10,
         "ENGINE_CSR_INDEX"           : 10,
@@ -17,7 +17,7 @@
         "ENGINE_ALU_OPS"             : 6,
         "ENGINE_FORWARD_DATA"        : 1
     },
-    "bundle": {  // overlay topology per CU->Bundles->Lanes->Engines
+    "bundle": {  
         "0": [
             ["ENGINE_READ_WRITE"         , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
             ["ENGINE_READ_WRITE(C:0)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
