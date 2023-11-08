@@ -419,6 +419,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_pipeline (
                     .ap_clk                             (ap_clk                                      ),
@@ -467,6 +469,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_read_write (
                     .ap_clk                             (ap_clk                                      ),
@@ -515,6 +519,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_csr_index (
                     .ap_clk                             (ap_clk                                      ),
@@ -563,6 +569,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_stride_index (
                     .ap_clk                             (ap_clk                                      ),
@@ -611,6 +619,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_filter_cond (
                     .ap_clk                             (ap_clk                                      ),
@@ -669,6 +679,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
+                    .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_merge_data (
                     .ap_clk                             (ap_clk                                            ),
@@ -717,6 +729,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_alu_ops (
                     .ap_clk                             (ap_clk                                      ),
@@ -765,6 +779,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_forward_data (
                     .ap_clk                             (ap_clk                                      ),
@@ -813,6 +829,8 @@ module engine_template #(
                     .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
                     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                     .PROG_THRESH       (PROG_THRESH       ),
+                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
+                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
                 ) inst_engine_forward_data (
                     .ap_clk                             (ap_clk                                      ),
