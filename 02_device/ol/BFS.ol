@@ -88,8 +88,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -101,8 +101,8 @@
 0x00000003 //  1  - alu_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0xcf257000 //  4  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000041 //  4  - ops_mask
+0xcf257000 //  5  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // --- ENGINE 9 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
@@ -110,8 +110,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -127,8 +127,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -162,8 +162,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -194,8 +194,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -221,8 +221,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -234,8 +234,8 @@
 0x00000003 //  1  - alu_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0xcf257000 //  4  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000041 //  4  - ops_mask
+0xcf257000 //  5  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
 // --- ENGINE 9 ENGINE_FILTER_COND - PROGRAM 8-CYCLES
 // --------------------------------------------------------------------------------------
@@ -243,8 +243,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
@@ -260,8 +260,8 @@
 0x00000003 //  1  - filter_mask
 0x00000001 //  2  - const_mask
 0x00000003 //  3  - const_value
-0x00000041 //  5  - ops_mask
-0x00000000 //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000041 //  4  - ops_mask
+0x00000000 //  5  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00000000 //  6  - if   route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 //  7  - else route | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 // --------------------------------------------------------------------------------------
