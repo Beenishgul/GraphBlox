@@ -1195,7 +1195,7 @@ module __KERNEL___testbench ();
     task automatic initalize_graph (ref GraphCSR graph);
         graph.graph_name = "_GRAPH_NAME_";
 
-        graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ALGORITHM_NAME_.ol", "r");
+        graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ARCHITECTURE_._CAPABILITY_/_ALGORITHM_NAME_.ol", "r");
         if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
         else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
 

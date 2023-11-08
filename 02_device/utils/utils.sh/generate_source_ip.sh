@@ -130,6 +130,17 @@ then
         sed -i "s~$search~$replace~" $newtext
     fi
 
+    search="_ARCHITECTURE_"
+    replace=${ARCHITECTURE}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
+
+    search="_CAPABILITY_"
+    replace=${CAPABILITY}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
+    fi
 
     search="_ALGORITHM_NAME_"
     replace=${ALGORITHM_NAME}
