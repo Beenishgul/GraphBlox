@@ -247,6 +247,7 @@ module cu_cache (
   assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
   assign fifo_request_din.iob              = request_in_reg.payload.iob;
   assign fifo_request_din.meta             = request_in_reg.payload.meta;
+  assign fifo_request_din.data             = request_in_reg.payload.data;
 
   // Pop
   assign fifo_request_signals_in_int.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
@@ -255,6 +256,7 @@ module cu_cache (
   assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
   assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
   assign cache_request_mem.meta            = fifo_request_dout.meta;
+  assign cache_request_mem.data            = fifo_request_dout.data;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
@@ -287,6 +289,7 @@ module cu_cache (
   assign fifo_response_signals_in_int.wr_en = cache_response_mem.iob.ready;
   assign fifo_response_din.iob              = cache_response_mem.iob;
   assign fifo_response_din.meta             = cache_request_mem.meta;
+  assign fifo_response_din.data             = cache_request_mem.data;
 
   // Pop
   assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;

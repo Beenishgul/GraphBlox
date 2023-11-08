@@ -50,16 +50,17 @@ package PKG_ENGINE;
     } engine_csr_index_generator_state;
 
     typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic                               mode_sequence;
-        logic                               mode_buffer  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+        logic                                     increment    ;
+        logic                                     decrement    ;
+        logic                                     mode_sequence;
+        logic                                     mode_buffer  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] granularity  ;
+        logic                                     direction    ;
     } CSRIndexConfigurationParameters;
 
     typedef struct packed{
@@ -270,16 +271,20 @@ package PKG_ENGINE;
     } engine_read_write_generator_state;
 
     typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic                               mode_sequence;
-        logic                               mode_buffer  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+        logic                                                                      increment    ;
+        logic                                                                      decrement    ;
+        logic                                                                      mode_sequence;
+        logic                                                                      mode_buffer  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  array_pointer;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  array_size   ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  index_start  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  index_end    ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  stride       ;
+        logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0]                                  granularity  ;
+        logic                                                                      direction    ;
+        logic [  NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask   ;
+        logic [        CACHE_FRONTEND_DATA_W-1:0]                                  const_value  ;
+        logic [  NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask     ;
     } ReadWriteConfigurationParameters;
 
     typedef struct packed{
@@ -319,14 +324,14 @@ package PKG_ENGINE;
     } engine_cu_setup_state;
 
     typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+        logic                                     increment    ;
+        logic                                     decrement    ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] start_read   ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] end_read     ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] granularity  ;
     } CUSetupEngineConfigurationParameters;
 
     typedef struct packed{
@@ -342,16 +347,16 @@ package PKG_ENGINE;
 
 // Template Engine Configuration
     typedef struct packed{
-        logic                               increment    ;
-        logic                               decrement    ;
-        logic                               mode_sequence;
-        logic                               mode_buffer  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
-        logic [M_AXI_MEMORY_ADDR_WIDTH-1:0] granularity  ;
+        logic                                     increment    ;
+        logic                                     decrement    ;
+        logic                                     mode_sequence;
+        logic                                     mode_buffer  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_size   ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] index_start  ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] index_end    ;
+        logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] stride       ;
+        logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] granularity  ;
     } EngineConfigurationParameters;
 
     typedef struct packed{

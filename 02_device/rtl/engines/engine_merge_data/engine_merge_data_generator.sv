@@ -410,19 +410,15 @@ module engine_merge_data_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            merge_data_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg     <= 0;
+            merge_data_response_engine_in_valid_reg   <= 0;
+            generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
             generator_engine_request_engine_reg.valid <= merge_data_response_engine_in_valid_flag;
 
             if(response_engine_in_int[0].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[0]) begin
-                generator_engine_request_engine_reg.payload.meta          <= response_engine_in_int[0].payload.meta;
-                generator_engine_request_engine_reg.payload.data.field[0] <= response_engine_in_int[0].payload.data.field[0];
-                merge_data_response_engine_in_valid_reg[0]                <= 1'b1;
+                merge_data_response_engine_in_valid_reg[0] <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload.meta          <= generator_engine_request_engine_reg.payload.meta ;
-                generator_engine_request_engine_reg.payload.data.field[0] <= generator_engine_request_engine_reg.payload.data.field[0];
                 if(merge_data_response_engine_in_valid_flag)
                     merge_data_response_engine_in_valid_reg[0] <= 1'b0 | ~configure_engine_param_int.merge_mask[0];
                 else
@@ -431,15 +427,31 @@ module engine_merge_data_generator #(parameter
 
             for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
                 if(response_engine_in_int[j].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
-                    generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[j];
-                    merge_data_response_engine_in_valid_reg[j]                <= 1'b1;
+                    merge_data_response_engine_in_valid_reg[j] <= 1'b1;
                 end else begin
-                    generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j];
                     if(merge_data_response_engine_in_valid_flag)
                         merge_data_response_engine_in_valid_reg[j] <= 1'b0 | ~configure_engine_param_int.merge_mask[j];
                     else
                         merge_data_response_engine_in_valid_reg[j] <= merge_data_response_engine_in_valid_reg[j] | ~configure_engine_param_int.merge_mask[j];
                 end
+            end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if(response_engine_in_int[0].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[0]) begin
+            generator_engine_request_engine_reg.payload.meta          <= response_engine_in_int[0].payload.meta;
+            generator_engine_request_engine_reg.payload.data.field[0] <= response_engine_in_int[0].payload.data.field[0];
+        end else begin
+            generator_engine_request_engine_reg.payload.meta          <= generator_engine_request_engine_reg.payload.meta ;
+            generator_engine_request_engine_reg.payload.data.field[0] <= generator_engine_request_engine_reg.payload.data.field[0];
+        end
+
+        for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
+            if(response_engine_in_int[j].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
+                generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[j];
+            end else begin
+                generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j];
             end
         end
     end

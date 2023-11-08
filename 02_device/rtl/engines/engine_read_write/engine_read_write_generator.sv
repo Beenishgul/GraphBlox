@@ -74,6 +74,7 @@ module engine_read_write_generator #(parameter
     logic areset_generator;
     logic areset_counter  ;
     logic areset_fifo     ;
+    logic areset_kernel   ;
 
     KernelDescriptor descriptor_in_reg;
 
@@ -125,8 +126,10 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic read_write_response_engine_in_valid_reg ;
-    logic read_write_response_engine_in_valid_flag;
+    logic               read_write_response_engine_in_valid_reg ;
+    logic               read_write_response_engine_in_valid_flag;
+    MemoryPacketData    result_int                              ;
+    MemoryPacketAddress address_int                             ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -145,6 +148,7 @@ module engine_read_write_generator #(parameter
         areset_generator <= areset;
         areset_counter   <= areset;
         areset_fifo      <= areset;
+        areset_kernel    <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -420,39 +424,9 @@ module engine_read_write_generator #(parameter
     end // always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
+// Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    assign read_write_response_engine_in_valid_flag = &read_write_response_engine_in_valid_reg;
-
-    always_comb begin
-        if(response_engine_in_int.valid & configure_engine_param_valid) begin
-            generator_engine_request_engine_int.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
-            generator_engine_request_engine_int.payload.meta.route.from.id_cu     = configure_memory_reg.payload.meta.route.from.id_cu ;
-            generator_engine_request_engine_int.payload.meta.route.from.id_bundle = configure_memory_reg.payload.meta.route.from.id_bundle;
-            generator_engine_request_engine_int.payload.meta.route.from.id_lane   = configure_memory_reg.payload.meta.route.from.id_lane;
-            generator_engine_request_engine_int.payload.meta.route.from.id_engine = configure_memory_reg.payload.meta.route.from.id_engine;
-            generator_engine_request_engine_int.payload.meta.route.from.id_buffer = configure_memory_reg.payload.meta.route.from.id_buffer;
-            generator_engine_request_engine_int.payload.meta.address.base         = configure_memory_reg.payload.param.array_pointer;
-            generator_engine_request_engine_int.payload.meta.route.to             = response_engine_in_int.payload.meta.route.to;
-            generator_engine_request_engine_int.payload.meta.route.seq_src        = response_engine_in_int.payload.meta.route.seq_src;
-            generator_engine_request_engine_int.payload.meta.route.seq_state      = response_engine_in_int.payload.meta.route.seq_state;
-            generator_engine_request_engine_int.payload.meta.subclass             = response_engine_in_int.payload.meta.subclass;
-            generator_engine_request_engine_int.payload.data                      = response_engine_in_int.payload.data;
-
-            if(configure_memory_reg.payload.meta.address.shift.direction) begin
-                generator_engine_request_engine_int.payload.meta.address.offset = response_engine_in_int.payload.data[0] << configure_memory_reg.payload.meta.address.shift.amount;
-            end else begin
-                generator_engine_request_engine_int.payload.meta.address.offset = response_engine_in_int.payload.data[0] >> configure_memory_reg.payload.meta.address.shift.amount;
-            end
-            generator_engine_request_engine_int.valid = 1'b1;
-        end else begin
-            generator_engine_request_engine_int.payload = generator_engine_request_engine_int.payload;
-            if(read_write_response_engine_in_valid_flag)
-                generator_engine_request_engine_int.valid = 1'b0;
-            else
-                generator_engine_request_engine_int.valid = generator_engine_request_engine_int.valid;
-        end
-    end
+    assign read_write_response_engine_in_valid_flag = read_write_response_engine_in_valid_reg;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
@@ -460,14 +434,50 @@ module engine_read_write_generator #(parameter
             generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
-            read_write_response_engine_in_valid_reg   <= generator_engine_request_engine_int.valid;
             generator_engine_request_engine_reg.valid <= read_write_response_engine_in_valid_flag;
+            if(response_engine_in_int.valid & configure_engine_param_valid) begin
+                read_write_response_engine_in_valid_reg <= 1'b1;
+            end else begin
+                if(read_write_response_engine_in_valid_flag)
+                    read_write_response_engine_in_valid_reg <= 1'b0;
+                else
+                    read_write_response_engine_in_valid_reg <= read_write_response_engine_in_valid_reg;
+            end
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload <= generator_engine_request_engine_int.payload;
+        generator_engine_request_engine_reg.payload.data         <= result_int;
+        generator_engine_request_engine_reg.payload.meta.address <= address_int;
+
+        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+            generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
+            generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+            generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
+            generator_engine_request_engine_reg.payload.meta.subclass        <= configure_memory_reg.payload.meta.subclass;
+        end else begin
+            generator_engine_request_engine_reg.payload.meta.route.from      <= generator_engine_request_engine_reg.payload.meta.route.from;
+            generator_engine_request_engine_reg.payload.meta.route.to        <= generator_engine_request_engine_reg.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= generator_engine_request_engine_reg.payload.meta.route.seq_src;
+            generator_engine_request_engine_reg.payload.meta.route.seq_state <= generator_engine_request_engine_reg.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg.payload.meta.route.hops      <= generator_engine_request_engine_reg.payload.meta.route.hops ;
+            generator_engine_request_engine_reg.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
+        end
     end
+
+    engine_read_write_kernel inst_engine_read_write_kernel (
+        .ap_clk                (ap_clk                             ),
+        .areset                (areset_kernel                      ),
+        .clear_in              (~(configure_engine_param_valid)    ),
+        .config_params_valid_in(configure_engine_param_valid       ),
+        .config_params_in      (configure_engine_param_int         ),
+        .data_valid_in         (response_engine_in_int.valid       ),
+        .data_in               (response_engine_in_int.payload.data),
+        .address_out           (address_int                        ),
+        .result_out            (result_int                         )
+    );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_814x16_MemoryPacket
@@ -508,17 +518,12 @@ module engine_read_write_generator #(parameter
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_response_comb.valid                     = response_memory_in_reg.valid;
-        fifo_response_comb.payload.meta.route        = configure_memory_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.address.base = configure_engine_param_int.array_pointer;
-        if(configure_memory_reg.payload.meta.address.shift.direction) begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field[0] << configure_memory_reg.payload.meta.address.shift.amount;
-        end else begin
-            fifo_response_comb.payload.meta.address.offset = response_memory_in_reg.payload.data.field[0] >> configure_memory_reg.payload.meta.address.shift.amount;
-        end
-        fifo_response_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
-        fifo_response_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_response_comb.payload.data               = response_memory_in_reg.payload.data;
+        fifo_response_comb.valid                        = response_memory_in_reg.valid;
+        fifo_response_comb.payload.meta.route           = response_memory_in_reg.payload.meta.route;
+        fifo_response_comb.payload.meta.address         = response_memory_in_reg.payload.meta.address;
+        fifo_response_comb.payload.meta.subclass.cmd    = CMD_ENGINE;
+        fifo_response_comb.payload.meta.subclass.buffer = response_memory_in_reg.payload.meta.subclass.buffer;
+        fifo_response_comb.payload.data                 = response_memory_in_reg.payload.data;
     end
 
     always_ff @(posedge ap_clk) begin
