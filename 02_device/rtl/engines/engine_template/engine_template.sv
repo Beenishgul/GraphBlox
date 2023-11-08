@@ -546,56 +546,6 @@ module engine_template #(
             end
             3       : begin
 // --------------------------------------------------------------------------------------
-// ENGINE STRIDE
-// --------------------------------------------------------------------------------------
-                assign areset_template = areset_engine;
-
-                assign template_descriptor_in                            = descriptor_in_reg;
-                assign template_response_engine_in                       = response_engine_in_int;
-                assign template_fifo_response_engine_in_signals_in.rd_en = 1'b1;
-                assign template_response_memory_in                       = response_memory_in_int;
-                assign template_fifo_response_memory_in_signals_in.rd_en = 1'b1;
-
-                assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
-                assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
-
-                engine_stride_index #(
-                    .ID_CU             (ID_CU             ),
-                    .ID_BUNDLE         (ID_BUNDLE         ),
-                    .ID_LANE           (ID_LANE           ),
-                    .ID_ENGINE         (ID_ENGINE         ),
-                    .ID_RELATIVE       (ID_RELATIVE       ),
-                    .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                    .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                    .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                    .PROG_THRESH       (PROG_THRESH       ),
-                    .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                    .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                    .ENGINES_CONFIG    (ENGINES_CONFIG    )
-                ) inst_engine_stride_index (
-                    .ap_clk                             (ap_clk                                      ),
-                    .areset                             (areset_template                             ),
-                    .descriptor_in                      (template_descriptor_in                      ),
-                    .response_engine_in                 (template_response_engine_in                 ),
-                    .fifo_response_engine_in_signals_in (template_fifo_response_engine_in_signals_in ),
-                    .fifo_response_engine_in_signals_out(template_fifo_response_engine_in_signals_out),
-                    .response_memory_in                 (template_response_memory_in                 ),
-                    .fifo_response_memory_in_signals_in (template_fifo_response_memory_in_signals_in ),
-                    .fifo_response_memory_in_signals_out(template_fifo_response_memory_in_signals_out),
-                    .request_engine_out                 (template_request_engine_out                 ),
-                    .fifo_request_engine_out_signals_in (template_fifo_request_engine_out_signals_in ),
-                    .fifo_request_engine_out_signals_out(template_fifo_request_engine_out_signals_out),
-                    .request_memory_out                 (template_request_memory_out                 ),
-                    .fifo_request_memory_out_signals_in (template_fifo_request_memory_out_signals_in ),
-                    .fifo_request_memory_out_signals_out(template_fifo_request_memory_out_signals_out),
-                    .fifo_setup_signal                  (template_fifo_setup_signal                  ),
-                    .done_out                           (template_done_out                           )
-                );
-
-// --------------------------------------------------------------------------------------
-            end
-            4       : begin
-// --------------------------------------------------------------------------------------
 // ENGINE FILTER
 // --------------------------------------------------------------------------------------
                 assign areset_template = areset_engine;
@@ -644,7 +594,7 @@ module engine_template #(
 
 // --------------------------------------------------------------------------------------
             end
-            5       : begin
+            4       : begin
 // --------------------------------------------------------------------------------------
 // ENGINE MERGE DATA
 // --------------------------------------------------------------------------------------
@@ -704,7 +654,7 @@ module engine_template #(
 
 // --------------------------------------------------------------------------------------
             end
-            6       : begin
+            5       : begin
 // --------------------------------------------------------------------------------------
 // ENGINE ALU
 // --------------------------------------------------------------------------------------
@@ -754,7 +704,7 @@ module engine_template #(
 
 // --------------------------------------------------------------------------------------
             end
-            7       : begin
+            6       : begin
 // --------------------------------------------------------------------------------------
 // ENGINE FORWARD BUFFER
 // --------------------------------------------------------------------------------------
@@ -819,7 +769,7 @@ module engine_template #(
                 assign template_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
                 assign template_fifo_request_memory_out_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 
-                engine_forward_data #(
+                engine_pipeline #(
                     .ID_CU             (ID_CU             ),
                     .ID_BUNDLE         (ID_BUNDLE         ),
                     .ID_LANE           (ID_LANE           ),
@@ -832,7 +782,7 @@ module engine_template #(
                     .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                     .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                     .ENGINES_CONFIG    (ENGINES_CONFIG    )
-                ) inst_engine_forward_data (
+                ) inst_engine_pipeline (
                     .ap_clk                             (ap_clk                                      ),
                     .areset                             (areset_template                             ),
                     .descriptor_in                      (template_descriptor_in                      ),
