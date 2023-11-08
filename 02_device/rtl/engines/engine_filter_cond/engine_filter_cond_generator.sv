@@ -115,9 +115,7 @@ module engine_filter_cond_generator #(parameter
 // Generation Logic - Filter data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     logic            result_flag_int;
-    logic            result_flag_reg;
     MemoryPacketData result_data_int;
-    MemoryPacketData result_data_reg;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -399,39 +397,41 @@ module engine_filter_cond_generator #(parameter
     end // always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
+// Generation Logic - Filter data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     assign filter_cond_response_engine_in_valid_flag = filter_cond_response_engine_in_valid_reg & result_flag_int;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            filter_cond_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg      <= 0;
-            result_flag_reg                          <= 0;
-            result_data_reg                          <= 0;
+            filter_cond_response_engine_in_valid_reg  <= 1'b0;
+            generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
-            result_data_reg                                  <= result_data_int;
-            generator_engine_request_engine_reg.valid        <= filter_cond_response_engine_in_valid_flag ;
-            generator_engine_request_engine_reg.payload.data <= result_data_int;
+            generator_engine_request_engine_reg.valid <= filter_cond_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
-                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
-
                 filter_cond_response_engine_in_valid_reg <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
                 if(filter_cond_response_engine_in_valid_flag)
                     filter_cond_response_engine_in_valid_reg <= 1'b0;
                 else
                     filter_cond_response_engine_in_valid_reg <= filter_cond_response_engine_in_valid_reg;
             end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg.payload.data <= result_data_int;
+        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+            generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
+            generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+            generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
+            generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
+            generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
+        end else begin
+            generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
         end
     end
 

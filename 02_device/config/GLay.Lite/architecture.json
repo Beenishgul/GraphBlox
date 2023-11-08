@@ -10,7 +10,7 @@
     },
     "cycles": { 
         "ENGINE_PIPELINE"            : 0,
-        "ENGINE_READ_WRITE"          : 10,
+        "ENGINE_READ_WRITE"          : 13,
         "ENGINE_CSR_INDEX"           : 10,
         "ENGINE_FILTER_COND"         : 8,
         "ENGINE_MERGE_DATA"          : 2,

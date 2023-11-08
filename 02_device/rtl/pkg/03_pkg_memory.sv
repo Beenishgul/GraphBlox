@@ -196,6 +196,7 @@ typedef struct packed {
 typedef struct packed {
   CacheRequestIOB  iob ;
   MemoryPacketMeta meta;
+  MemoryPacketData data;
 } CacheRequestPayload;
 
 typedef struct packed {
@@ -214,6 +215,7 @@ typedef struct packed {
 typedef struct packed {
   CacheResponseIOB iob ;
   MemoryPacketMeta meta;
+  MemoryPacketData data;
 } CacheResponsePayload;
 
 typedef struct packed {

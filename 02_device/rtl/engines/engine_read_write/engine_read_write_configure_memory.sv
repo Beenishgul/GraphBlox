@@ -223,6 +223,7 @@ module engine_read_write_configure_memory #(parameter
                 end
                 (1'b1 << 4) : begin
                     configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-2:0];
+                    configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
                     configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-2:0];
                     configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
                 end
@@ -247,12 +248,15 @@ module engine_read_write_configure_memory #(parameter
                 (1'b1 << 9) : begin
                     configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
-                // (1'b1 << 10) : begin
-                // end
-                // (1'b1 << 11) : begin
-                // end
-                // (1'b1 << 12) : begin
-                // end
+                (1'b1 << 10) : begin
+                    configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                end
+                (1'b1 << 11) : begin
+                    configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field[0];
+                end
+                (1'b1 << 12) : begin
+                    configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][(NUM_FIELDS_MEMORYPACKETDATA*NUM_FIELDS_MEMORYPACKETDATA)-1:0];
+                end
                 // (1'b1 << 13) : begin
                 // end
                 // (1'b1 << 14) : begin

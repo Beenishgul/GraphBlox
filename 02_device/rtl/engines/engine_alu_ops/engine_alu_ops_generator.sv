@@ -391,41 +391,43 @@ module engine_alu_ops_generator #(parameter
     end // always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
+// Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     MemoryPacketData result_int;
-    MemoryPacketData result_reg;
 
     assign alu_ops_response_engine_in_valid_flag = alu_ops_response_engine_in_valid_reg;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            alu_ops_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg  <= 0;
-            result_reg                           <= 0;
+            alu_ops_response_engine_in_valid_reg      <= 1'b0;
+            generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
-            result_reg                                       <= result_int;
-            generator_engine_request_engine_reg.valid        <= alu_ops_response_engine_in_valid_flag;
-            generator_engine_request_engine_reg.payload.data <= result_int;
-
+            generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
-                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
-
                 alu_ops_response_engine_in_valid_reg <= 1'b1;
             end else begin
-                generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
                 if(alu_ops_response_engine_in_valid_flag)
                     alu_ops_response_engine_in_valid_reg <= 1'b0;
                 else
                     alu_ops_response_engine_in_valid_reg <= alu_ops_response_engine_in_valid_reg;
             end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg.payload.data <= result_int;
+
+        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+            generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
+            generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+            generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
+            generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
+            generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
+        end else begin
+            generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
         end
     end
 

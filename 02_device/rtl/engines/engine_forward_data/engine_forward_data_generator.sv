@@ -393,44 +393,49 @@ module engine_forward_data_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    assign forward_data_response_engine_in_valid_flag = &forward_data_response_engine_in_valid_reg;
+    assign forward_data_response_engine_in_valid_flag = forward_data_response_engine_in_valid_reg;
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            forward_data_response_engine_in_valid_reg <= 0;
-            generator_engine_request_engine_reg       <= 0;
+            forward_data_response_engine_in_valid_reg <= 1'b0;
+            generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
             generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-                generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
-                generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
-                generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data;
-
-                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
-                end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-                end
-                if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
-                end else begin
-                    generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-                end
-
                 forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.hops);
             end else begin
-                generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
                 if(forward_data_response_engine_in_valid_flag)
                     forward_data_response_engine_in_valid_reg <= 1'b0;
                 else
                     forward_data_response_engine_in_valid_reg <= forward_data_response_engine_in_valid_reg;
             end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+            generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
+            generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+            generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
+            generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
+            generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data;
+
+            if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
+                generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
+            end else begin
+                generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
+            end
+            if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
+                generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
+            end else begin
+                generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
+            end
+        end else begin
+            generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
         end
     end
 

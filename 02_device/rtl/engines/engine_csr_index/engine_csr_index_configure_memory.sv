@@ -222,8 +222,9 @@ module engine_csr_index_configure_memory #(parameter
                     configure_memory_reg.payload.param.stride <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
                 (1'b1 << 4) : begin
-                    configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-2:0];
-                    configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-2:0];
+                    configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(CACHE_FRONTEND_ADDR_W)-2:0];
+                    configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
+                    configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(CACHE_FRONTEND_ADDR_W)-2:0];
                     configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
                 end
                 (1'b1 << 5) : begin

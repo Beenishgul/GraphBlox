@@ -137,6 +137,7 @@ module cache_generator_request #(
   always_comb begin
     fifo_request_comb.valid             = arbiter_bus_out.valid;
     fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
+    fifo_request_comb.payload.data      = arbiter_bus_out.payload.data;
     fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
     fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address.base + arbiter_bus_out.payload.meta.address.offset;
     fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
@@ -174,12 +175,14 @@ module cache_generator_request #(
   assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid & fifo_request_push_filter;
   assign fifo_request_din.iob              = fifo_request_din_reg.payload.iob;
   assign fifo_request_din.meta             = fifo_request_din_reg.payload.meta ;
+  assign fifo_request_din.data             = fifo_request_din_reg.payload.data ;
 
   // Pop
   assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
   assign request_out_int.valid             = fifo_request_signals_out_int.valid;
   assign request_out_int.payload.iob       = fifo_request_dout.iob;
   assign request_out_int.payload.meta      = fifo_request_dout.meta;
+  assign request_out_int.payload.data      = fifo_request_dout.data;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(32                        ),
