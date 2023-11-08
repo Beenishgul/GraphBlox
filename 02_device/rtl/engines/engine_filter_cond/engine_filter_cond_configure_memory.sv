@@ -27,11 +27,11 @@ module engine_filter_cond_configure_memory #(parameter
     ID_ENGINE        = 0                                ,
     ID_RELATIVE      = 0                                ,
     ID_MODULE        = 0                                ,
+    FIFO_WRITE_DEPTH = 16                               ,
+    PROG_THRESH      = 8                                ,
     ENGINE_SEQ_WIDTH = 16                               ,
     ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
-    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN,
-    FIFO_WRITE_DEPTH = 32                               ,
-    PROG_THRESH      = 16
+    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
     input  logic                   ap_clk                             ,
     input  logic                   areset                             ,
@@ -47,8 +47,8 @@ module engine_filter_cond_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-    logic areset_csr_index_generator;
-    logic areset_fifo               ;
+    logic areset_filter_cond_generator;
+    logic areset_fifo                 ;
 
     MemoryPacket                      response_memory_in_reg                          ;
     MemoryPacketMeta                  configure_memory_meta_int                       ;
@@ -63,6 +63,7 @@ module engine_filter_cond_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
     MemoryPacketPayload    fifo_response_memory_in_din             ;
     MemoryPacket           fifo_response_memory_in_dout_int        ;
+    MemoryPacket           fifo_response_memory_in_dout_reg        ;
     MemoryPacketPayload    fifo_response_memory_in_dout            ;
     FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
@@ -85,15 +86,15 @@ module engine_filter_cond_configure_memory #(parameter
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_csr_index_generator <= areset;
-        areset_fifo                <= areset;
+        areset_filter_cond_generator <= areset;
+        areset_fifo                  <= areset;
     end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_filter_cond_generator) begin
             response_memory_in_reg.valid           <= 1'b0;
             fifo_response_memory_in_signals_in_reg <= 0;
             fifo_configure_memory_signals_in_reg   <= 0;
@@ -112,7 +113,7 @@ module engine_filter_cond_configure_memory #(parameter
 // Drive output
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
+        if(areset_filter_cond_generator) begin
             fifo_setup_signal          <= 1'b1;
             configure_memory_out.valid <= 0;
         end else begin
@@ -127,10 +128,10 @@ module engine_filter_cond_configure_memory #(parameter
         configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
     end
 
+
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
-    assign configure_memory_valid_int                       = &configure_memory_valid_reg;
     assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
@@ -164,102 +165,104 @@ module engine_filter_cond_configure_memory #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        if(areset_csr_index_generator) begin
-            configure_memory_reg       <= 0;
-            configure_memory_valid_reg <= 0;
+        if(areset_filter_cond_generator) begin
+            configure_memory_reg.valid             <= 1'b0;
+            configure_memory_valid_reg             <= 0;
+            fifo_response_memory_in_dout_reg.valid <= 1'b0;
+            configure_memory_valid_int             <= 1'b0;
         end else begin
-            configure_memory_reg.valid                           <= configure_memory_valid_int;
-            configure_memory_reg.payload.meta.route.to           <= configure_memory_meta_int.route.to;
-            configure_memory_reg.payload.meta.route.from         <= configure_memory_meta_int.route.from;
-            configure_memory_reg.payload.meta.route.seq_src      <= configure_memory_meta_int.route.seq_src;
-            configure_memory_reg.payload.meta.route.seq_state    <= configure_memory_meta_int.route.seq_state;
-            configure_memory_reg.payload.meta.route.hops         <= configure_memory_meta_int.route.hops;
-            configure_memory_reg.payload.meta.address.base       <= configure_memory_meta_int.address.base;
-            configure_memory_reg.payload.meta.address.offset     <= configure_memory_meta_int.address.offset;
-            configure_memory_reg.payload.param.filter_route.hops <= configure_memory_meta_int.route.hops;
+            configure_memory_valid_int             <= configure_memory_valid_reg[(ENGINE_SEQ_WIDTH-1)];
+            configure_memory_reg.valid             <= configure_memory_valid_int;
+            fifo_response_memory_in_dout_reg.valid <= fifo_response_memory_in_dout_int.valid;
 
             if(fifo_response_memory_in_dout_int.valid) begin
-                case (fifo_response_memory_in_dout_int_offset_sequence)
-                    (ENGINE_SEQ_MIN+0) : begin
-                        configure_memory_reg.payload.param.filter_operation <= type_filter_operation'(fifo_response_memory_in_dout_int.payload.data.field[0][TYPE_FILTER_OPERATION_BITS-1:0]);
-                        configure_memory_valid_reg[0]                       <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+1) : begin
-                        configure_memory_reg.payload.param.filter_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
-                        configure_memory_valid_reg[1]                  <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+2) : begin
-                        configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
-                        configure_memory_valid_reg[2]                 <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+3) : begin
-                        configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_int.payload.data.field[0];
-                        configure_memory_valid_reg[3]                  <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+4) : begin
-                        configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_int.payload.data.field[0][(NUM_FIELDS_MEMORYPACKETDATA*NUM_FIELDS_MEMORYPACKETDATA)-1:0];
-                        configure_memory_valid_reg[4]               <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+5) : begin
-                        configure_memory_reg.payload.param.break_flag       <= fifo_response_memory_in_dout_int.payload.data.field[0][0];
-                        configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_int.payload.data.field[0][1];
-                        configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_int.payload.data.field[0][2];
-                        configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_int.payload.data.field[0][3];
-                        configure_memory_valid_reg[5]                       <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+6) : begin
-                        configure_memory_reg.payload.param.filter_route._if.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
-                        configure_memory_reg.payload.param.filter_route._if.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
-                        configure_memory_reg.payload.param.filter_route._if.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                        configure_memory_reg.payload.param.filter_route._if.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                        configure_memory_valid_reg[6]                                 <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+7) : begin
-                        configure_memory_reg.payload.param.filter_route._else.id_cu     <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
-                        configure_memory_reg.payload.param.filter_route._else.id_bundle <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
-                        configure_memory_reg.payload.param.filter_route._else.id_lane   <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                        configure_memory_reg.payload.param.filter_route._else.id_buffer <= fifo_response_memory_in_dout_int.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                        configure_memory_valid_reg[7]                                   <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+8) : begin
-                        configure_memory_valid_reg[8] <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+9) : begin
-                        configure_memory_valid_reg[9] <= 1'b1  ;
-                    end
-                    (ENGINE_SEQ_MIN+10) : begin
-                        configure_memory_valid_reg[10] <= 1'b1 ;
-                    end
-                    (ENGINE_SEQ_MIN+11) : begin
-                        configure_memory_valid_reg[11] <= 1'b1 ;
-                    end
-                    (ENGINE_SEQ_MIN+12) : begin
-                        configure_memory_valid_reg[12] <= 1'b1 ;
-                    end
-                    (ENGINE_SEQ_MIN+13) : begin
-                        configure_memory_valid_reg[13] <= 1'b1 ;
-                    end
-                    (ENGINE_SEQ_MIN+14) : begin
-                        configure_memory_valid_reg[14] <= 1'b1 ;
-                    end
-                    (ENGINE_SEQ_MIN+15) : begin
-                        configure_memory_valid_reg[15] <= 1'b1 ;
-                    end
-                    default : begin
-                        configure_memory_reg.payload.param <= configure_memory_reg.payload.param;
-                        if(configure_memory_valid_int)
-                            configure_memory_valid_reg <= 0;
-                        else
-                            configure_memory_valid_reg <= configure_memory_valid_reg;
-                    end
-                endcase
+                if (fifo_response_memory_in_dout_int_offset_sequence == ENGINE_SEQ_MIN) begin
+                    configure_memory_valid_reg[0] <= 1'b1  ;
+                end else begin
+                    configure_memory_valid_reg <= configure_memory_valid_reg << 1'b1;
+                end
             end else begin
-                configure_memory_reg.payload.param <= configure_memory_reg.payload.param;
                 if(configure_memory_valid_int)
                     configure_memory_valid_reg <= 0;
                 else
                     configure_memory_valid_reg <= configure_memory_valid_reg;
             end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        fifo_response_memory_in_dout_reg.payload <= fifo_response_memory_in_dout_int.payload;
+    end
+
+    always_ff @(posedge ap_clk) begin
+        configure_memory_reg.payload.meta.route.to           <= configure_memory_meta_int.route.to;
+        configure_memory_reg.payload.meta.route.from         <= configure_memory_meta_int.route.from;
+        configure_memory_reg.payload.meta.route.seq_src      <= configure_memory_meta_int.route.seq_src;
+        configure_memory_reg.payload.meta.route.seq_state    <= configure_memory_meta_int.route.seq_state;
+        configure_memory_reg.payload.meta.route.hops         <= configure_memory_meta_int.route.hops;
+        configure_memory_reg.payload.meta.address.base       <= configure_memory_meta_int.address.base;
+        configure_memory_reg.payload.meta.address.offset     <= configure_memory_meta_int.address.offset;
+        configure_memory_reg.payload.param.filter_route.hops <= configure_memory_meta_int.route.hops;
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if(fifo_response_memory_in_dout_reg.valid) begin
+            case (configure_memory_valid_reg)
+                (1'b1 << 0) : begin
+                    configure_memory_reg.payload.param.filter_operation <= type_filter_operation'(fifo_response_memory_in_dout_reg.payload.data.field[0][TYPE_FILTER_OPERATION_BITS-1:0]);
+                end
+                (1'b1 << 1) : begin
+                    configure_memory_reg.payload.param.filter_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                end
+                (1'b1 << 2) : begin
+                    configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                end
+                (1'b1 << 3) : begin
+                    configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field[0];
+                end
+                (1'b1 << 4) : begin
+                    configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][(NUM_FIELDS_MEMORYPACKETDATA*NUM_FIELDS_MEMORYPACKETDATA)-1:0];
+                end
+                (1'b1 << 5) : begin
+                    configure_memory_reg.payload.param.break_flag       <= fifo_response_memory_in_dout_reg.payload.data.field[0][0];
+                    configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_reg.payload.data.field[0][1];
+                    configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_reg.payload.data.field[0][2];
+                    configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_reg.payload.data.field[0][3];
+                end
+                (1'b1 << 6) : begin
+                    configure_memory_reg.payload.param.filter_route._if.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
+                    configure_memory_reg.payload.param.filter_route._if.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
+                    configure_memory_reg.payload.param.filter_route._if.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                    configure_memory_reg.payload.param.filter_route._if.id_buffer <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                end
+                (1'b1 << 7) : begin
+                    configure_memory_reg.payload.param.filter_route._else.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
+                    configure_memory_reg.payload.param.filter_route._else.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
+                    configure_memory_reg.payload.param.filter_route._else.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                    configure_memory_reg.payload.param.filter_route._else.id_buffer <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                end
+                // (1'b1 << 8) : begin
+                // end
+                // (1'b1 << 9) : begin
+                // end
+                // (1'b1 << 10) : begin
+                // end
+                // (1'b1 << 11) : begin
+                // end
+                // (1'b1 << 12) : begin
+                // end
+                // (1'b1 << 13) : begin
+                // end
+                // (1'b1 << 14) : begin
+                // end
+                // (1'b1 << 15) : begin
+                // end
+                default : begin
+                    configure_memory_reg.payload.param <= configure_memory_reg.payload.param;
+                end
+            endcase
+        end else begin
+            configure_memory_reg.payload.param <= configure_memory_reg.payload.param;
         end
     end
 
