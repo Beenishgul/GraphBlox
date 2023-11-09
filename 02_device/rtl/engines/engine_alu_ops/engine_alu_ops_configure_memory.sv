@@ -226,6 +226,8 @@ module engine_alu_ops_configure_memory #(parameter
                     configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
                     configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
                     configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                    configure_memory_reg.payload.meta.route.to.id_engine <= 0;
+                    configure_memory_reg.payload.meta.route.to.id_module <= 1;
                 end
                 // (1'b1 << 6) : begin
                 // end
