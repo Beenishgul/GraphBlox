@@ -35,12 +35,15 @@ module engine_read_write_kernel (
   MemoryPacketData    ops_value_reg;
   MemoryPacketData    result_int   ;
   MemoryPacketAddress address_int  ;
+  MemoryPacketData    org_value_reg;
+  MemoryPacketData    org_data_int ;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
     if (areset) begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         ops_value_reg.field[i] <= 0;
+        org_value_reg.field[i] <= 0;
       end
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
@@ -56,13 +59,27 @@ module engine_read_write_kernel (
           ops_value_reg.field[i] <= 0;
         end
       end
+
+      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+        if (data_valid & config_params_valid_in) begin
+          for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+            if(config_params.ops_mask[i][j]) begin
+              org_value_reg.field[i] <= data_in.field[j];
+            end
+          end
+        end else begin
+          org_value_reg.field[i] <= 0;
+        end
+      end
     end
   end
 
+
   always_comb begin
     // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
-    result_int  = 0;
-    address_int = 0;
+    result_int   = 0;
+    address_int  = 0;
+    org_data_int = org_value_reg;
 
     if (config_params_valid_in & data_valid_in) begin
       address_int.shift.amount    = config_params_in.granularity;
@@ -83,7 +100,7 @@ module engine_read_write_kernel (
       address_out <= 0;
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        result_out.field[i] <= result_int.field[i];
+        result_out.field[i] <= org_data_int.field[i];
       end
       address_out <= address_int;
     end
