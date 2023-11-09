@@ -1409,9 +1409,11 @@ module __KERNEL___testbench ();
         graph.mem512_vertex_count = ((graph.vertex_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_edge_count = ((graph.edge_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
-        graph.out_degree = new [graph.mem512_vertex_count];
-        graph.in_degree  = new [graph.mem512_vertex_count];
-        graph.edges_idx  = new [graph.mem512_vertex_count];
+        graph.out_degree   = new [graph.mem512_vertex_count];
+        graph.in_degree    = new [graph.mem512_vertex_count];
+        graph.edges_idx    = new [graph.mem512_vertex_count];
+        graph.auxiliary_1  = new [graph.mem512_vertex_count];
+        graph.auxiliary_1  = new [graph.mem512_vertex_count];
         graph.edges_array_src = new [graph.mem512_edge_count];
         graph.edges_array_dest= new [graph.mem512_edge_count];
         graph.overlay_program = new [graph.mem512_overlay_program_size];
