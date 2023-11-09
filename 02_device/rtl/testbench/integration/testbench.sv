@@ -31,6 +31,8 @@ class GraphCSR;
 
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] overlay_program[];
 
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] auxiliary_1[];
+    bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] auxiliary_2[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] in_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] out_degree[];
     bit [M_AXI_MEMORY_DATA_WIDTH_BITS-1:0] edges_idx[];
@@ -759,9 +761,9 @@ module __KERNEL___testbench ();
         buffer_4_ptr[62:0] = get_random_ptr();
         buffer_5_ptr[62:0] = get_random_ptr();
         buffer_6_ptr[62:0] = get_random_ptr();
-        buffer_7_ptr = 1;
-        buffer_8_ptr = (16*24);
-        buffer_9_ptr = 0;
+        buffer_7_ptr[62:0] = get_random_ptr();
+        buffer_8_ptr[62:0] = get_random_ptr();
+        buffer_9_ptr = {63'd121, 1'b1};;
 
         ///////////////////////////////////////////////////////////////////////////
         //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -856,6 +858,8 @@ module __KERNEL___testbench ();
         m00_axi_fill_memory(buffer_4_ptr, LP_MAX_LENGTH);
         m00_axi_fill_memory(buffer_5_ptr, LP_MAX_LENGTH);
         m00_axi_fill_memory(buffer_6_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_7_ptr, LP_MAX_LENGTH);
+        m00_axi_fill_memory(buffer_8_ptr, LP_MAX_LENGTH);
 
     endtask
 
@@ -869,7 +873,9 @@ module __KERNEL___testbench ();
         m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_edge_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_edge_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edge_count);
-
+        m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_vertex_count);
+    
     endtask
 
     function automatic bit check___KERNEL___result();
@@ -1080,6 +1086,7 @@ module __KERNEL___testbench ();
             end
         end
 
+
         /// --------------------------------------------------------------------------------------
         // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
         // --------------------------------------------------------------------------------------
@@ -1173,6 +1180,10 @@ module __KERNEL___testbench ();
                 setup_temp = temp_edges_idx;
                 graph.edges_idx[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;
                 // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
+
+                graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
+                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};;
+
             end
         end
 
@@ -1222,7 +1233,7 @@ module __KERNEL___testbench ();
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
         graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
 
-        graph.mem512_overlay_program_size = int'(buffer_8_ptr); // cachelines
+        graph.mem512_overlay_program_size = int'(buffer_9_ptr[63:1]); // cachelines
 
         graph.mem512_vertex_count = ((graph.vertex_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_edge_count = ((graph.edge_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
