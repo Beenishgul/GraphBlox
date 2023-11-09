@@ -87,6 +87,7 @@ else
     cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
 
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_OVERLAY} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
