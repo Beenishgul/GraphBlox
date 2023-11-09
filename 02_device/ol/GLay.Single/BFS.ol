@@ -11,9 +11,9 @@
 0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
 0x00000000 // entry 9    cacheline 0    offset 9    --  9  - BUFFER size
-0x00000001 // entry 10   cacheline 0    offset 10   --  10 - const_mask
+0x00000000 // entry 10   cacheline 0    offset 10   --  10 - const_mask
 0x00000001 // entry 11   cacheline 0    offset 11   --  11 - const_value
-0x00004182 // entry 12   cacheline 0    offset 12   --  12 - ops_mask
+0x00002148 // entry 12   cacheline 0    offset 12   --  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13  
