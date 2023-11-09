@@ -61,9 +61,9 @@ module engine_read_write_kernel (
       end
 
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        if (data_valid & config_params_valid_in) begin
+        if (data_valid_in & config_params_valid_in) begin
           for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
-            if(config_params.ops_mask[i][j]) begin
+            if(config_params_in.ops_mask[i][j]) begin
               org_value_reg.field[i] <= data_in.field[j];
             end
           end
