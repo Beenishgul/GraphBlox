@@ -68,115 +68,116 @@ module engine_filter_cond_kernel (
     if (config_params_valid & data_valid) begin
       case (config_params.filter_operation)
         FILTER_NOP : begin
-          result_data_int = ops_value_reg; // No operation
           result_flag_int = 1;
+          result_data_int = ops_value_reg; // No operation
         end
 
         FILTER_GT : begin
-          result_data_int = ops_value_reg.field[0];
+           result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int > ops_value_reg.field[i]);
-              result_data_int = result_flag_int ? result_data_int : ops_value_reg.field[i];
+              result_flag_int = (result_data_int.field[i-1] > ops_value_reg.field[i]);
+              result_data_int.field[0] = result_flag_int ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_LT : begin
-          result_data_int = ops_value_reg.field[0];
+           result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int < ops_value_reg.field[i]);
-              result_data_int = result_flag_int ? result_data_int : ops_value_reg.field[i];
+              result_flag_int = (result_data_int.field[i-1] < ops_value_reg.field[i]);
+              result_data_int.field[0] = result_flag_int ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_EQ : begin
-          result_data_int = ops_value_reg.field[0];
+           result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int == ops_value_reg.field[i]);
-              result_data_int = result_flag_int ? result_data_int : ops_value_reg.field[i];
+              result_flag_int = (result_data_int.field[i-1] == ops_value_reg.field[i]);
+              result_data_int.field[0] = result_flag_int ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_NOT_EQ : begin
-          result_data_int = ops_value_reg.field[0];
+         result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int != ops_value_reg.field[i]);
-              result_data_int = result_flag_int ? result_data_int : ops_value_reg.field[i];
+              result_flag_int = (result_data_int.field[i-1] != ops_value_reg.field[i]);
+              result_data_int.field[0] = result_flag_int ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_GT_TERN : begin
-          result_data_int = ops_value_reg.field[0];
+          result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
               result_flag_int = 1;
-              result_data_int = (result_data_int > ops_value_reg.field[i]) ? result_data_int : ops_value_reg.field[i];
+              result_data_int.field[0] = (result_data_int.field[i-1] > ops_value_reg.field[i]) ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_LT_TERN : begin
-          result_data_int = ops_value_reg.field[0];
+          result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
               result_flag_int = 1;
-              result_data_int = (result_data_int < ops_value_reg.field[i]) ? result_data_int : ops_value_reg.field[i];
+              result_data_int.field[0] = (result_data_int.field[i-1] < ops_value_reg.field[i]) ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_EQ_TERN : begin
-          result_data_int = ops_value_reg.field[0];
+          result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
               result_flag_int = 1;
-              result_data_int = (result_data_int == ops_value_reg.field[i]) ? result_data_int : ops_value_reg.field[i];
+              result_data_int.field[0] = (result_data_int.field[i-1] == ops_value_reg.field[i]) ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         FILTER_NOT_EQ_TERN : begin
-          result_data_int = ops_value_reg.field[0];
+          result_data_int.field[0] = ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.filter_mask[i]) begin
               result_flag_int = 1;
-              result_data_int = (result_data_int != ops_value_reg.field[i]) ? result_data_int : ops_value_reg.field[i];
+              result_data_int.field[0] = (result_data_int.field[i-1] != ops_value_reg.field[i]) ? result_data_int.field[i-1] : ops_value_reg.field[i];
             end else begin
-              result_flag_int = result_flag_int;
-              result_data_int = result_data_int;
+              result_flag_int = 1;
+              result_data_int.field[i] = result_data_int.field[i];
             end
           end
         end
 
         default : begin
+          result_flag_int = 1;
           result_data_int = 0; // Undefined operations reset result_data
         end
       endcase

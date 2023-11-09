@@ -192,7 +192,7 @@ package PKG_ENGINE;
 // Forward the data in a lane and operate if condition is true
 // Keeps the original meta data for that lane
 
-    typedef enum logic[12:0] {
+    typedef enum logic[14:0] {
         ENGINE_FILTER_COND_GEN_RESET,
         ENGINE_FILTER_COND_GEN_IDLE,
         ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE,
@@ -201,6 +201,8 @@ package PKG_ENGINE;
         ENGINE_FILTER_COND_GEN_START_TRANS,
         ENGINE_FILTER_COND_GEN_START,
         ENGINE_FILTER_COND_GEN_PAUSE_TRANS,
+        ENGINE_FILTER_COND_GEN_BREAK_TRANS,
+        ENGINE_FILTER_COND_GEN_BREAK,
         ENGINE_FILTER_COND_GEN_BUSY,
         ENGINE_FILTER_COND_GEN_BUSY_TRANS,
         ENGINE_FILTER_COND_GEN_PAUSE,

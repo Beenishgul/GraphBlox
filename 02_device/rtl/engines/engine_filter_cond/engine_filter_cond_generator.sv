@@ -116,6 +116,8 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic            result_flag_int;
     MemoryPacketData result_data_int;
+    logic            break_start_int;
+    logic            break_done_int;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -302,8 +304,22 @@ module engine_filter_cond_generator #(parameter
                     next_state = ENGINE_FILTER_COND_GEN_DONE_TRANS;
                 else if (fifo_request_engine_out_signals_out_int.prog_full)
                     next_state = ENGINE_FILTER_COND_GEN_PAUSE_TRANS;
+                else if (break_start_int)
+                    next_state = ENGINE_FILTER_COND_GEN_BREAK_TRANS;
                 else
                     next_state = ENGINE_FILTER_COND_GEN_BUSY;
+            end
+            ENGINE_FILTER_COND_GEN_BREAK_TRANS : begin
+                if (break_done_int)
+                    next_state = ENGINE_FILTER_COND_GEN_BUSY_TRANS;
+                else
+                    next_state = ENGINE_FILTER_COND_GEN_BREAK;
+            end
+            ENGINE_FILTER_COND_GEN_BREAK : begin
+                if (break_done_int)
+                    next_state = ENGINE_FILTER_COND_GEN_BUSY_TRANS;
+                else
+                    next_state = ENGINE_FILTER_COND_GEN_BREAK;
             end
             ENGINE_FILTER_COND_GEN_PAUSE_TRANS : begin
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE;
@@ -432,6 +448,20 @@ module engine_filter_cond_generator #(parameter
             generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
         end else begin
             generator_engine_request_engine_reg.payload.meta <= generator_engine_request_engine_reg.payload.meta;
+        end
+    end
+
+    always_comb begin
+        if (result_flag_int & configure_engine_param_int.break_flag) begin
+            break_start_int = 1;
+        end else begin
+            break_start_int = 0;
+        end
+
+        if(~result_flag_int | (response_engine_in_int.payload.meta.route.seq_state == SEQUENCE_DONE)) begin
+            break_done_int = 1;
+        end else begin
+            break_done_int = 0;
         end
     end
 
