@@ -3,34 +3,34 @@
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 0    cacheline 0    offset 0    -- // entry 37   cacheline 2    offset 5    -- //  0  - Increment/Decrement
 0x00000000 // entry 1    cacheline 0    offset 1    -- // entry 38   cacheline 2    offset 6    -- //  1  - Index_start
-0x00000033 // entry 2    cacheline 0    offset 2    -- // entry 39   cacheline 2    offset 7    -- //  2  - Index_end
+0x00000000 // entry 2    cacheline 0    offset 2    -- // entry 39   cacheline 2    offset 7    -- //  2  - Index_end
 0x00000001 // entry 3    cacheline 0    offset 3    -- // entry 40   cacheline 2    offset 8    -- //  3  - Stride
 0x80000002 // entry 4    cacheline 0    offset 4    -- // entry 41   cacheline 2    offset 9    -- //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000102 // entry 5    cacheline 0    offset 5    -- // entry 42   cacheline 2    offset 10   -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_READ | id moddule | id engine
-0x00010401 // entry 6    cacheline 0    offset 6    -- // entry 43   cacheline 2    offset 11   -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000104 // entry 5    cacheline 0    offset 5    -- // entry 42   cacheline 2    offset 10   -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_READ | id moddule | id engine
+0x00000000 // entry 6    cacheline 0    offset 6    -- // entry 43   cacheline 2    offset 11   -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 7    cacheline 0    offset 7    -- // entry 44   cacheline 2    offset 12   -- //  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 8    cacheline 0    offset 8    -- // entry 45   cacheline 2    offset 13   -- //  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 9    cacheline 0    offset 9    -- // entry 46   cacheline 2    offset 14   -- //  9  - BUFFER size
-0x00000000 // entry 10   cacheline 0    offset 10   -- // entry 47   cacheline 2    offset 15   -- //  10 - const_mask
-0x00000000 // entry 11   cacheline 0    offset 11   -- // entry 48   cacheline 3    offset 0    -- //  11 - const_value
-0x00008412 // entry 12   cacheline 0    offset 12   -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
+0x00000000 // entry 9    cacheline 0    offset 9    -- // entry 46   cacheline 2    offset 14   -- //  9  - BUFFER size
+0x00000001 // entry 10   cacheline 0    offset 10   -- // entry 47   cacheline 2    offset 15   -- //  10 - const_mask
+0x00000001 // entry 11   cacheline 0    offset 11   -- // entry 48   cacheline 3    offset 0    -- //  11 - const_value
+0x00004182 // entry 12   cacheline 0    offset 12   -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13  
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 13   cacheline 0    offset 13   -- // entry 37   cacheline 2    offset 5    -- //  0  - Increment/Decrement
 0x00000000 // entry 14   cacheline 0    offset 14   -- // entry 38   cacheline 2    offset 6    -- //  1  - Index_start
-0x00000033 // entry 15   cacheline 0    offset 15   -- // entry 39   cacheline 2    offset 7    -- //  2  - Index_end
+0x00000000 // entry 15   cacheline 0    offset 15   -- // entry 39   cacheline 2    offset 7    -- //  2  - Index_end
 0x00000001 // entry 16   cacheline 1    offset 0    -- // entry 40   cacheline 2    offset 8    -- //  3  - Stride
 0x80000002 // entry 17   cacheline 1    offset 1    -- // entry 41   cacheline 2    offset 9    -- //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000102 // entry 18   cacheline 1    offset 2    -- // entry 42   cacheline 2    offset 10   -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_READ | id moddule | id engine
-0x00010401 // entry 19   cacheline 1    offset 3    -- // entry 43   cacheline 2    offset 11   -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000104 // entry 18   cacheline 1    offset 2    -- // entry 42   cacheline 2    offset 10   -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_READ | id moddule | id engine
+0x00000000 // entry 19   cacheline 1    offset 3    -- // entry 43   cacheline 2    offset 11   -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 20   cacheline 1    offset 4    -- // entry 44   cacheline 2    offset 12   -- //  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 21   cacheline 1    offset 5    -- // entry 45   cacheline 2    offset 13   -- //  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 22   cacheline 1    offset 6    -- // entry 46   cacheline 2    offset 14   -- //  9  - BUFFER size
-0x00000000 // entry 23   cacheline 1    offset 7    -- // entry 47   cacheline 2    offset 15   -- //  10 - const_mask
-0x00000000 // entry 24   cacheline 1    offset 8    -- // entry 48   cacheline 3    offset 0    -- //  11 - const_value
-0x00008412 // entry 25   cacheline 1    offset 9    -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
+0x00000000 // entry 22   cacheline 1    offset 6    -- // entry 46   cacheline 2    offset 14   -- //  9  - BUFFER size
+0x00000001 // entry 23   cacheline 1    offset 7    -- // entry 47   cacheline 2    offset 15   -- //  10 - const_mask
+0x00000001 // entry 24   cacheline 1    offset 8    -- // entry 48   cacheline 3    offset 0    -- //  11 - const_value
+0x00004182 // entry 25   cacheline 1    offset 9    -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10  
@@ -79,9 +79,9 @@
 // --------------------------------------------------------------------------------------
 0x00000004 // entry 52   cacheline 3    offset 4    -- // entry 52   cacheline 3    offset 4    -- //  0  - filter_operation
 0x00000004 // entry 53   cacheline 3    offset 5    -- // entry 53   cacheline 3    offset 5    -- //  1  - filter_mask
-0x00000008 // entry 54   cacheline 3    offset 6    -- // entry 54   cacheline 3    offset 6    -- //  2  - const_mask
+0x00000004 // entry 54   cacheline 3    offset 6    -- // entry 54   cacheline 3    offset 6    -- //  2  - const_mask
 0xFFFFFFFF // entry 55   cacheline 3    offset 7    -- // entry 55   cacheline 3    offset 7    -- //  3  - const_value
-0x00008214 // entry 56   cacheline 3    offset 8    -- // entry 56   cacheline 3    offset 8    -- //  5  - ops_mask
+0x00004821 // entry 56   cacheline 3    offset 8    -- // entry 56   cacheline 3    offset 8    -- //  5  - ops_mask
 0x00000000 // entry 57   cacheline 3    offset 9    -- // entry 57   cacheline 3    offset 9    -- //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
 0x00010401 // entry 58   cacheline 3    offset 10   -- // entry 58   cacheline 3    offset 10   -- //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00010401 // entry 59   cacheline 3    offset 11   -- // entry 59   cacheline 3    offset 11   -- //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
@@ -160,19 +160,19 @@
 0x00000000 // entry 108  cacheline 6    offset 12   -- // entry 46   cacheline 2    offset 14   -- //  9  - BUFFER size
 0x00000000 // entry 109  cacheline 6    offset 13   -- // entry 47   cacheline 2    offset 15   -- //  10 - const_mask
 0x00000000 // entry 110  cacheline 6    offset 14   -- // entry 48   cacheline 3    offset 0    -- //  11 - const_value
-0x00008412 // entry 111  cacheline 6    offset 15   -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
+0x00004812 // entry 111  cacheline 6    offset 15   -- // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9   
 // --------------------------------------------------------------------------------------
-0x00000004 // entry 112  cacheline 7    offset 0    -- // entry 52   cacheline 3    offset 4    -- //  0  - filter_operation
+0x00000008 // entry 112  cacheline 7    offset 0    -- // entry 52   cacheline 3    offset 4    -- //  0  - filter_operation
 0x00000004 // entry 113  cacheline 7    offset 1    -- // entry 53   cacheline 3    offset 5    -- //  1  - filter_mask
-0x00000008 // entry 114  cacheline 7    offset 2    -- // entry 54   cacheline 3    offset 6    -- //  2  - const_mask
+0x00000004 // entry 114  cacheline 7    offset 2    -- // entry 54   cacheline 3    offset 6    -- //  2  - const_mask
 0x00000001 // entry 115  cacheline 7    offset 3    -- // entry 55   cacheline 3    offset 7    -- //  3  - const_value
-0x00008421 // entry 116  cacheline 7    offset 4    -- // entry 56   cacheline 3    offset 8    -- //  5  - ops_mask
-0x00000000 // entry 117  cacheline 7    offset 5    -- // entry 57   cacheline 3    offset 9    -- //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
-0x01010401 // entry 118  cacheline 7    offset 6    -- // entry 58   cacheline 3    offset 10   -- //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x01010401 // entry 119  cacheline 7    offset 7    -- // entry 59   cacheline 3    offset 11   -- //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00004821 // entry 116  cacheline 7    offset 4    -- // entry 56   cacheline 3    offset 8    -- //  5  - ops_mask
+0x00000001 // entry 117  cacheline 7    offset 5    -- // entry 57   cacheline 3    offset 9    -- //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00030101 // entry 118  cacheline 7    offset 6    -- // entry 58   cacheline 3    offset 10   -- //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00030101 // entry 119  cacheline 7    offset 7    -- // entry 59   cacheline 3    offset 11   -- //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 120  cacheline 7    offset 8    -- // entry 59   cacheline 3    offset 11   -- //  7  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------

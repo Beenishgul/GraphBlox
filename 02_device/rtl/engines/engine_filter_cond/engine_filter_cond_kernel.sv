@@ -90,7 +90,7 @@ module engine_filter_cond_kernel (
         FILTER_GT : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int.field[i] > ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] > ops_value_reg.field[i+1]);
             end
           end
         end
@@ -98,7 +98,7 @@ module engine_filter_cond_kernel (
         FILTER_LT : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int.field[i] < ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] < ops_value_reg.field[i+1]);
             end
           end
         end
@@ -106,7 +106,7 @@ module engine_filter_cond_kernel (
         FILTER_EQ : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int.field[i] == ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] == ops_value_reg.field[i+1]);
             end
           end
         end
@@ -114,7 +114,7 @@ module engine_filter_cond_kernel (
         FILTER_NOT_EQ : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = (result_data_int.field[i] != ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] != ops_value_reg.field[i+1]);
             end
           end
         end
