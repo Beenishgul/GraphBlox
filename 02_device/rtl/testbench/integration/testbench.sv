@@ -875,7 +875,7 @@ module __KERNEL___testbench ();
         m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edge_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_vertex_count);
         m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_vertex_count);
-    
+
     endtask
 
     function automatic bit check___KERNEL___result();
@@ -1087,77 +1087,248 @@ module __KERNEL___testbench ();
         end
 
 
-        /// --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-        // --------------------------------------------------------------------------------------
+        // /// --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
+
+        // /// --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
+
+        // /// --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        // // --------------------------------------------------------------------------------------
+
+        // // --------------------------------------------------------------------------------------
+        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
+        // // --------------------------------------------------------------------------------------
+        // graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+        // // --------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
+        // Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13
         // --------------------------------------------------------------------------------------
 
-        // --------------------------------------------------------------------------------------
-        // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
-        // --------------------------------------------------------------------------------------
+
+        //0x00000000 // entry 2    cacheline 0    offset 2    --  2  - Index_end
+
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        //0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[31:0];
+
+        //0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[63:32];
+
+        //0x00000000 // entry 9    cacheline 0    offset 9    --  9  - BUFFER size
+
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
 
         // --------------------------------------------------------------------------------------
-        // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
         // --------------------------------------------------------------------------------------
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
-        // --------------------------------------------------------------------------------------
-
-        // --------------------------------------------------------------------------------------
-        // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        // Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13
         // --------------------------------------------------------------------------------------
 
-        // --------------------------------------------------------------------------------------
-        // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
-        // --------------------------------------------------------------------------------------
+        //0x00000000 // entry 15   cacheline 0    offset 15   --  2  - Index_end
 
-        /// --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-        // --------------------------------------------------------------------------------------
+        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
 
-        // --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
-        // --------------------------------------------------------------------------------------
+        //0x00000000 // entry 20   cacheline 1    offset 4    --  7  - BUFFER Array Pointer LHS
 
-        /// --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
-        // --------------------------------------------------------------------------------------
+        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[31:0];
+
+        //0x00000000 // entry 21   cacheline 1    offset 5    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[63:32];
+
+        //0x00000000 // entry 22   cacheline 1    offset 6    --  9  - BUFFER size
+
+        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
 
         // --------------------------------------------------------------------------------------
-        // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
         // --------------------------------------------------------------------------------------
-        graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
-        // --------------------------------------------------------------------------------------
-
-        // --------------------------------------------------------------------------------------
-        // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
-        // --------------------------------------------------------------------------------------
-        graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+        // Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10
         // --------------------------------------------------------------------------------------
 
+        //0x00000033 // entry 28   cacheline 1    offset 12   --  2  - Index_end
+
+        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        //0x00000000 // entry 33   cacheline 2    offset 1    --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = 0;
+
+        //0x00000000 // entry 34   cacheline 2    offset 2    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = 0;
+
+        //0x00000033 // entry 35   cacheline 2    offset 3    --  9  - BUFFER size
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
         // --------------------------------------------------------------------------------------
-        // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
         // --------------------------------------------------------------------------------------
-        graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+        // Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 13
         // --------------------------------------------------------------------------------------
+
+        //0x00000033 // entry 39   cacheline 2    offset 7    --  2  - Index_end
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        //0x00000000 // entry 44   cacheline 2    offset 12   --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
+
+        //0x00000000 // entry 45   cacheline 2    offset 13   --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
+
+        //0x00000033 // entry 46   cacheline 2    offset 14   --  9  - BUFFER size
+
+        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        // --------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------
+        // Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13
+        // --------------------------------------------------------------------------------------
+
+        //0x00000033 // entry 63   cacheline 3    offset 15   --  2  - Index_end
+
+        graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        //0x00000000 // entry 68   cacheline 4    offset 4    --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
+
+        //0x00000000 // entry 69   cacheline 4    offset 5    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
+
+        //0x00000033 // entry 70   cacheline 4    offset 6    --  9  - BUFFER size
+
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        // --------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------
+        // Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13
+        // --------------------------------------------------------------------------------------
+
+        //0x00000033 // entry 76   cacheline 4    offset 12   --  2  - Index_end
+
+        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
+
+        //0x00000000 // entry 81   cacheline 5    offset 1    --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[31:0];
+
+        //0x00000000 // entry 82   cacheline 5    offset 2    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[63:32];
+
+        //0x00000033 // entry 83   cacheline 5    offset 3    --  9  - BUFFER size
+
+        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
+
+        // --------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------
+        // Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10
+        // --------------------------------------------------------------------------------------
+
+        //0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
+
+        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
+
+        //0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[31:0];
+
+        //0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[63:32];
+
+        //0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
+
+        // --------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------
+        // Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13
+        // --------------------------------------------------------------------------------------
+
+        //0x00000000 // entry 101  cacheline 6    offset 5    --  2  - Index_end
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        //0x00000000 // entry 106  cacheline 6    offset 10   --  7  - BUFFER Array Pointer LHS
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[31:0];
+
+        //0x00000000 // entry 107  cacheline 6    offset 11   --  8  - BUFFER Array Pointer RHS
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*11)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[63:32];
+
+        //0x00000000 // entry 108  cacheline 6    offset 12   --  9  - BUFFER size
+
+        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
+
+        // --------------------------------------------------------------------------------------
+
 
         realcount = 0;
 
