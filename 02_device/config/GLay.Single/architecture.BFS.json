@@ -12,7 +12,7 @@
         "ENGINE_PIPELINE"            : 0,
         "ENGINE_READ_WRITE"          : 13,
         "ENGINE_CSR_INDEX"           : 10,
-        "ENGINE_FILTER_COND"         : 8,
+        "ENGINE_FILTER_COND"         : 9,
         "ENGINE_MERGE_DATA"          : 2,
         "ENGINE_ALU_OPS"             : 6,
         "ENGINE_FORWARD_DATA"        : 1
@@ -31,11 +31,12 @@
             ["ENGINE_FORWARD_DATA"       ]
         ],
         "2": [
-            ["ENGINE_CSR_INDEX"          ]
+            ["ENGINE_CSR_INDEX"          ],
+            ["ENGINE_FORWARD_DATA"       ]
         ],
         "3": [
-            ["ENGINE_READ_WRITE"          , "ENGINE_MERGE_DATA(W:1)"],
-            ["ENGINE_READ_WRITE(C:0)"    ]
+            ["ENGINE_READ_WRITE"         , "ENGINE_FILTER_COND"],
+            ["ENGINE_FORWARD_DATA"       ]
         ]
     }
 }

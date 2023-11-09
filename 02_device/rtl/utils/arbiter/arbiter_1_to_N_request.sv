@@ -65,7 +65,7 @@ module arbiter_1_to_N_request #(
   logic [NUM_MEMORY_REQUESTOR-1:0] current_module_id_bundle         ;
 
 
-  assign current_module_id_bundle = ID_BUNDLE;
+  assign current_module_id_bundle = 1'b1 << ID_BUNDLE;
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ module arbiter_1_to_N_request #(
 // FIFO memory request out fifo MemoryPacket
 // --------------------------------------------------------------------------------------
   // FIFO is resetting
-  assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy  | fifo_request_signals_out_int.rd_rst_busy;
+  assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
   // Push
   assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;

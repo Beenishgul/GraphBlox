@@ -23,13 +23,12 @@ package PKG_SETUP;
 // --------------------------------------------------------------------------------------
 
   typedef enum logic[5:0] {
-    CU_SETUP_RESET,
-    CU_SETUP_IDLE,
-    CU_SETUP_REQ_START,
-    CU_SETUP_REQ_BUSY,
-    CU_SETUP_REQ_PAUSE,
-    CU_SETUP_REQ_DONE
+    CU_SETUP_RESET     = 1'b1 << 0, // 000001
+    CU_SETUP_IDLE      = 1'b1 << 1, // 000010
+    CU_SETUP_REQ_START = 1'b1 << 2, // 000100
+    CU_SETUP_REQ_BUSY  = 1'b1 << 3, // 001000
+    CU_SETUP_REQ_PAUSE = 1'b1 << 4, // 010000
+    CU_SETUP_REQ_DONE  = 1'b1 << 5  // 100000
   } cu_setup_state;
-
 
 endpackage

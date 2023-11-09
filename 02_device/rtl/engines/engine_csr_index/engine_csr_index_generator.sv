@@ -537,9 +537,9 @@ module engine_csr_index_generator #(parameter
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
         fifo_request_comb.payload.data.field[0]      = counter_count;
-        fifo_request_comb.payload.data.field[1]      = counter_count;
-        fifo_request_comb.payload.data.field[2]      = counter_count;
-        fifo_request_comb.payload.data.field[3]      = counter_count;
+        fifo_request_comb.payload.data.field[1]      = configure_memory_reg.payload.data.field[0];
+        fifo_request_comb.payload.data.field[2]      = configure_memory_reg.payload.data.field[1];
+        fifo_request_comb.payload.data.field[3]      = configure_memory_reg.payload.data.field[2];
     end
 
     always_ff @(posedge ap_clk) begin

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------
-// --- ENGINE 1 ENGINE_MERGE_DATA(W:2) - PROGRAM 2-CYCLES
+// Name ENGINE_MERGE_DATA   ID 5    mapping 4    cycles 2   
 // --------------------------------------------------------------------------------------
 0x00000007 //  0  - merge mask (W:2)
 0x00000000 //  1  - merge type (Serial|Parallel|Both)
