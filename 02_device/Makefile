@@ -148,6 +148,21 @@ TESTBENCH_MODULE     ?= integration
 # TESTBENCH_MODULE     ?= unit/arbiter
 
 # =========================================================
+# Each project has topology Architecture
+# ARCHITECTURE.CAPABILITY/architecture.ALGORITHM_NAME.json
+# Project GLay
+# Capability Full, lite, Single, Test
+# Algorithm BFS, PR, CC, SSSP, TC
+# =========================================================
+#if you make a push and use a previous compile 
+ARCHITECTURE              ?= GLay
+# CAPABILITY                = Test
+# CAPABILITY                = Single
+# CAPABILITY                = Lite
+CAPABILITY                ?= Full
+# =========================================================
+
+# =========================================================
 # COMPILER FLAGS                         
 # =========================================================
 CXX     := g++
