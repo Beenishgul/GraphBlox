@@ -1413,7 +1413,7 @@ module __KERNEL___testbench ();
         graph.in_degree    = new [graph.mem512_vertex_count];
         graph.edges_idx    = new [graph.mem512_vertex_count];
         graph.auxiliary_1  = new [graph.mem512_vertex_count];
-        graph.auxiliary_1  = new [graph.mem512_vertex_count];
+        graph.auxiliary_2  = new [graph.mem512_vertex_count];
         graph.edges_array_src = new [graph.mem512_edge_count];
         graph.edges_array_dest= new [graph.mem512_edge_count];
         graph.overlay_program = new [graph.mem512_overlay_program_size];
