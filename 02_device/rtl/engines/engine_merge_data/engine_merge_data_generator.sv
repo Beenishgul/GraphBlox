@@ -447,19 +447,13 @@ module engine_merge_data_generator #(parameter
             generator_engine_request_engine_reg.payload.data.field[0] <= generator_engine_request_engine_reg.payload.data.field[0];
         end
 
-        for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
+        for (int j=1; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             if(response_engine_in_int[j].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
-                generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[j];
-            end else begin
-                generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j];
-            end
-        end
-
-        for (int j=(1+ENGINE_MERGE_WIDTH); j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
-            if(response_engine_in_int[0].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
+                generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[0];
+            end else if (configure_engine_param_valid & ~configure_engine_param_int.merge_mask[j]) begin
                 generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
             end else begin
-                generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j];
+                generator_engine_request_engine_reg.payload.data.field[j] <= 0;
             end
         end
     end
