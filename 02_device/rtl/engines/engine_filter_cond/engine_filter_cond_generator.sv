@@ -463,11 +463,11 @@ module engine_filter_cond_generator #(parameter
         generator_engine_request_engine_reg.payload.meta.route.seq_src <= response_engine_in_int.payload.meta.route.seq_src;
 
         if(result_flag_int & configure_engine_param_int.conditional_flag & configure_engine_param_valid) begin
-            generator_engine_request_engine_reg.payload.meta.to <= configure_engine_param_int.filter_route._if;
+            generator_engine_request_engine_reg.payload.meta.route.to <= configure_engine_param_int.filter_route._if;
         end else if (~result_flag_int & configure_engine_param_int.conditional_flag & configure_engine_param_valid) begin
-            generator_engine_request_engine_reg.payload.meta.to <= configure_engine_param_int.filter_route._else;
+            generator_engine_request_engine_reg.payload.meta.route.to <= configure_engine_param_int.filter_route._else;
         end begin
-            generator_engine_request_engine_reg.payload.meta.to <= response_engine_in_int.payload.meta.route.to;
+            generator_engine_request_engine_reg.payload.meta.route.to <= response_engine_in_int.payload.meta.route.to;
         end
     end
 
