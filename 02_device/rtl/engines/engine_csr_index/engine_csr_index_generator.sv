@@ -536,7 +536,14 @@ module engine_csr_index_generator #(parameter
 
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data               = configure_memory_reg.payload.data;
+
+        if(configure_memory_reg.payload.param.mode_sequence) begin
+            fifo_request_comb.payload.data = configure_memory_reg.payload.data;
+        end else begin
+            for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+                fifo_request_comb.payload.data.field[j] = counter_count;
+            end
+        end
     end
 
     always_ff @(posedge ap_clk) begin
