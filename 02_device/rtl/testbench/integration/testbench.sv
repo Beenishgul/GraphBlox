@@ -14,12 +14,12 @@ import PKG_MEMORY::*;
 
 class GraphCSR;
 
-    string  graph_name                 ;
-    integer vertex_count               ;
-    integer edge_count                 ;
-    integer mem512_vertex_count        ;
-    integer mem512_edge_count          ;
-    integer mem512_overlay_program_size;
+    string  graph_name                    ;
+    integer num_vertices                  ;
+    integer nume_edges                    ;
+    integer mem512_num_vertices           ;
+    integer mem512_num_edges              ;
+    integer mem512_overlay_program_entries;
 
     integer file_error               ;
     integer file_ptr_overlay_program ;
@@ -48,18 +48,18 @@ class GraphCSR;
         this.file_ptr_out_degree       = 0;
         this.file_ptr_edges_array_src  = 0;
         this.file_ptr_edges_array_dest = 0;
-        this.vertex_count              = 0;
-        this.edge_count                = 0;
-        this.mem512_vertex_count       = 0;
-        this.mem512_edge_count         = 0;
-        this.mem512_overlay_program_size = 4;
+        this.num_vertices              = 0;
+        this.nume_edges                = 0;
+        this.mem512_num_vertices       = 0;
+        this.mem512_num_edges         = 0;
+        this.mem512_overlay_program_entries = 4;
     endfunction
 
     function void display ();
         $display("---------------------------------------------------------------------------");
         $display("MSG: GRAPH CSR : %s", this.graph_name);
-        $display("MSG: VERTEX COUNT : %0d", this.vertex_count);
-        $display("MSG: EDGE COUNT   : %0d", this.edge_count);
+        $display("MSG: VERTEX COUNT : %0d", this.num_vertices);
+        $display("MSG: EDGE COUNT   : %0d", this.nume_edges);
         $display("---------------------------------------------------------------------------");
     endfunction
 
@@ -866,15 +866,15 @@ module __KERNEL___testbench ();
     task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Backdoor fill the memory with the content.
-        m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_size);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_edge_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_edge_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edge_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_vertex_count);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_vertex_count);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_entries);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_num_vertices);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_num_vertices);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_num_vertices);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_num_vertices);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_num_vertices);
 
     endtask
 
@@ -939,8 +939,8 @@ module __KERNEL___testbench ();
         // graph.overlay_program[2] = 0;
         // graph.overlay_program[3] = 0;
 
-        // graph.overlay_program[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.edge_count;
-        // graph.overlay_program[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
+        // graph.overlay_program[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.nume_edges;
+        // graph.overlay_program[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;
         // graph.overlay_program[0][(64)+:64] = buffer_1_ptr;
         // graph.overlay_program[0][(64*2)+:64] = buffer_2_ptr;
         // graph.overlay_program[0][(64*3)+:64] = buffer_3_ptr;
@@ -976,7 +976,7 @@ module __KERNEL___testbench ();
         // setup_temp = 0;
 
         // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - param.index_start
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;               // 2 - param.index_end
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;               // 2 - param.index_end
         // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - param.stride
         // // --------------------------------------------------------------------------------------
 
@@ -1034,10 +1034,10 @@ module __KERNEL___testbench ();
         // // --------------------------------------------------------------------------------------
         // // 10-BUFFER size
         // // param.array_size
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.vertex_count;
+        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;
         // // --------------------------------------------------------------------------------------
 
-        for (int i = 0; i < graph.mem512_overlay_program_size; i++) begin
+        for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
                 realcount++;
@@ -1086,7 +1086,7 @@ module __KERNEL___testbench ();
             end
         end
 
-
+        
         // /// --------------------------------------------------------------------------------------
         // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
         // // --------------------------------------------------------------------------------------
@@ -1159,183 +1159,14 @@ module __KERNEL___testbench ();
         // graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
         // // --------------------------------------------------------------------------------------
 
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-
-        //0x00000000 // entry 2    cacheline 0    offset 2    --  2  - Index_end
-
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[31:0];
-
-        //0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[63:32];
-
-        //0x00000000 // entry 9    cacheline 0    offset 9    --  9  - BUFFER size
-
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-        //0x00000000 // entry 15   cacheline 0    offset 15   --  2  - Index_end
-
-        graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 20   cacheline 1    offset 4    --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[31:0];
-
-        //0x00000000 // entry 21   cacheline 1    offset 5    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[63:32];
-
-        //0x00000000 // entry 22   cacheline 1    offset 6    --  9  - BUFFER size
-
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10
-        // --------------------------------------------------------------------------------------
-
-        //0x00000033 // entry 28   cacheline 1    offset 12   --  2  - Index_end
-
-        graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 33   cacheline 2    offset 1    --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = 0;
-
-        //0x00000000 // entry 34   cacheline 2    offset 2    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = 0;
-
-        //0x00000033 // entry 35   cacheline 2    offset 3    --  9  - BUFFER size
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-        //0x00000033 // entry 39   cacheline 2    offset 7    --  2  - Index_end
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 44   cacheline 2    offset 12   --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
-
-        //0x00000000 // entry 45   cacheline 2    offset 13   --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
-
-        //0x00000033 // entry 46   cacheline 2    offset 14   --  9  - BUFFER size
-
-        graph.overlay_program[2][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-        //0x00000033 // entry 63   cacheline 3    offset 15   --  2  - Index_end
-
-        graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 68   cacheline 4    offset 4    --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-
-        //0x00000000 // entry 69   cacheline 4    offset 5    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
-
-        //0x00000033 // entry 70   cacheline 4    offset 6    --  9  - BUFFER size
-
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-        //0x00000033 // entry 76   cacheline 4    offset 12   --  2  - Index_end
-
-        graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
-
-        //0x00000000 // entry 81   cacheline 5    offset 1    --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[31:0];
-
-        //0x00000000 // entry 82   cacheline 5    offset 2    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[63:32];
-
-        //0x00000033 // entry 83   cacheline 5    offset 3    --  9  - BUFFER size
-
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10
-        // --------------------------------------------------------------------------------------
-
-        //0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
-
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
-
-        //0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[31:0];
-
-        //0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[63:32];
-
-        //0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = graph.edge_count;
-
-        // --------------------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        // Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13
-        // --------------------------------------------------------------------------------------
-
-        //0x00000000 // entry 101  cacheline 6    offset 5    --  2  - Index_end
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        //0x00000000 // entry 106  cacheline 6    offset 10   --  7  - BUFFER Array Pointer LHS
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[31:0];
-
-        //0x00000000 // entry 107  cacheline 6    offset 11   --  8  - BUFFER Array Pointer RHS
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*11)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_7_ptr[63:32];
-
-        //0x00000000 // entry 108  cacheline 6    offset 12   --  9  - BUFFER size
-
-        graph.overlay_program[6][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = graph.vertex_count;
-
-        // --------------------------------------------------------------------------------------
-
+       `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
         realcount = 0;
 
-        // $display("MSG: Starting graph.mem512_vertex_count: %0d\n", graph.mem512_vertex_count);
-        // $display("MSG: Starting graph.mem512_edge_count: %0d\n", graph.mem512_edge_count);
+        // $display("MSG: Starting graph.mem512_num_vertices: %0d\n", graph.mem512_num_vertices);
+        // $display("MSG: Starting graph.mem512_num_edges: %0d\n", graph.mem512_num_edges);
 
-        for (int i = 0; i < graph.mem512_vertex_count; i++) begin
+        for (int i = 0; i < graph.mem512_num_vertices; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
                 setup_temp = temp_out_degree;
@@ -1353,14 +1184,14 @@ module __KERNEL___testbench ();
                 // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
 
                 graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
-                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};;
+                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
 
             end
         end
 
         realcount = 0;
 
-        for (int i = 0; i < graph.mem512_edge_count; i++) begin
+        for (int i = 0; i < graph.mem512_num_edges; i++) begin
             for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
                 setup_temp = temp_edges_array_src;
@@ -1401,22 +1232,22 @@ module __KERNEL___testbench ();
         if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
         else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
-        graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.vertex_count);
-        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.edge_count);
+        graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
+        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.nume_edges);
 
-        graph.mem512_overlay_program_size = int'(buffer_9_ptr[63:1]); // cachelines
+        graph.mem512_overlay_program_entries = int'(buffer_9_ptr[63:1]); // cachelines
 
-        graph.mem512_vertex_count = ((graph.vertex_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_edge_count = ((graph.edge_count*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_num_vertices = ((graph.num_vertices*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_num_edges = ((graph.nume_edges*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
-        graph.out_degree   = new [graph.mem512_vertex_count];
-        graph.in_degree    = new [graph.mem512_vertex_count];
-        graph.edges_idx    = new [graph.mem512_vertex_count];
-        graph.auxiliary_1  = new [graph.mem512_vertex_count];
-        graph.auxiliary_2  = new [graph.mem512_vertex_count];
-        graph.edges_array_src = new [graph.mem512_edge_count];
-        graph.edges_array_dest= new [graph.mem512_edge_count];
-        graph.overlay_program = new [graph.mem512_overlay_program_size];
+        graph.out_degree   = new [graph.mem512_num_vertices];
+        graph.in_degree    = new [graph.mem512_num_vertices];
+        graph.edges_idx    = new [graph.mem512_num_vertices];
+        graph.auxiliary_1  = new [graph.mem512_num_vertices];
+        graph.auxiliary_2  = new [graph.mem512_num_vertices];
+        graph.edges_array_src = new [graph.mem512_num_edges];
+        graph.edges_array_dest= new [graph.mem512_num_edges];
+        graph.overlay_program = new [graph.mem512_overlay_program_entries];
 
         read_files_graphCSR(graph);
 
