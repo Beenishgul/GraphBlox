@@ -568,7 +568,7 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         fifo_request_din_reg_S2.valid                      <= fifo_request_din_reg.valid;
         fifo_request_din_reg_S2.payload.data               <= fifo_request_din_reg.payload.data;
-        fifo_request_din_reg_S2.payload.meta.subclass      <= fifo_request_din_reg.payload.meta.subclass  ;
+        fifo_request_din_reg_S2.payload.meta.subclass      <= fifo_request_din_reg.payload.meta.subclass;
         fifo_request_din_reg_S2.payload.meta.address       <= fifo_request_din_reg.payload.meta.address;
         fifo_request_din_reg_S2.payload.meta.route.from    <= fifo_request_din_reg.payload.meta.route.from;
         fifo_request_din_reg_S2.payload.meta.route.to      <= fifo_request_din_reg.payload.meta.route.to;

@@ -39,7 +39,7 @@ module engine_read_write_generator #(parameter
     ID_BUNDLE        = 0                    ,
     ID_LANE          = 0                    ,
     ID_ENGINE        = 0                    ,
-    ID_MODULE        = 0                    ,
+    ID_MODULE        = 1                    ,
     ENGINES_CONFIG   = 0                    ,
     FIFO_WRITE_DEPTH = 16                   ,
     PROG_THRESH      = 8                    ,
@@ -125,11 +125,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic               read_write_response_engine_in_valid_reg ;
-    logic               read_write_response_engine_in_valid_flag;
+    logic               read_write_response_engine_in_valid_reg    ;
+    logic               read_write_response_engine_in_valid_flag   ;
     logic               read_write_response_engine_in_valid_flag_S2;
-    MemoryPacketData    result_int                              ;
-    MemoryPacketAddress address_int                             ;
+    MemoryPacketData    result_int                                 ;
+    MemoryPacketAddress address_int                                ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -474,13 +474,13 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            read_write_response_engine_in_valid_reg   <= 1'b0;
-            read_write_response_engine_in_valid_flag_S2<= 1'b0;
-            generator_engine_request_engine_reg.valid <= 1'b0;
+            read_write_response_engine_in_valid_reg     <= 1'b0;
+            read_write_response_engine_in_valid_flag_S2 <= 1'b0;
+            generator_engine_request_engine_reg.valid   <= 1'b0;
         end
         else begin
-            read_write_response_engine_in_valid_flag_S2<= read_write_response_engine_in_valid_flag;
-            generator_engine_request_engine_reg.valid <= read_write_response_engine_in_valid_flag_S2;
+            read_write_response_engine_in_valid_flag_S2 <= read_write_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.valid   <= read_write_response_engine_in_valid_flag_S2;
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 read_write_response_engine_in_valid_reg <= 1'b1;
             end else begin
@@ -493,15 +493,22 @@ module engine_read_write_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data                 <= result_int;
-        generator_engine_request_engine_reg.payload.meta.address         <= address_int;
-        generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
-        generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
-        generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-        generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-        generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.subclass        <= configure_memory_reg.payload.meta.subclass;
+        generator_engine_request_engine_reg.payload.data                      <= result_int;
+        generator_engine_request_engine_reg.payload.meta.address              <= address_int;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_module <= 1 << ID_MODULE;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_cu     <= configure_memory_reg.payload.meta.route.from.id_cu ;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_bundle <= configure_memory_reg.payload.meta.route.from.id_bundle;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_lane   <= configure_memory_reg.payload.meta.route.from.id_lane;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_engine <= configure_memory_reg.payload.meta.route.from.id_engine;
+        generator_engine_request_engine_reg.payload.meta.route.from.id_buffer <= configure_memory_reg.payload.meta.route.from.id_buffer;
+        generator_engine_request_engine_reg.payload.meta.route.to             <= configure_memory_reg.payload.meta.route.to;
+        generator_engine_request_engine_reg.payload.meta.route.seq_src        <= response_engine_in_int.payload.meta.route.seq_src;
+        generator_engine_request_engine_reg.payload.meta.route.seq_state      <= response_engine_in_int.payload.meta.route.seq_state;
+        generator_engine_request_engine_reg.payload.meta.route.hops           <= response_engine_in_int.payload.meta.route.hops;
+        generator_engine_request_engine_reg.payload.meta.subclass             <= configure_memory_reg.payload.meta.subclass;
     end
+
+
 
     engine_read_write_kernel inst_engine_read_write_kernel (
         .ap_clk                (ap_clk                             ),
@@ -558,7 +565,7 @@ module engine_read_write_generator #(parameter
         fifo_response_comb.payload.meta.route           = response_memory_in_reg.payload.meta.route;
         fifo_response_comb.payload.meta.address         = response_memory_in_reg.payload.meta.address;
         fifo_response_comb.payload.meta.subclass.cmd    = CMD_ENGINE;
-        fifo_response_comb.payload.meta.subclass.buffer = response_memory_in_reg.payload.meta.subclass.buffer;
+        fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
         fifo_response_comb.payload.data                 = response_memory_in_reg.payload.data;
     end
 
