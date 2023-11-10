@@ -97,11 +97,12 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 //   Graph CSR structure types
 // --------------------------------------------------------------------------------------
-parameter TYPE_SEQUENCE_STATE_BITS = 3;
+parameter TYPE_SEQUENCE_STATE_BITS = 4;
 typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
-  SEQUENCE_INVALID = 1 << 0, // 001
-  SEQUENCE_RUNNING = 1 << 1, // 010
-  SEQUENCE_DONE    = 1 << 2  // 100
+  SEQUENCE_INVALID = 1 << 0, // 0001
+  SEQUENCE_RUNNING = 1 << 1, // 0010
+  SEQUENCE_DONE    = 1 << 2, // 0100
+  SEQUENCE_BREAK   = 1 << 3  // 1000
 } type_sequence_state;
 
 // --------------------------------------------------------------------------------------

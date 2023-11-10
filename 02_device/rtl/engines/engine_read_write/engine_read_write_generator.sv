@@ -253,7 +253,7 @@ module engine_read_write_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~read_write_response_engine_in_valid_reg & ~response_engine_in_int.valid );
+    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~read_write_response_engine_in_valid_reg & ~response_engine_in_int.valid & configure_engine_param_valid & ~fifo_request_signals_out_int.prog_full);
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -447,24 +447,14 @@ module engine_read_write_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data         <= result_int;
-        generator_engine_request_engine_reg.payload.meta.address <= address_int;
-
-        if(response_engine_in_int.valid & configure_engine_param_valid) begin
-            generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
-            generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
-            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-            generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
-            generator_engine_request_engine_reg.payload.meta.subclass        <= configure_memory_reg.payload.meta.subclass;
-        end else begin
-            generator_engine_request_engine_reg.payload.meta.route.from      <= generator_engine_request_engine_reg.payload.meta.route.from;
-            generator_engine_request_engine_reg.payload.meta.route.to        <= generator_engine_request_engine_reg.payload.meta.route.to;
-            generator_engine_request_engine_reg.payload.meta.route.seq_src   <= generator_engine_request_engine_reg.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg.payload.meta.route.seq_state <= generator_engine_request_engine_reg.payload.meta.route.seq_state;
-            generator_engine_request_engine_reg.payload.meta.route.hops      <= generator_engine_request_engine_reg.payload.meta.route.hops ;
-            generator_engine_request_engine_reg.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
-        end
+        generator_engine_request_engine_reg.payload.data                 <= result_int;
+        generator_engine_request_engine_reg.payload.meta.address         <= address_int;
+        generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
+        generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
+        generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
+        generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
+        generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
+        generator_engine_request_engine_reg.payload.meta.subclass        <= configure_memory_reg.payload.meta.subclass;
     end
 
     engine_read_write_kernel inst_engine_read_write_kernel (
