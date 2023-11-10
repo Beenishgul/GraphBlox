@@ -140,6 +140,13 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsInput  fifo_response_engine_in_signals_in_int  ;
     FIFOStateSignalsOutput fifo_response_engine_in_signals_out_int ;
     logic                  fifo_response_engine_in_setup_signal_int;
+// --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+    logic                     counter_load                      ;
+    logic                     response_memory_counter_is_zero   ;
+    logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
+    logic [COUNTER_WIDTH-1:0] response_memory_counter_load_value;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -342,7 +349,7 @@ module engine_read_write_generator #(parameter
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE;
             end
             ENGINE_READ_WRITE_GEN_DONE_TRANS : begin
-                if (done_int_reg)
+                if (done_int_reg & (response_memory_counter_is_zero | ~configure_engine_param_int.mode_counter))
                     next_state = ENGINE_READ_WRITE_GEN_DONE;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_DONE_TRANS;
@@ -364,16 +371,25 @@ module engine_read_write_generator #(parameter
                 configure_memory_setup_reg   <= 1'b0;
                 configure_engine_param_valid <= 1'b0;
                 configure_engine_param_int   <= 0;
+
+                counter_load                       <= 1'b0;
+                response_memory_counter_load_value <= 0;
             end
             ENGINE_READ_WRITE_GEN_IDLE : begin
                 done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
                 configure_memory_setup_reg <= 1'b0;
+
+                counter_load                       <= 1'b0;
+                response_memory_counter_load_value <= 0;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
                 done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
                 configure_memory_setup_reg <= 1'b0;
+
+                counter_load                       <= 1'b0;
+                response_memory_counter_load_value <= 0;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
@@ -386,42 +402,70 @@ module engine_read_write_generator #(parameter
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
                 done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b0;
+                done_out_reg                 <= 1'b1 & ~configure_engine_param_int.mode_counter;;
                 configure_engine_param_valid <= 1'b1;
+
+                counter_load <= 1'b1;
+                if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
+                    response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
+                end
             end
             ENGINE_READ_WRITE_GEN_START : begin
                 done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b1;
+                done_out_reg                 <= 1'b1 & ~configure_engine_param_int.mode_counter;
                 configure_engine_param_valid <= 1'b1;
+                counter_load                 <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1;
+                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1;
+                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1;
+                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1;
+                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_DONE_TRANS : begin
                 done_int_reg <= 1'b1;
-                done_out_reg <= 1'b1;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_DONE : begin
                 done_int_reg                 <= 1'b1;
                 done_out_reg                 <= 1'b1;
                 configure_engine_param_valid <= 1'b0;
                 configure_engine_param_int   <= 0;
+                counter_load                 <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
+
+// --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+    counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
+        .ap_clk      (ap_clk                            ),
+        .ap_clken    (1'b1                              ),
+        .areset      (areset_counter                    ),
+        .load        (counter_load                      ),
+        .incr        (1'b0                              ),
+        .decr        (request_engine_out_reg.valid      ),
+        .load_value  (response_memory_counter_load_value),
+        .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
+        .count       (response_memory_counter_          ),
+        .is_zero     (response_memory_counter_is_zero   )
+    );
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - Read/Write data [0-4] -> Gen

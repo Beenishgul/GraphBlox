@@ -279,6 +279,7 @@ package PKG_ENGINE;
         logic                                                                      decrement    ;
         logic                                                                      mode_sequence;
         logic                                                                      mode_buffer  ;
+        logic                                                                      mode_counter ;
         logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  array_pointer;
         logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  array_size   ;
         logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0]                                  index_start  ;
