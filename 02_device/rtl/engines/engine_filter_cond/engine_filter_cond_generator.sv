@@ -90,8 +90,9 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic filter_cond_response_engine_in_valid_reg ;
-    logic filter_cond_response_engine_in_valid_flag;
+    logic filter_cond_response_engine_in_valid_reg    ;
+    logic filter_cond_response_engine_in_valid_flag_S2;
+    logic filter_cond_response_engine_in_valid_flag   ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -434,11 +435,13 @@ module engine_filter_cond_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            filter_cond_response_engine_in_valid_reg  <= 1'b0;
-            generator_engine_request_engine_reg.valid <= 1'b0;
+            filter_cond_response_engine_in_valid_reg     <= 1'b0;
+            filter_cond_response_engine_in_valid_flag_S2 <= 1'b0;
+            generator_engine_request_engine_reg.valid    <= 1'b0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= filter_cond_response_engine_in_valid_flag;
+            filter_cond_response_engine_in_valid_flag_S2 <= filter_cond_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.valid    <= filter_cond_response_engine_in_valid_flag_S2;
 
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 filter_cond_response_engine_in_valid_reg <= 1'b1;

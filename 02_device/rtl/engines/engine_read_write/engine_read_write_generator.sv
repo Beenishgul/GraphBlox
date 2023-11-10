@@ -110,7 +110,6 @@ module engine_read_write_generator #(parameter
     ReadWriteConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket generator_engine_request_engine_reg;
-    MemoryPacket generator_engine_request_engine_int;
     MemoryPacket request_engine_out_reg             ;
     MemoryPacket request_memory_out_reg             ;
 
@@ -128,6 +127,7 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic               read_write_response_engine_in_valid_reg ;
     logic               read_write_response_engine_in_valid_flag;
+    logic               read_write_response_engine_in_valid_flag_S2;
     MemoryPacketData    result_int                              ;
     MemoryPacketAddress address_int                             ;
 
@@ -475,10 +475,12 @@ module engine_read_write_generator #(parameter
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             read_write_response_engine_in_valid_reg   <= 1'b0;
+            read_write_response_engine_in_valid_flag_S2<= 1'b0;
             generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= read_write_response_engine_in_valid_flag;
+            read_write_response_engine_in_valid_flag_S2<= read_write_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.valid <= read_write_response_engine_in_valid_flag_S2;
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 read_write_response_engine_in_valid_reg <= 1'b1;
             end else begin
