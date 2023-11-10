@@ -102,10 +102,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
     struct EdgeList *newEdgeList = (struct EdgeList *) my_malloc(sizeof(struct EdgeList));
     newEdgeList->edges_array_src = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
     newEdgeList->edges_array_dest = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
-
-#if WEIGHTED
     newEdgeList->edges_array_weight = (float *) my_malloc(num_edges * sizeof(float));
-#endif
 
     uint32_t i;
     #pragma omp parallel for
@@ -113,9 +110,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
     {
         newEdgeList->edges_array_dest[i] = 0;
         newEdgeList->edges_array_src[i] = 0;
-#if WEIGHTED
-        newEdgeList->edges_array_weight[i] = 0;
-#endif
+        newEdgeList->edges_array_weight[i] = 1;
     }
 
     newEdgeList->mask_array = NULL;
@@ -126,9 +121,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
     newEdgeList->avg_degree = 0;
     // newEdgeList->edges_array = newEdgeList(num_edges);
 
-#if WEIGHTED
-    newEdgeList->max_weight = 0;
-#endif
+    newEdgeList->max_weight = 1;
 
     return newEdgeList;
 
@@ -142,10 +135,8 @@ struct EdgeList *newEdgeListIncremental( uint32_t num_edges)
     struct EdgeList *newEdgeList = (struct EdgeList *) my_malloc(sizeof(struct EdgeList));
     newEdgeList->edges_array_src = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
     newEdgeList->edges_array_dest = (uint32_t *) my_malloc(num_edges * sizeof(uint32_t));
-
-#if WEIGHTED
     newEdgeList->edges_array_weight = (float *) my_malloc(num_edges * sizeof(float));
-#endif
+
 
     uint32_t i;
     #pragma omp parallel for
@@ -153,9 +144,8 @@ struct EdgeList *newEdgeListIncremental( uint32_t num_edges)
     {
         newEdgeList->edges_array_dest[i] = 0;
         newEdgeList->edges_array_src[i] = 0;
-#if WEIGHTED
-        newEdgeList->edges_array_weight[i] = 0;
-#endif
+        newEdgeList->edges_array_weight[i] = 1;
+
     }
 
     newEdgeList->mask_array = NULL;
@@ -165,10 +155,7 @@ struct EdgeList *newEdgeListIncremental( uint32_t num_edges)
     newEdgeList->num_vertices = 0;
     newEdgeList->avg_degree = 0;
     // newEdgeList->edges_array = newEdgeList(num_edges);
-
-#if WEIGHTED
     newEdgeList->max_weight = 0;
-#endif
 
     return newEdgeList;
 
@@ -192,19 +179,14 @@ struct EdgeList *deepCopyEdgeList( struct EdgeList *edgeListFrom, struct EdgeLis
     {
         edgeListTo->edges_array_dest[i] = edgeListFrom->edges_array_dest[i];
         edgeListTo->edges_array_src[i] = edgeListFrom->edges_array_src[i];
-#if WEIGHTED
         edgeListTo->edges_array_weight[i] = edgeListFrom->edges_array_weight[i];
-#endif
     }
 
     edgeListTo->mask_array = NULL;
     edgeListTo->label_array = NULL;
     edgeListTo->inverse_label_array = NULL;
 
-#if WEIGHTED
     edgeListTo->max_weight = edgeListFrom->max_weight;
-#endif
-
 
     return edgeListTo;
 
@@ -230,36 +212,25 @@ struct EdgeList *resizeEdgeList( struct EdgeList *edgeListFrom, uint32_t num_edg
 
 void insertEdgeInEdgeList( struct EdgeList *edgeList,  uint32_t src,  uint32_t dest,  float weight)
 {
-
     uint32_t num_vertices = edgeList->num_vertices;
 
-#if WEIGHTED
     float max_weight = edgeList->max_weight;
-#endif
 
     edgeList->edges_array_dest[edgeList->num_edges] = dest;
     edgeList->edges_array_src[edgeList->num_edges] = src;
-#if WEIGHTED
     edgeList->edges_array_weight[edgeList->num_edges] = weight;
-#endif
 
     num_vertices = maxTwoIntegers(num_vertices, maxTwoIntegers(src, dest));
-
-#if WEIGHTED
     max_weight = maxTwoFloats(max_weight, weight);
-#endif
 
     edgeList->num_vertices = num_vertices;
-#if WEIGHTED
     edgeList->max_weight = max_weight;
-#endif
 
     edgeList->num_edges++;
 }
 
 struct EdgeList *finalizeInsertEdgeInEdgeList( struct EdgeList *edgeList)
 {
-
 
     uint32_t i;
     edgeList->mask_array = (uint32_t *) my_malloc((edgeList->num_vertices + 1) * sizeof(uint32_t));
@@ -287,57 +258,50 @@ struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
     struct EdgeList *tempEdgeList = newEdgeList(edgeList->num_edges);
     uint32_t tempSrc = 0;
     uint32_t tempDest = 0;
-#if WEIGHTED
     uint32_t tempWeight = 0;
-#endif
+
     uint32_t j = 0;
     uint32_t i = 0;
-
 
     do
     {
         tempSrc = edgeList->edges_array_src[i];
         tempDest = edgeList->edges_array_dest[i];
-#if WEIGHTED
         tempWeight = edgeList->edges_array_weight[i];
-#endif
+
         i++;
     }
     while(tempSrc == tempDest);
 
     tempEdgeList->edges_array_src[j] = tempSrc;
     tempEdgeList->edges_array_dest[j] = tempDest;
-#if WEIGHTED
     tempEdgeList->edges_array_weight[j] = tempWeight;
-#endif
+
     j++;
 
     for(; i < tempEdgeList->num_edges; i++)
     {
         tempSrc = edgeList->edges_array_src[i];
         tempDest = edgeList->edges_array_dest[i];
-#if WEIGHTED
         tempWeight = edgeList->edges_array_weight[i];
-#endif
+
         if(tempSrc != tempDest)
         {
             if(tempEdgeList->edges_array_src[j - 1] != tempSrc || tempEdgeList->edges_array_dest[j - 1] != tempDest )
             {
                 tempEdgeList->edges_array_src[j] = tempSrc;
                 tempEdgeList->edges_array_dest[j] = tempDest;
-#if WEIGHTED
                 tempEdgeList->edges_array_weight[j] = tempWeight;
-#endif
+
                 j++;
             }
         }
     }
 
     tempEdgeList->num_edges = j;
-    tempEdgeList->num_vertices = edgeList->num_vertices ;
-#if WEIGHTED
-    tempEdgeList->max_weight = edgeList->max_weight ;
-#endif
+    tempEdgeList->num_vertices = edgeList->num_vertices;
+    tempEdgeList->max_weight = edgeList->max_weight;
+
     tempEdgeList->avg_degree = tempEdgeList->num_edges / tempEdgeList->num_vertices;
 
     tempEdgeList->mask_array = (uint32_t *) my_malloc((tempEdgeList->num_vertices + 1) * sizeof(uint32_t));
@@ -347,7 +311,7 @@ struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
     #pragma omp parallel for
     for (i = 0; i < (edgeList->num_vertices); ++i)
     {
-        tempEdgeList->mask_array[i] = edgeList->mask_array[i] ;
+        tempEdgeList->mask_array[i] = edgeList->mask_array[i];
         tempEdgeList->label_array[i] =  edgeList->label_array[i];
         tempEdgeList->inverse_label_array[i] =  edgeList->inverse_label_array[i];
     }
@@ -374,10 +338,8 @@ void freeEdgeList( struct EdgeList *edgeList)
                 free(edgeList->label_array);
             if(edgeList->inverse_label_array)
                 free(edgeList->inverse_label_array);
-#if WEIGHTED
             if(edgeList->edges_array_weight)
                 free(edgeList->edges_array_weight);
-#endif
         }
 
         free(edgeList);
@@ -487,8 +449,6 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
 
 struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t symmetric, uint32_t weighted)
 {
-
-
     int fd = open(fname, O_RDONLY);
     struct stat fs;
     char *buf_addr;
@@ -498,7 +458,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
     initializeMersenneState (mt19937var, 27491095);
 #endif
-    uint32_t  src = 0, dest = 0;
+    uint32_t src = 0, dest = 0;
     uint32_t offset = 0;
     uint32_t offset_size;
 
@@ -753,7 +713,7 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
     uint32_t num_edges = edgeListmem->num_edges;
     uint32_t num_vertices = edgeListmem->num_vertices;
     uint32_t i;
-    uint32_t  src = 0, dest = 0;
+    uint32_t src = 0, dest = 0;
 
     struct EdgeList *edgeList;
 
@@ -798,9 +758,8 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
     {
         src = edgeListmem->edges_array_src[i];
         dest = edgeListmem->edges_array_dest[i];
-#if WEIGHTED
         float weight = edgeListmem->edges_array_weight[i];
-#endif
+
         // printf("%u %lu -> %lu \n",src,dest);
 #if DIRECTED
         if(!inverse)
@@ -809,13 +768,7 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
             {
                 edgeList->edges_array_src[i] = src;
                 edgeList->edges_array_dest[i] = dest;
-
-
-#if WEIGHTED
-
                 edgeList->edges_array_weight[i] = weight;
-
-#endif
 
             }
             else
@@ -823,7 +776,6 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
                 edgeList->edges_array_src[i] = src;
                 edgeList->edges_array_dest[i] = dest;
 
-#if WEIGHTED
                 if(weighted)
                 {
                     edgeList->edges_array_weight[i] = weight;
@@ -832,7 +784,6 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
                 {
                     edgeList->edges_array_weight[i] = weight;
                 }
-#endif
             } // symmetric
         } // inverse
         else
@@ -841,22 +792,13 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
             {
                 edgeList->edges_array_src[i] = dest;
                 edgeList->edges_array_dest[i] = src;
-
-#if WEIGHTED
-
                 edgeList->edges_array_weight[i] = weight;
-
-#endif
             }
             else
             {
                 edgeList->edges_array_src[i] = dest;
                 edgeList->edges_array_dest[i] = src;
-#if WEIGHTED
-
                 edgeList->edges_array_weight[i] = weight;
-
-#endif
             }// symmetric
         }// inverse
 #else
@@ -864,22 +806,13 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
         {
             edgeList->edges_array_src[i] = src;
             edgeList->edges_array_dest[i] = dest;
-
-#if WEIGHTED
-
             edgeList->edges_array_weight[i] = weight;
-
-#endif
         }
         else
         {
             edgeList->edges_array_src[i] = src;
             edgeList->edges_array_dest[i] = dest;
-#if WEIGHTED
-
             edgeList->edges_array_weight[i] = weight;
-
-#endif
         }
 #endif
     }
@@ -889,9 +822,8 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
     if(edgeListmem->num_vertices)
         edgeList->avg_degree = edgeListmem->num_edges / edgeListmem->num_vertices;
 
-#if WEIGHTED
     edgeList->max_weight =  edgeListmem->max_weight;
-#endif
+
 
     return edgeList;
 }
