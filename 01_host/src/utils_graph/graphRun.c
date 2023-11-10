@@ -1066,72 +1066,72 @@ void freeGraphStatsGeneral(void *stats, uint32_t algorithm)
 
     switch (algorithm)
     {
-    case 0:  // bfs
-    {
-        struct BFSStats *freeStatsBFS = (struct BFSStats * )stats;
-        freeBFSStats(freeStatsBFS);
-    }
-    break;
-    case 1: // pagerank
-    {
-        struct PageRankStats *freeStatsPageRank = (struct PageRankStats * )stats;
-        freePageRankStats(freeStatsPageRank);
-    }
-    break;
-    case 2: // SSSP-Delta
-    {
-        struct SSSPStats *freeStatsSSSP = (struct SSSPStats * )stats;
-        freeSSSPStats(freeStatsSSSP);
-    }
-    break;
-    case 3: // SSSP-Bellmanford
-    {
-        struct BellmanFordStats *freeStatsBellmanFord = (struct BellmanFordStats * )stats;
-        freeBellmanFordStats(freeStatsBellmanFord);
-    }
-    break;
-    case 4: // DFS
-    {
-        struct DFSStats *freeStatsDFS = (struct DFSStats * )stats;
-        freeDFSStats(freeStatsDFS);
-    }
-    break;
-    case 5: //SPMV
-    {
-        struct SPMVStats *freeStats = (struct SPMVStats *)stats;
-        freeSPMVStats(freeStats);
-    }
-    break;
-    case 6: // Connected Components
-    {
-        struct CCStats *freeStats = (struct CCStats *)stats;
-        freeCCStats(freeStats);
-    }
-    break;
-    case 7: // Betweenness Centrality
-    {
-        struct BetweennessCentralityStats *freeStats = (struct BetweennessCentralityStats *)stats;
-        freeBetweennessCentralityStats(freeStats);
-    }
-    break;
-    case 8: // Triangle Counting
-    {
-        struct TCStats *freeStats = (struct TCStats *)stats;
-        freeTCStats(freeStats);
-    }
-    break;
-    case 9: // clustering
-    {
-        struct ClusterStats *freeStats = (struct ClusterStats *)stats;
-        freeClusterStats(freeStats);
-    }
-    break;
-    default:// BFS
-    {
-        struct BFSStats *freeStatsBFS = (struct BFSStats *)stats;
-        freeBFSStats(freeStatsBFS);
-    }
-    break;
+        case 0: // bfs
+        {
+            struct BFSStats *freeStatsBFS = (struct BFSStats * )stats;
+            freeBFSStats(freeStatsBFS);
+        }
+        break;
+        case 1: // pagerank
+        {
+            struct PageRankStats *freeStatsPageRank = (struct PageRankStats * )stats;
+            freePageRankStats(freeStatsPageRank);
+        }
+        break;
+        case 2: // SSSP-Delta
+        {
+            struct SSSPStats *freeStatsSSSP = (struct SSSPStats * )stats;
+            freeSSSPStats(freeStatsSSSP);
+        }
+        break;
+        case 3: // SSSP-Bellmanford
+        {
+            struct BellmanFordStats *freeStatsBellmanFord = (struct BellmanFordStats * )stats;
+            freeBellmanFordStats(freeStatsBellmanFord);
+        }
+        break;
+        case 4: // DFS
+        {
+            struct DFSStats *freeStatsDFS = (struct DFSStats * )stats;
+            freeDFSStats(freeStatsDFS);
+        }
+        break;
+        case 5: //SPMV
+        {
+            struct SPMVStats *freeStats = (struct SPMVStats *)stats;
+            freeSPMVStats(freeStats);
+        }
+        break;
+        case 6: // Connected Components
+        {
+            struct CCStats *freeStats = (struct CCStats *)stats;
+            freeCCStats(freeStats);
+        }
+        break;
+        case 7: // Betweenness Centrality
+        {
+            struct BetweennessCentralityStats *freeStats = (struct BetweennessCentralityStats *)stats;
+            freeBetweennessCentralityStats(freeStats);
+        }
+        break;
+        case 8: // Triangle Counting
+        {
+            struct TCStats *freeStats = (struct TCStats *)stats;
+            freeTCStats(freeStats);
+        }
+        break;
+        case 9: // clustering
+        {
+            struct ClusterStats *freeStats = (struct ClusterStats *)stats;
+            freeClusterStats(freeStats);
+        }
+        break;
+        default:// BFS
+        {
+            struct BFSStats *freeStatsBFS = (struct BFSStats *)stats;
+            freeBFSStats(freeStatsBFS);
+        }
+        break;
     }
 
 }

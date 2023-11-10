@@ -254,7 +254,7 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     }
 
     overlay_program_entries = values.size() * sizeof(uint32_t);
-    overlay_program = (uint32_t *)aligned_alloc(4096, overlay_program_entries);  // Assuming 4096-byte alignment
+    overlay_program = (uint32_t *)aligned_alloc(4096, overlay_program_entries); // Assuming 4096-byte alignment
 
     if (!overlay_program)
     {
@@ -271,7 +271,65 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     // overlay_program[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS
     // overlay_program[9]  = xrt_buffer_device[2] >> 32;//  9  - BUFFER Array Pointer RHS
     // overlay_program[10] = graph->num_vertices       ;//  10 - BUFFER size
-    mapGLAYOverlayProgramBuffers(overlay_program_entries, algorithm, graph, overlayPath);
+    switch (algorithm)
+    {
+    case 0: // bfs
+    {
+        mapGLAYOverlayProgramBuffersBFS(overlay_program_entries, algorithm, graph, overlayPath);
+    }
+    break;
+    case 1: // pagerank
+    {
+
+    }
+    break;
+    case 2: // SSSP-Delta
+    {
+
+    }
+    break;
+    case 3: // SSSP-Bellmanford
+    {
+
+    }
+    break;
+    case 4: // DFS
+    {
+
+    }
+    break;
+    case 5: //SPMV
+    {
+
+    }
+    break;
+    case 6: // Connected Components
+    {
+
+    }
+    break;
+    case 7: // Betweenness Centrality
+    {
+
+    }
+    break;
+    case 8: // Triangle Counting
+    {
+
+    }
+    break;
+    case 9: // clustering
+    {
+
+    }
+    break;
+    default:// BFS
+    {
+        mapGLAYOverlayProgramBuffersBFS(overlay_program_entries, algorithm, graph, overlayPath);
+    }
+    break;
+    }
+
 }
 
 void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()
