@@ -763,7 +763,7 @@ module __KERNEL___testbench ();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr[62:0] = get_random_ptr();
         buffer_8_ptr[62:0] = get_random_ptr();
-        buffer_9_ptr = {63'd122, 1'b1};
+        buffer_9_ptr = {63'd_NUM_ENTIRES_, 1'b1};
 
         ///////////////////////////////////////////////////////////////////////////
         //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)

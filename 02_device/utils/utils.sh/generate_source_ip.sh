@@ -60,7 +60,7 @@ mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${cu}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${lane}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}
 
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+eval(python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include")
 python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 # python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
@@ -127,6 +127,12 @@ then
     replace=${FULL_SRC_IP_DIR_OVERLAY}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s~$search~$replace~" $newtext
+    fi
+
+    search="_NUM_ENTRIES_"
+    replace=${NUM_ENTRIES}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/" $newtext
     fi
 
     search="_ARCHITECTURE_"
