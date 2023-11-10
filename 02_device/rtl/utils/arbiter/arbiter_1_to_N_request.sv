@@ -65,7 +65,7 @@ module arbiter_1_to_N_request #(
   logic [NUM_MEMORY_REQUESTOR-1:0] current_module_id_bundle         ;
 
 
-  assign current_module_id_bundle = 1'b1 << ID_BUNDLE;
+  assign current_module_id_bundle = 1 << ID_BUNDLE;
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------

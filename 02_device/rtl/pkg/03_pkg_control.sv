@@ -38,13 +38,13 @@ package PKG_CONTROL;
 // --------------------------------------------------------------------------------------
 
     typedef enum logic[6:0] {
-        USER_MANAGED_SYNC_RESET = 1'b1 << 0,
-        USER_MANAGED_SYNC_IDLE  = 1'b1 << 1,
-        USER_MANAGED_SYNC_SETUP = 1'b1 << 2,
-        USER_MANAGED_SYNC_READY = 1'b1 << 3,
-        USER_MANAGED_SYNC_START = 1'b1 << 4,
-        USER_MANAGED_SYNC_BUSY  = 1'b1 << 5,
-        USER_MANAGED_SYNC_DONE  = 1'b1 << 6
+        USER_MANAGED_SYNC_RESET = 1 << 0,
+        USER_MANAGED_SYNC_IDLE  = 1 << 1,
+        USER_MANAGED_SYNC_SETUP = 1 << 2,
+        USER_MANAGED_SYNC_READY = 1 << 3,
+        USER_MANAGED_SYNC_START = 1 << 4,
+        USER_MANAGED_SYNC_BUSY  = 1 << 5,
+        USER_MANAGED_SYNC_DONE  = 1 << 6
     } control_sync_state_user_managed;
 
 // --------------------------------------------------------------------------------------
@@ -52,13 +52,13 @@ package PKG_CONTROL;
 // --------------------------------------------------------------------------------------
 
     typedef enum logic[6:0] {
-        CTRL_CHAIN_SYNC_RESET = 1'b1 << 0,
-        CTRL_CHAIN_SYNC_IDLE  = 1'b1 << 1,
-        CTRL_CHAIN_SYNC_SETUP = 1'b1 << 2,
-        CTRL_CHAIN_SYNC_READY = 1'b1 << 3,
-        CTRL_CHAIN_SYNC_START = 1'b1 << 4,
-        CTRL_CHAIN_SYNC_BUSY  = 1'b1 << 5,
-        CTRL_CHAIN_SYNC_DONE  = 1'b1 << 6
+        CTRL_CHAIN_SYNC_RESET = 1 << 0,
+        CTRL_CHAIN_SYNC_IDLE  = 1 << 1,
+        CTRL_CHAIN_SYNC_SETUP = 1 << 2,
+        CTRL_CHAIN_SYNC_READY = 1 << 3,
+        CTRL_CHAIN_SYNC_START = 1 << 4,
+        CTRL_CHAIN_SYNC_BUSY  = 1 << 5,
+        CTRL_CHAIN_SYNC_DONE  = 1 << 6
     } control_sync_state_ap_ctrl_chain;
 
 
@@ -67,13 +67,13 @@ package PKG_CONTROL;
 // --------------------------------------------------------------------------------------
 
     typedef enum logic[6:0] {
-        CTRL_HS_SYNC_RESET = 1'b1 << 0,
-        CTRL_HS_SYNC_IDLE  = 1'b1 << 1,
-        CTRL_HS_SYNC_SETUP = 1'b1 << 2,
-        CTRL_HS_SYNC_READY = 1'b1 << 3,
-        CTRL_HS_SYNC_START = 1'b1 << 4,
-        CTRL_HS_SYNC_BUSY  = 1'b1 << 5,
-        CTRL_HS_SYNC_DONE  = 1'b1 << 6
+        CTRL_HS_SYNC_RESET = 1 << 0,
+        CTRL_HS_SYNC_IDLE  = 1 << 1,
+        CTRL_HS_SYNC_SETUP = 1 << 2,
+        CTRL_HS_SYNC_READY = 1 << 3,
+        CTRL_HS_SYNC_START = 1 << 4,
+        CTRL_HS_SYNC_BUSY  = 1 << 5,
+        CTRL_HS_SYNC_DONE  = 1 << 6
     } control_sync_state_ap_ctrl_hs;
 
 

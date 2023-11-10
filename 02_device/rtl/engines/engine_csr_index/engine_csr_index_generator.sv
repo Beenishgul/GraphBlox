@@ -518,7 +518,7 @@ module engine_csr_index_generator #(parameter
         fifo_request_comb.payload.meta.route.hops    = configure_memory_reg.payload.meta.route.hops;
         fifo_request_comb.payload.meta.route.seq_src = configure_memory_reg.payload.meta.route.seq_src;
 
-        fifo_request_comb.payload.meta.route.from.id_module = 1'b1 << ID_MODULE;
+        fifo_request_comb.payload.meta.route.from.id_module = 1 << ID_MODULE;
 
         fifo_request_comb.payload.meta.route.from.id_cu     = configure_memory_reg.payload.meta.route.from.id_cu ;
         fifo_request_comb.payload.meta.route.from.id_bundle = configure_memory_reg.payload.meta.route.from.id_bundle;

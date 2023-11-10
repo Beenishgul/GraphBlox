@@ -31,22 +31,22 @@ package PKG_ENGINE;
 // processing, in this scenario reading the data of the vertex neighbors.
 
     typedef enum logic[15:0] {
-        ENGINE_CSR_INDEX_GEN_RESET              = 1'b1 << 0,
-        ENGINE_CSR_INDEX_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE  = 1'b1 << 5,
-        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS = 1'b1 << 6,
-        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE       = 1'b1 << 7,
-        ENGINE_CSR_INDEX_GEN_START_TRANS        = 1'b1 << 8,
-        ENGINE_CSR_INDEX_GEN_START              = 1'b1 << 9,
-        ENGINE_CSR_INDEX_GEN_BUSY_TRANS         = 1'b1 << 10,
-        ENGINE_CSR_INDEX_GEN_BUSY               = 1'b1 << 11,
-        ENGINE_CSR_INDEX_GEN_PAUSE_TRANS        = 1'b1 << 12,
-        ENGINE_CSR_INDEX_GEN_PAUSE              = 1'b1 << 13,
-        ENGINE_CSR_INDEX_GEN_DONE_TRANS         = 1'b1 << 14,
-        ENGINE_CSR_INDEX_GEN_DONE               = 1'b1 << 15
+        ENGINE_CSR_INDEX_GEN_RESET              = 1 << 0,
+        ENGINE_CSR_INDEX_GEN_IDLE               = 1 << 1,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_CSR_INDEX_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE  = 1 << 5,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS = 1 << 6,
+        ENGINE_CSR_INDEX_GEN_SETUP_ENGINE       = 1 << 7,
+        ENGINE_CSR_INDEX_GEN_START_TRANS        = 1 << 8,
+        ENGINE_CSR_INDEX_GEN_START              = 1 << 9,
+        ENGINE_CSR_INDEX_GEN_BUSY_TRANS         = 1 << 10,
+        ENGINE_CSR_INDEX_GEN_BUSY               = 1 << 11,
+        ENGINE_CSR_INDEX_GEN_PAUSE_TRANS        = 1 << 12,
+        ENGINE_CSR_INDEX_GEN_PAUSE              = 1 << 13,
+        ENGINE_CSR_INDEX_GEN_DONE_TRANS         = 1 << 14,
+        ENGINE_CSR_INDEX_GEN_DONE               = 1 << 15
     } engine_csr_index_generator_state;
 
     typedef struct packed{
@@ -81,19 +81,19 @@ package PKG_ENGINE;
 // Keeps the original meta data for that lane
 
     typedef enum logic[12:0] {
-        ENGINE_MERGE_DATA_GEN_RESET              = 1'b1 << 0,
-        ENGINE_MERGE_DATA_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_MERGE_DATA_GEN_START_TRANS        = 1'b1 << 5,
-        ENGINE_MERGE_DATA_GEN_START              = 1'b1 << 6,
-        ENGINE_MERGE_DATA_GEN_PAUSE_TRANS        = 1'b1 << 7,
-        ENGINE_MERGE_DATA_GEN_BUSY               = 1'b1 << 8,
-        ENGINE_MERGE_DATA_GEN_BUSY_TRANS         = 1'b1 << 9,
-        ENGINE_MERGE_DATA_GEN_PAUSE              = 1'b1 << 10,
-        ENGINE_MERGE_DATA_GEN_DONE_TRANS         = 1'b1 << 11,
-        ENGINE_MERGE_DATA_GEN_DONE               = 1'b1 << 12
+        ENGINE_MERGE_DATA_GEN_RESET              = 1 << 0,
+        ENGINE_MERGE_DATA_GEN_IDLE               = 1 << 1,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_MERGE_DATA_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_MERGE_DATA_GEN_START_TRANS        = 1 << 5,
+        ENGINE_MERGE_DATA_GEN_START              = 1 << 6,
+        ENGINE_MERGE_DATA_GEN_PAUSE_TRANS        = 1 << 7,
+        ENGINE_MERGE_DATA_GEN_BUSY               = 1 << 8,
+        ENGINE_MERGE_DATA_GEN_BUSY_TRANS         = 1 << 9,
+        ENGINE_MERGE_DATA_GEN_PAUSE              = 1 << 10,
+        ENGINE_MERGE_DATA_GEN_DONE_TRANS         = 1 << 11,
+        ENGINE_MERGE_DATA_GEN_DONE               = 1 << 12
     } engine_merge_data_generator_state;
 
     typedef struct packed{
@@ -118,19 +118,19 @@ package PKG_ENGINE;
 // Keeps the original meta data for that lane
 
     typedef enum logic[12:0] {
-        ENGINE_FORWARD_DATA_GEN_RESET              = 1'b1 << 0,
-        ENGINE_FORWARD_DATA_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_FORWARD_DATA_GEN_START_TRANS        = 1'b1 << 5,
-        ENGINE_FORWARD_DATA_GEN_START              = 1'b1 << 6,
-        ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS        = 1'b1 << 7,
-        ENGINE_FORWARD_DATA_GEN_BUSY               = 1'b1 << 8,
-        ENGINE_FORWARD_DATA_GEN_BUSY_TRANS         = 1'b1 << 9,
-        ENGINE_FORWARD_DATA_GEN_PAUSE              = 1'b1 << 10,
-        ENGINE_FORWARD_DATA_GEN_DONE_TRANS         = 1'b1 << 11,
-        ENGINE_FORWARD_DATA_GEN_DONE               = 1'b1 << 12
+        ENGINE_FORWARD_DATA_GEN_RESET              = 1 << 0,
+        ENGINE_FORWARD_DATA_GEN_IDLE               = 1 << 1,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_FORWARD_DATA_GEN_START_TRANS        = 1 << 5,
+        ENGINE_FORWARD_DATA_GEN_START              = 1 << 6,
+        ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS        = 1 << 7,
+        ENGINE_FORWARD_DATA_GEN_BUSY               = 1 << 8,
+        ENGINE_FORWARD_DATA_GEN_BUSY_TRANS         = 1 << 9,
+        ENGINE_FORWARD_DATA_GEN_PAUSE              = 1 << 10,
+        ENGINE_FORWARD_DATA_GEN_DONE_TRANS         = 1 << 11,
+        ENGINE_FORWARD_DATA_GEN_DONE               = 1 << 12
     } engine_forward_data_generator_state;
 
     typedef struct packed{
@@ -154,19 +154,19 @@ package PKG_ENGINE;
 // Keeps the original meta data for that lane
 
     typedef enum logic[12:0] {
-        ENGINE_ALU_OPS_GEN_RESET              = 1'b1 << 0,
-        ENGINE_ALU_OPS_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_ALU_OPS_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_ALU_OPS_GEN_START_TRANS        = 1'b1 << 5,
-        ENGINE_ALU_OPS_GEN_START              = 1'b1 << 6,
-        ENGINE_ALU_OPS_GEN_PAUSE_TRANS        = 1'b1 << 7,
-        ENGINE_ALU_OPS_GEN_BUSY               = 1'b1 << 8,
-        ENGINE_ALU_OPS_GEN_BUSY_TRANS         = 1'b1 << 9,
-        ENGINE_ALU_OPS_GEN_PAUSE              = 1'b1 << 10,
-        ENGINE_ALU_OPS_GEN_DONE_TRANS         = 1'b1 << 11,
-        ENGINE_ALU_OPS_GEN_DONE               = 1'b1 << 12
+        ENGINE_ALU_OPS_GEN_RESET              = 1 << 0,
+        ENGINE_ALU_OPS_GEN_IDLE               = 1 << 1,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_ALU_OPS_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_ALU_OPS_GEN_START_TRANS        = 1 << 5,
+        ENGINE_ALU_OPS_GEN_START              = 1 << 6,
+        ENGINE_ALU_OPS_GEN_PAUSE_TRANS        = 1 << 7,
+        ENGINE_ALU_OPS_GEN_BUSY               = 1 << 8,
+        ENGINE_ALU_OPS_GEN_BUSY_TRANS         = 1 << 9,
+        ENGINE_ALU_OPS_GEN_PAUSE              = 1 << 10,
+        ENGINE_ALU_OPS_GEN_DONE_TRANS         = 1 << 11,
+        ENGINE_ALU_OPS_GEN_DONE               = 1 << 12
     } engine_alu_ops_generator_state;
 
     typedef struct packed{
@@ -194,21 +194,21 @@ package PKG_ENGINE;
 // Keeps the original meta data for that lane
 
     typedef enum logic[14:0] {
-        ENGINE_FILTER_COND_GEN_RESET              = 1'b1 << 0,
-        ENGINE_FILTER_COND_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_FILTER_COND_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_FILTER_COND_GEN_START_TRANS        = 1'b1 << 5,
-        ENGINE_FILTER_COND_GEN_START              = 1'b1 << 6,
-        ENGINE_FILTER_COND_GEN_PAUSE_TRANS        = 1'b1 << 7,
-        ENGINE_FILTER_COND_GEN_BREAK_TRANS        = 1'b1 << 8,
-        ENGINE_FILTER_COND_GEN_BREAK              = 1'b1 << 9,
-        ENGINE_FILTER_COND_GEN_BUSY               = 1'b1 << 10,
-        ENGINE_FILTER_COND_GEN_BUSY_TRANS         = 1'b1 << 11,
-        ENGINE_FILTER_COND_GEN_PAUSE              = 1'b1 << 12,
-        ENGINE_FILTER_COND_GEN_DONE_TRANS         = 1'b1 << 13,
-        ENGINE_FILTER_COND_GEN_DONE               = 1'b1 << 14
+        ENGINE_FILTER_COND_GEN_RESET              = 1 << 0,
+        ENGINE_FILTER_COND_GEN_IDLE               = 1 << 1,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_FILTER_COND_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_FILTER_COND_GEN_START_TRANS        = 1 << 5,
+        ENGINE_FILTER_COND_GEN_START              = 1 << 6,
+        ENGINE_FILTER_COND_GEN_PAUSE_TRANS        = 1 << 7,
+        ENGINE_FILTER_COND_GEN_BREAK_TRANS        = 1 << 8,
+        ENGINE_FILTER_COND_GEN_BREAK              = 1 << 9,
+        ENGINE_FILTER_COND_GEN_BUSY               = 1 << 10,
+        ENGINE_FILTER_COND_GEN_BUSY_TRANS         = 1 << 11,
+        ENGINE_FILTER_COND_GEN_PAUSE              = 1 << 12,
+        ENGINE_FILTER_COND_GEN_DONE_TRANS         = 1 << 13,
+        ENGINE_FILTER_COND_GEN_DONE               = 1 << 14
     } engine_filter_cond_generator_state;
 
     typedef struct packed{
@@ -255,22 +255,22 @@ package PKG_ENGINE;
 // array. Mode parameter would decide the engine read/write mode.
 
     typedef enum logic[15:0] {
-        ENGINE_READ_WRITE_GEN_RESET              = 1'b1 << 0,
-        ENGINE_READ_WRITE_GEN_IDLE               = 1'b1 << 1,
-        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE  = 1'b1 << 2,
-        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS = 1'b1 << 3,
-        ENGINE_READ_WRITE_GEN_SETUP_MEMORY       = 1'b1 << 4,
-        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_IDLE  = 1'b1 << 5,
-        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_TRANS = 1'b1 << 6,
-        ENGINE_READ_WRITE_GEN_SETUP_ENGINE       = 1'b1 << 7,
-        ENGINE_READ_WRITE_GEN_START_TRANS        = 1'b1 << 8,
-        ENGINE_READ_WRITE_GEN_START              = 1'b1 << 9,
-        ENGINE_READ_WRITE_GEN_BUSY_TRANS         = 1'b1 << 10,
-        ENGINE_READ_WRITE_GEN_BUSY               = 1'b1 << 11,
-        ENGINE_READ_WRITE_GEN_PAUSE_TRANS        = 1'b1 << 12,
-        ENGINE_READ_WRITE_GEN_PAUSE              = 1'b1 << 13,
-        ENGINE_READ_WRITE_GEN_DONE_TRANS         = 1'b1 << 14,
-        ENGINE_READ_WRITE_GEN_DONE               = 1'b1 << 15
+        ENGINE_READ_WRITE_GEN_RESET              = 1 << 0,
+        ENGINE_READ_WRITE_GEN_IDLE               = 1 << 1,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+        ENGINE_READ_WRITE_GEN_SETUP_MEMORY       = 1 << 4,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_IDLE  = 1 << 5,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE_TRANS = 1 << 6,
+        ENGINE_READ_WRITE_GEN_SETUP_ENGINE       = 1 << 7,
+        ENGINE_READ_WRITE_GEN_START_TRANS        = 1 << 8,
+        ENGINE_READ_WRITE_GEN_START              = 1 << 9,
+        ENGINE_READ_WRITE_GEN_BUSY_TRANS         = 1 << 10,
+        ENGINE_READ_WRITE_GEN_BUSY               = 1 << 11,
+        ENGINE_READ_WRITE_GEN_PAUSE_TRANS        = 1 << 12,
+        ENGINE_READ_WRITE_GEN_PAUSE              = 1 << 13,
+        ENGINE_READ_WRITE_GEN_DONE_TRANS         = 1 << 14,
+        ENGINE_READ_WRITE_GEN_DONE               = 1 << 15
     } engine_read_write_generator_state;
 
     typedef struct packed{
@@ -314,15 +314,15 @@ package PKG_ENGINE;
 // related to reading CSR structure data, for example, reading the offsets
 // array.
     typedef enum logic[8:0] {
-        ENGINE_CU_SETUP_RESET       = 1'b1 << 0,
-        ENGINE_CU_SETUP_IDLE        = 1'b1 << 1,
-        ENGINE_CU_SETUP_SETUP       = 1'b1 << 2,
-        ENGINE_CU_SETUP_START       = 1'b1 << 3,
-        ENGINE_CU_SETUP_BUSY_TRANS  = 1'b1 << 4,
-        ENGINE_CU_SETUP_BUSY        = 1'b1 << 5,
-        ENGINE_CU_SETUP_PAUSE_TRANS = 1'b1 << 6,
-        ENGINE_CU_SETUP_PAUSE       = 1'b1 << 7,
-        ENGINE_CU_SETUP_DONE        = 1'b1 << 8
+        ENGINE_CU_SETUP_RESET       = 1 << 0,
+        ENGINE_CU_SETUP_IDLE        = 1 << 1,
+        ENGINE_CU_SETUP_SETUP       = 1 << 2,
+        ENGINE_CU_SETUP_START       = 1 << 3,
+        ENGINE_CU_SETUP_BUSY_TRANS  = 1 << 4,
+        ENGINE_CU_SETUP_BUSY        = 1 << 5,
+        ENGINE_CU_SETUP_PAUSE_TRANS = 1 << 6,
+        ENGINE_CU_SETUP_PAUSE       = 1 << 7,
+        ENGINE_CU_SETUP_DONE        = 1 << 8
     } engine_cu_setup_state;
 
     typedef struct packed{

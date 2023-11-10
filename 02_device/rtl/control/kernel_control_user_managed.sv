@@ -225,7 +225,7 @@ module kernel_control (
                 ap_idle_reg          <= 1'b0;
                 descriptor_valid_reg <= 1'b1;
                 start_reg            <= 1'b1;
-                endian_reg           <= descriptor_in_reg.buffer_7[0];
+                endian_reg           <= descriptor_in_reg.buffer_9[0];
             end
             USER_MANAGED_SYNC_BUSY : begin
                 ap_ready_reg         <= 1'b0;
@@ -233,7 +233,7 @@ module kernel_control (
                 ap_idle_reg          <= 1'b0;
                 descriptor_valid_reg <= 1'b1;
                 start_reg            <= 1'b1;
-                endian_reg           <= descriptor_in_reg.buffer_7[0];
+                endian_reg           <= descriptor_in_reg.buffer_9[0];
             end
             USER_MANAGED_SYNC_DONE : begin
                 ap_ready_reg         <= 1'b0;

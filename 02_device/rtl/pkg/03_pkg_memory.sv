@@ -45,12 +45,12 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
-  CMD_INVALID       = 1'b1 << 0,
-  CMD_MEM_READ      = 1'b1 << 1,
-  CMD_MEM_WRITE     = 1'b1 << 2,
-  CMD_MEM_RESPONSE  = 1'b1 << 3,
-  CMD_MEM_CONFIGURE = 1'b1 << 4,
-  CMD_ENGINE        = 1'b1 << 5
+  CMD_INVALID       = 1 << 0,
+  CMD_MEM_READ      = 1 << 1,
+  CMD_MEM_WRITE     = 1 << 2,
+  CMD_MEM_RESPONSE  = 1 << 3,
+  CMD_MEM_CONFIGURE = 1 << 4,
+  CMD_ENGINE        = 1 << 5
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
@@ -58,15 +58,15 @@ typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 parameter TYPE_FILTER_OPERATION_BITS = 9;
 typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
-  FILTER_NOP         = 1'b1 << 0,
-  FILTER_GT          = 1'b1 << 1,
-  FILTER_LT          = 1'b1 << 2,
-  FILTER_EQ          = 1'b1 << 3,
-  FILTER_NOT_EQ      = 1'b1 << 4,
-  FILTER_GT_TERN     = 1'b1 << 5,
-  FILTER_LT_TERN     = 1'b1 << 6,
-  FILTER_EQ_TERN     = 1'b1 << 7,
-  FILTER_NOT_EQ_TERN = 1'b1 << 8
+  FILTER_NOP         = 1 << 0,
+  FILTER_GT          = 1 << 1,
+  FILTER_LT          = 1 << 2,
+  FILTER_EQ          = 1 << 3,
+  FILTER_NOT_EQ      = 1 << 4,
+  FILTER_GT_TERN     = 1 << 5,
+  FILTER_LT_TERN     = 1 << 6,
+  FILTER_EQ_TERN     = 1 << 7,
+  FILTER_NOT_EQ_TERN = 1 << 8
 } type_filter_operation;
 
 // --------------------------------------------------------------------------------------
@@ -74,12 +74,12 @@ typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
 // --------------------------------------------------------------------------------------
 parameter TYPE_ALU_OPERATION_BITS = 6;
 typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
-  ALU_NOP = 1'b1 << 0,
-  ALU_ADD = 1'b1 << 1,
-  ALU_SUB = 1'b1 << 2,
-  ALU_MUL = 1'b1 << 3,
-  ALU_ACC = 1'b1 << 4,
-  ALU_DIV = 1'b1 << 5
+  ALU_NOP = 1 << 0,
+  ALU_ADD = 1 << 1,
+  ALU_SUB = 1 << 2,
+  ALU_MUL = 1 << 3,
+  ALU_ACC = 1 << 4,
+  ALU_DIV = 1 << 5
 } type_ALU_operation;
 
 // --------------------------------------------------------------------------------------
@@ -87,11 +87,11 @@ typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 parameter TYPE_DATA_STRUCTURE_BITS = 5;
 typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
-  STRUCT_INVALID      = 1'b1 << 0,
-  STRUCT_CU_DATA      = 1'b1 << 1,
-  STRUCT_ENGINE_DATA  = 1'b1 << 2,
-  STRUCT_CU_SETUP     = 1'b1 << 3,
-  STRUCT_ENGINE_SETUP = 1'b1 << 4
+  STRUCT_INVALID      = 1 << 0,
+  STRUCT_CU_DATA      = 1 << 1,
+  STRUCT_ENGINE_DATA  = 1 << 2,
+  STRUCT_CU_SETUP     = 1 << 3,
+  STRUCT_ENGINE_SETUP = 1 << 4
 } type_data_buffer;
 
 // --------------------------------------------------------------------------------------
@@ -99,9 +99,9 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
 // --------------------------------------------------------------------------------------
 parameter TYPE_SEQUENCE_STATE_BITS = 3;
 typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
-  SEQUENCE_INVALID = 1'b1 << 0, // 001
-  SEQUENCE_RUNNING = 1'b1 << 1, // 010
-  SEQUENCE_DONE    = 1'b1 << 2  // 100
+  SEQUENCE_INVALID = 1 << 0, // 001
+  SEQUENCE_RUNNING = 1 << 1, // 010
+  SEQUENCE_DONE    = 1 << 2  // 100
 } type_sequence_state;
 
 // --------------------------------------------------------------------------------------
