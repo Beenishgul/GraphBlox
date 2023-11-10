@@ -32,20 +32,22 @@ module engine_read_write_kernel (
 );
 
   // Define internal signals
-  MemoryPacketData    ops_value_reg;
-  MemoryPacketData    result_int   ;
-  MemoryPacketAddress address_int  ;
-  MemoryPacketData    org_value_reg;
-  MemoryPacketData    org_data_int ;
+  MemoryPacketData    ops_value_reg ;
+  MemoryPacketAddress address_int   ;
+  MemoryPacketData    org_value_reg ;
+  MemoryPacketData    org_data_int  ;
+  logic               data_valid_reg;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
     if (areset) begin
+      data_valid_reg <= 1'b0;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         ops_value_reg.field[i] <= 0;
         org_value_reg.field[i] <= 0;
       end
     end else begin
+      data_valid_reg <= data_valid_in;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params_in.const_mask[i] & config_params_valid_in) begin
           ops_value_reg.field[i] <= config_params_in.const_value;
@@ -77,11 +79,10 @@ module engine_read_write_kernel (
 
   always_comb begin
     // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
-    result_int   = 0;
     address_int  = 0;
     org_data_int = org_value_reg;
 
-    if (config_params_valid_in & data_valid_in) begin
+    if (config_params_valid_in & data_valid_reg) begin
       address_int.shift.amount    = config_params_in.granularity;
       address_int.shift.direction = config_params_in.direction;
       address_int.base            = config_params_in.array_pointer;
