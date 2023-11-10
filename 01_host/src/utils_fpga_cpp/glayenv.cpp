@@ -133,7 +133,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     // ********************************************************************************************
     // ***************                  Setup Host pointers                          **************
     // ********************************************************************************************
-    InitializeGLAYOverlayConfiguration(overlay_program_entries, 1, graph, glayHandle->overlayPath);
+    initializeGLAYOverlayConfiguration(overlay_program_entries, 1, graph, glayHandle->overlayPath);
     xrt_buffer_host[0] = overlay_program;
     xrt_buffer_host[1] = graph->vertices->in_degree;
     xrt_buffer_host[2] = graph->vertices->out_degree;
@@ -226,7 +226,7 @@ int GLAYGraphCSRxrtBufferHandlePerBank::setArgsKernelAddressGLAYGraphCSRHostToDe
     return 0;
 }
 
-void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath)
+void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
     std::ifstream file(overlayPath);
     if (!file.is_open())
@@ -267,10 +267,11 @@ void GLAYGraphCSRxrtBufferHandlePerBank::InitializeGLAYOverlayConfiguration(size
         overlay_program[i] = values[i];
     }
 
-    overlay_program[2]  = graph->num_vertices       ;//  2  - Index_end
-    overlay_program[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS
-    overlay_program[9]  = xrt_buffer_device[2] >> 32;//  9  - BUFFER Array Pointer RHS
-    overlay_program[10] = graph->num_vertices       ;//  10 - BUFFER size
+    // overlay_program[2]  = graph->num_vertices       ;//  2  - Index_end
+    // overlay_program[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS
+    // overlay_program[9]  = xrt_buffer_device[2] >> 32;//  9  - BUFFER Array Pointer RHS
+    // overlay_program[10] = graph->num_vertices       ;//  10 - BUFFER size
+    mapGLAYOverlayProgramBuffers(overlay_program_entries, algorithm, graph, overlayPath);
 }
 
 void GLAYGraphCSRxrtBufferHandlePerBank::printGLAYGraphCSRxrtBufferHandlePerBank()

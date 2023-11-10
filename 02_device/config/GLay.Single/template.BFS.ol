@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13   buffer_8-auxiliary_2 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 0    cacheline 0    offset 0    -- //  0  - Increment/Decrement
 0x00000000 // entry 1    cacheline 0    offset 1    -- //  1  - Index_start
@@ -16,7 +16,7 @@
 0x00008412 // entry 12   cacheline 0    offset 12   -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13   buffer_7-auxiliary_1 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 13   cacheline 0    offset 13   -- //  0  - Increment/Decrement
 0x00000000 // entry 14   cacheline 0    offset 14   -- //  1  - Index_start
@@ -33,7 +33,7 @@
 0x00008412 // entry 25   cacheline 1    offset 9    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10  
+// Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10   None-NONE 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x0000000D // entry 26   cacheline 1    offset 10   -- //  0  - Increment/Decrement
 0x00000000 // entry 27   cacheline 1    offset 11   -- //  1  - Index_start
@@ -47,12 +47,12 @@
 0x00000033 // entry 35   cacheline 2    offset 3    -- //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 3    mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 3    mapping 6    cycles 1    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 36   cacheline 2    offset 4    -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 13   buffer_3-edges_idx 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 37   cacheline 2    offset 5    -- //  0  - Increment/Decrement
 0x00000000 // entry 38   cacheline 2    offset 6    -- //  1  - Index_start
@@ -69,13 +69,13 @@
 0x00008412 // entry 49   cacheline 3    offset 1    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA   ID 5    mapping 4    cycles 2   
+// Name ENGINE_MERGE_DATA   ID 5    mapping 4    cycles 2    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000007 // entry 50   cacheline 3    offset 2    -- //  0  - merge mask (W:2)
 0x00000000 // entry 51   cacheline 3    offset 3    -- //  1  - merge type (Serial|Parallel|Both)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 6    mapping 3    cycles 9   
+// Name ENGINE_FILTER_COND  ID 6    mapping 3    cycles 9    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000004 // entry 52   cacheline 3    offset 4    -- //  0  - filter_operation
 0x00000004 // entry 53   cacheline 3    offset 5    -- //  1  - filter_mask
@@ -88,7 +88,7 @@
 0x00000000 // entry 60   cacheline 3    offset 12   -- //  8  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_1-out_degree 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 61   cacheline 3    offset 13   -- //  0  - Increment/Decrement
 0x00000000 // entry 62   cacheline 3    offset 14   -- //  1  - Index_start
@@ -105,7 +105,7 @@
 0x00008412 // entry 73   cacheline 4    offset 9    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13   buffer_8-auxiliary_2 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 74   cacheline 4    offset 10   -- //  0  - Increment/Decrement
 0x00000000 // entry 75   cacheline 4    offset 11   -- //  1  - Index_start
@@ -122,12 +122,12 @@
 0x00008412 // entry 86   cacheline 5    offset 6    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 9    mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 9    mapping 6    cycles 1    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 87   cacheline 5    offset 7    -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
+// Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10   buffer_4-edges_array_dest 0-num_edges
 // --------------------------------------------------------------------------------------
 0x0000000D // entry 88   cacheline 5    offset 8    -- //  0  - Increment/Decrement
 0x00000000 // entry 89   cacheline 5    offset 9    -- //  1  - Index_start
@@ -141,12 +141,12 @@
 0x00000033 // entry 97   cacheline 6    offset 1    -- //  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 11   mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 11   mapping 6    cycles 1    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 98   cacheline 6    offset 2    -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13   buffer_7-auxiliary_1 0-num_vertices
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 99   cacheline 6    offset 3    -- //  0  - Increment/Decrement
 0x00000000 // entry 100  cacheline 6    offset 4    -- //  1  - Index_start
@@ -163,7 +163,7 @@
 0x00008412 // entry 111  cacheline 6    offset 15   -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9   
+// Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000004 // entry 112  cacheline 7    offset 0    -- //  0  - filter_operation
 0x00000004 // entry 113  cacheline 7    offset 1    -- //  1  - filter_mask
@@ -176,7 +176,8 @@
 0x00000000 // entry 120  cacheline 7    offset 8    -- //  8  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 14   mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 14   mapping 6    cycles 1    None-None 0-0
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 121  cacheline 7    offset 9    -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
+// Number of entries 122
