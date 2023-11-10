@@ -16,7 +16,7 @@ class GraphCSR;
 
     string  graph_name                    ;
     integer num_vertices                  ;
-    integer nume_edges                    ;
+    integer num_edges                    ;
     integer mem512_num_vertices           ;
     integer mem512_num_edges              ;
     integer mem512_overlay_program_entries;
@@ -49,9 +49,9 @@ class GraphCSR;
         this.file_ptr_edges_array_src  = 0;
         this.file_ptr_edges_array_dest = 0;
         this.num_vertices              = 0;
-        this.nume_edges                = 0;
+        this.num_edges                 = 0;
         this.mem512_num_vertices       = 0;
-        this.mem512_num_edges         = 0;
+        this.mem512_num_edges          = 0;
         this.mem512_overlay_program_entries = 4;
     endfunction
 
@@ -59,7 +59,7 @@ class GraphCSR;
         $display("---------------------------------------------------------------------------");
         $display("MSG: GRAPH CSR : %s", this.graph_name);
         $display("MSG: VERTEX COUNT : %0d", this.num_vertices);
-        $display("MSG: EDGE COUNT   : %0d", this.nume_edges);
+        $display("MSG: EDGE COUNT   : %0d", this.num_edges);
         $display("---------------------------------------------------------------------------");
     endfunction
 
@@ -939,7 +939,7 @@ module __KERNEL___testbench ();
         // graph.overlay_program[2] = 0;
         // graph.overlay_program[3] = 0;
 
-        // graph.overlay_program[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.nume_edges;
+        // graph.overlay_program[0][0+:GLOBAL_DATA_WIDTH_BITS] = graph.num_edges;
         // graph.overlay_program[0][GLOBAL_DATA_WIDTH_BITS+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;
         // graph.overlay_program[0][(64)+:64] = buffer_1_ptr;
         // graph.overlay_program[0][(64*2)+:64] = buffer_2_ptr;
@@ -1233,12 +1233,12 @@ module __KERNEL___testbench ();
         else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
-        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.nume_edges);
+        graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
         graph.mem512_overlay_program_entries = int'(buffer_9_ptr[63:1]); // cachelines
 
         graph.mem512_num_vertices = ((graph.num_vertices*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_num_edges = ((graph.nume_edges*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_num_edges = ((graph.num_edges*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
         graph.out_degree   = new [graph.mem512_num_vertices];
         graph.in_degree    = new [graph.mem512_num_vertices];

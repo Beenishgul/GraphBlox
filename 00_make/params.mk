@@ -50,6 +50,8 @@ $(shell echo 'ROOT=$(ROOT)' >> $(PARAMS_SH_DIR))
 $(shell echo 'ROOT_DIR=$(ROOT_DIR)' >> $(PARAMS_SH_DIR))
 $(shell echo 'SORT_TYPE=$(SORT_TYPE)' >> $(PARAMS_SH_DIR))
 $(shell echo 'TOLERANCE=$(TOLERANCE)' >> $(PARAMS_SH_DIR))
+$(shell echo 'FULL_SRC_FPGA_UTILS_CPP=$(FULL_SRC_FPGA_UTILS_CPP)' >> $(PARAMS_SH_DIR))
+
 # =========================================================
 #                        DEVICE ARGS                    
 # =========================================================
@@ -164,6 +166,8 @@ $(shell echo 'set ROOT $(ROOT)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set ROOT_DIR $(ROOT_DIR)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set SORT_TYPE $(SORT_TYPE)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set TOLERANCE $(TOLERANCE)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set FULL_SRC_FPGA_UTILS_CPP $(FULL_SRC_FPGA_UTILS_CPP)' >> $(PARAMS_TCL_DIR))
+
 # =========================================================
 #                        DEVICE ARGS                    
 # =========================================================

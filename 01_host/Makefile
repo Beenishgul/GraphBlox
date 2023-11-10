@@ -46,6 +46,7 @@ TEST_DIR_CPP        ?= tests_cpp
 #contains the main for the graph processing framework
 MAIN_DIR            ?= main
 
+FULL_SRC_FPGA_UTILS_CPP ?= $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/$(SRC_DIR)/$(UTIL_DIR_FPGA_CPP)
 # =========================================================
 #     CLI COMMANDS                           
 # =========================================================
@@ -59,7 +60,6 @@ MKDIR   := -@mkdir -p
 # TEST PASS OR FAIL
 PASS = \033[92mPASS\033[0m
 FAIL = \033[91mFAIL\033[0m
-
 
 # =========================================================
 # Color coded messages                      
