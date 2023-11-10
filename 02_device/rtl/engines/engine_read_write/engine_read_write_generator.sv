@@ -508,8 +508,6 @@ module engine_read_write_generator #(parameter
         generator_engine_request_engine_reg.payload.meta.subclass             <= configure_memory_reg.payload.meta.subclass;
     end
 
-
-
     engine_read_write_kernel inst_engine_read_write_kernel (
         .ap_clk                (ap_clk                             ),
         .areset                (areset_kernel                      ),
