@@ -37,15 +37,18 @@ module engine_filter_cond_kernel (
   MemoryPacketData org_value_reg  ;
   MemoryPacketData org_data_int   ;
   logic            result_flag_int;
+  logic            data_valid_reg ;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
     if (areset) begin
+      data_valid_reg <= 1'b0;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         ops_value_reg.field[i] <= 0;
         org_value_reg.field[i] <= 0;
       end
     end else begin
+      data_valid_reg <= data_valid;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params.const_mask[i] & config_params_valid) begin
           ops_value_reg.field[i] <= config_params.const_value;
@@ -58,7 +61,7 @@ module engine_filter_cond_kernel (
         end else begin
           ops_value_reg.field[i] <= 0;
         end
-        
+
         for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
           if (data_valid & config_params_valid) begin
             for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
@@ -77,14 +80,14 @@ module engine_filter_cond_kernel (
   // FILTER operations logic
   always_comb begin
     // Process the FILTER operation if both config_params and data are valid
-    result_flag_int = 1;
+    result_flag_int = 1'b1;
     result_data_int = ops_value_reg;
     org_data_int    = org_value_reg;
 
-    if (config_params_valid & data_valid) begin
+    if (config_params_valid & data_valid_reg) begin
       case (config_params.filter_operation)
         FILTER_NOP : begin
-          result_flag_int = 1;
+          result_flag_int = 1'b1;
         end
 
         FILTER_GT : begin
@@ -122,7 +125,7 @@ module engine_filter_cond_kernel (
         FILTER_GT_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1;
+              result_flag_int = 1'b1;
               if(result_data_int.field[i] > ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -139,7 +142,7 @@ module engine_filter_cond_kernel (
         FILTER_LT_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1;
+              result_flag_int = 1'b1;
               if(result_data_int.field[i] < ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -156,7 +159,7 @@ module engine_filter_cond_kernel (
         FILTER_EQ_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1;
+              result_flag_int = 1'b1;
               if(result_data_int.field[i] == ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -173,7 +176,7 @@ module engine_filter_cond_kernel (
         FILTER_NOT_EQ_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1;
+              result_flag_int = 1'b1;
               if(result_data_int.field[i] != ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -188,7 +191,7 @@ module engine_filter_cond_kernel (
         end
 
         default : begin
-          result_flag_int = 1;
+          result_flag_int = 1'b1;
           result_data_int = 0; // Undefined operations reset result_data
         end
       endcase

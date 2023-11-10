@@ -31,16 +31,19 @@ module engine_alu_ops_kernel (
 );
 
   // Define internal signals
-  MemoryPacketData ops_value_reg;
-  MemoryPacketData result_int   ;
+  MemoryPacketData ops_value_reg ;
+  MemoryPacketData result_int    ;
+  logic            data_valid_reg;
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
     if (areset) begin
+      data_valid_reg         <= 1'b0;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         ops_value_reg.field[i] <= 0;
       end
     end else begin
+      data_valid_reg <= data_valid;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params.const_mask[i] & config_params_valid) begin
           ops_value_reg.field[i] <= config_params.const_value;
@@ -67,7 +70,7 @@ module engine_alu_ops_kernel (
       result_int = 0;
     end
 
-    if (config_params_valid & data_valid) begin
+    if (config_params_valid & data_valid_reg) begin
       case (config_params.alu_operation)
         ALU_NOP : begin
           result_int = ops_value_reg; // No operation
