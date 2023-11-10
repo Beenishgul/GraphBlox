@@ -310,6 +310,14 @@ for bundle in CU_BUNDLES_CONFIG_ARRAY:
     new_bundle = pad_bundle(new_bundle)
     CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY.append(new_bundle)
 
+def check_and_clean_file(file_path):
+    # Check if the file exists
+    if os.path.exists(file_path):
+        # Delete the file if it exists
+        os.remove(file_path)
+        # print(f"MSG: Existing file '{file_path}' found and removed.")
+
+check_and_clean_file(output_file_path)
 
 # Write to VHDL file
 with open(output_file_path, "w") as file:
