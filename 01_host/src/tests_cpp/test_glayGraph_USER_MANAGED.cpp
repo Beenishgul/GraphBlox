@@ -322,7 +322,7 @@ main (int argc, char **argv)
     int bank_grp_idx = 0;
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 0, TRUE, 122);
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 0, 0, 122);
 
     if(arguments->glayHandle == NULL)
     {
@@ -340,13 +340,13 @@ main (int argc, char **argv)
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_1 ; i++)
     {
-        graphAuxiliary->auxiliary_1[i] = 0;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
     }
 
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_2 ; i++)
     {
-        graphAuxiliary->auxiliary_2[i] = -1;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = -1;
     }
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
@@ -366,10 +366,10 @@ main (int argc, char **argv)
     printf(" -----------------------------------------------------\n");
 
     // closeGLAYUserManaged(arguments->glayHandle);
-    if(graphAuxiliary->num_auxiliary_1)
-        free(graphAuxiliary->num_auxiliary_1);
-    if(graphAuxiliary->num_auxiliary_2)
-        free(graphAuxiliary->num_auxiliary_2);
+    if(graphAuxiliary->auxiliary_1)
+        free(graphAuxiliary->auxiliary_1);
+    if(graphAuxiliary->auxiliary_2)
+        free(graphAuxiliary->auxiliary_2);
     if(graphAuxiliary)
         free(graphAuxiliary);
 

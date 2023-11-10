@@ -1,5 +1,5 @@
 #include "glayenv.hpp"
-void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath)
+void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13   buffer_8-auxiliary_2 0-num_vertices

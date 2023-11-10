@@ -5,12 +5,12 @@ import ast
 import json
 
 # Validate the number of arguments
-if len(sys.argv) != 7:
-    print("Usage: <script> <FULL_SRC_IP_DIR_CONFIG> <FULL_SRC_IP_DIR_OVERLAY> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
+if len(sys.argv) != 10:
+    print("Usage: <script> <FULL_SRC_IP_DIR_CONFIG> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_FPGA_UTILS_CPP> <utils> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
 
 # Define the filename based on the CAPABILITY
 if CAPABILITY == "Single":
@@ -29,8 +29,11 @@ config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
 output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, overlay_template_filename)
-output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
-output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, verilog_template_filename)
+# output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
+output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
+# output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, verilog_template_filename)
+output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, verilog_template_filename)
+
 config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
 
 with open(config_file_path, "r") as file:
@@ -339,7 +342,7 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
 
 
 append_to_file(output_file_path_cpp, "#include \"glayenv.hpp\"")
-append_to_file(output_file_path_cpp, "void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath)")
+append_to_file(output_file_path_cpp, "void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
 append_to_file(output_file_path_cpp, "{")
 
 # Get engine IDs and pad accordingly

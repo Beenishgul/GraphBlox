@@ -60,6 +60,9 @@ mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${cu}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${lane}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}
 
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${pkgs}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${engines}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${engines}
@@ -71,7 +74,6 @@ cp -r -u ${FULL_SRC_IP_DIR_RTL}/${cu}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${cu}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${lane}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${lane}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${utils}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${testbench}/${TESTBENCH_MODULE}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}
-
 
 if [[ "$XILINX_CTRL_MODE" == "USER_MANAGED" ]]
 then
@@ -86,10 +88,6 @@ else
     echo "MSG: else |$XILINX_CTRL_MODE|"
     cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
-
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_OVERLAY} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
-python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
 if [[ "$TESTBENCH_MODULE" == "integration" ]]
