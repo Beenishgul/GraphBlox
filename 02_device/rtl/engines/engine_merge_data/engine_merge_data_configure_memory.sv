@@ -21,26 +21,26 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_merge_data_configure_memory #(parameter
-    ID_CU            = 0,
-    ID_BUNDLE        = 0,
-    ID_LANE          = 0,
-    ID_ENGINE        = 0,
-    ID_RELATIVE      = 0,
-    ID_MODULE        = 0,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8,
-    ENGINE_SEQ_WIDTH = 16,
-    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH,
+    ID_CU            = 0                                ,
+    ID_BUNDLE        = 0                                ,
+    ID_LANE          = 0                                ,
+    ID_ENGINE        = 0                                ,
+    ID_RELATIVE      = 0                                ,
+    ID_MODULE        = 0                                ,
+    FIFO_WRITE_DEPTH = 16                               ,
+    PROG_THRESH      = 8                                ,
+    ENGINE_SEQ_WIDTH = 16                               ,
+    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
-    input  logic                  ap_clk,
-    input  logic                  areset,
-    input  MemoryPacket           response_memory_in,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in,
+    input  logic                  ap_clk                             ,
+    input  logic                  areset                             ,
+    input  MemoryPacket           response_memory_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MergeDataConfiguration configure_memory_out,
-    input  FIFOStateSignalsInput  fifo_configure_memory_signals_in,
-    output FIFOStateSignalsOutput fifo_configure_memory_signals_out,
+    output MergeDataConfiguration configure_memory_out               ,
+    input  FIFOStateSignalsInput  fifo_configure_memory_signals_in   ,
+    output FIFOStateSignalsOutput fifo_configure_memory_signals_out  ,
     output logic                  fifo_setup_signal
 );
 
@@ -48,38 +48,38 @@ module engine_merge_data_configure_memory #(parameter
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_merge_data_generator;
-    logic areset_fifo;
+    logic areset_fifo                ;
 
-    MemoryPacket                      response_memory_in_reg;
-    MemoryPacketMeta                  configure_memory_meta_int;
-    MergeDataConfiguration            configure_memory_reg;
-    logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg;
-    logic                             configure_memory_valid_int;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence;
+    MemoryPacket                      response_memory_in_reg                          ;
+    MemoryPacketMeta                  configure_memory_meta_int                       ;
+    MergeDataConfiguration            configure_memory_reg                            ;
+    logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
+    logic                             configure_memory_valid_int                      ;
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_memory_in_din;
-    MemoryPacket           fifo_response_memory_in_dout_int;
-    MemoryPacket           fifo_response_memory_in_dout_reg;
-    MemoryPacketPayload    fifo_response_memory_in_dout;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int;
-    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int;
+    MemoryPacketPayload    fifo_response_memory_in_din             ;
+    MemoryPacket           fifo_response_memory_in_dout_int        ;
+    MemoryPacket           fifo_response_memory_in_dout_reg        ;
+    MemoryPacketPayload    fifo_response_memory_in_dout            ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int ;
     logic                  fifo_response_memory_in_setup_signal_int;
-    logic                  fifo_response_memory_in_push_filter;
+    logic                  fifo_response_memory_in_push_filter     ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    MergeDataConfigurationPayload fifo_configure_memory_din;
-    MergeDataConfiguration        fifo_configure_memory_dout_int;
-    MergeDataConfigurationPayload fifo_configure_memory_dout;
-    FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg;
-    FIFOStateSignalsInput         fifo_configure_memory_signals_in_int;
-    FIFOStateSignalsOutput        fifo_configure_memory_signals_out_int;
+    MergeDataConfigurationPayload fifo_configure_memory_din             ;
+    MergeDataConfiguration        fifo_configure_memory_dout_int        ;
+    MergeDataConfigurationPayload fifo_configure_memory_dout            ;
+    FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg  ;
+    FIFOStateSignalsInput         fifo_configure_memory_signals_in_int  ;
+    FIFOStateSignalsOutput        fifo_configure_memory_signals_out_int ;
     logic                         fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
@@ -195,13 +195,7 @@ module engine_merge_data_configure_memory #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
-        configure_memory_reg.payload.meta.route.to        <= configure_memory_meta_int.route.to;
-        configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
-        configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
-        configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
-        configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
-        configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;
+        configure_memory_reg.payload.meta <= configure_memory_meta_int;
     end
 
     always_ff @(posedge ap_clk) begin
