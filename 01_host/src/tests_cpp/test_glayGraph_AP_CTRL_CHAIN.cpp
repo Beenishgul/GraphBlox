@@ -320,17 +320,37 @@ main (int argc, char **argv)
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
     int bank_grp_idx = 0;
-    struct GLAYGraphCSR *glayGraph = (struct GLAYGraphCSR *) my_malloc(sizeof(struct GLAYGraphCSR));
+    struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 2);
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 2, TRUE, 122);
 
     if(arguments->glayHandle == NULL)
     {
         printf("ERROR:--> setupGLAYDevice\n");
     }
 
+    uint32_t i;
+    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices;
+    graphAuxiliary->auxiliary_1  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+
+    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices;
+    graphAuxiliary->auxiliary_2  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+
+    // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    {
+        graphAuxiliary->auxiliary_1[i] = 0;
+    }
+
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    {
+        graphAuxiliary->auxiliary_2[i] = -1;
+    }
+
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
-    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, glayGraph, bank_grp_idx);
+    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx);
     glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
 
     startGLAYCtrlChain(arguments->glayHandle);
@@ -346,10 +366,15 @@ main (int argc, char **argv)
     printf(" -----------------------------------------------------\n");
 
     // closeGLAYUserManaged(arguments->glayHandle);
-
+    if(graphAuxiliary->num_auxiliary_1)
+        free(graphAuxiliary->num_auxiliary_1);
+    if(graphAuxiliary->num_auxiliary_2)
+        free(graphAuxiliary->num_auxiliary_2);
+    if(graphAuxiliary)
+        free(graphAuxiliary);
     // releaseGLAY(arguments->glayHandle);
     free(timer);
-    free(glayGraph);
+    free(graphAuxiliary);
     argumentsFree(arguments);
     exit (0);
 }
@@ -358,6 +383,8 @@ main (int argc, char **argv)
 #ifdef __cplusplus
 }
 #endif
+
+
 
 
 

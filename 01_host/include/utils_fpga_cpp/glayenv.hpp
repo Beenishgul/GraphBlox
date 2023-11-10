@@ -157,23 +157,15 @@ extern "C" {
 #define ADDR_BUFFER_9_ID  9
 
 // ********************************************************************************************
-// ***************                      DataStructure CSR                        **************
+// ***************                      XRT Device Management                    **************
 // ********************************************************************************************
-struct __attribute__((__packed__)) GLAYGraphCSR
+struct __attribute__((__packed__)) GraphAuxiliary
 {
-    uint32_t num_edges;             // 4-Bytes
-    uint32_t num_vertices;          // 4-Bytes
-    void *vertex_out_degree;        // 8-Bytes
-    void *vertex_in_degree;         // 8-Bytes
-    void *vertex_edges_idx;         // 8-Bytes
-    void *edges_array_src;          // 8-Bytes
-    void *edges_array_dest;         // 8-Bytes
-    void *edges_array_weight;       // 8-Bytes
-    void *auxiliary1;               // 8-Bytes
-    //---------------------------------------------------//--// 64bytes
-    void *auxiliary2;               // 8-Bytes
-    void *auxiliary3;               // 8-Bytes
-    float max_weight;               // 4-Bytes
+    uint32_t num_auxiliary_1;             
+    uint32_t num_auxiliary_2;         
+    //---------------------------------------------------
+    void *auxiliary_1;               
+    void *auxiliary_2;               
 };
 
 // ********************************************************************************************
@@ -183,6 +175,8 @@ struct xrtGLAYHandle
 {
     int numThreads;
     int ctrlMode;
+    int entries;
+    bool endian;
     char *kernelName;
     char *xclbinPath;
     char *overlayPath;
@@ -198,7 +192,7 @@ struct xrtGLAYHandle
     xrt::ip::interrupt interruptHandle;
 };
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode);
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian, int entries);
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle);
 
 // ********************************************************************************************
@@ -207,30 +201,31 @@ void printGLAYDevice(struct xrtGLAYHandle *glayHandle);
 class GLAYGraphCSRxrtBufferHandlePerBank
 {
 public:
-size_t overlay_buffer_size_in_bytes;
-uint32_t *overlay_configuration;
+size_t overlay_program_entries;
+bool endian;
+uint32_t *overlay_program;
 // Each Memory bank contains a Graph CSR segment
 xrt::bo xrt_buffer[10];
 void *   xrt_buffer_host[10];
 uint64_t xrt_buffer_device[10];
 size_t xrt_buffer_size[10];
 
-GLAYGraphCSRxrtBufferHandlePerBank() : overlay_configuration(nullptr) {
+GLAYGraphCSRxrtBufferHandlePerBank() : overlay_program(nullptr) {
 }
 ~GLAYGraphCSRxrtBufferHandlePerBank(){
-    if (overlay_configuration) {
-        free(overlay_configuration); // Use free for memory allocated with aligned_alloc
+    if (overlay_program) {
+        free(overlay_program); // Use free for memory allocated with aligned_alloc
     }
 }
 GLAYGraphCSRxrtBufferHandlePerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex);
-int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
+int writeGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
 int writeRegistersAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle);
 int setArgsKernelAddressGLAYGraphCSRHostToDeviceBuffersPerBank(struct xrtGLAYHandle *glayHandle, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank);
 void InitializeGLAYOverlayConfiguration(size_t overlayBufferSizeInBytes, int algorithm, struct GraphCSR *graph, char *overlayPath);
 void printGLAYGraphCSRxrtBufferHandlePerBank();
 };
 
-struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bankGroupIndex);
+struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSR(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex);
 
 // ********************************************************************************************
 // ***************                  GLAY Control                                 **************
@@ -241,7 +236,7 @@ void releaseGLAY(struct xrtGLAYHandle *glayHandle);
 // ********************************************************************************************
 // ***************                  GLAY Control USER_MANAGED                    **************
 // ********************************************************************************************
-struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bankGroupIndex);
+struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRUserManaged(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex);
 void startGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 void waitGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
@@ -249,7 +244,7 @@ void releaseGLAYUserManaged(struct xrtGLAYHandle *glayHandle);
 // ********************************************************************************************
 // ***************                  GLAY Control AP_CTRL_HS                      **************
 // ********************************************************************************************
-struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlHs(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bankGroupIndex);
+struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlHs(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex);
 void startGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
 void waitGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
@@ -257,7 +252,7 @@ void releaseGLAYCtrlHs(struct xrtGLAYHandle *glayHandle);
 // ********************************************************************************************
 // ***************                  GLAY Control AP_CTRL_CHAIN                   **************
 // ********************************************************************************************
-struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, struct GLAYGraphCSR *glayGraph, int bankGroupIndex);
+struct GLAYGraphCSRxrtBufferHandlePerBank *setupGLAYGraphCSRCtrlChain(struct xrtGLAYHandle *glayHandle, struct GraphCSR *graph, int bankGroupIndex);
 void startGLAYCtrlChain(struct xrtGLAYHandle *glayHandle);
 void waitGLAYCtrlChain(struct xrtGLAYHandle *glayHandle);
 void releaseGLAYCtrlChain(struct xrtGLAYHandle *glayHandle);
