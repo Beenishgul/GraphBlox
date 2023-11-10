@@ -272,9 +272,9 @@ module cu_setup #(
         configuration_comb.payload.param.increment     = 1'b1;
         configuration_comb.payload.param.decrement     = 1'b0;
         configuration_comb.payload.param.array_pointer = descriptor_in_reg.payload.buffer_0;
-        configuration_comb.payload.param.array_size    = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH:1]};
+        configuration_comb.payload.param.array_size    = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:1]};
         configuration_comb.payload.param.start_read    = 0;
-        configuration_comb.payload.param.end_read      = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH:1]};
+        configuration_comb.payload.param.end_read      = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:1]};
         configuration_comb.payload.param.stride        = 1;
         configuration_comb.payload.param.granularity   = $clog2(CACHE_FRONTEND_DATA_W/8);
 
