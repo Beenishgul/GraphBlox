@@ -655,7 +655,7 @@ module engine_csr_index_generator #(parameter
         fifo_response_comb.payload.meta.route           = response_memory_in_reg.payload.meta.route;
         fifo_response_comb.payload.meta.subclass.cmd    = CMD_ENGINE;
         fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
-        fifo_response_comb.payload.meta.address         = response_memory_in_reg.payload.address; 
+        fifo_response_comb.payload.meta.address         = response_memory_in_reg.payload.meta.address; 
     end
 
     always_ff @(posedge ap_clk) begin

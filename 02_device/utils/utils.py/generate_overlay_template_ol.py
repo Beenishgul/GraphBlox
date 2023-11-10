@@ -342,7 +342,7 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
 
 
 append_to_file(output_file_path_cpp, "#include \"glayenv.hpp\"")
-append_to_file(output_file_path_cpp, "void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
+append_to_file(output_file_path_cpp, f"void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
 append_to_file(output_file_path_cpp, "{")
 
 # Get engine IDs and pad accordingly
