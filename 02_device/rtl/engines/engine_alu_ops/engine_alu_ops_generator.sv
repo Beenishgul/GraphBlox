@@ -89,8 +89,9 @@ module engine_alu_ops_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic alu_ops_response_engine_in_valid_reg ;
-    logic alu_ops_response_engine_in_valid_flag;
+    logic alu_ops_response_engine_in_valid_reg    ;
+    logic alu_ops_response_engine_in_valid_flag_S2;
+    logic alu_ops_response_engine_in_valid_flag   ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -400,10 +401,13 @@ module engine_alu_ops_generator #(parameter
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             alu_ops_response_engine_in_valid_reg      <= 1'b0;
+            alu_ops_response_engine_in_valid_flag_S2  <= 1'b0;
             generator_engine_request_engine_reg.valid <= 1'b0;
         end
         else begin
-            generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag;
+            alu_ops_response_engine_in_valid_flag_S2  <= alu_ops_response_engine_in_valid_flag;
+            generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag_S2;
+
             if(response_engine_in_int.valid & configure_engine_param_valid) begin
                 alu_ops_response_engine_in_valid_reg <= 1'b1;
             end else begin
