@@ -21,7 +21,9 @@ import PKG_CACHE::*;
 
 module arbiter_N_to_1_request #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR),
+  parameter FIFO_WRITE_DEPTH      = 32                             ,
+  parameter PROG_THRESH           = 16
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
@@ -170,10 +172,10 @@ module arbiter_N_to_1_request #(
   assign request_out_int.payload           = fifo_request_dout;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                        ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (16                        )
+    .PROG_THRESH     (PROG_THRESH               )
   ) inst_fifo_MemoryPacket (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),

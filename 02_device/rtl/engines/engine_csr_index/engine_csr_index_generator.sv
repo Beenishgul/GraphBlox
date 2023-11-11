@@ -650,12 +650,18 @@ module engine_csr_index_generator #(parameter
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
     always_comb begin
-        fifo_response_comb.valid                        = response_memory_in_reg.valid;
-        fifo_response_comb.payload.data                 = response_memory_in_reg.payload.data;
-        fifo_response_comb.payload.meta.route           = response_memory_in_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.subclass.cmd    = CMD_ENGINE;
-        fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
-        fifo_response_comb.payload.meta.address         = response_memory_in_reg.payload.meta.address; 
+        fifo_response_comb.valid                     = response_memory_in_reg.valid;
+        fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
+        fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
+        fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
+
+        if(esponse_memory_in_reg.payload.meta.route.to.module_id == 2'b01) begin
+            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
+        end else begin
+            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
+        end
+
+        fifo_response_comb.payload.meta.address = response_memory_in_reg.payload.meta.address;
     end
 
     always_ff @(posedge ap_clk) begin

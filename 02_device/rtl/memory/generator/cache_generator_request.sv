@@ -21,7 +21,9 @@ import PKG_CACHE::*;
 
 module cache_generator_request #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR),
+  parameter FIFO_WRITE_DEPTH      = 32                             ,
+  parameter PROG_THRESH           = 16
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
@@ -185,10 +187,10 @@ module cache_generator_request #(
   assign request_out_int.payload.data      = fifo_request_dout.data;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                        ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
-    .PROG_THRESH     (16                        )
+    .PROG_THRESH     (PROG_THRESH               )
   ) inst_fifo_CacheRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
