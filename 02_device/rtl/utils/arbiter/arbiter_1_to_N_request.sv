@@ -326,7 +326,7 @@ module arbiter_1_to_N_request #(
   assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
+  assign fifo_request_signals_in_int.wr_en = request_in_reg.valid & (|request_in_reg.payload.meta.route.to);
   assign fifo_request_din                  = request_in_reg.payload;
 
   // Pop

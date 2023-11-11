@@ -109,12 +109,12 @@ typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [CU_KERNEL_COUNT_WIDTH_BITS-1:0] id_cu    ; // SIZE = 4 bits  - up to 4 vertex cu - pending
+  logic [CU_KERNEL_COUNT_WIDTH_BITS-1:0] id_cu    ; // SIZE = 8 bits  - up to 8 vertex cu - pending
   logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
   logic [  CU_LANE_COUNT_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
   logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
   logic [CU_MODULE_COUNT_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
-  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits - up to 12 buffers in the descriptor
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
 } MemoryPacketArbitrate;
 
 typedef struct packed{

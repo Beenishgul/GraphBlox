@@ -206,7 +206,7 @@ module engine_template #(
         end
         else begin
             fifo_setup_signal        <= engine_cast_arbiter_1_to_N_fifo_setup_signal | fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
-            request_engine_out[0].valid <= request_engine_out_int.valid;
+            request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.to);
             request_memory_out.valid <= request_memory_out_int.valid;
             done_out                 <= template_done_out;
         end
