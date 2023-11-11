@@ -564,7 +564,7 @@ module engine_read_write_generator #(parameter
         fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
         fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
 
-        if(esponse_memory_in_reg.payload.meta.route.to.module_id == 2'b01) begin
+        if(response_memory_in_reg.payload.meta.route.to.module_id == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
