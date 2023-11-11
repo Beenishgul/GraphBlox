@@ -303,7 +303,7 @@ module arbiter_1_to_N_response #(
   assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
+  assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.from);
   assign fifo_response_din                  = response_in_reg.payload;
 
   // Pop
