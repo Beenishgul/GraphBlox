@@ -70,7 +70,7 @@ module counter #(
         count_r  <= count_r + stride_r;
         stride_r <= stride_r;
       end
-      else if (~incr & decr) begin
+      else if (~incr & decr & ~is_zero_r) begin
         count_r  <= count_r - stride_r;
         stride_r <= stride_r;
       end
