@@ -25,7 +25,9 @@ module arbiter_1_to_N_request #(
   parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter ID_LEVEL             = 1                         ,
-  parameter ID_BUNDLE            = 0
+  parameter ID_BUNDLE            = 0                         ,
+  parameter FIFO_WRITE_DEPTH     = 32                        ,
+  parameter PROG_THRESH          = 16
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
@@ -335,10 +337,10 @@ module arbiter_1_to_N_request #(
   assign fifo_request_dout_int.payload     = fifo_request_dout;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                        ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (16                        ),
+    .PROG_THRESH     (PROG_THRESH               ),
     .READ_MODE       ("fwft"                    )
   ) inst_fifo_MemoryPacket (
     .clk        (ap_clk                                  ),

@@ -137,7 +137,7 @@ module engine_csr_index_configure_engine #(parameter
             configure_engine_reg.payload.param.stride        <= 0;
             configure_engine_reg.payload.param.granularity   <= 0;
             configure_engine_reg.payload.param.array_pointer <= 0;
-            configure_engine_reg.payload.param.array_size    <= fifo_response_engine_in_dout_int.payload.data.field[3];
+            configure_engine_reg.payload.param.array_size    <= fifo_response_engine_in_dout_int.payload.data.field[1];
         end else begin
             configure_engine_reg.payload.data  <= configure_engine_reg.payload.data;
             configure_engine_reg.payload.meta  <= configure_engine_reg.payload.meta;

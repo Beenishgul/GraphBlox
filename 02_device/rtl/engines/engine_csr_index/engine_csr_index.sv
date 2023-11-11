@@ -436,17 +436,17 @@ module engine_csr_index #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(
+    arbiter_1_to_N_request #(
         .NUM_MEMORY_REQUESTOR(NUM_MODULES),
         .ID_LEVEL            (4          )
     ) inst_arbiter_1_to_N_engine_response_in (
-        .ap_clk                   (ap_clk                                         ),
-        .areset                   (areset_arbiter_1_to_N_engine                   ),
-        .response_in              (arbiter_1_to_N_engine_response_in              ),
-        .fifo_response_signals_in (arbiter_1_to_N_engine_fifo_response_signals_in ),
-        .fifo_response_signals_out(arbiter_1_to_N_engine_fifo_response_signals_out),
-        .response_out             (arbiter_1_to_N_engine_response_out             ),
-        .fifo_setup_signal        (arbiter_1_to_N_engine_fifo_setup_signal        )
+        .ap_clk                  (ap_clk                                         ),
+        .areset                  (areset_arbiter_1_to_N_engine                   ),
+        .request_in              (arbiter_1_to_N_engine_response_in              ),
+        .fifo_request_signals_in (arbiter_1_to_N_engine_fifo_response_signals_in ),
+        .fifo_request_signals_out(arbiter_1_to_N_engine_fifo_response_signals_out),
+        .request_out             (arbiter_1_to_N_engine_response_out             ),
+        .fifo_setup_signal       (arbiter_1_to_N_engine_fifo_setup_signal        )
     );
 
 // Generate Response - Arbiter Signals: Memory Response Generator
@@ -462,8 +462,8 @@ module engine_csr_index #(parameter
 
 // --------------------------------------------------------------------------------------
     arbiter_1_to_N_response #(
-        .NUM_MEMORY_REQUESTOR(2),
-        .ID_LEVEL            (4)
+        .NUM_MEMORY_REQUESTOR(NUM_MODULES),
+        .ID_LEVEL            (4          )
     ) inst_arbiter_1_to_N_memory_response_in (
         .ap_clk                   (ap_clk                                         ),
         .areset                   (areset_arbiter_1_to_N_memory                   ),

@@ -19,7 +19,11 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
+module cache_generator_response #(
+  parameter NUM_MEMORY_REQUESTOR = 2 ,
+  parameter FIFO_WRITE_DEPTH     = 32,
+  parameter PROG_THRESH          = 16
+) (
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
   input  CacheResponse          response_in                            ,
@@ -137,13 +141,13 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_int.wr_en      = response_in_reg.valid;
-  assign fifo_response_din.iob                   = response_in_reg.payload.iob;
-  assign fifo_response_din.meta.address          = response_in_reg.payload.meta.address ;
-  assign fifo_response_din.meta.route            = response_in_reg.payload.meta.route;
-  assign fifo_response_din.meta.subclass.buffer  = response_in_reg.payload.meta.subclass.buffer;
-  assign fifo_response_din.meta.subclass.cmd     = CMD_MEM_RESPONSE;
-  assign fifo_response_din.data                  = response_in_reg.payload.data;
+  assign fifo_response_signals_in_int.wr_en     = response_in_reg.valid;
+  assign fifo_response_din.iob                  = response_in_reg.payload.iob;
+  assign fifo_response_din.meta.address         = response_in_reg.payload.meta.address ;
+  assign fifo_response_din.meta.route           = response_in_reg.payload.meta.route;
+  assign fifo_response_din.meta.subclass.buffer = response_in_reg.payload.meta.subclass.buffer;
+  assign fifo_response_din.meta.subclass.cmd    = CMD_MEM_RESPONSE;
+  assign fifo_response_din.data                 = response_in_reg.payload.data;
 
   // Pop
   assign fifo_response_signals_in_int.rd_en           = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
@@ -155,10 +159,10 @@ module cache_generator_response #(parameter NUM_MEMORY_REQUESTOR = 2) (
   assign fifo_response_dout_int.payload.data.field[3] = fifo_response_dout.data.field[2];
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                         ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
     .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
     .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
-    .PROG_THRESH     (16                         )
+    .PROG_THRESH     (PROG_THRESH                )
   ) inst_fifo_CacheResponse (
     .clk        (ap_clk                                   ),
     .srst       (areset_fifo                              ),

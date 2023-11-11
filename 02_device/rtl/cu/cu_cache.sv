@@ -20,7 +20,10 @@ import PKG_CACHE::*;
 import PKG_MEMORY::*;
 
 
-module cu_cache (
+module cu_cache #(
+  parameter FIFO_WRITE_DEPTH = 32,
+  parameter PROG_THRESH      = 16
+) (
   // System Signals
   input  logic                          ap_clk                   ,
   input  logic                          areset                   ,
@@ -259,11 +262,11 @@ module cu_cache (
   assign cache_request_mem.data            = fifo_request_dout.data;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                        ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
     .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
-    .PROG_THRESH     (16                        ),
-    .READ_MODE       ("fwft"                    ) //string; "std" or "fwft";
+    .PROG_THRESH     (PROG_THRESH               ),
+    .READ_MODE       ("fwft"                    )  //string; "std" or "fwft";
   ) inst_fifo_CacheRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
@@ -297,10 +300,10 @@ module cu_cache (
   assign response_in_int.payload            = fifo_response_dout;
 
   xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(32                         ),
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
     .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
     .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
-    .PROG_THRESH     (16                         )
+    .PROG_THRESH     (PROG_THRESH                )
   ) inst_fifo_CacheResponse (
     .clk        (ap_clk                                   ),
     .srst       (areset_fifo                              ),
