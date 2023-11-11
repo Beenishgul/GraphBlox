@@ -477,10 +477,10 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Configuration module - Engine transient
 // --------------------------------------------------------------------------------------
-    assign configure_engine_fifo_response_engine_in_signals_in.rd_en = generator_engine_configure_engine_setup;
+    assign configure_engine_fifo_configure_engine_signals_in.rd_en = generator_engine_configure_engine_setup;
 
-    assign configure_engine_response_engine_in                     = modules_response_engine_in[0];
-    assign configure_engine_fifo_configure_engine_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[0].rd_en;
+    assign configure_engine_response_engine_in                       = modules_response_engine_in[0];
+    assign configure_engine_fifo_response_engine_in_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[0].rd_en;
 
     assign modules_fifo_response_engine_in_signals_out[0] = configure_engine_fifo_response_engine_in_signals_out;
 

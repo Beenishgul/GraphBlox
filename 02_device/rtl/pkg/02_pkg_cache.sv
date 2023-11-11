@@ -39,7 +39,7 @@ package PKG_CACHE;
 	parameter CACHE_FRONTEND_ADDR_W = GLOBAL_ADDR_WIDTH_BITS; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter CACHE_FRONTEND_DATA_W = GLOBAL_DATA_WIDTH_BITS; //Data width - word size used for the cache
 	parameter CACHE_N_WAYS          = 1                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 5                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_LINE_OFF_W      = 4                     ; //Line-Offset Width - 2**NLINE_W total cache lines
 	parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)            ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
@@ -78,5 +78,20 @@ package PKG_CACHE;
 	parameter                      CACHE_AXI_SIZE_W  = M_AXI_MEMORY_SIZE_W ;
 	parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID      = 0                   ; //AXI ID value
 
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// CACHE FLUSH GENERAL
+// --------------------------------------------------------------------------------------
+	parameter SYSTEM_CACHE_NUM_WAYS      = 4                                                                                  ;
+	parameter SYSTEM_CACHE_ADDR_WIDTH    = 63                                                                                 ;
+	parameter SYSTEM_CACHE_DATA_WIDTH    = CACHE_BACKEND_NBYTES                                                               ;
+	parameter SYSTEM_CACHE_SIZE          = 65536                                                                              ; // Define the total size of the cache
+	parameter SYSTEM_CACHE_LINE_SIZE_LOG = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ; // Log base 2 of cache line size, which is 64 bytes
+	parameter SYSTEM_CACHE_NUM_SETS      = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
+	parameter SYSTEM_CACHE_COUNT         = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM_WAYS                                      ;
+
+// Optimized address calculation using shift operations
+// read char *addr = base_address + (((counter >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | (counter & (SYSTEM_CACHE_NUM_WAYS-1) << CACHE_LINE_SIZE_LOG));
+// --------------------------------------------------------------------------------------
 
 endpackage
