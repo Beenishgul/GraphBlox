@@ -655,7 +655,7 @@ module engine_csr_index_generator #(parameter
         fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
         fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
 
-        if(esponse_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
+        if(response_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
