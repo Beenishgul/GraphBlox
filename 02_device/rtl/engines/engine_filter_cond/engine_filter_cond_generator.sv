@@ -441,10 +441,10 @@ module engine_filter_cond_generator #(parameter
     assign filter_cond_response_engine_in_valid_flag = filter_cond_response_engine_in_valid_reg ;
 
     always_comb begin
-        filter_cond_response_engine_in_valid_int = (filter_cond_response_engine_in_valid_flag_S2 & filter_result_int);
-        conditional_flow_int                     = (result_flag_int & configure_engine_int.payload.param.conditional_flag) & ~break_running_reg;
-        filter_flow_int                          = (result_flag_int ^ configure_engine_int.payload.param.filter_pass) & ~break_running_reg;
-        break_flow_int                           = ~(result_flag_int ^ configure_engine_int.payload.param.break_pass) & ~break_running_reg & configure_engine_int.payload.param.break_flag;
+        filter_cond_response_engine_in_valid_int = filter_result_int;
+        conditional_flow_int                     = filter_cond_response_engine_in_valid_flag_S2 & (result_flag_int & configure_engine_int.payload.param.conditional_flag) & ~break_running_reg;
+        filter_flow_int                          = filter_cond_response_engine_in_valid_flag_S2 & (result_flag_int ^ configure_engine_int.payload.param.filter_pass) & ~break_running_reg;
+        break_flow_int                           = filter_cond_response_engine_in_valid_flag_S2 & ~(result_flag_int ^ configure_engine_int.payload.param.break_pass) & ~break_running_reg & configure_engine_int.payload.param.break_flag;
         filter_result_int                        = (configure_engine_int.payload.param.filter_post & (break_flow_int | filter_flow_int)) | (~break_flow_int & filter_flow_int & ~configure_engine_int.payload.param.filter_post);
         sequence_flow_int                        = break_flow_int | (response_engine_in_int.payload.meta.route.seq_state == SEQUENCE_DONE);
     end
@@ -503,7 +503,7 @@ module engine_filter_cond_generator #(parameter
                 generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
             end
         end
-        sequence_flow_reg <= (sequence_flow_int & filter_cond_response_engine_in_valid_flag_S2);
+        sequence_flow_reg <= sequence_flow_int;
     end
 
     always_ff @(posedge ap_clk) begin
