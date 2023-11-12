@@ -41,6 +41,7 @@ source ${PARAMS_SH_DIR}
 
 NUM_SLR=1
 
+
 generate_connectivity_sp () {
 
     local kernel_name=$1
@@ -67,7 +68,6 @@ generate_connectivity_sp () {
 
     echo $config
 }
-
 
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then
@@ -99,9 +99,9 @@ config+="save-temps=1\n"
 config+="debug=1\n"
 config+="link=1\n"
 
-# config+="\n"
-# config+="[clock]\n"
-# config+="defaultFreqHz=${DESIGN_FREQ_HZ}\n"
+config+="\n"
+config+="[clock]\n"
+config+="defaultFreqHz=${DESIGN_FREQ_HZ}\n"
 config+="\n"
 
 config+="[connectivity]\n"
@@ -122,17 +122,21 @@ config+="\n"
 #SLR placement loop
 for i in $(seq 1 ${XILINX_NUM_KERNELS})
 do
-    config+="slr=${KERNEL_NAME}_$i:SLR$((i - 1))\n"
+    
     if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
     then
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * 4)) $((((i)*4)-1)) $i)
     elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
     then
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * 4))  $((((i)*4)-1)) $i)
     elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
     then
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     else
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     fi
 done
