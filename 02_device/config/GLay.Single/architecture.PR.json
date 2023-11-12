@@ -17,21 +17,37 @@
         "ENGINE_ALU_OPS"             : 6,
         "ENGINE_FORWARD_DATA"        : 1
     },
+    "buffers": { 
+        "buffer_0"        : "overlay_program",
+        "buffer_1"        : "out_degree",
+        "buffer_2"        : "in_degree",
+        "buffer_3"        : "edges_idx",
+        "buffer_4"        : "edges_array_dest",
+        "buffer_5"        : "edges_array_src",
+        "buffer_6"        : "edges_array_weight",
+        "buffer_7"        : "auxiliary_1",
+        "buffer_8"        : "auxiliary_2",
+        "buffer_9"        : "entries"
+    },
     "bundle": {  
         "0": [
-            ["ENGINE_READ_WRITE"         , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
-            ["ENGINE_READ_WRITE(C:0)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
-            ["ENGINE_CSR_INDEX(C:0,1)"   , "ENGINE_FILTER_COND"   ],
-            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
-            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
+            ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
+            ["ENGINE_ALU_OPS"                                      ],
+            ["ENGINE_FORWARD_DATA"   ]
         ],
         "1": [
-            ["ENGINE_READ_WRITE"         , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
-            ["ENGINE_READ_WRITE(C:0)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
-            ["ENGINE_CSR_INDEX(C:0,1)"   , "ENGINE_FILTER_COND"   ],
-            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
-            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
+            ["ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)"         , "ENGINE_MERGE_DATA(W:1)"],
+            ["ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"  ],
+            ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"      ],
+            ["ENGINE_FORWARD_DATA"                                  ]
+        ],
+        "2": [
+            ["ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"     ],
+            ["ENGINE_FORWARD_DATA"   ]
+        ],
+        "3": [
+            ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"      ],
+            ["ENGINE_FORWARD_DATA"   ]
         ]
     }
 }
-

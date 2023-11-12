@@ -200,8 +200,8 @@ module engine_filter_cond_configure_memory #(parameter
         configure_memory_reg.payload.meta.route.seq_src      <= configure_memory_meta_int.route.seq_src;
         configure_memory_reg.payload.meta.route.seq_state    <= configure_memory_meta_int.route.seq_state;
         configure_memory_reg.payload.meta.route.hops         <= configure_memory_meta_int.route.hops;
-        configure_memory_reg.payload.meta.address.base       <= configure_memory_meta_int.address.base;
-        configure_memory_reg.payload.meta.address.offset     <= configure_memory_meta_int.address.offset;
+        configure_memory_reg.payload.meta.address            <= configure_memory_meta_int.address;
+        configure_memory_reg.payload.meta.subclass           <= configure_memory_meta_int.subclass;
         configure_memory_reg.payload.param.filter_route.hops <= configure_memory_meta_int.route.hops;
     end
 

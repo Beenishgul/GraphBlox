@@ -280,7 +280,7 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     break;
     case 1: // pagerank
     {
-
+        mapGLAYOverlayProgramBuffersPR(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
     case 2: // SSSP-Delta
@@ -315,7 +315,7 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     break;
     case 8: // Triangle Counting
     {
-
+        mapGLAYOverlayProgramBuffersTC(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
     case 9: // clustering
