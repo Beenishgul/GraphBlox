@@ -169,7 +169,7 @@
 0x00000004 // entry 113  cacheline 7    offset 1    --  1  - filter_mask
 0x00000004 // entry 114  cacheline 7    offset 2    --  2  - const_mask
 0x00000001 // entry 115  cacheline 7    offset 3    --  3  - const_value
-0x00004821 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
+0x00001824 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
 0x00000003 // entry 117  cacheline 7    offset 5    --  4  - break_flag | filter_post | continue_flag | ternary_flag | conditional_flag
 0x00030101 // entry 118  cacheline 7    offset 6    --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00030101 // entry 119  cacheline 7    offset 7    --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
