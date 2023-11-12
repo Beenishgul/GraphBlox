@@ -35,7 +35,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10   None-NONE 0-num_vertices
 // --------------------------------------------------------------------------------------
-0x0000000D // entry 26   cacheline 1    offset 10   -- //  0  - Increment/Decrement
+0x0000000D // entry 26   cacheline 1    offset 10   -- //  0  - Increment | Decrement | mode_sequence | mode_buffer | mode_break | mode_filter
 0x00000000 // entry 27   cacheline 1    offset 11   -- //  1  - Index_start
 0x00000000 // entry 28   cacheline 1    offset 12   -- //  2  - Index_end
 0x00000001 // entry 29   cacheline 1    offset 13   -- //  3  - Stride
@@ -77,15 +77,15 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND  ID 6    mapping 3    cycles 9    None-None 0-0
 // --------------------------------------------------------------------------------------
-0x00000004 // entry 52   cacheline 3    offset 4    -- //  0  - filter_operation
-0x00000004 // entry 53   cacheline 3    offset 5    -- //  1  - filter_mask
-0x00000008 // entry 54   cacheline 3    offset 6    -- //  2  - const_mask
-0xFFFFFFFF // entry 55   cacheline 3    offset 7    -- //  3  - const_value
-0x00008421 // entry 56   cacheline 3    offset 8    -- //  5  - ops_mask
-0x00000000 // entry 57   cacheline 3    offset 9    -- //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
-0x01010401 // entry 58   cacheline 3    offset 10   -- //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x01010401 // entry 59   cacheline 3    offset 11   -- //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 60   cacheline 3    offset 12   -- //  8  - if -> id_engine id_module | else -> id_engine id_module
+0x00000008 // entry 52   cacheline 3    offset 4    -- // --  0  - filter_operation
+0x00000004 // entry 53   cacheline 3    offset 5    -- // --  1  - filter_mask
+0x00000004 // entry 54   cacheline 3    offset 6    -- // --  2  - const_mask
+0x00000001 // entry 55   cacheline 3    offset 7    -- // --  3  - const_value
+0x00004821 // entry 56   cacheline 3    offset 8    -- // --  5  - ops_mask
+0x00000001 // entry 57   cacheline 3    offset 9    -- // --  4  - break_flag | filter_post | continue_flag | ternary_flag | conditional_flag
+0x00030101 // entry 58   cacheline 3    offset 10   -- // --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00030101 // entry 59   cacheline 3    offset 11   -- // --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 60   cacheline 3    offset 12   -- // --  8  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_1-out_degree 0-num_vertices
@@ -129,7 +129,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10   buffer_4-edges_array_dest 0-num_edges
 // --------------------------------------------------------------------------------------
-0x0000000D // entry 88   cacheline 5    offset 8    -- //  0  - Increment/Decrement
+0x0000000D // entry 88   cacheline 5    offset 8    -- //  0  - Increment | Decrement | mode_sequence | mode_buffer | mode_break | mode_filter
 0x00000000 // entry 89   cacheline 5    offset 9    -- //  1  - Index_start
 0x00000000 // entry 90   cacheline 5    offset 10   -- //  2  - Index_end
 0x00000001 // entry 91   cacheline 5    offset 11   -- //  3  - Stride
@@ -165,15 +165,15 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9    None-None 0-0
 // --------------------------------------------------------------------------------------
-0x00000004 // entry 112  cacheline 7    offset 0    -- //  0  - filter_operation
-0x00000004 // entry 113  cacheline 7    offset 1    -- //  1  - filter_mask
-0x00000008 // entry 114  cacheline 7    offset 2    -- //  2  - const_mask
-0xFFFFFFFF // entry 115  cacheline 7    offset 3    -- //  3  - const_value
-0x00008421 // entry 116  cacheline 7    offset 4    -- //  5  - ops_mask
-0x00000000 // entry 117  cacheline 7    offset 5    -- //  4  - break_flag | continue_flag | ternary_flag | conditional_flag
-0x01010401 // entry 118  cacheline 7    offset 6    -- //  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x01010401 // entry 119  cacheline 7    offset 7    -- //  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 120  cacheline 7    offset 8    -- //  8  - if -> id_engine id_module | else -> id_engine id_module
+0x00000008 // entry 112  cacheline 7    offset 0    -- // --  0  - filter_operation
+0x00000004 // entry 113  cacheline 7    offset 1    -- // --  1  - filter_mask
+0x00000004 // entry 114  cacheline 7    offset 2    -- // --  2  - const_mask
+0x00000001 // entry 115  cacheline 7    offset 3    -- // --  3  - const_value
+0x00004821 // entry 116  cacheline 7    offset 4    -- // --  5  - ops_mask
+0x00000001 // entry 117  cacheline 7    offset 5    -- // --  4  - break_flag | filter_post | continue_flag | ternary_flag | conditional_flag
+0x00030101 // entry 118  cacheline 7    offset 6    -- // --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00030101 // entry 119  cacheline 7    offset 7    -- // --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 120  cacheline 7    offset 8    -- // --  8  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 14   mapping 6    cycles 1    None-None 0-0
