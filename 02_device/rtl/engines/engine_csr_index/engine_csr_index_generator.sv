@@ -410,8 +410,8 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg <= 1'b0;
                 if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) begin
-                    configure_engine_int.valid         <= 1'b0;
-                    configure_engine_int.payload.param <= configure_memory_reg.payload.param;
+                    configure_engine_int.valid   <= 1'b0;
+                    configure_engine_int.payload <= configure_memory_reg.payload;
                 end else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) begin
                     configure_engine_int.valid         <= 1'b1;
                     configure_engine_int.payload.param <= configure_memory_reg.payload.param;
@@ -574,6 +574,7 @@ module engine_csr_index_generator #(parameter
 
         fifo_request_comb.payload.meta.address.shift = configure_memory_reg.payload.meta.address.shift;
         fifo_request_comb.payload.meta.subclass      = configure_memory_reg.payload.meta.subclass;
+        fifo_request_comb.payload.data               = 0;
 
         if(configure_memory_reg.payload.param.mode_sequence) begin
             for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA-1; j++) begin
@@ -614,16 +615,16 @@ module engine_csr_index_generator #(parameter
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_request_counter (
-        .ap_clk      (ap_clk                        ),
-        .ap_clken    (counter_enable                ),
-        .areset      (areset_counter                ),
-        .load        (counter_load                  ),
-        .incr        (counter_incr                  ),
-        .decr        (counter_decr                  ),
-        .load_value  (counter_load_value            ),
-        .stride_value(counter_stride_value          ),
-        .count       (counter_count                 ),
-        .is_zero     (counter_is_zero               )
+        .ap_clk      (ap_clk              ),
+        .ap_clken    (counter_enable      ),
+        .areset      (areset_counter      ),
+        .load        (counter_load        ),
+        .incr        (counter_incr        ),
+        .decr        (counter_decr        ),
+        .load_value  (counter_load_value  ),
+        .stride_value(counter_stride_value),
+        .count       (counter_count       ),
+        .is_zero     (counter_is_zero     )
     );
 
 // --------------------------------------------------------------------------------------
