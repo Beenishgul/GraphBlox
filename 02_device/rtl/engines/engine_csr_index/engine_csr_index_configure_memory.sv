@@ -152,7 +152,7 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
         configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
         configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
-        configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
+        configure_memory_meta_int.route.seq_src.id_module = 1 << (ID_MODULE+1);
         configure_memory_meta_int.route.seq_src.id_buffer = 0;
         configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
         configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
@@ -213,6 +213,7 @@ module engine_csr_index_configure_memory #(parameter
                     configure_memory_reg.payload.param.mode_sequence <= fifo_response_memory_in_dout_reg.payload.data.field[0][2];
                     configure_memory_reg.payload.param.mode_buffer   <= fifo_response_memory_in_dout_reg.payload.data.field[0][3];
                     configure_memory_reg.payload.param.mode_break    <= fifo_response_memory_in_dout_reg.payload.data.field[0][4];
+                    configure_memory_reg.payload.param.mode_filter   <= fifo_response_memory_in_dout_reg.payload.data.field[0][5];
                 end
                 (1 << 1) : begin
                     configure_memory_reg.payload.param.index_start <= fifo_response_memory_in_dout_reg.payload.data.field[0];

@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
 // --------------------------------------------------------------------------------------
-0x0000000D //  0  - Increment/Decrement
+0x0000000D //  0  - Increment | Decrement | mode_sequence | mode_buffer | mode_break | mode_filter
 0x00000000 //  1  - Index_start
 0x00000000 //  2  - Index_end
 0x00000001 //  3  - Stride

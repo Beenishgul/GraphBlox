@@ -225,9 +225,10 @@ module engine_filter_cond_configure_memory #(parameter
                 end
                 (1 << 5) : begin
                     configure_memory_reg.payload.param.break_flag       <= fifo_response_memory_in_dout_reg.payload.data.field[0][0];
-                    configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_reg.payload.data.field[0][1];
-                    configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_reg.payload.data.field[0][2];
-                    configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_reg.payload.data.field[0][3];
+                    configure_memory_reg.payload.param.filter_post      <= fifo_response_memory_in_dout_reg.payload.data.field[0][1];
+                    configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_reg.payload.data.field[0][2];
+                    configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_reg.payload.data.field[0][3];
+                    configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_reg.payload.data.field[0][4];
                 end
                 (1 << 6) : begin
                     configure_memory_reg.payload.param.filter_route._if.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];

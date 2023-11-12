@@ -129,7 +129,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
 // --------------------------------------------------------------------------------------
-0x0000001D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement
+0x0000003D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement
 0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
 0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
 0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
@@ -170,7 +170,7 @@
 0x00000004 // entry 114  cacheline 7    offset 2    --  2  - const_mask
 0x00000001 // entry 115  cacheline 7    offset 3    --  3  - const_value
 0x00004821 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
-0x00000001 // entry 117  cacheline 7    offset 5    --  4  - break_flag | continue_flag | ternary_flag | conditional_flag
+0x00000003 // entry 117  cacheline 7    offset 5    --  4  - break_flag | filter_post | continue_flag | ternary_flag | conditional_flag
 0x00030101 // entry 118  cacheline 7    offset 6    --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00030101 // entry 119  cacheline 7    offset 7    --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 120  cacheline 7    offset 8    --  7  - if -> id_engine id_module | else -> id_engine id_module
