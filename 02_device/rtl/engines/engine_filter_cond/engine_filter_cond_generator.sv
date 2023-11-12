@@ -378,7 +378,7 @@ module engine_filter_cond_generator #(parameter
                 configure_memory_setup_reg <= 1'b0;
                 configure_engine_int.valid <= 1'b0;
                 if(configure_memory_reg.valid) begin
-                    configure_engine_int.payload.param <= configure_memory_reg.payload;
+                    configure_engine_int.payload <= configure_memory_reg.payload;
                 end
             end
             ENGINE_FILTER_COND_GEN_START_TRANS : begin
@@ -495,7 +495,7 @@ module engine_filter_cond_generator #(parameter
 
         if(done_int_reg | (generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE)) begin
             generator_engine_request_engine_reg_S2.payload.meta.route.seq_state <= SEQUENCE_DONE;
-            if(valid_break_pipe[1]) begin
+            if(valid_break_pipe[2]) begin
                 generator_engine_request_engine_reg_S2.payload.meta.route.to <= generator_engine_request_engine_reg.payload.meta.route.seq_src;
             end else begin
                 generator_engine_request_engine_reg_S2.payload.meta.route.to <= generator_engine_request_engine_reg.payload.meta.route.to;
