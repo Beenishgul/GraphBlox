@@ -12,7 +12,7 @@ print_usage () {
     echo "  XILINX_JOBS_STRATEGY: 2"
     echo "  PART: xcu280-fsvh2892-2L-e"
     echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
-    echo "  TARGET: hw_emu"
+    echo "  TARGET: hw"
     echo "  XILINX_NUM_KERNELS: 2"
     echo "  XILINX_MAX_THREADS: 8"
     echo "  DESIGN_FREQ_HZ: 300000000"
@@ -122,17 +122,21 @@ config+="\n"
 #SLR placement loop
 for i in $(seq 1 ${XILINX_NUM_KERNELS})
 do
-    config+="slr=${KERNEL_NAME}_$i:SLR$((i - 1))\n"
+    
     if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
     then
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * 4)) $((((i)*4)-1)) $i)
     elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
     then
-        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" "0" "4" $i)
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * 4))  $((((i)*4)-1)) $i)
     elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
     then
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     else
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     fi
 done
