@@ -12,7 +12,7 @@ print_usage () {
     echo "  XILINX_JOBS_STRATEGY: 2"
     echo "  PART: xcu280-fsvh2892-2L-e"
     echo "  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1"
-    echo "  TARGET: hw_emu"
+    echo "  TARGET: hw"
     echo "  XILINX_NUM_KERNELS: 2"
     echo "  XILINX_MAX_THREADS: 8"
     echo "  DESIGN_FREQ_HZ: 300000000"
@@ -60,14 +60,31 @@ generate_connectivity_sp () {
     do
         if [[ "$start" == "$end" ]]
         then
-            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]\n"
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]"
+            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            then
+                config+=".$end.RAMA"
+            fi
+            config+="\n"
         else
-            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]\n"
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]"
+            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            then
+                config+=".$end.RAMA"
+            fi
+        config+="\n"
         fi
     done
 
     echo $config
 }
+
+
+        if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+        then
+            config+=".$end.RAMA"
+        fi
+        config+="\n"
 
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then

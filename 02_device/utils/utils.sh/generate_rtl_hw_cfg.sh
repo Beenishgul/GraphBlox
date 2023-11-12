@@ -60,14 +60,31 @@ generate_connectivity_sp () {
     do
         if [[ "$start" == "$end" ]]
         then
-            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]\n"
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]"
+            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            then
+                config+=".$end.RAMA"
+            fi
+            config+="\n"
         else
-            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]\n"
+            config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]"
+            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            then
+                config+=".$end.RAMA"
+            fi
+        config+="\n"
         fi
     done
 
     echo $config
 }
+
+
+        if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+        then
+            config+=".$end.RAMA"
+        fi
+        config+="\n"
 
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then
