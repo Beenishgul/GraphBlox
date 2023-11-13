@@ -216,6 +216,8 @@ module engine_filter_cond_generator #(parameter
         end
     end
 
+    assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty;
+
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_int.payload;
     end

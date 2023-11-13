@@ -208,7 +208,7 @@ module engine_filter_cond #(parameter
         if (areset_csr_engine) begin
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            done_out                 <= 1'b0;
             fifo_empty_reg           <= 1'b1;
         end
         else begin
