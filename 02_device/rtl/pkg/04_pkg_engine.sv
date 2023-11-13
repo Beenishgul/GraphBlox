@@ -334,6 +334,7 @@ package PKG_ENGINE;
     typedef struct packed{
         logic                                     increment    ;
         logic                                     decrement    ;
+        logic                                     flush_mode   ;
         logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [        CACHE_FRONTEND_DATA_W-1:0] array_size   ;
         logic [        CACHE_FRONTEND_DATA_W-1:0] start_read   ;

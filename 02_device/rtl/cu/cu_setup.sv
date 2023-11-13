@@ -328,7 +328,7 @@ module cu_setup #(
                 engine_cu_setup_start_in                       <= 1'b0;
                 engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b1;
+                counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b0;
                 response_memory_counter_load_value             <= 0;
             end
@@ -371,7 +371,7 @@ module cu_setup #(
                 engine_cu_setup_start_in                       <= 1'b0;
                 engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b1;
+                counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b0;
                 response_memory_counter_load_value             <= 0;
             end
@@ -384,6 +384,7 @@ module cu_setup #(
 // --------------------------------------------------------------------------------------
     assign configuration_comb_program.payload.param.increment              = 1'b1;
     assign configuration_comb_program.payload.param.decrement              = 1'b0;
+    assign configuration_comb_program.payload.param.flush_mode             = 1'b0;
     assign configuration_comb_program.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_program.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
     assign configuration_comb_program.payload.param.start_read             = 0;
@@ -422,6 +423,7 @@ module cu_setup #(
 // --------------------------------------------------------------------------------------
     assign configuration_comb_flush.payload.param.increment              = 1'b1;
     assign configuration_comb_flush.payload.param.decrement              = 1'b0;
+    assign configuration_comb_flush.payload.param.flush_mode             = 1'b1;
     assign configuration_comb_flush.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_flush.payload.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W] - {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
     assign configuration_comb_flush.payload.param.start_read             = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
