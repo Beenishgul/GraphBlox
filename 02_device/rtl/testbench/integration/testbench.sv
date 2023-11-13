@@ -1186,6 +1186,9 @@ module __KERNEL___testbench ();
                 graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
                 graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
 
+                graph.auxiliary_1[i+(graph.mem512_num_vertices*(M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS))][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
+                graph.auxiliary_2[i+(graph.mem512_num_vertices*(M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS))][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
+
             end
         end
 
@@ -1243,8 +1246,8 @@ module __KERNEL___testbench ();
         graph.out_degree   = new [graph.mem512_num_vertices];
         graph.in_degree    = new [graph.mem512_num_vertices];
         graph.edges_idx    = new [graph.mem512_num_vertices];
-        graph.auxiliary_1  = new [graph.mem512_num_vertices];
-        graph.auxiliary_2  = new [graph.mem512_num_vertices];
+        graph.auxiliary_1  = new [graph.mem512_num_vertices * 2];
+        graph.auxiliary_2  = new [graph.mem512_num_vertices * 2];
         graph.edges_array_src = new [graph.mem512_num_edges];
         graph.edges_array_dest= new [graph.mem512_num_edges];
         graph.overlay_program = new [graph.mem512_overlay_program_entries];
