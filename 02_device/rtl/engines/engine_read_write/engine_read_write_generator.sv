@@ -428,7 +428,7 @@ module engine_read_write_generator #(parameter
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b0;
+                done_out_reg <= 1'b1;
                 counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin

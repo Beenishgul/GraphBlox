@@ -56,18 +56,18 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersBFS(size_t 
     overlay_program[44] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[49] = ( 0 );
+    overlay_program[49] = ( graph->num_vertices );
    // --  2  - Index_End
-    overlay_program[50] = ( graph->num_vertices );
+    overlay_program[50] = ( graph->num_vertices * 2 );
    // --  7  - Array_Pointer_LHS
     overlay_program[55] = xrt_buffer_device[8];
    // --  8  - Array_Pointer_RHS
     overlay_program[56] = xrt_buffer_device[8] >> 32;
    // --  9  - Array_size
-    overlay_program[57] = ( graph->num_vertices )-( 0 );
+    overlay_program[57] = ( graph->num_vertices * 2 )-( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
