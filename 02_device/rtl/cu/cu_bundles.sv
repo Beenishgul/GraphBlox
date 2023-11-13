@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module cu_bundles #(`include "cu_parameters.vh") (
+module cu_bundles #(
+    `include "cu_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,

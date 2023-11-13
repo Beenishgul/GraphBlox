@@ -21,7 +21,9 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(`include "lane_parameters.vh") (
+module lane_template #(
+    `include "lane_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                                                     ,
     input  logic                  areset                                                     ,

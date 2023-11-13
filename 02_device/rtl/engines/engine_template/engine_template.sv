@@ -64,6 +64,7 @@ module engine_template #(
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------
@@ -140,8 +141,6 @@ module engine_template #(
     FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out;
     logic                  template_fifo_setup_signal                  ;
     logic                  template_done_out                           ;
-
-
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
