@@ -46,7 +46,7 @@ module cu_setup #(
     output logic                  done_out
 );
 
-    assign fifo_response_signals_out = 6'b010000;
+    assign fifo_response_signals_out_int = 6'b010000;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------

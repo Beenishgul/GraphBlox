@@ -129,10 +129,10 @@ then
         sed -i "s~$search~$replace~" $newtext
     fi
 
-    search="_NUM_ENTRIES_"
+    search="__NUM_ENTRIES__"
     replace=${NUM_ENTRIES}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s~$search~$replace~" $newtext
     fi
 
     search="_ARCHITECTURE_"

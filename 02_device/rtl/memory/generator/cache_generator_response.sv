@@ -123,6 +123,10 @@ module cache_generator_response #(
           response_out_reg[0] = fifo_response_dout_int;
           response_out_reg[1] = fifo_response_dout_int;
         end
+        STRUCT_CU_FLUSH : begin
+          response_out_reg[0] = fifo_response_dout_int;
+          response_out_reg[1] = 0;
+        end
         default : begin
           response_out_reg[0] = 0;
           response_out_reg[1] = fifo_response_dout_int;
