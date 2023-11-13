@@ -72,7 +72,6 @@ module engine_template #(
     MemoryPacket           engine_cast_arbiter_1_to_N_request_in                                     ;
     FIFOStateSignalsInput  engine_cast_arbiter_1_to_N_fifo_request_signals_in [ENGINE_CAST_WIDTH-1:0];
     FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_request_signals_out                       ;
-    MemoryPacket           engine_cast_arbiter_1_to_N_request_out             [ENGINE_CAST_WIDTH-1:0];
     logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal                              ;
 
 // --------------------------------------------------------------------------------------
@@ -233,6 +232,9 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
     generate
         if(ENGINE_CAST_WIDTH>0) begin
+// --------------------------------------------------------------------------------------            
+            MemoryPacket engine_cast_arbiter_1_to_N_request_out[ENGINE_CAST_WIDTH-1:0];
+// --------------------------------------------------------------------------------------
             assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
             always_comb begin
                 for (int i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
@@ -254,11 +256,11 @@ module engine_template #(
                 .response_out             (engine_cast_arbiter_1_to_N_request_out             ),
                 .fifo_setup_signal        (engine_cast_arbiter_1_to_N_fifo_setup_signal       )
             );
-
+// --------------------------------------------------------------------------------------
         end else begin
             assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 6'b010000;
             assign engine_cast_arbiter_1_to_N_fifo_setup_signal        = 0;
-            assign engine_cast_arbiter_1_to_N_request_out              = 0;
+            // assign engine_cast_arbiter_1_to_N_request_out              = 0;
         end
     endgenerate
 
