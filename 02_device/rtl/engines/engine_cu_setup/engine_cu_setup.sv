@@ -334,20 +334,24 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
+
+    assign fifo_request_comb.payload.meta.route         = configuration_reg.payload.meta.route;
+    assign fifo_request_comb.payload.meta.address.base  = configuration_reg.payload.param.array_pointer;
+    assign fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
+
     always_comb begin
-        fifo_request_comb.payload.meta.route        = configuration_reg.payload.meta.route;
-        fifo_request_comb.payload.meta.address.base = configuration_reg.payload.param.array_pointer;
         if(configuration_reg.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
         end else begin
             fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end
-        fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
-        fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
-        fifo_request_comb.payload.data.field[0]      = counter_count;
-        fifo_request_comb.payload.data.field[1]      = counter_count;
-        fifo_request_comb.payload.data.field[2]      = counter_count;
-        fifo_request_comb.payload.data.field[3]      = counter_count;
+    end
+    
+    always_comb begin
+        for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+            fifo_request_comb.payload.data.field[j] = counter_count;
+        end
     end
 
     always_ff @(posedge ap_clk) begin

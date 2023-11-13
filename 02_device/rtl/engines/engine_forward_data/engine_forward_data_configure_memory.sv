@@ -21,26 +21,26 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_forward_data_configure_memory #(parameter
-    ID_CU            = 0,
-    ID_BUNDLE        = 0,
-    ID_LANE          = 0,
-    ID_ENGINE        = 0,
-    ID_RELATIVE      = 0,
-    ID_MODULE        = 0,
-    FIFO_WRITE_DEPTH = 16,
-    PROG_THRESH      = 8,
-    ENGINE_SEQ_WIDTH = 16,
-    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH,
+    ID_CU            = 0                                ,
+    ID_BUNDLE        = 0                                ,
+    ID_LANE          = 0                                ,
+    ID_ENGINE        = 0                                ,
+    ID_RELATIVE      = 0                                ,
+    ID_MODULE        = 0                                ,
+    FIFO_WRITE_DEPTH = 16                               ,
+    PROG_THRESH      = 8                                ,
+    ENGINE_SEQ_WIDTH = 16                               ,
+    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
     ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
-    input  logic                    ap_clk,
-    input  logic                    areset,
-    input  MemoryPacket             response_memory_in,
-    input  FIFOStateSignalsInput    fifo_response_memory_in_signals_in,
+    input  logic                    ap_clk                             ,
+    input  logic                    areset                             ,
+    input  MemoryPacket             response_memory_in                 ,
+    input  FIFOStateSignalsInput    fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput   fifo_response_memory_in_signals_out,
-    output ForwardDataConfiguration configure_memory_out,
-    input  FIFOStateSignalsInput    fifo_configure_memory_signals_in,
-    output FIFOStateSignalsOutput   fifo_configure_memory_signals_out,
+    output ForwardDataConfiguration configure_memory_out               ,
+    input  FIFOStateSignalsInput    fifo_configure_memory_signals_in   ,
+    output FIFOStateSignalsOutput   fifo_configure_memory_signals_out  ,
     output logic                    fifo_setup_signal
 );
 
@@ -48,38 +48,38 @@ module engine_forward_data_configure_memory #(parameter
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_forward_data_generator;
-    logic areset_fifo;
+    logic areset_fifo                  ;
 
-    MemoryPacket                      response_memory_in_reg;
-    MemoryPacketMeta                  configure_memory_meta_int;
-    ForwardDataConfiguration          configure_memory_reg;
-    logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg;
-    logic                             configure_memory_valid_int;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence;
+    MemoryPacket                      response_memory_in_reg                          ;
+    MemoryPacketMeta                  configure_memory_meta_int                       ;
+    ForwardDataConfiguration          configure_memory_reg                            ;
+    logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
+    logic                             configure_memory_valid_int                      ;
+    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
     logic [CACHE_FRONTEND_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_memory_in_din;
-    MemoryPacket           fifo_response_memory_in_dout_int;
-    MemoryPacket           fifo_response_memory_in_dout_reg;
-    MemoryPacketPayload    fifo_response_memory_in_dout;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int;
-    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int;
+    MemoryPacketPayload    fifo_response_memory_in_din             ;
+    MemoryPacket           fifo_response_memory_in_dout_int        ;
+    MemoryPacket           fifo_response_memory_in_dout_reg        ;
+    MemoryPacketPayload    fifo_response_memory_in_dout            ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
+    FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int ;
     logic                  fifo_response_memory_in_setup_signal_int;
-    logic                  fifo_response_memory_in_push_filter;
+    logic                  fifo_response_memory_in_push_filter     ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
 // --------------------------------------------------------------------------------------
-    ForwardDataConfigurationPayload fifo_configure_memory_din;
-    ForwardDataConfiguration        fifo_configure_memory_dout_int;
-    ForwardDataConfigurationPayload fifo_configure_memory_dout;
-    FIFOStateSignalsInput           fifo_configure_memory_signals_in_reg;
-    FIFOStateSignalsInput           fifo_configure_memory_signals_in_int;
-    FIFOStateSignalsOutput          fifo_configure_memory_signals_out_int;
+    ForwardDataConfigurationPayload fifo_configure_memory_din             ;
+    ForwardDataConfiguration        fifo_configure_memory_dout_int        ;
+    ForwardDataConfigurationPayload fifo_configure_memory_dout            ;
+    FIFOStateSignalsInput           fifo_configure_memory_signals_in_reg  ;
+    FIFOStateSignalsInput           fifo_configure_memory_signals_in_int  ;
+    FIFOStateSignalsOutput          fifo_configure_memory_signals_out_int ;
     logic                           fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ module engine_forward_data_configure_memory #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         areset_forward_data_generator <= areset;
-        areset_fifo                  <= areset;
+        areset_fifo                   <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -135,34 +135,32 @@ module engine_forward_data_configure_memory #(parameter
     assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
-    always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = 1 << ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
-        configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = 0;
-        configure_memory_meta_int.route.to.id_bundle      = 0;
-        configure_memory_meta_int.route.to.id_lane        = 0;
-        configure_memory_meta_int.route.to.id_engine      = 0;
-        configure_memory_meta_int.route.to.id_module      = 1;
-        configure_memory_meta_int.route.to.id_buffer      = 0;
-        configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
-        configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
-        configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
-        configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
-        configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
-        configure_memory_meta_int.route.seq_src.id_buffer = 0;
-        configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
-        configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
-        configure_memory_meta_int.address.base            = 0;
-        configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
-        configure_memory_meta_int.address.shift.amount    = 0;
-        configure_memory_meta_int.address.shift.direction = 1'b1;
-        configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
-        configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
-    end
+    assign configure_memory_meta_int.route.from.id_cu        = 1 << ID_CU;
+    assign configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
+    assign configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
+    assign configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
+    assign configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
+    assign configure_memory_meta_int.route.from.id_buffer    = 0;
+    assign configure_memory_meta_int.route.to.id_cu          = 0;
+    assign configure_memory_meta_int.route.to.id_bundle      = 0;
+    assign configure_memory_meta_int.route.to.id_lane        = 0;
+    assign configure_memory_meta_int.route.to.id_engine      = 0;
+    assign configure_memory_meta_int.route.to.id_module      = 1;
+    assign configure_memory_meta_int.route.to.id_buffer      = 0;
+    assign configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
+    assign configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
+    assign configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
+    assign configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
+    assign configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
+    assign configure_memory_meta_int.route.seq_src.id_buffer = 0;
+    assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+    assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
+    assign configure_memory_meta_int.address.base            = 0;
+    assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configure_memory_meta_int.address.shift.amount    = 0;
+    assign configure_memory_meta_int.address.shift.direction = 1'b1;
+    assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
+    assign configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
 
     always_ff @(posedge ap_clk) begin
         if(areset_forward_data_generator) begin

@@ -44,6 +44,7 @@ module bundle_lanes #(
     output logic                  done_out
 );
 
+    genvar i;
     genvar j;
 // --------------------------------------------------------------------------------------
 // Wires and Variables

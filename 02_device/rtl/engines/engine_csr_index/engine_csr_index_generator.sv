@@ -375,11 +375,11 @@ module engine_csr_index_generator #(parameter
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
-                configure_engine_int.payload      <= 0;
-                configure_engine_int.valid        <= 1'b0;
-                configure_engine_setup_reg        <= 1'b0;
-                configure_memory_setup_reg        <= 1'b0;
-                configure_memory_setup_reg        <= 1'b0;
+                configure_engine_int.payload       <= 0;
+                configure_engine_int.valid         <= 1'b0;
+                configure_engine_setup_reg         <= 1'b0;
+                configure_memory_setup_reg         <= 1'b0;
+                configure_memory_setup_reg         <= 1'b0;
                 counter_clear                      <= 1'b0;
                 counter_decr                       <= 1'b0;
                 counter_enable                     <= 1'b1;
@@ -390,7 +390,7 @@ module engine_csr_index_generator #(parameter
                 done_int_reg                       <= 1'b1;
                 done_out_reg                       <= 1'b0;
                 fifo_request_din_reg.valid         <= 1'b0;
-                response_engine_in_break_flag_reg <= 1'b0;
+                response_engine_in_break_flag_reg  <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
@@ -572,33 +572,35 @@ module engine_csr_index_generator #(parameter
         end
     end
 
+
+    assign fifo_request_comb.valid                      = 1'b0;
+    assign fifo_request_comb.payload.meta.route.to      = configure_engine_int.payload.meta.route.to;
+    assign fifo_request_comb.payload.meta.route.hops    = configure_engine_int.payload.meta.route.hops;
+    assign fifo_request_comb.payload.meta.route.seq_src = configure_engine_int.payload.meta.route.seq_src;
+
+    assign fifo_request_comb.payload.meta.route.from.id_module = 1 << ID_MODULE;
+
+    assign fifo_request_comb.payload.meta.route.from.id_cu     = configure_engine_int.payload.meta.route.from.id_cu ;
+    assign fifo_request_comb.payload.meta.route.from.id_bundle = configure_engine_int.payload.meta.route.from.id_bundle;
+    assign fifo_request_comb.payload.meta.route.from.id_lane   = configure_engine_int.payload.meta.route.from.id_lane;
+    assign fifo_request_comb.payload.meta.route.from.id_engine = configure_engine_int.payload.meta.route.from.id_engine;
+    assign fifo_request_comb.payload.meta.route.from.id_buffer = configure_engine_int.payload.meta.route.from.id_buffer;
+    assign fifo_request_comb.payload.meta.route.seq_state      = configure_engine_int.payload.meta.route.seq_state;
+
+    assign fifo_request_comb.payload.meta.address.base  = configure_engine_int.payload.param.array_pointer;
+    assign fifo_request_comb.payload.meta.address.shift = configure_engine_int.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass      = configure_engine_int.payload.meta.subclass;
+
     always_comb begin
-        fifo_request_comb.valid                      = 1'b0;
-        fifo_request_comb.payload.meta.route.to      = configure_engine_int.payload.meta.route.to;
-        fifo_request_comb.payload.meta.route.hops    = configure_engine_int.payload.meta.route.hops;
-        fifo_request_comb.payload.meta.route.seq_src = configure_engine_int.payload.meta.route.seq_src;
-
-        fifo_request_comb.payload.meta.route.from.id_module = 1 << ID_MODULE;
-
-        fifo_request_comb.payload.meta.route.from.id_cu     = configure_engine_int.payload.meta.route.from.id_cu ;
-        fifo_request_comb.payload.meta.route.from.id_bundle = configure_engine_int.payload.meta.route.from.id_bundle;
-        fifo_request_comb.payload.meta.route.from.id_lane   = configure_engine_int.payload.meta.route.from.id_lane;
-        fifo_request_comb.payload.meta.route.from.id_engine = configure_engine_int.payload.meta.route.from.id_engine;
-        fifo_request_comb.payload.meta.route.from.id_buffer = configure_engine_int.payload.meta.route.from.id_buffer;
-        fifo_request_comb.payload.meta.route.seq_state      = configure_engine_int.payload.meta.route.seq_state;
-
-        fifo_request_comb.payload.meta.address.base = configure_engine_int.payload.param.array_pointer;
-
         if(configure_engine_int.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_engine_int.payload.meta.address.shift.amount;
         end else begin
             fifo_request_comb.payload.meta.address.offset = counter_count >> configure_engine_int.payload.meta.address.shift.amount;
         end
+    end
 
-        fifo_request_comb.payload.meta.address.shift = configure_engine_int.payload.meta.address.shift;
-        fifo_request_comb.payload.meta.subclass      = configure_engine_int.payload.meta.subclass;
-        fifo_request_comb.payload.data               = 0;
-
+    always_comb begin
+        fifo_request_comb.payload.data = 0;
         if(configure_engine_int.payload.param.mode_sequence) begin
             for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA-1; j++) begin
                 fifo_request_comb.payload.data.field[j] = configure_engine_int.payload.data.field[j];
@@ -656,7 +658,7 @@ module engine_csr_index_generator #(parameter
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
         .ap_clk      (ap_clk                            ),
         .ap_clken    (1'b1                              ),
-        .areset      (areset_counter  | clear_counter   ),
+        .areset      (areset_counter  | counter_clear   ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
         .decr        (request_engine_out_reg.valid      ),
@@ -704,19 +706,19 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    always_comb begin
-        fifo_response_comb.valid                     = response_memory_in_reg.valid;
-        fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
-        fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
 
+    assign fifo_response_comb.valid                     = response_memory_in_reg.valid;
+    assign fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
+    assign fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
+    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
+    assign fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
+
+    always_comb begin
         if(response_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
         end
-
-        fifo_response_comb.payload.meta.address = response_memory_in_reg.payload.meta.address;
     end
 
     always_ff @(posedge ap_clk) begin

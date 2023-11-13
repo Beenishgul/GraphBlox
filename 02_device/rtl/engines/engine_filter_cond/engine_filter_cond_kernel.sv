@@ -59,7 +59,7 @@ module engine_filter_cond_kernel (
             end
           end
         end else begin
-          ops_value_reg.field[i] <= 0;
+          ops_value_reg.field[i] <= data.field[i];
         end
 
         for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
@@ -70,7 +70,7 @@ module engine_filter_cond_kernel (
               end
             end
           end else begin
-            org_value_reg.field[i] <= 0;
+            org_value_reg.field[i] <= data.field[i];
           end
         end
       end
@@ -80,14 +80,13 @@ module engine_filter_cond_kernel (
   // FILTER operations logic
   always_comb begin
     // Process the FILTER operation if both config_params and data are valid
-    result_flag_int = 1'b1;
+    result_flag_int = ~config_params.break_pass;
     result_data_int = ops_value_reg;
     org_data_int    = org_value_reg;
 
     if (config_params_valid & data_valid_reg) begin
       case (config_params.filter_operation)
         FILTER_NOP : begin
-          result_flag_int = 1'b1;
         end
 
         FILTER_GT : begin
@@ -125,7 +124,6 @@ module engine_filter_cond_kernel (
         FILTER_GT_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1'b1;
               if(result_data_int.field[i] > ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -142,7 +140,6 @@ module engine_filter_cond_kernel (
         FILTER_LT_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1'b1;
               if(result_data_int.field[i] < ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -159,7 +156,6 @@ module engine_filter_cond_kernel (
         FILTER_EQ_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1'b1;
               if(result_data_int.field[i] == ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -176,7 +172,6 @@ module engine_filter_cond_kernel (
         FILTER_NOT_EQ_TERN : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = 1'b1;
               if(result_data_int.field[i] != ops_value_reg.field[i+1]) begin
                 result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
                 result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -191,7 +186,6 @@ module engine_filter_cond_kernel (
         end
 
         default : begin
-          result_flag_int = 1'b1;
           result_data_int = 0; // Undefined operations reset result_data
         end
       endcase
@@ -202,7 +196,7 @@ module engine_filter_cond_kernel (
   always_ff @(posedge ap_clk) begin
     if (areset || clear) begin
       result_data <= 0;
-      result_flag <= 1;
+      result_flag <= ~config_params.break_pass;
     end else begin
       result_data <= org_data_int;
       result_flag <= result_flag_int;
