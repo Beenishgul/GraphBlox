@@ -46,7 +46,7 @@ module cu_setup #(
     output logic                  done_out
 );
 
-    assign fifo_response_signals_out_int = 6'b010000;
+
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -111,8 +111,8 @@ module cu_setup #(
     logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
     logic [COUNTER_WIDTH-1:0] response_memory_counter_load_value;
 
-
-    assign done_out_int = done_int_reg & fifo_request_signals_out_int.empty & response_memory_counter_is_zero;
+    assign fifo_response_signals_out_int = 6'b010000;
+    assign done_out_int                  = done_int_reg & fifo_request_signals_out_int.empty & response_memory_counter_is_zero;
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
