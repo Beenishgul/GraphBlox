@@ -102,19 +102,19 @@ then
     search="_GRAPH_DIR_"
     replace=${GRAPH_DIR}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s@$search@$replace@" $newtext
+        sed -i "s@$search@$replace@g" $newtext
     fi
 
     search="_GRAPH_SUIT_"
     replace=${GRAPH_SUIT}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 
     search="_GRAPH_NAME_"
     replace=${GRAPH_NAME}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 
     # search="_DIR_OVERLAY_"
@@ -126,30 +126,30 @@ then
     search="_FULL_SRC_IP_DIR_OVERLAY_"
     replace=${FULL_SRC_IP_DIR_OVERLAY}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s~$search~$replace~" $newtext
+        sed -i "s~$search~$replace~g" $newtext
     fi
 
     search="_NUM_ENTRIES_"
     replace=${NUM_ENTRIES}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s~$search~$replace~" $newtext
+        sed -i "s~$search~$replace~g" $newtext
     fi
 
     search="_ARCHITECTURE_"
     replace=${ARCHITECTURE}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 
     search="_CAPABILITY_"
     replace=${CAPABILITY}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 
     search="_ALGORITHM_NAME_"
     replace=${ALGORITHM_NAME}
     if [[ $search != "" && $replace != "" ]]; then
-        sed -i "s/$search/$replace/" $newtext
+        sed -i "s/$search/$replace/g" $newtext
     fi
 fi
