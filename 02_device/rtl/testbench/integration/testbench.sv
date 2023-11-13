@@ -11,6 +11,7 @@ import PKG_GLOBALS::*;
 import PKG_AXI4::*;
 import PKG_DESCRIPTOR::*;
 import PKG_MEMORY::*;
+import PKG_CACHE::*;
 
 class GraphCSR;
 
@@ -767,7 +768,7 @@ module __KERNEL___testbench ();
         buffer_6_ptr[62:0] = get_random_ptr();
         buffer_7_ptr[62:0] = get_random_ptr();
         buffer_8_ptr[62:0] = get_random_ptr();
-        buffer_9_ptr = {63'd_NUM_ENTRIES_, 1'b1};
+        buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS + _NUM_ENTRIES_ ),31'd_NUM_ENTRIES_, 1'b1};
 
         ///////////////////////////////////////////////////////////////////////////
         //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -1114,7 +1115,7 @@ module __KERNEL___testbench ();
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
         graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
-        graph.mem512_overlay_program_entries = int'(buffer_9_ptr[63:1]); // cachelines
+        graph.mem512_overlay_program_entries = int'(buffer_9_ptr[32-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
 
         graph.mem512_num_vertices = ((graph.num_vertices*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_num_edges = ((graph.num_edges*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);

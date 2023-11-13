@@ -64,7 +64,6 @@ module engine_read_write_generator #(parameter
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     output logic                  fifo_setup_signal                  ,
     output logic                  configure_memory_setup             ,
-    output logic                  configure_engine_setup             ,
     output logic                  done_out
 );
 

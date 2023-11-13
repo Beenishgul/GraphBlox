@@ -338,8 +338,6 @@ package PKG_ENGINE;
         logic [        CACHE_FRONTEND_DATA_W-1:0] array_size   ;
         logic [        CACHE_FRONTEND_DATA_W-1:0] start_read   ;
         logic [        CACHE_FRONTEND_DATA_W-1:0] end_read     ;
-        logic [        CACHE_FRONTEND_DATA_W-1:0] flush_end    ;
-        logic                                     flush_mode   ;
         logic [        CACHE_FRONTEND_DATA_W-1:0] stride       ;
         logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] granularity  ;
     } CUSetupEngineConfigurationParameters;

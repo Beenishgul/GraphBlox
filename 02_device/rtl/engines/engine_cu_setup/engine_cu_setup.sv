@@ -74,7 +74,6 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     logic ready_out_reg;
     logic done_out_reg ;
 
-
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
@@ -142,7 +141,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
         else begin
             fifo_setup_signal <= fifo_request_setup_signal_int;
             ready_out         <= ready_out_reg;
-            done_out          <= done_out_reg;
+            done_out          <= done_out_reg & fifo_request_signals_out_int.empty;
             request_out.valid <= request_out_int.valid;
         end
     end
@@ -347,7 +346,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
             fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end
     end
-    
+
     always_comb begin
         for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             fifo_request_comb.payload.data.field[j] = counter_count;

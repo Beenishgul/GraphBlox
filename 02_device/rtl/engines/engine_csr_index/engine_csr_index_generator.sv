@@ -572,24 +572,20 @@ module engine_csr_index_generator #(parameter
         end
     end
 
-
-    assign fifo_request_comb.valid                      = 1'b0;
-    assign fifo_request_comb.payload.meta.route.to      = configure_engine_int.payload.meta.route.to;
-    assign fifo_request_comb.payload.meta.route.hops    = configure_engine_int.payload.meta.route.hops;
-    assign fifo_request_comb.payload.meta.route.seq_src = configure_engine_int.payload.meta.route.seq_src;
-
+    assign fifo_request_comb.valid                             = 1'b0;
+    assign fifo_request_comb.payload.meta.route.to             = configure_engine_int.payload.meta.route.to;
+    assign fifo_request_comb.payload.meta.route.hops           = configure_engine_int.payload.meta.route.hops;
+    assign fifo_request_comb.payload.meta.route.seq_src        = configure_engine_int.payload.meta.route.seq_src;
     assign fifo_request_comb.payload.meta.route.from.id_module = 1 << ID_MODULE;
-
     assign fifo_request_comb.payload.meta.route.from.id_cu     = configure_engine_int.payload.meta.route.from.id_cu ;
     assign fifo_request_comb.payload.meta.route.from.id_bundle = configure_engine_int.payload.meta.route.from.id_bundle;
     assign fifo_request_comb.payload.meta.route.from.id_lane   = configure_engine_int.payload.meta.route.from.id_lane;
     assign fifo_request_comb.payload.meta.route.from.id_engine = configure_engine_int.payload.meta.route.from.id_engine;
     assign fifo_request_comb.payload.meta.route.from.id_buffer = configure_engine_int.payload.meta.route.from.id_buffer;
     assign fifo_request_comb.payload.meta.route.seq_state      = configure_engine_int.payload.meta.route.seq_state;
-
-    assign fifo_request_comb.payload.meta.address.base  = configure_engine_int.payload.param.array_pointer;
-    assign fifo_request_comb.payload.meta.address.shift = configure_engine_int.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.subclass      = configure_engine_int.payload.meta.subclass;
+    assign fifo_request_comb.payload.meta.address.base         = configure_engine_int.payload.param.array_pointer;
+    assign fifo_request_comb.payload.meta.address.shift        = configure_engine_int.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass             = configure_engine_int.payload.meta.subclass;
 
     always_comb begin
         if(configure_engine_int.payload.meta.address.shift.direction) begin

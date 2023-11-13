@@ -157,7 +157,6 @@ module engine_read_write #(parameter
 
     logic generator_engine_fifo_setup_signal     ;
     logic generator_engine_configure_memory_setup;
-    logic generator_engine_configure_engine_setup;
     logic generator_engine_done_out              ;
 
 // --------------------------------------------------------------------------------------
@@ -514,7 +513,6 @@ module engine_read_write #(parameter
         .fifo_request_memory_out_signals_in (generator_engine_fifo_request_memory_out_signals_in ),
         .fifo_setup_signal                  (generator_engine_fifo_setup_signal                  ),
         .configure_memory_setup             (generator_engine_configure_memory_setup             ),
-        .configure_engine_setup             (generator_engine_configure_engine_setup             ),
         .done_out                           (generator_engine_done_out                           )
     );
 
