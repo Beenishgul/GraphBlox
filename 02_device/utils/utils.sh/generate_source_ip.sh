@@ -129,7 +129,7 @@ then
         sed -i "s~$search~$replace~" $newtext
     fi
 
-    search="__NUM_ENTRIES__"
+    search="_NUM_ENTRIES_"
     replace=${NUM_ENTRIES}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s~$search~$replace~" $newtext
