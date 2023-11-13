@@ -345,7 +345,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
         end else if(~configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin
             fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end else begin
-             fifo_request_comb.payload.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | (counter_count & (SYSTEM_CACHE_NUM_WAYS-1) << SYSTEM_CACHE_LINE_SIZE_LOG));
+             fifo_request_comb.payload.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | ((counter_count & (SYSTEM_CACHE_NUM_WAYS-1)) << SYSTEM_CACHE_LINE_SIZE_LOG));
         end
     end
 
