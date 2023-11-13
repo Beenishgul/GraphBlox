@@ -62,6 +62,8 @@ module engine_template #(
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------
@@ -202,15 +204,19 @@ module engine_template #(
             fifo_setup_signal        <= 1'b1;
             request_engine_out[0].valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= engine_cast_arbiter_1_to_N_fifo_setup_signal | fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
             request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.to);
             request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= template_done_out;
+            done_out                 <= template_done_out & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
+
+    assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_request_signals_out.empty & fifo_response_engine_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out[0] <= fifo_response_engine_in_signals_out_int;

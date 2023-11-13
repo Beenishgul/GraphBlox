@@ -88,6 +88,9 @@ module engine_csr_index_generator #(parameter
     logic response_engine_in_break_flag_reg;
     logic response_engine_in_done_flag_reg ;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
@@ -235,6 +238,7 @@ module engine_csr_index_generator #(parameter
             configure_memory_setup              <= 1'b0;
             configure_engine_setup              <= 1'b0;
             done_out                            <= 1'b0;
+            fifo_empty_reg                      <= 1'b1;
             fifo_response_engine_in_signals_out <= 0;
             fifo_response_memory_in_signals_out <= 0;
         end
@@ -244,11 +248,14 @@ module engine_csr_index_generator #(parameter
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             configure_engine_setup              <= configure_engine_setup_reg;
-            done_out                            <= done_out_reg;
+            done_out                            <= done_out_reg & fifo_empty_reg;
+            fifo_empty_reg                      <= fifo_empty_int;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
     end
+
+    assign fifo_empty_int = fifo_request_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;

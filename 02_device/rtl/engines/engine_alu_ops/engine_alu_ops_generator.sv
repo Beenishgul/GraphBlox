@@ -63,6 +63,10 @@ module engine_alu_ops_generator #(parameter
     ALUOpsConfiguration configure_memory_reg;
 
     logic configure_memory_setup_reg;
+
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
@@ -192,14 +196,18 @@ module engine_alu_ops_generator #(parameter
             request_engine_out.valid <= 1'b0;
             configure_memory_setup   <= 1'b0;
             done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_request_engine_out_setup_signal_int;
             request_engine_out.valid <= request_engine_out_int.valid;
             configure_memory_setup   <= configure_memory_setup_reg;
-            done_out                 <= done_out_reg;
+            done_out                 <= done_out_reg & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
+
+    assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty ;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_int.payload;

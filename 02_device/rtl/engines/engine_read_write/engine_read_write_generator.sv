@@ -229,6 +229,7 @@ module engine_read_write_generator #(parameter
             request_memory_out.valid            <= 1'b0;
             configure_memory_setup              <= 1'b0;
             done_out                            <= 1'b0;
+            fifo_empty_reg                      <= 1'b1;
             fifo_response_engine_in_signals_out <= 0;
             fifo_response_memory_in_signals_out <= 0;
         end
@@ -237,11 +238,14 @@ module engine_read_write_generator #(parameter
             request_engine_out.valid            <= request_engine_out_reg.valid;
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
-            done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_request_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
+            done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
+            fifo_empty_reg                      <= fifo_empty_int;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
     end
+
+    assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;

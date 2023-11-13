@@ -19,7 +19,9 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(`include "kernel_parameters.vh") (
+module kernel_cu #(
+  `include "kernel_parameters.vh"
+  ) (
   input  logic                          ap_clk           ,
   input  logic                          areset           ,
   input  KernelDescriptor               descriptor_in    ,

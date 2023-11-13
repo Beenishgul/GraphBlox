@@ -70,6 +70,9 @@ module engine_pipeline #(parameter
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -183,13 +186,15 @@ module engine_pipeline #(parameter
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | template_fifo_setup_signal;
             request_engine_out.valid <= request_engine_out_int.valid;
             request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= template_done_out;
+            done_out                 <= template_done_out & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
 
@@ -201,6 +206,8 @@ module engine_pipeline #(parameter
         request_engine_out.payload          <= request_engine_out_int.payload;
         request_memory_out.payload          <= request_memory_out_int.payload ;
     end
+
+    assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket

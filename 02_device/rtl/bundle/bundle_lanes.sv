@@ -62,6 +62,8 @@ module bundle_lanes #(
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Lanes INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -245,13 +247,15 @@ module bundle_lanes #(
             fifo_setup_signal        <= 1'b1;
             request_lanes_out.valid  <= 1'b0;
             request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= lane_arbiter_N_to_1_lane_fifo_setup_signal | lane_arbiter_1_to_N_lanes_fifo_setup_signal | fifo_response_lanes_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lanes_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|lanes_fifo_setup_signal_reg);
             request_lanes_out.valid  <= request_engine_out_int.valid ;
             request_memory_out.valid <= request_memory_out_int.valid ;
-            done_out                 <= (&lanes_done_out_reg);
+            done_out                 <= (&lanes_done_out_reg) & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
 
@@ -264,6 +268,7 @@ module bundle_lanes #(
         request_memory_out.payload          <= request_memory_out_int.payload ;
     end
 
+    assign fifo_empty_int = fifo_response_lanes_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_lanes_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & lane_arbiter_N_to_1_lane_fifo_request_signals_out.empty & lane_arbiter_1_to_N_lanes_fifo_response_signals_out.empty & lane_arbiter_N_to_1_memory_fifo_request_signals_out.empty & lane_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Lanes Response MemoryPacket
 // --------------------------------------------------------------------------------------

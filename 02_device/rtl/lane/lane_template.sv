@@ -21,9 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module lane_template #(
-    `include "lane_parameters.vh"
-    ) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                                                     ,
     input  logic                  areset                                                     ,
@@ -61,6 +59,8 @@ module lane_template #(
     MemoryPacket response_lane_in_int  ;
     MemoryPacket response_memory_in_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engines INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -218,15 +218,19 @@ module lane_template #(
             fifo_setup_signal        <= 1'b1;
             request_lane_out[0].valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b1;
+            done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
             request_lane_out[0].valid <= request_lane_out_int.valid ;
             request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= (&engines_done_out_reg);
+            done_out                 <= (&engines_done_out_reg) & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
+
+    assign fifo_empty_int = fifo_response_lane_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_lane_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
 
     always_ff @(posedge ap_clk) begin
         fifo_response_lane_in_signals_out[0] <= fifo_response_lane_in_signals_out_int;
