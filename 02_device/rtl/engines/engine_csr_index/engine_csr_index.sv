@@ -76,6 +76,9 @@ module engine_csr_index #(parameter
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -254,14 +257,18 @@ module engine_csr_index #(parameter
             request_engine_out.valid <= 1'b0;
             request_memory_out.valid <= 1'b0;
             done_out                 <= 1'b1;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_response_engine_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | configure_fifo_setup_signal | generator_engine_fifo_setup_signal;
             request_engine_out.valid <= request_engine_out_int.valid;
             request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= generator_engine_done_out;
+            done_out                 <= generator_engine_done_out & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
         end
     end
+
+    assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & arbiter_1_to_N_engine_fifo_response_signals_out.empty & arbiter_1_to_N_memory_fifo_response_signals_out.empty & configure_engine_fifo_response_engine_in_signals_out.empty & configure_engine_fifo_configure_engine_signals_out.empty & configure_memory_fifo_response_memory_in_signals_out.empty & configure_memory_fifo_configure_memory_signals_out.empty;
 
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;

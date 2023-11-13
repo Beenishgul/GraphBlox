@@ -79,6 +79,8 @@ module engine_merge_data #(parameter
     MemoryPacket response_engine_in_int[(1+ENGINE_MERGE_WIDTH)-1:0];
     MemoryPacket response_memory_in_int                            ;
 
+    logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_empty_int;
+    logic  fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -214,11 +216,13 @@ module engine_merge_data #(parameter
             fifo_setup_signal        <= 1'b1;
             request_engine_out.valid <= 1'b0;
             done_out                 <= 1'b1;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | configure_fifo_setup_signal | generator_engine_fifo_setup_signal;
             request_engine_out.valid <= request_engine_out_int.valid;
-            done_out                 <= generator_engine_done_out;
+            done_out                 <= generator_engine_done_out & fifo_empty_reg;
+            fifo_empty_reg           <= (&fifo_empty_int) & fifo_response_memory_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & configure_memory_fifo_response_memory_in_signals_out.empty & configure_memory_fifo_configure_memory_signals_out.empty;
         end
     end
 
@@ -270,6 +274,8 @@ module engine_merge_data #(parameter
                 .wr_rst_busy(fifo_response_engine_in_signals_out_int[i].wr_rst_busy),
                 .rd_rst_busy(fifo_response_engine_in_signals_out_int[i].rd_rst_busy)
             );
+
+            assign fifo_empty_int[i] = fifo_response_engine_in_signals_out_int[i].empty;
         end
     endgenerate
 

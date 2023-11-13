@@ -21,9 +21,7 @@ import PKG_ENGINE::*;
 import PKG_SETUP::*;
 import PKG_CACHE::*;
 
-module cu_bundles #(
-    `include "cu_parameters.vh"
-    ) (
+module cu_bundles #(`include "cu_parameters.vh") (
     // System Signals
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -50,6 +48,8 @@ module cu_bundles #(
     MemoryPacket     response_memory_in_int;
     MemoryPacket     request_memory_out_int;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ module cu_bundles #(
         if (areset_cu_bundles) begin
             fifo_response_memory_in_signals_in_reg <= 0;
             fifo_request_memory_out_signals_in_reg <= 0;
-            response_memory_in_reg.valid           <= 0;
+            response_memory_in_reg.valid           <= 1'b0;
         end
         else begin
             fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
@@ -207,14 +207,16 @@ module cu_bundles #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_cu_bundles) begin
-            fifo_setup_signal        <= 1;
-            request_memory_out.valid <= 0;
-            done_out                 <= 0;
+            fifo_setup_signal        <= 1'b1;
+            request_memory_out.valid <= 1'b0;
+            done_out                 <= 1'b0;
+            fifo_empty_reg           <= 1'b1;
         end
         else begin
             fifo_setup_signal        <= fifo_request_memory_out_setup_signal_int | fifo_response_memory_in_setup_signal_int | (|bundle_fifo_setup_signal_reg) | bundle_arbiter_N_to_1_fifo_setup_signal | bundle_arbiter_1_to_N_fifo_setup_signal;
             request_memory_out.valid <= request_memory_out_int.valid ;
-            done_out                 <= (&bundle_done_out_reg);
+            done_out                 <= (&bundle_done_out_reg) & fifo_empty_reg;
+            fifo_empty_reg           <= fifo_empty_int;
             // done_out                 <= done_signal_reg;
         end
     end
@@ -225,6 +227,7 @@ module cu_bundles #(
         request_memory_out.payload          <= request_memory_out_int.payload;
     end
 
+    assign fifo_empty_int = fifo_response_memory_in_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & bundle_arbiter_N_to_1_fifo_request_signals_out.empty & bundle_arbiter_1_to_N_fifo_response_signals_out.empty;
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
