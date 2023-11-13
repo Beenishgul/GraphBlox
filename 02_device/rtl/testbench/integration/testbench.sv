@@ -16,8 +16,10 @@ class GraphCSR;
 
     string  graph_name                    ;
     integer num_vertices                  ;
-    integer num_edges                    ;
+    integer num_edges                     ;
     integer mem512_num_vertices           ;
+    integer mem512_auxiliary_1            ;
+    integer mem512_auxiliary_2            ;
     integer mem512_num_edges              ;
     integer mem512_overlay_program_entries;
 
@@ -51,6 +53,8 @@ class GraphCSR;
         this.num_vertices              = 0;
         this.num_edges                 = 0;
         this.mem512_num_vertices       = 0;
+        this.mem512_auxiliary_1        = 0;
+        this.mem512_auxiliary_2        = 0;
         this.mem512_num_edges          = 0;
         this.mem512_overlay_program_entries = 4;
     endfunction
@@ -873,8 +877,8 @@ module __KERNEL___testbench ();
         m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
         m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
         m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_num_vertices);
-        m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_num_vertices);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
+        m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
 
     endtask
 
@@ -964,79 +968,7 @@ module __KERNEL___testbench ();
 
         realcount = 0;
         setup_temp = 0;
-        // graph.overlay_program[0] = 0;
-        // // --------------------------------------------------------------------------------------
-        // //CSR/StrideIndexGeneratorConfiguration
-        // setup_temp[0] = 1'b1; // param.increment
-        // setup_temp[1] = 1'b0; // param.decrement
-        // setup_temp[2] = 1'b0; // param.mode_sequence // (1) indirect mode (get count from other engines)  // (0) direct mode (get count from memory)
-        // setup_temp[3] = 1'b1; // param.mode_buffer
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;                       // 0 - increment/decrement
-        // setup_temp = 0;
-
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS] = 0;                                // 1 - param.index_start
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;               // 2 - param.index_end
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*3)+:GLOBAL_DATA_WIDTH_BITS] = 1;                                // 3 - param.stride
-        // // --------------------------------------------------------------------------------------
-
-
-        // // --------------------------------------------------------------------------------------
-        // // param.granularity
-        // // meta.address.shift.amount
-        // // meta.address.shift.direction
-        // // 4 - shift direction 1-left 0-right | (granularity - log2 value for shifting)
-        // setup_temp[GLOBAL_DATA_WIDTH_BITS-2:0] = $clog2(GLOBAL_DATA_WIDTH_BITS/8);            // 4 - (granularity - log2 value for shifting)
-        // setup_temp[GLOBAL_DATA_WIDTH_BITS-1] = 1'b1;                                          // 4 - shift direction 1-left 0-right
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*4)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;
-        // setup_temp = 0;
-        // // --------------------------------------------------------------------------------------
-
-        // // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_MEM_CONFIGURE}; // 5 - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-
-        // // --------------------------------------------------------------------------------------
-        // // subclass.cmd
-        // // subclass.buffer
-        // // 5 - STRUCT_ENGINE_SETUP | CMD_MEM_CONFIGURE
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS){1'b0}},STRUCT_ENGINE_SETUP,CMD_MEM_READ};
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // subclass.operand
-        // // subclass.filter
-        // // subclass.alu
-        // // 6 - ALU_NOP | FILTER_NOP | OP_LOCATION_0
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS] = {{GLOBAL_DATA_WIDTH_BITS-(TYPE_ALU_OPERATION_BITS+TYPE_FILTER_OPERATION_BITS+TYPE_ENGINE_OPERAND_BITS){1'b0}},ALU_NOP,FILTER_NOP,OP_LOCATION_0};
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // route.to.id_cu
-        // // route.to.id_bundle
-        // // route.to.id_lane
-        // // route.to.id_buffer
-        // // 7 - BUFFER | Configure first 3 ENGINES | BUNDLE-0 | VERTEX-0
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS] = {8'b00000001,8'b00000000,8'b00001000,8'b00000001};
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // param.array_pointer
-        // // 8-BUFFER pointer
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // param.array_pointer
-        // // 9-BUFFER pointer
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*9)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // 10-BUFFER size
-        // // param.array_size
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS] = graph.num_vertices;
-        // // --------------------------------------------------------------------------------------
-
+       
         for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.overlay_program[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = realcount;
@@ -1086,79 +1018,6 @@ module __KERNEL___testbench ();
             end
         end
 
-        
-        // /// --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[0][(GLOBAL_DATA_WIDTH_BITS*8)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 3 ENGINE_READ_WRITE(C:0) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[1][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // /// --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*14)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_1_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // /// --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES  BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 0 ENGINE_READ_WRITE - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[7][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_2_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES   BUFFER Array Pointer LHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*12)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[31:0];
-        // // --------------------------------------------------------------------------------------
-
-        // // --------------------------------------------------------------------------------------
-        // // --- ENGINE 6 ENGINE_CSR_INDEX(C:0,1) - PROGRAM 10-CYCLES BUFFER Array Pointer RHS
-        // // --------------------------------------------------------------------------------------
-        // graph.overlay_program[8][(GLOBAL_DATA_WIDTH_BITS*13)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_3_ptr[63:32];
-        // // --------------------------------------------------------------------------------------
-
        `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
         realcount = 0;
@@ -1182,19 +1041,30 @@ module __KERNEL___testbench ();
                 setup_temp = temp_edges_idx;
                 graph.edges_idx[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = setup_temp;
                 // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
-
-                graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
-                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
-
-               
             end
         end
 
-         for (int i = graph.mem512_num_vertices; i < graph.mem512_num_vertices * 2; i++) begin
+        for (int i = 0; i < graph.mem512_auxiliary_1 / 2; i++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
+                graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
+            end
+        end
+
+        for (int i = graph.mem512_auxiliary_1 / 2; i < graph.mem512_auxiliary_1 ; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
+            end
+        end
+
+        for (int i = 0; i < graph.mem512_auxiliary_2 / 2; i++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
                 graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
-               
+            end
+        end
+
+        for (int i = graph.mem512_auxiliary_2 / 2; i < graph.mem512_auxiliary_2 ; i++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
+                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
             end
         end
 
@@ -1249,11 +1119,14 @@ module __KERNEL___testbench ();
         graph.mem512_num_vertices = ((graph.num_vertices*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_num_edges = ((graph.num_edges*32) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
+        graph.mem512_auxiliary_1 = ((graph.num_vertices*32*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_auxiliary_2 = ((graph.num_vertices*32*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+
         graph.out_degree   = new [graph.mem512_num_vertices];
         graph.in_degree    = new [graph.mem512_num_vertices];
         graph.edges_idx    = new [graph.mem512_num_vertices];
-        graph.auxiliary_1  = new [graph.mem512_num_vertices * 2];
-        graph.auxiliary_2  = new [graph.mem512_num_vertices * 2];
+        graph.auxiliary_1  = new [graph.mem512_auxiliary_1];
+        graph.auxiliary_2  = new [graph.mem512_auxiliary_2];
         graph.edges_array_src = new [graph.mem512_num_edges];
         graph.edges_array_dest= new [graph.mem512_num_edges];
         graph.overlay_program = new [graph.mem512_overlay_program_entries];

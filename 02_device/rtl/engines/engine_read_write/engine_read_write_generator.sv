@@ -238,7 +238,7 @@ module engine_read_write_generator #(parameter
             request_engine_out.valid            <= request_engine_out_reg.valid;
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
-            done_out                            <= done_out_reg;
+            done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_request_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
@@ -246,7 +246,7 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= request_memory_out_reg.payload ;
+        request_memory_out.payload <= request_memory_out_reg.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -384,10 +384,9 @@ module engine_read_write_generator #(parameter
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
-                done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b0;
-                configure_memory_setup_reg <= 1'b0;
-
+                done_int_reg                       <= 1'b1;
+                done_out_reg                       <= 1'b0;
+                configure_memory_setup_reg         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
@@ -402,38 +401,38 @@ module engine_read_write_generator #(parameter
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
                 done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b1 & ~configure_engine_param_int.mode_counter;;
+                done_out_reg                 <= 1'b0;
                 configure_engine_param_valid <= 1'b1;
 
                 counter_load <= 1'b1;
-                if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
-                    response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
-                end
+                // if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
+                //     response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
+                // end
             end
             ENGINE_READ_WRITE_GEN_START : begin
                 done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                done_out_reg                 <= 1'b0;
                 configure_engine_param_valid <= 1'b1;
                 counter_load                 <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
                 done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1 & ~configure_engine_param_int.mode_counter;
+                done_out_reg <= 1'b0;
                 counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_DONE_TRANS : begin
@@ -459,7 +458,7 @@ module engine_read_write_generator #(parameter
         .ap_clken    (1'b1                              ),
         .areset      (areset_counter                    ),
         .load        (counter_load                      ),
-        .incr        (1'b0                              ),
+        .incr        (request_memory_out_reg.valid      ),
         .decr        (request_engine_out_reg.valid      ),
         .load_value  (response_memory_counter_load_value),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
