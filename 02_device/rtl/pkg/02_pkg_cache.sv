@@ -85,10 +85,10 @@ package PKG_CACHE;
 	parameter SYSTEM_CACHE_NUM_WAYS       = 4                                                                                  ;
 	parameter SYSTEM_CACHE_ADDR_WIDTH     = 63                                                                                 ;
 	parameter SYSTEM_CACHE_DATA_WIDTH     = CACHE_BACKEND_NBYTES                                                               ;
+	parameter SYSTEM_CACHE_LINE_SIZE_LOG  = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ;
 	parameter SYSTEM_CACHE_SIZE           = 65536                                                                              ; // Define the total size of the cache
-	parameter SYSTEM_CACHE_SIZE_ITERAIONS = SYSTEM_CACHE_NUM_WAYS * SYSTEM_CACHE_NUM_SETS                                      ;
-	parameter SYSTEM_CACHE_LINE_SIZE_LOG  = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ; // Log base 2 of cache line size, which is 64 bytes
 	parameter SYSTEM_CACHE_NUM_SETS       = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
+	parameter SYSTEM_CACHE_SIZE_ITERAIONS = SYSTEM_CACHE_NUM_WAYS * SYSTEM_CACHE_NUM_SETS                                      ;
 	parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM_WAYS                                      ;
 
 // Optimized address calculation using shift operations

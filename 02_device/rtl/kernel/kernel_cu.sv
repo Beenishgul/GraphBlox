@@ -19,19 +19,17 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(
-  `include "kernel_parameters.vh"
-  ) (
-    input  logic                          ap_clk           ,
-    input  logic                          areset           ,
-    input  KernelDescriptor               descriptor_in    ,
-    input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
-    output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
-    input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
-    output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
-    output logic                          fifo_setup_signal,
-    output logic                          done_out
-  );
+module kernel_cu #(`include "kernel_parameters.vh") (
+  input  logic                          ap_clk           ,
+  input  logic                          areset           ,
+  input  KernelDescriptor               descriptor_in    ,
+  input  AXI4MasterReadInterfaceInput   m_axi_read_in    ,
+  output AXI4MasterReadInterfaceOutput  m_axi_read_out   ,
+  input  AXI4MasterWriteInterfaceInput  m_axi_write_in   ,
+  output AXI4MasterWriteInterfaceOutput m_axi_write_out  ,
+  output logic                          fifo_setup_signal,
+  output logic                          done_out
+);
 
 // --------------------------------------------------------------------------------------
 // Wires and Variables
@@ -84,7 +82,8 @@ module kernel_cu #(
   FIFOStateSignalsOutput cu_setup_fifo_request_signals_out ;
   FIFOStateSignalsInput  cu_setup_fifo_request_signals_in  ;
   logic                  cu_setup_fifo_setup_signal        ;
-
+  logic                  cu_setup_cu_flush                 ;
+  logic                  cu_setup_done_out                 ;
 // --------------------------------------------------------------------------------------
 // Signals for Vertex CU
 // --------------------------------------------------------------------------------------
@@ -167,11 +166,13 @@ module kernel_cu #(
       fifo_setup_signal           <= 1'b1;
       kernel_cu_request_out.valid <= 1'b0;
       done_out                    <= 1'b0;
+      cu_setup_cu_flush           <= 1'b0;
     end
     else begin
       fifo_setup_signal           <= cu_cache_fifo_setup_signal | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
       kernel_cu_request_out.valid <= request_out_reg.valid ;
-      done_out                    <= cu_bundles_done_out;
+      done_out                    <= cu_setup_done_out;
+      cu_setup_cu_flush           <= cu_bundles_done_out;
     end
   end
 
@@ -308,6 +309,7 @@ module kernel_cu #(
   ) inst_cu_setup (
     .ap_clk                   (ap_clk                            ),
     .areset                   (areset_setup                      ),
+    .cu_flush                 (cu_setup_cu_flush                 ),
     .descriptor_in            (cu_setup_descriptor               ),
     .response_in              (cu_setup_response_in              ),
     .fifo_response_signals_in (cu_setup_fifo_response_signals_in ),
@@ -315,15 +317,14 @@ module kernel_cu #(
     .request_out              (cu_setup_request_out              ),
     .fifo_request_signals_in  (cu_setup_fifo_request_signals_in  ),
     .fifo_request_signals_out (cu_setup_fifo_request_signals_out ),
-    .fifo_setup_signal        (cu_setup_fifo_setup_signal        )
+    .fifo_setup_signal        (cu_setup_fifo_setup_signal        ),
+    .done_out                 (cu_setup_done_out                 )
   );
 
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(
-    `include"set_cu_parameters.vh"
-    ) inst_cu_bundles (
+  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),
