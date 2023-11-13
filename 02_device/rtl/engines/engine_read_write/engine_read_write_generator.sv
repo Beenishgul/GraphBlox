@@ -81,6 +81,9 @@ module engine_read_write_generator #(parameter
     ReadWriteConfiguration configure_engine_reg;
     MemoryPacket           request_out_int     ;
 
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
+
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------

@@ -326,9 +326,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(
-    `include"set_cu_parameters.vh"
-    ) inst_cu_bundles (
+  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),
