@@ -132,7 +132,7 @@ typedef struct packed{
 
 typedef struct packed{
   logic [CACHE_FRONTEND_ADDR_W-1:0] base  ; // SIZE = 64 bits
-  logic [CACHE_FRONTEND_ADDR_W-1:0] offset; // SIZE = 64 bits
+  logic [CACHE_FRONTEND_DATA_W-1:0] offset; // SIZE = 64 bits
   MemoryPacketAddressShift          shift ; // SIZE = 64 bits
 } MemoryPacketAddress;
 
@@ -223,19 +223,5 @@ typedef struct packed {
   logic                valid  ;
   CacheResponsePayload payload;
 } CacheResponse;
-
-// --------------------------------------------------------------------------------------
-//   Cache Requests state machine
-// --------------------------------------------------------------------------------------
-typedef enum logic[6:0] {
-  CACHE_REQUEST_GEN_RESET,
-  CACHE_REQUEST_GEN_IDLE,
-  CACHE_REQUEST_GEN_SEND_S1,
-  CACHE_REQUEST_GEN_SEND_S2,
-  CACHE_REQUEST_GEN_BUSY,
-  CACHE_REQUEST_GEN_READY,
-  CACHE_REQUEST_GEN_DONE
-} cache_generator_request_state;
-
 
 endpackage

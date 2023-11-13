@@ -86,9 +86,9 @@ module engine_read_write_kernel (
       address_int.shift.direction = config_params_in.direction;
       address_int.base            = config_params_in.array_pointer;
       if(address_int.shift.direction ) begin
-        address_int.offset = ops_value_reg.field[1] << address_int.shift.amount;
+        address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) << address_int.shift.amount;
       end else begin
-        address_int.offset = ops_value_reg.field[1] >> address_int.shift.amount;
+        address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) >> address_int.shift.amount;
       end
     end
   end

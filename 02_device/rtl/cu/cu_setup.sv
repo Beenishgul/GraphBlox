@@ -34,6 +34,7 @@ module cu_setup #(
     // System Signals
     input  logic                  ap_clk                   ,
     input  logic                  areset                   ,
+    input  logic                  cu_flush                 ,
     input  KernelDescriptor       descriptor_in            ,
     input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
@@ -51,6 +52,7 @@ module cu_setup #(
     logic areset_serial_read;
     logic areset_fifo       ;
 
+    logic            cu_flush_reg     ;
     KernelDescriptor descriptor_in_reg;
     MemoryPacket     response_in_reg  ;
     MemoryPacket     response_out_int ;
@@ -114,9 +116,11 @@ module cu_setup #(
     always_ff @(posedge ap_clk) begin
         if (areset_cu_setup) begin
             descriptor_in_reg.valid <= 0;
+            cu_flush_reg            <= 1'b0;
         end
         else begin
             descriptor_in_reg.valid <= descriptor_in.valid;
+            cu_flush_reg            <= cu_flush;
         end
     end
 
@@ -271,10 +275,12 @@ module cu_setup #(
     assign configuration_comb.payload.param.increment              = 1'b1;
     assign configuration_comb.payload.param.decrement              = 1'b0;
     assign configuration_comb.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
-    assign configuration_comb.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:1]};
+    assign configuration_comb.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
     assign configuration_comb.payload.param.start_read             = 0;
-    assign configuration_comb.payload.param.end_read               = {1'b0,descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:1]};
+    assign configuration_comb.payload.param.end_read               = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
+    assign configuration_comb.payload.param.flush_end              = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W];
     assign configuration_comb.payload.param.stride                 = 1;
+    assign configuration_comb.payload.param.flush_mode             = 0;
     assign configuration_comb.payload.param.granularity            = $clog2(CACHE_FRONTEND_DATA_W/8);
     assign configuration_comb.payload.meta.route.from.id_cu        = ID_CU;
     assign configuration_comb.payload.meta.route.from.id_bundle    = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
