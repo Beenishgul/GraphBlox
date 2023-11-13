@@ -101,20 +101,22 @@ def get_engine_id(engine_name):
     engine_template_filename_ol = f"{base_name}.ol" 
     template_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, overlay_template_source)
     
+    buffer_start_ops = print_operations_cpp(buffer_start)
+    buffer_end_ops = print_operations_cpp(buffer_end)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_ol, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start}-{buffer_end}")
+    append_to_file(output_file_path_ol, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     process_file_ol(template_file_path, engine_template_filename_ol)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_vh, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start}-{buffer_end}")
+    append_to_file(output_file_path_vh, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
     process_file_vh(template_file_path, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
 
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_cpp, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start}-{buffer_end}")
+    append_to_file(output_file_path_cpp, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
     process_file_cpp(template_file_path, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
@@ -150,27 +152,74 @@ def extract_buffer(token):
         return token[start:end]        # Extracts and returns the substring
     return ""  # Returns an empty string if "(B:" is not found
 
+# def extract_buffer_details(token):
+#     """Extracts buffer details from a token. Handles both (B:buffer_name) and (B:buffer_name,start,end) formats."""
+#     if "(B:" in token:
+#         start = token.find("(B:") + 3
+#         end = token.find(")", start)
+#         details = token[start:end].split(',')
+
+#         buffer_name = details[0]  # Buffer name is always present
+#         start_value = '0'  # Default value
+#         end_value = '0'   # Default value
+
+#         # Update start and end values if present
+#         if len(details) > 1:
+#             start_value = details[1]
+#         if len(details) > 2:
+#             end_value = details[2]
+
+#         return buffer_name, start_value, end_value
+
+#     return "None", '0', '0'
+
+# def extract_buffer_details(token):
+#     """Extracts buffer details from a token. Handles (B:buffer_name,start,end) formats including mathematical operations."""
+#     if "(B:" in token:
+#         start = token.find("(B:") + 3
+#         end = token.find(")", start)
+#         details = token[start:end].split(',')
+
+#         buffer_name = details[0]  # Buffer name is always present
+#         start_value_ops = ['0']  # Default value
+#         end_value_ops = ['0']   # Default value
+
+#         # Define a regular expression pattern to split by operators while keeping the operators
+#         pattern = r'(\d+|\+|\-|\*|\/|\%|\(|\))'
+
+#         # Update start and end values if present, including parsing for operations
+#         if len(details) > 1:
+#             start_value_ops = re.findall(pattern, details[1])
+#         if len(details) > 2:
+#             end_value_ops = re.findall(pattern, details[2])
+
+#         return buffer_name, start_value_ops, end_value_ops
+
+#     return "None", ['0'], ['0']
+
 def extract_buffer_details(token):
-    """Extracts buffer details from a token. Handles both (B:buffer_name) and (B:buffer_name,start,end) formats."""
+    """Extracts buffer details from a token. Handles (B:buffer_name,start,end) formats including mathematical operations."""
     if "(B:" in token:
         start = token.find("(B:") + 3
         end = token.find(")", start)
         details = token[start:end].split(',')
 
         buffer_name = details[0]  # Buffer name is always present
-        start_value = '0'  # Default value
-        end_value = '0'   # Default value
+        start_value_ops = ['0']  # Default value
+        end_value_ops = ['0']   # Default value
 
-        # Update start and end values if present
+        # Improved pattern to match identifiers, numbers, and operators
+        pattern = r'([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%|\(|\))'
+
+        # Update start and end values if present, including parsing for operations
         if len(details) > 1:
-            start_value = details[1]
+            start_value_ops = re.findall(pattern, details[1])
         if len(details) > 2:
-            end_value = details[2]
+            end_value_ops = re.findall(pattern, details[2])
 
-        return buffer_name, start_value, end_value
+        return buffer_name, start_value_ops, end_value_ops
 
-    return "None", '0', '0'
-
+    return "None", ['0'], ['0']
 
 # Modified pad_data to accept a default pad value
 def pad_data(data, max_length, default_val=0):
@@ -186,6 +235,50 @@ def calculate_cache_info(entry_index, entries_per_line):
     cache_line_index = entry_index // entries_per_line
     entry_offset = entry_index % entries_per_line
     return cache_line_index, entry_offset
+
+def print_operations_vh(ops):
+    if not ops:
+        print(f"echo No operations {ops}")
+        return
+
+    processed_ops = []
+    processed_ops.append(f"(")
+    for op in ops:
+        if op.isdigit():
+            # If the operation is a number
+            processed_ops.append(f"{op}")
+        elif op in {'+', '-', '*', '/', '%'}:
+            # If the operation is a mathematical operator
+            processed_ops.append(f"{op}")
+        else:
+            # If the operation is text
+            processed_ops.append(f"graph.{op}")
+    processed_ops.append(f")")
+    # Join and print the processed operations
+    operation_str = ' '.join(processed_ops)
+    return operation_str
+
+def print_operations_cpp(ops):
+    if not ops:
+        print(f"echo No operations {ops}")
+        return
+
+    processed_ops = []
+    processed_ops.append(f"(")
+    for op in ops:
+        if op.isdigit():
+            # If the operation is a number
+            processed_ops.append(f"{op}")
+        elif op in {'+', '-', '*', '/', '%'}:
+            # If the operation is a mathematical operator
+            processed_ops.append(f"{op}")
+        else:
+            # If the operation is text
+            processed_ops.append(f"graph->{op}")
+    processed_ops.append(f")")
+    # Join and print the processed operations
+    operation_str = ' '.join(processed_ops)
+    return operation_str
 
 def process_file_ol(template_file_path, engine_template_filename):
     # Define the size of a cache line in bytes and the size of each entry
@@ -230,6 +323,8 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
 
     engine_type    = engine_name.split("(")[0]
     buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    buffer_start_ops = print_operations_vh(buffer_start)
+    buffer_end_ops = print_operations_vh(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
     local_count = 0
     filename = os.path.join(template_file_path, engine_template_filename)
@@ -251,10 +346,10 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                 if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
                     if local_count == 1:
                         append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = {buffer_start};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = {buffer_start_ops};")
                     elif local_count == 2:
                         append_to_file(output_file_path_vh, f"   // --  2  - Index_End")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = graph.{buffer_end};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = {buffer_end_ops};")
                     elif local_count == 7:
                         append_to_file(output_file_path_vh, f"   // --  7  - Array_Pointer_LHS")
                         if buffer_key != "None":
@@ -269,7 +364,7 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                             append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = 0;")
                     elif local_count == 9:
                         append_to_file(output_file_path_vh, f"   // --  9  - Array_size")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = graph.{buffer_end};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(GLOBAL_DATA_WIDTH_BITS*{offset})+:GLOBAL_DATA_WIDTH_BITS]  = {buffer_end_ops}-{buffer_start_ops};")
 
                 entry_index_vh += 1
                 local_count += 1
@@ -291,6 +386,8 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
 
     engine_type    = engine_name.split("(")[0]
     buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    buffer_start_ops = print_operations_cpp(buffer_start)
+    buffer_end_ops = print_operations_cpp(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
     buffer_index   = get_index_from_value(buffers, buffer_name)
     local_count = 0
@@ -313,10 +410,10 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                 if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
                     if local_count == 1:
                         append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
                     elif local_count == 2:
                         append_to_file(output_file_path_cpp, f"   // --  2  - Index_End")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = graph->{buffer_end};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops};")
                     elif local_count == 7:
                         append_to_file(output_file_path_cpp, f"   // --  7  - Array_Pointer_LHS")
                         if buffer_key != "None":
@@ -331,7 +428,7 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                             append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = 0;")
                     elif local_count == 9:
                         append_to_file(output_file_path_cpp, f"   // --  9  - Array_size")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = graph->{buffer_end};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
 
                 entry_index_cpp += 1
                 local_count += 1
