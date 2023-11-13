@@ -231,28 +231,36 @@ module engine_template #(
 // --------------------------------------------------------------------------------------
 // Generate CAST - Arbiter Signals: CAST Request Generator
 // --------------------------------------------------------------------------------------
-    assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
-    always_comb begin
-        for (int i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
-            engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
-            request_engine_out[i+1]                  = engine_cast_arbiter_1_to_N_request_out[i];
-            fifo_request_engine_out_signals_out[i+1] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
-        end
-    end
-
+    generate
+        if(ENGINE_CAST_WIDTH>0) begin
+            assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
+            always_comb begin
+                for (int i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
+                    engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
+                    request_engine_out[i+1]                  = engine_cast_arbiter_1_to_N_request_out[i];
+                    fifo_request_engine_out_signals_out[i+1] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
+                end
+            end
 // --------------------------------------------------------------------------------------
-    arbiter_1_to_N_response #(
-        .NUM_MEMORY_REQUESTOR(ENGINE_CAST_WIDTH),
-        .ID_LEVEL            (5                )
-    ) inst_engine_cast_arbiter_1_to_N_request (
-        .ap_clk                   (ap_clk                                             ),
-        .areset                   (areset_engine_cast_arbiter_1_to_N                  ),
-        .response_in              (engine_cast_arbiter_1_to_N_request_in              ),
-        .fifo_response_signals_in (engine_cast_arbiter_1_to_N_fifo_request_signals_in ),
-        .fifo_response_signals_out(engine_cast_arbiter_1_to_N_fifo_request_signals_out),
-        .response_out             (engine_cast_arbiter_1_to_N_request_out             ),
-        .fifo_setup_signal        (engine_cast_arbiter_1_to_N_fifo_setup_signal       )
-    );
+            arbiter_1_to_N_response #(
+                .NUM_MEMORY_REQUESTOR(ENGINE_CAST_WIDTH),
+                .ID_LEVEL            (5                )
+            ) inst_engine_cast_arbiter_1_to_N_request (
+                .ap_clk                   (ap_clk                                             ),
+                .areset                   (areset_engine_cast_arbiter_1_to_N                  ),
+                .response_in              (engine_cast_arbiter_1_to_N_request_in              ),
+                .fifo_response_signals_in (engine_cast_arbiter_1_to_N_fifo_request_signals_in ),
+                .fifo_response_signals_out(engine_cast_arbiter_1_to_N_fifo_request_signals_out),
+                .response_out             (engine_cast_arbiter_1_to_N_request_out             ),
+                .fifo_setup_signal        (engine_cast_arbiter_1_to_N_fifo_setup_signal       )
+            );
+
+        end else begin
+            assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 6'b010000;
+            assign engine_cast_arbiter_1_to_N_fifo_setup_signal        = 0;
+            assign engine_cast_arbiter_1_to_N_request_out              = 0;
+        end
+    endgenerate
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket

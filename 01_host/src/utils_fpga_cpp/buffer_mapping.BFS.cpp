@@ -73,45 +73,5 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersBFS(size_t 
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 9    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
-// --------------------------------------------------------------------------------------
-   // --  1  - Index_Start
-    overlay_program[63] = ( 0 );
-   // --  2  - Index_End
-    overlay_program[64] = ( graph->num_edges );
-   // --  7  - Array_Pointer_LHS
-    overlay_program[69] = xrt_buffer_device[4];
-   // --  8  - Array_Pointer_RHS
-    overlay_program[70] = xrt_buffer_device[4] >> 32;
-   // --  9  - Array_size
-    overlay_program[71] = ( graph->num_edges )-( 0 );
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 10   mapping 6    cycles 1    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
-// --------------------------------------------------------------------------------------
-   // --  1  - Index_Start
-    overlay_program[74] = ( graph->num_vertices );
-   // --  2  - Index_End
-    overlay_program[75] = ( graph->num_vertices * 2 );
-   // --  7  - Array_Pointer_LHS
-    overlay_program[80] = xrt_buffer_device[8];
-   // --  8  - Array_Pointer_RHS
-    overlay_program[81] = xrt_buffer_device[8] >> 32;
-   // --  9  - Array_size
-    overlay_program[82] = ( graph->num_vertices * 2 )-( graph->num_vertices );
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 12   mapping 3    cycles 9    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 13   mapping 6    cycles 1    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
 }
-// Number of entries 96
+// Number of entries 62

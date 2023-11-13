@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 2    mapping 2    cycles 10  
+// Name ENGINE_CSR_INDEX    ID 0    mapping 2    cycles 10   None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 26   cacheline 1    offset 10   --  0  - Increment/Decrement
 0x00000000 // entry 27   cacheline 1    offset 11   --  1  - Index_start
@@ -13,12 +13,12 @@
 0x00000033 // entry 35   cacheline 2    offset 3    --  9  - BUFFER size
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 3    mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 1    mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 36   cacheline 2    offset 4    --  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 13   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 37   cacheline 2    offset 5    --  0  - Increment/Decrement
 0x00000000 // entry 38   cacheline 2    offset 6    --  1  - Index_start
@@ -35,13 +35,13 @@
 0x00008412 // entry 49   cacheline 3    offset 1    --  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA   ID 5    mapping 4    cycles 2   
+// Name ENGINE_MERGE_DATA   ID 3    mapping 4    cycles 2    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000007 // entry 50   cacheline 3    offset 2    --  0  - merge mask (W:2)
 0x00000000 // entry 51   cacheline 3    offset 3    --  1  - merge type (Serial|Parallel|Both)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 6    mapping 3    cycles 9   
+// Name ENGINE_FILTER_COND  ID 4    mapping 3    cycles 9    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000008 // entry 52   cacheline 3    offset 4    --  0  - filter_operation
 0x00000004 // entry 53   cacheline 3    offset 5    --  1  - filter_mask
@@ -54,7 +54,7 @@
 0x00000000 // entry 60   cacheline 3    offset 12   --  7  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 5    mapping 1    cycles 13   buffer_1-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 61   cacheline 3    offset 13   --  0  - Increment/Decrement
 0x00000000 // entry 62   cacheline 3    offset 14   --  1  - Index_start
@@ -71,7 +71,7 @@
 0x00008412 // entry 73   cacheline 4    offset 9    --  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13  
+// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 74   cacheline 4    offset 10   --  0  - Increment/Decrement
 0x00000000 // entry 75   cacheline 4    offset 11   --  1  - Index_start
@@ -88,61 +88,8 @@
 0x00008412 // entry 86   cacheline 5    offset 6    --  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 9    mapping 6    cycles 1   
+// Name ENGINE_FORWARD_DATA ID 7    mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 87   cacheline 5    offset 7    --  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
-// --------------------------------------------------------------------------------------
-0x0000003D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement
-0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
-0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
-0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
-0x80000002 // entry 92   cacheline 5    offset 12   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000102 // entry 93   cacheline 5    offset 13   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00010801 // entry 94   cacheline 5    offset 14   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 11   mapping 6    cycles 1   
-// --------------------------------------------------------------------------------------
-0x00000001 // entry 98   cacheline 6    offset 2    --  0  - number of hops (forward till discards)
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13  
-// --------------------------------------------------------------------------------------
-0x00000000 // entry 99   cacheline 6    offset 3    --  0  - Increment/Decrement
-0x00000000 // entry 100  cacheline 6    offset 4    --  1  - Index_start
-0x00000000 // entry 101  cacheline 6    offset 5    --  2  - Index_end
-0x00000001 // entry 102  cacheline 6    offset 6    --  3  - Stride
-0x80000002 // entry 103  cacheline 6    offset 7    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000102 // entry 104  cacheline 6    offset 8    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00030101 // entry 105  cacheline 6    offset 9    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 106  cacheline 6    offset 10   --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 107  cacheline 6    offset 11   --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 108  cacheline 6    offset 12   --  9  - BUFFER size
-0x00000000 // entry 109  cacheline 6    offset 13   --  10 - const_mask
-0x00000000 // entry 110  cacheline 6    offset 14   --  11 - const_value
-0x00004812 // entry 111  cacheline 6    offset 15   --  12 - ops_mask
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9   
-// --------------------------------------------------------------------------------------
-0x00000008 // entry 112  cacheline 7    offset 0    --  0  - filter_operation
-0x00000004 // entry 113  cacheline 7    offset 1    --  1  - filter_mask
-0x00000004 // entry 114  cacheline 7    offset 2    --  2  - const_mask
-0x00000001 // entry 115  cacheline 7    offset 3    --  3  - const_value
-0x00001824 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
-0x00000007 // entry 117  cacheline 7    offset 5    --  4  - break_flag | break_pass | filter_post | filter_pass | continue_flag | ternary_flag | conditional_flag
-0x00030101 // entry 118  cacheline 7    offset 6    --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00030101 // entry 119  cacheline 7    offset 7    --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 120  cacheline 7    offset 8    --  7  - if -> id_engine id_module | else -> id_engine id_module
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 14   mapping 6    cycles 1   
-// --------------------------------------------------------------------------------------
-0x00000001 // entry 121  cacheline 7    offset 9    --  0  - number of hops (forward till discards)
-// --------------------------------------------------------------------------------------
+// Number of entries 62
