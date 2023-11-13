@@ -1186,9 +1186,15 @@ module __KERNEL___testbench ();
                 graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
                 graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
 
-                graph.auxiliary_1[i+(graph.mem512_num_vertices*(M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS))][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
-                graph.auxiliary_2[i+(graph.mem512_num_vertices*(M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS))][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
+               
+            end
+        end
 
+         for (int i = graph.mem512_num_vertices; i < graph.mem512_num_vertices * 2; i++) begin
+            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/GLOBAL_DATA_WIDTH_BITS); j++) begin
+                graph.auxiliary_1[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = {GLOBAL_DATA_WIDTH_BITS{1'b1}};
+                graph.auxiliary_2[i][(GLOBAL_DATA_WIDTH_BITS*j)+:GLOBAL_DATA_WIDTH_BITS] = 0;
+               
             end
         end
 
