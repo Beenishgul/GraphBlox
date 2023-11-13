@@ -135,34 +135,32 @@ module engine_filter_cond_configure_memory #(parameter
     assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
     assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
-    always_comb begin
-        configure_memory_meta_int.route.from.id_cu        = 1 << ID_CU;
-        configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
-        configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
-        configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
-        configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
-        configure_memory_meta_int.route.from.id_buffer    = 0;
-        configure_memory_meta_int.route.to.id_cu          = 0;
-        configure_memory_meta_int.route.to.id_bundle      = 0;
-        configure_memory_meta_int.route.to.id_lane        = 0;
-        configure_memory_meta_int.route.to.id_engine      = 0;
-        configure_memory_meta_int.route.to.id_module      = 1;
-        configure_memory_meta_int.route.to.id_buffer      = 0;
-        configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
-        configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
-        configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
-        configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
-        configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
-        configure_memory_meta_int.route.seq_src.id_buffer = 0;
-        configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
-        configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
-        configure_memory_meta_int.address.base            = 0;
-        configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
-        configure_memory_meta_int.address.shift.amount    = 0;
-        configure_memory_meta_int.address.shift.direction = 1'b1;
-        configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
-        configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
-    end
+    assign configure_memory_meta_int.route.from.id_cu        = 1 << ID_CU;
+    assign configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
+    assign configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
+    assign configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
+    assign configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
+    assign configure_memory_meta_int.route.from.id_buffer    = 0;
+    assign configure_memory_meta_int.route.to.id_cu          = 0;
+    assign configure_memory_meta_int.route.to.id_bundle      = 0;
+    assign configure_memory_meta_int.route.to.id_lane        = 0;
+    assign configure_memory_meta_int.route.to.id_engine      = 0;
+    assign configure_memory_meta_int.route.to.id_module      = 1;
+    assign configure_memory_meta_int.route.to.id_buffer      = 0;
+    assign configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
+    assign configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
+    assign configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
+    assign configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
+    assign configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
+    assign configure_memory_meta_int.route.seq_src.id_buffer = 0;
+    assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+    assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
+    assign configure_memory_meta_int.address.base            = 0;
+    assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configure_memory_meta_int.address.shift.amount    = 0;
+    assign configure_memory_meta_int.address.shift.direction = 1'b1;
+    assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
+    assign configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
 
     always_ff @(posedge ap_clk) begin
         if(areset_filter_cond_generator) begin

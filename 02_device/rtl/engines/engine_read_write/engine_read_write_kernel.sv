@@ -76,12 +76,11 @@ module engine_read_write_kernel (
     end
   end
 
+  assign org_data_int = org_value_reg;
 
   always_comb begin
     // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
-    address_int  = 0;
-    org_data_int = org_value_reg;
-
+    address_int = 0;
     if (config_params_valid_in & data_valid_reg) begin
       address_int.shift.amount    = config_params_in.granularity;
       address_int.shift.direction = config_params_in.direction;

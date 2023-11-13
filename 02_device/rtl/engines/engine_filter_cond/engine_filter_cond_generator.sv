@@ -84,16 +84,9 @@ module engine_filter_cond_generator #(parameter
     MemoryPacket          generator_engine_request_engine_reg    ;
     MemoryPacket          generator_engine_request_engine_reg_S2 ;
     MemoryPacket          generator_engine_request_engine_reg_S3 ;
+    MemoryPacket          generator_engine_request_engine_reg_S4 ;
     MemoryPacket          request_engine_out_int                 ;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
-
-// --------------------------------------------------------------------------------------
-// Generation Logic - Fiilter data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-    logic filter_cond_response_engine_in_valid_reg    ;
-    logic filter_cond_response_engine_in_valid_flag_S2;
-    logic filter_cond_response_engine_in_valid_flag   ;
-    logic filter_cond_response_engine_in_valid_int    ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -125,7 +118,7 @@ module engine_filter_cond_generator #(parameter
     logic            filter_result_int   ;
     logic            filter_flow_int     ;
     logic            break_flow_int      ;
-    logic            sequence_flow_reg   ;
+    logic [1:0]      sequence_flow_reg   ;
     logic            sequence_flow_int   ;
     logic            conditional_flow_int;
 
@@ -238,7 +231,7 @@ module engine_filter_cond_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~filter_cond_response_engine_in_valid_reg & ~response_engine_in_int.valid & configure_engine_int.valid & ~fifo_request_engine_out_signals_out_int.prog_full);
+    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~generator_engine_request_engine_reg.valid & ~response_engine_in_int.valid & configure_engine_int.valid & ~fifo_request_engine_out_signals_out_int.prog_full);
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -438,94 +431,86 @@ module engine_filter_cond_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Filter data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    assign filter_cond_response_engine_in_valid_flag = filter_cond_response_engine_in_valid_reg ;
+    assign conditional_flow_int = (result_flag_int & configure_engine_int.payload.param.conditional_flag) & generator_engine_request_engine_reg_S2.valid;
+    assign filter_flow_int      = (result_flag_int ^ configure_engine_int.payload.param.filter_pass) & generator_engine_request_engine_reg_S2.valid;
+    assign break_flow_int       = ~(result_flag_int ^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & generator_engine_request_engine_reg_S2.valid;
+    assign filter_result_int    = (configure_engine_int.payload.param.filter_post & (break_flow_int | filter_flow_int)) | (~break_flow_int & filter_flow_int & ~configure_engine_int.payload.param.filter_post);
+    assign sequence_flow_int    = break_flow_int | ((generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE)&generator_engine_request_engine_reg_S2.valid);
 
-    always_comb begin
-        filter_cond_response_engine_in_valid_int = filter_result_int;
-        conditional_flow_int                     = (result_flag_int & configure_engine_int.payload.param.conditional_flag) & ~break_running_reg;
-        filter_flow_int                          = (result_flag_int ^ configure_engine_int.payload.param.filter_pass) & ~break_running_reg;
-        break_flow_int                           = filter_cond_response_engine_in_valid_flag_S2 & ~(result_flag_int ^ configure_engine_int.payload.param.break_pass) & ~break_running_reg & configure_engine_int.payload.param.break_flag;
-        filter_result_int                        = (configure_engine_int.payload.param.filter_post & (break_flow_int | filter_flow_int)) | (~break_flow_int & filter_flow_int & ~configure_engine_int.payload.param.filter_post);
-        sequence_flow_int                        = break_flow_int | (response_engine_in_int.payload.meta.route.seq_state == SEQUENCE_DONE);
-    end
+    assign break_start_int = (~result_flag_int & configure_engine_int.payload.param.break_flag & configure_engine_int.valid & ~break_running_reg);
+    assign break_done_int  = (break_running_reg & (generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE) & generator_engine_request_engine_reg_S2.valid);
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            filter_cond_response_engine_in_valid_reg     <= 1'b0;
-            filter_cond_response_engine_in_valid_flag_S2 <= 1'b0;
-            generator_engine_request_engine_reg.valid    <= 1'b0;
+            generator_engine_request_engine_reg.valid <= 1'b0; // s1
         end
         else begin
-            filter_cond_response_engine_in_valid_flag_S2 <= filter_cond_response_engine_in_valid_flag;
-            generator_engine_request_engine_reg.valid    <= filter_cond_response_engine_in_valid_flag_S2 & filter_result_int;
-
             if(response_engine_in_int.valid & configure_engine_int.valid) begin
-                filter_cond_response_engine_in_valid_reg <= 1'b1;
+                generator_engine_request_engine_reg.valid <= 1'b1;
             end else begin
-                if(filter_cond_response_engine_in_valid_flag)
-                    filter_cond_response_engine_in_valid_reg <= 1'b0;
+                if(generator_engine_request_engine_reg.valid)
+                    generator_engine_request_engine_reg.valid <= 1'b0;
                 else
-                    filter_cond_response_engine_in_valid_reg <= filter_cond_response_engine_in_valid_reg;
+                    generator_engine_request_engine_reg.valid <= generator_engine_request_engine_reg.valid;
             end
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data               <= result_data_int;
-        generator_engine_request_engine_reg.payload.meta.subclass      <= response_engine_in_int.payload.meta.subclass;
-        generator_engine_request_engine_reg.payload.meta.address       <= response_engine_in_int.payload.meta.address;
-        generator_engine_request_engine_reg.payload.meta.route.from    <= response_engine_in_int.payload.meta.route.from;
-        generator_engine_request_engine_reg.payload.meta.route.hops    <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.route.seq_src <= response_engine_in_int.payload.meta.route.seq_src;
-
-        if(sequence_flow_reg)begin
-            if(configure_engine_int.payload.param.conditional_flag & configure_engine_int.valid) begin
-                if(conditional_flow_int & configure_engine_int.valid) begin
-                    generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                    generator_engine_request_engine_reg.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._if;
-                end else if (~conditional_flow_int & configure_engine_int.valid) begin
-                    generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                    generator_engine_request_engine_reg.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._else;
-                end
-            end else begin
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-            end
-        end else begin
-            if (response_engine_in_int.payload.meta.route.seq_state == SEQUENCE_DONE) begin
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= SEQUENCE_DONE;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.seq_src;
-            end else if (break_flow_int) begin
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= SEQUENCE_BREAK;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.seq_src;
-            end else begin
-                generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-                generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-            end
-        end
-        sequence_flow_reg <= sequence_flow_int;
+        generator_engine_request_engine_reg.payload <= response_engine_in_int.payload;
     end
 
     always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg_S2.valid   <= generator_engine_request_engine_reg.valid;
         generator_engine_request_engine_reg_S2.payload <= generator_engine_request_engine_reg.payload;
+        sequence_flow_reg                              <= sequence_flow_int;
 
-        generator_engine_request_engine_reg_S3.valid   <= generator_engine_request_engine_reg_S2.valid;
-        generator_engine_request_engine_reg_S3.payload <= generator_engine_request_engine_reg_S2.payload;
+        if (sequence_flow_int & ~sequence_flow_reg) begin
+            sequence_flow_reg <= 1'b1  ;
+        end else begin
+            sequence_flow_reg <= 1'b0;
+        end
     end
 
-    always_comb begin
-        if (~result_flag_int & configure_engine_int.payload.param.break_flag & configure_engine_int.valid & ~break_running_reg) begin
-            break_start_int = 1'b1;
-        end else begin
-            break_start_int = 1'b0;
-        end
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg_S3.valid                      <= (generator_engine_request_engine_reg_S2.valid & filter_result_int & ~break_running_reg) | sequence_flow_reg;
+        generator_engine_request_engine_reg_S3.payload.data               <= result_data_int;
+        generator_engine_request_engine_reg_S3.payload.meta.subclass      <= generator_engine_request_engine_reg_S2.payload.meta.subclass;
+        generator_engine_request_engine_reg_S3.payload.meta.address       <= generator_engine_request_engine_reg_S2.payload.meta.address;
+        generator_engine_request_engine_reg_S3.payload.meta.route.from    <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
+        generator_engine_request_engine_reg_S3.payload.meta.route.hops    <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
+        generator_engine_request_engine_reg_S3.payload.meta.route.seq_src <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
 
-        if(break_running_reg & (response_engine_in_int.payload.meta.route.seq_state == SEQUENCE_DONE) & response_engine_in_int.valid) begin
-            break_done_int = 1'b1;
+        if(sequence_flow_reg)begin
+            if(configure_engine_int.payload.param.conditional_flag & configure_engine_int.valid) begin
+                if(conditional_flow_int & configure_engine_int.valid) begin
+                    generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                    generator_engine_request_engine_reg_S3.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._if;
+                end else if (~conditional_flow_int & configure_engine_int.valid) begin
+                    generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                    generator_engine_request_engine_reg_S3.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._else;
+                end
+            end else begin
+                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
+            end
         end else begin
-            break_done_int = 1'b0;
+            if (generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE) begin
+                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
+                generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
+            end else if (break_flow_int) begin
+                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_BREAK;
+                generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
+            end else begin
+                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
+            end
         end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg_S4.valid   <= generator_engine_request_engine_reg_S3.valid;
+        generator_engine_request_engine_reg_S4.payload <= generator_engine_request_engine_reg_S3.payload;
     end
 
     engine_filter_cond_kernel inst_engine_filter_cond_kernel (
@@ -547,8 +532,8 @@ module engine_filter_cond_generator #(parameter
     assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
-    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
+    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S4.valid;
+    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S4.payload;
 
     // Pop
     assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;

@@ -136,14 +136,15 @@ module cache_generator_request #(
 // --------------------------------------------------------------------------------------
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
-  always_comb begin
-    fifo_request_comb.valid             = arbiter_bus_out.valid;
-    fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
-    fifo_request_comb.payload.data      = arbiter_bus_out.payload.data;
-    fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
-    fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address.base + arbiter_bus_out.payload.meta.address.offset;
-    fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
 
+  assign fifo_request_comb.valid             = arbiter_bus_out.valid;
+  assign fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
+  assign fifo_request_comb.payload.data      = arbiter_bus_out.payload.data;
+  assign fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
+  assign fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address.base + arbiter_bus_out.payload.meta.address.offset;
+  assign fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
+
+  always_comb begin
     case (arbiter_bus_out.payload.meta.subclass.cmd)
       CMD_MEM_WRITE : begin
         fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};

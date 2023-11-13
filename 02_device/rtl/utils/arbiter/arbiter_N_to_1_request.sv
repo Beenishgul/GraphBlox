@@ -137,10 +137,8 @@ module arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 // Generate memory requests from generic memory requests
 // --------------------------------------------------------------------------------------
-  always_comb begin
-    fifo_request_comb.valid   = arbiter_bus_out.valid;
-    fifo_request_comb.payload = arbiter_bus_out.payload;
-  end
+  assign fifo_request_comb.valid   = arbiter_bus_out.valid;
+  assign fifo_request_comb.payload = arbiter_bus_out.payload;
 
   always_ff @(posedge ap_clk) begin
     if (areset_control) begin

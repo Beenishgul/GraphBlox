@@ -558,19 +558,18 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    always_comb begin
-        fifo_response_comb.valid                     = response_memory_in_reg.valid;
-        fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
-        fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
-        fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
+    assign fifo_response_comb.valid                     = response_memory_in_reg.valid;
+    assign fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
+    assign fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
+    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
+    assign fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
 
+    always_comb begin
         if(response_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
         end
-
-        fifo_response_comb.payload.data = response_memory_in_reg.payload.data;
     end
 
     always_ff @(posedge ap_clk) begin
