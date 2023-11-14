@@ -248,7 +248,7 @@ module engine_csr_index_generator #(parameter
             request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             configure_engine_setup              <= configure_engine_setup_reg;
-            done_out                            <= done_out_reg & fifo_empty_reg;
+            done_out                            <= done_out_reg & fifo_empty_reg & response_memory_counter_is_zero;
             fifo_empty_reg                      <= fifo_empty_int;
             fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
@@ -444,7 +444,7 @@ module engine_csr_index_generator #(parameter
                 counter_load_value                 <= 0;
                 counter_stride_value               <= 0;
                 done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b0;
+                done_out_reg                       <= 1'b0 | configure_engine_int.payload.param.mode_sequence;
                 fifo_request_din_reg.valid         <= 1'b0;
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
