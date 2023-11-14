@@ -44,7 +44,7 @@ module engine_csr_index_generator #(parameter
     FIFO_WRITE_DEPTH = 16                   ,
     PROG_THRESH      = 8                    ,
     PIPELINE_STAGES  = 2                    ,
-    COUNTER_WIDTH    = CACHE_FRONTEND_ADDR_W
+    COUNTER_WIDTH    = CACHE_FRONTEND_DATA_W
 ) (
     // System Signals
     input  logic                 ap_clk                             ,

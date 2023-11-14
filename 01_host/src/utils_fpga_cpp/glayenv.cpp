@@ -13,6 +13,15 @@
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <unistd.h>
+#include <iomanip>
+#include <cstdlib>
+#include <time.h>
+#include <string.h>
+#include <thread>
 #include "glayenv.hpp"
 #include "myMalloc.h"
 
@@ -68,6 +77,7 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 {
     printf("\n-----------------------------------------------------\n");
+
     printf("DEVICE::NAME                    [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::name>().c_str() );
     printf("DEVICE::BDF                     [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::bdf>().c_str() );
     printf("DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld] \n", glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() );
@@ -509,3 +519,61 @@ void releaseGLAYCtrlChain(struct xrtGLAYHandle *glayHandle)
     freeGlayHandle(glayHandle);
 }
 
+
+// ********************************************************************************************
+// ***************                  GLAY Control multithreaded                   **************
+// ********************************************************************************************
+
+// // kernel running thread
+// void executeGLayThread(xrt::run runGLayKernel, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
+// {
+//     runGLayKernel.set_arg(ADDR_BUFFER_0_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[0]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_1_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[1]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_2_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[2]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_3_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[3]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_4_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[4]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_5_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[5]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_6_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[6]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_7_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[7]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_8_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[8]);
+//     runGLayKernel.set_arg(ADDR_BUFFER_9_ID, glayGraphCSRxrtBufferHandlePerBank->xrt_buffer[9]);
+//     runGLayKernel.start();
+//     runGLayKernel.wait();
+// }
+
+
+// void executeGLayMultiThreaded(struct xrtGLAYHandle *glayHandle, GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank)
+// {
+//     std::vector<xrt::run> runGLayKernels;
+//     std::vector<std::thread> t(thread_num);
+
+//     for (int i = 0; i < thread_num; i++)
+//     {
+//         runGLayKernels.push_back(xrt::run(glayHandle->kernelHandle));
+//     }
+
+//     int residue = groups_num % thread_num;
+//     int i, k;
+//     for (k = 0; k < groups_num / thread_num; k++)
+//     {
+//         for (i = 0; i < thread_num; i++)
+//         {
+//             t[i] = std::thread(executeGLayThread, runGLayKernels[i], glayGraphCSRxrtBufferHandlePerBank);
+//         }
+//         for (i = 0; i < thread_num; i++)
+//         {
+//             t[i].join();
+//         }
+//     }
+//     for (i = 0; i < residue; i++)
+//     {
+//         //runGLayKernels[i].set_arg(krnl_cbc_arg_SRC_ADDR, input_sub_buffer[k * thread_num + i]);   // use sub-buffer for source pointer argument
+//         //runGLayKernels[i].set_arg(krnl_cbc_arg_DEST_ADDR, output_sub_buffer[k * thread_num + i]); // use sub-buffer for source pointer argument
+//         t[i] = std::thread(executeGLayThread, runGLayKernels[i], glayGraphCSRxrtBufferHandlePerBank);
+//     }
+//     for (i = 0; i < residue; i++)
+//     {
+//         t[i].join();
+//     }
+
+// }
