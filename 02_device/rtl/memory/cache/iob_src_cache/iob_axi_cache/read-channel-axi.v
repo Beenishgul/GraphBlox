@@ -73,76 +73,121 @@ localparam
 reg [1:0] state;
 
 
-always @(posedge ap_clk)
-  begin
-    if(reset)
+// always @(posedge ap_clk)
+//   begin
+//     if(reset)
 
-      state <= idle;
+//       state <= idle;
 
-    else
+//     else
 
-      case (state)
-        idle :
-          begin
-            if(replace_valid)
-              state <= init_process;
+//       case (state)
+//         idle :
+//           begin
+//             if(replace_valid)
+//               state <= init_process;
+//             else
+//               state <= idle;
+//           end
+
+//         init_process :
+//           begin
+//             if(m_axi_arready)
+//               state <= load_process;
+//             else
+//               state <= init_process;
+//           end
+
+//         load_process :
+//           begin
+//             if(m_axi_rvalid)
+//               if(m_axi_rresp != 2'b00) //slave_error - received at the same time as valid
+//                 state <= init_process;
+//             else
+//               state <= end_process;
+//             else
+//               state <= load_process;
+//           end
+
+//         end_process : //delay for the read_latency of the memories (if the rdata is the last word)
+//           state <= idle;
+
+
+//         default : ;
+//       endcase
+//   end
+
+
+// always @*
+//   begin
+//     m_axi_arvalid_int = 1'b0;
+//     m_axi_rready_int  = 1'b0;
+//     replace           = 1'b1;
+//     case(state)
+
+//       idle :
+//         begin
+//           replace = 1'b0;
+//         end
+
+//       init_process :
+//         begin
+//           m_axi_arvalid_int = 1'b1;
+//         end
+
+//       load_process :
+//         begin
+//           m_axi_rready_int = 1'b1;
+//         end
+
+//       default : ;
+
+//     endcase
+//   end // always @ *
+
+         always @(posedge ap_clk) begin
+            if (reset) state <= idle;
             else
-              state <= idle;
-          end
+               case (state)
+                  idle: begin
+                     if (replace_valid) state <= init_process;
+                     else state <= idle;
+                  end
+                  init_process: begin
+                     if (m_axi_arready) state <= load_process;
+                     else state <= init_process;
+                  end
+                  load_process: begin
+                     if (m_axi_rvalid)
+                        if (m_axi_rresp != 2'b00)  // slave_error - received at the same time as valid
+                           state <= init_process;
+                        else state <= end_process;
+                     else state <= load_process;
+                  end
+                  end_process:
+                  state <= idle; // delay for the read_latency of the memories (if the rdata is the last word)
+                  default: ;
+               endcase
+         end
 
-        init_process :
-          begin
-            if(m_axi_arready)
-              state <= load_process;
-            else
-              state <= init_process;
-          end
+         always @* begin
+            m_axi_arvalid_int = 1'b0;
+            m_axi_rready_int  = 1'b0;
+            replace         = 1'b1;
 
-        load_process :
-          begin
-            if(m_axi_rvalid)
-              if(m_axi_rresp != 2'b00) //slave_error - received at the same time as valid
-                state <= init_process;
-            else
-              state <= end_process;
-            else
-              state <= load_process;
-          end
-
-        end_process : //delay for the read_latency of the memories (if the rdata is the last word)
-          state <= idle;
-
-
-        default : ;
-      endcase
-  end
-
-
-always @*
-  begin
-    m_axi_arvalid_int = 1'b0;
-    m_axi_rready_int  = 1'b0;
-    replace           = 1'b1;
-    case(state)
-
-      idle :
-        begin
-          replace = 1'b0;
-        end
-
-      init_process :
-        begin
-          m_axi_arvalid_int = 1'b1;
-        end
-
-      load_process :
-        begin
-          m_axi_rready_int = 1'b1;
-        end
-
-      default : ;
-
-    endcase
-  end // always @ *
+            case (state)
+               idle: begin
+                  replace = 1'b0;
+               end
+               init_process: begin
+                  m_axi_arvalid_int = 1'b1;
+               end
+               load_process: begin
+                  m_axi_rready_int = 1'b1;
+               end
+               default: ;
+            endcase
+         end
+      
 
 endmodule // read_process_native

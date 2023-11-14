@@ -426,7 +426,7 @@ module cu_setup #(
     assign configuration_comb_flush.payload.param.flush_mode             = 1'b1;
     assign configuration_comb_flush.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_flush.payload.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W] - {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
-    assign configuration_comb_flush.payload.param.start_read             = 0;
+    assign configuration_comb_flush.payload.param.start_read             = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
     assign configuration_comb_flush.payload.param.end_read               = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W];
     assign configuration_comb_flush.payload.param.stride                 = 1;
     assign configuration_comb_flush.payload.param.granularity            = $clog2(CACHE_FRONTEND_DATA_W/8);

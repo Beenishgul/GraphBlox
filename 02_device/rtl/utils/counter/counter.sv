@@ -65,6 +65,9 @@ module counter #(
       if (load) begin
         count_r  <= load_value;
         stride_r <= stride_value;
+      end else if (incr & decr) begin
+        count_r  <= count_r;
+        stride_r <= stride_r;
       end
       else if (incr & ~decr) begin
         count_r  <= count_r + stride_r;
