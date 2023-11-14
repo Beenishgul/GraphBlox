@@ -19,9 +19,7 @@ import PKG_CONTROL::*;
 import PKG_MEMORY::*;
 import PKG_CACHE::*;
 
-module kernel_cu #(
-  `include "kernel_parameters.vh"
-  ) (
+module kernel_cu #(`include "kernel_parameters.vh") (
   input  logic                          ap_clk           ,
   input  logic                          areset           ,
   input  KernelDescriptor               descriptor_in    ,
@@ -87,7 +85,7 @@ module kernel_cu #(
   logic                  cu_setup_cu_flush                 ;
   logic                  cu_setup_done_out                 ;
 // --------------------------------------------------------------------------------------
-// Signals for Vertex CU
+// Signals for CU
 // --------------------------------------------------------------------------------------
   KernelDescriptor       cu_bundles_descriptor               ;
   MemoryPacket           cu_bundles_response_in              ;
@@ -97,7 +95,12 @@ module kernel_cu #(
   FIFOStateSignalsOutput cu_bundles_fifo_request_signals_out ;
   FIFOStateSignalsInput  cu_bundles_fifo_request_signals_in  ;
   logic                  cu_bundles_fifo_setup_signal        ;
-  logic                  cu_bundles_done_out                 ;
+
+// --------------------------------------------------------------------------------------
+  parameter              PULSE_HOLD             = 100;
+  logic [PULSE_HOLD-1:0] cu_bundles_done_hold        ;
+  logic                  cu_bundles_done_out         ;
+  logic                  cu_bundles_done_assert      ;
 
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI
@@ -174,7 +177,7 @@ module kernel_cu #(
       fifo_setup_signal           <= cu_cache_fifo_setup_signal | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
       kernel_cu_request_out.valid <= request_out_reg.valid ;
       done_out                    <= cu_setup_done_out;
-      cu_setup_cu_flush           <= cu_bundles_done_out;
+      cu_setup_cu_flush           <= cu_bundles_done_assert;
     end
   end
 
@@ -326,9 +329,7 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-  cu_bundles #(
-    `include"set_cu_parameters.vh"
-    ) inst_cu_bundles (
+  cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
     .ap_clk                             (ap_clk                              ),
     .areset                             (areset_bundles                      ),
     .descriptor_in                      (cu_bundles_descriptor               ),
@@ -341,5 +342,18 @@ module kernel_cu #(
     .fifo_setup_signal                  (cu_bundles_fifo_setup_signal        ),
     .done_out                           (cu_bundles_done_out                 )
   );
+
+// --------------------------------------------------------------------------------------
+// Make sure done signal is asserted for N cycles
+// --------------------------------------------------------------------------------------
+  assign cu_bundles_done_assert = &cu_bundles_done_hold;
+
+  always_ff @(posedge ap_clk) begin
+    if (areset_bundles) begin
+      cu_bundles_done_hold <= 0;
+    end else begin
+      cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],cu_bundles_done_out};
+    end
+  end
 
 endmodule : kernel_cu
