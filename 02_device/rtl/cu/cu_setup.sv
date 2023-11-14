@@ -22,14 +22,14 @@ import PKG_SETUP::*;
 import PKG_CACHE::*;
 
 module cu_setup #(
-    parameter ID_CU            = 0 ,
-    parameter ID_BUNDLE        = 0 ,
-    parameter ID_LANE          = 0 ,
-    parameter ID_ENGINE        = 0 ,
-    parameter ID_MODULE        = 0 ,
-    parameter FIFO_WRITE_DEPTH = 32,
-    parameter PROG_THRESH      = 16,
-    parameter COUNTER_WIDTH    = 32
+    parameter ID_CU            = 0                    ,
+    parameter ID_BUNDLE        = 0                    ,
+    parameter ID_LANE          = 0                    ,
+    parameter ID_ENGINE        = 0                    ,
+    parameter ID_MODULE        = 0                    ,
+    parameter FIFO_WRITE_DEPTH = 32                   ,
+    parameter PROG_THRESH      = 16                   ,
+    parameter COUNTER_WIDTH    = CACHE_FRONTEND_DATA_W
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
