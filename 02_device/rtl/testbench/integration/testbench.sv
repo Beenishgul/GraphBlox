@@ -506,28 +506,28 @@ module __KERNEL___testbench ();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Write to the control registers to enable the triggering of interrupts for the __KERNEL__
     task automatic enable_interrupts();
-        $display("Starting: Enabling Interrupts....");
+        $display("MSG: Starting: Enabling Interrupts....");
         write_register(KRNL_GIE_REG_ADDR, GIE_GIE_MASK);
         write_register(KRNL_IER_REG_ADDR, IER_DONE_MASK);
-        $display("Finished: Interrupts enabled.");
+        $display("MSG: Finished: Interrupts enabled.");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Disabled the interrupts.
     task automatic disable_interrupts();
-        $display("Starting: Disable Interrupts....");
+        $display("MSG: Starting: Disable Interrupts....");
         write_register(KRNL_GIE_REG_ADDR, 32'h0);
         write_register(KRNL_IER_REG_ADDR, 32'h0);
-        $display("Finished: Interrupts disabled.");
+        $display("MSG: Finished: Interrupts disabled.");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //When the interrupt is asserted, read the correct registers and clear the asserted interrupt.
     task automatic service_interrupts();
         bit [31:0] rd_value;
-        $display("Starting Servicing interrupts....");
+        $display("MSG: Starting Servicing interrupts....");
         read_register(KRNL_CTRL_REG_ADDR, rd_value);
-        $display("Control Register: 0x%0x", rd_value);
+        $display("MSG: Control Register: 0x%0x", rd_value);
 
         blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_CONTINUE_MASK);
 
@@ -535,22 +535,22 @@ module __KERNEL___testbench ();
             $error("%t : DONE bit not asserted. Register value: (0x%0x)", $time, rd_value);
         end
         read_register(KRNL_ISR_REG_ADDR, rd_value);
-        $display("Interrupt Status Register: 0x%0x", rd_value);
+        $display("MSG: Interrupt Status Register: 0x%0x", rd_value);
         blocking_write_register(KRNL_ISR_REG_ADDR, rd_value);
-        $display("Finished Servicing interrupts");
+        $display("MSG: Finished Servicing interrupts");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Start the control VIP, SLAVE memory models and AXI4-Stream.
     task automatic start_vips();
 
-        $display("///////////////////////////////////////////////////////////////////////////");
-        $display("Control Master: ctrl");
+        $display("MSG: ///////////////////////////////////////////////////////////////////////////");
+        $display("MSG: Control Master: ctrl");
         ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
         ctrl.start_master();
 
-        $display("///////////////////////////////////////////////////////////////////////////");
-        $display("Starting Memory slave: m00_axi");
+        $display("MSG: ///////////////////////////////////////////////////////////////////////////");
+        $display("MSG: Starting Memory slave: m00_axi");
         m00_axi = new("m00_axi", __KERNEL___testbench.inst_slv_m00_axi_vip.inst.IF);
         m00_axi.start_slave();
 
@@ -621,13 +621,13 @@ module __KERNEL___testbench ();
         end
         read_register(addr_in, rddata);
         if (rddata != 32'h0) begin
-            $error("Initial value mismatch: A:0x%0x : Expected 0x%x -> Got 0x%x", addr_in, 0, rddata);
+            $error("MSG: Initial value mismatch: A:0x%0x : Expected 0x%x -> Got 0x%x", addr_in, 0, rddata);
             error_found = 1;
         end
         blocking_write_register(addr_in, 32'hffffffff);
         read_register(addr_in, rddata);
         if (rddata != mask_data) begin
-            $error("Initial value mismatch: A:0x%0x : Expected 0x%x -> Got 0x%x", addr_in, mask_data, rddata);
+            $error("MSG: Initial value mismatch: A:0x%0x : Expected 0x%x -> Got 0x%x", addr_in, mask_data, rddata);
             error_found = 1;
         end
     endtask
@@ -1092,23 +1092,23 @@ module __KERNEL___testbench ();
         if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
         else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
 
-        graph.file_ptr_in_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.in_degree", "r");
+        graph.file_ptr_in_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/_FILE_BIN_TYPE_.in_degree", "r");
         if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
         else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
 
-        graph.file_ptr_out_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.out_degree", "r");
+        graph.file_ptr_out_degree = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/_FILE_BIN_TYPE_.out_degree", "r");
         if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
         else                    $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
 
-        graph.file_ptr_edges_idx = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_idx", "r");
+        graph.file_ptr_edges_idx = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/_FILE_BIN_TYPE_.edges_idx", "r");
         if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
         else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
 
-        graph.file_ptr_edges_array_src = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_src", "r");
+        graph.file_ptr_edges_array_src = $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/_FILE_BIN_TYPE_.edges_array_src", "r");
         if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
         else                         $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
 
-        graph.file_ptr_edges_array_dest= $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/graph.bin.edges_array_dest", "r");
+        graph.file_ptr_edges_array_dest= $fopen("_GRAPH_DIR_/_GRAPH_SUIT_/_GRAPH_NAME_/_FILE_BIN_TYPE_.edges_array_dest", "r");
         if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
         else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
 
@@ -1150,10 +1150,10 @@ module __KERNEL___testbench ();
     task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
         error_found = 0;
 
-        $display("Starting: multiple_iteration");
+        $display("MSG: Starting: multiple_iteration");
         for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
 
-            $display("Starting iteration: %d / %d", iter+1, num_iterations);
+            $display("MSG: Starting iteration: %d / %d", iter+1, num_iterations);
             RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
             case(choose_pressure_type)
                 0 : slv_no_backpressure_wready();
@@ -1193,7 +1193,7 @@ module __KERNEL___testbench ();
             ///////////////////////////////////////////////////////////////////////////
             // error_found |= check___KERNEL___result()   ;
 
-            $display("Finished iteration: %d / %d", iter+1, num_iterations);
+            $display("MSG: Finished iteration: %d / %d", iter+1, num_iterations);
         end
     endtask
 
@@ -1207,14 +1207,14 @@ module __KERNEL___testbench ();
         start_vips();
         check_scalar_registers(error_found);
         if (error_found == 1) begin
-            $display( "Test Failed!");
+            $display( "ERROR: Test Failed!");
             $finish();
         end
 
         #1000
             check_pointer_registers(error_found);
         if (error_found == 1) begin
-            $display( "Test Failed!");
+            $display( "ERROR: Test Failed!");
             $finish();
         end
 
@@ -1224,7 +1224,7 @@ module __KERNEL___testbench ();
         #1000
             multiple_iteration(1, error_found, graph);
         if (error_found == 1) begin
-            $display( "Test Failed!");
+            $display( "ERROR: Test Failed!");
             $finish();
         end
 
@@ -1232,10 +1232,10 @@ module __KERNEL___testbench ();
             multiple_iteration(5, error_found, graph);
 
         if (error_found == 1) begin
-            $display( "Test Failed!");
+            $display( "ERROR: Test Failed!");
             $finish();
         end else begin
-            $display( "Test completed successfully");
+            $display( "ERROR: Test completed successfully");
         end
 
         #1000  $finish;

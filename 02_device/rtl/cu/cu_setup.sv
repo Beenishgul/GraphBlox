@@ -255,9 +255,6 @@ module cu_setup #(
                     next_state = CU_SETUP_FLUSH_PAUSE;
             end
             CU_SETUP_FLUSH_DONE : begin
-                if (done_out_int)
-                    next_state = CU_SETUP_IDLE;
-                else
                     next_state = CU_SETUP_FLUSH_DONE;
             end
         endcase
@@ -302,7 +299,7 @@ module cu_setup #(
                 response_memory_counter_load_value             <= configuration_comb_program.payload.param.array_size;
             end
             CU_SETUP_REQ_BUSY : begin
-                done_int_reg                                   <= engine_cu_setup_done_out;
+                done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
                 engine_cu_setup_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
@@ -345,7 +342,7 @@ module cu_setup #(
                 response_memory_counter_load_value             <= configuration_comb_flush.payload.param.array_size;
             end
             CU_SETUP_FLUSH_BUSY : begin
-                done_int_reg                                   <= engine_cu_setup_done_out;
+                done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b1;
                 engine_cu_setup_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
