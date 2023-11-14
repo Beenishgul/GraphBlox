@@ -38,8 +38,8 @@ package PKG_CACHE;
 // --------------------------------------------------------------------------------------
 	parameter CACHE_FRONTEND_ADDR_W = GLOBAL_ADDR_WIDTH_BITS; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 	parameter CACHE_FRONTEND_DATA_W = GLOBAL_DATA_WIDTH_BITS; //Data width - word size used for the cache
-	parameter CACHE_N_WAYS          = 2                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-	parameter CACHE_LINE_OFF_W      = 4                     ; //Line-Offset Width - 2**NLINE_W total cache lines
+	parameter CACHE_N_WAYS          = 1                     ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+	parameter CACHE_LINE_OFF_W      = 5                     ; //Line-Offset Width - 2**NLINE_W total cache lines
 	parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)            ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 	parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
@@ -57,8 +57,8 @@ package PKG_CACHE;
 	parameter CACHE_WORD_OFF_W = $clog2(CACHE_BACKEND_DATA_W/CACHE_FRONTEND_DATA_W); //Word-Offset Width - 2**OFFSET_W total CACHE_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
 /*---------------------------------------------------*/
 //Write Policy
-	parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
-	// parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
+	// parameter CACHE_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
+	parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
 //Controller's options
 	parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
 	parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
