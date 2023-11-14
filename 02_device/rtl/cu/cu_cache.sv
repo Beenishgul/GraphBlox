@@ -66,6 +66,10 @@ module cu_cache #(
   CacheResponsePayload  cache_response_mem;
   CacheControlIOBOutput cache_ctrl_in     ;
   CacheControlIOBOutput cache_ctrl_out    ;
+  logic                 invalidate        ;
+  logic                 invalidate_reg    ;
+  logic                 l1_avalid         ;
+
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
@@ -239,6 +243,17 @@ module cu_cache #(
     .ap_clk       (ap_clk                      ),
     .reset        (areset_cache                )
   );
+
+  assign l1_avalid               = cache_request_mem.iob.valid ;
+  assign cache_ctrl_in.force_inv = invalidate_reg & ~l1_avalid;
+  assign cache_ctrl_in.wtb_empty = 1'b1;
+
+  //Necessary logic to avoid invalidating L2 while it's being accessed by a request
+  always @(posedge ap_clk)
+    if (areset_cache) invalidate_reg    <= 1'b0;
+    else if (invalidate) invalidate_reg <= 1'b1;
+    else if (~l1_avalid) invalidate_reg <= 1'b0;
+    else invalidate_reg <= invalidate_reg;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT

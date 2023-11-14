@@ -133,12 +133,30 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
+  parameter PULSE_HOLD = 40;
+  logic areset_system;
+// --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    areset_m_axi   <= ~ap_rst_n;
-    areset_cu      <= ~ap_rst_n | ap_done;
-    areset_control <= ~ap_rst_n;
-    areset_cache   <= ~ap_rst_n;
+    areset_m_axi   <= areset_system;
+    areset_cu      <= areset_system | ap_done;
+    areset_control <= areset_system;
+    areset_cache   <= areset_system;
   end
+
+  logic [PULSE_HOLD-1:0] sync_ff;
+
+  always_ff @(posedge ap_clk or negedge ap_rst_n) begin
+    if (~ap_rst_n) begin
+      // Asynchronously assert reset (active low reset)
+      sync_ff <= {PULSE_HOLD{1'b1}};;
+    end else begin
+      // Synchronously de-assert reset
+      sync_ff <= sync_ff << 1'b1;
+    end
+  end
+
+  // Output of the second flip-flop is the synchronized reset
+  assign areset_system = sync_ff[PULSE_HOLD-1];
 
 // --------------------------------------------------------------------------------------
 // Control chain signals
