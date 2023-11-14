@@ -85,11 +85,10 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-  (* KEEP = "yes" *)
-  logic areset_m_axi   = 1'b0;
-  logic areset_cu      = 1'b0;
-  logic areset_control = 1'b0;
-  logic areset_cache   = 1'b0;
+  logic areset_m_axi   ;
+  logic areset_cu      ;
+  logic areset_control ;
+  logic areset_cache   ;
 
 // --------------------------------------------------------------------------------------
 // AXI
@@ -138,7 +137,7 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     areset_m_axi   <= areset_system;
-    areset_cu      <= areset_system | ap_done;
+    areset_cu      <= areset_system;
     areset_control <= areset_system;
     areset_cache   <= areset_system;
   end
@@ -146,7 +145,7 @@ module kernel_afu #(
   logic [PULSE_HOLD-1:0] sync_ff;
 
   always_ff @(posedge ap_clk or negedge ap_rst_n) begin
-    if (~ap_rst_n) begin
+    if (~ap_rst_n | ap_done) begin
       // Asynchronously assert reset (active low reset)
       sync_ff <= {PULSE_HOLD{1'b1}};;
     end else begin

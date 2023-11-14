@@ -1235,7 +1235,7 @@ module __KERNEL___testbench ();
             $display( "ERROR: Test Failed!");
             $finish();
         end else begin
-            $display( "ERROR: Test completed successfully");
+            $display( "MSG: Test completed successfully");
         end
 
         #1000  $finish;
