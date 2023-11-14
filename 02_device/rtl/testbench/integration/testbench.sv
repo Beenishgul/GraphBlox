@@ -1150,10 +1150,10 @@ module __KERNEL___testbench ();
     task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
         error_found = 0;
 
-        $display("MSG: Starting: multiple_iteration");
+        $display("Starting: multiple_iteration");
         for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
 
-            $display("MSG: Starting iteration: %d / %d", iter+1, num_iterations);
+            $display("Starting iteration: %d / %d", iter+1, num_iterations);
             RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
             case(choose_pressure_type)
                 0 : slv_no_backpressure_wready();
@@ -1193,7 +1193,7 @@ module __KERNEL___testbench ();
             ///////////////////////////////////////////////////////////////////////////
             // error_found |= check___KERNEL___result()   ;
 
-            $display("MSG: Finished iteration: %d / %d", iter+1, num_iterations);
+            $display("Finished iteration: %d / %d", iter+1, num_iterations);
         end
     endtask
 
@@ -1235,7 +1235,7 @@ module __KERNEL___testbench ();
             $display( "ERROR: Test Failed!");
             $finish();
         end else begin
-            $display( "MSG: Test completed successfully");
+            $display( "Test completed successfully");
         end
 
         #1000  $finish;
