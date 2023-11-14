@@ -52,7 +52,7 @@ module engine_filter_cond_kernel (
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params.const_mask[i] & config_params_valid) begin
           ops_value_reg.field[i] <= config_params.const_value;
-        end else if (data_valid & config_params_valid) begin
+        end else if (config_params_valid) begin
           for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             if(config_params.ops_mask[i][j]) begin
               ops_value_reg.field[i] <= data.field[j];
@@ -63,7 +63,7 @@ module engine_filter_cond_kernel (
         end
 
         for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-          if (data_valid & config_params_valid) begin
+          if (config_params_valid) begin
             for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
               if(config_params.ops_mask[i][j]) begin
                 org_value_reg.field[i] <= data.field[j];
