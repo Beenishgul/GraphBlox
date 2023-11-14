@@ -25,7 +25,7 @@
 0x00000033 // entry 39   cacheline 2    offset 7    --  2  - Index_end
 0x00000001 // entry 40   cacheline 2    offset 8    --  3  - Stride
 0x80000002 // entry 41   cacheline 2    offset 9    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00010902 // entry 42   cacheline 2    offset 10   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00001102 // entry 42   cacheline 2    offset 10   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine -> 1 0001 0000 0010
 0x00010401 // entry 43   cacheline 2    offset 11   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 44   cacheline 2    offset 12   --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 45   cacheline 2    offset 13   --  8  - BUFFER Array Pointer RHS
@@ -49,7 +49,7 @@
 0xFFFFFFFF // entry 55   cacheline 3    offset 7    --  3  - const_value
 0x00004821 // entry 56   cacheline 3    offset 8    --  5  - ops_mask
 0x00000000 // entry 57   cacheline 3    offset 9    --  4  - break_flag | continue_flag | ternary_flag | conditional_flag
-0x00010902 // entry 58   cacheline 3    offset 10   --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00001102 // entry 58   cacheline 3    offset 10   --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 59   cacheline 3    offset 11   --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 60   cacheline 3    offset 12   --  7  - if -> id_engine id_module | else -> id_engine id_module
 // --------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x0000003D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement
+0x0000002D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0010  1110
 0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
 0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
 0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride

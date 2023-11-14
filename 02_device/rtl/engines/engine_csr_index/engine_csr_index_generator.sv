@@ -501,7 +501,6 @@ module engine_csr_index_generator #(parameter
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 done_out_reg               <= 1'b0;
-                fifo_request_din_reg.valid <= 1'b1;
                 if(response_engine_in_break_flag_int)
                     response_engine_in_break_flag_reg <= 1'b1;
             end
@@ -588,7 +587,7 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_comb begin
         response_engine_in_break_flag_int = 1'b0;
-        response_engine_in_done_flag_int  = 1'b0 | ~configure_engine_int.payload.param.mode_filter;
+        response_engine_in_done_flag_int  = 1'b0 | ~configure_engine_int.payload.param.mode_break;
         if(configure_engine_int.valid & configure_engine_int.payload.param.mode_break) begin
             response_engine_in_break_flag_int = (response_engine_in_reg.payload.meta.route.seq_state == SEQUENCE_BREAK) & response_engine_in_reg.valid;
             response_engine_in_done_flag_int  = (response_engine_in_reg.payload.meta.route.seq_state == SEQUENCE_DONE)  & response_engine_in_reg.valid;
@@ -762,6 +761,11 @@ module engine_csr_index_generator #(parameter
                 fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
                 fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 request_engine_out_reg                        <= fifo_response_comb;
+
+                if(fifo_response_comb.valid)
+                    $display("MSG: %0d", fifo_response_comb.payload.data.field[0]);
+   
+                     // $display("MSG: fifo_response_comb.payload.data.field : %0d - %0d|%0d|%0d",fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[0],fifo_response_comb.payload.data.field[2],fifo_response_comb.payload.data.field[3]);
             end
         end
     end
