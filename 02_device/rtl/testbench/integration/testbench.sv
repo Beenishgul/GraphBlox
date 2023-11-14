@@ -506,26 +506,26 @@ module __KERNEL___testbench ();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Write to the control registers to enable the triggering of interrupts for the __KERNEL__
     task automatic enable_interrupts();
-        $display("MSG: Starting: Enabling Interrupts....");
+        $display("Starting: Enabling Interrupts....");
         write_register(KRNL_GIE_REG_ADDR, GIE_GIE_MASK);
         write_register(KRNL_IER_REG_ADDR, IER_DONE_MASK);
-        $display("MSG: Finished: Interrupts enabled.");
+        $display("Finished: Interrupts enabled.");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Disabled the interrupts.
     task automatic disable_interrupts();
-        $display("MSG: Starting: Disable Interrupts....");
+        $display("Starting: Disable Interrupts....");
         write_register(KRNL_GIE_REG_ADDR, 32'h0);
         write_register(KRNL_IER_REG_ADDR, 32'h0);
-        $display("MSG: Finished: Interrupts disabled.");
+        $display("Finished: Interrupts disabled.");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //When the interrupt is asserted, read the correct registers and clear the asserted interrupt.
     task automatic service_interrupts();
         bit [31:0] rd_value;
-        $display("MSG: Starting Servicing interrupts....");
+        $display("Starting Servicing interrupts....");
         read_register(KRNL_CTRL_REG_ADDR, rd_value);
         $display("MSG: Control Register: 0x%0x", rd_value);
 
@@ -537,20 +537,20 @@ module __KERNEL___testbench ();
         read_register(KRNL_ISR_REG_ADDR, rd_value);
         $display("MSG: Interrupt Status Register: 0x%0x", rd_value);
         blocking_write_register(KRNL_ISR_REG_ADDR, rd_value);
-        $display("MSG: Finished Servicing interrupts");
+        $display("Finished Servicing interrupts");
     endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Start the control VIP, SLAVE memory models and AXI4-Stream.
     task automatic start_vips();
 
-        $display("MSG: ///////////////////////////////////////////////////////////////////////////");
+        $display("///////////////////////////////////////////////////////////////////////////");
         $display("MSG: Control Master: ctrl");
         ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
         ctrl.start_master();
 
-        $display("MSG: ///////////////////////////////////////////////////////////////////////////");
-        $display("MSG: Starting Memory slave: m00_axi");
+        $display("///////////////////////////////////////////////////////////////////////////");
+        $display("Starting Memory slave: m00_axi");
         m00_axi = new("m00_axi", __KERNEL___testbench.inst_slv_m00_axi_vip.inst.IF);
         m00_axi.start_slave();
 
@@ -895,19 +895,19 @@ module __KERNEL___testbench ();
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_0_ptr + (slot * 4));
             if (slot < LP_MAX_TRANSFER_LENGTH) begin
                 if (ret_rd_value != (slot + 1)) begin
-                    $error("Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot + 1, ret_rd_value);
+                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot + 1, ret_rd_value);
                     error_found |= 1;
                     error_counter++;
                 end
             end else begin
                 if (ret_rd_value != slot) begin
-                    $error("Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot, ret_rd_value);
+                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot, ret_rd_value);
                     error_found |= 1;
                     error_counter++;
                 end
             end
             if (error_counter > 5) begin
-                $display("Too many errors found. Exiting check of m00_axi.");
+                $display("WARNING: Too many errors found. Exiting check of m00_axi.");
                 slot = LP_MAX_LENGTH;
             end
         end
