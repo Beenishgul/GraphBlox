@@ -92,4 +92,23 @@
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 61   cacheline 3    offset 13   -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
-// Number of entries 62
+// --------------------------------------------------------------------------------------
+// Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
+// --------------------------------------------------------------------------------------
+0x0000000D // entry 62   cacheline 3    offset 14   -- //  0  - Increment | Decrement | mode_sequence | mode_buffer | mode_break | mode_filter
+0x00000000 // entry 63   cacheline 3    offset 15   -- //  1  - Index_start
+0x00000000 // entry 64   cacheline 4    offset 0    -- //  2  - Index_end
+0x00000001 // entry 65   cacheline 4    offset 1    -- //  3  - Stride
+0x80000002 // entry 66   cacheline 4    offset 2    -- //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
+0x00000102 // entry 67   cacheline 4    offset 3    -- //  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
+0x01010801 // entry 68   cacheline 4    offset 4    -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 69   cacheline 4    offset 5    -- //  7  - BUFFER Array Pointer LHS
+0x00000000 // entry 70   cacheline 4    offset 6    -- //  8  - BUFFER Array Pointer RHS
+0x00000033 // entry 71   cacheline 4    offset 7    -- //  9  - BUFFER size
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA ID 9    mapping 6    cycles 1    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+0x00000001 // entry 72   cacheline 4    offset 8    -- //  0  - number of hops (forward till discards)
+// --------------------------------------------------------------------------------------
+// Number of entries 73

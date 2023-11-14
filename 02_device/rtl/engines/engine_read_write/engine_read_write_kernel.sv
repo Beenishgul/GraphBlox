@@ -51,7 +51,7 @@ module engine_read_write_kernel (
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         if(config_params_in.const_mask[i] & config_params_valid_in) begin
           ops_value_reg.field[i] <= config_params_in.const_value;
-        end else if (data_valid_in & config_params_valid_in) begin
+        end else if (config_params_valid_in) begin
           for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             if(config_params_in.ops_mask[i][j]) begin
               ops_value_reg.field[i] <= data_in.field[j];
@@ -63,7 +63,7 @@ module engine_read_write_kernel (
       end
 
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        if (data_valid_in & config_params_valid_in) begin
+        if (config_params_valid_in) begin
           for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
             if(config_params_in.ops_mask[i][j]) begin
               org_value_reg.field[i] <= data_in.field[j];

@@ -70,4 +70,22 @@
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Number of entries 62
+// --------------------------------------------------------------------------------------
+// Name ENGINE_CSR_INDEX    ID 9    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
+// --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    graph.overlay_program[3][(GLOBAL_DATA_WIDTH_BITS*15)+:GLOBAL_DATA_WIDTH_BITS]  = ( 0 );
+   // --  2  - Index_End
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS]  = ( graph.num_edges );
+   // --  7  - Array_Pointer_LHS
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*5)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[31:0];
+   // --  8  - Array_Pointer_RHS
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*6)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_4_ptr[63:32];
+   // --  9  - Array_size
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*7)+:GLOBAL_DATA_WIDTH_BITS]  = ( graph.num_edges )-( 0 );
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA ID 10   mapping 6    cycles 1    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Number of entries 73
