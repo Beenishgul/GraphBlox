@@ -162,7 +162,7 @@ void writeSerializedGraphDataStructure(struct Arguments *arguments)  // for now 
         Stop(timer);
         generateGraphPrintMessageWithtime("Free Graph CSR (Seconds)", Seconds(timer));
     }
-    else if(arguments->fnameb_format == 1 && arguments->convert_format == 3)   // for now it edge list is text only convert to binary
+    else if(arguments->fnameb_format == 1 && arguments->convert_format == 3)   // for Glay testbench
     {
         void *graph = NULL;
         struct GraphCSR *graphCSR = NULL;

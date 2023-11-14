@@ -147,6 +147,12 @@ then
         sed -i "s/$search/$replace/g" $newtext
     fi
 
+    search="_FILE_BIN_TYPE_"
+    replace=${FILE_BIN_TYPE}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtext
+    fi
+
     search="_ALGORITHM_NAME_"
     replace=${ALGORITHM_NAME}
     if [[ $search != "" && $replace != "" ]]; then
