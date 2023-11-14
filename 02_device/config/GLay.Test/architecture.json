@@ -39,6 +39,10 @@
             ["ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"  ],
             ["ENGINE_READ_WRITE(C:0)(B:auxiliary_2,num_vertices,num_vertices*2)" ],
             ["ENGINE_FORWARD_DATA"                                  ]
+        ],
+         "2": [
+            ["ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"     ],
+            ["ENGINE_FORWARD_DATA"       ]
         ]
     }
 }

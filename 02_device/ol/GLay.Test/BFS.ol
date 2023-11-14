@@ -92,4 +92,22 @@
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 87   cacheline 5    offset 7    --  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
-// Number of entries 62
+// --------------------------------------------------------------------------------------
+// Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
+// --------------------------------------------------------------------------------------
+0x0000003D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement
+0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
+0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
+0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
+0x80000002 // entry 92   cacheline 5    offset 12   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
+0x00000102 // entry 93   cacheline 5    offset 13   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00010801 // entry 94   cacheline 5    offset 14   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
+0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
+0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA ID 11   mapping 6    cycles 1   
+// --------------------------------------------------------------------------------------
+0x00000001 // entry 98   cacheline 6    offset 2    --  0  - number of hops (forward till discards)
+// --------------------------------------------------------------------------------------
