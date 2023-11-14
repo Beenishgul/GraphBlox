@@ -335,10 +335,15 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
-                next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
+                if (done_int_reg)
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
+                else 
+                    next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full)
+                if (done_int_reg)
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
+                else if (~fifo_request_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
@@ -484,11 +489,17 @@ module engine_csr_index_generator #(parameter
                 counter_load               <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
-                configure_engine_int.valid <= 1'b1;
+                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
+                    done_int_reg               <= 1'b1;
+                    fifo_request_din_reg.valid <= 1'b0;
+                end
+                else begin
+                    done_int_reg               <= 1'b0;
+                    fifo_request_din_reg.valid <= 1'b1;
+                end
                 counter_clear              <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
-                done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b1;
                 if(response_engine_in_break_flag_int)
@@ -531,11 +542,16 @@ module engine_csr_index_generator #(parameter
                     response_engine_in_break_flag_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
+                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
+                    done_int_reg               <= 1'b1;
+                end
+                else begin
+                    done_int_reg               <= 1'b0;
+                end
                 configure_engine_int.valid <= 1'b1;
                 counter_clear              <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
-                done_int_reg               <= 1'b0;
                 done_out_reg               <= 1'b0;
                 fifo_request_din_reg.valid <= 1'b0;
                 if(response_engine_in_break_flag_int)

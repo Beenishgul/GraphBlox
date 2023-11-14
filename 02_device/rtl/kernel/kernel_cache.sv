@@ -76,16 +76,28 @@ module kernel_cache (
 // DRIVE AXI4 MASTER SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    m_axi_write.in <= m_axi_write_in;
-    m_axi_read.in  <= m_axi_read_in;
+    if (areset_control) begin
+      m_axi_write.in <= 0;
+      m_axi_read.in  <= 0;
+    end
+    else begin
+      m_axi_write.in <= m_axi_write_in;
+      m_axi_read.in  <= m_axi_read_in;
+    end
   end
-
+  
 // --------------------------------------------------------------------------------------
 // DRIVE AXI4 MASTER SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    m_axi_read_out  <= m_axi_read.out;
-    m_axi_write_out <= m_axi_write.out;
+    if (areset_control) begin
+      m_axi_read_out  <= 0;
+      m_axi_write_out <= 0;
+    end
+    else begin
+      m_axi_read_out  <= m_axi_read.out;
+      m_axi_write_out <= m_axi_write.out;
+    end
   end
 
 // --------------------------------------------------------------------------------------
@@ -94,16 +106,28 @@ module kernel_cache (
 // DRIVE AXI4 SLAVE SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    s_axi_write_out <= s_axi_write.out;
-    s_axi_read_out  <= s_axi_read.out;
+    if (areset_control) begin
+      s_axi_write_out <= 0;
+      s_axi_read_out  <= 0;
+    end
+    else begin
+      s_axi_write_out <= s_axi_write.out;
+      s_axi_read_out  <= s_axi_read.out;
+    end
   end
 
 // --------------------------------------------------------------------------------------
 // DRIVE AXI4 SLAVE SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-    s_axi_read.in  <= s_axi_read_in;
-    s_axi_write.in <= s_axi_write_in;
+    if (areset_control) begin
+      s_axi_read.in  <= 0;
+      s_axi_write.in <= 0;
+    end
+    else begin
+      s_axi_read.in  <= s_axi_read_in;
+      s_axi_write.in <= s_axi_write_in;
+    end
   end
 
 // --------------------------------------------------------------------------------------

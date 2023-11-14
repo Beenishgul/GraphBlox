@@ -101,7 +101,6 @@ module cu_setup #(
     FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_in ;
     FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_reg;
     logic                      engine_cu_setup_start_in                ;
-    logic                      engine_cu_setup_pause_in                ;
     logic                      engine_cu_setup_ready_out               ;
     logic                      engine_cu_setup_done_out                ;
 
@@ -266,9 +265,7 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b1;
                 done_out_reg                                   <= 1'b1;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
                 counter_clear                                  <= 1'b1;
                 counter_load                                   <= 1'b0;
@@ -278,9 +275,7 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b0;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
                 counter_clear                                  <= 1'b1;
                 counter_load                                   <= 1'b0;
@@ -290,9 +285,7 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b0;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b1;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b1;
                 counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b1;
@@ -302,9 +295,7 @@ module cu_setup #(
                 done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b1;
                 counter_load                                   <= 1'b0;
             end
@@ -312,18 +303,14 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b0;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b1;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
             end
             CU_SETUP_REQ_DONE : begin
                 done_int_reg                                   <= 1'b1;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
                 counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b0;
@@ -333,9 +320,7 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b0;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b1;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b1;
                 counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b1;
@@ -345,9 +330,7 @@ module cu_setup #(
                 done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= ~fifo_request_signals_out_int.prog_full;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b1;
                 counter_load                                   <= 1'b0;
             end
@@ -355,18 +338,14 @@ module cu_setup #(
                 done_int_reg                                   <= 1'b0;
                 done_out_reg                                   <= 1'b0;
                 cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b1;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
             end
             CU_SETUP_FLUSH_DONE : begin
                 done_int_reg                                   <= 1'b1;
                 done_out_reg                                   <= 1'b1;
                 cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_fifo_request_signals_reg.rd_en <= 1'b0;
                 engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_pause_in                       <= 1'b0;
                 engine_cu_setup_configuration_in.valid         <= 1'b0;
                 counter_clear                                  <= 1'b0;
                 counter_load                                   <= 1'b0;
@@ -448,7 +427,7 @@ module cu_setup #(
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-    assign engine_cu_setup_fifo_request_signals_in = engine_cu_setup_fifo_request_signals_reg;
+    assign engine_cu_setup_fifo_request_signals_in.rd_en = ~fifo_request_signals_out_int.prog_full;
 
     engine_cu_setup #(.COUNTER_WIDTH(COUNTER_WIDTH)) inst_engine_cu_setup (
         .ap_clk                  (ap_clk                                  ),
@@ -459,7 +438,6 @@ module cu_setup #(
         .fifo_request_signals_out(engine_cu_setup_fifo_request_signals_out),
         .fifo_setup_signal       (engine_cu_setup_fifo_setup_signal       ),
         .start_in                (engine_cu_setup_start_in                ),
-        .pause_in                (engine_cu_setup_pause_in                ),
         .ready_out               (engine_cu_setup_ready_out               ),
         .done_out                (engine_cu_setup_done_out                )
     );
