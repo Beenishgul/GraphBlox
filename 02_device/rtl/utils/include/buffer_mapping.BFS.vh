@@ -88,4 +88,26 @@
 // Name ENGINE_FORWARD_DATA ID 10   mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Number of entries 73
+// --------------------------------------------------------------------------------------
+// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*10)+:GLOBAL_DATA_WIDTH_BITS]  = ( 0 );
+   // --  2  - Index_End
+    graph.overlay_program[4][(GLOBAL_DATA_WIDTH_BITS*11)+:GLOBAL_DATA_WIDTH_BITS]  = ( graph.num_vertices );
+   // --  7  - Array_Pointer_LHS
+    graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*0)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[31:0];
+   // --  8  - Array_Pointer_RHS
+    graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*1)+:GLOBAL_DATA_WIDTH_BITS]  = buffer_8_ptr[63:32];
+   // --  9  - Array_size
+    graph.overlay_program[5][(GLOBAL_DATA_WIDTH_BITS*2)+:GLOBAL_DATA_WIDTH_BITS]  = ( graph.num_vertices )-( 0 );
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FILTER_COND  ID 12   mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA ID 13   mapping 6    cycles 1    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Number of entries 96
