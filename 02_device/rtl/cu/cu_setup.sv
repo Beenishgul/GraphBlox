@@ -153,11 +153,15 @@ module cu_setup #(
             fifo_response_signals_in_reg <= fifo_response_signals_in;
             fifo_request_signals_in_reg  <= fifo_request_signals_in;
             response_in_reg.valid        <= response_in.valid;
+                if(response_in_reg.valid & cu_flush_mode)
+                   $display("%t - FLUSH B:%0d L:%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_in_reg.payload.data.field[0]);
         end
     end
 
     always_ff @(posedge ap_clk) begin
         response_in_reg.payload <= response_in.payload;
+
+
     end
 
 // --------------------------------------------------------------------------------------
