@@ -337,7 +337,7 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
                 if (done_int_reg)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
-                else 
+                else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
@@ -497,10 +497,10 @@ module engine_csr_index_generator #(parameter
                     done_int_reg               <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b1;
                 end
-                counter_clear              <= 1'b0;
-                counter_enable             <= 1'b0;
-                counter_load               <= 1'b0;
-                done_out_reg               <= 1'b0;
+                counter_clear  <= 1'b0;
+                counter_enable <= 1'b0;
+                counter_load   <= 1'b0;
+                done_out_reg   <= 1'b0;
                 if(response_engine_in_break_flag_int)
                     response_engine_in_break_flag_reg <= 1'b1;
             end
@@ -542,10 +542,10 @@ module engine_csr_index_generator #(parameter
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
                 if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
-                    done_int_reg               <= 1'b1;
+                    done_int_reg <= 1'b1;
                 end
                 else begin
-                    done_int_reg               <= 1'b0;
+                    done_int_reg <= 1'b0;
                 end
                 configure_engine_int.valid <= 1'b1;
                 counter_clear              <= 1'b0;
@@ -741,32 +741,36 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_request_signals_in_reg             <= 0;
-            request_engine_out_reg                  <= 0;
-            request_memory_out_reg                  <= 0;
-            fifo_response_engine_in_signals_out_reg <= 0;
-            fifo_response_memory_in_signals_out_reg <= 0;
+            fifo_request_signals_in_reg             <= 1'b0;
+            request_engine_out_reg.valid            <= 1'b0;
+            request_memory_out_reg.valid            <= 1'b0;
+            fifo_response_engine_in_signals_out_reg <= 1'b0;
+            fifo_response_memory_in_signals_out_reg <= 1'b0;
         end
         else begin
             if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
                 fifo_request_signals_in_reg                   <= fifo_request_engine_out_signals_in_reg;
                 fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
                 fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
-                request_engine_out_reg                        <= request_out_int;
-                request_memory_out_reg                        <= 0;
+                request_engine_out_reg.valid                  <= request_out_int.valid;
+                request_memory_out_reg.valid                  <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
-                fifo_request_signals_in_reg <= fifo_request_memory_out_signals_in_reg;
-                request_memory_out_reg      <= request_out_int;
-
+                fifo_request_signals_in_reg  <= fifo_request_memory_out_signals_in_reg;
+                request_memory_out_reg.valid <= request_out_int.valid;
                 fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;
                 fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
-                request_engine_out_reg                        <= fifo_response_comb;
-
-                if(fifo_response_comb.valid)
-                    $display("MSG: %0d", fifo_response_comb.payload.data.field[0]);
-   
-                     // $display("MSG: fifo_response_comb.payload.data.field : %0d - %0d|%0d|%0d",fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[0],fifo_response_comb.payload.data.field[2],fifo_response_comb.payload.data.field[3]);
+                request_engine_out_reg.valid                  <= fifo_response_comb.valid;
             end
+        end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
+            request_engine_out_reg.payload <= request_out_int.payload;
+            request_memory_out_reg.payload <= 0;
+        end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
+            request_memory_out_reg.payload <= request_out_int.payload;
+            request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
     end
 

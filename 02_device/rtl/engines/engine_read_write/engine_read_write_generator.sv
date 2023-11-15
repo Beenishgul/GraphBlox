@@ -578,17 +578,24 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_request_signals_in_reg             <= 0;
-            request_engine_out_reg                  <= 0;
-            request_memory_out_reg                  <= 0;
-            fifo_response_memory_in_signals_out_reg <= 0;
+            fifo_request_signals_in_reg                   <= 0;
+            request_engine_out_reg.valid                  <= 1'b0;
+            request_memory_out_reg.valid                  <= 1'b0;
+            fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
         end
         else begin
             fifo_request_signals_in_reg                   <= fifo_request_memory_out_signals_in_reg;
-            request_memory_out_reg                        <= request_out_int;
+            request_memory_out_reg.valid                  <= request_out_int.valid ;
             fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
-            request_engine_out_reg                        <= fifo_response_comb;
+            request_engine_out_reg.valid                  <= fifo_response_comb.valid ;
+            if(fifo_response_comb.valid)
+                $display("%t - %0d-%0d", $time, ID_LANE, fifo_response_comb.payload.data.field[0]);
         end
+    end
+
+    always_ff @(posedge ap_clk) begin
+        request_memory_out_reg.payload <= request_out_int.payload;
+        request_engine_out_reg.payload <= fifo_response_comb.payload;
     end
 
 endmodule : engine_read_write_generator
