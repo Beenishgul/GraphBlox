@@ -384,6 +384,7 @@ module engine_csr_index_generator #(parameter
                 done_out_reg                       <= 1'b1;
                 fifo_request_din_reg.valid         <= 1'b0;
                 response_engine_in_break_flag_reg  <= 1'b0;
+                response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
@@ -403,6 +404,7 @@ module engine_csr_index_generator #(parameter
                 done_out_reg                       <= 1'b0;
                 fifo_request_din_reg.valid         <= 1'b0;
                 response_engine_in_break_flag_reg  <= 1'b0;
+                response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin

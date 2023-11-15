@@ -61,14 +61,14 @@ generate_connectivity_sp () {
         if [[ "$start" == "$end" ]]
         then
             config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start]"
-            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            if [[ "$j" == 8 ]]
             then
                 config+=".$end.RAMA"
             fi
             config+="\n"
         else
             config+="sp=${kernel_name}_$i.buffer_$j:$mem_type[$start:$end]"
-            if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+            if  [[ "$j" == 8 ]]
             then
                 config+=".$end.RAMA"
             fi

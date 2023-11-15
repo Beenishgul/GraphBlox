@@ -26,8 +26,8 @@ module arbiter_1_to_N_request #(
   parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter ID_LEVEL             = 1                         ,
   parameter ID_BUNDLE            = 0                         ,
-  parameter FIFO_WRITE_DEPTH     = 16                        ,
-  parameter PROG_THRESH          = 8
+  parameter FIFO_WRITE_DEPTH     = 32                        ,
+  parameter PROG_THRESH          = 16
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
@@ -50,24 +50,21 @@ module arbiter_1_to_N_request #(
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-  MemoryPacketPayload              fifo_request_din                     ;
-  MemoryPacket                     fifo_request_dout_int                ;
-  MemoryPacketPayload              fifo_request_dout                    ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_request_signals_in_reg_rd_en    ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_request_signals_in_reg_mask_int ;
-  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_request_signals_in_reg_mask_reg ;
-  FIFOStateSignalsInput            fifo_request_signals_in_int          ;
-  FIFOStateSignalsOutput           fifo_request_signals_out_int         ;
-  logic                            fifo_request_setup_signal_int        ;
-  logic                            fifo_request_signals_in_int_rd_en_int;
-  logic                            fifo_request_signals_in_int_rd_en_reg;
+  MemoryPacketPayload              fifo_request_din                    ;
+  MemoryPacket                     fifo_request_dout_int               ;
+  MemoryPacketPayload              fifo_request_dout                   ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_request_signals_in_reg_rd_en   ;
+  logic [NUM_MEMORY_REQUESTOR-1:0] fifo_request_signals_in_reg_mask_int;
+  FIFOStateSignalsInput            fifo_request_signals_in_int         ;
+  FIFOStateSignalsOutput           fifo_request_signals_out_int        ;
+  logic                            fifo_request_setup_signal_int       ;
+  logic                            fifo_request_signals_in_int_rd_en   ;
 
 // --------------------------------------------------------------------------------------
 // Forward FIFO
 // --------------------------------------------------------------------------------------
-  logic                            fifo_forward_signals_in_int_rd_en_int;
-  logic                            fifo_forward_signals_in_int_rd_en_reg;
-  logic [NUM_MEMORY_REQUESTOR-1:0] current_module_id_bundle             ;
+  logic                            fifo_forward_signals_in_int_rd_en;
+  logic [NUM_MEMORY_REQUESTOR-1:0] current_module_id_bundle         ;
 
 
   assign current_module_id_bundle = 1 << ID_BUNDLE;
@@ -166,47 +163,35 @@ module arbiter_1_to_N_request #(
   generate
     case (ID_LEVEL)
       0 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
       1 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
       2 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = (current_module_id_bundle != fifo_request_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = (current_module_id_bundle != fifo_request_dout_int.payload.meta.route.to.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
       end
       3 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
       4 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_module[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_module[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
       5 : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == id_mask[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == id_mask[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
       default : begin
-        assign fifo_request_signals_in_int_rd_en_int = (fifo_request_signals_in_reg_mask_reg == fifo_request_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
-        assign fifo_forward_signals_in_int_rd_en_int = 1'b0;
+        assign fifo_request_signals_in_int_rd_en = (fifo_request_signals_in_reg_mask_int == fifo_request_dout_int.payload.meta.route.to.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+        assign fifo_forward_signals_in_int_rd_en = 1'b0;
       end
     endcase
   endgenerate
-
-  always_ff @(posedge ap_clk) begin
-    if(~areset) begin
-      fifo_request_signals_in_reg_mask_reg  <= 0;
-      fifo_request_signals_in_int_rd_en_reg <= 1'b0;
-      fifo_forward_signals_in_int_rd_en_reg <= 1'b0;
-    end else begin
-      fifo_request_signals_in_reg_mask_reg  <= fifo_request_signals_in_reg_mask_int;
-      fifo_request_signals_in_int_rd_en_reg <= fifo_request_signals_in_int_rd_en_int;
-      fifo_forward_signals_in_int_rd_en_reg <= fifo_forward_signals_in_int_rd_en_int;
-    end
-  end
 
 // --------------------------------------------------------------------------------------
 //   Drive Outputs
@@ -262,7 +247,7 @@ module arbiter_1_to_N_request #(
             end
           end else begin
             for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-              if(fifo_forward_signals_in_int_rd_en_reg) begin
+              if(fifo_forward_signals_in_int_rd_en) begin
                 if((i == (NUM_MEMORY_REQUESTOR-1))) begin
                   request_out[i].valid <= fifo_request_dout_int.valid;
                 end else  begin
@@ -347,8 +332,8 @@ module arbiter_1_to_N_request #(
   assign fifo_request_din                  = request_in_reg.payload;
 
   // Pop
-  assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & (fifo_request_signals_in_int_rd_en_reg | fifo_forward_signals_in_int_rd_en_reg);
-  assign fifo_request_dout_int.valid       = fifo_request_signals_out_int.valid & (fifo_request_signals_in_int_rd_en_reg | fifo_forward_signals_in_int_rd_en_reg);
+  assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & (fifo_request_signals_in_int_rd_en | fifo_forward_signals_in_int_rd_en);
+  assign fifo_request_dout_int.valid       = fifo_request_signals_out_int.valid & (fifo_request_signals_in_int_rd_en | fifo_forward_signals_in_int_rd_en);
   assign fifo_request_dout_int.payload     = fifo_request_dout;
 
   xpm_fifo_sync_wrapper #(
