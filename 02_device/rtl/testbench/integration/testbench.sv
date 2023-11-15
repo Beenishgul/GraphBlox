@@ -436,6 +436,15 @@ module __KERNEL___testbench ();
     endfunction
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate a random bit number
+    function bit get_random_bit();
+        bit rptr;
+        ptr_random_failed : assert(std::randomize(rptr));
+        return(rptr);
+    endfunction
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 // Control interface non-blocking write
 // The task will return when the transaction has been accepted by the driver. It will be some
 // amount of time before it will appear on the interface.
@@ -1064,7 +1073,7 @@ module __KERNEL___testbench ();
 
         for (int i = 0; i < mem512_auxiliary_2_half; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = 0;
+                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = {31'b0,get_random_bit()};
             end
         end
 
