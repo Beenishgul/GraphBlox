@@ -153,8 +153,12 @@ module cu_setup #(
             fifo_response_signals_in_reg <= fifo_response_signals_in;
             fifo_request_signals_in_reg  <= fifo_request_signals_in;
             response_in_reg.valid        <= response_in.valid;
+
+  
                 if(response_in_reg.valid & cu_flush_mode)
-                   $display("%t - FLUSH B:%0d L:%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_in_reg.payload.data.field[0]);
+                    $display("%t - FLUSH B:%0d L:%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_in_reg.payload.data.field[0]);
+
+
         end
     end
 
@@ -258,7 +262,7 @@ module cu_setup #(
                     next_state = CU_SETUP_FLUSH_PAUSE;
             end
             CU_SETUP_FLUSH_DONE : begin
-                    next_state = CU_SETUP_FLUSH_DONE;
+                next_state = CU_SETUP_FLUSH_DONE;
             end
         endcase
     end // always_comb
@@ -266,94 +270,94 @@ module cu_setup #(
     always_ff @(posedge ap_clk) begin
         case (current_state)
             CU_SETUP_RESET : begin
-                done_int_reg                                   <= 1'b1;
-                done_out_reg                                   <= 1'b1;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b1;
-                counter_load                                   <= 1'b0;
-                response_memory_counter_load_value             <= 0;
+                done_int_reg                           <= 1'b1;
+                done_out_reg                           <= 1'b1;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
+                counter_clear                          <= 1'b1;
+                counter_load                           <= 1'b0;
+                response_memory_counter_load_value     <= 0;
             end
             CU_SETUP_IDLE : begin
-                done_int_reg                                   <= 1'b0;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b1;
-                counter_load                                   <= 1'b0;
-                response_memory_counter_load_value             <= 0;
+                done_int_reg                           <= 1'b0;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
+                counter_clear                          <= 1'b1;
+                counter_load                           <= 1'b0;
+                response_memory_counter_load_value     <= 0;
             end
             CU_SETUP_REQ_START : begin
-                done_int_reg                                   <= 1'b0;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b1;
-                engine_cu_setup_configuration_in.valid         <= 1'b1;
-                counter_clear                                  <= 1'b0;
-                counter_load                                   <= 1'b1;
-                response_memory_counter_load_value             <= configuration_comb_program.payload.param.array_size;
+                done_int_reg                           <= 1'b0;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b1;
+                engine_cu_setup_configuration_in.valid <= 1'b1;
+                counter_clear                          <= 1'b0;
+                counter_load                           <= 1'b1;
+                response_memory_counter_load_value     <= configuration_comb_program.payload.param.array_size;
             end
             CU_SETUP_REQ_BUSY : begin
-                done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b1;
-                counter_load                                   <= 1'b0;
+                done_int_reg                           <= engine_cu_setup_done_out & response_memory_counter_is_zero;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b1;
+                counter_load                           <= 1'b0;
             end
             CU_SETUP_REQ_PAUSE : begin
-                done_int_reg                                   <= 1'b0;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
+                done_int_reg                           <= 1'b0;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
             end
             CU_SETUP_REQ_DONE : begin
-                done_int_reg                                   <= 1'b1;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b0;
-                counter_load                                   <= 1'b0;
-                response_memory_counter_load_value             <= 0;
+                done_int_reg                           <= 1'b1;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
+                counter_clear                          <= 1'b0;
+                counter_load                           <= 1'b0;
+                response_memory_counter_load_value     <= 0;
             end
             CU_SETUP_FLUSH_START : begin
-                done_int_reg                                   <= 1'b0;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_start_in                       <= 1'b1;
-                engine_cu_setup_configuration_in.valid         <= 1'b1;
-                counter_clear                                  <= 1'b0;
-                counter_load                                   <= 1'b1;
-                response_memory_counter_load_value             <= configuration_comb_flush.payload.param.array_size;
+                done_int_reg                           <= 1'b0;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b1;
+                engine_cu_setup_start_in               <= 1'b1;
+                engine_cu_setup_configuration_in.valid <= 1'b1;
+                counter_clear                          <= 1'b0;
+                counter_load                           <= 1'b1;
+                response_memory_counter_load_value     <= configuration_comb_flush.payload.param.array_size;
             end
             CU_SETUP_FLUSH_BUSY : begin
-                done_int_reg                                   <= engine_cu_setup_done_out & response_memory_counter_is_zero;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b1;
-                counter_load                                   <= 1'b0;
+                done_int_reg                           <= engine_cu_setup_done_out & response_memory_counter_is_zero;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b1;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b1;
+                counter_load                           <= 1'b0;
             end
             CU_SETUP_FLUSH_PAUSE : begin
-                done_int_reg                                   <= 1'b0;
-                done_out_reg                                   <= 1'b0;
-                cu_flush_mode                                  <= 1'b1;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
+                done_int_reg                           <= 1'b0;
+                done_out_reg                           <= 1'b0;
+                cu_flush_mode                          <= 1'b1;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
             end
             CU_SETUP_FLUSH_DONE : begin
-                done_int_reg                                   <= 1'b1;
-                done_out_reg                                   <= 1'b1;
-                cu_flush_mode                                  <= 1'b0;
-                engine_cu_setup_start_in                       <= 1'b0;
-                engine_cu_setup_configuration_in.valid         <= 1'b0;
-                counter_clear                                  <= 1'b0;
-                counter_load                                   <= 1'b0;
-                response_memory_counter_load_value             <= 0;
+                done_int_reg                           <= 1'b1;
+                done_out_reg                           <= 1'b1;
+                cu_flush_mode                          <= 1'b0;
+                engine_cu_setup_start_in               <= 1'b0;
+                engine_cu_setup_configuration_in.valid <= 1'b0;
+                counter_clear                          <= 1'b0;
+                counter_load                           <= 1'b0;
+                response_memory_counter_load_value     <= 0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
