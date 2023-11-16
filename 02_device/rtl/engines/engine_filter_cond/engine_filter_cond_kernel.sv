@@ -80,7 +80,7 @@ module engine_filter_cond_kernel (
   // FILTER operations logic
   always_comb begin
     // Process the FILTER operation if both config_params and data are valid
-    result_flag_int = ~config_params.break_pass;
+    result_flag_int = 1'b1;
     result_data_int = ops_value_reg;
     org_data_int    = org_value_reg;
 
@@ -92,7 +92,7 @@ module engine_filter_cond_kernel (
         FILTER_GT : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = result_flag_int | (result_data_int.field[i] > ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] > ops_value_reg.field[i+1]);
             end
           end
         end
@@ -100,7 +100,7 @@ module engine_filter_cond_kernel (
         FILTER_LT : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = result_flag_int | (result_data_int.field[i] < ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] < ops_value_reg.field[i+1]);
             end
           end
         end
@@ -108,7 +108,7 @@ module engine_filter_cond_kernel (
         FILTER_EQ : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = result_flag_int | (result_data_int.field[i] == ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] == ops_value_reg.field[i+1]);
             end
           end
         end
@@ -116,7 +116,7 @@ module engine_filter_cond_kernel (
         FILTER_NOT_EQ : begin
           for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_flag_int = result_flag_int | (result_data_int.field[i] != ops_value_reg.field[i+1]);
+              result_flag_int = result_flag_int & (result_data_int.field[i] != ops_value_reg.field[i+1]);
             end
           end
         end

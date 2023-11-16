@@ -155,6 +155,7 @@ module engine_read_write_configure_memory #(parameter
         configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
         configure_memory_meta_int.route.seq_src.id_buffer = 0;
         configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+        configure_memory_meta_int.route.seq_id            = 0;
         configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
         configure_memory_meta_int.address.base            = 0;
         configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
@@ -198,6 +199,7 @@ module engine_read_write_configure_memory #(parameter
         configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
         configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
         configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+        configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
         configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
         configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
         configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;

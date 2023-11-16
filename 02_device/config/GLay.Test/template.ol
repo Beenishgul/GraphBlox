@@ -71,7 +71,7 @@
 0x00008412 // entry 47   cacheline 2    offset 15   -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 48   cacheline 3    offset 0    -- //  0  - Increment/Decrement
 0x00000000 // entry 49   cacheline 3    offset 1    -- //  1  - Index_start
@@ -112,7 +112,7 @@
 0x00000001 // entry 72   cacheline 4    offset 8    -- //  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 10   mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 10   mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 73   cacheline 4    offset 9    -- //  0  - Increment/Decrement
 0x00000000 // entry 74   cacheline 4    offset 10   -- //  1  - Index_start

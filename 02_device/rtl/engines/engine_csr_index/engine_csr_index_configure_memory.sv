@@ -50,13 +50,13 @@ module engine_csr_index_configure_memory #(parameter
     logic areset_csr_index_generator;
     logic areset_fifo               ;
 
-    MemoryPacket                      response_memory_in_reg                          ;
-    MemoryPacketMeta                  configure_memory_meta_int                       ;
-    CSRIndexConfiguration             configure_memory_reg                            ;
-    logic [     ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
-    logic                             configure_memory_valid_int                      ;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
-    logic [CACHE_FRONTEND_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
+    MemoryPacket                            response_memory_in_reg                          ;
+    MemoryPacketMeta                        configure_memory_meta_int                       ;
+    CSRIndexConfiguration                   configure_memory_reg                            ;
+    logic [           ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
+    logic                                   configure_memory_valid_int                      ;
+    logic [      CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
+    logic [      CACHE_FRONTEND_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -115,7 +115,7 @@ module engine_csr_index_configure_memory #(parameter
     always_ff @(posedge ap_clk) begin
         if(areset_csr_index_generator) begin
             fifo_setup_signal          <= 1'b1;
-            configure_memory_out.valid <= 0;
+            configure_memory_out.valid <= 1'b0;
         end else begin
             fifo_setup_signal          <= fifo_response_memory_in_setup_signal_int | fifo_configure_memory_setup_signal_int;
             configure_memory_out.valid <= fifo_configure_memory_dout_int.valid;
@@ -154,6 +154,7 @@ module engine_csr_index_configure_memory #(parameter
     assign configure_memory_meta_int.route.seq_src.id_module = 1 << (ID_MODULE+1);
     assign configure_memory_meta_int.route.seq_src.id_buffer = 0;
     assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+    assign configure_memory_meta_int.route.seq_id            = 0;
     assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
     assign configure_memory_meta_int.address.base            = 0;
     assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
@@ -196,6 +197,7 @@ module engine_csr_index_configure_memory #(parameter
         configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
         configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
         configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+        configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
         configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
         configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
         configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;

@@ -119,11 +119,12 @@ typedef struct packed{
 } MemoryPacketArbitrate;
 
 typedef struct packed{
-  MemoryPacketArbitrate                  from     ;
-  MemoryPacketArbitrate                  to       ;
-  MemoryPacketArbitrate                  seq_src  ;
-  type_sequence_state                    seq_state;
-  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops     ;
+  MemoryPacketArbitrate                   from     ;
+  MemoryPacketArbitrate                   to       ;
+  MemoryPacketArbitrate                   seq_src  ;
+  type_sequence_state                     seq_state;
+  logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id   ;
+  logic [ CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops     ;
 } MemoryPacketRoute;
 
 typedef struct packed{

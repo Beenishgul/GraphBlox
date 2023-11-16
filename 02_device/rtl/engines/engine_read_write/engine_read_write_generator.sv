@@ -508,6 +508,7 @@ module engine_read_write_generator #(parameter
         generator_engine_request_engine_reg.payload.meta.route.to             <= configure_memory_reg.payload.meta.route.to;
         generator_engine_request_engine_reg.payload.meta.route.seq_src        <= response_engine_in_int.payload.meta.route.seq_src;
         generator_engine_request_engine_reg.payload.meta.route.seq_state      <= response_engine_in_int.payload.meta.route.seq_state;
+        generator_engine_request_engine_reg.payload.meta.route.seq_id         <= response_engine_in_int.payload.meta.route.seq_id;
         generator_engine_request_engine_reg.payload.meta.route.hops           <= response_engine_in_int.payload.meta.route.hops;
         generator_engine_request_engine_reg.payload.meta.subclass             <= configure_memory_reg.payload.meta.subclass;
     end

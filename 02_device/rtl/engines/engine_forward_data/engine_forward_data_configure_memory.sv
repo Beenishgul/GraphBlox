@@ -154,6 +154,7 @@ module engine_forward_data_configure_memory #(parameter
     assign configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
     assign configure_memory_meta_int.route.seq_src.id_buffer = 0;
     assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
+    assign configure_memory_meta_int.route.seq_id            = 0;
     assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
     assign configure_memory_meta_int.address.base            = 0;
     assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
@@ -197,6 +198,7 @@ module engine_forward_data_configure_memory #(parameter
         configure_memory_reg.payload.meta.route.to        <= configure_memory_meta_int.route.to;
         configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
         configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+        configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
         configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
         configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
         configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;
