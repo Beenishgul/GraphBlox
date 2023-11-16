@@ -58,8 +58,6 @@ module engine_forward_data #(parameter
     output logic                  done_out
 );
 
-    genvar i;
-
     assign request_memory_out                  = 0;
     assign fifo_request_memory_out_signals_out = 6'b010000;
 // --------------------------------------------------------------------------------------
