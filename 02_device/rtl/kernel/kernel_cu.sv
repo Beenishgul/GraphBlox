@@ -99,7 +99,7 @@ module kernel_cu #(
   logic                  cu_bundles_fifo_setup_signal        ;
 
 // --------------------------------------------------------------------------------------
-  parameter              PULSE_HOLD             = 100;
+  parameter              PULSE_HOLD             = 1024;
   logic [PULSE_HOLD-1:0] cu_bundles_done_hold        ;
   logic                  cu_bundles_done_out         ;
   logic                  cu_bundles_done_assert      ;
@@ -356,7 +356,7 @@ module kernel_cu #(
     if (areset_bundles) begin
       cu_bundles_done_hold <= 0;
     end else begin
-      cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],cu_bundles_done_out};
+      cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],(cu_bundles_done_out|cu_setup_done_out)};
     end
   end
 

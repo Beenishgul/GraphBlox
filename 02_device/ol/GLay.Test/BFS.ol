@@ -1,4 +1,38 @@
 // --------------------------------------------------------------------------------------
+// Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13  
+// --------------------------------------------------------------------------------------
+0x00000000 // entry 0    cacheline 0    offset 0    --  0  - Increment/Decrement
+0x00000000 // entry 1    cacheline 0    offset 1    --  1  - Index_start
+0x00000000 // entry 2    cacheline 0    offset 2    --  2  - Index_end
+0x00000001 // entry 3    cacheline 0    offset 3    --  3  - Stride
+0x80000002 // entry 4    cacheline 0    offset 4    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
+0x00000104 // entry 5    cacheline 0    offset 5    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00000000 // entry 6    cacheline 0    offset 6    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
+0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
+0x00000000 // entry 9    cacheline 0    offset 9    --  9  - BUFFER size
+0x00000000 // entry 10   cacheline 0    offset 10   --  10 - const_mask
+0x00000001 // entry 11   cacheline 0    offset 11   --  11 - const_value
+0x00002148 // entry 12   cacheline 0    offset 12   --  12 - ops_mask
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13  
+// --------------------------------------------------------------------------------------
+0x00000000 // entry 13   cacheline 0    offset 13   --  0  - Increment/Decrement
+0x00000000 // entry 14   cacheline 0    offset 14   --  1  - Index_start
+0x00000000 // entry 15   cacheline 0    offset 15   --  2  - Index_end
+0x00000001 // entry 16   cacheline 1    offset 0    --  3  - Stride
+0x80000002 // entry 17   cacheline 1    offset 1    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
+0x00000102 // entry 18   cacheline 1    offset 2    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00000000 // entry 19   cacheline 1    offset 3    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00000000 // entry 20   cacheline 1    offset 4    --  7  - BUFFER Array Pointer LHS
+0x00000000 // entry 21   cacheline 1    offset 5    --  8  - BUFFER Array Pointer RHS
+0x00000000 // entry 22   cacheline 1    offset 6    --  9  - BUFFER size
+0x00000001 // entry 23   cacheline 1    offset 7    --  10 - const_mask
+0x00000001 // entry 24   cacheline 1    offset 8    --  11 - const_value
+0x00004182 // entry 25   cacheline 1    offset 9    --  12 - ops_mask
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 0    mapping 2    cycles 10   None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 26   cacheline 1    offset 10   --  0  - Increment/Decrement
@@ -95,7 +129,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x0000001D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0001  1110
+0x0000000D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0001  1110
 0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
 0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
 0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
@@ -120,7 +154,7 @@
 0x00000001 // entry 102  cacheline 6    offset 6    --  3  - Stride
 0x80000002 // entry 103  cacheline 6    offset 7    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000102 // entry 104  cacheline 6    offset 8    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00030101 // entry 105  cacheline 6    offset 9    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x00030101 // entry 105  cacheline 6    offset 9    --  6  - route  | Cast to first 2 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 106  cacheline 6    offset 10   --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 107  cacheline 6    offset 11   --  8  - BUFFER Array Pointer RHS
 0x00000000 // entry 108  cacheline 6    offset 12   --  9  - BUFFER size
@@ -136,7 +170,7 @@
 0x00000004 // entry 114  cacheline 7    offset 2    --  2  - const_mask
 0x00000001 // entry 115  cacheline 7    offset 3    --  3  - const_value
 0x00001824 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
-0x00000001 // entry 117  cacheline 7    offset 5    --  4  - break_flag | break_pass | filter_post | filter_pass | continue_flag | ternary_flag | conditional_flag
+0x00000000 // entry 117  cacheline 7    offset 5    --  4  - break_flag | break_pass | filter_post | filter_pass | continue_flag | ternary_flag | conditional_flag
 0x00030101 // entry 118  cacheline 7    offset 6    --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00030101 // entry 119  cacheline 7    offset 7    --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 120  cacheline 7    offset 8    --  7  - if -> id_engine id_module | else -> id_engine id_module
@@ -146,4 +180,4 @@
 // --------------------------------------------------------------------------------------
 0x00000001 // entry 121  cacheline 7    offset 9    --  0  - number of hops (forward till discards)
 // --------------------------------------------------------------------------------------
-// Number of entries 96
+// Number of entries 122

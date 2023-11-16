@@ -31,7 +31,9 @@
     },
     "bundle": {  
         "0": [
-            ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
+            ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"                  ],
+            ["ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"     ],
+            ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"                          ],
             ["ENGINE_FORWARD_DATA"   ]
         ],
         "1": [

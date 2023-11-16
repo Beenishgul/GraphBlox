@@ -6,7 +6,7 @@
 0x00000000 // entry 2    cacheline 0    offset 2    --  2  - Index_end
 0x00000001 // entry 3    cacheline 0    offset 3    --  3  - Stride
 0x80000002 // entry 4    cacheline 0    offset 4    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000104 // entry 5    cacheline 0    offset 5    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00000104 // entry 5    cacheline 0    offset 5    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
 0x00000000 // entry 6    cacheline 0    offset 6    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
@@ -23,7 +23,7 @@
 0x00000000 // entry 15   cacheline 0    offset 15   --  2  - Index_end
 0x00000001 // entry 16   cacheline 1    offset 0    --  3  - Stride
 0x80000002 // entry 17   cacheline 1    offset 1    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000104 // entry 18   cacheline 1    offset 2    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
+0x00000104 // entry 18   cacheline 1    offset 2    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
 0x00000000 // entry 19   cacheline 1    offset 3    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 20   cacheline 1    offset 4    --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 21   cacheline 1    offset 5    --  8  - BUFFER Array Pointer RHS

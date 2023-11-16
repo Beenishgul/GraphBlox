@@ -912,16 +912,16 @@ module __KERNEL___testbench ();
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Checking memory connected to m00_axi
         for (longint unsigned slot = 0; slot < LP_MAX_LENGTH; slot++) begin
-            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_0_ptr + (slot * 4));
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (slot * 4));
             if (slot < LP_MAX_TRANSFER_LENGTH) begin
                 if (ret_rd_value != (slot + 1)) begin
-                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot + 1, ret_rd_value);
+                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot + 1, ret_rd_value);
                     error_found |= 1;
                     error_counter++;
                 end
             end else begin
                 if (ret_rd_value != slot) begin
-                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_0_ptr + (slot * 4), slot, ret_rd_value);
+                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot, ret_rd_value);
                     error_found |= 1;
                     error_counter++;
                 end
@@ -1068,7 +1068,7 @@ module __KERNEL___testbench ();
         l=0;
 
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
+            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = {CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
             if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
                 l++;
@@ -1077,7 +1077,7 @@ module __KERNEL___testbench ();
         end
 
         for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
+            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
             o++;
             if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
                 l++;
@@ -1272,15 +1272,15 @@ module __KERNEL___testbench ();
             $finish();
         end
 
-        // #1000
-        //     multiple_iteration(5, error_found, graph);
+        #1000
+            multiple_iteration(5, error_found, graph);
 
-        // if (error_found == 1) begin
-        //     $display( "ERROR: Test Failed!");
-        //     $finish();
-        // end else begin
-        //     $display( "Test completed successfully");
-        // end
+        if (error_found == 1) begin
+            $display( "ERROR: Test Failed!");
+            $finish();
+        end else begin
+            $display( "Test completed successfully");
+        end
 
         #1000  $finish;
 
