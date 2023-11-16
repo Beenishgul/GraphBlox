@@ -59,11 +59,11 @@ module engine_csr_index_generator #(parameter
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsInput  fifo_response_memory_in_signals_out,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output MemoryPacket           request_engine_out                 ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
     output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsOutput fifo_request_memory_out_signals_in ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     output logic                  fifo_setup_signal                  ,
     output logic                  configure_memory_setup             ,
     output logic                  configure_engine_setup             ,
@@ -245,8 +245,8 @@ module engine_csr_index_generator #(parameter
             configure_engine_setup              <= 1'b0;
             done_out                            <= 1'b0;
             fifo_empty_reg                      <= 1'b1;
-            fifo_response_engine_in_signals_out <= 0;
-            fifo_response_memory_in_signals_out <= 0;
+            fifo_response_engine_in_signals_out <= 6'b010000;
+            fifo_response_memory_in_signals_out <= 6'b010000;
         end
         else begin
             fifo_setup_signal                   <= fifo_request_setup_signal_int;
