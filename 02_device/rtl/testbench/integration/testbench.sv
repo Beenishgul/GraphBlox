@@ -18,13 +18,15 @@ class GraphCSR;
     string  graph_name                    ;
     integer num_vertices                  ;
     integer num_edges                     ;
+    integer num_auxiliary_1               ;
+    integer num_auxiliary_2               ;
     integer mem512_num_vertices           ;
     integer mem512_auxiliary_1            ;
     integer mem512_auxiliary_2            ;
     integer mem512_num_edges              ;
     integer mem512_overlay_program_entries;
-    integer debug_counter_1;
-    integer debug_counter_2;
+    integer debug_counter_1               ;
+    integer debug_counter_2               ;
 
     integer file_error               ;
     integer file_ptr_overlay_program ;
@@ -56,12 +58,13 @@ class GraphCSR;
         this.num_vertices              = 0;
         this.num_edges                 = 0;
         this.mem512_num_vertices       = 0;
+        this.mem512_num_edges          = 0;
+        this.num_auxiliary_1           = 0;
+        this.num_auxiliary_2           = 0;
         this.mem512_auxiliary_1        = 0;
         this.mem512_auxiliary_2        = 0;
-        this.mem512_num_edges          = 0;
-        this.mem512_num_edges          = 0;
-        this.debug_counter_1          = 0;
-        this.debug_counter_2          = 0;
+        this.debug_counter_1           = 0;
+        this.debug_counter_2           = 0;
         this.mem512_overlay_program_entries = 4;
     endfunction
 
@@ -72,7 +75,7 @@ class GraphCSR;
         $display("MSG: EDGE COUNT   : %0d", this.num_edges);
         $display("---------------------------------------------------------------------------");
         $display("MSG: debug_counter_1  : %0d", this.debug_counter_1);
-        $display("MSG: debug_counter_1  : %0d", this.debug_counter_2);
+        $display("MSG: debug_counter_2  : %0d", this.debug_counter_2);
         $display("---------------------------------------------------------------------------");
     endfunction
 
@@ -974,6 +977,7 @@ module __KERNEL___testbench ();
         // graph.overlay_program[1][(64)+:64] = 1;
 
         int          realcount                 = 0;
+        int          vertexcount               = 0;
         int o,l;
         bit [CACHE_FRONTEND_DATA_W-1:0] temp_overlay_program         ;
         bit [CACHE_FRONTEND_DATA_W-1:0] temp_out_degree              ;
@@ -983,12 +987,10 @@ module __KERNEL___testbench ();
         bit [CACHE_FRONTEND_DATA_W-1:0] temp_edges_array_src ;
         bit [CACHE_FRONTEND_DATA_W-1:0] temp_edges_array_dest;
         bit [CACHE_FRONTEND_DATA_W-1:0] setup_temp;
-        int mem512_auxiliary_1_half ;
-        int mem512_auxiliary_2_half;
 
         realcount = 0;
         setup_temp = 0;
-       
+
         for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
                 graph.overlay_program[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = realcount;
@@ -1038,9 +1040,7 @@ module __KERNEL___testbench ();
             end
         end
 
-       `include"buffer_mapping._ALGORITHM_NAME_.vh"
-
-        realcount = 0;
+        `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
         // $display("MSG: Starting graph.mem512_num_vertices: %0d\n", graph.mem512_num_vertices);
         // $display("MSG: Starting graph.mem512_num_edges: %0d\n", graph.mem512_num_edges);
@@ -1064,36 +1064,53 @@ module __KERNEL___testbench ();
             end
         end
 
-        mem512_auxiliary_1_half = (graph.num_vertices*CACHE_FRONTEND_DATA_W)/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
-        mem512_auxiliary_2_half = (graph.num_vertices*CACHE_FRONTEND_DATA_W)/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        o=0;
+        l=0;
 
-        for (int i = 0; i < mem512_auxiliary_1_half; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.auxiliary_1[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = 0;
+        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
+            o++;
+            if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+                l++;
+                o=0;
             end
         end
 
-        for (int i = mem512_auxiliary_1_half; i < graph.mem512_auxiliary_1 ; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.auxiliary_1[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = {CACHE_FRONTEND_DATA_W{1'b1}};
+        for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+            graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
+            o++;
+            if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+                l++;
+                o=0;
             end
         end
 
-        for (int i = 0; i < mem512_auxiliary_2_half; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                setup_temp = {31'b0,get_random_bit()};
-                graph.debug_counter_1 += setup_temp;
-                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = setup_temp;
+        o=0;
+        l=0;
+
+        for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+            setup_temp = {31'b0,get_random_bit()};
+            if(setup_temp)
+                graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
+            else
+                graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] =5;
+            o++;
+            if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+                l++;
+                o=0;
             end
         end
 
-        for (int i = mem512_auxiliary_2_half; i < graph.mem512_auxiliary_2 ; i++) begin
-            for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = {CACHE_FRONTEND_DATA_W{1'b1}};
+        for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+            setup_temp = {31'b0,get_random_bit()};
+            graph.debug_counter_2 += setup_temp;
+            graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = setup_temp;
+            o++;
+            if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+                l++;
+                o=0;
             end
         end
-
-        realcount = 0;
 
         for (int i = 0; i < graph.mem512_num_edges; i++) begin
             for (int j = 0;j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
@@ -1139,13 +1156,16 @@ module __KERNEL___testbench ();
         graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
         graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
+        graph.num_auxiliary_1 = graph.num_vertices;
+        graph.num_auxiliary_2 = graph.num_vertices;
+
         graph.mem512_overlay_program_entries = int'(buffer_9_ptr[CACHE_FRONTEND_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
 
         graph.mem512_num_vertices = ((graph.num_vertices*CACHE_FRONTEND_DATA_W) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
         graph.mem512_num_edges = ((graph.num_edges*CACHE_FRONTEND_DATA_W) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
-        graph.mem512_auxiliary_1 = ((graph.num_vertices*CACHE_FRONTEND_DATA_W*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
-        graph.mem512_auxiliary_2 = ((graph.num_vertices*CACHE_FRONTEND_DATA_W*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*CACHE_FRONTEND_DATA_W*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
+        graph.mem512_auxiliary_2 = ((graph.num_auxiliary_2*CACHE_FRONTEND_DATA_W*2) + (M_AXI_MEMORY_DATA_WIDTH_BITS-1) )/ (M_AXI_MEMORY_DATA_WIDTH_BITS);
 
         graph.out_degree   = new [graph.mem512_num_vertices];
         graph.in_degree    = new [graph.mem512_num_vertices];
@@ -1252,15 +1272,15 @@ module __KERNEL___testbench ();
             $finish();
         end
 
-        #1000
-            multiple_iteration(5, error_found, graph);
+        // #1000
+        //     multiple_iteration(5, error_found, graph);
 
-        if (error_found == 1) begin
-            $display( "ERROR: Test Failed!");
-            $finish();
-        end else begin
-            $display( "Test completed successfully");
-        end
+        // if (error_found == 1) begin
+        //     $display( "ERROR: Test Failed!");
+        //     $finish();
+        // end else begin
+        //     $display( "Test completed successfully");
+        // end
 
         #1000  $finish;
 

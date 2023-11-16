@@ -64,7 +64,7 @@ module engine_alu_ops_kernel (
   always_comb begin
     // Process the ALU operation if both config_params and data are valid
 
-    if(config_params.alu_operation == ALU_ACC) begin
+    if(config_params.alu_operation == ALU_ACC & ~clear) begin
       result_int = result_int;
     end else begin
       result_int = 0;

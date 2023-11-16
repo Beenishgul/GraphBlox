@@ -392,6 +392,7 @@ module cu_setup #(
     assign configuration_comb_program.payload.meta.route.seq_src.id_module = 1;
     assign configuration_comb_program.payload.meta.route.seq_src.id_buffer = 0;
     assign configuration_comb_program.payload.meta.route.seq_state         = SEQUENCE_INVALID;
+    assign configuration_comb_program.payload.meta.route.seq_id            = 0;
     assign configuration_comb_program.payload.meta.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
     assign configuration_comb_program.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_program.payload.meta.address.offset          = 0;

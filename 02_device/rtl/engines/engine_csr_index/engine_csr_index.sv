@@ -149,13 +149,13 @@ module engine_csr_index #(parameter
     CSRIndexConfiguration generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput generator_engine_fifo_configure_memory_in_signals_in;
 
-    MemoryPacket          generator_engine_response_engine_in                 ;
-    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_in ;
-    FIFOStateSignalsInput generator_engine_fifo_response_engine_in_signals_out;
+    MemoryPacket           generator_engine_response_engine_in                 ;
+    FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
+    FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
 
-    MemoryPacket          generator_engine_response_memory_in                 ;
-    FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_in ;
-    FIFOStateSignalsInput generator_engine_fifo_response_memory_in_signals_out;
+    MemoryPacket           generator_engine_response_memory_in                 ;
+    FIFOStateSignalsInput  generator_engine_fifo_response_memory_in_signals_in ;
+    FIFOStateSignalsOutput generator_engine_fifo_response_memory_in_signals_out;
 
     MemoryPacket          generator_engine_request_engine_out                ;
     FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
@@ -554,11 +554,11 @@ module engine_csr_index #(parameter
 
     assign generator_engine_response_engine_in                       = modules_response_engine_in[1];
     assign generator_engine_fifo_response_engine_in_signals_in.rd_en = modules_fifo_response_engine_in_signals_in[1].rd_en;
-    assign modules_fifo_response_engine_in_signals_out[1].prog_full  = generator_engine_fifo_response_engine_in_signals_out.rd_en;
+    assign modules_fifo_response_engine_in_signals_out[1]            = generator_engine_fifo_response_engine_in_signals_out;
 
     assign generator_engine_response_memory_in                       = modules_response_memory_in[1];
     assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en;
-    assign modules_fifo_response_memory_in_signals_out[1].prog_full  = generator_engine_fifo_response_memory_in_signals_out.rd_en;
+    assign modules_fifo_response_memory_in_signals_out[1]            = generator_engine_fifo_response_memory_in_signals_out;
 
     assign generator_engine_fifo_request_engine_out_signals_in.rd_en = ~fifo_request_engine_out_signals_out_int.prog_full;
 

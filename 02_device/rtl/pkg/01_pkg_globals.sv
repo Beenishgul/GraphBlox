@@ -25,25 +25,26 @@ package PKG_GLOBALS;
 	parameter CU_BUFFER_COUNT = 10;
 
 // Maximum supported engines/lanes/bundles/buffers
-	parameter CU_KERNEL_COUNT_TOTAL = 8;
-	parameter CU_BUNDLE_COUNT_TOTAL = 8;
-	parameter CU_LANE_COUNT_TOTAL   = 8;
-	parameter CU_ENGINE_COUNT_TOTAL = 8;
-	parameter CU_MODULE_COUNT_TOTAL = 8;
-	parameter CU_BUFFER_COUNT_TOTAL = 8;
+	parameter CU_KERNEL_COUNT_TOTAL       = 8 ;
+	parameter CU_BUNDLE_COUNT_TOTAL       = 8 ;
+	parameter CU_LANE_COUNT_TOTAL         = 8 ;
+	parameter CU_ENGINE_COUNT_TOTAL       = 8 ;
+	parameter CU_MODULE_COUNT_TOTAL       = 8 ;
+	parameter CU_BUFFER_COUNT_TOTAL       = 8 ;
+	parameter CU_PACKET_SEQ_ID_WIDTH_BITS = 16;
 
 
-	parameter CU_KERNEL_COUNT_WIDTH_BITS = CU_KERNEL_COUNT_TOTAL        ; // 5
-	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL        ;
-	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_LANE_COUNT_TOTAL          ;
-	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL        ;
-	parameter CU_MODULE_COUNT_WIDTH_BITS = CU_MODULE_COUNT_TOTAL        ;
-	parameter CU_BUFFER_COUNT_WIDTH_BITS = CU_BUFFER_COUNT_TOTAL        ;
+	parameter CU_KERNEL_COUNT_WIDTH_BITS = CU_KERNEL_COUNT_TOTAL; // 5
+	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL;
+	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_LANE_COUNT_TOTAL  ;
+	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL;
+	parameter CU_MODULE_COUNT_WIDTH_BITS = CU_MODULE_COUNT_TOTAL;
+	parameter CU_BUFFER_COUNT_WIDTH_BITS = CU_BUFFER_COUNT_TOTAL;
 
 // --------------------------------------------------------------------------------------
-//  KERNEL COMMON GLOBALS 
+//  KERNEL COMMON GLOBALS
 // --------------------------------------------------------------------------------------
-//  CU -> Cache Changing these values would change the cache front end 
+//  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
 	parameter GLOBAL_DATA_WIDTH_BITS = 32;
