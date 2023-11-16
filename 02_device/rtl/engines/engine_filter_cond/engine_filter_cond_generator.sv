@@ -518,6 +518,10 @@ module engine_filter_cond_generator #(parameter
     always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg_S4.valid   <= generator_engine_request_engine_reg_S3.valid;
         generator_engine_request_engine_reg_S4.payload <= generator_engine_request_engine_reg_S3.payload;
+
+
+            if(generator_engine_request_engine_reg_S4.valid)
+                $display("%t - %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S4.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S4.payload.data.field[0], generator_engine_request_engine_reg_S4.payload.data.field[3]);
     end
 
     engine_filter_cond_kernel inst_engine_filter_cond_kernel (
