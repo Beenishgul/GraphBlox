@@ -588,11 +588,6 @@ module engine_read_write_generator #(parameter
             request_memory_out_reg.valid                  <= request_out_int.valid ;
             fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
             request_engine_out_reg.valid                  <= fifo_response_comb.valid ;
-
-
-                if(fifo_response_comb.valid)
-                    $display("%t - B:%0d L:%0d-%0d", $time,ID_BUNDLE, ID_LANE, fifo_response_comb.payload.data.field[0]);
-            
         end
     end
 

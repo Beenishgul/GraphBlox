@@ -23,6 +23,8 @@ class GraphCSR;
     integer mem512_auxiliary_2            ;
     integer mem512_num_edges              ;
     integer mem512_overlay_program_entries;
+    integer debug_counter_1;
+    integer debug_counter_2;
 
     integer file_error               ;
     integer file_ptr_overlay_program ;
@@ -57,6 +59,9 @@ class GraphCSR;
         this.mem512_auxiliary_1        = 0;
         this.mem512_auxiliary_2        = 0;
         this.mem512_num_edges          = 0;
+        this.mem512_num_edges          = 0;
+        this.debug_counter_1          = 0;
+        this.debug_counter_2          = 0;
         this.mem512_overlay_program_entries = 4;
     endfunction
 
@@ -65,6 +70,9 @@ class GraphCSR;
         $display("MSG: GRAPH CSR : %s", this.graph_name);
         $display("MSG: VERTEX COUNT : %0d", this.num_vertices);
         $display("MSG: EDGE COUNT   : %0d", this.num_edges);
+        $display("---------------------------------------------------------------------------");
+        $display("MSG: debug_counter_1  : %0d", this.debug_counter_1);
+        $display("MSG: debug_counter_1  : %0d", this.debug_counter_2);
         $display("---------------------------------------------------------------------------");
     endfunction
 
@@ -1073,7 +1081,9 @@ module __KERNEL___testbench ();
 
         for (int i = 0; i < mem512_auxiliary_2_half; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = {31'b0,get_random_bit()};
+                setup_temp = {31'b0,get_random_bit()};
+                graph.debug_counter_1 += setup_temp;
+                graph.auxiliary_2[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = setup_temp;
             end
         end
 

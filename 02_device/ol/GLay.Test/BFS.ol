@@ -95,7 +95,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x0000002D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0010  1110
+0x0000002D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0001  1110
 0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
 0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
 0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride

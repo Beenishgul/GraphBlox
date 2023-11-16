@@ -146,7 +146,6 @@ module engine_csr_index_configure_engine #(parameter
         configure_engine_reg.payload.param.mode_sequence <= 1'b0;
         configure_engine_reg.payload.param.mode_buffer   <= 1'b0;
         configure_engine_reg.payload.param.mode_break    <= 1'b0;
-        configure_engine_reg.payload.param.mode_filter   <= 1'b0;
         configure_engine_reg.payload.param.index_start   <= fifo_response_engine_in_dout_reg.payload.data.field[0];
         configure_engine_reg.payload.param.index_end     <= fifo_response_engine_in_dout_reg.payload.data.field[0] + fifo_response_engine_in_dout_reg.payload.data.field[1];
         configure_engine_reg.payload.param.stride        <= 0;
@@ -199,7 +198,7 @@ module engine_csr_index_configure_engine #(parameter
     assign fifo_configure_engine_setup_signal_int = fifo_configure_engine_signals_out_int.wr_rst_busy  | fifo_configure_engine_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_configure_engine_signals_in_int.wr_en = configure_engine_reg.valid;
+    assign fifo_configure_engine_signals_in_int.wr_en = configure_engine_reg.valid & (|configure_engine_reg.payload.param.array_size);
     assign fifo_configure_engine_din                  = configure_engine_reg.payload;
 
     // Pop

@@ -55,7 +55,6 @@ package PKG_ENGINE;
         logic                                     mode_sequence;
         logic                                     mode_buffer  ;
         logic                                     mode_break   ;
-        logic                                     mode_filter  ;
         logic [      M_AXI_MEMORY_ADDR_WIDTH-1:0] array_pointer;
         logic [        CACHE_FRONTEND_DATA_W-1:0] array_size   ;
         logic [        CACHE_FRONTEND_DATA_W-1:0] index_start  ;
