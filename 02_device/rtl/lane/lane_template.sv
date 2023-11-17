@@ -34,12 +34,18 @@ module lane_template #(
     input  MemoryPacket           response_memory_in                                         ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                         ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                        ,
+    input  MemoryPacket           response_control_in                                        ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                        ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                       ,
     output MemoryPacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                 ,
     input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in[ (1+LANE_CAST_WIDTH)-1:0] ,
     output FIFOStateSignalsOutput fifo_request_lane_out_signals_out[ (1+LANE_CAST_WIDTH)-1:0],
     output MemoryPacket           request_memory_out                                         ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                         ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                        ,
+    output MemoryPacket           request_control_out                                        ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                        ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                       ,
     output logic                  fifo_setup_signal                                          ,
     output logic                  done_out
 );
@@ -53,120 +59,173 @@ module lane_template #(
 
     KernelDescriptor descriptor_in_reg;
 
-    MemoryPacket response_lane_in_reg  ;
-    MemoryPacket response_memory_in_reg;
-
-    MemoryPacket request_lane_out_int  ;
-    MemoryPacket request_memory_out_int;
-    MemoryPacket response_lane_in_int  ;
-    MemoryPacket response_memory_in_int;
+    MemoryPacket request_control_out_int;
+    MemoryPacket request_lane_out_int   ;
+    MemoryPacket request_memory_out_int ;
+    MemoryPacket response_control_in_int;
+    MemoryPacket response_control_in_reg;
+    MemoryPacket response_lane_in_int   ;
+    MemoryPacket response_lane_in_reg   ;
+    MemoryPacket response_memory_in_int ;
+    MemoryPacket response_memory_in_reg ;
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engines INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_lane_in_din             ;
-    MemoryPacketPayload    fifo_response_lane_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_lane_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_lane_in_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_response_lane_in_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_response_lane_in_signals_out_int ;
     logic                  fifo_response_lane_in_setup_signal_int;
+    MemoryPacketPayload    fifo_response_lane_in_din             ;
+    MemoryPacketPayload    fifo_response_lane_in_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Memory Response MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_memory_in_din             ;
-    MemoryPacketPayload    fifo_response_memory_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int ;
     logic                  fifo_response_memory_in_setup_signal_int;
+    MemoryPacketPayload    fifo_response_memory_in_din             ;
+    MemoryPacketPayload    fifo_response_memory_in_dout            ;
+
+// --------------------------------------------------------------------------------------
+// FIFO INPUT CONTROL Response MemoryPacket
+// --------------------------------------------------------------------------------------
+    FIFOStateSignalsInput  fifo_response_control_in_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_response_control_in_signals_in_reg  ;
+    FIFOStateSignalsOutput fifo_response_control_in_signals_out_int ;
+    logic                  fifo_response_control_in_setup_signal_int;
+    MemoryPacketPayload    fifo_response_control_in_din             ;
+    MemoryPacketPayload    fifo_response_control_in_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engines OUTPUT Request MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_lane_out_din             ;
-    MemoryPacketPayload    fifo_request_lane_out_dout            ;
-    FIFOStateSignalsInput  fifo_request_lane_out_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_lane_out_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_request_lane_out_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_request_lane_out_signals_out_int ;
     logic                  fifo_request_lane_out_setup_signal_int;
+    MemoryPacketPayload    fifo_request_lane_out_din             ;
+    MemoryPacketPayload    fifo_request_lane_out_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Memory Request Memory MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_memory_out_din             ;
-    MemoryPacketPayload    fifo_request_memory_out_dout            ;
-    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_memory_out_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_request_memory_out_signals_out_int ;
     logic                  fifo_request_memory_out_setup_signal_int;
+    MemoryPacketPayload    fifo_request_memory_out_din             ;
+    MemoryPacketPayload    fifo_request_memory_out_dout            ;
+
+// --------------------------------------------------------------------------------------
+// FIFO OUTPUT CONTROL Request CONTROL MemoryPacket
+// --------------------------------------------------------------------------------------
+    FIFOStateSignalsInput  fifo_request_control_out_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_request_control_out_signals_in_reg  ;
+    FIFOStateSignalsOutput fifo_request_control_out_signals_out_int ;
+    logic                  fifo_request_control_out_setup_signal_int;
+    MemoryPacketPayload    fifo_request_control_out_din             ;
+    MemoryPacketPayload    fifo_request_control_out_dout            ;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-    logic                   areset_engine_arbiter_N_to_1_memory                                    ;
-    MemoryPacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
     FIFOStateSignalsInput   engine_arbiter_N_to_1_memory_fifo_request_signals_in                   ;
     FIFOStateSignalsOutput  engine_arbiter_N_to_1_memory_fifo_request_signals_out                  ;
-    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_request_in                 ;
-    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_grant_out                  ;
-    MemoryPacket            engine_arbiter_N_to_1_memory_request_out                               ;
+    logic                   areset_engine_arbiter_N_to_1_memory                                    ;
     logic                   engine_arbiter_N_to_1_memory_fifo_setup_signal                         ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_grant_out                  ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_request_in                 ;
+    MemoryPacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
+    MemoryPacket            engine_arbiter_N_to_1_memory_request_out                               ;
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: CONTROL Request Generator
+// --------------------------------------------------------------------------------------
+    FIFOStateSignalsInput   engine_arbiter_N_to_1_control_fifo_request_signals_in                   ;
+    FIFOStateSignalsOutput  engine_arbiter_N_to_1_control_fifo_request_signals_out                  ;
+    logic                   areset_engine_arbiter_N_to_1_control                                    ;
+    logic                   engine_arbiter_N_to_1_control_fifo_setup_signal                         ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_control_engine_arbiter_grant_out                  ;
+    logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_control_engine_arbiter_request_in                 ;
+    MemoryPacket            engine_arbiter_N_to_1_control_request_in               [NUM_ENGINES-1:0];
+    MemoryPacket            engine_arbiter_N_to_1_control_request_out                               ;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
-    logic                  areset_engine_arbiter_1_to_N_memory                                    ;
-    MemoryPacket           engine_arbiter_1_to_N_memory_response_in                               ;
     FIFOStateSignalsInput  engine_arbiter_1_to_N_memory_fifo_response_signals_in [NUM_ENGINES-1:0];
     FIFOStateSignalsOutput engine_arbiter_1_to_N_memory_fifo_response_signals_out                 ;
-    MemoryPacket           engine_arbiter_1_to_N_memory_response_out             [NUM_ENGINES-1:0];
+    logic                  areset_engine_arbiter_1_to_N_memory                                    ;
     logic                  engine_arbiter_1_to_N_memory_fifo_setup_signal                         ;
+    MemoryPacket           engine_arbiter_1_to_N_memory_response_in                               ;
+    MemoryPacket           engine_arbiter_1_to_N_memory_response_out             [NUM_ENGINES-1:0];
+
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: Memory Response Generator
+// --------------------------------------------------------------------------------------
+    FIFOStateSignalsInput  engine_arbiter_1_to_N_control_fifo_response_signals_in [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput engine_arbiter_1_to_N_control_fifo_response_signals_out                 ;
+    logic                  areset_engine_arbiter_1_to_N_control                                    ;
+    logic                  engine_arbiter_1_to_N_control_fifo_setup_signal                         ;
+    MemoryPacket           engine_arbiter_1_to_N_control_response_in                               ;
+    MemoryPacket           engine_arbiter_1_to_N_control_response_out             [NUM_ENGINES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Engines
 // --------------------------------------------------------------------------------------
-    logic                   areset_engine                              [NUM_ENGINES-1:0];
-    KernelDescriptor        engines_descriptor_in                      [NUM_ENGINES-1:0];
-    MemoryPacket            engines_response_lane_in                   [NUM_ENGINES-1:0];
-    FIFOStateSignalsInput   engines_fifo_response_lane_in_signals_in   [NUM_ENGINES-1:0];
-    FIFOStateSignalsOutput  engines_fifo_response_lane_in_signals_out  [NUM_ENGINES-1:0];
-    MemoryPacket            engines_response_memory_in                 [NUM_ENGINES-1:0];
-    FIFOStateSignalsInput   engines_fifo_response_memory_in_signals_in [NUM_ENGINES-1:0];
-    FIFOStateSignalsOutput  engines_fifo_response_memory_in_signals_out[NUM_ENGINES-1:0];
-    MemoryPacket            engines_request_lane_out                   [NUM_ENGINES-1:0];
-    FIFOStateSignalsInput   engines_fifo_request_lane_out_signals_in   [NUM_ENGINES-1:0];
-    FIFOStateSignalsOutput  engines_fifo_request_lane_out_signals_out  [NUM_ENGINES-1:0];
-    MemoryPacket            engines_request_memory_out                 [NUM_ENGINES-1:0];
-    FIFOStateSignalsInput   engines_fifo_request_memory_out_signals_in [NUM_ENGINES-1:0];
-    FIFOStateSignalsOutput  engines_fifo_request_memory_out_signals_out[NUM_ENGINES-1:0];
-    logic                   engines_fifo_setup_signal                  [NUM_ENGINES-1:0];
-    logic                   engines_done_out                           [NUM_ENGINES-1:0];
-    MemoryPacket            engines_request_lane_out_int                                ;
-    MemoryPacket            engines_request_memory_out_int                              ;
-    logic [NUM_ENGINES-1:0] engines_fifo_setup_signal_reg                               ;
-    logic [NUM_ENGINES-1:0] engines_done_out_reg                                        ;
+    FIFOStateSignalsInput   engines_fifo_request_control_out_signals_in [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engines_fifo_request_lane_out_signals_in    [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engines_fifo_request_memory_out_signals_in  [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engines_fifo_response_control_in_signals_in [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engines_fifo_response_lane_in_signals_in    [NUM_ENGINES-1:0];
+    FIFOStateSignalsInput   engines_fifo_response_memory_in_signals_in  [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_request_control_out_signals_out[NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_request_lane_out_signals_out   [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_request_memory_out_signals_out [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_response_control_in_signals_out[NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_response_lane_in_signals_out   [NUM_ENGINES-1:0];
+    FIFOStateSignalsOutput  engines_fifo_response_memory_in_signals_out [NUM_ENGINES-1:0];
+    KernelDescriptor        engines_descriptor_in                       [NUM_ENGINES-1:0];
+    logic                   areset_engine                               [NUM_ENGINES-1:0];
+    logic                   engines_done_out                            [NUM_ENGINES-1:0];
+    logic                   engines_fifo_setup_signal                   [NUM_ENGINES-1:0];
+    logic [NUM_ENGINES-1:0] engines_done_out_reg                                         ;
+    logic [NUM_ENGINES-1:0] engines_fifo_setup_signal_reg                                ;
+    MemoryPacket            engines_request_control_out                 [NUM_ENGINES-1:0];
+    MemoryPacket            engines_request_control_out_int                              ;
+    MemoryPacket            engines_request_lane_out                    [NUM_ENGINES-1:0];
+    MemoryPacket            engines_request_lane_out_int                                 ;
+    MemoryPacket            engines_request_memory_out                  [NUM_ENGINES-1:0];
+    MemoryPacket            engines_request_memory_out_int                               ;
+    MemoryPacket            engines_response_control_in                 [NUM_ENGINES-1:0];
+    MemoryPacket            engines_response_lane_in                    [NUM_ENGINES-1:0];
+    MemoryPacket            engines_response_memory_in                  [NUM_ENGINES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
-    MemoryPacket           engines_response_merge_lane_in                 [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsInput  engines_fifo_request_cast_lane_out_signals_in  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
     FIFOStateSignalsInput  engines_fifo_response_merge_lane_in_signals_in [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+    FIFOStateSignalsOutput engines_fifo_request_cast_lane_out_signals_out [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
     FIFOStateSignalsOutput engines_fifo_response_merge_lane_in_signals_out[NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
     MemoryPacket           engines_request_cast_lane_out                  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsInput  engines_fifo_request_cast_lane_out_signals_in  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
-    FIFOStateSignalsOutput engines_fifo_request_cast_lane_out_signals_out [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+    MemoryPacket           engines_response_merge_lane_in                 [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        areset_lane_template                <= areset;
-        areset_fifo                         <= areset;
-        areset_engine_arbiter_N_to_1_memory <= areset;
-        areset_engine_arbiter_1_to_N_memory <= areset;
+        areset_engine_arbiter_1_to_N_control <= areset;
+        areset_engine_arbiter_1_to_N_memory  <= areset;
+        areset_engine_arbiter_N_to_1_control <= areset;
+        areset_engine_arbiter_N_to_1_memory  <= areset;
+        areset_fifo                          <= areset;
+        areset_lane_template                 <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -190,26 +249,33 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_lane_template) begin
-            fifo_response_lane_in_signals_in_reg   <= 0;
-            fifo_request_lane_out_signals_in_reg   <= 0;
-            fifo_response_memory_in_signals_in_reg <= 0;
-            fifo_request_memory_out_signals_in_reg <= 0;
-            response_lane_in_reg.valid             <= 1'b0;
-            response_memory_in_reg.valid           <= 1'b0;
+            fifo_request_control_out_signals_in_reg <= 0;
+            fifo_request_lane_out_signals_in_reg    <= 0;
+            fifo_request_memory_out_signals_in_reg  <= 0;
+            fifo_response_control_in_signals_in_reg <= 0;
+            fifo_response_lane_in_signals_in_reg    <= 0;
+            fifo_response_memory_in_signals_in_reg  <= 0;
+            response_control_in_reg.valid           <= 1'b0;
+            response_lane_in_reg.valid              <= 1'b0;
+            response_memory_in_reg.valid            <= 1'b0;
         end
         else begin
-            fifo_response_lane_in_signals_in_reg   <= fifo_response_lane_in_signals_in[0];
-            fifo_request_lane_out_signals_in_reg   <= fifo_request_lane_out_signals_in[0];
-            fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
-            fifo_request_memory_out_signals_in_reg <= fifo_request_memory_out_signals_in;
-            response_lane_in_reg.valid             <= response_lane_in[0].valid;
-            response_memory_in_reg.valid           <= response_memory_in.valid ;
+            fifo_request_control_out_signals_in_reg <= fifo_request_control_out_signals_in;
+            fifo_request_lane_out_signals_in_reg    <= fifo_request_lane_out_signals_in[0];
+            fifo_request_memory_out_signals_in_reg  <= fifo_request_memory_out_signals_in;
+            fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
+            fifo_response_lane_in_signals_in_reg    <= fifo_response_lane_in_signals_in[0];
+            fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
+            response_control_in_reg.valid           <= response_control_in.valid ;
+            response_lane_in_reg.valid              <= response_lane_in[0].valid;
+            response_memory_in_reg.valid            <= response_memory_in.valid ;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        response_lane_in_reg.payload   <= response_lane_in[0].payload;
-        response_memory_in_reg.payload <= response_memory_in.payload;
+        response_control_in_reg.payload <= response_control_in.payload;
+        response_lane_in_reg.payload    <= response_lane_in[0].payload;
+        response_memory_in_reg.payload  <= response_memory_in.payload;
     end
 
 // --------------------------------------------------------------------------------------
@@ -217,28 +283,33 @@ module lane_template #(
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_lane_template) begin
-            fifo_setup_signal        <= 1'b1;
+            done_out                  <= 1'b0;
+            fifo_empty_reg            <= 1'b1;
+            fifo_setup_signal         <= 1'b1;
+            request_control_out.valid <= 1'b0;
             request_lane_out[0].valid <= 1'b0;
-            request_memory_out.valid <= 1'b0;
-            done_out                 <= 1'b0;
-            fifo_empty_reg           <= 1'b1;
+            request_memory_out.valid  <= 1'b0;
         end
         else begin
-            fifo_setup_signal        <= fifo_response_lane_in_setup_signal_int | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
+            done_out                  <= (&engines_done_out_reg) & fifo_empty_reg;
+            fifo_empty_reg            <= fifo_empty_int;
+            fifo_setup_signal         <= fifo_response_lane_in_setup_signal_int | fifo_response_control_in_setup_signal_int  | engine_arbiter_N_to_1_memory_fifo_setup_signal |  engine_arbiter_N_to_1_control_fifo_setup_signal |  engine_arbiter_1_to_N_memory_fifo_setup_signal | engine_arbiter_1_to_N_control_fifo_setup_signal | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_control_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
+            request_control_out.valid <= request_control_out_int.valid;
             request_lane_out[0].valid <= request_lane_out_int.valid ;
-            request_memory_out.valid <= request_memory_out_int.valid;
-            done_out                 <= (&engines_done_out_reg) & fifo_empty_reg;
-            fifo_empty_reg           <= fifo_empty_int;
+            request_memory_out.valid  <= request_memory_out_int.valid;
         end
     end
 
-    assign fifo_empty_int = fifo_response_lane_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_lane_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
+    assign fifo_empty_int = fifo_response_lane_in_signals_out_int.empty & fifo_response_control_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_lane_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & fifo_request_control_out_signals_out_int.empty & engine_arbiter_1_to_N_control_fifo_response_signals_out.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_N_to_1_control_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
 
     always_ff @(posedge ap_clk) begin
-        fifo_response_lane_in_signals_out[0] <= fifo_response_lane_in_signals_out_int;
+        fifo_request_control_out_signals_out <= fifo_request_control_out_signals_out_int;
         fifo_request_lane_out_signals_out[0] <= fifo_request_lane_out_signals_out_int;
-        fifo_response_memory_in_signals_out  <= fifo_response_memory_in_signals_out_int;
         fifo_request_memory_out_signals_out  <= fifo_request_memory_out_signals_out_int;
+        fifo_response_control_in_signals_out <= fifo_response_control_in_signals_out_int;
+        fifo_response_lane_in_signals_out[0] <= fifo_response_lane_in_signals_out_int;
+        fifo_response_memory_in_signals_out  <= fifo_response_memory_in_signals_out_int;
+        request_control_out.payload          <= request_control_out_int.payload ;
         request_lane_out[0].payload          <= request_lane_out_int.payload;
         request_memory_out.payload           <= request_memory_out_int.payload ;
     end
@@ -314,6 +385,41 @@ module lane_template #(
     );
 
 // --------------------------------------------------------------------------------------
+// FIFO INPUT CONTROL Response MemoryPacket
+// --------------------------------------------------------------------------------------
+    // FIFO is resetting
+    assign fifo_response_control_in_setup_signal_int = fifo_response_control_in_signals_out_int.wr_rst_busy | fifo_response_control_in_signals_out_int.rd_rst_busy;
+
+    // Push
+    assign fifo_response_control_in_signals_in_int.wr_en = response_control_in_reg.valid;
+    assign fifo_response_control_in_din                  = response_control_in_reg.payload;
+
+    // Pop
+    assign fifo_response_control_in_signals_in_int.rd_en = ~fifo_response_control_in_signals_out_int.empty & fifo_response_control_in_signals_in_reg.rd_en & ~engine_arbiter_1_to_N_control_fifo_response_signals_out.prog_full;
+    assign response_control_in_int.valid                 = fifo_response_control_in_signals_out_int.valid;
+    assign response_control_in_int.payload               = fifo_response_control_in_dout;
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (PROG_THRESH               )
+    ) inst_fifo_MemoryPacketResponseControlInput (
+        .clk        (ap_clk                                              ),
+        .srst       (areset_fifo                                         ),
+        .din        (fifo_response_control_in_din                        ),
+        .wr_en      (fifo_response_control_in_signals_in_int.wr_en       ),
+        .rd_en      (fifo_response_control_in_signals_in_int.rd_en       ),
+        .dout       (fifo_response_control_in_dout                       ),
+        .full       (fifo_response_control_in_signals_out_int.full       ),
+        .empty      (fifo_response_control_in_signals_out_int.empty      ),
+        .valid      (fifo_response_control_in_signals_out_int.valid      ),
+        .prog_full  (fifo_response_control_in_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_response_control_in_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_response_control_in_signals_out_int.rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engines requests MemoryPacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
@@ -381,6 +487,41 @@ module lane_template #(
         .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
         .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
         .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO OUTPUT CONTROL requests MemoryPacket
+// --------------------------------------------------------------------------------------
+    // FIFO is resetting
+    assign fifo_request_control_out_setup_signal_int = fifo_request_control_out_signals_out_int.wr_rst_busy | fifo_request_control_out_signals_out_int.rd_rst_busy;
+
+    // Push
+    assign fifo_request_control_out_signals_in_int.wr_en = engine_arbiter_N_to_1_control_request_out.valid;
+    assign fifo_request_control_out_din                  = engine_arbiter_N_to_1_control_request_out.payload;
+
+    // Pop
+    assign fifo_request_control_out_signals_in_int.rd_en = ~fifo_request_control_out_signals_out_int.empty & fifo_request_control_out_signals_in_reg.rd_en;
+    assign request_control_out_int.valid                 = fifo_request_control_out_signals_out_int.valid;
+    assign request_control_out_int.payload               = fifo_request_control_out_dout;
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (PROG_THRESH               )
+    ) inst_fifo_MemoryPacketRequestControlOutput (
+        .clk        (ap_clk                                              ),
+        .srst       (areset_fifo                                         ),
+        .din        (fifo_request_control_out_din                        ),
+        .wr_en      (fifo_request_control_out_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_control_out_signals_in_int.rd_en       ),
+        .dout       (fifo_request_control_out_dout                       ),
+        .full       (fifo_request_control_out_signals_out_int.full       ),
+        .empty      (fifo_request_control_out_signals_out_int.empty      ),
+        .valid      (fifo_request_control_out_signals_out_int.valid      ),
+        .prog_full  (fifo_request_control_out_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_control_out_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_control_out_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
@@ -480,6 +621,35 @@ module lane_template #(
     );
 
 // --------------------------------------------------------------------------------------
+// Generate Engines - CONTROL Arbitration
+// --------------------------------------------------------------------------------------
+// Generate Engines - Signals
+// --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: CONTROL Request Generator
+// --------------------------------------------------------------------------------------
+    always_comb begin
+        for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_control_request_in
+            engine_arbiter_N_to_1_control_request_in[i]                = engines_request_control_out[i];
+            engine_arbiter_N_to_1_control_engine_arbiter_request_in[i] = ~engines_fifo_request_control_out_signals_out[i].empty & ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full;
+            engines_fifo_request_control_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[i];
+        end
+    end
+
+    assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
+// --------------------------------------------------------------------------------------
+    arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_ENGINES)) inst_engine_arbiter_N_to_1_control_request_out (
+        .ap_clk                  (ap_clk                                                 ),
+        .areset                  (areset_engine_arbiter_N_to_1_control                   ),
+        .request_in              (engine_arbiter_N_to_1_control_request_in               ),
+        .fifo_request_signals_in (engine_arbiter_N_to_1_control_fifo_request_signals_in  ),
+        .fifo_request_signals_out(engine_arbiter_N_to_1_control_fifo_request_signals_out ),
+        .arbiter_request_in      (engine_arbiter_N_to_1_control_engine_arbiter_request_in),
+        .arbiter_grant_out       (engine_arbiter_N_to_1_control_engine_arbiter_grant_out ),
+        .request_out             (engine_arbiter_N_to_1_control_request_out              ),
+        .fifo_setup_signal       (engine_arbiter_N_to_1_control_fifo_setup_signal        )
+    );
+
+// --------------------------------------------------------------------------------------
 // Generate Engines - Signals
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Response Generator
@@ -508,30 +678,62 @@ module lane_template #(
     );
 
 // --------------------------------------------------------------------------------------
+// Generate Engines - Arbiter Signals: CONTROL Response Generator
+// --------------------------------------------------------------------------------------
+    assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;
+    always_comb begin
+        for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_control_response
+            engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_control_in_signals_out[i].prog_full;
+            engines_response_control_in[i] = engine_arbiter_1_to_N_control_response_out[i];
+            engines_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
+        end
+    end
+
+// --------------------------------------------------------------------------------------
+    arbiter_1_to_N_response #(
+        .NUM_MEMORY_REQUESTOR(NUM_ENGINES),
+        .ID_LEVEL            (3          )
+    ) inst_engine_arbiter_1_to_N_control_response_in (
+        .ap_clk                   (ap_clk                                                 ),
+        .areset                   (areset_engine_arbiter_1_to_N_control                   ),
+        .response_in              (engine_arbiter_1_to_N_control_response_in              ),
+        .fifo_response_signals_in (engine_arbiter_1_to_N_control_fifo_response_signals_in ),
+        .fifo_response_signals_out(engine_arbiter_1_to_N_control_fifo_response_signals_out),
+        .response_out             (engine_arbiter_1_to_N_control_response_out             ),
+        .fifo_setup_signal        (engine_arbiter_1_to_N_control_fifo_setup_signal        )
+    );
+
+// --------------------------------------------------------------------------------------
 // Generate Bundles - instants
 // --------------------------------------------------------------------------------------
     generate
         for (j=0; j<NUM_ENGINES; j++) begin : generate_engine_template
             engine_template #(
                 `include"set_engine_parameters.vh"
-            ) inst_engine_template (
-                .ap_clk                             (ap_clk                                                                                   ),
-                .areset                             (areset_engine[j]                                                                         ),
-                .descriptor_in                      (engines_descriptor_in[j]                                                                 ),
-                .response_engine_in                 (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
-                .fifo_response_engine_in_signals_in (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
-                .fifo_response_engine_in_signals_out(engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
-                .response_memory_in                 (engines_response_memory_in[j]                                                            ),
-                .fifo_response_memory_in_signals_in (engines_fifo_response_memory_in_signals_in[j]                                            ),
-                .fifo_response_memory_in_signals_out(engines_fifo_response_memory_in_signals_out[j]                                           ),
-                .request_engine_out                 (engines_request_cast_lane_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]                   ),
-                .fifo_request_engine_out_signals_in (engines_fifo_request_cast_lane_out_signals_in[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]   ),
-                .fifo_request_engine_out_signals_out(engines_fifo_request_cast_lane_out_signals_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]  ),
-                .request_memory_out                 (engines_request_memory_out[j]                                                            ),
-                .fifo_request_memory_out_signals_in (engines_fifo_request_memory_out_signals_in[j]                                            ),
-                .fifo_request_memory_out_signals_out(engines_fifo_request_memory_out_signals_out[j]                                           ),
-                .fifo_setup_signal                  (engines_fifo_setup_signal[j]                                                             ),
-                .done_out                           (engines_done_out[j]                                                                      )
+                ) inst_engine_template (
+                .ap_clk                              (ap_clk                                                                                   ),
+                .areset                              (areset_engine[j]                                                                         ),
+                .descriptor_in                       (engines_descriptor_in[j]                                                                 ),
+                .response_engine_in                  (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
+                .fifo_response_engine_in_signals_in  (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
+                .fifo_response_engine_in_signals_out (engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
+                .response_memory_in                  (engines_response_memory_in[j]                                                            ),
+                .fifo_response_memory_in_signals_in  (engines_fifo_response_memory_in_signals_in[j]                                            ),
+                .fifo_response_memory_in_signals_out (engines_fifo_response_memory_in_signals_out[j]                                           ),
+                .response_control_in                 (engines_response_control_in[j]                                                           ),
+                .fifo_response_control_in_signals_in (engines_fifo_response_control_in_signals_in[j]                                           ),
+                .fifo_response_control_in_signals_out(engines_fifo_response_control_in_signals_out[j]                                          ),
+                .request_engine_out                  (engines_request_cast_lane_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]                   ),
+                .fifo_request_engine_out_signals_in  (engines_fifo_request_cast_lane_out_signals_in[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]   ),
+                .fifo_request_engine_out_signals_out (engines_fifo_request_cast_lane_out_signals_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]  ),
+                .request_memory_out                  (engines_request_memory_out[j]                                                            ),
+                .fifo_request_memory_out_signals_in  (engines_fifo_request_memory_out_signals_in[j]                                            ),
+                .fifo_request_memory_out_signals_out (engines_fifo_request_memory_out_signals_out[j]                                           ),
+                .request_control_out                 (engines_request_control_out[j]                                                           ),
+                .fifo_request_control_out_signals_in (engines_fifo_request_control_out_signals_in[j]                                           ),
+                .fifo_request_control_out_signals_out(engines_fifo_request_control_out_signals_out[j]                                          ),
+                .fifo_setup_signal                   (engines_fifo_setup_signal[j]                                                             ),
+                .done_out                            (engines_done_out[j]                                                                      )
             );
         end
     endgenerate

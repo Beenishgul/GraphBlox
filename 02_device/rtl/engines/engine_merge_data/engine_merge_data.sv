@@ -48,20 +48,29 @@ module engine_merge_data #(parameter
     input  MemoryPacket           response_memory_in                                             ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
+    input  MemoryPacket           response_control_in                                            ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                            ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                           ,
     output MemoryPacket           request_engine_out                                             ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                             ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                            ,
     output MemoryPacket           request_memory_out                                             ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                             ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                            ,
+    output MemoryPacket           request_control_out                                            ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                            ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                           ,
     output logic                  fifo_setup_signal                                              ,
     output logic                  done_out
 );
 
-    genvar i;
+    assign fifo_request_control_out_signals_out = 6'b010000;
+    assign fifo_request_memory_out_signals_out  = 6'b010000;
+    assign fifo_response_control_in_signals_out = 6'b010000;
+    assign request_control_out                  = 0;
+    assign request_memory_out                   = 0;
 
-    assign request_memory_out                  = 0;
-    assign fifo_request_memory_out_signals_out = 6'b010000;
+    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -80,7 +89,7 @@ module engine_merge_data #(parameter
     MemoryPacket response_memory_in_int                            ;
 
     logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_empty_int;
-    logic  fifo_empty_reg;
+    logic                              fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------

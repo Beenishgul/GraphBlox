@@ -38,25 +38,34 @@ module engine_read_write #(parameter
     PIPELINE_STAGES    = 2
 ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                              ,
+    input  logic                  areset                              ,
+    input  KernelDescriptor       descriptor_in                       ,
+    input  MemoryPacket           response_engine_in                  ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in  ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out ,
+    input  MemoryPacket           response_memory_in                  ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in  ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out ,
+    input  MemoryPacket           response_control_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out,
+    output MemoryPacket           request_engine_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out ,
+    output MemoryPacket           request_memory_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out ,
+    output MemoryPacket           request_control_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out,
+    output logic                  fifo_setup_signal                   ,
     output logic                  done_out
 );
 
+    assign fifo_request_control_out_signals_out = 6'b010000;
+    assign fifo_response_control_in_signals_out = 6'b010000;
+    assign request_control_out                  = 0;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -76,8 +85,8 @@ module engine_read_write #(parameter
     MemoryPacket response_engine_in_int;
     MemoryPacket response_memory_in_int;
 
-  logic fifo_empty_int;
-   logic fifo_empty_reg;
+    logic fifo_empty_int;
+    logic fifo_empty_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -252,7 +261,7 @@ module engine_read_write #(parameter
     end
 
     assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & arbiter_1_to_N_memory_fifo_response_signals_out.empty & configure_memory_fifo_response_memory_in_signals_out.empty & configure_memory_fifo_configure_memory_signals_out.empty;
-    
+
     always_ff @(posedge ap_clk) begin
         fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
         fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_int;
