@@ -306,7 +306,7 @@ module cu_cache #(
 
   always_comb begin
     if((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))begin
-      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_ctrl_out.wtb_empty & ~cache_response_mem.iob.ready  & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready  & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
       cache_request_mem.iob.wstrb        = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
       fifo_request_signals_in_int.rd_en  = cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
       fifo_response_signals_in_int.wr_en = ~cache_request_mem.iob.valid & fifo_request_signals_out_int.valid;
