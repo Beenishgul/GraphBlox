@@ -330,23 +330,23 @@ main (int argc, char **argv)
     }
 
     uint32_t i;
-    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices;
+    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices*2;
     graphAuxiliary->auxiliary_1  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices;
+    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices*2;
     graphAuxiliary->auxiliary_2  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_1 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
     }
 
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = -1;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 1;
     }
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;

@@ -115,20 +115,62 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     // ********************************************************************************************
     // ***************                  Allocate Device buffers                      **************
     // ********************************************************************************************
-    xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, bankGroupIndex);// graph overlay_program program
-    xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, bankGroupIndex);// V | vertex in degree
-    xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, bankGroupIndex);// V | vertex out degree
-    xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, bankGroupIndex);// V | vertex edges CSR index
-    xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex);// E | edges array src
-    xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex);// E | edges array dest
-    xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex);// E | edges array weight
-    xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 1
-    xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 2
-    xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 3
 
-    // ********************************************************************************************
-    // ***************                  Setup Device pointers                        **************
-    // ********************************************************************************************
+    switch (glayHandle->ctrlMode)
+    {
+    case 0:
+    {
+        xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, bankGroupIndex);// graph overlay_program program
+        xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, bankGroupIndex);// V | vertex in degree
+        xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, bankGroupIndex);// V | vertex out degree
+        xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, bankGroupIndex);// V | vertex edges CSR index
+        xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex);// E | edges array src
+        xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex);// E | edges array dest
+        xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex);// E | edges array weight
+        xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 1
+        xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 2
+        xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 3
+    }
+    break;
+    case 1:
+    case 2:
+    {
+        xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(0));// graph overlay_program program
+        xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(1));// V | vertex in degree
+        xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(2));// V | vertex out degree
+        xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(3));// V | vertex edges CSR index
+        xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(4));// E | edges array src
+        xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(5));// E | edges array dest
+        xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(6));// E | edges array weight
+        xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(7));// auxiliary 1
+        xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(8));// auxiliary 2
+        xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, glayHandle->kernelHandle.group_id(9));// auxiliary 3
+    }
+    break;
+    default:
+    {
+        xrt_buffer[0]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[0], xrt::bo::flags::normal, bankGroupIndex);// graph overlay_program program
+        xrt_buffer[1]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[1], xrt::bo::flags::normal, bankGroupIndex);// V | vertex in degree
+        xrt_buffer[2]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[2], xrt::bo::flags::normal, bankGroupIndex);// V | vertex out degree
+        xrt_buffer[3]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[3], xrt::bo::flags::normal, bankGroupIndex);// V | vertex edges CSR index
+        xrt_buffer[4]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[4], xrt::bo::flags::normal, bankGroupIndex);// E | edges array src
+        xrt_buffer[5]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[5], xrt::bo::flags::normal, bankGroupIndex);// E | edges array dest
+        xrt_buffer[6]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[6], xrt::bo::flags::normal, bankGroupIndex);// E | edges array weight
+        xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 1
+        xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 2
+        xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 3}
+    }
+    break;
+    }
+
+
+
+
+
+
+// ********************************************************************************************
+// ***************                  Setup Device pointers                        **************
+// ********************************************************************************************
     xrt_buffer_device[0] = xrt_buffer[0].address();
     xrt_buffer_device[1] = xrt_buffer[1].address();
     xrt_buffer_device[2] = xrt_buffer[2].address();
@@ -140,9 +182,9 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_device[8] = xrt_buffer[8].address(); // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
     xrt_buffer_device[9] = (uint64_t)((uint64_t)1024 << 32) | (uint64_t)(overlay_program_entries << 1) | (uint64_t)endian; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
 
-    // ********************************************************************************************
-    // ***************                  Setup Host pointers                          **************
-    // ********************************************************************************************
+// ********************************************************************************************
+// ***************                  Setup Host pointers                          **************
+// ********************************************************************************************
     initializeGLAYOverlayConfiguration(overlay_program_entries, 1, graph, glayHandle->overlayPath);
     xrt_buffer_host[0] = overlay_program;
     xrt_buffer_host[1] = graph->vertices->in_degree;
@@ -344,6 +386,12 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     }
     break;
     }
+
+    // for (size_t i = 0; i < (overlay_program_entries+16384); i++)
+    // {
+    //     overlay_program[i] = 0;
+    // }
+
 
 }
 
