@@ -56,7 +56,6 @@ module cu_cache #(
 
   logic fifo_empty_int;
   logic fifo_empty_reg;
-  logic done_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -71,9 +70,9 @@ module cu_cache #(
   CacheResponsePayload  cache_response_mem;
   CacheControlIOBOutput cache_ctrl_in     ;
   CacheControlIOBOutput cache_ctrl_out    ;
-  logic                 invalidate        ;
-  logic                 invalidate_reg    ;
-  logic                 l1_avalid         ;
+  // logic                 invalidate        ;
+  // logic                 invalidate_reg    ;
+  // logic                 l1_avalid         ;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -145,7 +144,7 @@ module cu_cache #(
     end
   end
 
-  assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready;
+  assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & ~cache_response_mem.iob.ready;
 
   always_ff @(posedge ap_clk) begin
     fifo_request_signals_out  <= fifo_request_signals_out_int;
@@ -255,16 +254,17 @@ module cu_cache #(
     .reset        (areset_cache                )
   );
 
-  assign l1_avalid               = cache_request_mem.iob.valid ;
-  assign cache_ctrl_in.force_inv = invalidate_reg & ~l1_avalid;
-  assign cache_ctrl_in.wtb_empty = 1'b1;
+  // assign l1_avalid               = cache_request_mem.iob.valid ;
+  // assign cache_ctrl_in.force_inv = invalidate_reg & ~l1_avalid;
+  // assign cache_ctrl_in.wtb_empty = 1'b1;
+  // assign invalidate   = 1'b0;
 
-  //Necessary logic to avoid invalidating L2 while it's being accessed by a request
-  always @(posedge ap_clk)
-    if (areset_cache) invalidate_reg    <= 1'b0;
-    else if (invalidate) invalidate_reg <= 1'b1;
-    else if (~l1_avalid) invalidate_reg <= 1'b0;
-    else invalidate_reg <= invalidate_reg;
+  // //Necessary logic to avoid invalidating L2 while it's being accessed by a request
+  // always @(posedge ap_clk)
+  //   if (areset_cache) invalidate_reg    <= 1'b0;
+  //   else if (invalidate) invalidate_reg <= 1'b1;
+  //   else if (~l1_avalid) invalidate_reg <= 1'b0;
+  //   else invalidate_reg <= invalidate_reg;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT

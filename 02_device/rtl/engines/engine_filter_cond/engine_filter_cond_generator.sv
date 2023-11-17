@@ -520,13 +520,16 @@ module engine_filter_cond_generator #(parameter
                     generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
                     generator_engine_request_engine_reg_S3.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._if;
                     generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
+                    generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
                 end else begin
                     generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
                     generator_engine_request_engine_reg_S3.payload.meta.route.to        <= configure_engine_int.payload.param.filter_route._else;
                     generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
+                    generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
                 end
             end else begin
                 generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
                 generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
                 generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
             end
@@ -534,13 +537,16 @@ module engine_filter_cond_generator #(parameter
             if (generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE) begin
                 generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
                 generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
+                generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
                 generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= CMD_CONTROL;
             end else if (break_flow_int) begin
                 generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_BREAK;
                 generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
+                generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
                 generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= CMD_CONTROL;
             end else begin
                 generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
                 generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
                 generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
             end
