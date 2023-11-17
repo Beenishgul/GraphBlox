@@ -39,43 +39,51 @@ module engine_alu_ops #(parameter
     PIPELINE_STAGES    = 2
 ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                              ,
+    input  logic                  areset                              ,
+    input  KernelDescriptor       descriptor_in                       ,
+    input  MemoryPacket           response_engine_in                  ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in  ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out ,
+    input  MemoryPacket           response_memory_in                  ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in  ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out ,
+    input  MemoryPacket           response_control_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out,
+    output MemoryPacket           request_engine_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out ,
+    output MemoryPacket           request_memory_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out ,
+    output MemoryPacket           request_control_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out,
+    output logic                  fifo_setup_signal                   ,
     output logic                  done_out
 );
 
-    assign request_memory_out                  = 0;
-    assign fifo_request_memory_out_signals_out = 6'b010000;
+    assign fifo_request_control_out_signals_out = 6'b010000;
+    assign fifo_request_memory_out_signals_out  = 6'b010000;
+    assign fifo_response_control_in_signals_out = 6'b010000;
+    assign request_control_out                  = 0;
+    assign request_memory_out                   = 0;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
+    logic areset_configure_memory;
     logic areset_csr_engine      ;
     logic areset_fifo            ;
-    logic areset_configure_memory;
     logic areset_generator       ;
 
     KernelDescriptor descriptor_in_reg;
 
-    MemoryPacket response_engine_in_reg;
-    MemoryPacket response_memory_in_reg;
-
     MemoryPacket request_engine_out_int;
     MemoryPacket response_engine_in_int;
+    MemoryPacket response_engine_in_reg;
     MemoryPacket response_memory_in_int;
+    MemoryPacket response_memory_in_reg;
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
@@ -83,70 +91,66 @@ module engine_alu_ops #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_engine_in_din             ;
-    MemoryPacketPayload    fifo_response_engine_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_engine_in_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_response_engine_in_signals_out_int ;
     logic                  fifo_response_engine_in_setup_signal_int;
+    MemoryPacketPayload    fifo_response_engine_in_din             ;
+    MemoryPacketPayload    fifo_response_engine_in_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Memory Response MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_response_memory_in_din             ;
-    MemoryPacketPayload    fifo_response_memory_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int ;
     logic                  fifo_response_memory_in_setup_signal_int;
+    MemoryPacketPayload    fifo_response_memory_in_din             ;
+    MemoryPacketPayload    fifo_response_memory_in_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine OUTPUT Request MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_engine_out_din             ;
-    MemoryPacketPayload    fifo_request_engine_out_dout            ;
-    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_engine_out_signals_in_int  ;
+    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_request_engine_out_signals_out_int ;
     logic                  fifo_request_engine_out_setup_signal_int;
+    MemoryPacketPayload    fifo_request_engine_out_din             ;
+    MemoryPacketPayload    fifo_request_engine_out_dout            ;
 
 // --------------------------------------------------------------------------------------
 // ENGINE CONFIGURATION AND GENERATION LOGIC
 // --------------------------------------------------------------------------------------
-    logic configure_fifo_setup_signal;
-
-    MemoryPacket           configure_memory_response_memory_in                 ;
-    FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
-    FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
     ALUOpsConfiguration    configure_memory_out                                ;
     FIFOStateSignalsInput  configure_memory_fifo_configure_memory_signals_in   ;
+    FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
     FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
+    FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
     logic                  configure_memory_fifo_setup_signal                  ;
+    logic                  configure_fifo_setup_signal                         ;
+    MemoryPacket           configure_memory_response_memory_in                 ;
 
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-    ALUOpsConfiguration   generator_engine_configure_memory_in                ;
-    FIFOStateSignalsInput generator_engine_fifo_configure_memory_in_signals_in;
-
-    MemoryPacket           generator_engine_response_engine_in                 ;
+    ALUOpsConfiguration    generator_engine_configure_memory_in                ;
     FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
+    FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
+    FIFOStateSignalsInput  generator_engine_fifo_request_engine_out_signals_in ;
     FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
-
-    MemoryPacket          generator_engine_request_engine_out                ;
-    FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
-
-    logic generator_engine_fifo_setup_signal     ;
-    logic generator_engine_configure_memory_setup;
-    logic generator_engine_done_out              ;
+    logic                  generator_engine_configure_memory_setup             ;
+    logic                  generator_engine_done_out                           ;
+    logic                  generator_engine_fifo_setup_signal                  ;
+    MemoryPacket           generator_engine_response_engine_in                 ;
+    MemoryPacket           generator_engine_request_engine_out                 ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
+        areset_configure_memory <= areset;
         areset_csr_engine       <= areset;
         areset_fifo             <= areset;
-        areset_configure_memory <= areset;
         areset_generator        <= areset;
     end
 
@@ -206,16 +210,16 @@ module engine_alu_ops #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_csr_engine) begin
-            fifo_setup_signal        <= 1'b1;
-            request_engine_out.valid <= 1'b0;
             done_out                 <= 1'b0;
             fifo_empty_reg           <= 1'b1;
+            fifo_setup_signal        <= 1'b1;
+            request_engine_out.valid <= 1'b0;
         end
         else begin
-            fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | configure_fifo_setup_signal | generator_engine_fifo_setup_signal;
-            request_engine_out.valid <= request_engine_out_int.valid;
             done_out                 <= generator_engine_done_out & fifo_empty_reg;
             fifo_empty_reg           <= fifo_empty_int;
+            fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_response_memory_in_setup_signal_int | fifo_request_engine_out_setup_signal_int | configure_fifo_setup_signal | generator_engine_fifo_setup_signal;
+            request_engine_out.valid <= request_engine_out_int.valid;
         end
     end
 
