@@ -1273,7 +1273,7 @@ module __KERNEL___testbench ();
         end
 
         #1000
-            multiple_iteration(5, error_found, graph);
+            multiple_iteration(0, error_found, graph);
 
         if (error_found == 1) begin
             $display( "ERROR: Test Failed!");

@@ -37,7 +37,8 @@ module cu_cache #(
   input  AXI4MasterReadInterfaceInput   m_axi_read_in            ,
   output AXI4MasterReadInterfaceOutput  m_axi_read_out           ,
   input  AXI4MasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MasterWriteInterfaceOutput m_axi_write_out
+  output AXI4MasterWriteInterfaceOutput m_axi_write_out          ,
+  output logic                          done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -52,6 +53,10 @@ module cu_cache #(
 
   CacheRequest  request_in_reg ;
   CacheResponse response_in_int;
+
+  logic fifo_empty_int;
+  logic fifo_empty_reg;
+  logic done_out_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -129,12 +134,18 @@ module cu_cache #(
     if (areset_control) begin
       fifo_setup_signal  <= 1'b1;
       response_out.valid <= 1'b0;
+      done_out           <= 1'b0;
+      fifo_empty_reg     <= 1'b1;
     end
     else begin
       fifo_setup_signal  <= fifo_request_setup_signal_int | fifo_response_setup_signal_int;
       response_out.valid <= response_in_int.valid;
+      done_out           <= fifo_empty_reg;
+      fifo_empty_reg     <= fifo_empty_int;
     end
   end
+
+  assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready;
 
   always_ff @(posedge ap_clk) begin
     fifo_request_signals_out  <= fifo_request_signals_out_int;
