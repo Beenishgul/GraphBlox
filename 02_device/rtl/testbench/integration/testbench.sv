@@ -1095,6 +1095,9 @@ module __KERNEL___testbench ();
         o=0;
         l=0;
 
+        graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 1;
+        o++;
+
         for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
             graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
@@ -1103,9 +1106,6 @@ module __KERNEL___testbench ();
                 o=0;
             end
         end
-
-        graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 1;
-        o++;
 
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
             // setup_temp = {31'b0,get_random_bit()};
@@ -1331,7 +1331,7 @@ module __KERNEL___testbench ();
         end
 
         #1000
-            multiple_iteration(5, error_found, graph);
+            multiple_iteration_bfs(5, error_found, graph);
 
         if (error_found == 1) begin
             $display( "ERROR: Test Failed!");

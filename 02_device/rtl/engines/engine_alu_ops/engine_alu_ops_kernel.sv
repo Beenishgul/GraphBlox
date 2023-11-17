@@ -28,6 +28,7 @@ module engine_alu_ops_kernel (
   input  logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id             ,
   input  logic                                   data_valid         ,
   input  MemoryPacketData                        data               ,
+  output logic                                   result_flag        ,
   output MemoryPacketData                        result
 );
 
@@ -37,9 +38,7 @@ module engine_alu_ops_kernel (
   MemoryPacketData result_reg     ;
   logic            data_valid_reg ;
   logic            result_flag_int;
-  logic            result_flag_reg;
 
-  logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id_int;
   logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id_reg;
 
 
@@ -70,9 +69,9 @@ module engine_alu_ops_kernel (
 
   always_ff @(posedge ap_clk) begin
     if(areset) begin
-      seq_id_reg <= 0;
-      result_flag_int  <= 1'b0;
-      result_reg       <= 0;
+      seq_id_reg      <= 0;
+      result_flag_int <= 1'b0;
+      result_reg      <= 0;
     end else begin
 
       if(seq_id_reg != seq_id && config_params.alu_operation == ALU_ACC & ~clear) begin
@@ -96,7 +95,7 @@ module engine_alu_ops_kernel (
     // Process the ALU operation if both config_params and data are valid
 
     result_int = result_reg;
-  
+
     if (config_params_valid & data_valid_reg) begin
       case (config_params.alu_operation)
         ALU_NOP : begin
@@ -162,13 +161,13 @@ module engine_alu_ops_kernel (
   // Output assignment logic
   always_ff @(posedge ap_clk) begin
     if (areset || clear) begin
-      result <= 0;
-      result_flag_reg <= 0;
+      result      <= 0;
+      result_flag <= 0;
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         result.field[i] <= result_int.field[i];
       end
-      result_flag_reg <= result_flag_int;
+      result_flag <= result_flag_int;
     end
   end
 
