@@ -138,7 +138,7 @@ GLAYGraphCSRxrtBufferHandlePerBank::GLAYGraphCSRxrtBufferHandlePerBank(struct xr
     xrt_buffer_device[6] = xrt_buffer[6].address();
     xrt_buffer_device[7] = xrt_buffer[7].address();
     xrt_buffer_device[8] = xrt_buffer[8].address(); // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
-    xrt_buffer_device[9] = (overlay_program_entries << 1) | endian; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
+    xrt_buffer_device[9] = (uint64_t)((uint64_t)1024 << 32) | (uint64_t)(overlay_program_entries << 1) | (uint64_t)endian; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
 
     // ********************************************************************************************
     // ***************                  Setup Host pointers                          **************
@@ -263,8 +263,8 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
         }
     }
 
-    overlay_program_entries = values.size() * sizeof(uint32_t);
-    overlay_program = (uint32_t *)aligned_alloc(4096, overlay_program_entries); // Assuming 4096-byte alignment
+    overlay_program_entries = values.size();
+    overlay_program = (uint32_t *)aligned_alloc(4096, (overlay_program_entries+16384)* sizeof(uint32_t)); // Assuming 4096-byte alignment
 
     if (!overlay_program)
     {
@@ -275,6 +275,11 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     for (size_t i = 0; i < values.size(); i++)
     {
         overlay_program[i] = values[i];
+    }
+
+    for (size_t i = values.size(); i < (overlay_program_entries+16384); i++)
+    {
+        overlay_program[i] = 0;
     }
 
     // overlay_program[2]  = graph->num_vertices       ;//  2  - Index_end

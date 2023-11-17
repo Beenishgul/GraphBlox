@@ -993,7 +993,7 @@ module __KERNEL___testbench ();
 
         for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
             for (int j = 0; j < (M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W); j++) begin
-                graph.overlay_program[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = realcount;
+                graph.overlay_program[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = 0;
                 realcount++;
             end
         end
