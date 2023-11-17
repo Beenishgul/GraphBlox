@@ -144,7 +144,7 @@ module cu_cache #(
     end
   end
 
-  assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & ~cache_response_mem.iob.ready;
+  assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready;
 
   always_ff @(posedge ap_clk) begin
     fifo_request_signals_out  <= fifo_request_signals_out_int;
@@ -206,52 +206,89 @@ module cu_cache #(
   assign cache_ctrl_in.force_inv = 1'b0;
   assign cache_ctrl_in.wtb_empty = 1'b1;
 
+  // iob_cache_axi #(
+  //   .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W                        ),
+  //   .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W                        ),
+  //   .CACHE_N_WAYS         (CACHE_N_WAYS                                 ),
+  //   .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W                             ),
+  //   .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W                             ),
+  //   .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W                          ),
+  //   .CACHE_REP_POLICY     (CACHE_REP_POLICY                             ),
+  //   .CACHE_NWAY_W         (CACHE_NWAY_W                                 ),
+  //   .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES                        ),
+  //   .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W                        ),
+  //   .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W                         ),
+  //   .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W                         ),
+  //   .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES                         ),
+  //   .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W                         ),
+  //   .CACHE_WRITE_POL      (CACHE_WRITE_POL                              ),
+  //   .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE                             ),
+  //   .CACHE_CTRL_CNT       (CACHE_CTRL_CNT                               ),
+  //   .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W                             ),
+  //   .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W                             ),
+  //   .CACHE_AXI_ID_W       (CACHE_AXI_ID_W                               ),
+  //   .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W                              ),
+  //   .CACHE_AXI_ID         (CACHE_AXI_ID                                 ),
+  //   .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W                             ),
+  //   .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W                            ),
+  //   .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W                             ),
+  //   .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W                              ),
+  //   .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W                            ),
+  //   .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W                             ),
+  //   .CACHE_AXI_CACHE_MODE (M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  // ) inst_cache_axi (
+  //   .valid        (cache_request_mem.iob.valid ),
+  //   .addr         (cache_request_mem.iob.addr  ),
+  //   .wdata        (cache_request_mem.iob.wdata ),
+  //   .wstrb        (cache_request_mem.iob.wstrb ),
+  //   .rdata        (cache_response_mem.iob.rdata),
+  //   .ready        (cache_response_mem.iob.ready),
+  //   `ifdef CTRL_IO
+  //   .force_inv_in (cache_ctrl_in.force_inv     ),
+  //   .force_inv_out(cache_ctrl_out.force_inv    ), // floating
+  //   .wtb_empty_in (cache_ctrl_in.wtb_empty     ),
+  //   .wtb_empty_out(cache_ctrl_out.wtb_empty    ),
+  //   `endif
+  //   `include "m_axi_portmap_glay.vh"
+  //   .ap_clk       (ap_clk                      ),
+  //   .reset        (areset_cache                )
+  // );
+
   iob_cache_axi #(
-    .CACHE_FRONTEND_ADDR_W(CACHE_FRONTEND_ADDR_W                        ),
-    .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W                        ),
-    .CACHE_N_WAYS         (CACHE_N_WAYS                                 ),
-    .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W                             ),
-    .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W                             ),
-    .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W                          ),
-    .CACHE_REP_POLICY     (CACHE_REP_POLICY                             ),
-    .CACHE_NWAY_W         (CACHE_NWAY_W                                 ),
-    .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES                        ),
-    .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W                        ),
-    .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W                         ),
-    .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W                         ),
-    .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES                         ),
-    .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W                         ),
-    .CACHE_WRITE_POL      (CACHE_WRITE_POL                              ),
-    .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE                             ),
-    .CACHE_CTRL_CNT       (CACHE_CTRL_CNT                               ),
-    .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W                             ),
-    .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W                             ),
-    .CACHE_AXI_ID_W       (CACHE_AXI_ID_W                               ),
-    .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W                              ),
-    .CACHE_AXI_ID         (CACHE_AXI_ID                                 ),
-    .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W                             ),
-    .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W                            ),
-    .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W                             ),
-    .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W                              ),
-    .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W                            ),
-    .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W                             ),
-    .CACHE_AXI_CACHE_MODE (M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
-  ) inst_cache_axi (
-    .valid        (cache_request_mem.iob.valid ),
-    .addr         (cache_request_mem.iob.addr  ),
-    .wdata        (cache_request_mem.iob.wdata ),
-    .wstrb        (cache_request_mem.iob.wstrb ),
-    .rdata        (cache_response_mem.iob.rdata),
-    .ready        (cache_response_mem.iob.ready),
-    `ifdef CTRL_IO
-    .force_inv_in (cache_ctrl_in.force_inv     ),
-    .force_inv_out(cache_ctrl_out.force_inv    ), // floating
-    .wtb_empty_in (cache_ctrl_in.wtb_empty     ),
-    .wtb_empty_out(cache_ctrl_out.wtb_empty    ),
-    `endif
-    `include "m_axi_portmap_glay.vh"
-    .ap_clk       (ap_clk                      ),
-    .reset        (areset_cache                )
+    .FE_ADDR_W           (CACHE_FRONTEND_ADDR_W                        ),
+    .FE_DATA_W           (CACHE_FRONTEND_DATA_W                        ),
+    .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                         ),
+    .BE_DATA_W           (CACHE_BACKEND_DATA_W                         ),
+    .NWAYS_W             (CACHE_N_WAYS                                 ),
+    .NLINES_W            (CACHE_LINE_OFF_W                             ),
+    .WORD_OFFSET_W       (CACHE_WORD_OFF_W                             ),
+    .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                          ),
+    .REP_POLICY          (CACHE_REP_POLICY                             ),
+    .WRITE_POL           (CACHE_WRITE_POL                              ),
+    .USE_CTRL            (CACHE_CTRL_CACHE                             ),
+    .USE_CTRL_CNT        (CACHE_CTRL_CACHE                             ),
+    .AXI_ID_W            (CACHE_AXI_ID_W                               ),
+    .AXI_ID              (CACHE_AXI_ID                                 ),
+    .AXI_LEN_W           (CACHE_AXI_LEN_W                              ),
+    .AXI_ADDR_W          (CACHE_AXI_ADDR_W                             ),
+    .AXI_DATA_W          (CACHE_AXI_DATA_W                             ),
+    .CACHE_AXI_CACHE_MODE(M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  ) inst_iob_cache_axi (
+    .avalid_i    (cache_request_mem.iob.valid                                                              ),
+    .addr_i      (cache_request_mem.iob.addr [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
+    .wdata_i     (cache_request_mem.iob.wdata                                                              ),
+    .wstrb_i     (cache_request_mem.iob.wstrb                                                              ),
+    .rdata_o     (cache_response_mem.iob.rdata                                                             ),
+    .rvalid_o    (cache_response_mem.iob.valid                                                             ),
+    .ready_o     (cache_response_mem.iob.ready                                                             ),
+    .invalidate_i(cache_ctrl_in.force_inv                                                                  ),
+    .invalidate_o(cache_ctrl_out.force_inv                                                                 ),
+    .wtb_empty_i (cache_ctrl_in.wtb_empty                                                                  ),
+    .wtb_empty_o (cache_ctrl_out.wtb_empty                                                                 ),
+    `include "m_axi_portmap_glay_iob.vh"
+    .clk_i       (ap_clk                                                                                   ),
+    .cke_i       (1'b1                                                                                     ),
+    .arst_i      (areset_cache                                                                             )
   );
 
   // assign l1_avalid               = cache_request_mem.iob.valid ;
@@ -266,6 +303,21 @@ module cu_cache #(
   //   else if (~l1_avalid) invalidate_reg <= 1'b0;
   //   else invalidate_reg <= invalidate_reg;
 
+
+  always_comb begin
+    if((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))begin
+      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_ctrl_out.wtb_empty & ~cache_response_mem.iob.ready  & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+      cache_request_mem.iob.wstrb        = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+      fifo_request_signals_in_int.rd_en  = cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
+      fifo_response_signals_in_int.wr_en = ~cache_request_mem.iob.valid & fifo_request_signals_out_int.valid;
+    end else begin
+      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+      cache_request_mem.iob.wstrb        = 0;
+      fifo_request_signals_in_int.rd_en  = cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
+      fifo_response_signals_in_int.wr_en = cache_response_mem.iob.valid & fifo_request_signals_out_int.valid;
+    end
+  end
+
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT
 // --------------------------------------------------------------------------------------
@@ -279,13 +331,13 @@ module cu_cache #(
   assign fifo_request_din.data             = request_in_reg.payload.data;
 
   // Pop
-  assign fifo_request_signals_in_int.rd_en = cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-  assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty;
-  assign cache_request_mem.iob.addr        = fifo_request_dout.iob.addr;
-  assign cache_request_mem.iob.wdata       = fifo_request_dout.iob.wdata;
-  assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb;
-  assign cache_request_mem.meta            = fifo_request_dout.meta;
-  assign cache_request_mem.data            = fifo_request_dout.data;
+  // assign fifo_request_signals_in_int.rd_en = cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
+  // assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+  assign cache_request_mem.iob.addr  = fifo_request_dout.iob.addr;
+  assign cache_request_mem.iob.wdata = fifo_request_dout.iob.wdata;
+  // assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  assign cache_request_mem.meta = fifo_request_dout.meta;
+  assign cache_request_mem.data = fifo_request_dout.data;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -315,10 +367,10 @@ module cu_cache #(
   assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  assign fifo_response_signals_in_int.wr_en = cache_response_mem.iob.ready;
-  assign fifo_response_din.iob              = cache_response_mem.iob;
-  assign fifo_response_din.meta             = cache_request_mem.meta;
-  assign fifo_response_din.data             = cache_request_mem.data;
+  // assign fifo_response_signals_in_int.wr_en = cache_response_mem.iob.valid;
+  assign fifo_response_din.iob  = cache_response_mem.iob;
+  assign fifo_response_din.meta = cache_request_mem.meta;
+  assign fifo_response_din.data = cache_request_mem.data;
 
   // Pop
   assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
@@ -347,3 +399,4 @@ module cu_cache #(
 
 
 endmodule : cu_cache
+

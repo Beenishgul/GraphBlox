@@ -26,7 +26,7 @@ package PKG_AXI4;
   parameter M_AXI4_PROT_W   = 3                ;
   parameter M_AXI4_REGION_W = 4                ;
   parameter M_AXI4_USER_W   = 4                ;
-  parameter M_AXI4_LOCK_W   = 1                ;
+  parameter M_AXI4_LOCK_W   = 2                ;
   parameter M_AXI4_QOS_W    = 4                ;
   parameter M_AXI4_LEN_W    = 8                ;
   parameter M_AXI4_SIZE_W   = 3                ;

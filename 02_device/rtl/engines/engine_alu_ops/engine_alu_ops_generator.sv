@@ -402,7 +402,8 @@ module engine_alu_ops_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    MemoryPacketData result_int;
+    MemoryPacketData result_int ;
+    logic            result_flag;
 
     assign alu_ops_response_engine_in_valid_flag = alu_ops_response_engine_in_valid_reg;
 
@@ -440,14 +441,16 @@ module engine_alu_ops_generator #(parameter
     end
 
     engine_alu_ops_kernel inst_engine_alu_ops_kernel (
-        .ap_clk             (ap_clk                             ),
-        .areset             (areset_kernel                      ),
-        .clear              (~(configure_engine_param_valid)    ),
-        .config_params_valid(configure_engine_param_valid       ),
-        .config_params      (configure_engine_param_int         ),
-        .data_valid         (response_engine_in_int.valid       ),
-        .data               (response_engine_in_int.payload.data),
-        .result             (result_int                         )
+        .ap_clk             (ap_clk                                          ),
+        .areset             (areset_kernel                                   ),
+        .clear              (~(configure_engine_param_valid)                 ),
+        .config_params_valid(configure_engine_param_valid                    ),
+        .config_params      (configure_engine_param_int                      ),
+        .data_valid         (response_engine_in_int.valid                    ),
+        .data               (response_engine_in_int.payload.data             ),
+        .seq_id             (response_engine_in_int.payload.meta.route.seq_id),
+        .result_flag        (result_flag                                     ),
+        .result             (result_int                                      )
     );
 
 // --------------------------------------------------------------------------------------

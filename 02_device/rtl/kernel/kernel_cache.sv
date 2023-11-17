@@ -76,20 +76,20 @@ module kernel_cache (
 // DRIVE AXI4 MASTER SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-  
-      m_axi_write.in <= m_axi_write_in;
-      m_axi_read.in  <= m_axi_read_in;
-   
+
+    m_axi_write.in <= m_axi_write_in;
+    m_axi_read.in  <= m_axi_read_in;
+
   end
-  
+
 // --------------------------------------------------------------------------------------
 // DRIVE AXI4 MASTER SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-   
-      m_axi_read_out  <= m_axi_read.out;
-      m_axi_write_out <= m_axi_write.out;
-    
+
+    m_axi_read_out  <= m_axi_read.out;
+    m_axi_write_out <= m_axi_write.out;
+
   end
 
 // --------------------------------------------------------------------------------------
@@ -98,20 +98,20 @@ module kernel_cache (
 // DRIVE AXI4 SLAVE SIGNALS INPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-   
-      s_axi_write_out <= s_axi_write.out;
-      s_axi_read_out  <= s_axi_read.out;
-    
+
+    s_axi_write_out <= s_axi_write.out;
+    s_axi_read_out  <= s_axi_read.out;
+
   end
 
 // --------------------------------------------------------------------------------------
 // DRIVE AXI4 SLAVE SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
-  
-      s_axi_read.in  <= s_axi_read_in;
-      s_axi_write.in <= s_axi_write_in;
-  
+
+    s_axi_read.in  <= s_axi_read_in;
+    s_axi_write.in <= s_axi_write_in;
+
   end
 
 // --------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ module kernel_cache (
     .S0_AXI_GEN_ARID   (s_axi_read.in.arid          ), // Input Read Address read channel ID
     .S0_AXI_GEN_ARSIZE (s_axi_read.in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
     .S0_AXI_GEN_ARBURST(s_axi_read.in.arburst       ), // Input Read Address read channel burst type
-    .S0_AXI_GEN_ARLOCK (s_axi_read.in.arlock        ), // Input Read Address read channel lock type
+    .S0_AXI_GEN_ARLOCK (s_axi_read.in.arlock[0]     ), // Input Read Address read channel lock type
     .S0_AXI_GEN_ARCACHE(s_axi_read.in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
     .S0_AXI_GEN_ARPROT (s_axi_read.in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
     .S0_AXI_GEN_ARQOS  (s_axi_read.in.arqos         ), // Input Read Address channel quality of service
@@ -155,7 +155,7 @@ module kernel_cache (
     .S0_AXI_GEN_AWLEN  (s_axi_write.in.awlen        ), // Input Write Address write channel burst length
     .S0_AXI_GEN_AWSIZE (s_axi_write.in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
     .S0_AXI_GEN_AWBURST(s_axi_write.in.awburst      ), // Input Write Address write channel burst type
-    .S0_AXI_GEN_AWLOCK (s_axi_write.in.awlock       ), // Input Write Address write channel lock type
+    .S0_AXI_GEN_AWLOCK (s_axi_write.in.awlock[0]    ), // Input Write Address write channel lock type
     .S0_AXI_GEN_AWCACHE(s_axi_write.in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
     .S0_AXI_GEN_AWPROT (s_axi_write.in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
     .S0_AXI_GEN_AWQOS  (s_axi_write.in.awqos        ), // Input Write Address write channel quality of service
@@ -178,7 +178,7 @@ module kernel_cache (
     .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
     .M0_AXI_ARSIZE     (m_axi_read.out.arsize       ), // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
     .M0_AXI_ARBURST    (m_axi_read.out.arburst      ), // Output Read Address read channel burst type
-    .M0_AXI_ARLOCK     (m_axi_read.out.arlock       ), // Output Read Address read channel lock type
+    .M0_AXI_ARLOCK     (m_axi_read.out.arlock[0]    ), // Output Read Address read channel lock type
     .M0_AXI_ARCACHE    (m_axi_read.out.arcache      ), // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
     .M0_AXI_ARPROT     (m_axi_read.out.arprot       ), // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
     .M0_AXI_ARQOS      (m_axi_read.out.arqos        ), // Output Read Address channel quality of service
@@ -193,7 +193,7 @@ module kernel_cache (
     .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
     .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
     .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
-    .M0_AXI_AWLOCK     (m_axi_write.out.awlock      ), // Output Write Address write channel lock type
+    .M0_AXI_AWLOCK     (m_axi_write.out.awlock[0]   ), // Output Write Address write channel lock type
     .M0_AXI_AWCACHE    (m_axi_write.out.awcache     ), // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
     .M0_AXI_AWPROT     (m_axi_write.out.awprot      ), // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
     .M0_AXI_AWQOS      (m_axi_write.out.awqos       ), // Output Write Address write channel quality of service
