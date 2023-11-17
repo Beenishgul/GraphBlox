@@ -166,6 +166,19 @@ typedef struct packed{
 } MemoryPacket;
 
 // --------------------------------------------------------------------------------------
+//   Generic Control packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  MemoryPacketRoute   route   ;
+  MemoryPacketType    subclass;
+} ControlPacketPayload;
+
+typedef struct packed{
+  logic               valid  ;
+  MemoryPacketPayload payload;
+} ControlPacket;
+
+// --------------------------------------------------------------------------------------
 // Cache Control Signals
 // --------------------------------------------------------------------------------------
 typedef struct packed {
