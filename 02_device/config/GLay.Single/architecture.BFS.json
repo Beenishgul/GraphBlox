@@ -31,9 +31,9 @@
     },
     "bundle": {  
         "0": [
-            ["ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"     ],
-            ["ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"],
-            ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
+            ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"                  ],
+            ["ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"     ],
+            ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"                          ],
             ["ENGINE_FORWARD_DATA"   ]
         ],
         "1": [
@@ -42,12 +42,12 @@
             ["ENGINE_READ_WRITE(C:0)(B:auxiliary_2,0,num_vertices)" ],
             ["ENGINE_FORWARD_DATA"                                  ]
         ],
-        "2": [
+         "2": [
             ["ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"     ],
             ["ENGINE_FORWARD_DATA"       ]
         ],
-        "3": [
-            ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"       , "ENGINE_FILTER_COND"],
+         "3": [
+            ["ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"       , "ENGINE_FILTER_COND"],
             ["ENGINE_FORWARD_DATA"       ]
         ]
     }
