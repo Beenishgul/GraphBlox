@@ -15,8 +15,8 @@
 
 `timescale 1 ns / 1 ps
 
-`include "iob_lib.vh"
-`include "iob-cache.vh"
+// `include "iob_lib.vh"
+// `include "iob-cache.vh"
 
 package PKG_MEMORY;
 
@@ -225,6 +225,7 @@ typedef struct packed {
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
+logic                               valid;
   logic                             ready;
   logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
 } CacheResponseIOB;

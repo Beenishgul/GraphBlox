@@ -596,9 +596,9 @@ module engine_read_write_generator #(parameter
         request_memory_out_reg.payload <= request_out_int.payload;
         request_engine_out_reg.payload <= fifo_response_comb.payload;
 
-           if(request_memory_out_reg.valid && (request_memory_out_reg.payload.meta.subclass.cmd == CMD_MEM_WRITE))
-                $display("%t - %0s B:%0d L:%0d-%0d-%0d-%0d-%0d", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.data.field[0], request_memory_out_reg.payload.data.field[1], request_memory_out_reg.payload.data.field[2], request_memory_out_reg.payload.data.field[3]);
-    
+        if(request_memory_out_reg.valid && (request_memory_out_reg.payload.meta.subclass.cmd == CMD_MEM_WRITE))
+            $display("%t - %0s B:%0d L:%0d-%0d-%0d-%0d-%0d", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.data.field[0], request_memory_out_reg.payload.data.field[1], request_memory_out_reg.payload.data.field[2], request_memory_out_reg.payload.data.field[3]);
+
     end
 
 endmodule : engine_read_write_generator

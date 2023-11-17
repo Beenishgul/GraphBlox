@@ -872,6 +872,12 @@ module __KERNEL___testbench ();
 
     endtask
 
+    task automatic swap_memory_pointers();
+        buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
+        buffer_8_ptr = buffer_7_ptr ^ buffer_8_ptr;
+        buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
+    endtask
+
     task automatic backdoor_fill_memories();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1076,6 +1082,7 @@ module __KERNEL___testbench ();
             end
         end
 
+
         for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
             graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
             o++;
@@ -1089,11 +1096,7 @@ module __KERNEL___testbench ();
         l=0;
 
         for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-            setup_temp = {31'b0,get_random_bit()};
-            if(setup_temp)
-                graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
-            else
-                graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] =5;
+            graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
             if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
                 l++;
@@ -1101,10 +1104,13 @@ module __KERNEL___testbench ();
             end
         end
 
+        graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 1;
+        o++;
+
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-            setup_temp = {31'b0,get_random_bit()};
-            graph.debug_counter_2 += setup_temp;
-            graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = setup_temp;
+            // setup_temp = {31'b0,get_random_bit()};
+            // graph.debug_counter_2 += setup_temp;
+            graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
             o++;
             if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
                 l++;
@@ -1241,6 +1247,58 @@ module __KERNEL___testbench ();
         end
     endtask
 
+    task automatic multiple_iteration_bfs(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        error_found = 0;
+
+        set_scalar_registers();
+        set_memory_pointers();
+        initalize_graph (graph);
+        // backdoor_fill_memories();
+        backdoor_buffer_fill_memories(graph);
+
+        $display("Starting: multiple_iteration BFS");
+        for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+
+            $display("Starting iteration: %d / %d", iter+1, num_iterations);
+            RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+            case(choose_pressure_type)
+                0 : slv_no_backpressure_wready();
+                1 : slv_random_backpressure_wready();
+            endcase
+            RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+            case(choose_pressure_type)
+                0 : slv_no_delay_rvalid();
+                1 : slv_random_delay_rvalid();
+            endcase
+
+            swap_memory_pointers();
+            // Check that __KERNEL__ is IDLE before starting.
+            poll_idle_register();
+            ///////////////////////////////////////////////////////////////////////////
+            //Start transfers
+            blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+            ctrl.wait_drivers_idle();
+
+            poll_ready_register();
+
+            poll_done_register();
+            ///////////////////////////////////////////////////////////////////////////
+            //Wait for interrupt being asserted or poll done register
+            // @(posedge interrupt);
+            // poll_done_register();
+            ///////////////////////////////////////////////////////////////////////////
+            // Service the interrupt
+            // service_interrupts();
+            // wait(interrupt == 0);
+
+            ///////////////////////////////////////////////////////////////////////////
+            // error_found |= check___KERNEL___result()   ;
+
+            $display("Finished iteration: %d / %d", iter+1, num_iterations);
+        end
+    endtask
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
     initial begin : STIMULUS
@@ -1296,4 +1354,5 @@ module __KERNEL___testbench ();
 
 endmodule
 `default_nettype wire
+
 
