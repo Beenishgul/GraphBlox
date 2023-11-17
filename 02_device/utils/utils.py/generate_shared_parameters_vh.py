@@ -24,6 +24,8 @@ config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "shared_parameters.vh")
+output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "bundle_topology.vh")
+output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "lane_topology.vh")
 config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
 
 with open(config_file_path, "r") as file:
@@ -318,6 +320,8 @@ def check_and_clean_file(file_path):
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
 check_and_clean_file(output_file_path)
+check_and_clean_file(output_file_bundle_top)
+check_and_clean_file(output_file_lane_top)
 
 # Write to VHDL file
 with open(output_file_path, "w") as file:
@@ -430,4 +434,159 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + "\n")
    
 
-   
+
+# Write to VHDL file
+with open(output_file_bundle_top, "w") as file:
+    cast_count = [0] * NUM_LANES
+
+    for j in range(NUM_BUNDLES):
+        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]      
+        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY       = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]       
+        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY  = CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]  
+        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j] 
+        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j] 
+        LANES_CONFIG_ARRAY                      = CU_BUNDLES_CONFIG_ARRAY[j]                      
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN       = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]                    
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH     = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]      
+        LANES_CONFIG_CAST_WIDTH_ARRAY           = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]           
+        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]      
+        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY     = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]     
+        LANES_CONFIG_MERGE_CONNECT_ARRAY        = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]        
+        LANES_CONFIG_MERGE_WIDTH_ARRAY          = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]          
+        LANES_ENGINE_ID_ARRAY                   = CU_BUNDLES_ENGINE_ID_ARRAY[j]                   
+        ENGINES_COUNT_ARRAY                     = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]                 
+        ID_BUNDLE                               = j                                            
+        NUM_LANES                               = CU_BUNDLES_COUNT_ARRAY[j]   
+        file.write("\n")
+        file.write(f"generate\n")
+        file.write(f"     if(ID_BUNDLE == {j})\n")
+        file.write(f"                    begin\n")         
+        for lane_merge in range(NUM_LANES):
+            lane_merge_l = lane_merge
+            LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge_l]
+            
+
+            file.write(f"                      assign lanes_fifo_request_cast_lane_out_signals_in[{lane_merge_l}][0]  = lanes_fifo_request_lane_out_signals_in[{lane_merge_l}];\n")
+            file.write(f"                      assign lanes_fifo_request_lane_out_signals_out[{lane_merge_l}]         = lanes_fifo_request_cast_lane_out_signals_out [{lane_merge_l}][0];\n")
+            file.write(f"                      assign lanes_fifo_response_lane_in_signals_out[{lane_merge_l}]         = lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][0];\n")
+            file.write(f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][0] = lanes_fifo_response_lane_in_signals_in[{lane_merge_l}];\n")
+            file.write(f"                      assign lanes_request_lane_out[{lane_merge_l}]                          = lanes_request_cast_lane_out[{lane_merge_l}][0];\n")
+            file.write(f"                      assign lanes_response_merge_engine_in[{lane_merge_l}][0]               = lanes_response_engine_in[{lane_merge_l}];\n\n")
+
+
+            if LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L != 0:
+                merge_count = 0
+                for lane_cast in range(NUM_LANES):
+                    lane_cast_l = lane_cast
+                    LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l]
+                    ENGINES_COUNT_ARRAY_L = ENGINES_COUNT_ARRAY[lane_cast_l]
+
+                    if LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0 and lane_cast_l != lane_merge_l:
+                        for engine_idx in range(ENGINES_COUNT_ARRAY_L):
+                            engine_idx_l = engine_idx
+                            LANES_CONFIG_CAST_WIDTH_ARRAY_L = LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l]
+
+                            for cast_idx in range(LANES_CONFIG_CAST_WIDTH_ARRAY_L):
+                                cast_idx_l = cast_idx
+                                LANES_CONFIG_MERGE_CONNECT_ARRAY_L = LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][engine_idx_l][cast_idx_l]
+
+                                if LANES_CONFIG_MERGE_CONNECT_ARRAY_L == lane_merge_l:
+                                    merge_count += 1
+                                    cast_count[lane_cast_l] += 1
+                                    file.write(f"                      assign lanes_fifo_request_cast_lane_out_signals_in[{lane_cast_l}][{cast_count[lane_cast_l]}].rd_en             = ~lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][{merge_count}].prog_full;\n")
+                                    file.write(f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][{merge_count}].rd_en             = 1'b1;\n")
+                                    file.write(f"                      assign lanes_response_merge_engine_in[{lane_merge_l}][{merge_count}]                                 = lanes_request_cast_lane_out[{lane_cast_l}][{cast_count[lane_cast_l]}];\n\n")
+                               
+
+        file.write(f"                    end\n") 
+        file.write(f"endgenerate\n")
+        file.write(f"\n\n")  
+
+
+# Write to VHDL file
+with open(output_file_lane_top, "w") as file:
+    cast_count = [0] * NUM_LANES
+
+    for j in range(NUM_BUNDLES):
+        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]      
+        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY       = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]       
+        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY  = CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]  
+        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j] 
+        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j] 
+        LANES_CONFIG_ARRAY                      = CU_BUNDLES_CONFIG_ARRAY[j]                      
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN       = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]                    
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH     = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]      
+        LANES_CONFIG_CAST_WIDTH_ARRAY           = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]           
+        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]      
+        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY     = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]     
+        LANES_CONFIG_MERGE_CONNECT_ARRAY        = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]        
+        LANES_CONFIG_MERGE_WIDTH_ARRAY          = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]          
+        LANES_ENGINE_ID_ARRAY                   = CU_BUNDLES_ENGINE_ID_ARRAY[j]                   
+        ENGINES_COUNT_ARRAY                     = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]                 
+        ID_BUNDLE                               = j                                            
+        NUM_LANES                               = CU_BUNDLES_COUNT_ARRAY[j]   
+        
+        for l in range(NUM_LANES):
+
+            ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY   =LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[l]          
+            ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY    =LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[l]           
+            ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY  =LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[l] 
+            ENGINES_CONFIG_ARRAY                   =LANES_CONFIG_ARRAY[l]                          
+            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN    =LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[l]                                 
+            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH  =LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[l]          
+            ENGINES_CONFIG_CAST_WIDTH_ARRAY        =LANES_CONFIG_CAST_WIDTH_ARRAY[l]               
+            ENGINES_CONFIG_MERGE_CONNECT_ARRAY     =LANES_CONFIG_MERGE_CONNECT_ARRAY[l]            
+            ENGINES_CONFIG_MERGE_WIDTH_ARRAY       =LANES_CONFIG_MERGE_WIDTH_ARRAY[l]              
+            ENGINES_ENGINE_ID_ARRAY                =LANES_ENGINE_ID_ARRAY[l]                       
+            ID_LANE                                =l                                              
+            LANE_CAST_WIDTH                        =LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[l]          
+            LANE_MERGE_WIDTH                       =LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[l]         
+            NUM_ENGINES                            =ENGINES_COUNT_ARRAY[l]                         
+
+
+            file.write("\n")
+            file.write(f"generate\n")
+            file.write(f"     if((ID_BUNDLE == {j}) && (ID_LANE == {l}))\n")
+            file.write(f"          begin\n")       
+
+            # Initialize counters
+            cast_count = 0
+            merge_count = 0
+
+            # Ensure NUM_ENGINES is an integer or use NUM_ENGINES[0] if it's a list containing the integer value
+            for engine_idx in range(NUM_ENGINES):
+                engine_idx_l = engine_idx
+                ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L = ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx_l]
+                ENGINES_CONFIG_CAST_WIDTH_ARRAY_L = ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx_l]
+
+                file.write(f"               assign engines_response_merge_lane_in[{engine_idx_l}][0]        = engines_response_lane_in[{engine_idx_l}];\n")
+                file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][0].rd_en = 1'b1;\n")
+                file.write(f"               assign engines_fifo_response_lane_in_signals_out[{engine_idx_l}] = engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][0];\n")
+
+                file.write(f"               assign engines_request_lane_out[{engine_idx_l}]                  = engines_request_cast_lane_out[{engine_idx_l}][0];\n")
+                file.write(f"               assign engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][0].rd_en = engines_fifo_request_lane_out_signals_in[{engine_idx_l}].rd_en ;\n")
+                file.write(f"               assign engines_fifo_request_lane_out_signals_out[{engine_idx_l}] = engines_fifo_request_cast_lane_out_signals_out [{engine_idx_l}][0];\n\n")
+    
+                for engine_merge in range(ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L):
+                    engine_merge_l = engine_merge
+                    merge_count += 1
+                   
+                    file.write(f"               assign engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}]          = response_lane_in[{merge_count}];\n")
+                    file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][{engine_merge_l+1}].rd_en = 1'b1;\n")
+                    file.write(f"               assign fifo_response_lane_in_signals_out[{merge_count}] = engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][{engine_merge_l+1}];\n\n")
+
+
+                for engine_cast in range(ENGINES_CONFIG_CAST_WIDTH_ARRAY_L):
+                    engine_cast_l = engine_cast
+                    cast_count += 1
+
+                    file.write(f"               assign request_lane_out[{cast_count}]                  = engines_request_cast_lane_out[{engine_idx_l}][{engine_cast_l+1}];\n")
+                    file.write(f"               assign engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][{engine_cast_l+1}].rd_en = fifo_request_lane_out_signals_in[{cast_count}].rd_en;\n")
+                    file.write(f"               assign fifo_request_lane_out_signals_out[{cast_count}] = engines_fifo_request_cast_lane_out_signals_out[{engine_idx_l}][{engine_cast_l+1}];\n\n")
+
+            file.write(f"          end\n") 
+            file.write(f"endgenerate\n")
+            file.write(f"\n\n")  
+                   
+
+  
