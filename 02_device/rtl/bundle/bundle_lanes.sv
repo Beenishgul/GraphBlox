@@ -25,37 +25,34 @@ module bundle_lanes #(
     `include "bundle_parameters.vh"
     ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_lanes_in                  ,
-    input  FIFOStateSignalsInput  fifo_response_lanes_in_signals_in  ,
-    output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out ,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_lanes_out                  ,
-    input  FIFOStateSignalsInput  fifo_request_lanes_out_signals_in  ,
-    output FIFOStateSignalsOutput fifo_request_lanes_out_signals_out ,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
-    output logic                  fifo_setup_signal                  ,
+    input  logic                  ap_clk                              ,
+    input  logic                  areset                              ,
+    input  KernelDescriptor       descriptor_in                       ,
+    input  MemoryPacket           response_lanes_in                   ,
+    input  FIFOStateSignalsInput  fifo_response_lanes_in_signals_in   ,
+    output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out  ,
+    input  MemoryPacket           response_memory_in                  ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in  ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out ,
+    input  MemoryPacket           response_control_in                 ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out,
+    output MemoryPacket           request_lanes_out                   ,
+    input  FIFOStateSignalsInput  fifo_request_lanes_out_signals_in   ,
+    output FIFOStateSignalsOutput fifo_request_lanes_out_signals_out  ,
+    output MemoryPacket           request_memory_out                  ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out ,
+    output MemoryPacket           request_control_out                 ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out,
+    output logic                  fifo_setup_signal                   ,
     output logic                  done_out
 );
 
     genvar i;
     genvar j;
-// --------------------------------------------------------------------------------------
-// CONTROL Variables
-// --------------------------------------------------------------------------------------
-    FIFOStateSignalsInput  fifo_request_control_out_signals_in ;
-    FIFOStateSignalsInput  fifo_response_control_in_signals_in ;
-    FIFOStateSignalsOutput fifo_request_control_out_signals_out;
-    FIFOStateSignalsOutput fifo_response_control_in_signals_out;
-    MemoryPacket           request_control_out                 ;
-    MemoryPacket           response_control_in                 ;
-
+    
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -272,13 +269,6 @@ module bundle_lanes #(
     always_ff @(posedge ap_clk) begin
         descriptor_in_reg.payload <= descriptor_in.payload;
     end
-
-// --------------------------------------------------------------------------------------
-// assign CONTROL Variables
-// --------------------------------------------------------------------------------------
-    assign fifo_request_control_out_signals_in.rd_en = ~fifo_response_control_in_signals_out.prog_full & ~fifo_request_control_out_signals_out.empty;
-    assign fifo_response_control_in_signals_in.rd_en = 1'b1;
-    assign response_control_in                       = request_control_out;
 
 // --------------------------------------------------------------------------------------
 // Drive input signals
