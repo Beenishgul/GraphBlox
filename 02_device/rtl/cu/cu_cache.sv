@@ -461,17 +461,9 @@ module cu_cache #(
         cache_request_mem_reg.iob.valid    <= 1'b1;
       end
       CU_CACHE_CMD_READ : begin
-        if(~cache_response_mem.iob.ready & ~cache_response_mem.iob.valid)
-          cache_request_mem_reg.iob.valid <= 1'b1;
-        else if(cache_response_mem.iob.ready & cache_response_mem.iob.valid)
-          cache_request_mem_reg.iob.valid <= 1'b0;
-        else if(cache_response_mem.iob.ready & ~cache_response_mem.iob.valid)
-          cache_request_mem_reg.iob.valid <= 1'b1;
-        else
-          cache_request_mem_reg.iob.valid <= 1'b0;
-
         fifo_request_signals_in_int.rd_en  <= 1'b0;
         fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
       end
       CU_CACHE_CMD_WRITE_TRANS : begin
         fifo_request_signals_in_int.rd_en  <= 1'b0;
