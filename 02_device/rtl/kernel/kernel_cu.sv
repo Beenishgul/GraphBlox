@@ -228,14 +228,14 @@ module kernel_cu #(
 // --------------------------------------------------------------------------------------
 // Assign FIFO signals Requestor <-> Generator <-> Setup <-> CU
 // --------------------------------------------------------------------------------------
-  assign cache_generator_fifo_request_signals_in.rd_en  = ~(cache_generator_fifo_response_signals_out.prog_full|cu_cache_fifo_request_signals_out.prog_full) & fifo_request_signals_in_reg.rd_en;
+  assign cache_generator_fifo_request_signals_in.rd_en  = ~(cu_cache_fifo_request_signals_out.prog_full) & fifo_request_signals_in_reg.rd_en;
   assign cache_generator_fifo_response_signals_in.rd_en = ~(cu_setup_fifo_response_signals_out.prog_full|cu_bundles_fifo_response_signals_out.prog_full);
 
   assign cu_setup_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[0];
-  assign cu_setup_fifo_response_signals_in.rd_en = 1;
+  assign cu_setup_fifo_response_signals_in.rd_en = 1'b1;
 
   assign cu_bundles_fifo_request_signals_in.rd_en  = ~cache_generator_fifo_request_signals_out.prog_full & fifo_request_signals_in_reg.rd_en & cache_generator_arbiter_grant_out[1];
-  assign cu_bundles_fifo_response_signals_in.rd_en = 1;
+  assign cu_bundles_fifo_response_signals_in.rd_en = 1'b1;
 
 // --------------------------------------------------------------------------------------
 // Arbiter Signals: Cache Request Generator

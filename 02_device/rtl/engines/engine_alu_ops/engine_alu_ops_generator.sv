@@ -87,6 +87,7 @@ module engine_alu_ops_generator #(parameter
     ALUOpsConfigurationParameters configure_engine_param_int  ;
 
     MemoryPacket          generator_engine_request_engine_reg    ;
+    MemoryPacket          generator_engine_request_engine_reg_S2 ;
     MemoryPacket          request_engine_out_int                 ;
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
@@ -402,8 +403,9 @@ module engine_alu_ops_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    MemoryPacketData result_int ;
-    logic            result_flag;
+    MemoryPacketData result_int          ;
+    logic            result_flag         ;
+    logic            engine_alu_ops_clear;
 
     assign alu_ops_response_engine_in_valid_flag = alu_ops_response_engine_in_valid_reg;
 
@@ -412,6 +414,7 @@ module engine_alu_ops_generator #(parameter
             alu_ops_response_engine_in_valid_reg      <= 1'b0;
             alu_ops_response_engine_in_valid_flag_S2  <= 1'b0;
             generator_engine_request_engine_reg.valid <= 1'b0;
+            engine_alu_ops_clear                      <= 1'b0;
         end
         else begin
             alu_ops_response_engine_in_valid_flag_S2  <= alu_ops_response_engine_in_valid_flag;
@@ -429,7 +432,7 @@ module engine_alu_ops_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data                 <= result_int;
+        generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data  ;
         generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
         generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
         generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
@@ -440,17 +443,36 @@ module engine_alu_ops_generator #(parameter
         generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
     end
 
+    always_ff @(posedge ap_clk) begin
+
+        if((config_params.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE)
+            generator_engine_request_engine_reg_S2.valid <= result_flag;
+        else if ((config_params.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state != SEQUENCE_DONE)
+            generator_engine_request_engine_reg_S2.valid <= 1'b0;
+        else
+            generator_engine_request_engine_reg_S2.valid <= generator_engine_request_engine_reg.valid;
+
+        generator_engine_request_engine_reg_S2.payload.data                 <= result_int;
+        generator_engine_request_engine_reg_S2.payload.meta.route.from      <= generator_engine_request_engine_reg.payload.meta.route.from;
+        generator_engine_request_engine_reg_S2.payload.meta.route.to        <= generator_engine_request_engine_reg.payload.meta.route.to;
+        generator_engine_request_engine_reg_S2.payload.meta.route.seq_src   <= generator_engine_request_engine_reg.payload.meta.route.seq_src;
+        generator_engine_request_engine_reg_S2.payload.meta.route.seq_state <= generator_engine_request_engine_reg.payload.meta.route.seq_state;
+        generator_engine_request_engine_reg_S2.payload.meta.route.seq_id    <= generator_engine_request_engine_reg.payload.meta.route.seq_id;
+        generator_engine_request_engine_reg_S2.payload.meta.route.hops      <= generator_engine_request_engine_reg.payload.meta.route.hops;
+        generator_engine_request_engine_reg_S2.payload.meta.address         <= generator_engine_request_engine_reg.payload.meta.address;
+        generator_engine_request_engine_reg_S2.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
+    end
+
     engine_alu_ops_kernel inst_engine_alu_ops_kernel (
-        .ap_clk             (ap_clk                                          ),
-        .areset             (areset_kernel                                   ),
-        .clear              (~(configure_engine_param_valid)                 ),
-        .config_params_valid(configure_engine_param_valid                    ),
-        .config_params      (configure_engine_param_int                      ),
-        .data_valid         (response_engine_in_int.valid                    ),
-        .data               (response_engine_in_int.payload.data             ),
-        .seq_id             (response_engine_in_int.payload.meta.route.seq_id),
-        .result_flag        (result_flag                                     ),
-        .result             (result_int                                      )
+        .ap_clk             (ap_clk                                                ),
+        .areset             (areset_kernel                                         ),
+        .clear              (~(configure_engine_param_valid) | engine_alu_ops_clear),
+        .config_params_valid(configure_engine_param_valid                          ),
+        .config_params      (configure_engine_param_int                            ),
+        .data_valid         (response_engine_in_int.valid                          ),
+        .data               (response_engine_in_int.payload.data                   ),
+        .result_flag        (result_flag                                           ),
+        .result             (result_int                                            )
     );
 
 // --------------------------------------------------------------------------------------
@@ -460,8 +482,8 @@ module engine_alu_ops_generator #(parameter
     assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg.valid;
-    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg.payload;
+    assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
+    assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
 
     // Pop
     assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en;

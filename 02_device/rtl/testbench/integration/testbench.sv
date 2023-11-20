@@ -872,6 +872,95 @@ module __KERNEL___testbench ();
 
     endtask
 
+     task automatic set_memory_pointers_bfs();
+        ///////////////////////////////////////////////////////////////////////////
+        //Randomly generate memory pointers.
+        buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
+        buffer_8_ptr = buffer_7_ptr ^ buffer_8_ptr;
+        buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h010, buffer_0_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 0: buffer_0 (0x014) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h014, buffer_0_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 1: buffer_1 (0x01c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h01c, buffer_1_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 1: buffer_1 (0x020) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h020, buffer_1_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 2: buffer_2 (0x028) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h028, buffer_2_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 2: buffer_2 (0x02c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h02c, buffer_2_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 3: buffer_3 (0x034) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h034, buffer_3_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 3: buffer_3 (0x038) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h038, buffer_3_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 4: edges_array_weight (0x040) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h040, buffer_4_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 4: edges_array_weight (0x044) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h044, buffer_4_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 5: edges_array_src (0x04c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h04c, buffer_5_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 5: edges_array_src (0x050) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h050, buffer_5_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 6: edges_array_dest (0x058) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h058, buffer_6_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 6: edges_array_dest (0x05c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h05c, buffer_6_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 7: buffer_7 (0x064) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h064, buffer_7_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 7: buffer_7 (0x068) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h068, buffer_7_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 8: buffer_8 (0x070) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h070, buffer_8_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 8: buffer_8 (0x074) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h074, buffer_8_ptr[63:32]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 9: buffer_9 (0x07c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
+        write_register(32'h07c, buffer_9_ptr[31:0]);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //Write ID 9: buffer_9 (0x080) -> Randomized 4k aligned address (Global memory, upper 32 bits)
+        write_register(32'h080, buffer_9_ptr[63:32]);
+
+    endtask
+
     task automatic swap_memory_pointers();
         buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
         buffer_8_ptr = buffer_7_ptr ^ buffer_8_ptr;
@@ -1072,7 +1161,7 @@ module __KERNEL___testbench ();
 
         o=0;
         l=0;
-
+        
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
             graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = {CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
@@ -1095,9 +1184,6 @@ module __KERNEL___testbench ();
         o=0;
         l=0;
 
-        graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 1;
-        o++;
-
         for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
             graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
@@ -1109,8 +1195,13 @@ module __KERNEL___testbench ();
 
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
             // setup_temp = {31'b0,get_random_bit()};
-            // graph.debug_counter_2 += setup_temp;
+            
             graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
+
+            if(graph.debug_counter_2 == 0)
+                graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 1;
+
+            graph.debug_counter_2 += 1;
             o++;
             if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
                 l++;
@@ -1127,6 +1218,7 @@ module __KERNEL___testbench ();
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
                 setup_temp = temp_edges_array_dest;
                 graph.edges_array_dest[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = setup_temp;
+                $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
             end
         end
 
@@ -1250,8 +1342,7 @@ module __KERNEL___testbench ();
     task automatic multiple_iteration_bfs(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
         error_found = 0;
 
-        set_scalar_registers();
-        set_memory_pointers();
+
         initalize_graph (graph);
         // backdoor_fill_memories();
         backdoor_buffer_fill_memories(graph);
@@ -1271,7 +1362,9 @@ module __KERNEL___testbench ();
                 1 : slv_random_delay_rvalid();
             endcase
 
-            swap_memory_pointers();
+      
+            set_scalar_registers();
+            set_memory_pointers_bfs();
             // Check that __KERNEL__ is IDLE before starting.
             poll_idle_register();
             ///////////////////////////////////////////////////////////////////////////
@@ -1331,7 +1424,7 @@ module __KERNEL___testbench ();
         end
 
         #1000
-            multiple_iteration_bfs(5, error_found, graph);
+            multiple_iteration(5, error_found, graph);
 
         if (error_found == 1) begin
             $display( "ERROR: Test Failed!");

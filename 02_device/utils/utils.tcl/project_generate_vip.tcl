@@ -193,7 +193,7 @@ set_property -dict [list                                                  \
                     CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {1}            \
                     CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {0}         \
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {Automatic}            \
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {Automatic}           \
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {URAM}                \
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {Automatic}            \
                     ] [get_ips ${module_name}]
 

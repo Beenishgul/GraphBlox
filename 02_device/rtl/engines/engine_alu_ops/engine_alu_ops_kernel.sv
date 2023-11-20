@@ -20,16 +20,15 @@ import PKG_ENGINE::*;
 import PKG_CACHE::*;
 
 module engine_alu_ops_kernel (
-  input  logic                                   ap_clk             ,
-  input  logic                                   areset             ,
-  input  logic                                   clear              ,
-  input  logic                                   config_params_valid,
-  input  ALUOpsConfigurationParameters           config_params      ,
-  input  logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id             ,
-  input  logic                                   data_valid         ,
-  input  MemoryPacketData                        data               ,
-  output logic                                   result_flag        ,
-  output MemoryPacketData                        result
+  input  logic                         ap_clk             ,
+  input  logic                         areset             ,
+  input  logic                         clear              ,
+  input  logic                         config_params_valid,
+  input  ALUOpsConfigurationParameters config_params      ,
+  input  logic                         data_valid         ,
+  input  MemoryPacketData              data               ,
+  output logic                         result_flag        ,
+  output MemoryPacketData              result
 );
 
   // Define internal signals
@@ -38,6 +37,7 @@ module engine_alu_ops_kernel (
   MemoryPacketData result_reg     ;
   logic            data_valid_reg ;
   logic            result_flag_int;
+  logic            result_flag_reg;
 
   logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id_reg;
 
@@ -67,36 +67,25 @@ module engine_alu_ops_kernel (
     end
   end
 
-  always_ff @(posedge ap_clk) begin
-    if(areset) begin
-      seq_id_reg      <= 0;
-      result_flag_int <= 1'b0;
-      result_reg      <= 0;
-    end else begin
+  always_ff @(posedge ap_clk) begin 
+    if(config_params_valid & (config_params.alu_operation == ALU_ACC) & ~clear & result_flag_int)
+      result_reg <= result_int;
+    else if(config_params_valid & (config_params.alu_operation == ALU_ACC) & ~clear & ~result_flag_int)
+       result_reg <= result_reg;
+    else
+       result_reg <= result_int;
 
-      if(seq_id_reg != seq_id && config_params.alu_operation == ALU_ACC & ~clear) begin
-        seq_id_reg      <= seq_id;
-        result_flag_int <= data_valid_reg;
-        result_reg      <= result_reg;
-      end else if (seq_id_reg == seq_id && config_params.alu_operation == ALU_ACC & ~clear) begin
-        seq_id_reg      <= seq_id;
-        result_flag_int <= 0;
-        result_reg      <= 0;
-      end begin
-        seq_id_reg      <= seq_id;
-        result_flag_int <= data_valid_reg;
-        result_reg      <= 0;
-      end
-    end
+    result_flag_reg <= result_flag_int;
   end
 
   // ALU operations logic
   always_comb begin
     // Process the ALU operation if both config_params and data are valid
-
-    result_int = result_reg;
+    result_flag_int = 1'b0;
+    result_int      = 0;
 
     if (config_params_valid & data_valid_reg) begin
+      result_flag_int = 1'b1;
       case (config_params.alu_operation)
         ALU_NOP : begin
           result_int = ops_value_reg; // No operation
@@ -136,12 +125,12 @@ module engine_alu_ops_kernel (
         end
 
         ALU_ACC : begin
-          result_int = result_int + ops_value_reg.field[0];
+          result_int = result_reg + ops_value_reg.field[0];
           for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int = result_int + ops_value_reg.field[i];
+              result_int = result_reg + ops_value_reg.field[i];
             end else begin
-              result_int = result_int;
+              result_int = result_reg;
             end
           end
         end
@@ -165,9 +154,9 @@ module engine_alu_ops_kernel (
       result_flag <= 0;
     end else begin
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-        result.field[i] <= result_int.field[i];
+        result.field[i] <= result_reg.field[i];
       end
-      result_flag <= result_flag_int;
+      result_flag <= result_flag_reg;
     end
   end
 

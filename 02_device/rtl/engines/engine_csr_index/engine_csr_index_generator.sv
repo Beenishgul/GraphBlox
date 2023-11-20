@@ -114,7 +114,7 @@ module engine_csr_index_generator #(parameter
     MemoryPacket           fifo_request_comb            ;
     MemoryPacket           fifo_request_din_reg         ;
     MemoryPacket           fifo_request_din_reg_S2      ;
-    MemoryPacket           fifo_request_din_reg_S3      ;
+    MemoryPacket           fifo_request_dout_reg        ;
     MemoryPacket           fifo_response_comb           ;
     MemoryPacketPayload    fifo_request_din             ;
     MemoryPacketPayload    fifo_request_dout            ;
@@ -359,17 +359,15 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (done_int_reg)
-                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
-                else if (~fifo_request_signals_out_int.prog_full)
+                if (~fifo_request_signals_out_int.prog_full)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
-                if (configure_engine_int.payload.param.mode_sequence & done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg)
+                if (configure_engine_int.payload.param.mode_sequence & done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg & fifo_request_signals_out_int.empty)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
-                else if (~configure_engine_int.payload.param.mode_sequence & done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg)
+                else if (~configure_engine_int.payload.param.mode_sequence & done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg & fifo_request_signals_out_int.empty)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
@@ -511,13 +509,15 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
                 if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
                     done_int_reg               <= 1'b1;
+                    counter_clear              <= 1'b1;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
                     done_int_reg               <= 1'b0;
+                    counter_clear              <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b1;
                 end
-                counter_clear  <= 1'b0;
+
                 counter_enable <= 1'b0;
                 counter_load   <= 1'b0;
                 done_out_reg   <= 1'b0;
@@ -528,14 +528,16 @@ module engine_csr_index_generator #(parameter
                 if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
                     done_int_reg               <= 1'b1;
                     counter_enable             <= 1'b0;
+                    counter_clear              <= 1'b1;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
                 else begin
                     done_int_reg               <= 1'b0;
                     counter_enable             <= 1'b1;
+                    counter_clear              <= 1'b0;
                     fifo_request_din_reg.valid <= 1'b1;
                 end
-                counter_clear              <= 1'b0;
+
                 done_out_reg               <= 1'b0;
                 counter_load               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
@@ -543,17 +545,10 @@ module engine_csr_index_generator #(parameter
                     response_engine_in_break_flag_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_BUSY_TRANS : begin
-                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
-                    done_int_reg               <= 1'b1;
-                    counter_enable             <= 1'b0;
-                    counter_clear              <= 1'b0;
-                    fifo_request_din_reg.valid <= 1'b0;
-                end
-                else begin
-                    done_int_reg               <= 1'b0;
-                    counter_enable             <= 1'b1;
-                    fifo_request_din_reg.valid <= 1'b0;
-                end
+                done_int_reg               <= 1'b0;
+                counter_enable             <= 1'b1;
+                fifo_request_din_reg.valid <= 1'b0;
+                counter_clear              <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_load               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
@@ -561,12 +556,7 @@ module engine_csr_index_generator #(parameter
                     response_engine_in_break_flag_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) begin
-                    done_int_reg <= 1'b1;
-                end
-                else begin
-                    done_int_reg <= 1'b0;
-                end
+                done_int_reg               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
                 counter_clear              <= 1'b0;
                 counter_enable             <= 1'b0;
@@ -605,14 +595,14 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-    always_comb begin
-        response_engine_in_break_flag_int = 1'b0;
-        response_engine_in_done_flag_int  = 1'b0 | ~configure_engine_int.payload.param.mode_break;
-        if(configure_engine_int.valid & configure_engine_int.payload.param.mode_break) begin
-            response_engine_in_done_flag_int  = (response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_DONE)  & response_control_in_reg.valid;
-            response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.seq_id == seq_id_counter) ;
-        end
-    end
+    // always_comb begin
+    //     response_engine_in_break_flag_int = 1'b0;
+    //     response_engine_in_done_flag_int  = 1'b0 | ~configure_engine_int.payload.param.mode_break;
+    //     if(configure_engine_int.valid & configure_engine_int.payload.param.mode_break) begin
+    assign response_engine_in_done_flag_int  = ((response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_DONE)  & response_control_in_reg.valid) | ~configure_engine_int.payload.param.mode_break;
+    assign response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.seq_id == seq_id_counter) ;
+    //     end
+    // end
 
     assign fifo_request_comb.valid                             = 1'b0;
     assign fifo_request_comb.payload.meta.route.to             = configure_engine_int.payload.meta.route.to;
@@ -661,24 +651,6 @@ module engine_csr_index_generator #(parameter
         fifo_request_din_reg_S2.payload <= fifo_request_din_reg.payload;
     end
 
-    always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg_S3.valid                      <= fifo_request_din_reg_S2.valid;
-        fifo_request_din_reg_S3.payload.data               <= fifo_request_din_reg_S2.payload.data;
-        fifo_request_din_reg_S3.payload.meta.subclass      <= fifo_request_din_reg_S2.payload.meta.subclass;
-        fifo_request_din_reg_S3.payload.meta.address       <= fifo_request_din_reg_S2.payload.meta.address;
-        fifo_request_din_reg_S3.payload.meta.route.from    <= fifo_request_din_reg_S2.payload.meta.route.from;
-        fifo_request_din_reg_S3.payload.meta.route.to      <= fifo_request_din_reg_S2.payload.meta.route.to;
-        fifo_request_din_reg_S3.payload.meta.route.hops    <= fifo_request_din_reg_S2.payload.meta.route.hops;
-        fifo_request_din_reg_S3.payload.meta.route.seq_src <= fifo_request_din_reg_S2.payload.meta.route.seq_src;
-        fifo_request_din_reg_S3.payload.meta.route.seq_id  <= fifo_request_din_reg_S2.payload.meta.route.seq_id;
-
-        if(done_int_reg) begin
-            fifo_request_din_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
-        end else begin
-            fifo_request_din_reg_S3.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
-        end
-    end
-
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_request_counter (
         .ap_clk      (ap_clk              ),
         .ap_clken    (counter_enable      ),
@@ -701,7 +673,7 @@ module engine_csr_index_generator #(parameter
         .areset      (areset_counter  | counter_clear   ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
-        .decr        (request_engine_out_reg.valid      ),
+        .decr        (request_out_int.valid             ),
         .load_value  (response_memory_counter_load_value),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
         .count       (response_memory_counter_          ),
@@ -715,8 +687,8 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg_S3.valid;
-    assign fifo_request_din                  = fifo_request_din_reg_S3.payload;
+    assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg_S2.valid;
+    assign fifo_request_din                  = fifo_request_din_reg_S2.payload;
 
     // Pop
     assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
@@ -742,6 +714,24 @@ module engine_csr_index_generator #(parameter
         .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
         .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
     );
+
+    always_ff  @(posedge ap_clk) begin
+        fifo_request_dout_reg.valid                      <= request_out_int.valid;
+        fifo_request_dout_reg.payload.data               <= request_out_int.payload.data;
+        fifo_request_dout_reg.payload.meta.subclass      <= request_out_int.payload.meta.subclass;
+        fifo_request_dout_reg.payload.meta.address       <= request_out_int.payload.meta.address;
+        fifo_request_dout_reg.payload.meta.route.from    <= request_out_int.payload.meta.route.from;
+        fifo_request_dout_reg.payload.meta.route.to      <= request_out_int.payload.meta.route.to;
+        fifo_request_dout_reg.payload.meta.route.hops    <= request_out_int.payload.meta.route.hops;
+        fifo_request_dout_reg.payload.meta.route.seq_src <= request_out_int.payload.meta.route.seq_src;
+        fifo_request_dout_reg.payload.meta.route.seq_id  <= request_out_int.payload.meta.route.seq_id;
+
+        if(response_memory_counter_is_zero & fifo_request_signals_out_int.empty) begin
+            fifo_request_dout_reg.payload.meta.route.seq_state <= SEQUENCE_DONE;
+        end else begin
+            fifo_request_dout_reg.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
+        end
+    end
 
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
@@ -776,11 +766,11 @@ module engine_csr_index_generator #(parameter
                 fifo_response_engine_in_signals_out_reg  <= 6'b010000;
                 fifo_response_control_in_signals_out_reg <= 6'b010000;
                 fifo_response_memory_in_signals_out_reg  <= 6'b010000;
-                request_engine_out_reg.valid             <= request_out_int.valid;
+                request_engine_out_reg.valid             <= fifo_request_dout_reg.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
-                request_memory_out_reg.valid                      <= request_out_int.valid;
+                request_memory_out_reg.valid                      <= fifo_request_dout_reg.valid;
                 fifo_response_engine_in_signals_out_reg           <= 6'b010000;
                 fifo_response_control_in_signals_out_reg          <= 6'b010000;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
@@ -791,12 +781,16 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
-            request_engine_out_reg.payload <= request_out_int.payload;
+            request_engine_out_reg.payload <= fifo_request_dout_reg.payload;
             request_memory_out_reg.payload <= 0;
         end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
-            request_memory_out_reg.payload <= request_out_int.payload;
+            request_memory_out_reg.payload <= fifo_request_dout_reg.payload;
             request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
+
+        if(fifo_response_comb.valid && (fifo_response_comb.payload.meta.subclass.cmd == CMD_ENGINE))
+            $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,fifo_response_comb.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, fifo_response_comb.payload.data.field[0], fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[2], fifo_response_comb.payload.data.field[3]);
+
     end
 
 endmodule : engine_csr_index_generator
