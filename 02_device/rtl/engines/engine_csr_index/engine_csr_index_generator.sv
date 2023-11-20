@@ -788,8 +788,8 @@ module engine_csr_index_generator #(parameter
             request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
 
-        if(fifo_response_comb.valid && (fifo_response_comb.payload.meta.subclass.cmd == CMD_ENGINE))
-            $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,fifo_response_comb.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, fifo_response_comb.payload.data.field[0], fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[2], fifo_response_comb.payload.data.field[3]);
+        // if(fifo_response_comb.valid && (fifo_response_comb.payload.meta.subclass.cmd == CMD_ENGINE))
+        //     $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,fifo_response_comb.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, fifo_response_comb.payload.data.field[0], fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[2], fifo_response_comb.payload.data.field[3]);
 
     end
 

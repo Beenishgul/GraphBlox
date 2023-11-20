@@ -1218,7 +1218,7 @@ module __KERNEL___testbench ();
                 graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
                 setup_temp = temp_edges_array_dest;
                 graph.edges_array_dest[i][(CACHE_FRONTEND_DATA_W*j)+:CACHE_FRONTEND_DATA_W] = setup_temp;
-                $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
             end
         end
 

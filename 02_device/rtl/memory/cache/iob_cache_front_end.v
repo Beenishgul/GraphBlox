@@ -30,10 +30,10 @@ module iob_cache_front_end #(
    input                        data_ack_i,
 
    // output registered input signals
-   output reg                       data_req_reg_o,
-   output reg [ADDR_W-USE_CTRL-1:0] data_addr_reg_o,
-   output reg [         DATA_W-1:0] data_wdata_reg_o,
-   output reg [       DATA_W/8-1:0] data_wstrb_reg_o,
+   output                       data_req_reg_o,
+   output [ADDR_W-USE_CTRL-1:0] data_addr_reg_o,
+   output [         DATA_W-1:0] data_wdata_reg_o,
+   output [       DATA_W/8-1:0] data_wstrb_reg_o,
 
    // cache-control
    output                               ctrl_req_o,
