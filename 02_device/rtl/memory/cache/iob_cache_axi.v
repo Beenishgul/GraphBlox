@@ -33,23 +33,26 @@ module iob_cache_axi #(
    parameter                FE_NBYTES_W   = $clog2(FE_NBYTES),
    parameter                BE_NBYTES     = BE_DATA_W / 8,
    parameter                BE_NBYTES_W   = $clog2(BE_NBYTES),
-   parameter                LINE2BE_W     = WORD_OFFSET_W - $clog2(BE_DATA_W / FE_DATA_W)
+   parameter                LINE2BE_W     = WORD_OFFSET_W - $clog2(BE_DATA_W / FE_DATA_W),
+   parameter                ADDR_W        = USE_CTRL + FE_ADDR_W - FE_NBYTES_W,
+   parameter                DATA_W        = FE_DATA_W
 ) (
+   input  [             1-1:0] clk_i,
+   input  [             1-1:0] cke_i,
+   input  [             1-1:0] arst_i,
    // Front-end interface (IOb native slave)
-   input  [                             1-1:0] avalid_i,
-   input  [USE_CTRL+FE_ADDR_W-FE_NBYTES_W-1:0] addr_i,
-   input  [                     FE_DATA_W-1:0] wdata_i,
-   input  [                     FE_NBYTES-1:0] wstrb_i,
-   output [                     FE_DATA_W-1:0] rdata_o,
-   output                                      rvalid_o,
-   output                                      ready_o,
-
+   input  [             1-1:0] iob_avalid_i,
+   input  [        ADDR_W-1:0] iob_addr_i,
+   input  [        DATA_W-1:0] iob_wdata_i,
+   input  [    (DATA_W/8)-1:0] iob_wstrb_i,
+   output [             1-1:0] iob_rvalid_o,
+   output [        DATA_W-1:0] iob_rdata_o,
+   output [             1-1:0] iob_ready_o,
    // Cache invalidate and write-trough buffer IO chain
-   input  [1-1:0] invalidate_i,
-   output [1-1:0] invalidate_o,
-   input  [1-1:0] wtb_empty_i,
-   output [1-1:0] wtb_empty_o,
-
+   input  [             1-1:0] invalidate_i,
+   output [             1-1:0] invalidate_o,
+   input  [             1-1:0] wtb_empty_i,
+   output [             1-1:0] wtb_empty_o,
    // AXI4 back-end interface
    output [      AXI_ID_W-1:0] axi_awid_o,
    output [    AXI_ADDR_W-1:0] axi_awaddr_o,
@@ -87,11 +90,7 @@ module iob_cache_axi #(
    input  [             2-1:0] axi_rresp_i,
    input  [             1-1:0] axi_rlast_i,
    input  [             1-1:0] axi_rvalid_i,
-   output [             1-1:0] axi_rready_o,
-   //General Interface Signals
-   input  [             1-1:0] clk_i,          //System clock input
-   input  [             1-1:0] cke_i,          //System clock enable
-   input  [             1-1:0] arst_i          //System reset, asynchronous and active high
+   output [             1-1:0] axi_rready_o
 );
 
    //Front-end & Front-end interface.
@@ -124,13 +123,13 @@ module iob_cache_axi #(
       .arst_i(arst_i),
 
       // front-end port
-      .avalid_i(avalid_i),
-      .addr_i  (addr_i),
-      .wdata_i (wdata_i),
-      .wstrb_i (wstrb_i),
-      .rdata_o (rdata_o),
-      .rvalid_o(rvalid_o),
-      .ready_o (ready_o),
+      .iob_avalid_i(iob_avalid_i),  //Request valid.
+      .iob_addr_i  (iob_addr_i),    //Address.
+      .iob_wdata_i (iob_wdata_i),   //Write data.
+      .iob_wstrb_i (iob_wstrb_i),   //Write strobe.
+      .iob_rvalid_o(iob_rvalid_o),  //Read data valid.
+      .iob_rdata_o (iob_rdata_o),   //Read data.
+      .iob_ready_o (iob_ready_o),   //Interface ready.
 
       // cache-memory input signals
       .data_req_o (data_req),

@@ -95,4 +95,24 @@ package PKG_CACHE;
 // read char *addr = base_address + (((counter >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | (counter & (SYSTEM_CACHE_NUM_WAYS-1) << SYSTEM_CACHE_LINE_SIZE_LOG));
 // --------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------
+//   State Machine input sync
+// --------------------------------------------------------------------------------------
+	typedef enum logic[10:0] {
+		CU_CACHE_CMD_RESET       = 1 << 0,
+		CU_CACHE_CMD_READY       = 1 << 1,
+		CU_CACHE_CMD_READ_TRANS  = 1 << 2,
+		CU_CACHE_CMD_READ        = 1 << 3,
+		CU_CACHE_CMD_WRITE_TRANS = 1 << 4,
+		CU_CACHE_CMD_WRITE       = 1 << 5,
+		CU_CACHE_CMD_WRITE_POST  = 1 << 6,
+		CU_CACHE_CMD_PENDING     = 1 << 7,
+		CU_CACHE_CMD_POP_TRANS   = 1 << 8,
+		CU_CACHE_CMD_POP         = 1 << 9,
+		CU_CACHE_CMD_DONE        = 1 << 10
+	} cu_cache_command_generator_state;
+
+
+
+
 endpackage

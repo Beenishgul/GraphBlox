@@ -66,24 +66,22 @@ module cu_cache #(
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-  CacheRequestPayload   cache_request_mem ;
-  CacheResponsePayload  cache_response_mem;
-  CacheControlIOBOutput cache_ctrl_in     ;
-  CacheControlIOBOutput cache_ctrl_out    ;
-  // logic                 invalidate        ;
-  // logic                 invalidate_reg    ;
-  // logic                 l1_avalid         ;
+  CacheRequestPayload   cache_request_mem    ;
+  CacheRequestPayload   cache_request_mem_reg;
+  CacheResponsePayload  cache_response_mem   ;
+  CacheControlIOBOutput cache_ctrl_in        ;
+  CacheControlIOBOutput cache_ctrl_out       ;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-  CacheRequestPayload    fifo_request_din             ;
-  CacheRequestPayload    fifo_request_dout            ;
-  FIFOStateSignalsOutput fifo_request_signals_out_int ;
-  FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-  FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-  logic                  fifo_request_setup_signal_int;
-
+  CacheRequestPayload    fifo_request_din                  ;
+  CacheRequestPayload    fifo_request_dout                 ;
+  FIFOStateSignalsOutput fifo_request_signals_out_int      ;
+  FIFOStateSignalsInput  fifo_request_signals_in_reg       ;
+  FIFOStateSignalsInput  fifo_request_signals_in_int       ;
+  logic                  fifo_request_setup_signal_int     ;
+  logic                  fifo_request_signals_out_valid_int;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
@@ -96,6 +94,17 @@ module cu_cache #(
   logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+  logic                           areset_counter                  ;
+  logic                           counter_load                    ;
+  logic                           write_command_counter_is_zero   ;
+  logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
+  logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
+
+  assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
@@ -105,6 +114,7 @@ module cu_cache #(
     areset_setup   <= areset;
     areset_control <= areset;
     areset_cache   <= areset;
+    areset_counter <= areset;
   end
 
 // --------------------------------------------------------------------------------------
@@ -274,13 +284,13 @@ module cu_cache #(
     .AXI_DATA_W          (CACHE_AXI_DATA_W                             ),
     .CACHE_AXI_CACHE_MODE(M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
   ) inst_iob_cache_axi (
-    .avalid_i    (cache_request_mem.iob.valid                                                              ),
-    .addr_i      (cache_request_mem.iob.addr [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
-    .wdata_i     (cache_request_mem.iob.wdata                                                              ),
-    .wstrb_i     (cache_request_mem.iob.wstrb                                                              ),
-    .rdata_o     (cache_response_mem.iob.rdata                                                             ),
-    .rvalid_o    (cache_response_mem.iob.valid                                                             ),
-    .ready_o     (cache_response_mem.iob.ready                                                             ),
+    .iob_avalid_i(cache_request_mem.iob.valid                                                              ),
+    .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
+    .iob_wdata_i (cache_request_mem.iob.wdata                                                              ),
+    .iob_wstrb_i (cache_request_mem.iob.wstrb                                                              ),
+    .iob_rdata_o (cache_response_mem.iob.rdata                                                             ),
+    .iob_rvalid_o(cache_response_mem.iob.valid                                                             ),
+    .iob_ready_o (cache_response_mem.iob.ready                                                             ),
     .invalidate_i(cache_ctrl_in.force_inv                                                                  ),
     .invalidate_o(cache_ctrl_out.force_inv                                                                 ),
     .wtb_empty_i (cache_ctrl_in.wtb_empty                                                                  ),
@@ -291,32 +301,8 @@ module cu_cache #(
     .arst_i      (areset_cache                                                                             )
   );
 
-  // assign l1_avalid               = cache_request_mem.iob.valid ;
-  // assign cache_ctrl_in.force_inv = invalidate_reg & ~l1_avalid;
-  // assign cache_ctrl_in.wtb_empty = 1'b1;
-  // assign invalidate   = 1'b0;
-
-  // //Necessary logic to avoid invalidating L2 while it's being accessed by a request
-  // always @(posedge ap_clk)
-  //   if (areset_cache) invalidate_reg    <= 1'b0;
-  //   else if (invalidate) invalidate_reg <= 1'b1;
-  //   else if (~l1_avalid) invalidate_reg <= 1'b0;
-  //   else invalidate_reg <= invalidate_reg;
 
 
-  always_comb begin
-    if((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))begin
-      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready  & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
-      cache_request_mem.iob.wstrb        = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
-      fifo_request_signals_in_int.rd_en  = cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
-      fifo_response_signals_in_int.wr_en = ~cache_request_mem.iob.valid & fifo_request_signals_out_int.valid;
-    end else begin
-      cache_request_mem.iob.valid        = fifo_request_dout.iob.valid & ~cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
-      cache_request_mem.iob.wstrb        = 0;
-      fifo_request_signals_in_int.rd_en  = cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
-      fifo_response_signals_in_int.wr_en = cache_response_mem.iob.valid & fifo_request_signals_out_int.valid;
-    end
-  end
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT
@@ -331,13 +317,13 @@ module cu_cache #(
   assign fifo_request_din.data             = request_in_reg.payload.data;
 
   // Pop
-  // assign fifo_request_signals_in_int.rd_en = cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & ~fifo_response_signals_out_int.prog_full;
-  // assign cache_request_mem.iob.valid       = fifo_request_dout.iob.valid & ~cache_response_mem.iob.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
-  assign cache_request_mem.iob.addr  = fifo_request_dout.iob.addr;
-  assign cache_request_mem.iob.wdata = fifo_request_dout.iob.wdata;
-  // assign cache_request_mem.iob.wstrb       = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
-  assign cache_request_mem.meta = fifo_request_dout.meta;
-  assign cache_request_mem.data = fifo_request_dout.data;
+  // assign fifo_request_signals_in_int.rd_en = cache_request_pop_int;
+  assign cache_request_mem.iob.valid = cache_request_mem_reg.iob.valid;
+  assign cache_request_mem.iob.addr  = cache_request_mem_reg.iob.addr;
+  assign cache_request_mem.iob.wdata = cache_request_mem_reg.iob.wdata;
+  assign cache_request_mem.iob.wstrb = cache_request_mem_reg.iob.wstrb;
+  assign cache_request_mem.meta      = cache_request_mem_reg.meta;
+  assign cache_request_mem.data      = cache_request_mem_reg.data;
 
   xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -367,7 +353,7 @@ module cu_cache #(
   assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
   // Push
-  // assign fifo_response_signals_in_int.wr_en = cache_response_mem.iob.valid;
+  // assign fifo_response_signals_in_int.wr_en = cache_response_push_int;
   assign fifo_response_din.iob  = cache_response_mem.iob;
   assign fifo_response_din.meta = cache_request_mem.meta;
   assign fifo_response_din.data = cache_request_mem.data;
@@ -397,6 +383,162 @@ module cu_cache #(
     .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
   );
 
+// --------------------------------------------------------------------------------------
+// Cache Commands State Machine
+// --------------------------------------------------------------------------------------
+  cu_cache_command_generator_state current_state;
+  cu_cache_command_generator_state next_state   ;
+// --------------------------------------------------------------------------------------
+//   State Machine AP_USER_MANAGED sync
+// --------------------------------------------------------------------------------------
+  always_ff @(posedge ap_clk) begin
+    if(areset_control)
+      current_state <= CU_CACHE_CMD_RESET;
+    else begin
+      current_state <= next_state;
+    end
+  end // always_ff @(posedge ap_clk)
+
+  always_comb begin
+    next_state = current_state;
+    case (current_state)
+      CU_CACHE_CMD_RESET : begin
+        next_state = CU_CACHE_CMD_READY;
+      end
+      CU_CACHE_CMD_READY : begin
+        if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
+          next_state = CU_CACHE_CMD_READ_TRANS;
+        else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~write_command_counter_is_zero)
+          next_state = CU_CACHE_CMD_WRITE_TRANS;
+        else
+          next_state = CU_CACHE_CMD_READY;
+      end
+      CU_CACHE_CMD_READ_TRANS : begin
+        next_state = CU_CACHE_CMD_READ;
+      end
+      CU_CACHE_CMD_READ : begin
+        if(cache_response_mem.iob.valid)
+          next_state = CU_CACHE_CMD_POP_TRANS;
+        else
+          next_state = CU_CACHE_CMD_READ;
+      end
+      CU_CACHE_CMD_WRITE_TRANS : begin
+        next_state = CU_CACHE_CMD_WRITE;
+      end
+      CU_CACHE_CMD_WRITE : begin
+        next_state = CU_CACHE_CMD_WRITE_POST;
+      end
+      CU_CACHE_CMD_WRITE_POST : begin
+        next_state = CU_CACHE_CMD_POP_TRANS;
+      end
+      CU_CACHE_CMD_POP_TRANS : begin
+        next_state = CU_CACHE_CMD_POP;
+      end
+      CU_CACHE_CMD_POP : begin
+        next_state = CU_CACHE_CMD_READY;
+      end
+      CU_CACHE_CMD_DONE : begin
+        next_state = CU_CACHE_CMD_DONE;
+      end
+    endcase
+  end // always_comb
+  // State Transition Logic
+
+  always_ff @(posedge ap_clk) begin
+    case (current_state)
+      CU_CACHE_CMD_RESET : begin
+        counter_load                       <= 1'b1;
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+      end
+      CU_CACHE_CMD_READY : begin
+        counter_load                       <= 1'b0;
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+      end
+      CU_CACHE_CMD_READ_TRANS : begin
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b1;
+      end
+      CU_CACHE_CMD_READ : begin
+        if(~cache_response_mem.iob.ready & ~cache_response_mem.iob.valid)
+          cache_request_mem_reg.iob.valid <= 1'b1;
+        else if(cache_response_mem.iob.ready & cache_response_mem.iob.valid)
+          cache_request_mem_reg.iob.valid <= 1'b0;
+        else if(cache_response_mem.iob.ready & ~cache_response_mem.iob.valid)
+          cache_request_mem_reg.iob.valid <= 1'b1;
+        else
+          cache_request_mem_reg.iob.valid <= 1'b0;
+
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+      end
+      CU_CACHE_CMD_WRITE_TRANS : begin
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b1;
+      end
+      CU_CACHE_CMD_WRITE : begin
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+      end
+      CU_CACHE_CMD_WRITE_POST : begin
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+      end
+      CU_CACHE_CMD_POP_TRANS : begin
+        fifo_request_signals_in_int.rd_en  <= 1'b1;
+        fifo_response_signals_in_int.wr_en <= 1'b1;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+      end
+      CU_CACHE_CMD_POP : begin
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+      end
+      CU_CACHE_CMD_DONE : begin
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+      end
+    endcase
+  end // always_ff @(posedge ap_clk)
+
+  assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+
+  always_ff @(posedge ap_clk) begin
+    cache_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+    cache_request_mem_reg.iob.addr  <= fifo_request_dout.iob.addr;
+    cache_request_mem_reg.iob.wdata <= fifo_request_dout.iob.wdata;
+    cache_request_mem_reg.meta      <= fifo_request_dout.meta;
+    cache_request_mem_reg.data      <= fifo_request_dout.data;
+  end
+
+// --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+  counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
+    .ap_clk      (ap_clk                                                                                       ),
+    .ap_clken    (1'b1                                                                                         ),
+    .areset      (areset_counter                                                                               ),
+    .load        (counter_load                                                                                 ),
+    .incr        (fifo_response_signals_in_int.wr_en  & (fifo_response_din.meta.subclass.cmd == CMD_MEM_WRITE) ),
+    .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
+    .load_value  (write_command_counter_load_value                                                             ),
+    .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
+    .count       (write_command_counter_                                                                       ),
+    .is_zero     (write_command_counter_is_zero                                                                )
+  );
 
 endmodule : cu_cache
 
+
+
+
+
+// Remaining logic remains as is...
