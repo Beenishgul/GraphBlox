@@ -230,7 +230,7 @@ module engine_alu_ops_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~alu_ops_response_engine_in_valid_reg & ~response_engine_in_int.valid & configure_engine_param_valid & ~fifo_request_engine_out_signals_out_int.prog_full);
+    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~alu_ops_response_engine_in_valid_reg & ~generator_engine_request_engine_reg.valid & ~alu_ops_response_engine_in_valid_flag_S2 & ~response_engine_in_int.valid & configure_engine_param_valid & ~fifo_request_engine_out_signals_out_int.prog_full);
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -414,7 +414,6 @@ module engine_alu_ops_generator #(parameter
             alu_ops_response_engine_in_valid_reg      <= 1'b0;
             alu_ops_response_engine_in_valid_flag_S2  <= 1'b0;
             generator_engine_request_engine_reg.valid <= 1'b0;
-            engine_alu_ops_clear                      <= 1'b0;
         end
         else begin
             alu_ops_response_engine_in_valid_flag_S2  <= alu_ops_response_engine_in_valid_flag;
@@ -444,13 +443,19 @@ module engine_alu_ops_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-
-        if((config_params.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE)
-            generator_engine_request_engine_reg_S2.valid <= result_flag;
-        else if ((config_params.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state != SEQUENCE_DONE)
+        if((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE & result_flag) begin
+            generator_engine_request_engine_reg_S2.valid <= 1'b1;
+            engine_alu_ops_clear                         <= 1'b1;
+        end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state != SEQUENCE_DONE & ~result_flag) begin
             generator_engine_request_engine_reg_S2.valid <= 1'b0;
-        else
+            engine_alu_ops_clear                         <= 1'b0;
+        end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE & ~result_flag) begin
+            generator_engine_request_engine_reg_S2.valid <= 1'b0;
+            engine_alu_ops_clear                         <= 1'b0;
+        end else begin
             generator_engine_request_engine_reg_S2.valid <= generator_engine_request_engine_reg.valid;
+            engine_alu_ops_clear                         <= 1'b0;
+        end
 
         generator_engine_request_engine_reg_S2.payload.data                 <= result_int;
         generator_engine_request_engine_reg_S2.payload.meta.route.from      <= generator_engine_request_engine_reg.payload.meta.route.from;
@@ -461,6 +466,10 @@ module engine_alu_ops_generator #(parameter
         generator_engine_request_engine_reg_S2.payload.meta.route.hops      <= generator_engine_request_engine_reg.payload.meta.route.hops;
         generator_engine_request_engine_reg_S2.payload.meta.address         <= generator_engine_request_engine_reg.payload.meta.address;
         generator_engine_request_engine_reg_S2.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
+
+        // if(generator_engine_request_engine_reg_S2.valid)
+        //     $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
+
     end
 
     engine_alu_ops_kernel inst_engine_alu_ops_kernel (

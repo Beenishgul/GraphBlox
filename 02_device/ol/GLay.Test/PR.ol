@@ -2,7 +2,7 @@
 // Name ENGINE_ALU_OPS      ID 0    mapping 5    cycles 6    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000010 // entry 0    cacheline 0    offset 0    -- //  0  - alu_operation
-0x00000000 // entry 1    cacheline 0    offset 1    -- //  1  - alu_mask
+0x00000001 // entry 1    cacheline 0    offset 1    -- //  1  - alu_mask
 0x00000001 // entry 2    cacheline 0    offset 2    -- //  2  - const_mask
 0x00000001 // entry 3    cacheline 0    offset 3    -- //  3  - const_value
 0x00008421 // entry 4    cacheline 0    offset 4    -- //  4  - ops_mask
@@ -75,14 +75,14 @@
 0x00000000 // entry 47   cacheline 2    offset 15   -- //  2  - Index_end
 0x00000001 // entry 48   cacheline 3    offset 0    -- //  3  - Stride
 0x80000002 // entry 49   cacheline 3    offset 1    -- //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000204 // entry 50   cacheline 3    offset 2    -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_WRITE | id moddule | id engine
+0x00000202 // entry 50   cacheline 3    offset 2    -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_WRITE | id moddule | id engine
 0x00000000 // entry 51   cacheline 3    offset 3    -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 52   cacheline 3    offset 4    -- //  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 53   cacheline 3    offset 5    -- //  8  - BUFFER Array Pointer RHS
 0x00000033 // entry 54   cacheline 3    offset 6    -- //  9  - BUFFER size
 0x00000000 // entry 55   cacheline 3    offset 7    -- //  10 - const_mask
 0x00000000 // entry 56   cacheline 3    offset 8    -- //  11 - const_value
-0x00008412 // entry 57   cacheline 3    offset 9    -- //  12 - ops_mask
+0x00002481 // entry 57   cacheline 3    offset 9    -- //  12 - ops_mask
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 7    mapping 6    cycles 1    None-None ( 0 )-( 0 )

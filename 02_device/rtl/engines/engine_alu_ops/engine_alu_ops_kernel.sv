@@ -35,12 +35,10 @@ module engine_alu_ops_kernel (
   MemoryPacketData ops_value_reg  ;
   MemoryPacketData result_int     ;
   MemoryPacketData result_reg     ;
+  MemoryPacketData org_value_reg  ;
   logic            data_valid_reg ;
   logic            result_flag_int;
   logic            result_flag_reg;
-
-  logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id_reg;
-
 
   // Process input data and mask
   always_ff @(posedge ap_clk) begin
@@ -48,6 +46,7 @@ module engine_alu_ops_kernel (
       data_valid_reg <= 1'b0;
       for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
         ops_value_reg.field[i] <= 0;
+        org_value_reg.field[i] <= 0;
       end
     end else begin
       data_valid_reg <= data_valid;
@@ -64,86 +63,89 @@ module engine_alu_ops_kernel (
           ops_value_reg.field[i] <= 0;
         end
       end
+
+      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+        if (config_params_valid) begin
+          for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+            if(config_params.ops_mask[i][j]) begin
+              org_value_reg.field[i] <= data.field[j];
+            end
+          end
+        end else begin
+          org_value_reg.field[i] <= data.field[i];
+        end
+      end
     end
   end
 
-  always_ff @(posedge ap_clk) begin 
-    if(config_params_valid & (config_params.alu_operation == ALU_ACC) & ~clear & result_flag_int)
-      result_reg <= result_int;
-    else if(config_params_valid & (config_params.alu_operation == ALU_ACC) & ~clear & ~result_flag_int)
-       result_reg <= result_reg;
-    else
-       result_reg <= result_int;
-
-    result_flag_reg <= result_flag_int;
+  always_ff @(posedge ap_clk) begin
+    if (areset | clear) begin
+      result_reg      <= 0;
+      result_flag_reg <= 1'b0;
+    end else begin
+      result_reg      <= result_int;
+      result_flag_reg <= result_flag_int;
+    end
   end
 
   // ALU operations logic
-  always_comb begin
-    // Process the ALU operation if both config_params and data are valid
-    result_flag_int = 1'b0;
-    result_int      = 0;
+  always_ff @(posedge ap_clk) begin
+    if (areset | clear) begin
+      result_flag_int <= 1'b0;
+      result_int      <= 0;
+    end else begin
+      if (config_params_valid & data_valid_reg) begin
+        result_flag_int <= 1'b1;
+        case (config_params.alu_operation)
 
-    if (config_params_valid & data_valid_reg) begin
-      result_flag_int = 1'b1;
-      case (config_params.alu_operation)
-        ALU_NOP : begin
-          result_int = ops_value_reg; // No operation
-        end
+          ALU_NOP : begin
+            result_int <= ops_value_reg; // No operation
+          end
 
-        ALU_ADD : begin
-          result_int = ops_value_reg.field[0];
-          for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-            if (config_params.alu_mask[i]) begin
-              result_int = result_int + ops_value_reg.field[i];
-            end else begin
-              result_int = result_int;
+          ALU_ADD : begin
+            for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+              if (config_params.alu_mask[i]) begin
+                result_int <= ops_value_reg.field[i] + ops_value_reg.field[i+1];
+              end
             end
           end
-        end
 
-        ALU_SUB : begin
-          result_int = ops_value_reg.field[0];
-          for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-            if (config_params.alu_mask[i]) begin
-              result_int = result_int - ops_value_reg.field[i];
-            end else begin
-              result_int = result_int;
+          ALU_SUB : begin
+            for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+              if (config_params.alu_mask[i]) begin
+                result_int <= ops_value_reg.field[i] - ops_value_reg.field[i+1];
+              end
             end
           end
-        end
 
-        ALU_MUL : begin
-          result_int = ops_value_reg.field[0];
-          for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-            if (config_params.alu_mask[i]) begin
-              result_int = result_int * ops_value_reg.field[i];
-            end else begin
-              result_int = result_int;
+          ALU_MUL : begin
+            for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+              if (config_params.alu_mask[i]) begin
+                result_int <= ops_value_reg.field[i] * ops_value_reg.field[i+1];
+              end
             end
           end
-        end
 
-        ALU_ACC : begin
-          result_int = result_reg + ops_value_reg.field[0];
-          for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
-            if (config_params.alu_mask[i]) begin
-              result_int = result_reg + ops_value_reg.field[i];
-            end else begin
-              result_int = result_reg;
+          ALU_ACC : begin
+            for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+              if (config_params.alu_mask[i]) begin
+                result_int <= result_reg + ops_value_reg.field[i];
+              end
             end
           end
-        end
 
-        ALU_DIV : begin
-          result_int = ops_value_reg.field[0];
-          result_int = result_int >> ops_value_reg.field[1]; // Undefined operations reset result
-        end
+          ALU_DIV : begin
+            result_int <= ops_value_reg; // Undefined operations reset result
+          end
 
-        default : begin
-          result_int = 0; // Undefined operations reset result
-        end
-      endcase
+          default : begin
+            result_int <= ops_value_reg; // Undefined operations reset result
+          end
+
+        endcase
+      end else begin
+        result_flag_int <= 1'b0;
+      end
     end
   end
 
@@ -153,8 +155,11 @@ module engine_alu_ops_kernel (
       result      <= 0;
       result_flag <= 0;
     end else begin
-      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA/2; i++) begin
         result.field[i] <= result_reg.field[i];
+      end
+      for (int i = NUM_FIELDS_MEMORYPACKETDATA/2; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+        result.field[i] <= org_value_reg.field[i];
       end
       result_flag <= result_flag_reg;
     end
