@@ -22,12 +22,6 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 //  COMPUTE UNITS GLOBALS
 // --------------------------------------------------------------------------------------
-// Kernel current settings engines/lanes/bundles/buffers
-// --------------------------------------------------------------------------------------
-	parameter KERNEL_CU_COUNT = 1 ;
-	parameter CU_BUNDLE_COUNT = 4 ;
-	parameter CU_ENGINE_COUNT = 8 ;
-	parameter CU_BUFFER_COUNT = 10;
 
 // --------------------------------------------------------------------------------------
 // Maximum supported engines/lanes/bundles/buffers

@@ -32,7 +32,7 @@ output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_p
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
 output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
 # output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, verilog_template_filename)
-output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, verilog_template_filename)
+output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters", verilog_template_filename)
 
 config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
 
