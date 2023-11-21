@@ -154,14 +154,14 @@ export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${file
 # set SYSTEM_CACHE_SIZE_B   65536
 set SYSTEM_CACHE_NUM_WAYS 4
 set LINE_CACHE_DATA_WIDTH 512 
-set FE_ADDR_WIDTH         64 
-set FE_CACHE_DATA_WIDTH   512 
+set MID_ADDR_WIDTH        64 
+set MID_CACHE_DATA_WIDTH  512 
 set BE_ADDR_WIDTH         63
 set BE_CACHE_DATA_WIDTH   512
 
 set SYSTEM_CACHE_SIZE_KB [expr {${SYSTEM_CACHE_SIZE_B} / 1024}]
 puts "[color 2 "                        Generate Kernel Cache: Cache-line: ${LINE_CACHE_DATA_WIDTH}bits | Ways: ${SYSTEM_CACHE_NUM_WAYS} | Size: ${SYSTEM_CACHE_SIZE_KB}KB"]" 
-puts "[color 2 "                                    Front-End: Data width: ${FE_CACHE_DATA_WIDTH}bits | Address width: ${FE_ADDR_WIDTH}bits"]" 
+puts "[color 2 "                                    Front-End: Data width: ${MID_CACHE_DATA_WIDTH}bits | Address width: ${MID_ADDR_WIDTH}bits"]" 
 puts "[color 2 "                                     Back-End: Data width: ${BE_CACHE_DATA_WIDTH}bits | Address width: ${BE_ADDR_WIDTH}bits"]" 
 
 
@@ -182,8 +182,8 @@ set_property -dict [list                                                  \
                     CONFIG.C_ENABLE_NON_SECURE {1}                        \
                     CONFIG.C_ENABLE_ERROR_HANDLING {1}                    \
                     CONFIG.C_NUM_WAYS ${SYSTEM_CACHE_NUM_WAYS}            \
-                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${FE_CACHE_DATA_WIDTH} \
-                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${FE_ADDR_WIDTH}       \
+                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${MID_CACHE_DATA_WIDTH}\
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${MID_ADDR_WIDTH}      \
                     CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {1}           \
                     CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {0}        \
                     CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {1}          \
