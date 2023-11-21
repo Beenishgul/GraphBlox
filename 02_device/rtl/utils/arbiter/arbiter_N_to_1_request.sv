@@ -12,12 +12,7 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import PKG_AXI4::*;
-import PKG_GLOBALS::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_MEMORY::*;
-import PKG_CACHE::*;
+`include "global_package.vh"
 
 module arbiter_N_to_1_request #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,

@@ -80,11 +80,11 @@ generate_connectivity_sp () {
 }
 
 
-        if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
-        then
-            config+=".$end.RAMA"
-        fi
-        config+="\n"
+        # if [[ "$j" == 7 ]] || [[ "$j" == 8 ]]
+        # then
+        #     config+=".$end.RAMA"
+        # fi
+        # config+="\n"
 
 if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
 then

@@ -40,8 +40,7 @@
 // (two ap_clks for the 'arbiter_node' modules and one ap_clk
 // for the output registers).
 
-`timescale 1ns / 1ps
-import PKG_FUNCTIONS::*;
+`include "global_package.vh"
 
 module arbiter_bus_N_in_1_out #(
     parameter WIDTH            = 2                    ,

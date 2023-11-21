@@ -12,6 +12,8 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
+`include "global_package.vh"
+
 module demux_bus_one_hot #(
   parameter DATA_WIDTH = 32       ,
   parameter BUS_WIDTH  = 8        ,

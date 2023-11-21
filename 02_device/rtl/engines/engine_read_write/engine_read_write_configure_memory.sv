@@ -12,13 +12,7 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-import PKG_AXI4::*;
-import PKG_GLOBALS::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_MEMORY::*;
-import PKG_ENGINE::*;
-import PKG_CACHE::*;
+`include "global_package.vh"
 
 module engine_read_write_configure_memory #(parameter
     ID_CU            = 0                                ,

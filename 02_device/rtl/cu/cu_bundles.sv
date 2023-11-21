@@ -12,14 +12,7 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-import PKG_AXI4::*;
-import PKG_GLOBALS::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_MEMORY::*;
-import PKG_ENGINE::*;
-import PKG_SETUP::*;
-import PKG_CACHE::*;
+`include "global_package.vh"
 
 module cu_bundles #(
     `include "cu_parameters.vh"
@@ -610,7 +603,7 @@ module cu_bundles #(
         for (j=0; j<NUM_BUNDLES; j++) begin : generate_bundle_lanes
             bundle_lanes #(
                 `include"set_bundle_parameters.vh"
-                ) inst_bundle_lanes (
+            ) inst_bundle_lanes (
                 .ap_clk                              (ap_clk                                        ),
                 .areset                              (areset_bundle[j]                              ),
                 .descriptor_in                       (bundle_descriptor_in[j]                       ),

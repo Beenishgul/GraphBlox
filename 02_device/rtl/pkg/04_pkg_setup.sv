@@ -13,7 +13,7 @@
 // -----------------------------------------------------------------------------
 
 
-`timescale 1 ns / 1 ps
+`include "global_timescale.vh"
 package PKG_SETUP;
 
   import PKG_GLOBALS::*;

@@ -12,7 +12,7 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
-`timescale 1 ns / 1 ps
+`include "global_timescale.vh"
 package PKG_DESCRIPTOR;
 
     import PKG_GLOBALS::*;

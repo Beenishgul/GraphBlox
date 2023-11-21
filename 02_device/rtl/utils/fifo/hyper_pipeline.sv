@@ -12,6 +12,8 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
+`include "global_package.vh"
+
 module hyper_pipeline #(
     parameter STAGES = 1 ,
     parameter WIDTH  = 32

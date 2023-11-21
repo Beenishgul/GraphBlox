@@ -1,4 +1,4 @@
-`timescale 1 ns / 1 ps
+`include "global_timescale.vh"
 
 module iob_regfile_sp #(
    parameter ADDR_W = 2,

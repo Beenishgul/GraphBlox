@@ -12,6 +12,8 @@
 // Editor : sublime text4, tab size (3)
 // -----------------------------------------------------------------------------
 
+`include "global_package.vh"
+
 module xpm_fifo_sync_fwft_wrapper #(
    parameter FIFO_WRITE_DEPTH = 16,
    parameter WRITE_DATA_WIDTH = 32,

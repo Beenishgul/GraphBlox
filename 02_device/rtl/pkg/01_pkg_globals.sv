@@ -11,7 +11,6 @@
 // Revise : 2023-08-28 14:41:10
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
-`timescale 1 ns / 1 ps
 package PKG_GLOBALS;
 
 	import PKG_AXI4::*;
@@ -48,7 +47,8 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
 	parameter GLOBAL_DATA_WIDTH_BITS = 32;
-	parameter GLOBAL_SYSTEM_CACHE_IP = 0;
+	parameter GLOBAL_SYSTEM_CACHE_IP = 0 ;
+	parameter GLOBAL_CU_CACHE_IP     = 1 ;
 
 // ********************************************************************************************
 // ***************                  GLOBAL MEMORY(DDR4/HBM)                      **************

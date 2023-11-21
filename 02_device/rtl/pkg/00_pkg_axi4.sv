@@ -12,7 +12,7 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-`timescale 1 ns / 1 ps
+`include "global_timescale.vh"
 package PKG_AXI4;
 
   parameter S_AXI_ADDR_WIDTH_BITS = 12;

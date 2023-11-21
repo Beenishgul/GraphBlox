@@ -7,11 +7,7 @@ import axi_vip_pkg::*;
 import slv_m00_axi_vip_pkg::*;
 import control___KERNEL___vip_pkg::*;
 
-import PKG_GLOBALS::*;
-import PKG_AXI4::*;
-import PKG_DESCRIPTOR::*;
-import PKG_MEMORY::*;
-import PKG_CACHE::*;
+`include "global_package.vh"
 
 class GraphCSR;
 

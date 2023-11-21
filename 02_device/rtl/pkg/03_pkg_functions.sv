@@ -29,7 +29,7 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-`timescale 1 ns / 1 ps
+`include "global_timescale.vh"
 package PKG_FUNCTIONS;
 
 	import PKG_GLOBALS::*;

@@ -12,11 +12,7 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import PKG_GLOBALS::*;
-import PKG_AXI4::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_CACHE::*;
+`include "global_package.vh"
 
 module kernel_afu #(
   parameter C_M00_AXI_ADDR_WIDTH = M_AXI_MEMORY_ADDR_WIDTH     ,

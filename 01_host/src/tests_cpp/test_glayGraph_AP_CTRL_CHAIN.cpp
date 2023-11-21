@@ -322,7 +322,7 @@ main (int argc, char **argv)
     int bank_grp_idx = 0;
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 2, TRUE, 122);
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 0, 0, 122);
 
     if(arguments->glayHandle == NULL)
     {
@@ -330,23 +330,23 @@ main (int argc, char **argv)
     }
 
     uint32_t i;
-    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices;
+    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices*2;
     graphAuxiliary->auxiliary_1  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices;
+    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices*2;
     graphAuxiliary->auxiliary_2  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_1 ; i++)
     {
-        graphAuxiliary->auxiliary_1[i] = 0;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
     }
 
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_2 ; i++)
     {
-        graphAuxiliary->auxiliary_2[i] = -1;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 1;
     }
 
     GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
@@ -365,16 +365,16 @@ main (int argc, char **argv)
     printf("| %-9f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
-    // closeGLAYUserManaged(arguments->glayHandle);
-    if(graphAuxiliary->num_auxiliary_1)
-        free(graphAuxiliary->num_auxiliary_1);
-    if(graphAuxiliary->num_auxiliary_2)
-        free(graphAuxiliary->num_auxiliary_2);
+    // closeGLAYCtrlChain(arguments->glayHandle);
+    if(graphAuxiliary->auxiliary_1)
+        free(graphAuxiliary->auxiliary_1);
+    if(graphAuxiliary->auxiliary_2)
+        free(graphAuxiliary->auxiliary_2);
     if(graphAuxiliary)
         free(graphAuxiliary);
+
     // releaseGLAY(arguments->glayHandle);
     free(timer);
-    free(graphAuxiliary);
     argumentsFree(arguments);
     exit (0);
 }
@@ -383,8 +383,4 @@ main (int argc, char **argv)
 #ifdef __cplusplus
 }
 #endif
-
-
-
-
 
