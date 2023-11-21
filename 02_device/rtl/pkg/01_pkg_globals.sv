@@ -53,8 +53,6 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 //  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
-	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
-	parameter GLOBAL_DATA_WIDTH_BITS = 32;
 	parameter GLOBAL_SYSTEM_CACHE_IP = 1 ;
 	parameter GLOBAL_CU_CACHE_IP     = 1 ;
 // --------------------------------------------------------------------------------------
