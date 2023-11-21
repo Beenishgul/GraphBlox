@@ -49,8 +49,8 @@ module engine_csr_index_configure_memory #(parameter
     CSRIndexConfiguration                   configure_memory_reg                            ;
     logic [           ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
     logic                                   configure_memory_valid_int                      ;
-    logic [      CACHE_FRONTEND_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
-    logic [      CACHE_FRONTEND_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
+    logic [      M_AXI4_FE_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
+    logic [      M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -151,7 +151,7 @@ module engine_csr_index_configure_memory #(parameter
     assign configure_memory_meta_int.route.seq_id            = 0;
     assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
     assign configure_memory_meta_int.address.base            = 0;
-    assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configure_memory_meta_int.address.offset          = $clog2(M_AXI4_FE_DATA_W/8);
     assign configure_memory_meta_int.address.shift.amount    = 0;
     assign configure_memory_meta_int.address.shift.direction = 1'b1;
     assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
@@ -218,10 +218,10 @@ module engine_csr_index_configure_memory #(parameter
                     configure_memory_reg.payload.param.stride <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
                 (1 << 4) : begin
-                    configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(CACHE_FRONTEND_ADDR_W)-2:0];
-                    configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
-                    configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(CACHE_FRONTEND_ADDR_W)-2:0];
-                    configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[0][CACHE_FRONTEND_DATA_W-1];
+                    configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(M_AXI4_FE_ADDR_W)-2:0];
+                    configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[0][M_AXI4_FE_DATA_W-1];
+                    configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[0][$clog2(M_AXI4_FE_ADDR_W)-2:0];
+                    configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[0][M_AXI4_FE_DATA_W-1];
                 end
                 (1 << 5) : begin
                     configure_memory_reg.payload.meta.subclass.cmd       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[0][TYPE_MEMORY_CMD_BITS-1:0]);
@@ -236,10 +236,10 @@ module engine_csr_index_configure_memory #(parameter
                     configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
                 end
                 (1 << 7) : begin
-                    configure_memory_reg.payload.param.array_pointer[(CACHE_FRONTEND_DATA_W)-1:0] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
+                    configure_memory_reg.payload.param.array_pointer[(M_AXI4_FE_DATA_W)-1:0] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
                 (1 << 8) : begin
-                    configure_memory_reg.payload.param.array_pointer[(M_AXI_MEMORY_ADDR_WIDTH)-1:CACHE_FRONTEND_DATA_W] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
+                    configure_memory_reg.payload.param.array_pointer[(M_AXI4_FE_ADDR_W)-1:M_AXI4_FE_DATA_W] <= fifo_response_memory_in_dout_reg.payload.data.field[0];
                 end
                 (1 << 9) : begin
                     configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_reg.payload.data.field[0];

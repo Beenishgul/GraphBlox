@@ -22,7 +22,7 @@ module cu_setup #(
     parameter ID_MODULE        = 0                    ,
     parameter FIFO_WRITE_DEPTH = 32                   ,
     parameter PROG_THRESH      = 16                   ,
-    parameter COUNTER_WIDTH    = CACHE_FRONTEND_DATA_W
+    parameter COUNTER_WIDTH    = M_AXI4_FE_DATA_W
 ) (
     // System Signals
     input  logic                  ap_clk                   ,
@@ -361,11 +361,11 @@ module cu_setup #(
     assign configuration_comb_program.payload.param.decrement              = 1'b0;
     assign configuration_comb_program.payload.param.flush_mode             = 1'b0;
     assign configuration_comb_program.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
-    assign configuration_comb_program.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
+    assign configuration_comb_program.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:1]};
     assign configuration_comb_program.payload.param.start_read             = 0;
-    assign configuration_comb_program.payload.param.end_read               = {1'b0,descriptor_in_reg.payload.buffer_9[CACHE_FRONTEND_DATA_W-1:1]};
+    assign configuration_comb_program.payload.param.end_read               = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:1]};
     assign configuration_comb_program.payload.param.stride                 = 1;
-    assign configuration_comb_program.payload.param.granularity            = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configuration_comb_program.payload.param.granularity            = $clog2(M_AXI4_FE_DATA_W/8);
     assign configuration_comb_program.payload.meta.route.from.id_cu        = ID_CU;
     assign configuration_comb_program.payload.meta.route.from.id_bundle    = {CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}};
     assign configuration_comb_program.payload.meta.route.from.id_lane      = {CU_LANE_COUNT_WIDTH_BITS{1'b1}};
@@ -389,7 +389,7 @@ module cu_setup #(
     assign configuration_comb_program.payload.meta.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
     assign configuration_comb_program.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_program.payload.meta.address.offset          = 0;
-    assign configuration_comb_program.payload.meta.address.shift.amount    = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configuration_comb_program.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
     assign configuration_comb_program.payload.meta.address.shift.direction = 1'b1;
     assign configuration_comb_program.payload.meta.subclass.cmd            = CMD_MEM_READ;
     assign configuration_comb_program.payload.meta.subclass.buffer         = STRUCT_CU_SETUP;
@@ -401,15 +401,15 @@ module cu_setup #(
     assign configuration_comb_flush.payload.param.decrement              = 1'b0;
     assign configuration_comb_flush.payload.param.flush_mode             = 1'b1;
     assign configuration_comb_flush.payload.param.array_pointer          = descriptor_in_reg.payload.buffer_0;
-    assign configuration_comb_flush.payload.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W];
+    assign configuration_comb_flush.payload.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
     assign configuration_comb_flush.payload.param.start_read             = 0;
-    assign configuration_comb_flush.payload.param.end_read               = descriptor_in_reg.payload.buffer_9[M_AXI_MEMORY_ADDR_WIDTH-1:CACHE_FRONTEND_DATA_W];
+    assign configuration_comb_flush.payload.param.end_read               = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
     assign configuration_comb_flush.payload.param.stride                 = 1;
-    assign configuration_comb_flush.payload.param.granularity            = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configuration_comb_flush.payload.param.granularity            = $clog2(M_AXI4_FE_DATA_W/8);
     assign configuration_comb_flush.payload.meta.route                   = 0;
     assign configuration_comb_flush.payload.meta.address.base            = descriptor_in_reg.payload.buffer_0;
     assign configuration_comb_flush.payload.meta.address.offset          = 0;
-    assign configuration_comb_flush.payload.meta.address.shift.amount    = $clog2(CACHE_FRONTEND_DATA_W/8);
+    assign configuration_comb_flush.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
     assign configuration_comb_flush.payload.meta.address.shift.direction = 1'b1;
     assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_READ;
     assign configuration_comb_flush.payload.meta.subclass.buffer         = STRUCT_CU_FLUSH;

@@ -21,7 +21,7 @@
 package PKG_MEMORY;
 
 import PKG_GLOBALS::*;
-import PKG_CACHE::*;
+import PKG_AXI4_FE::*;
 
 // --------------------------------------------------------------------------------------
 // FIFO Signals
@@ -129,14 +129,14 @@ typedef struct packed{
 } MemoryPacketRoute;
 
 typedef struct packed{
-  logic                                     direction; // 0 - right, 1 left
-  logic [$clog2(CACHE_FRONTEND_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
+  logic                                direction; // 0 - right, 1 left
+  logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
 } MemoryPacketAddressShift;
 
 typedef struct packed{
-  logic [CACHE_FRONTEND_ADDR_W-1:0] base  ; // SIZE = 64 bits
-  logic [CACHE_FRONTEND_DATA_W-1:0] offset; // SIZE = 64 bits
-  MemoryPacketAddressShift          shift ; // SIZE = 64 bits
+  logic [M_AXI4_FE_ADDR_W-1:0] base  ; // SIZE = 64 bits
+  logic [M_AXI4_FE_DATA_W-1:0] offset; // SIZE = 64 bits
+  MemoryPacketAddressShift     shift ; // SIZE = 64 bits
 } MemoryPacketAddress;
 
 typedef struct packed{
@@ -152,7 +152,7 @@ typedef struct packed{
 
 parameter NUM_FIELDS_MEMORYPACKETDATA = 4;
 typedef struct packed{
-  logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][CACHE_FRONTEND_DATA_W-1:0] field;
+  logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][M_AXI4_FE_DATA_W-1:0] field;
 } MemoryPacketData;
 
 typedef struct packed{
@@ -169,8 +169,8 @@ typedef struct packed{
 //   Generic Control packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  MemoryPacketRoute   route   ;
-  MemoryPacketType    subclass;
+  MemoryPacketRoute route   ;
+  MemoryPacketType  subclass;
 } ControlPacketPayload;
 
 typedef struct packed{
@@ -200,14 +200,10 @@ typedef struct packed {
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-  logic valid;
-  `ifdef WORD_ADDR
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W] addr;
-  `else
-    logic [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:0] addr;
-  `endif
-  logic [CACHE_FRONTEND_DATA_W-1:0] wdata;
-  logic [CACHE_FRONTEND_NBYTES-1:0] wstrb;
+  logic                        valid;
+  logic [M_AXI4_FE_ADDR_W-1:0] addr ;
+  logic [M_AXI4_FE_DATA_W-1:0] wdata;
+  logic [M_AXI4_FE_STRB_W-1:0] wstrb;
 } CacheRequestIOB;
 
 typedef struct packed {
@@ -225,9 +221,9 @@ typedef struct packed {
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-logic                               valid;
-  logic                             ready;
-  logic [CACHE_FRONTEND_DATA_W-1:0] rdata;
+  logic                        valid;
+  logic                        ready;
+  logic [M_AXI4_FE_DATA_W-1:0] rdata;
 } CacheResponseIOB;
 
 typedef struct packed {

@@ -49,319 +49,304 @@
 `include "global_package.vh"
 
 module engine_m_axi_read #(
-  // Set to the address width of the interface
-  parameter integer C_M_AXI_ADDR_WIDTH  = M_AXI4_ADDR_W     ,
-  // Set the data width of the interface
-  // Range: 32, 64, 128, 256, 512, 1024
-  parameter integer C_M_AXI_DATA_WIDTH  = M_AXI4_DATA_W     ,
-  // Width of the ctrl_xfer_size_in_bytes input
-  // Range: 16:C_M_AXI_ADDR_WIDTH
-  parameter integer C_XFER_SIZE_WIDTH   = C_M_AXI_ADDR_WIDTH,
-  // Specifies the maximum number of AXI4 transactions that may be outstanding.
-  // Affects FIFO depth if data FIFO is enabled.
-  parameter integer C_MAX_OUTSTANDING   = 16                ,
-  // Includes a data fifo between the AXI4 read channel master and the AXI4-Stream
-  // master.  It will be sized to hold C_MAX_OUTSTANDING transactions. If no
-  // FIFO is instantiated then the AXI4 read channel is passed through to the
-  // AXI4-Stream slave interface.
-  // Range: 0, 1
+  parameter integer C_ID_WIDTH          = 1,   // Must be >= $clog2(C_NUM_CHANNELS)
+  parameter integer C_ADDR_WIDTH        = 64,
+  parameter integer C_DATA_WIDTH        = 32,
+  parameter integer C_NUM_CHANNELS      = 1,   // Only 2 tested.
+  parameter integer C_LENGTH_WIDTH      = 32,
+  parameter integer C_BURST_LEN         = 256, // Max AXI burst length for read commands
+  parameter integer C_LOG_BURST_LEN     = 8,
+  parameter integer C_MAX_OUTSTANDING   = 3,
   parameter integer C_INCLUDE_DATA_FIFO = 1
-) (
+)
+(
   // System signals
-  input  logic                          aclk                   ,
-  input  logic                          areset                 ,
+  input  logic                                          aclk,
+  input  logic                                          areset,
   // Control signals
-  input  logic                          ctrl_start             , // Pulse high for one cycle to begin reading
-  output logic                          ctrl_done              , // Pulses high for one cycle when transfer request is complete
-  // The following ctrl signals are sampled when ctrl_start is asserted
-  input  logic [C_M_AXI_ADDR_WIDTH-1:0] ctrl_addr_offset       , // Starting Address offset
-  input  logic [ C_XFER_SIZE_WIDTH-1:0] ctrl_xfer_size_in_bytes, // Length in number of bytes, limited by the address width.
-  // AXI4 master interface (read only)
-  output logic                          m_axi_arvalid          ,
-  input  logic                          m_axi_arready          ,
-  output logic [C_M_AXI_ADDR_WIDTH-1:0] m_axi_araddr           ,
-  output logic [                 8-1:0] m_axi_arlen            ,
-  input  logic                          m_axi_rvalid           ,
-  output logic                          m_axi_rready           ,
-  input  logic [C_M_AXI_DATA_WIDTH-1:0] m_axi_rdata            ,
-  input  logic                          m_axi_rlast            ,
-  // AXI4-Stream master interface
-  input  logic                          m_axis_aclk            ,
-  input  logic                          m_axis_areset          ,
-  output logic                          m_axis_tvalid          ,
-  input  logic                          m_axis_tready          ,
-  output logic [C_M_AXI_DATA_WIDTH-1:0] m_axis_tdata           ,
-  output logic                          m_axis_tlast
+  input  logic                                          ctrl_start,
+  output logic                                          ctrl_done,
+  input  logic [C_NUM_CHANNELS-1:0][C_ADDR_WIDTH-1:0]   ctrl_offset,
+  input  logic                     [C_LENGTH_WIDTH-1:0] ctrl_length,
+  //input  logic [C_NUM_CHANNELS-1:0]                     ctrl_prog_full,
+  // AXI4 master interface
+  output logic                                          arvalid,
+  input  logic                                          arready,
+  output logic [C_ADDR_WIDTH-1:0]                       araddr,
+  output logic [C_ID_WIDTH-1:0]                         arid,
+  output logic [7:0]                                    arlen,
+  output logic [2:0]                                    arsize,
+  input  logic                                          rvalid,
+  output logic                                          rready,
+  input  logic [C_DATA_WIDTH - 1:0]                     rdata,
+  input  logic                                          rlast,
+  input  logic [C_ID_WIDTH - 1:0]                       rid,
+  input  logic [1:0]                                    rresp,
+  // AXI4-Stream master interface, 1 interface per channel.
+  output logic [C_NUM_CHANNELS-1:0]                     m_tvalid,
+  input  logic [C_NUM_CHANNELS-1:0]                     m_tready,
+  output logic [C_NUM_CHANNELS-1:0][C_DATA_WIDTH-1:0]   m_tdata
 );
 
-  timeunit 1ps;
-  timeprecision 1ps;
-///////////////////////////////////////////////////////////////////////////////
-// functions
-///////////////////////////////////////////////////////////////////////////////
-  function integer f_max (
-      input integer a,
-      input integer b
-    );
-    f_max = (a > b) ? a : b;
-  endfunction
-
-  function integer f_min (
-      input integer a,
-      input integer b
-    );
-    f_min = (a < b) ? a : b;
-  endfunction
+timeunit 1ps;
+timeprecision 1ps;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Local Parameters
 ///////////////////////////////////////////////////////////////////////////////
-  localparam integer                             LP_DW_BYTES               = C_M_AXI_DATA_WIDTH/8                                      ;
-  localparam integer                             LP_LOG_DW_BYTES           = $clog2(LP_DW_BYTES)                                       ;
-  localparam integer                             LP_MAX_BURST_LENGTH       = 256                                                       ; // Max AXI Protocol burst length
-  localparam integer                             LP_MAX_BURST_BYTES        = 4096                                                      ; // Max AXI Protocol burst size in bytes
-  localparam integer                             LP_AXI_BURST_LEN          = f_min(LP_MAX_BURST_BYTES/LP_DW_BYTES, LP_MAX_BURST_LENGTH);
-  localparam integer                             LP_LOG_BURST_LEN          = $clog2(LP_AXI_BURST_LEN)                                  ;
-  localparam integer                             LP_OUTSTANDING_CNTR_WIDTH = $clog2(C_MAX_OUTSTANDING+1)                               ;
-  localparam integer                             LP_TOTAL_LEN_WIDTH        = C_XFER_SIZE_WIDTH-LP_LOG_DW_BYTES                         ;
-  localparam integer                             LP_TRANSACTION_CNTR_WIDTH = LP_TOTAL_LEN_WIDTH-LP_LOG_BURST_LEN                       ;
-  localparam            [C_M_AXI_ADDR_WIDTH-1:0] LP_ADDR_MASK              = LP_DW_BYTES*LP_AXI_BURST_LEN - 1                          ;
-// FIFO Parameters
-  localparam integer LP_FIFO_DEPTH        = 2**($clog2(LP_AXI_BURST_LEN*C_MAX_OUTSTANDING)); // Ensure power of 2
-  localparam integer LP_FIFO_READ_LATENCY = 2                                              ; // 2: Registered output on BRAM, 1: Registered output on LUTRAM
-  localparam integer LP_FIFO_COUNT_WIDTH  = $clog2(LP_FIFO_DEPTH)+1                        ;
+localparam integer LP_MAX_OUTSTANDING_CNTR_WIDTH = $clog2(C_MAX_OUTSTANDING+1)                   ;
+localparam integer LP_TRANSACTION_CNTR_WIDTH     = C_LENGTH_WIDTH-C_LOG_BURST_LEN                ;
+localparam integer LP_FIFO_DEPTH                 = 2**($clog2(C_BURST_LEN*(C_MAX_OUTSTANDING+1))); // Ensure power of 2
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variables
 ///////////////////////////////////////////////////////////////////////////////
 // Control logic
-  logic                                 done               = '0  ;
-  logic                                 has_partial_bursts       ;
-  logic                                 start_d1           = 1'b0;
-  logic [       C_M_AXI_ADDR_WIDTH-1:0] addr_offset_r            ;
-  logic                                 start              = 1'b0;
-  logic [       LP_TOTAL_LEN_WIDTH-1:0] total_len_r              ;
-  logic [LP_TRANSACTION_CNTR_WIDTH-1:0] num_transactions         ;
-  logic [         LP_LOG_BURST_LEN-1:0] final_burst_len          ;
-  logic                                 single_transaction       ;
-  logic                                 ar_idle            = 1'b1;
-  logic                                 ar_done                  ;
+logic [           C_NUM_CHANNELS-1:0] done               = '0  ;
+logic [LP_TRANSACTION_CNTR_WIDTH-1:0] num_full_bursts          ;
+logic                                 num_partial_bursts       ;
+logic                                 start              = 1'b0;
+logic [LP_TRANSACTION_CNTR_WIDTH-1:0] num_transactions         ;
+logic                                 has_partial_burst        ;
+logic [          C_LOG_BURST_LEN-1:0] final_burst_len          ;
+logic                                 single_transaction       ;
+logic                                 ar_idle            = 1'b1;
+logic                                 ar_done                  ;
 // AXI Read Address Channel
-  logic                                 arxfer                      ;
-  logic                                 arvalid_r             = 1'b0;
-  logic [       C_M_AXI_ADDR_WIDTH-1:0] addr                        ;
-  logic [LP_TRANSACTION_CNTR_WIDTH-1:0] ar_transactions_to_go       ;
-  logic                                 ar_final_transaction        ;
-  logic                                 stall_ar                    ;
+logic [C_NUM_CHANNELS-1:0]                   prog_full        ;
+logic                                        fifo_stall       ;
+logic                                        arxfer           ;
+logic                                        arvalid_r  = 1'b0;
+logic [C_NUM_CHANNELS-1:0][C_ADDR_WIDTH-1:0] addr             ;
+// TODO this needs to be reset as the maximum value
+logic [               C_ID_WIDTH-1:0]                                    id                        = {C_ID_WIDTH{C_NUM_CHANNELS-1}};
+logic [LP_TRANSACTION_CNTR_WIDTH-1:0]                                    ar_transactions_to_go                                     ;
+logic                                                                    ar_final_transaction                                      ;
+logic [           C_NUM_CHANNELS-1:0]                                    incr_ar_to_r_cnt                                          ;
+logic [           C_NUM_CHANNELS-1:0]                                    decr_ar_to_r_cnt                                          ;
+logic [           C_NUM_CHANNELS-1:0]                                    stall_ar                                                  ;
+logic [           C_NUM_CHANNELS-1:0][LP_MAX_OUTSTANDING_CNTR_WIDTH-1:0] outstanding_vacancy_count                                 ;
 // AXI Data Channel
-  logic                                 rxfer                    ;
-  logic                                 r_completed              ;
-  logic                                 decr_r_transaction_cntr  ;
-  logic [LP_TRANSACTION_CNTR_WIDTH-1:0] r_transactions_to_go     ;
-  logic                                 r_final_transaction      ;
-  logic [LP_OUTSTANDING_CNTR_WIDTH-1:0] outstanding_vacancy_count;
+logic [C_NUM_CHANNELS-1:0]                                tvalid                 ;
+logic [C_NUM_CHANNELS-1:0][             C_DATA_WIDTH-1:0] tdata                  ;
+logic                                                     rxfer                  ;
+logic [C_NUM_CHANNELS-1:0]                                decr_r_transaction_cntr;
+logic [C_NUM_CHANNELS-1:0][LP_TRANSACTION_CNTR_WIDTH-1:0] r_transactions_to_go   ;
+logic [C_NUM_CHANNELS-1:0]                                r_final_transaction    ;
 
+logic [C_NUM_CHANNELS-1:0] m_tvalid_n;
 ///////////////////////////////////////////////////////////////////////////////
 // Control Logic
 ///////////////////////////////////////////////////////////////////////////////
 
-  always @(posedge aclk) begin
-    done <= rxfer & m_axi_rlast & r_final_transaction ? 1'b1 : ctrl_done ? 1'b0 : done;
+always @(posedge aclk) begin
+  for (int i = 0; i < C_NUM_CHANNELS; i++) begin
+    done[i] <= rxfer & rlast & (rid == i) & r_final_transaction[i] ? 1'b1 :
+      ctrl_done ? 1'b0 : done[i];
   end
-
-  assign ctrl_done = done;
-
-  always @(posedge aclk) begin
-    start_d1 <= ctrl_start;
-  end
-
-// Store the address and transfer size after some pre-processing.
-  always @(posedge aclk) begin
-    if (ctrl_start) begin
-      // Round transfer size up to integer value of the axi interface data width. Convert to axi_arlen format which is length -1.
-      total_len_r <= ctrl_xfer_size_in_bytes[0+:LP_LOG_DW_BYTES] > 0
-        ? ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH]
-        : ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH] - 1'b1;
-      // Align transfer to 4kB to avoid AXI protocol issues if starting address is not correctly aligned.
-      addr_offset_r <= ctrl_addr_offset & ~LP_ADDR_MASK;
-    end
-  end
+end
+assign ctrl_done = &done;
 
 // Determine how many full burst to issue and if there are any partial bursts.
-  assign num_transactions   = total_len_r[LP_LOG_BURST_LEN+:LP_TRANSACTION_CNTR_WIDTH];
-  assign has_partial_bursts = total_len_r[0+:LP_LOG_BURST_LEN] == {LP_LOG_BURST_LEN{1'b1}} ? 1'b0 : 1'b1;
+assign num_full_bursts    = ctrl_length[C_LOG_BURST_LEN+:C_LENGTH_WIDTH-C_LOG_BURST_LEN];
+assign num_partial_bursts = ctrl_length[0+:C_LOG_BURST_LEN] ? 1'b1 : 1'b0;
 
-  always @(posedge aclk) begin
-    start           <= start_d1;
-    final_burst_len <= total_len_r[0+:LP_LOG_BURST_LEN];
-  end
+always @(posedge aclk) begin
+  start             <= ctrl_start;
+  num_transactions  <= (num_partial_bursts == 1'b0) ? num_full_bursts - 1'b1 : num_full_bursts;
+  has_partial_burst <= num_partial_bursts;
+  final_burst_len   <= ctrl_length[0+:C_LOG_BURST_LEN] - 1'b1;
+end
 
 // Special case if there is only 1 AXI transaction.
-  assign single_transaction = (num_transactions == {LP_TRANSACTION_CNTR_WIDTH{1'b0}}) ? 1'b1 : 1'b0;
+assign single_transaction = (num_transactions == {LP_TRANSACTION_CNTR_WIDTH{1'b0}}) ? 1'b1 : 1'b0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // AXI Read Address Channel
 ///////////////////////////////////////////////////////////////////////////////
-  assign m_axi_arvalid = arvalid_r;
-  assign m_axi_araddr  = addr;
-  assign m_axi_arlen   = ar_final_transaction || (start & single_transaction) ? final_burst_len : LP_AXI_BURST_LEN - 1;
+assign arvalid = arvalid_r;
+assign araddr  = addr[id];
+assign arlen   = ar_final_transaction || (start & single_transaction) ? final_burst_len : C_BURST_LEN - 1;
+assign arsize  = $clog2((C_DATA_WIDTH/8));
+assign arid    = id;
 
-  assign arxfer = m_axi_arvalid & m_axi_arready;
+assign arxfer     = arvalid & arready;
+assign fifo_stall = prog_full[id];
 
-  always @(posedge aclk) begin
-    if (areset) begin
-      arvalid_r <= 1'b0;
-    end
-    else begin
-      arvalid_r <= ~ar_idle & ~stall_ar & ~arvalid_r ? 1'b1 :
-        m_axi_arready ? 1'b0 : arvalid_r;
-    end
+always @(posedge aclk) begin
+  if (areset) begin
+    arvalid_r <= 1'b0;
   end
+  else begin
+    arvalid_r <= ~ar_idle & ~stall_ar[id] & ~arvalid_r & ~fifo_stall ? 1'b1 :
+      arready ? 1'b0 : arvalid_r;
+  end
+end
 
 // When ar_idle, there are no transactions to issue.
-  always @(posedge aclk) begin
-    if (areset) begin
-      ar_idle <= 1'b1;
-    end
-    else begin
-      ar_idle <= start   ? 1'b0 :
-        ar_done ? 1'b1 :
-        ar_idle;
-    end
+always @(posedge aclk) begin
+  if (areset) begin
+    ar_idle <= 1'b1;
   end
+  else begin
+    ar_idle <= start   ? 1'b0 :
+      ar_done ? 1'b1 :
+      ar_idle;
+  end
+end
+
+// each channel is assigned a different id. The transactions are interleaved.
+always @(posedge aclk) begin
+  if (start) begin
+    // TODO this needs to be reset to maximum id
+    id <= {C_ID_WIDTH{C_NUM_CHANNELS-1}};
+  end
+  else begin
+    id <= arxfer ? (id - 1'b1) % {C_ID_WIDTH{C_NUM_CHANNELS}} : id;
+  end
+end
+
 
 // Increment to next address after each transaction is issued.
-  always @(posedge aclk) begin
-    addr <= start ? addr_offset_r :
-      arxfer     ? addr + LP_AXI_BURST_LEN*C_M_AXI_DATA_WIDTH/8 :
-      addr;
+always @(posedge aclk) begin
+  for (int i = 0; i < C_NUM_CHANNELS; i++) begin
+    addr[i] <= ctrl_start?ctrl_offset[i] :
+      arxfer && (id == i) ? addr[i] + C_BURST_LEN*C_DATA_WIDTH/8 :
+        addr[i];
   end
+end
 
 // Counts down the number of transactions to send.
-  rtl_kernel_wizard_0_example_counter #(
-    .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
-    .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
-  ) inst_ar_transaction_cntr (
-    .clk       (aclk                 ),
-    .clken     (1'b1                 ),
-    .rst       (areset               ),
-    .load      (start                ),
-    .incr      (1'b0                 ),
-    .decr      (arxfer               ),
-    .load_value(num_transactions     ),
-    .count     (ar_transactions_to_go),
-    .is_zero   (ar_final_transaction )
-  );
+axi_counter #(
+  .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
+  .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
+) inst_ar_transaction_cntr (
+  .clk       (aclk                 ),
+  .clken     (1'b1                 ),
+  .rst       (areset               ),
+  .load      (start                ),
+  .incr      (1'b0                 ),
+  .decr      (arxfer && id == '0   ),
+  .load_value(num_transactions     ),
+  .count     (ar_transactions_to_go),
+  .is_zero   (ar_final_transaction )
+);
 
-  assign ar_done = ar_final_transaction && arxfer;
+assign ar_done = ar_final_transaction && arxfer && id == 1'b0;
 
+always_comb begin
+  for (int i = 0; i < C_NUM_CHANNELS; i++) begin
+    incr_ar_to_r_cnt[i] = rxfer & rlast & (rid == i);
+    decr_ar_to_r_cnt[i] = arxfer & (arid == i);
+  end
+end
 
 // Keeps track of the number of outstanding transactions. Stalls
 // when the value is reached so that the FIFO won't overflow.
-// If no FIFO present, then just limit at max outstanding transactions.
-  rtl_kernel_wizard_0_example_counter #(
-    .C_WIDTH(LP_OUTSTANDING_CNTR_WIDTH                      ),
-    .C_INIT (C_MAX_OUTSTANDING[0+:LP_OUTSTANDING_CNTR_WIDTH])
-  ) inst_ar_to_r_transaction_cntr (
-    .clk       (aclk                             ),
-    .clken     (1'b1                             ),
-    .rst       (areset                           ),
-    .load      (1'b0                             ),
-    .incr      (r_completed                      ),
-    .decr      (arxfer                           ),
-    .load_value({LP_OUTSTANDING_CNTR_WIDTH{1'b0}}),
-    .count     (outstanding_vacancy_count        ),
-    .is_zero   (stall_ar                         )
-  );
-
+axi_counter #(
+  .C_WIDTH ( LP_MAX_OUTSTANDING_CNTR_WIDTH                       ) ,
+  .C_INIT  ( C_MAX_OUTSTANDING[0+:LP_MAX_OUTSTANDING_CNTR_WIDTH] )
+)
+inst_ar_to_r_transaction_cntr[C_NUM_CHANNELS-1:0] (
+  .clk        ( aclk                           ) ,
+  .clken      ( 1'b1                           ) ,
+  .rst        ( areset                         ) ,
+  .load       ( 1'b0                           ) ,
+  .incr       ( incr_ar_to_r_cnt               ) ,
+  .decr       ( decr_ar_to_r_cnt               ) ,
+  .load_value ( {LP_MAX_OUTSTANDING_CNTR_WIDTH{1'b0}} ) ,
+  .count      ( outstanding_vacancy_count      ) ,
+  .is_zero    ( stall_ar                       )
+);
 
 ///////////////////////////////////////////////////////////////////////////////
 // AXI Read Channel
 ///////////////////////////////////////////////////////////////////////////////
-  generate
-    if (C_INCLUDE_DATA_FIFO == 1) begin : gen_fifo
 
-      // xpm_fifo_sync: Synchronous FIFO
-      // Xilinx Parameterized Macro, Version 2017.4
+generate
+  if (C_INCLUDE_DATA_FIFO == 1) begin : gen_fifo
+    genvar i;
+    for (i = 0; i < C_NUM_CHANNELS; i = i+1) begin
       xpm_fifo_sync #(
-        .FIFO_MEMORY_TYPE   ("auto"              ), // string; "auto", "block", "distributed", or "ultra";
-        .ECC_MODE           ("no_ecc"            ), // string; "no_ecc" or "en_ecc";
-        .FIFO_WRITE_DEPTH   (LP_FIFO_DEPTH       ), // positive integer
-        .WRITE_DATA_WIDTH   (C_M_AXI_DATA_WIDTH+1), // positive integer
-        .WR_DATA_COUNT_WIDTH(LP_FIFO_COUNT_WIDTH ), // positive integer, not used
-        .PROG_FULL_THRESH   (10                  ), // positive integer, not used
-        .FULL_RESET_VALUE   (1                   ), // positive integer; 0 or 1
-        .USE_ADV_FEATURES   ("1F1F"              ), // string; "0000" to "1F1F";
-        .READ_MODE          ("fwft"              ), // string; "std" or "fwft";
-        .FIFO_READ_LATENCY  (LP_FIFO_READ_LATENCY), // positive integer;
-        .READ_DATA_WIDTH    (C_M_AXI_DATA_WIDTH+1), // positive integer
-        .RD_DATA_COUNT_WIDTH(LP_FIFO_COUNT_WIDTH ), // positive integer, not used
-        .PROG_EMPTY_THRESH  (10                  ), // positive integer, not used
-        .DOUT_RESET_VALUE   ("0"                 ), // string, don't care
-        .WAKEUP_TIME        (0                   )  // positive integer; 0 or 2;
+        .FIFO_MEMORY_TYPE   ("auto"                 ), // string; "auto", "block", "distributed", or "ultra";
+        .ECC_MODE           ("no_ecc"               ), // string; "no_ecc" or "en_ecc";
+        .FIFO_WRITE_DEPTH   (LP_FIFO_DEPTH          ), // positive integer
+        .WRITE_DATA_WIDTH   (C_DATA_WIDTH           ), // positive integer
+        .WR_DATA_COUNT_WIDTH($clog2(LP_FIFO_DEPTH)+1), // positive integer, Not used
+        .PROG_FULL_THRESH   (C_BURST_LEN-2          ), // positive integer
+        .FULL_RESET_VALUE   (1                      ), // positive integer; 0 or 1
+        .READ_MODE          ("fwft"                 ), // string; "std" or "fwft";
+        .FIFO_READ_LATENCY  (1                      ), // positive integer;
+        .READ_DATA_WIDTH    (C_DATA_WIDTH           ), // positive integer
+        .RD_DATA_COUNT_WIDTH($clog2(LP_FIFO_DEPTH)+1), // positive integer, not used
+        .PROG_EMPTY_THRESH  (10                     ), // positive integer, not used
+        .DOUT_RESET_VALUE   ("0"                    ), // string, don't care
+        .WAKEUP_TIME        (0                      )  // positive integer; 0 or 2;
       ) inst_rd_xpm_fifo_sync (
-        .sleep        (1'b0                       ),
-        .rst          (areset                     ),
-        .wr_clk       (aclk                       ),
-        .wr_en        (m_axi_rvalid               ),
-        .din          ({m_axi_rlast,m_axi_rdata}  ),
-        .full         (                           ),
-        .overflow     (                           ),
-        .prog_full    (                           ),
-        .wr_data_count(                           ),
-        .almost_full  (                           ),
-        .wr_ack       (                           ),
-        .wr_rst_busy  (                           ),
-        .rd_en        (m_axis_tready              ),
-        .dout         ({m_axis_tlast,m_axis_tdata}),
-        .empty        (                           ),
-        .prog_empty   (                           ),
-        .rd_data_count(                           ),
-        .almost_empty (                           ),
-        .data_valid   (m_axis_tvalid              ),
-        .underflow    (                           ),
-        .rd_rst_busy  (                           ),
-        .injectsbiterr(1'b0                       ),
-        .injectdbiterr(1'b0                       ),
-        .sbiterr      (                           ),
-        .dbiterr      (                           )
+        .sleep        (1'b0         ),
+        .rst          (areset       ),
+        .wr_clk       (aclk         ),
+        .wr_en        (tvalid[i]    ),
+        .din          (tdata[i]     ),
+        .full         (             ),
+        .prog_full    (prog_full[i] ),
+        .wr_data_count(             ),
+        .overflow     (             ),
+        .wr_rst_busy  (             ),
+        .rd_en        (m_tready[i]  ),
+        .dout         (m_tdata[i]   ),
+        .empty        (m_tvalid_n[i]),
+        .prog_empty   (             ),
+        .rd_data_count(             ),
+        .underflow    (             ),
+        .rd_rst_busy  (             ),
+        .injectsbiterr(1'b0         ),
+        .injectdbiterr(1'b0         ),
+        .sbiterr      (             ),
+        .dbiterr      (             )
       );
-
-      assign m_axi_rready = 1'b1;
+      // rready can remain high for optimal timing because ar transactions are
+      // not issued unless there is enough space in the FIFO.
     end
-    else begin : gen_no_fifo
-
-      // All signals pass through.
-      assign m_axis_tvalid = m_axi_rvalid;
-      assign m_axis_tdata = m_axi_rdata;
-      assign m_axi_rready = m_axis_tready;
-      assign m_axis_tlast = m_axi_rlast;
-
-    end
-  endgenerate
-
-  assign rxfer = m_axi_rready & m_axi_rvalid;
-
-  assign r_completed = m_axis_tvalid & m_axis_tready & m_axis_tlast;
-
-  always_comb begin
-    decr_r_transaction_cntr = rxfer & m_axi_rlast;
+    assign rready   = 1'b1;
+    assign m_tvalid = ~m_tvalid_n;
+  end else begin
+    assign m_tvalid = tvalid;
+    assign m_tdata  = tdata;
+    assign rready   = &m_tready;
   end
+endgenerate
 
-  rtl_kernel_wizard_0_example_counter #(
-    .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
-    .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
-  ) inst_r_transaction_cntr (
-    .clk       (aclk                   ),
-    .clken     (1'b1                   ),
-    .rst       (areset                 ),
-    .load      (start                  ),
-    .incr      (1'b0                   ),
-    .decr      (decr_r_transaction_cntr),
-    .load_value(num_transactions       ),
-    .count     (r_transactions_to_go   ),
-    .is_zero   (r_final_transaction    )
-  );
+always_comb begin
+  for (int i = 0; i < C_NUM_CHANNELS; i++) begin
+    tvalid[i] = rvalid && (rid == i);
+    tdata[i]  = rdata;
+  end
+end
+
+assign rxfer = rready & rvalid;
+
+always_comb begin
+  for (int i = 0; i < C_NUM_CHANNELS; i++) begin
+    decr_r_transaction_cntr[i] = rxfer & rlast & (rid == i);
+  end
+end
+axi_counter #(
+  .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
+  .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
+)
+inst_r_transaction_cntr[C_NUM_CHANNELS-1:0] (
+  .clk        ( aclk                          ) ,
+  .clken      ( 1'b1                          ) ,
+  .rst        ( areset                        ) ,
+  .load       ( start                         ) ,
+  .incr       ( 1'b0                          ) ,
+  .decr       ( decr_r_transaction_cntr       ) ,
+  .load_value ( num_transactions              ) ,
+  .count      ( r_transactions_to_go          ) ,
+  .is_zero    ( r_final_transaction           )
+);
+
 
 endmodule : engine_m_axi_read
 

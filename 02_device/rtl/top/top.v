@@ -193,10 +193,7 @@ module top #(
 // GLay kernel logic here.
 // --------------------------------------------------------------------------------------
 
-  kernel_afu #(
-    .C_M00_AXI_ADDR_WIDTH(C_M00_AXI_ADDR_WIDTH),
-    .C_M00_AXI_DATA_WIDTH(C_M00_AXI_DATA_WIDTH)
-  ) inst_kernel_afu (
+  kernel_afu inst_kernel_afu (
     .ap_clk         (ap_clk         ),
     .ap_rst_n       (ap_rst_n       ),
     .m00_axi_awvalid(m00_axi_awvalid),

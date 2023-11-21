@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : cu_cache.sv
+// File   cu_buffer.sv
 // Create : 2023-06-13 23:21:43
 // Revise : 2023-08-28 18:21:31
 // Editor : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module cu_cache #(
+module cu_buffer #(
   parameter FIFO_WRITE_DEPTH = 32,
   parameter PROG_THRESH      = 16
 ) (
@@ -210,72 +210,24 @@ end
 assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
-// iob_cache_axi #(
-//   .M_AXI4_FE_ADDR_W(M_AXI4_FE_ADDR_W                        ),
-//   .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W                        ),
-//   .CACHE_N_WAYS         (CACHE_N_WAYS                                 ),
-//   .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W                             ),
-//   .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W                             ),
-//   .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W                          ),
-//   .CACHE_REP_POLICY     (CACHE_REP_POLICY                             ),
-//   .CACHE_NWAY_W         (CACHE_NWAY_W                                 ),
-//   .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES                        ),
-//   .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W                        ),
-//   .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W                         ),
-//   .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W                         ),
-//   .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES                         ),
-//   .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W                         ),
-//   .CACHE_WRITE_POL      (CACHE_WRITE_POL                              ),
-//   .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE                             ),
-//   .CACHE_CTRL_CNT       (CACHE_CTRL_CNT                               ),
-//   .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W                             ),
-//   .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W                             ),
-//   .CACHE_AXI_ID_W       (CACHE_AXI_ID_W                               ),
-//   .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W                              ),
-//   .CACHE_AXI_ID         (CACHE_AXI_ID                                 ),
-//   .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W                             ),
-//   .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W                            ),
-//   .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W                             ),
-//   .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W                              ),
-//   .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W                            ),
-//   .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W                             ),
-//   .CACHE_AXI_CACHE_MODE (M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
-// ) inst_cache_axi (
-//   .valid        (cache_request_mem.iob.valid ),
-//   .addr         (cache_request_mem.iob.addr  ),
-//   .wdata        (cache_request_mem.iob.wdata ),
-//   .wstrb        (cache_request_mem.iob.wstrb ),
-//   .rdata        (cache_response_mem.iob.rdata),
-//   .ready        (cache_response_mem.iob.ready),
-//   `ifdef CTRL_IO
-//   .force_inv_in (cache_ctrl_in.force_inv     ),
-//   .force_inv_out(cache_ctrl_out.force_inv    ), // floating
-//   .wtb_empty_in (cache_ctrl_in.wtb_empty     ),
-//   .wtb_empty_out(cache_ctrl_out.wtb_empty    ),
-//   `endif
-//   `include "m_axi_portmap_glay.vh"
-//   .ap_clk       (ap_clk                      ),
-//   .reset        (areset_cache                )
-// );
-
 iob_cache_axi #(
-  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                       ),
-  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                  ),
-  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                   ),
-  .BE_DATA_W           (CACHE_BACKEND_DATA_W                   ),
-  .NWAYS_W             (CACHE_N_WAYS                           ),
-  .NLINES_W            (CACHE_LINE_OFF_W                       ),
-  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                       ),
-  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                    ),
-  .REP_POLICY          (CACHE_REP_POLICY                       ),
-  .WRITE_POL           (CACHE_WRITE_POL                        ),
-  .USE_CTRL            (CACHE_CTRL_CACHE                       ),
-  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                       ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                         ),
-  .AXI_ID              (CACHE_AXI_ID                           ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                        ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                       ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                       ),
+  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                   ),
+  .FE_DATA_W           (CACHE_FRONTEND_DATA_W              ),
+  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W               ),
+  .BE_DATA_W           (CACHE_BACKEND_DATA_W               ),
+  .NWAYS_W             (CACHE_N_WAYS                       ),
+  .NLINES_W            (CACHE_LINE_OFF_W                   ),
+  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                   ),
+  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                ),
+  .REP_POLICY          (CACHE_REP_POLICY                   ),
+  .WRITE_POL           (CACHE_WRITE_POL                    ),
+  .USE_CTRL            (CACHE_CTRL_CACHE                   ),
+  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                   ),
+  .AXI_ID_W            (CACHE_AXI_ID_W                     ),
+  .AXI_ID              (CACHE_AXI_ID                       ),
+  .AXI_LEN_W           (CACHE_AXI_LEN_W                    ),
+  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                   ),
+  .AXI_DATA_W          (CACHE_AXI_DATA_W                   ),
   .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE)
 ) inst_iob_cache_axi (
   .iob_avalid_i(cache_request_mem.iob.valid                                                         ),
@@ -388,7 +340,7 @@ always_ff @(posedge ap_clk) begin
   else begin
     current_state <= next_state;
   end
-end// always_ff @(posedge ap_clk)
+end // always_ff @(posedge ap_clk)
 
 always_comb begin
   next_state = current_state;
@@ -435,7 +387,7 @@ always_comb begin
       next_state = CU_CACHE_CMD_DONE;
     end
   endcase
-end// always_comb
+end // always_comb
 // State Transition Logic
 
 always_ff @(posedge ap_clk) begin
@@ -498,7 +450,7 @@ always_ff @(posedge ap_clk) begin
       cache_request_mem_reg.iob.valid    <= 1'b0;
     end
   endcase
-end// always_ff @(posedge ap_clk)
+end // always_ff @(posedge ap_clk)
 
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
 
@@ -526,10 +478,43 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : cu_cache
+// // --------------------------------------------------------------------------------------
+// // Cache/Memory response counter
+// // --------------------------------------------------------------------------------------
+
+//   AXI4MasterReadInterfaceInput   m_axi_read_in_int  ;
+//   AXI4MasterReadInterfaceOutput  m_axi_read_out_int ;
+//   AXI4MasterWriteInterfaceInput  m_axi_write_in_int ;
+//   AXI4MasterWriteInterfaceOutput m_axi_write_out_int;
+
+
+//   localparam OFFSET_BITS = $clog2(CACHE_LINE_SIZE); // Bits for cache line offset
+//   localparam STROBE_BITS = DATA_SIZE * 8;          // Strobe bits for the data size
+//   wire [OFFSET_BITS-1:0] byte_offset;              // Offset within cache line
+
+//   // Calculate byte offset within the cache line
+//   assign byte_offset = base_address_reg[OFFSET_BITS-1:0];
+
+//   // Procedural block to calculate write strobe
+//   always @(posedge ap_clk) begin
+//       if (areset) begin
+//           // Reset the write strobe on active-high reset signal
+//           write_strobe <= {CACHE_LINE_SIZE{1'b0}};
+//       end
+//       else begin
+//           // Clear previous value
+//           write_strobe <= {CACHE_LINE_SIZE{1'b0}};
+
+//           // Check if the strobe fits within the cache line
+//           if ((byte_offset + STROBE_BITS/8) <= CACHE_LINE_SIZE) begin
+//               // Set the bits for the data size
+//               write_strobe[byte_offset*8 +: STROBE_BITS] <= {STROBE_BITS{1'b1}};
+//           end
+//           // Add additional logic here if needed for boundary conditions
+//       end
+//   end
 
 
 
+endmodule : cu_buffer
 
-
-// Remaining logic remains as is...

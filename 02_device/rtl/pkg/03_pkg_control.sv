@@ -16,8 +16,6 @@
 `include "global_timescale.vh"
 package PKG_CONTROL;
 
-    import PKG_GLOBALS::*;
-
     typedef struct packed{
         logic ap_start   ;
         logic ap_continue;
