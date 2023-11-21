@@ -23,9 +23,9 @@ else:
 config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
-output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "shared_parameters.vh")
-output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "bundle_topology.vh")
-output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "lane_topology.vh")
+output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
+output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
+output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_topology.vh")
 config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
 
 with open(config_file_path, "r") as file:
