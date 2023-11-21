@@ -12,6 +12,8 @@
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
 
+`include "global_package.vh"
+
 module arbiter_round_robin #(
     parameter WIDTH         = 2               ,
     parameter ARBITER_WIDTH = 2**$clog2(WIDTH)

@@ -28,8 +28,7 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-`timescale 1ns / 1ps
-import PKG_FUNCTIONS::*;
+`include "global_package.vh"
 
 module mux_node (
 	input  logic [1:0] in    ,

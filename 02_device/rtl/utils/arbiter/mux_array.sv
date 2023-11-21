@@ -28,8 +28,7 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-`timescale 1ns / 1ps
-import PKG_FUNCTIONS::*;
+`include "global_package.vh"
 
 module mux_array #(parameter WIDTH = 8) (
 	input  logic [(2*WIDTH)-1:0] in    ,

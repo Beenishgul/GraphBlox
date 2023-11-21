@@ -34,8 +34,7 @@
 // larger arbiter. Outputs are not registered to allow
 // interconnected nodes to change state on the same ap_clk.
 
-`timescale 1ns / 1ps
-import PKG_FUNCTIONS::*;
+`include "global_package.vh"
 
 module arbiter_node (
 	input  logic       enable,

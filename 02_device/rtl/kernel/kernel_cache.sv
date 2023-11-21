@@ -12,12 +12,7 @@
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
-import PKG_AXI4::*;
-import PKG_GLOBALS::*;
-import PKG_DESCRIPTOR::*;
-import PKG_CONTROL::*;
-import PKG_CACHE::*;
-import PKG_MEMORY::*;
+`include "global_package.vh"
 
 module kernel_cache (
   // System Signals

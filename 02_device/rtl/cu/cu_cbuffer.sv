@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : cu_cache.sv
+// File   cu_buffer.sv
 // Create : 2023-06-13 23:21:43
 // Revise : 2023-08-28 18:21:31
 // Editor : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module cu_cache #(
+module cu_buffer #(
   parameter FIFO_WRITE_DEPTH = 32,
   parameter PROG_THRESH      = 16
 ) (
@@ -526,10 +526,5 @@ module cu_cache #(
     .is_zero     (write_command_counter_is_zero                                                                )
   );
 
-endmodule : cu_cache
+endmodule : cu_buffer
 
-
-
-
-
-// Remaining logic remains as is...
