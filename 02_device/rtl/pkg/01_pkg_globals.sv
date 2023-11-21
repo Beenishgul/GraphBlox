@@ -48,6 +48,7 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_ADDR_WIDTH_BITS = 64;
 	parameter GLOBAL_DATA_WIDTH_BITS = 32;
+	parameter GLOBAL_SYSTEM_CACHE_IP = 0;
 
 // ********************************************************************************************
 // ***************                  GLOBAL MEMORY(DDR4/HBM)                      **************

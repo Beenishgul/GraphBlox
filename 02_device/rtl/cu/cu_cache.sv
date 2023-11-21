@@ -265,24 +265,24 @@ module cu_cache #(
   // );
 
   iob_cache_axi #(
-    .FE_ADDR_W           (CACHE_FRONTEND_ADDR_W                        ),
-    .FE_DATA_W           (CACHE_FRONTEND_DATA_W                        ),
-    .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                         ),
-    .BE_DATA_W           (CACHE_BACKEND_DATA_W                         ),
-    .NWAYS_W             (CACHE_N_WAYS                                 ),
-    .NLINES_W            (CACHE_LINE_OFF_W                             ),
-    .WORD_OFFSET_W       (CACHE_WORD_OFF_W                             ),
-    .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                          ),
-    .REP_POLICY          (CACHE_REP_POLICY                             ),
-    .WRITE_POL           (CACHE_WRITE_POL                              ),
-    .USE_CTRL            (CACHE_CTRL_CACHE                             ),
-    .USE_CTRL_CNT        (CACHE_CTRL_CACHE                             ),
-    .AXI_ID_W            (CACHE_AXI_ID_W                               ),
-    .AXI_ID              (CACHE_AXI_ID                                 ),
-    .AXI_LEN_W           (CACHE_AXI_LEN_W                              ),
-    .AXI_ADDR_W          (CACHE_AXI_ADDR_W                             ),
-    .AXI_DATA_W          (CACHE_AXI_DATA_W                             ),
-    .CACHE_AXI_CACHE_MODE(M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+    .FE_ADDR_W           (CACHE_FRONTEND_ADDR_W              ),
+    .FE_DATA_W           (CACHE_FRONTEND_DATA_W              ),
+    .BE_ADDR_W           (CACHE_BACKEND_ADDR_W               ),
+    .BE_DATA_W           (CACHE_BACKEND_DATA_W               ),
+    .NWAYS_W             (CACHE_N_WAYS                       ),
+    .NLINES_W            (CACHE_LINE_OFF_W                   ),
+    .WORD_OFFSET_W       (CACHE_WORD_OFF_W                   ),
+    .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                ),
+    .REP_POLICY          (CACHE_REP_POLICY                   ),
+    .WRITE_POL           (CACHE_WRITE_POL                    ),
+    .USE_CTRL            (CACHE_CTRL_CACHE                   ),
+    .USE_CTRL_CNT        (CACHE_CTRL_CACHE                   ),
+    .AXI_ID_W            (CACHE_AXI_ID_W                     ),
+    .AXI_ID              (CACHE_AXI_ID                       ),
+    .AXI_LEN_W           (CACHE_AXI_LEN_W                    ),
+    .AXI_ADDR_W          (CACHE_AXI_ADDR_W                   ),
+    .AXI_DATA_W          (CACHE_AXI_DATA_W                   ),
+    .CACHE_AXI_CACHE_MODE(M_AXI4_CACHE_BUFFERABLE_NO_ALLOCATE)
   ) inst_iob_cache_axi (
     .iob_avalid_i(cache_request_mem.iob.valid                                                              ),
     .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+CACHE_FRONTEND_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
@@ -403,9 +403,9 @@ module cu_cache #(
         next_state = CU_CACHE_CMD_READY;
       end
       CU_CACHE_CMD_READY : begin
-        if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
+        if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) & cache_ctrl_out.wtb_empty)
           next_state = CU_CACHE_CMD_READ_TRANS;
-        else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~write_command_counter_is_zero)
+        else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & cache_ctrl_out.wtb_empty)
           next_state = CU_CACHE_CMD_WRITE_TRANS;
         else
           next_state = CU_CACHE_CMD_READY;
@@ -426,6 +426,9 @@ module cu_cache #(
         next_state = CU_CACHE_CMD_WRITE_POST;
       end
       CU_CACHE_CMD_WRITE_POST : begin
+        next_state = CU_CACHE_CMD_WRITE_POST_2;
+      end
+      CU_CACHE_CMD_WRITE_POST_2 : begin
         next_state = CU_CACHE_CMD_POP_TRANS;
       end
       CU_CACHE_CMD_POP_TRANS : begin
@@ -471,6 +474,11 @@ module cu_cache #(
         cache_request_mem_reg.iob.valid    <= 1'b1;
       end
       CU_CACHE_CMD_WRITE : begin
+        cache_request_mem_reg.iob.valid    <= 1'b0;
+        fifo_request_signals_in_int.rd_en  <= 1'b0;
+        fifo_response_signals_in_int.wr_en <= 1'b0;
+      end
+      CU_CACHE_CMD_WRITE_POST_2 : begin
         cache_request_mem_reg.iob.valid    <= 1'b0;
         fifo_request_signals_in_int.rd_en  <= 1'b0;
         fifo_response_signals_in_int.wr_en <= 1'b0;

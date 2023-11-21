@@ -872,7 +872,7 @@ module __KERNEL___testbench ();
 
     endtask
 
-     task automatic set_memory_pointers_bfs();
+    task automatic set_memory_pointers_bfs();
         ///////////////////////////////////////////////////////////////////////////
         //Randomly generate memory pointers.
         buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
@@ -998,37 +998,73 @@ module __KERNEL___testbench ();
 
     endtask
 
-    function automatic bit check___KERNEL___result();
+    function automatic bit check___KERNEL___result(ref GraphCSR graph);
         bit [31:0]        ret_rd_value = 32'h0;
-        bit error_found = 0;
-        integer error_counter;
-        error_counter = 0;
+        // bit error_found = 0;
+        // integer error_counter;
+        // error_counter = 0;
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        // Checking memory connected to m00_axi
-        for (longint unsigned slot = 0; slot < LP_MAX_LENGTH; slot++) begin
-            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (slot * 4));
-            if (slot < LP_MAX_TRANSFER_LENGTH) begin
-                if (ret_rd_value != (slot + 1)) begin
-                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot + 1, ret_rd_value);
-                    error_found |= 1;
-                    error_counter++;
-                end
-            end else begin
-                if (ret_rd_value != slot) begin
-                    $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot, ret_rd_value);
-                    error_found |= 1;
-                    error_counter++;
-                end
-            end
-            if (error_counter > 5) begin
-                $display("WARNING: Too many errors found. Exiting check of m00_axi.");
-                slot = LP_MAX_LENGTH;
-            end
+        // /////////////////////////////////////////////////////////////////////////////////////////////////
+        // // Checking memory connected to m00_axi
+        // for (longint unsigned slot = 0; slot < LP_MAX_LENGTH; slot++) begin
+        //     ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (slot * 4));
+        //     if (slot < LP_MAX_TRANSFER_LENGTH) begin
+        //         if (ret_rd_value != (slot + 1)) begin
+        //             $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot + 1, ret_rd_value);
+        //             error_found |= 1;
+        //             error_counter++;
+        //         end
+        //     end else begin
+        //         if (ret_rd_value != slot) begin
+        //             $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot, ret_rd_value);
+        //             error_found |= 1;
+        //             error_counter++;
+        //         end
+        //     end
+        //     if (error_counter > 5) begin
+        //         $display("WARNING: Too many errors found. Exiting check of m00_axi.");
+        //         slot = LP_MAX_LENGTH;
+        //     end
+        // end
+        // error_counter = 0;
+
+        // return(error_found);
+        // int o,l;
+
+        // o=0;
+        // l=0;
+
+        // for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+        //     // graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] ={CACHE_FRONTEND_DATA_W{1'b1}};
+        //     o++;
+        //     if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+        //         l++;
+        //         o=0;
+        //     end
+        // end
+
+        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * 4));
+            $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+            // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W]);
+            // o++;
+            // if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+            //     l++;
+            //     o=0;
+            // end
         end
-        error_counter = 0;
 
-        return(error_found);
+        for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_2*2; i++) begin
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * 4));
+            $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+            // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W]);
+            // o++;
+            // if (o%(M_AXI_MEMORY_DATA_WIDTH_BITS/CACHE_FRONTEND_DATA_W) == 0) begin
+            //     l++;
+            //     o=0;
+            // end
+        end
+
     endfunction
 
     bit         choose_pressure_type      = 0;
@@ -1161,7 +1197,7 @@ module __KERNEL___testbench ();
 
         o=0;
         l=0;
-        
+
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
             graph.auxiliary_1[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = {CACHE_FRONTEND_DATA_W{1'b1}};
             o++;
@@ -1195,7 +1231,7 @@ module __KERNEL___testbench ();
 
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
             // setup_temp = {31'b0,get_random_bit()};
-            
+
             graph.auxiliary_2[l][(CACHE_FRONTEND_DATA_W*o)+:CACHE_FRONTEND_DATA_W] = 0;
 
             if(graph.debug_counter_2 == 0)
@@ -1333,7 +1369,7 @@ module __KERNEL___testbench ();
             // wait(interrupt == 0);
 
             ///////////////////////////////////////////////////////////////////////////
-            // error_found |= check___KERNEL___result()   ;
+            error_found |= check___KERNEL___result(graph)   ;
 
             $display("Finished iteration: %d / %d", iter+1, num_iterations);
         end
@@ -1362,7 +1398,7 @@ module __KERNEL___testbench ();
                 1 : slv_random_delay_rvalid();
             endcase
 
-      
+
             set_scalar_registers();
             set_memory_pointers_bfs();
             // Check that __KERNEL__ is IDLE before starting.
