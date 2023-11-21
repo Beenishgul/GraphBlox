@@ -75,7 +75,7 @@
 0x00000000 // entry 47   cacheline 2    offset 15   -- //  2  - Index_end
 0x00000001 // entry 48   cacheline 3    offset 0    -- //  3  - Stride
 0x80000002 // entry 49   cacheline 3    offset 1    -- //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000202 // entry 50   cacheline 3    offset 2    -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_WRITE | id moddule | id engine
+0x00000204 // entry 50   cacheline 3    offset 2    -- //  5  - STRUCT_ENGINE_DATA | CMD_MEM_WRITE | id moddule | id engine
 0x00000000 // entry 51   cacheline 3    offset 3    -- //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 52   cacheline 3    offset 4    -- //  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 53   cacheline 3    offset 5    -- //  8  - BUFFER Array Pointer RHS

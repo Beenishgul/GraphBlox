@@ -85,10 +85,10 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-  logic areset_m_axi   ;
-  logic areset_cu      ;
-  logic areset_control ;
-  logic areset_cache   ;
+  logic areset_m_axi  ;
+  logic areset_cu     ;
+  logic areset_control;
+  logic areset_cache  ;
 
 // --------------------------------------------------------------------------------------
 // AXI
@@ -132,8 +132,8 @@ module kernel_afu #(
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
-  parameter PULSE_HOLD = 100;
-  logic areset_system;
+  parameter PULSE_HOLD    = 100;
+  logic     areset_system      ;
 // --------------------------------------------------------------------------------------
   always_ff @(posedge ap_clk) begin
     areset_m_axi   <= areset_system;
@@ -287,7 +287,7 @@ module kernel_afu #(
       m00_axi_awcache <= m_axi_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
       m00_axi_awprot  <= m_axi_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       m00_axi_awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
-      m00_axi_wdata   <= swap_endianness_cacheline_axi(m_axi_write.out.wdata, endian_reg)  ; // Write channel data
+      m00_axi_wdata   <= m_axi_write.out.wdata  ; // Write channel data
       m00_axi_wstrb   <= m_axi_write.out.wstrb  ; // Write channel write strobe
       m00_axi_wlast   <= m_axi_write.out.wlast  ; // Write channel last word flag
       m00_axi_wvalid  <= m_axi_write.out.wvalid ; // Write channel valid
@@ -311,27 +311,42 @@ module kernel_afu #(
     kernel_control_descriptor_in.buffer_9 <= buffer_9  ;
   end
 
+
+  generate
+    if(GLOBAL_SYSTEM_CACHE_IP == 1) begin
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI
 // --------------------------------------------------------------------------------------
-  assign kernel_cache_m_axi_read_in  = m_axi_read.in  ;
-  assign m_axi_read.out              = kernel_cache_m_axi_read_out  ;
-  assign kernel_cache_m_axi_write_in = m_axi_write.in ;
-  assign m_axi_write.out             = kernel_cache_m_axi_write_out;
+      assign kernel_cache_m_axi_read_in  = m_axi_read.in  ;
+      assign m_axi_read.out              = kernel_cache_m_axi_read_out  ;
+      assign kernel_cache_m_axi_write_in = m_axi_write.in ;
+      assign m_axi_write.out             = kernel_cache_m_axi_write_out;
 
-  kernel_cache inst_kernel_cache (
-    .ap_clk            (ap_clk                      ),
-    .areset            (areset_cache                ),
-    .s_axi_read_out    (kernel_cache_s_axi_read_out ),
-    .s_axi_read_in     (kernel_cache_s_axi_read_in  ),
-    .s_axi_write_out   (kernel_cache_s_axi_write_out),
-    .s_axi_write_in    (kernel_cache_s_axi_write_in ),
-    .m_axi_read_in     (kernel_cache_m_axi_read_in  ),
-    .m_axi_read_out    (kernel_cache_m_axi_read_out ),
-    .m_axi_write_in    (kernel_cache_m_axi_write_in ),
-    .m_axi_write_out   (kernel_cache_m_axi_write_out),
-    .cache_setup_signal(kernel_cache_setup_signal   )
-  );
+      kernel_cache inst_kernel_cache (
+        .ap_clk            (ap_clk                      ),
+        .areset            (areset_cache                ),
+        .s_axi_read_out    (kernel_cache_s_axi_read_out ),
+        .s_axi_read_in     (kernel_cache_s_axi_read_in  ),
+        .s_axi_write_out   (kernel_cache_s_axi_write_out),
+        .s_axi_write_in    (kernel_cache_s_axi_write_in ),
+        .m_axi_read_in     (kernel_cache_m_axi_read_in  ),
+        .m_axi_read_out    (kernel_cache_m_axi_read_out ),
+        .m_axi_write_in    (kernel_cache_m_axi_write_in ),
+        .m_axi_write_out   (kernel_cache_m_axi_write_out),
+        .cache_setup_signal(kernel_cache_setup_signal   )
+      );
+    end else begin
+      assign kernel_cache_setup_signal    = 0;
+      assign kernel_cache_m_axi_read_in   = m_axi_read.in  ;
+      assign m_axi_read.out               = kernel_cache_m_axi_read_out;
+      assign kernel_cache_m_axi_write_in  = m_axi_write.in ;
+      assign m_axi_write.out              = kernel_cache_m_axi_write_out;
+      assign kernel_cache_s_axi_read_out  = kernel_cache_m_axi_read_in;
+      assign kernel_cache_m_axi_read_out  = kernel_cache_s_axi_read_in;
+      assign kernel_cache_s_axi_write_out = kernel_cache_m_axi_write_in;
+      assign kernel_cache_m_axi_write_out = kernel_cache_s_axi_write_in;
+    end
+  endgenerate
 
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
