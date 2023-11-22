@@ -43,7 +43,10 @@
 // default_nettype of none prevents implicit logic declaration.
 `include "global_package.vh"
 
-module engine_m_axi #(parameter integer C_NUM_CHANNELS      = 1) (
+module engine_m_axi #(
+  parameter C_NUM_CHANNELS = 1                                               ,
+  parameter C_AXI_RW_CACHE = M_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES
+) (
   // System signals
   input  logic                                                  ap_clk                      ,
   input  logic                                                  areset                      ,
@@ -125,13 +128,13 @@ logic areset_m_axi_kernel;
 // --------------------------------------------------------------------------------------//
 // Tie-off unused AXI protocol features
 assign axi_arburst  = 2'b00;
-assign axi_arcache  = M_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES;
+assign axi_arcache  = C_AXI_RW_CACHE;
 assign axi_arlock   = 2'b00;
 assign axi_arprot   = 3'b000;
 assign axi_arqos    = 4'b0000;
 assign axi_arregion = 4'b0000;
 assign axi_awburst  = 2'b00;
-assign axi_awcache  = M_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES;
+assign axi_awcache  = C_AXI_RW_CACHE;
 assign axi_awid     = {M_AXI4_MID_ID_W{1'b0}};
 assign axi_awlock   = 2'b00;
 assign axi_awprot   = 3'b000;
