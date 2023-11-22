@@ -210,54 +210,6 @@ end
 assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
-// iob_cache_axi #(
-//   .M_AXI4_FE_ADDR_W(M_AXI4_FE_ADDR_W                        ),
-//   .CACHE_FRONTEND_DATA_W(CACHE_FRONTEND_DATA_W                        ),
-//   .CACHE_N_WAYS         (CACHE_N_WAYS                                 ),
-//   .CACHE_LINE_OFF_W     (CACHE_LINE_OFF_W                             ),
-//   .CACHE_WORD_OFF_W     (CACHE_WORD_OFF_W                             ),
-//   .CACHE_WTBUF_DEPTH_W  (CACHE_WTBUF_DEPTH_W                          ),
-//   .CACHE_REP_POLICY     (CACHE_REP_POLICY                             ),
-//   .CACHE_NWAY_W         (CACHE_NWAY_W                                 ),
-//   .CACHE_FRONTEND_NBYTES(CACHE_FRONTEND_NBYTES                        ),
-//   .CACHE_FRONTEND_BYTE_W(CACHE_FRONTEND_BYTE_W                        ),
-//   .CACHE_BACKEND_ADDR_W (CACHE_BACKEND_ADDR_W                         ),
-//   .CACHE_BACKEND_DATA_W (CACHE_BACKEND_DATA_W                         ),
-//   .CACHE_BACKEND_NBYTES (CACHE_BACKEND_NBYTES                         ),
-//   .CACHE_BACKEND_BYTE_W (CACHE_BACKEND_BYTE_W                         ),
-//   .CACHE_WRITE_POL      (CACHE_WRITE_POL                              ),
-//   .CACHE_CTRL_CACHE     (CACHE_CTRL_CACHE                             ),
-//   .CACHE_CTRL_CNT       (CACHE_CTRL_CNT                               ),
-//   .CACHE_AXI_ADDR_W     (CACHE_AXI_ADDR_W                             ),
-//   .CACHE_AXI_DATA_W     (CACHE_AXI_DATA_W                             ),
-//   .CACHE_AXI_ID_W       (CACHE_AXI_ID_W                               ),
-//   .CACHE_AXI_LEN_W      (CACHE_AXI_LEN_W                              ),
-//   .CACHE_AXI_ID         (CACHE_AXI_ID                                 ),
-//   .CACHE_AXI_LOCK_W     (CACHE_AXI_LOCK_W                             ),
-//   .CACHE_AXI_CACHE_W    (CACHE_AXI_CACHE_W                            ),
-//   .CACHE_AXI_PROT_W     (CACHE_AXI_PROT_W                             ),
-//   .CACHE_AXI_QOS_W      (CACHE_AXI_QOS_W                              ),
-//   .CACHE_AXI_BURST_W    (CACHE_AXI_BURST_W                            ),
-//   .CACHE_AXI_RESP_W     (CACHE_AXI_RESP_W                             ),
-//   .CACHE_AXI_CACHE_MODE (M_AXI4_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
-// ) inst_cache_axi (
-//   .valid        (cache_request_mem.iob.valid ),
-//   .addr         (cache_request_mem.iob.addr  ),
-//   .wdata        (cache_request_mem.iob.wdata ),
-//   .wstrb        (cache_request_mem.iob.wstrb ),
-//   .rdata        (cache_response_mem.iob.rdata),
-//   .ready        (cache_response_mem.iob.ready),
-//   `ifdef CTRL_IO
-//   .force_inv_in (cache_ctrl_in.force_inv     ),
-//   .force_inv_out(cache_ctrl_out.force_inv    ), // floating
-//   .wtb_empty_in (cache_ctrl_in.wtb_empty     ),
-//   .wtb_empty_out(cache_ctrl_out.wtb_empty    ),
-//   `endif
-//   `include "m_axi_portmap_glay.vh"
-//   .ap_clk       (ap_clk                      ),
-//   .reset        (areset_cache                )
-// );
-
 iob_cache_axi #(
   .FE_ADDR_W           (M_AXI4_FE_ADDR_W                       ),
   .FE_DATA_W           (CACHE_FRONTEND_DATA_W                  ),

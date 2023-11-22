@@ -165,14 +165,14 @@ module __KERNEL___testbench ();
         wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_awid   ;
         wire [                 3-1:0] m00_axi_awsize ;
         wire [                 2-1:0] m00_axi_awburst;
-        wire [                 2-1:0] m00_axi_awlock ;
+        wire [                 1-1:0] m00_axi_awlock ;
         wire [                 4-1:0] m00_axi_awcache;
         wire [                 3-1:0] m00_axi_awprot ;
         wire [                 4-1:0] m00_axi_awqos  ;
         wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_arid   ;
         wire [                 3-1:0] m00_axi_arsize ;
         wire [                 2-1:0] m00_axi_arburst;
-        wire [                 2-1:0] m00_axi_arlock ;
+        wire [                 1-1:0] m00_axi_arlock ;
         wire [                 4-1:0] m00_axi_arcache;
         wire [                 3-1:0] m00_axi_arprot ;
         wire [                 4-1:0] m00_axi_arqos  ;
@@ -321,14 +321,14 @@ module __KERNEL___testbench ();
         .s_axi_awid   (m00_axi_awid     ),
         .s_axi_awsize (m00_axi_awsize   ),
         .s_axi_awburst(m00_axi_awburst  ),
-        .s_axi_awlock (m00_axi_awlock[0]),
+        .s_axi_awlock (m00_axi_awlock   ),
         .s_axi_awcache(m00_axi_awcache  ),
         .s_axi_awprot (m00_axi_awprot   ),
         .s_axi_awqos  (m00_axi_awqos    ),
         .s_axi_arid   (m00_axi_arid     ),
         .s_axi_arsize (m00_axi_arsize   ),
         .s_axi_arburst(m00_axi_arburst  ),
-        .s_axi_arlock (m00_axi_arlock[0]),
+        .s_axi_arlock (m00_axi_arlock   ),
         .s_axi_arcache(m00_axi_arcache  ),
         .s_axi_arprot (m00_axi_arprot   ),
         .s_axi_arqos  (m00_axi_arqos    )
