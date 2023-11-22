@@ -308,7 +308,7 @@ xpm_fifo_sync_wrapper #(
 );
 
 // --------------------------------------------------------------------------------------
-// Cache Commands State Machine
+// Cache Commands Read State Machine
 // --------------------------------------------------------------------------------------
 cu_engine_m_axi_state current_state;
 cu_engine_m_axi_state next_state   ;
@@ -412,15 +412,10 @@ assign write_transaction_length_in = 1;
 assign write_transaction_offset_in = engine_m_axi_request_mem_reg.iob.addr;
 assign write_transaction_tdata_in  = engine_m_axi_request_mem_reg.iob.wdata;
 
-
-// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_prog_full    ;
-// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tready_in    ;
-// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tvalid_out   ;
-// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
-// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
-// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
-
-engine_m_axi #(.C_NUM_CHANNELS(NUM_CHANNELS_READ)) inst_engine_m_axi (
+engine_m_axi #(
+  .C_NUM_CHANNELS(NUM_CHANNELS_READ                                ),
+  .C_AXI_RW_CACHE(M_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+) inst_engine_m_axi (
   .read_transaction_done_out   (read_transaction_done_out   ),
   .read_transaction_length_in  (read_transaction_length_in  ),
   .read_transaction_offset_in  (read_transaction_offset_in  ),

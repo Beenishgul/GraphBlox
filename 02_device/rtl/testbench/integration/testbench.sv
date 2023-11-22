@@ -292,46 +292,46 @@ module __KERNEL___testbench ();
 
 // Slave MM VIP instantiation
     slv_m00_axi_vip inst_slv_m00_axi_vip (
-        .aclk         (ap_clk         ),
-        .aresetn      (ap_rst_n       ),
-        .s_axi_awvalid(m00_axi_awvalid),
-        .s_axi_awready(m00_axi_awready),
-        .s_axi_awaddr (m00_axi_awaddr ),
-        .s_axi_awlen  (m00_axi_awlen  ),
-        .s_axi_wvalid (m00_axi_wvalid ),
-        .s_axi_wready (m00_axi_wready ),
-        .s_axi_wdata  (m00_axi_wdata  ),
-        .s_axi_wstrb  (m00_axi_wstrb  ),
-        .s_axi_wlast  (m00_axi_wlast  ),
-        .s_axi_bvalid (m00_axi_bvalid ),
-        .s_axi_bready (m00_axi_bready ),
-        .s_axi_arvalid(m00_axi_arvalid),
-        .s_axi_arready(m00_axi_arready),
-        .s_axi_araddr (m00_axi_araddr ),
-        .s_axi_arlen  (m00_axi_arlen  ),
-        .s_axi_rvalid (m00_axi_rvalid ),
-        .s_axi_rready (m00_axi_rready ),
-        .s_axi_rdata  (m00_axi_rdata  ),
-        .s_axi_rlast  (m00_axi_rlast  ),
+        .aclk         (ap_clk           ),
+        .aresetn      (ap_rst_n         ),
+        .s_axi_awvalid(m00_axi_awvalid  ),
+        .s_axi_awready(m00_axi_awready  ),
+        .s_axi_awaddr (m00_axi_awaddr   ),
+        .s_axi_awlen  (m00_axi_awlen    ),
+        .s_axi_wvalid (m00_axi_wvalid   ),
+        .s_axi_wready (m00_axi_wready   ),
+        .s_axi_wdata  (m00_axi_wdata    ),
+        .s_axi_wstrb  (m00_axi_wstrb    ),
+        .s_axi_wlast  (m00_axi_wlast    ),
+        .s_axi_bvalid (m00_axi_bvalid   ),
+        .s_axi_bready (m00_axi_bready   ),
+        .s_axi_arvalid(m00_axi_arvalid  ),
+        .s_axi_arready(m00_axi_arready  ),
+        .s_axi_araddr (m00_axi_araddr   ),
+        .s_axi_arlen  (m00_axi_arlen    ),
+        .s_axi_rvalid (m00_axi_rvalid   ),
+        .s_axi_rready (m00_axi_rready   ),
+        .s_axi_rdata  (m00_axi_rdata    ),
+        .s_axi_rlast  (m00_axi_rlast    ),
         
-        .s_axi_bid    (m00_axi_bid    ),
-        .s_axi_rid    (m00_axi_rid    ),
-        .s_axi_rresp  (m00_axi_rresp  ),
-        .s_axi_bresp  (m00_axi_bresp  ),
-        .s_axi_awid   (m00_axi_awid   ),
-        .s_axi_awsize (m00_axi_awsize ),
-        .s_axi_awburst(m00_axi_awburst),
-        .s_axi_awlock (m00_axi_awlock[0] ),
-        .s_axi_awcache(m00_axi_awcache),
-        .s_axi_awprot (m00_axi_awprot ),
-        .s_axi_awqos  (m00_axi_awqos  ),
-        .s_axi_arid   (m00_axi_arid   ),
-        .s_axi_arsize (m00_axi_arsize ),
-        .s_axi_arburst(m00_axi_arburst),
-        .s_axi_arlock (m00_axi_arlock[0] ),
-        .s_axi_arcache(m00_axi_arcache),
-        .s_axi_arprot (m00_axi_arprot ),
-        .s_axi_arqos  (m00_axi_arqos  )
+        .s_axi_bid    (m00_axi_bid      ),
+        .s_axi_rid    (m00_axi_rid      ),
+        .s_axi_rresp  (m00_axi_rresp    ),
+        .s_axi_bresp  (m00_axi_bresp    ),
+        .s_axi_awid   (m00_axi_awid     ),
+        .s_axi_awsize (m00_axi_awsize   ),
+        .s_axi_awburst(m00_axi_awburst  ),
+        .s_axi_awlock (m00_axi_awlock[0]),
+        .s_axi_awcache(m00_axi_awcache  ),
+        .s_axi_awprot (m00_axi_awprot   ),
+        .s_axi_awqos  (m00_axi_awqos    ),
+        .s_axi_arid   (m00_axi_arid     ),
+        .s_axi_arsize (m00_axi_arsize   ),
+        .s_axi_arburst(m00_axi_arburst  ),
+        .s_axi_arlock (m00_axi_arlock[0]),
+        .s_axi_arcache(m00_axi_arcache  ),
+        .s_axi_arprot (m00_axi_arprot   ),
+        .s_axi_arqos  (m00_axi_arqos    )
     );
 
         slv_m00_axi_vip_slv_mem_t m00_axi    ;
@@ -784,7 +784,7 @@ module __KERNEL___testbench ();
             buffer_6_ptr[62:0] = get_random_ptr();
             buffer_7_ptr[62:0] = get_random_ptr();
             buffer_8_ptr[62:0] = get_random_ptr();
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b0, 1'b0, 1'b1};
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b0, 1'b1};
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -995,52 +995,10 @@ module __KERNEL___testbench ();
         endtask
 
         function automatic bit check___KERNEL___result(ref GraphCSR graph);
-            bit [31:0]        ret_rd_value = 32'h0;
-            // bit error_found = 0;
-            // integer error_counter;
-            // error_counter = 0;
-
-            // /////////////////////////////////////////////////////////////////////////////////////////////////
-            // // Checking memory connected to m00_axi
-            // for (longint unsigned slot = 0; slot < LP_MAX_LENGTH; slot++) begin
-            //     ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (slot * 4));
-            //     if (slot < LP_MAX_TRANSFER_LENGTH) begin
-            //         if (ret_rd_value != (slot + 1)) begin
-            //             $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot + 1, ret_rd_value);
-            //             error_found |= 1;
-            //             error_counter++;
-            //         end
-            //     end else begin
-            //         if (ret_rd_value != slot) begin
-            //             $error("ERROR: Memory Mismatch: m00_axi : @0x%x : Expected 0x%x -> Got 0x%x ", buffer_7_ptr + (slot * 4), slot, ret_rd_value);
-            //             error_found |= 1;
-            //             error_counter++;
-            //         end
-            //     end
-            //     if (error_counter > 5) begin
-            //         $display("WARNING: Too many errors found. Exiting check of m00_axi.");
-            //         slot = LP_MAX_LENGTH;
-            //     end
-            // end
-            // error_counter = 0;
-
-            // return(error_found);
-            // int o,l;
-
-            // o=0;
-            // l=0;
-
-            // for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-            //     // graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] ={M_AXI4_FE_DATA_W{1'b1}};
-            //     o++;
-            //     if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-            //         l++;
-            //         o=0;
-            //     end
-            // end
+            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
 
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * 4));
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
                 // o++;
@@ -1050,8 +1008,8 @@ module __KERNEL___testbench ();
                 // end
             end
 
-            for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * 4));
+            for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_1*2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
                 // o++;
@@ -1061,6 +1019,27 @@ module __KERNEL___testbench ();
                 // end
             end
 
+            for (int i = 0; i < graph.num_auxiliary_2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                // o++;
+                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                //     l++;
+                //     o=0;
+                // end
+            end
+
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                // o++;
+                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                //     l++;
+                //     o=0;
+                // end
+            end
         endfunction
 
         bit         choose_pressure_type      = 0;
@@ -1103,7 +1082,7 @@ module __KERNEL___testbench ();
 
             for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
                 for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
-                    graph.overlay_program[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.overlay_program[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = realcount;
                     realcount++;
                 end
             end

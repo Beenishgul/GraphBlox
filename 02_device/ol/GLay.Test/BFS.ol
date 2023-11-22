@@ -135,7 +135,7 @@
 0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
 0x80000002 // entry 92   cacheline 5    offset 12   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
 0x00000202 // entry 93   cacheline 5    offset 13   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00010801 // entry 94   cacheline 5    offset 14   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
+0x01010801 // entry 94   cacheline 5    offset 14   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
 0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
 0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
 0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
