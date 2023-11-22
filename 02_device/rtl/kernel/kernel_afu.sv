@@ -86,9 +86,10 @@ logic areset_cache  ;
 // --------------------------------------------------------------------------------------
 // AXI
 // --------------------------------------------------------------------------------------
-AXI4BEMasterReadInterface  m_axi4_read ;
-AXI4BEMasterWriteInterface m_axi4_write;
-logic                      endian_reg  ;
+AXI4BEMasterReadInterface  m_axi4_read     ;
+AXI4BEMasterWriteInterface m_axi4_write    ;
+logic                      endian_read_reg ;
+logic                      endian_write_reg;
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control
@@ -170,16 +171,18 @@ end
 
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
-    ap_ready   <= 1'b0;
-    ap_done    <= 1'b0;
-    ap_idle    <= 1'b1;
-    endian_reg <= 1'b0;
+    ap_ready         <= 1'b0;
+    ap_done          <= 1'b0;
+    ap_idle          <= 1'b1;
+    endian_read_reg  <= 1'b0;
+    endian_write_reg <= 1'b0;
   end
   else begin
-    ap_done    <= kernel_control_out.ap_done;
-    ap_ready   <= kernel_control_out.ap_ready;
-    ap_idle    <= kernel_control_out.ap_idle;
-    endian_reg <= kernel_control_out.endian;
+    ap_done          <= kernel_control_out.ap_done;
+    ap_ready         <= kernel_control_out.ap_ready;
+    ap_idle          <= kernel_control_out.ap_idle;
+    endian_read_reg  <= kernel_control_out.endian_read;
+    endian_write_reg <= kernel_control_out.endian_write;
   end
 end
 
@@ -194,7 +197,7 @@ always_ff @(posedge ap_clk) begin
     m_axi4_read.in.rvalid  <= m00_axi_rvalid ; // Read channel valid
     m_axi4_read.in.arready <= m00_axi_arready; // Address read channel ready
     m_axi4_read.in.rlast   <= m00_axi_rlast  ; // Read channel last word
-    m_axi4_read.in.rdata   <= swap_endianness_cacheline_axi_be(m00_axi_rdata, endian_reg)  ; // Read channel data
+    m_axi4_read.in.rdata   <= swap_endianness_cacheline_axi_be(m00_axi_rdata, endian_read_reg)  ; // Read channel data
     m_axi4_read.in.rid     <= m00_axi_rid    ; // Read channel ID
     m_axi4_read.in.rresp   <= m00_axi_rresp  ; // Read channel response
   end
@@ -280,7 +283,7 @@ always_ff @(posedge ap_clk) begin
     m00_axi_awcache <= m_axi4_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
     m00_axi_awprot  <= m_axi4_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
     m00_axi_awqos   <= m_axi4_write.out.awqos  ; // Address write channel quality of service
-    m00_axi_wdata   <= m_axi4_write.out.wdata  ; // Write channel data
+    m00_axi_wdata   <= swap_endianness_cacheline_axi_be(m_axi4_write.out.wdata , endian_write_reg); // Write channel data
     m00_axi_wstrb   <= m_axi4_write.out.wstrb  ; // Write channel write strobe
     m00_axi_wlast   <= m_axi4_write.out.wlast  ; // Write channel last word flag
     m00_axi_wvalid  <= m_axi4_write.out.wvalid ; // Write channel valid

@@ -9,7 +9,7 @@
   .axi_arready        (m_axi_read.in.arready    ), //Address read channel ready
   .axi_arsize         (m_axi_read.out.arsize    ), //Address read channel burst size. This signal indicates the size of each transfer in the burst
   .axi_arvalid        (m_axi_read.out.arvalid   ), //Address read channel valid
-  .axi_awregion       (m_axi_read.out.arregion  ), //Address read channel valid
+  .axi_arregion       (m_axi_read.out.arregion  ), //Address read channel valid
   .axi_awaddr         (m_axi_write.out.awaddr   ), //Address write channel address
   .axi_awburst        (m_axi_write.out.awburst  ), //Address write channel burst type
   .axi_awcache        (m_axi_write.out.awcache  ), //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).

@@ -38,12 +38,12 @@ module cu_buffer #(
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_m_axi  ;
-logic areset_fifo   ;
-logic areset_arbiter;
-logic areset_setup  ;
-logic areset_cache  ;
-logic areset_control;
+logic areset_m_axi       ;
+logic areset_fifo        ;
+logic areset_arbiter     ;
+logic areset_setup       ;
+logic areset_engine_m_axi;
+logic areset_control     ;
 
 CacheRequest  request_in_reg ;
 CacheResponse response_in_int;
@@ -60,11 +60,9 @@ AXI4MIDMasterWriteInterface m_axi_write;
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-CacheRequestPayload   cache_request_mem    ;
-CacheRequestPayload   cache_request_mem_reg;
-CacheResponsePayload  cache_response_mem   ;
-CacheControlIOBOutput cache_ctrl_in        ;
-CacheControlIOBOutput cache_ctrl_out       ;
+CacheRequestPayload  engine_m_axi_request_mem    ;
+CacheRequestPayload  engine_m_axi_request_mem_reg;
+CacheResponsePayload engine_m_axi_response_mem   ;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -88,27 +86,38 @@ FIFOStateSignalsInput  fifo_response_signals_in_int  ;
 logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
+// READ/WRITE ENGINE
 // --------------------------------------------------------------------------------------
-logic                           areset_counter                  ;
-logic                           counter_load                    ;
-logic                           write_command_counter_is_zero   ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
+logic                         read_transaction_start_in     ;
+logic                         read_transaction_tvalid_out   ;
+logic [M_AXI4_MID_DATA_W-1:0] read_transaction_length_in    ;
+logic [M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
+logic [M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
+logic [M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
+logic                         read_transaction_done_out     ;
+logic                         read_transaction_tready_in    ;
+logic                         read_transaction_prog_full    ;
 
-assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
+logic                         write_transaction_start_in    ;
+logic                         write_transaction_tvalid_in   ;
+logic [M_AXI4_MID_DATA_W-1:0] write_transaction_length_in   ;
+logic [M_AXI4_MID_ADDR_W-1:0] write_transaction_offset_in   ;
+logic [M_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in    ;
+logic [M_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in_reg;
+logic                         write_transaction_done_out    ;
+logic                         write_transaction_tready_out  ;
+
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-  areset_m_axi   <= areset;
-  areset_fifo    <= areset;
-  areset_arbiter <= areset;
-  areset_setup   <= areset;
-  areset_control <= areset;
-  areset_cache   <= areset;
-  areset_counter <= areset;
+  areset_m_axi        <= areset;
+  areset_fifo         <= areset;
+  areset_arbiter      <= areset;
+  areset_setup        <= areset;
+  areset_control      <= areset;
+  areset_engine_m_axi <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -148,7 +157,7 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & cache_ctrl_out.wtb_empty & cache_response_mem.iob.ready;
+assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & write_transaction_tready_out;
 
 always_ff @(posedge ap_clk) begin
   fifo_request_signals_out  <= fifo_request_signals_out_int;
@@ -205,50 +214,9 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// AXI port cache
+// AXI port engine_m_axi
 // --------------------------------------------------------------------------------------
-assign cache_ctrl_in.force_inv = 1'b0;
-assign cache_ctrl_in.wtb_empty = 1'b1;
-
-iob_cache_axi #(
-  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                   ),
-  .FE_DATA_W           (CACHE_FRONTEND_DATA_W              ),
-  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W               ),
-  .BE_DATA_W           (CACHE_BACKEND_DATA_W               ),
-  .NWAYS_W             (CACHE_N_WAYS                       ),
-  .NLINES_W            (CACHE_LINE_OFF_W                   ),
-  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                   ),
-  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                ),
-  .REP_POLICY          (CACHE_REP_POLICY                   ),
-  .WRITE_POL           (CACHE_WRITE_POL                    ),
-  .USE_CTRL            (CACHE_CTRL_CACHE                   ),
-  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                   ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                     ),
-  .AXI_ID              (CACHE_AXI_ID                       ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                    ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                   ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                   ),
-  .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE)
-) inst_iob_cache_axi (
-  .iob_avalid_i(cache_request_mem.iob.valid                                                         ),
-  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M_AXI4_FE_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
-  .iob_wdata_i (cache_request_mem.iob.wdata                                                         ),
-  .iob_wstrb_i (cache_request_mem.iob.wstrb                                                         ),
-  .iob_rdata_o (cache_response_mem.iob.rdata                                                        ),
-  .iob_rvalid_o(cache_response_mem.iob.valid                                                        ),
-  .iob_ready_o (cache_response_mem.iob.ready                                                        ),
-  .invalidate_i(cache_ctrl_in.force_inv                                                             ),
-  .invalidate_o(cache_ctrl_out.force_inv                                                            ),
-  .wtb_empty_i (cache_ctrl_in.wtb_empty                                                             ),
-  .wtb_empty_o (cache_ctrl_out.wtb_empty                                                            ),
-  `include "m_axi_portmap_glay_iob.vh"
-  .clk_i       (ap_clk                                                                              ),
-  .cke_i       (1'b1                                                                                ),
-  .arst_i      (areset_cache                                                                        )
-);
-
-// --------------------------------------------------------------------------------------
-// Cache request FIFO FWFT
+// Request FIFO FWFT
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
@@ -260,13 +228,13 @@ assign fifo_request_din.meta             = request_in_reg.payload.meta;
 assign fifo_request_din.data             = request_in_reg.payload.data;
 
 // Pop
-// assign fifo_request_signals_in_int.rd_en = cache_request_pop_int;
-assign cache_request_mem.iob.valid = cache_request_mem_reg.iob.valid;
-assign cache_request_mem.iob.addr  = cache_request_mem_reg.iob.addr;
-assign cache_request_mem.iob.wdata = cache_request_mem_reg.iob.wdata;
-assign cache_request_mem.iob.wstrb = cache_request_mem_reg.iob.wstrb;
-assign cache_request_mem.meta      = cache_request_mem_reg.meta;
-assign cache_request_mem.data      = cache_request_mem_reg.data;
+// assign fifo_request_signals_in_int.rd_en = engine_m_axi_request_pop_int;
+assign engine_m_axi_request_mem.iob.valid = engine_m_axi_request_mem_reg.iob.valid;
+assign engine_m_axi_request_mem.iob.addr  = engine_m_axi_request_mem_reg.iob.addr;
+assign engine_m_axi_request_mem.iob.wdata = engine_m_axi_request_mem_reg.iob.wdata;
+assign engine_m_axi_request_mem.iob.wstrb = engine_m_axi_request_mem_reg.iob.wstrb;
+assign engine_m_axi_request_mem.meta      = engine_m_axi_request_mem_reg.meta;
+assign engine_m_axi_request_mem.data      = engine_m_axi_request_mem_reg.data;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -296,15 +264,27 @@ xpm_fifo_sync_wrapper #(
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-// assign fifo_response_signals_in_int.wr_en = cache_response_push_int;
-assign fifo_response_din.iob  = cache_response_mem.iob;
-assign fifo_response_din.meta = cache_request_mem.meta;
-assign fifo_response_din.data = cache_request_mem.data;
+// assign fifo_response_signals_in_int.wr_en = engine_m_axi_response_push_int;
+assign fifo_response_din.iob  = engine_m_axi_request_mem.iob;
+assign fifo_response_din.meta = engine_m_axi_request_mem.meta;
+assign fifo_response_din.data = engine_m_axi_request_mem.data;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & engine_m_axi_response_mem.iob.valid;
 assign response_in_int.valid              = fifo_response_signals_out_int.valid;
-assign response_in_int.payload            = fifo_response_dout;
+// assign response_in_int.payload.iob        = fifo_response_dout.iob;
+assign response_in_int.payload.meta       = fifo_response_dout.meta;
+assign response_in_int.payload.data       = fifo_response_dout.data;
+
+assign response_in_int.payload.iob.valid = fifo_response_signals_out_int.valid;
+assign response_in_int.payload.iob.ready = fifo_response_signals_out_int.valid;
+
+always_comb begin
+  if(fifo_response_dout.meta.subclass.cmd == CMD_MEM_READ)
+    response_in_int.payload.iob.rdata = read_transaction_tdata_out_reg;
+  else
+    response_in_int.payload.iob.rdata = write_transaction_tdata_in_reg;
+end
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
@@ -329,192 +309,128 @@ xpm_fifo_sync_wrapper #(
 // --------------------------------------------------------------------------------------
 // Cache Commands State Machine
 // --------------------------------------------------------------------------------------
-cu_cache_command_generator_state current_state;
-cu_cache_command_generator_state next_state   ;
+cu_engine_m_axi_state current_state;
+cu_engine_m_axi_state next_state   ;
 // --------------------------------------------------------------------------------------
 //   State Machine AP_USER_MANAGED sync
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if(areset_control)
-    current_state <= CU_CACHE_CMD_RESET;
+    current_state <= CU_ENGINE_M_AXI_RESET;
   else begin
     current_state <= next_state;
   end
-end // always_ff @(posedge ap_clk)
+end// always_ff @(posedge ap_clk)
 
 always_comb begin
   next_state = current_state;
   case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      next_state = CU_CACHE_CMD_READY;
+    CU_ENGINE_M_AXI_RESET : begin
+      next_state = CU_ENGINE_M_AXI_READY;
     end
-    CU_CACHE_CMD_READY : begin
-      if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) & cache_ctrl_out.wtb_empty)
-        next_state = CU_CACHE_CMD_READ_TRANS;
-      else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & cache_ctrl_out.wtb_empty)
-        next_state = CU_CACHE_CMD_WRITE_TRANS;
+    CU_ENGINE_M_AXI_READY : begin
+      if(~fifo_response_signals_out_int.prog_full & ~read_transaction_prog_full & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
+        next_state = CU_ENGINE_M_AXI_CMD_TRANS;
+      else if(~fifo_response_signals_out_int.prog_full & engine_m_axi_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))
+        next_state = CU_ENGINE_M_AXI_CMD_TRANS;
       else
-        next_state = CU_CACHE_CMD_READY;
+        next_state = CU_ENGINE_M_AXI_READY;
     end
-    CU_CACHE_CMD_READ_TRANS : begin
-      next_state = CU_CACHE_CMD_READ;
+    CU_ENGINE_M_AXI_CMD_TRANS : begin
+      next_state = CU_ENGINE_M_AXI_PEND;
     end
-    CU_CACHE_CMD_READ : begin
-      if(cache_response_mem.iob.valid)
-        next_state = CU_CACHE_CMD_POP_TRANS;
+    CU_ENGINE_M_AXI_PEND : begin
+      if(engine_m_axi_response_mem.iob.valid)
+        next_state = CU_ENGINE_M_AXI_READY;
       else
-        next_state = CU_CACHE_CMD_READ;
+        next_state = CU_ENGINE_M_AXI_PEND;
     end
-    CU_CACHE_CMD_WRITE_TRANS : begin
-      next_state = CU_CACHE_CMD_WRITE;
-    end
-    CU_CACHE_CMD_WRITE : begin
-      next_state = CU_CACHE_CMD_WRITE_POST;
-    end
-    CU_CACHE_CMD_WRITE_POST : begin
-      next_state = CU_CACHE_CMD_WRITE_POST_2;
-    end
-    CU_CACHE_CMD_WRITE_POST_2 : begin
-      next_state = CU_CACHE_CMD_POP_TRANS;
-    end
-    CU_CACHE_CMD_POP_TRANS : begin
-      next_state = CU_CACHE_CMD_POP;
-    end
-    CU_CACHE_CMD_POP : begin
-      next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_DONE : begin
-      next_state = CU_CACHE_CMD_DONE;
+    CU_ENGINE_M_AXI_DONE : begin
+      next_state = CU_ENGINE_M_AXI_DONE;
     end
   endcase
-end // always_comb
+end// always_comb
 // State Transition Logic
 
 always_ff @(posedge ap_clk) begin
   case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      counter_load                       <= 1'b1;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
+    CU_ENGINE_M_AXI_RESET : begin
+      fifo_request_signals_in_int.rd_en      <= 1'b0;
+      fifo_response_signals_in_int.wr_en     <= 1'b0;
+      engine_m_axi_request_mem_reg.iob.valid <= 1'b0;
     end
-    CU_CACHE_CMD_READY : begin
-      counter_load                       <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
+    CU_ENGINE_M_AXI_READY : begin
+      fifo_request_signals_in_int.rd_en      <= 1'b0;
+      fifo_response_signals_in_int.wr_en     <= 1'b0;
+      engine_m_axi_request_mem_reg.iob.valid <= 1'b0;
     end
-    CU_CACHE_CMD_READ_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b1;
+    CU_ENGINE_M_AXI_CMD_TRANS : begin
+      fifo_request_signals_in_int.rd_en      <= 1'b1;
+      fifo_response_signals_in_int.wr_en     <= 1'b1;
+      engine_m_axi_request_mem_reg.iob.valid <= 1'b1;
     end
-    CU_CACHE_CMD_READ : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
+    CU_ENGINE_M_AXI_PEND : begin
+      fifo_request_signals_in_int.rd_en      <= 1'b0;
+      fifo_response_signals_in_int.wr_en     <= 1'b0;
+      engine_m_axi_request_mem_reg.iob.valid <= 1'b0;
     end
-    CU_CACHE_CMD_WRITE_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b1;
-    end
-    CU_CACHE_CMD_WRITE : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_WRITE_POST_2 : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_WRITE_POST : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_POP_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b1;
-      fifo_response_signals_in_int.wr_en <= 1'b1;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_POP : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_DONE : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
+    CU_ENGINE_M_AXI_DONE : begin
+      fifo_request_signals_in_int.rd_en      <= 1'b0;
+      fifo_response_signals_in_int.wr_en     <= 1'b0;
+      engine_m_axi_request_mem_reg.iob.valid <= 1'b0;
     end
   endcase
-end // always_ff @(posedge ap_clk)
+end// always_ff @(posedge ap_clk)
 
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
 
 always_ff @(posedge ap_clk) begin
-  cache_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
-  cache_request_mem_reg.iob.addr  <= fifo_request_dout.iob.addr;
-  cache_request_mem_reg.iob.wdata <= fifo_request_dout.iob.wdata;
-  cache_request_mem_reg.meta      <= fifo_request_dout.meta;
-  cache_request_mem_reg.data      <= fifo_request_dout.data;
+  engine_m_axi_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  engine_m_axi_request_mem_reg.iob.addr  <= fifo_request_dout.iob.addr;
+  engine_m_axi_request_mem_reg.iob.wdata <= fifo_request_dout.iob.wdata;
+  engine_m_axi_request_mem_reg.meta      <= fifo_request_dout.meta;
+  engine_m_axi_request_mem_reg.data      <= fifo_request_dout.data;
+  read_transaction_tdata_out_reg         <= engine_m_axi_response_mem.iob.rdata ;
+  write_transaction_tdata_in_reg         <= engine_m_axi_request_mem.iob.wdata;
 end
 
+
+assign engine_m_axi_response_mem.iob.ready = write_transaction_tready_out & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign engine_m_axi_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
+assign engine_m_axi_response_mem.iob.rdata = read_transaction_tdata_out;
+assign read_transaction_length_in          = 1;
+assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign read_transaction_offset_in          = engine_m_axi_request_mem.iob.addr;
+assign read_transaction_tready_in          = fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
+// READ/WRITE ENGINE
 // --------------------------------------------------------------------------------------
-counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
-  .ap_clk      (ap_clk                                                                                       ),
-  .ap_clken    (1'b1                                                                                         ),
-  .areset      (areset_counter                                                                               ),
-  .load        (counter_load                                                                                 ),
-  .incr        (fifo_response_signals_in_int.wr_en  & (fifo_response_din.meta.subclass.cmd == CMD_MEM_WRITE) ),
-  .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
-  .load_value  (write_command_counter_load_value                                                             ),
-  .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
-  .count       (write_command_counter_                                                                       ),
-  .is_zero     (write_command_counter_is_zero                                                                )
+assign write_transaction_start_in  = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign write_transaction_tvalid_in = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign write_transaction_length_in = 1;
+assign write_transaction_offset_in = engine_m_axi_request_mem.iob.addr;
+assign write_transaction_tdata_in  = engine_m_axi_request_mem.iob.wdata;
+
+engine_m_axi inst_engine_m_axi (
+  .read_transaction_done_out   (read_transaction_done_out   ),
+  .read_transaction_length_in  (read_transaction_length_in  ),
+  .read_transaction_offset_in  (read_transaction_offset_in  ),
+  .read_transaction_start_in   (read_transaction_start_in   ),
+  .read_transaction_tdata_out  (read_transaction_tdata_out  ),
+  .read_transaction_tready_in  (read_transaction_tready_in  ),
+  .read_transaction_tvalid_out (read_transaction_tvalid_out ),
+  .read_transaction_prog_full  (read_transaction_prog_full  ),
+  .write_transaction_start_in  (write_transaction_start_in  ),
+  .write_transaction_tvalid_in (write_transaction_tvalid_in ),
+  .write_transaction_length_in (write_transaction_length_in ),
+  .write_transaction_offset_in (write_transaction_offset_in ),
+  .write_transaction_tdata_in  (write_transaction_tdata_in  ),
+  .write_transaction_done_out  (write_transaction_done_out  ),
+  .write_transaction_tready_out(write_transaction_tready_out),
+  `include "m_axi_portmap_full.vh"
+  .ap_clk                      (ap_clk                      ),
+  .areset                      (areset_engine_m_axi         )
 );
-
-// // --------------------------------------------------------------------------------------
-// // Cache/Memory response counter
-// // --------------------------------------------------------------------------------------
-
-//   AXI4MasterReadInterfaceInput   m_axi_read_in_int  ;
-//   AXI4MasterReadInterfaceOutput  m_axi_read_out_int ;
-//   AXI4MasterWriteInterfaceInput  m_axi_write_in_int ;
-//   AXI4MasterWriteInterfaceOutput m_axi_write_out_int;
-
-
-//   localparam OFFSET_BITS = $clog2(CACHE_LINE_SIZE); // Bits for cache line offset
-//   localparam STROBE_BITS = DATA_SIZE * 8;          // Strobe bits for the data size
-//   wire [OFFSET_BITS-1:0] byte_offset;              // Offset within cache line
-
-//   // Calculate byte offset within the cache line
-//   assign byte_offset = base_address_reg[OFFSET_BITS-1:0];
-
-//   // Procedural block to calculate write strobe
-//   always @(posedge ap_clk) begin
-//       if (areset) begin
-//           // Reset the write strobe on active-high reset signal
-//           write_strobe <= {CACHE_LINE_SIZE{1'b0}};
-//       end
-//       else begin
-//           // Clear previous value
-//           write_strobe <= {CACHE_LINE_SIZE{1'b0}};
-
-//           // Check if the strobe fits within the cache line
-//           if ((byte_offset + STROBE_BITS/8) <= CACHE_LINE_SIZE) begin
-//               // Set the bits for the data size
-//               write_strobe[byte_offset*8 +: STROBE_BITS] <= {STROBE_BITS{1'b1}};
-//           end
-//           // Add additional logic here if needed for boundary conditions
-//       end
-//   end
-
-
 
 endmodule : cu_buffer
 

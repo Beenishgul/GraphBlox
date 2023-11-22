@@ -176,7 +176,9 @@ struct xrtGLAYHandle
     int numThreads;
     int ctrlMode;
     int entries;
-    bool endian;
+    bool endian_write;
+    bool endian_read;
+    bool flush_enable;
     char *kernelName;
     char *xclbinPath;
     char *overlayPath;

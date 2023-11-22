@@ -334,6 +334,7 @@ typedef struct packed{
     logic                                increment    ;
     logic                                decrement    ;
     logic                                flush_mode   ;
+    logic                                flush_enable ;
     logic [        M_AXI4_FE_ADDR_W-1:0] array_pointer;
     logic [        M_AXI4_FE_DATA_W-1:0] array_size   ;
     logic [        M_AXI4_FE_DATA_W-1:0] start_read   ;

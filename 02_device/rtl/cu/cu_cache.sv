@@ -276,7 +276,7 @@ iob_cache_axi #(
   .AXI_LEN_W           (CACHE_AXI_LEN_W                        ),
   .AXI_ADDR_W          (CACHE_AXI_ADDR_W                       ),
   .AXI_DATA_W          (CACHE_AXI_DATA_W                       ),
-  .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE)
+  .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
   .iob_avalid_i(cache_request_mem.iob.valid                                                         ),
   .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M_AXI4_FE_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
