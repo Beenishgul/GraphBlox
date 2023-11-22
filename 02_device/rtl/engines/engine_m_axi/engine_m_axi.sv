@@ -152,12 +152,11 @@ engine_m_axi_read #(
   .C_ADDR_WIDTH       (M_AXI4_MID_ADDR_W    ),
   .C_DATA_WIDTH       (M_AXI4_MID_DATA_W    ),
   .C_ID_WIDTH         (M_AXI4_MID_ID_W      ),
-  .C_NUM_CHANNELS     (LP_NUM_READ_CHANNELS ),
+  .C_NUM_CHANNELS     (C_NUM_CHANNELS       ),
   .C_LENGTH_WIDTH     (M_AXI4_MID_DATA_W    ),
   .C_BURST_LEN        (LP_AXI_BURST_LEN     ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN     ),
   .C_MAX_OUTSTANDING  (LP_RD_MAX_OUTSTANDING),
-  .C_NUM_CHANNELS     (C_NUM_CHANNELS       ),
   .C_INCLUDE_DATA_FIFO(1                    )
 ) inst_engine_m_axi_read (
   .ap_clk        (ap_clk                     ),
