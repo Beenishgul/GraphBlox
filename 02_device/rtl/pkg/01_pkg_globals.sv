@@ -48,7 +48,7 @@ package PKG_GLOBALS;
 //  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_SYSTEM_CACHE_IP = 1 ;
-	parameter GLOBAL_CU_CACHE_IP     = 0 ;
+	parameter GLOBAL_CU_CACHE_IP     = 1 ;
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------

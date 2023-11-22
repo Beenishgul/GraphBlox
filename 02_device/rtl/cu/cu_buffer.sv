@@ -344,7 +344,7 @@ always_comb begin
       if(engine_m_axi_response_mem.iob.valid)
         next_state = CU_ENGINE_M_AXI_READY;
       else
-        next_state = CU_ENGINE_M_AXI_PEND;
+        next_state = CU_ENGINE_M_AXI_READY;
     end
     CU_ENGINE_M_AXI_DONE : begin
       next_state = CU_ENGINE_M_AXI_DONE;

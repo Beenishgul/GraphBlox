@@ -310,6 +310,12 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     overlay_program_entries = values.size();
     overlay_program = (uint32_t *)aligned_alloc(4096, (overlay_program_entries+16384)* sizeof(uint32_t)); // Assuming 4096-byte alignment
 
+
+    for (size_t i =0 ; i < (overlay_program_entries+16384); i++)
+    {
+        overlay_program[i] = i;
+    }
+
     if (!overlay_program)
     {
         std::cerr << "Memory alignment error." << std::endl;
@@ -321,10 +327,6 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
         overlay_program[i] = values[i];
     }
 
-    for (size_t i = values.size(); i < (overlay_program_entries+16384); i++)
-    {
-        overlay_program[i] = 0;
-    }
 
     // overlay_program[2]  = graph->num_vertices       ;//  2  - Index_end
     // overlay_program[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS

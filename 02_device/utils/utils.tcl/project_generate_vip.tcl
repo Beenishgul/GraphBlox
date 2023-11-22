@@ -155,7 +155,7 @@ export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${file
 set SYSTEM_CACHE_NUM_WAYS 4
 set LINE_CACHE_DATA_WIDTH 512 
 set MID_ADDR_WIDTH        64 
-set MID_CACHE_DATA_WIDTH  32 
+set MID_CACHE_DATA_WIDTH  512 
 set BE_ADDR_WIDTH         63
 set BE_CACHE_DATA_WIDTH   512
 
