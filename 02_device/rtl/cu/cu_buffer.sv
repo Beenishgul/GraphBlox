@@ -15,8 +15,9 @@
 `include "global_package.vh"
 
 module cu_buffer #(
-  parameter FIFO_WRITE_DEPTH = 32,
-  parameter PROG_THRESH      = 16
+  parameter NUM_CHANNELS_READ = 1 ,
+  parameter FIFO_WRITE_DEPTH  = 32,
+  parameter PROG_THRESH       = 16
 ) (
   // System Signals
   input  logic                             ap_clk                   ,
@@ -88,15 +89,15 @@ logic                  fifo_response_setup_signal_int;
 // --------------------------------------------------------------------------------------
 // READ/WRITE ENGINE
 // --------------------------------------------------------------------------------------
-logic                         read_transaction_start_in     ;
-logic                         read_transaction_tvalid_out   ;
-logic [M_AXI4_MID_DATA_W-1:0] read_transaction_length_in    ;
-logic [M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
-logic [M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
-logic [M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
-logic                         read_transaction_done_out     ;
-logic                         read_transaction_tready_in    ;
-logic                         read_transaction_prog_full    ;
+logic                                                read_transaction_done_out     ;
+logic                                                read_transaction_start_in     ;
+logic [NUM_CHANNELS_READ-1:0]                        read_transaction_prog_full    ;
+logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tready_in    ;
+logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tvalid_out   ;
+logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
+logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
+logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
+logic [M_AXI4_MID_DATA_W-1:0]                        read_transaction_length_in    ;
 
 logic                         write_transaction_start_in    ;
 logic                         write_transaction_tvalid_in   ;
@@ -273,8 +274,8 @@ assign fifo_response_din.data = engine_m_axi_request_mem.data;
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en & engine_m_axi_response_mem.iob.valid;
 assign response_in_int.valid              = fifo_response_signals_out_int.valid;
 // assign response_in_int.payload.iob        = fifo_response_dout.iob;
-assign response_in_int.payload.meta       = fifo_response_dout.meta;
-assign response_in_int.payload.data       = fifo_response_dout.data;
+assign response_in_int.payload.meta = fifo_response_dout.meta;
+assign response_in_int.payload.data = fifo_response_dout.data;
 
 assign response_in_int.payload.iob.valid = fifo_response_signals_out_int.valid;
 assign response_in_int.payload.iob.ready = fifo_response_signals_out_int.valid;
@@ -400,7 +401,7 @@ assign engine_m_axi_response_mem.iob.valid = (read_transaction_tvalid_out | writ
 assign engine_m_axi_response_mem.iob.rdata = read_transaction_tdata_out;
 assign read_transaction_length_in          = 1;
 assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign read_transaction_offset_in          = engine_m_axi_request_mem.iob.addr;
+assign read_transaction_offset_in          = engine_m_axi_request_mem_reg.iob.addr;
 assign read_transaction_tready_in          = fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
 // READ/WRITE ENGINE
@@ -408,10 +409,18 @@ assign read_transaction_tready_in          = fifo_request_signals_out_valid_int;
 assign write_transaction_start_in  = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
 assign write_transaction_tvalid_in = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
 assign write_transaction_length_in = 1;
-assign write_transaction_offset_in = engine_m_axi_request_mem.iob.addr;
-assign write_transaction_tdata_in  = engine_m_axi_request_mem.iob.wdata;
+assign write_transaction_offset_in = engine_m_axi_request_mem_reg.iob.addr;
+assign write_transaction_tdata_in  = engine_m_axi_request_mem_reg.iob.wdata;
 
-engine_m_axi inst_engine_m_axi (
+
+// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_prog_full    ;
+// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tready_in    ;
+// logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tvalid_out   ;
+// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
+// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
+// logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
+
+engine_m_axi #(.C_NUM_CHANNELS(NUM_CHANNELS_READ)) inst_engine_m_axi (
   .read_transaction_done_out   (read_transaction_done_out   ),
   .read_transaction_length_in  (read_transaction_length_in  ),
   .read_transaction_offset_in  (read_transaction_offset_in  ),
@@ -433,4 +442,3 @@ engine_m_axi inst_engine_m_axi (
 );
 
 endmodule : cu_buffer
-
