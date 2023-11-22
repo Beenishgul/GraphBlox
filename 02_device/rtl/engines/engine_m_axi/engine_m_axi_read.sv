@@ -61,14 +61,14 @@ module engine_m_axi_read #(
 )
 (
   // System signals
-  input  logic                                          aclk,
+  input  logic                                          ap_clk,
   input  logic                                          areset,
   // Control signals
   input  logic                                          ctrl_start,
   output logic                                          ctrl_done,
   input  logic [C_NUM_CHANNELS-1:0][C_ADDR_WIDTH-1:0]   ctrl_offset,
   input  logic                     [C_LENGTH_WIDTH-1:0] ctrl_length,
-  //input  logic [C_NUM_CHANNELS-1:0]                     ctrl_prog_full,
+  output logic [C_NUM_CHANNELS-1:0]                     ctrl_prog_full,
   // AXI4 master interface
   output logic                                          arvalid,
   input  logic                                          arready,
@@ -134,12 +134,14 @@ logic [C_NUM_CHANNELS-1:0]                                decr_r_transaction_cnt
 logic [C_NUM_CHANNELS-1:0][LP_TRANSACTION_CNTR_WIDTH-1:0] r_transactions_to_go   ;
 logic [C_NUM_CHANNELS-1:0]                                r_final_transaction    ;
 
-logic [C_NUM_CHANNELS-1:0] m_tvalid_n;
+logic [C_NUM_CHANNELS-1:0] m_tvalid_n ;
+logic [C_NUM_CHANNELS-1:0] wr_rst_busy;
+logic [C_NUM_CHANNELS-1:0] rd_rst_busy;
 ///////////////////////////////////////////////////////////////////////////////
 // Control Logic
 ///////////////////////////////////////////////////////////////////////////////
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   for (int i = 0; i < C_NUM_CHANNELS; i++) begin
     done[i] <= rxfer & rlast & (rid == i) & r_final_transaction[i] ? 1'b1 :
       ctrl_done ? 1'b0 : done[i];
@@ -151,7 +153,7 @@ assign ctrl_done = &done;
 assign num_full_bursts    = ctrl_length[C_LOG_BURST_LEN+:C_LENGTH_WIDTH-C_LOG_BURST_LEN];
 assign num_partial_bursts = ctrl_length[0+:C_LOG_BURST_LEN] ? 1'b1 : 1'b0;
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   start             <= ctrl_start;
   num_transactions  <= (num_partial_bursts == 1'b0) ? num_full_bursts - 1'b1 : num_full_bursts;
   has_partial_burst <= num_partial_bursts;
@@ -170,10 +172,10 @@ assign arlen   = ar_final_transaction || (start & single_transaction) ? final_bu
 assign arsize  = $clog2((C_DATA_WIDTH/8));
 assign arid    = id;
 
-assign arxfer     = arvalid & arready;
-assign fifo_stall = prog_full[id];
+assign arxfer         = arvalid & arready;
+assign fifo_stall     = prog_full[id];
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   if (areset) begin
     arvalid_r <= 1'b0;
   end
@@ -184,7 +186,7 @@ always @(posedge aclk) begin
 end
 
 // When ar_idle, there are no transactions to issue.
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   if (areset) begin
     ar_idle <= 1'b1;
   end
@@ -196,7 +198,7 @@ always @(posedge aclk) begin
 end
 
 // each channel is assigned a different id. The transactions are interleaved.
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   if (start) begin
     // TODO this needs to be reset to maximum id
     id <= {C_ID_WIDTH{C_NUM_CHANNELS-1}};
@@ -208,7 +210,7 @@ end
 
 
 // Increment to next address after each transaction is issued.
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   for (int i = 0; i < C_NUM_CHANNELS; i++) begin
     addr[i] <= ctrl_start?ctrl_offset[i] :
       arxfer && (id == i) ? addr[i] + C_BURST_LEN*C_DATA_WIDTH/8 :
@@ -221,7 +223,7 @@ axi_counter #(
   .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
   .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
 ) inst_ar_transaction_cntr (
-  .clk       (aclk                 ),
+  .clk       (ap_clk               ),
   .clken     (1'b1                 ),
   .rst       (areset               ),
   .load      (start                ),
@@ -248,7 +250,7 @@ axi_counter #(
   .C_INIT  ( C_MAX_OUTSTANDING[0+:LP_MAX_OUTSTANDING_CNTR_WIDTH] )
 )
 inst_ar_to_r_transaction_cntr[C_NUM_CHANNELS-1:0] (
-  .clk        ( aclk                           ) ,
+  .clk        ( ap_clk                           ) ,
   .clken      ( 1'b1                           ) ,
   .rst        ( areset                         ) ,
   .load       ( 1'b0                           ) ,
@@ -283,37 +285,40 @@ generate
         .DOUT_RESET_VALUE   ("0"                    ), // string, don't care
         .WAKEUP_TIME        (0                      )  // positive integer; 0 or 2;
       ) inst_rd_xpm_fifo_sync (
-        .sleep        (1'b0         ),
-        .rst          (areset       ),
-        .wr_clk       (aclk         ),
-        .wr_en        (tvalid[i]    ),
-        .din          (tdata[i]     ),
-        .full         (             ),
-        .prog_full    (prog_full[i] ),
-        .wr_data_count(             ),
-        .overflow     (             ),
-        .wr_rst_busy  (             ),
-        .rd_en        (m_tready[i]  ),
-        .dout         (m_tdata[i]   ),
-        .empty        (m_tvalid_n[i]),
-        .prog_empty   (             ),
-        .rd_data_count(             ),
-        .underflow    (             ),
-        .rd_rst_busy  (             ),
-        .injectsbiterr(1'b0         ),
-        .injectdbiterr(1'b0         ),
-        .sbiterr      (             ),
-        .dbiterr      (             )
+        .sleep        (1'b0          ),
+        .rst          (areset        ),
+        .wr_clk       (ap_clk        ),
+        .wr_en        (tvalid[i]     ),
+        .din          (tdata[i]      ),
+        .full         (              ),
+        .prog_full    (prog_full[i]  ),
+        .wr_data_count(              ),
+        .overflow     (              ),
+        .wr_rst_busy  (wr_rst_busy[i]),
+        .rd_en        (m_tready[i]   ),
+        .dout         (m_tdata[i]    ),
+        .empty        (m_tvalid_n[i] ),
+        .prog_empty   (              ),
+        .rd_data_count(              ),
+        .underflow    (              ),
+        .rd_rst_busy  (rd_rst_busy[i]),
+        .injectsbiterr(1'b0          ),
+        .injectdbiterr(1'b0          ),
+        .sbiterr      (              ),
+        .dbiterr      (              )
       );
       // rready can remain high for optimal timing because ar transactions are
       // not issued unless there is enough space in the FIFO.
+      assign ctrl_prog_full[i] = prog_full[i] | wr_rst_busy[i]  | rd_rst_busy[i] ;
     end
     assign rready   = 1'b1;
     assign m_tvalid = ~m_tvalid_n;
   end else begin
-    assign m_tvalid = tvalid;
-    assign m_tdata  = tdata;
-    assign rready   = &m_tready;
+    assign m_tvalid       = tvalid;
+    assign m_tdata        = tdata;
+    assign rready         = &m_tready;
+    assign wr_rst_busy[i] = 0;
+    assign rd_rst_busy[i] = 0;
   end
 endgenerate
 
@@ -336,7 +341,7 @@ axi_counter #(
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
 inst_r_transaction_cntr[C_NUM_CHANNELS-1:0] (
-  .clk        ( aclk                          ) ,
+  .clk        ( ap_clk                          ) ,
   .clken      ( 1'b1                          ) ,
   .rst        ( areset                        ) ,
   .load       ( start                         ) ,

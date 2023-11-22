@@ -48,7 +48,18 @@ package PKG_GLOBALS;
 //  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_SYSTEM_CACHE_IP = 1 ;
-	parameter GLOBAL_CU_CACHE_IP     = 1 ;
+	parameter GLOBAL_CU_CACHE_IP     = 0 ;
 // --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+//   State Machine input sync
+// --------------------------------------------------------------------------------------
+typedef enum logic[4:0] {
+	CU_ENGINE_M_AXI_RESET        = 1 << 0,
+	CU_ENGINE_M_AXI_READY        = 1 << 1,
+	CU_ENGINE_M_AXI_CMD_TRANS    = 1 << 2,
+	CU_ENGINE_M_AXI_PEND         = 1 << 3,
+	CU_ENGINE_M_AXI_DONE         = 1 << 4
+} cu_engine_m_axi_state;
 
 endpackage

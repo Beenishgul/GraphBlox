@@ -200,6 +200,15 @@ module engine_csr_index #(parameter
     MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1:0];
 
 // --------------------------------------------------------------------------------------
+// Fair Memory response counter
+// --------------------------------------------------------------------------------------
+    logic [CACHE_WTBUF_DEPTH_W-1:0] response_memory_in_counter     ;
+    logic [CACHE_WTBUF_DEPTH_W-1:0] request_memory_out_counter     ;
+    logic                           clear_memory_in_out_counter    ;
+    logic                           response_memory_in_counter_fair;
+    logic                           request_memory_out_counter_fair;
+    
+// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -655,12 +664,6 @@ module engine_csr_index #(parameter
 // --------------------------------------------------------------------------------------
 // Fair Memory response counter
 // --------------------------------------------------------------------------------------
-    logic [CACHE_WTBUF_DEPTH_W-1:0] response_memory_in_counter     ;
-    logic [CACHE_WTBUF_DEPTH_W-1:0] request_memory_out_counter     ;
-    logic                           clear_memory_in_out_counter    ;
-    logic                           response_memory_in_counter_fair;
-    logic                           request_memory_out_counter_fair;
-
     assign clear_memory_in_out_counter     = ((response_memory_in_counter==0) && (response_memory_in_counter==0));
     assign response_memory_in_counter_fair = (response_memory_in_counter!= 0);
     assign request_memory_out_counter_fair = (request_memory_out_counter!= 0);

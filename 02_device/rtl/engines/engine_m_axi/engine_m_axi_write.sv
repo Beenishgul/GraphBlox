@@ -47,7 +47,7 @@ module engine_m_axi_write #(
   parameter integer C_INCLUDE_DATA_FIFO = 1
 ) (
   // AXI Interface
-  input  logic                          aclk       ,
+  input  logic                          ap_clk       ,
   input  logic                          areset     ,
   // Control interface
   input  logic                          ctrl_start ,
@@ -58,7 +58,7 @@ module engine_m_axi_write #(
   input  logic                          s_tvalid   ,
   input  logic [      C_DATA_WIDTH-1:0] s_tdata    ,
   output logic                          s_tready   ,
-  
+
   output logic [      C_ADDR_WIDTH-1:0] awaddr     ,
   output logic [                   7:0] awlen      ,
   output logic [                   2:0] awsize     ,
@@ -120,7 +120,8 @@ logic [LP_TRANSACTION_CNTR_WIDTH-1:0] b_transactions_to_go;
 logic                                 b_final_transaction ;
 
 logic s_tready_n;
-
+logic wr_rst_busy;
+logic rd_rst_busy;
 /////////////////////////////////////////////////////////////////////////////
 // Control logic
 /////////////////////////////////////////////////////////////////////////////
@@ -128,7 +129,7 @@ logic s_tready_n;
 assign num_full_bursts    = ctrl_length[C_LOG_BURST_LEN+:C_MAX_LENGTH_WIDTH-C_LOG_BURST_LEN];
 assign num_partial_bursts = ctrl_length[0+:C_LOG_BURST_LEN] ? 1'b1 : 1'b0;
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   start             <= ctrl_start;
   num_transactions  <= (num_partial_bursts == 1'b0) ? num_full_bursts - 1'b1 : num_full_bursts;
   has_partial_burst <= num_partial_bursts;
@@ -163,33 +164,33 @@ generate
       .DOUT_RESET_VALUE   ("0"                 ), // string, don't care
       .WAKEUP_TIME        (0                   )  // positive integer; 0 or 2;
     ) inst_xpm_fifo_sync (
-      .sleep        (1'b0      ),
-      .rst          (areset    ),
-      .wr_clk       (aclk      ),
-      .wr_en        (s_tvalid  ),
-      .din          (s_tdata   ),
-      .full         (s_tready_n),
-      .overflow     (          ),
-      .prog_full    (          ),
-      .wr_data_count(          ),
-      .almost_full  (          ),
-      .wr_ack       (          ),
-      .wr_rst_busy  (          ),
-      .rd_en        (wready    ),
-      .dout         (wdata     ),
-      .empty        (          ),
-      .prog_empty   (          ),
-      .rd_data_count(          ),
-      .almost_empty (          ),
-      .data_valid   (wvalid    ),
-      .underflow    (          ),
-      .rd_rst_busy  (          ),
-      .injectsbiterr(1'b0      ),
-      .injectdbiterr(1'b0      ),
-      .sbiterr      (          ),
-      .dbiterr      (          )
+      .sleep        (1'b0       ),
+      .rst          (areset     ),
+      .wr_clk       (ap_clk     ),
+      .wr_en        (s_tvalid   ),
+      .din          (s_tdata    ),
+      .full         (           ),
+      .overflow     (           ),
+      .prog_full    (s_tready_n ),
+      .wr_data_count(           ),
+      .almost_full  (           ),
+      .wr_ack       (           ),
+      .wr_rst_busy  (wr_rst_busy),
+      .rd_en        (wready     ),
+      .dout         (wdata      ),
+      .empty        (           ),
+      .prog_empty   (           ),
+      .rd_data_count(           ),
+      .almost_empty (           ),
+      .data_valid   (wvalid     ),
+      .underflow    (           ),
+      .rd_rst_busy  (rd_rst_busy),
+      .injectsbiterr(1'b0       ),
+      .injectdbiterr(1'b0       ),
+      .sbiterr      (           ),
+      .dbiterr      (           )
     );
-    assign s_tready = ~s_tready_n;
+    assign s_tready = ~s_tready_n & ~wr_rst_busy & ~rd_rst_busy;
 
   end
   else begin : gen_no_fifo
@@ -198,13 +199,15 @@ generate
     assign wvalid = s_tvalid;
     assign wdata    = s_tdata;
     assign s_tready = wready;
+    assign wr_rst_busy = 0;
+    assign rd_rst_busy = 0;
   end
 endgenerate
 
 assign wstrb = {(C_DATA_WIDTH/8){1'b1}};
 assign wxfer = wvalid & wready;
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   if (areset) begin
     wfirst <= 1'b1;
   end
@@ -220,7 +223,7 @@ axi_counter #(
   .C_WIDTH(C_LOG_BURST_LEN        ),
   .C_INIT ({C_LOG_BURST_LEN{1'b1}})
 ) inst_burst_cntr (
-  .clk       (aclk           ),
+  .clk       (ap_clk         ),
   .clken     (1'b1           ),
   .rst       (areset         ),
   .load      (load_burst_cntr),
@@ -235,7 +238,7 @@ axi_counter #(
   .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
   .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
 ) inst_w_transaction_cntr (
-  .clk       (aclk                ),
+  .clk       (ap_clk              ),
   .clken     (1'b1                ),
   .rst       (areset              ),
   .load      (start               ),
@@ -246,7 +249,7 @@ axi_counter #(
   .is_zero   (w_final_transaction )
 );
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   w_almost_final_transaction <= (w_transactions_to_go == 1) ? 1'b1 : 1'b0;
 end
 
@@ -260,7 +263,7 @@ end
 assign awvalid = awvalid_r;
 assign awxfer  = awvalid & awready;
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   if (areset) begin
     awvalid_r <= 1'b0;
   end
@@ -273,7 +276,7 @@ end
 
 assign awaddr = addr;
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   addr <= ctrl_start ? ctrl_offset :
     awxfer     ? addr + C_BURST_LEN*C_DATA_WIDTH/8 :
     addr;
@@ -286,7 +289,7 @@ axi_counter #(
   .C_WIDTH(LP_LOG_MAX_W_TO_AW        ),
   .C_INIT ({LP_LOG_MAX_W_TO_AW{1'b0}})
 ) inst_w_to_aw_cntr (
-  .clk       (aclk                   ),
+  .clk       (ap_clk                 ),
   .clken     (1'b1                   ),
   .rst       (areset                 ),
   .load      (1'b0                   ),
@@ -297,11 +300,11 @@ axi_counter #(
   .is_zero   (idle_aw                )
 );
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   wfirst_d1 <= wvalid & wfirst;
 end
 
-always @(posedge aclk) begin
+always @(posedge ap_clk) begin
   wfirst_pulse <= wvalid & wfirst & ~wfirst_d1;
 end
 
@@ -309,7 +312,7 @@ axi_counter #(
   .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
   .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
 ) inst_aw_transaction_cntr (
-  .clk       (aclk                 ),
+  .clk       (ap_clk               ),
   .clken     (1'b1                 ),
   .rst       (areset               ),
   .load      (start                ),
@@ -331,7 +334,7 @@ axi_counter #(
   .C_WIDTH(LP_TRANSACTION_CNTR_WIDTH        ),
   .C_INIT ({LP_TRANSACTION_CNTR_WIDTH{1'b0}})
 ) inst_b_transaction_cntr (
-  .clk       (aclk                ),
+  .clk       (ap_clk              ),
   .clken     (1'b1                ),
   .rst       (areset              ),
   .load      (start               ),
