@@ -88,17 +88,6 @@ FIFOStateSignalsInput  fifo_response_signals_in_int  ;
 logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
-// --------------------------------------------------------------------------------------
-logic                           areset_counter                  ;
-logic                           counter_load                    ;
-logic                           write_command_counter_is_zero   ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
-
-assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
-
-// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -108,7 +97,6 @@ always_ff @(posedge ap_clk) begin
   areset_setup   <= areset;
   areset_control <= areset;
   areset_cache   <= areset;
-  areset_counter <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -211,23 +199,23 @@ assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
 iob_cache_axi #(
-  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                       ),
-  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                  ),
-  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                   ),
-  .BE_DATA_W           (CACHE_BACKEND_DATA_W                   ),
-  .NWAYS_W             (CACHE_N_WAYS                           ),
-  .NLINES_W            (CACHE_LINE_OFF_W                       ),
-  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                       ),
-  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                    ),
-  .REP_POLICY          (CACHE_REP_POLICY                       ),
-  .WRITE_POL           (CACHE_WRITE_POL                        ),
-  .USE_CTRL            (CACHE_CTRL_CACHE                       ),
-  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                       ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                         ),
-  .AXI_ID              (CACHE_AXI_ID                           ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                        ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                       ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                       ),
+  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                                 ),
+  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                            ),
+  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                             ),
+  .BE_DATA_W           (CACHE_BACKEND_DATA_W                             ),
+  .NWAYS_W             (CACHE_N_WAYS                                     ),
+  .NLINES_W            (CACHE_LINE_OFF_W                                 ),
+  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                                 ),
+  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                              ),
+  .REP_POLICY          (CACHE_REP_POLICY                                 ),
+  .WRITE_POL           (CACHE_WRITE_POL                                  ),
+  .USE_CTRL            (CACHE_CTRL_CACHE                                 ),
+  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                                 ),
+  .AXI_ID_W            (CACHE_AXI_ID_W                                   ),
+  .AXI_ID              (CACHE_AXI_ID                                     ),
+  .AXI_LEN_W           (CACHE_AXI_LEN_W                                  ),
+  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                                 ),
+  .AXI_DATA_W          (CACHE_AXI_DATA_W                                 ),
   .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
   .iob_avalid_i(cache_request_mem.iob.valid                                                         ),
@@ -393,13 +381,11 @@ end// always_comb
 always_ff @(posedge ap_clk) begin
   case (current_state)
     CU_CACHE_CMD_RESET : begin
-      counter_load                       <= 1'b1;
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
       cache_request_mem_reg.iob.valid    <= 1'b0;
     end
     CU_CACHE_CMD_READY : begin
-      counter_load                       <= 1'b0;
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
       cache_request_mem_reg.iob.valid    <= 1'b0;
@@ -461,22 +447,6 @@ always_ff @(posedge ap_clk) begin
   cache_request_mem_reg.meta      <= fifo_request_dout.meta;
   cache_request_mem_reg.data      <= fifo_request_dout.data;
 end
-
-// --------------------------------------------------------------------------------------
-// Cache/Memory response counter
-// --------------------------------------------------------------------------------------
-counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
-  .ap_clk      (ap_clk                                                                                       ),
-  .ap_clken    (1'b1                                                                                         ),
-  .areset      (areset_counter                                                                               ),
-  .load        (counter_load                                                                                 ),
-  .incr        (fifo_response_signals_in_int.wr_en  & (fifo_response_din.meta.subclass.cmd == CMD_MEM_WRITE) ),
-  .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
-  .load_value  (write_command_counter_load_value                                                             ),
-  .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
-  .count       (write_command_counter_                                                                       ),
-  .is_zero     (write_command_counter_is_zero                                                                )
-);
 
 endmodule : cu_cache
 

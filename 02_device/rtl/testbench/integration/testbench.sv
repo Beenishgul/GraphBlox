@@ -996,7 +996,7 @@ module __KERNEL___testbench ();
 
         function automatic bit check___KERNEL___result(ref GraphCSR graph);
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-
+            $display("MSG: ///////////////////////////////////////////////////////////////////////////////////////////////// \n");
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
@@ -1007,7 +1007,7 @@ module __KERNEL___testbench ();
                 //     o=0;
                 // end
             end
-
+            $display("MSG: ///////////////////////////////////////////////////////////////////////////////////////////////// \n");
             for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_1*2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
@@ -1018,10 +1018,10 @@ module __KERNEL___testbench ();
                 //     o=0;
                 // end
             end
-
+            $display("MSG: ///////////////////////////////////////////////////////////////////////////////////////////////// \n");
             for (int i = 0; i < graph.num_auxiliary_2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
                 // o++;
                 // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
@@ -1029,10 +1029,10 @@ module __KERNEL___testbench ();
                 //     o=0;
                 // end
             end
-
+            $display("MSG: ///////////////////////////////////////////////////////////////////////////////////////////////// \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
                 // o++;
                 // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
@@ -1041,7 +1041,7 @@ module __KERNEL___testbench ();
                 // end
             end
         endfunction
-
+        
         bit         choose_pressure_type      = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
