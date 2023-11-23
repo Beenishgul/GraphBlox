@@ -19,7 +19,7 @@ def run_make_in_parallel(directory, alg_index, arch, cap, num_kernels, target, c
     make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq}"
     
     # Define the log file path
-    log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} .log")
+    log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}.log")
     
     # Run the make commands in its own shell and redirect output to the log file
     with open(log_file, "w") as file:
@@ -43,7 +43,7 @@ algorithms = [
 
 # List of destination directories to be ignored during copy
 destination_directories = [
-    os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} ")
+    os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}")
     for alg_index, arch, cap, num_kernels, target, cache, freq, strategy in algorithms
 ]
 
@@ -55,6 +55,6 @@ for destination in destination_directories:
 # Run make in parallel for each algorithm configuration
 for alg in algorithms:
     alg_index, arch, cap, num_kernels, target, cache, freq, strategy  = alg
-    destination_directory = os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} ")
+    destination_directory = os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}")
     run_make_in_parallel(destination_directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy )
     print(f"Started processing in parallel with parameters: {alg}")
