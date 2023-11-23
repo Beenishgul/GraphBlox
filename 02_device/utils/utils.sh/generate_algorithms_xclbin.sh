@@ -1,54 +1,30 @@
 #!/bin/bash
 
-# Define an array of algorithm indices to be processed
-# Add or remove indices as needed
-algorithm_indices=(0 1 5 6 8)
+# Function to build with parameters
+build_with_params() {
+    local alg_index=$1
+    local arch=$2
+    local cap=$3
+    local num_kernels=$4
+    local target=$5
 
-# Loop through the specified algorithm indices
-for ALGORITHM_INDEX in "${algorithm_indices[@]}"
-do
-    # Export ALGORITHMS variable
-    export ALGORITHMS=$ALGORITHM_INDEX
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Single
-    export XILINX_NUM_KERNELS=8
-    export TARGET=hw
+    # Constructing the parameter list
+    local params="ALGORITHMS=$alg_index ARCHITECTURE=$arch CAPABILITY=$cap XILINX_NUM_KERNELS=$num_kernels TARGET=$target"
 
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
-done
+    # Define the log file name
+    local log_file="algorithm_${alg_index}_${cap}.log"
 
-echo "Selected Single GLay algorithms are being processed in the background."
+    # Run make commands with nohup and output redirection
+    nohup bash -c "make $params && make build-hw $params" > "$log_file" 2>&1 &
+}
 
-    # Export ALGORITHMS variable
-    export ALGORITHMS=0
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Lite
-    export XILINX_NUM_KERNELS=4
-    export TARGET=hw
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <Algorithm Index> <Architecture> <Capability> <Number of Kernels> <Target>"
+    exit 1
+fi
 
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
+# Call the build function with command line arguments
+build_with_params "$1" "$2" "$3" "$4" "$5"
 
-echo "Selected Lite GLay algorithms are being processed in the background."
-
-    # Export ALGORITHMS variable
-    export ALGORITHMS=0
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Full
-    export XILINX_NUM_KERNELS=2
-    export TARGET=hw
-
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
-
-echo "Selected Full GLay algorithms are being processed in the background."
+echo "xlcbin $3 $2 algorithm is being processed in the background."

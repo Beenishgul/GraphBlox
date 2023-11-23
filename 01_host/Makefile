@@ -207,6 +207,7 @@ clean-all:
 	-$(RMDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)
 	-$(RMDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)
 	-$(RMDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)
+	-$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/alg_*
 
 .PHONY: clean
 clean:
