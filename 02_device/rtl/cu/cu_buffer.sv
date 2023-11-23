@@ -431,7 +431,7 @@ engine_m_axi #(
   .write_transaction_tdata_in  (write_transaction_tdata_in  ),
   .write_transaction_done_out  (write_transaction_done_out  ),
   .write_transaction_tready_out(write_transaction_tready_out),
-  `include "m_axi_portmap_full.vh"
+  `include "m_axi_portmap_buffer.vh"
   .ap_clk                      (ap_clk                      ),
   .areset                      (areset_engine_m_axi         )
 );

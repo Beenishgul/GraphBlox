@@ -229,7 +229,7 @@ iob_cache_axi #(
   .invalidate_o(cache_ctrl_out.force_inv                                                            ),
   .wtb_empty_i (cache_ctrl_in.wtb_empty                                                             ),
   .wtb_empty_o (cache_ctrl_out.wtb_empty                                                            ),
-  `include "m_axi_portmap_glay_iob.vh"
+  `include "m_axi_portmap_cache.vh"
   .clk_i       (ap_clk                                                                              ),
   .cke_i       (1'b1                                                                                ),
   .arst_i      (areset_cache                                                                        )

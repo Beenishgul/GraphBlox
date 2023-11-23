@@ -79,10 +79,28 @@ end
 // DRIVE AXI4 MASTER SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
+  m_axi_read_out <= m_axi_read.out;
+  // m_axi_write_out <= m_axi_write.out;
+end
 
-  m_axi_read_out  <= m_axi_read.out;
-  m_axi_write_out <= m_axi_write.out;
-
+always_ff @(posedge ap_clk) begin
+  m_axi_write_out.awvalid <= m_axi_write.out.awvalid; // Address write channel valid
+  m_axi_write_out.awid    <= m_axi_write.out.awid   ; // Address write channel ID
+  m_axi_write_out.awaddr  <= m_axi_write.out.awaddr ; // Address write channel address
+  m_axi_write_out.awlen   <= m_axi_write.out.awlen  ; // Address write channel burst length
+  m_axi_write_out.awsize  <= m_axi_write.out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
+  m_axi_write_out.awburst <= m_axi_write.out.awburst; // Address write channel burst type
+  m_axi_write_out.awlock  <= m_axi_write.out.awlock ; // Address write channel lock type
+  m_axi_write_out.awcache <= m_axi_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  m_axi_write_out.awprot  <= m_axi_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  m_axi_write_out.awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
+  if(m_axi_write.out.wvalid)
+    m_axi_write_out.wdata <= m_axi_write.out.wdata  ; // Write channel data
+  m_axi_write_out.wstrb    <= m_axi_write.out.wstrb  ; // Write channel write strobe
+  m_axi_write_out.wlast    <= m_axi_write.out.wlast  ; // Write channel last word flag
+  m_axi_write_out.wvalid   <= m_axi_write.out.wvalid ; // Write channel valid
+  m_axi_write_out.bready   <= m_axi_write.out.bready ; // Write response channel ready
+  m_axi_write_out.awregion <= m_axi_write.out.awregion ; // Write channel valid
 end
 
 // --------------------------------------------------------------------------------------
@@ -108,8 +126,8 @@ end
 // --------------------------------------------------------------------------------------
 assign m_axi_read.out.araddr[63]  = 1'b0;
 assign m_axi_write.out.awaddr[63] = 1'b0;
-assign m_axi_write.out.awregion = 0;
-assign m_axi_read.out.arregion = 0;
+assign m_axi_write.out.awregion   = 0;
+assign m_axi_read.out.arregion    = 0;
 
 system_cache_512x64 inst_system_cache_512x64 (
   .ACLK              (ap_clk                      ),

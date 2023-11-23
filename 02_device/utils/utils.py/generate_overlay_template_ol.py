@@ -5,20 +5,17 @@ import ast
 import json
 
 # Validate the number of arguments
-if len(sys.argv) != 10:
-    print("Usage: <script> <FULL_SRC_IP_DIR_CONFIG> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_FPGA_UTILS_CPP> <utils> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
+if len(sys.argv) != 9:
+    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_FPGA_UTILS_CPP> <utils> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
 
 # Define the filename based on the CAPABILITY
-if CAPABILITY == "Single":
-    config_filename = f"architecture.{ALGORITHM_NAME}.json"
-    overlay_template_filename = f"template.{ALGORITHM_NAME}.ol"
-else:
-    config_filename = "architecture.json"
-    overlay_template_filename = "template.ol"
+config_filename = f"topology.json"
+overlay_template_filename = f"template.{ALGORITHM_NAME}.ol"
+
   
 cpp_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.cpp"
 verilog_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.vh"
@@ -28,13 +25,13 @@ overlay_template_path= f"{ARCHITECTURE}.{CAPABILITY}"
 config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
-output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, overlay_template_filename)
+output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, overlay_template_filename)
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
 output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
-# output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, verilog_template_filename)
+# output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, verilog_template_filename)
 output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters", verilog_template_filename)
 
-config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_filename)
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
@@ -43,8 +40,21 @@ mapping = config_data["mapping"]
 cycles  = config_data["cycles"]
 buffers = config_data["buffers"]
 
+def get_config(config_data, algorithm):
+    # Default to 'bundle' if the specified algorithm is not found
+    selected_config = config_data.get(algorithm, config_data['bundle'])
+
+    # Sort the keys and create the configuration array
+    return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
+
+# Example algorithm selection
+algorithm = ALGORITHM_NAME
+
+# Get the configuration for the selected algorithm
+CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, algorithm)
+
 # Extract bundles and transform to the desired format
-CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
+# CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
 
 # Compute values based on CU_BUNDLES_CONFIG_ARRAY
 NUM_CUS_MAX = 1  # As there's only one CU
