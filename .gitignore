@@ -37,3 +37,4 @@ xilinx_*
 02_device/vivado.log 
 02_device/vivado_pid*.str   
 02_device/xilinx_*
+02_device/ol/*/template.*.ol
