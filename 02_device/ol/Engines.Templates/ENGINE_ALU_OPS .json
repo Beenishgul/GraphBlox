@@ -1,31 +1,69 @@
-parameter NUM_FIELDS_MEMORYPACKETDATA = 4;
-parameter TYPE_MEMORY_CMD_BITS = 7;
-parameter TYPE_FILTER_OPERATION_BITS = 9;
-parameter TYPE_ALU_OPERATION_BITS = 6;
-parameter TYPE_DATA_STRUCTURE_BITS = 6;
-parameter TYPE_SEQUENCE_STATE_BITS = 4;
 
-//32bit frame each begin, and based on the bits fill each paramter/meta
- "entry_0" : {  
-    alu_operation : "" 
-  {
- "entry_1" : { //32bit
-    alu_mask  : ""
-    id_module : "" 
-    id_engine : "" 
-  {
- "entry_2" : { //32bit
-    const_mask : "" 
-  {
- "entry_3" : { //32bit
-    const_value : "" 
-  {
- "entry_4" : { //32bit
-    ops_mask : "" 
-  {
- "entry_5" : { //32bit
-    id_cu     : "" 
-    id_bundle : "" 
-    id_lane   : "" 
-    id_buffer : "" 
-  {
+{
+   "alu_operations": {
+        "ALU_NOP" : 0,
+        "ALU_ADD" : 1,
+        "ALU_SUB" : 2,
+        "ALU_MUL" : 4,
+        "ALU_ACC" : 8,
+        "ALU_DIV" : 16
+   },
+   "entries" : {
+      "entry_0" : {  
+         "alu_operation" : {
+            "value" : "ALU_NOP",
+            "bits" : "6"
+         }
+      },
+      "entry_1" : {  
+         "alu_mask" : {
+            "value" : "0x0",
+            "bits" : "4"
+         },
+         "id_module" : {
+            "value" : "0x00",
+            "bits" : "8"
+         },
+         "id_engine" : {
+            "value" : "0x00",
+            "bits" : "8"
+         }
+      },
+      "entry_2" : {  
+         "const_mask" : {
+            "value" : "0x0",
+            "bits" : "4"
+         }
+      },
+      "entry_3" : {  
+         "const_value" : {
+            "value" : "0x00000000",
+            "bits" : "32"
+         }
+      },
+      "entry_4" : {  
+         "ops_mask" : {
+            "value" : "0x0000",
+            "bits" : "16"
+         }
+      },
+      "entry_5" : {  
+         "id_cu" : {
+            "value" : "0x00",
+            "bits" : "8"
+         },
+         "id_bundle" : {
+            "value" : "0x00",
+            "bits" : "8"
+         },
+         "id_lane" : {
+            "value" : "0x00",
+            "bits" : "8"
+         },
+         "id_buffer" : {
+            "value" : "0x00",
+            "bits" : "8"
+         }
+      }
+   }
+}
