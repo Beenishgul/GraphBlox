@@ -14,12 +14,12 @@ def copy_directory(source, destination):
     except FileExistsError:
         print(f"Directory {destination} already exists.")
 
-def run_make_in_parallel(directory, alg_index, arch, cap, num_kernels, target):
+def run_make_in_parallel(directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy):
     # Construct the make commands
-    make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target}"
+    make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq}"
     
     # Define the log file path
-    log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}.log")
+    log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} .log")
     
     # Run the make commands in its own shell and redirect output to the log file
     with open(log_file, "w") as file:
@@ -31,20 +31,20 @@ source_directory = base_directory
 # Parameters for different algorithm configurations
 algorithms = [
     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-    (0, "GLay", "Single", 8, "hw"),
-    (1, "GLay", "Single", 8, "hw"),
-    (5, "GLay", "Single", 8, "hw"),
-    (6, "GLay", "Single", 8, "hw"),
-    (8, "GLay", "Single", 8, "hw"),
-    (0, "GLay", "Lite", 4, "hw"),
-    (0, "GLay", "Full", 2, "hw"),
+    (0, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
+    (1, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
+    (5, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
+    (6, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
+    (8, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
+    (0, "GLay", "Lite", 4, "hw", 131072, 200000000, 1),
+    (0, "GLay", "Full", 2, "hw", 131072, 200000000, 1),
     # Add more tuples here for other algorithm configurations as needed
 ]
 
 # List of destination directories to be ignored during copy
 destination_directories = [
-    os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}")
-    for alg_index, arch, cap, num_kernels, target in algorithms
+    os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} ")
+    for alg_index, arch, cap, num_kernels, target, cache, freq, strategy in algorithms
 ]
 
 # Create and copy to each destination directory
@@ -54,7 +54,7 @@ for destination in destination_directories:
 
 # Run make in parallel for each algorithm configuration
 for alg in algorithms:
-    alg_index, arch, cap, num_kernels, target = alg
-    destination_directory = os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}")
-    run_make_in_parallel(destination_directory, alg_index, arch, cap, num_kernels, target)
+    alg_index, arch, cap, num_kernels, target, cache, freq, strategy  = alg
+    destination_directory = os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}_{strategy} ")
+    run_make_in_parallel(destination_directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy )
     print(f"Started processing in parallel with parameters: {alg}")
