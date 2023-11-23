@@ -634,6 +634,27 @@ clean-report-metrics: session-info
 	$(RMDIR) $(APP_DIR_ACTIVE)/$(REPORTS_DIR_ACTIVE)
 
 # =========================================================
+# SWEEP GENERATION of XCLBIN Images based on architecture paramters
+# =========================================================
+# # Parameters for different algorithm configurations
+# algorithms = [
+#     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
+#     (0, "GLay", "Single", 8, "hw"),
+#     (1, "GLay", "Single", 8, "hw"),
+#     (5, "GLay", "Single", 8, "hw"),
+#     (6, "GLay", "Single", 8, "hw"),
+#     (8, "GLay", "Single", 8, "hw"),
+#     (0, "GLay", "Lite", 4, "hw"),
+#     (0, "GLay", "Full", 2, "hw"),
+#     # Add more tuples here for other algorithm configurations as needed
+# ]
+# =========================================================
+.PHONY: run-sweep-xclbin
+run-sweep-xclbin:
+	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
+	python $(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/sweep_algorithms_xclbin.py 
+
+# =========================================================
 #  Help menu
 # =========================================================
 .PHONY: help
