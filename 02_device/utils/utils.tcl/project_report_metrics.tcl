@@ -3,6 +3,27 @@ set PARAMS_TCL_DIR                  [lindex $argv 0]
 
 source ${PARAMS_TCL_DIR}
 
+puts "========================================================="
+puts "\[[color 2 "Project Report ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"
+puts "========================================================="
+puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
+puts "========================================================="
+puts "\[[color 4 "ARCHITECTURE      "]\] [color 2 ${ARCHITECTURE}]"
+puts "\[[color 4 "CAPABILITY        "]\] [color 2 ${CAPABILITY}]"
+puts "\[[color 4 "ALGORITHM_NAME    "]\] [color 2 ${ALGORITHM_NAME}]"
+puts "========================================================="
+puts "\[[color 4 "ALVEO ID          "]\] [color 2 ${ALVEO}]"
+puts "\[[color 4 "PART ID           "]\] [color 2 ${PART}]"
+puts "\[[color 4 "KERNEL_NAME       "]\] [color 2 ${KERNEL_NAME}]"
+puts "\[[color 4 "KERNEL_PROJECT    "]\] [color 2 ${KERNEL_PROJECT_PKG_XPR}]"
+puts "\[[color 4 "VIVADO_VER        "]\] [color 2 ${VIVADO_VER}]"
+puts "\[[color 4 "GIT_VER           "]\] [color 2 ${GIT_VER}]"
+puts "========================================================="
+puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
+puts "========================================================="
+puts "\[[color 2 "Reporting ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"
+puts "========================================================="
+
 open_project ${KERNEL_PROJECT_PKG_XPR} 
 
 open_run impl_1
@@ -41,3 +62,8 @@ report_drc -file drc_routed_report.txt
 # set impl_finish_time [clock clicks -milliseconds]
 # set impl_time [expr ($impl_finish_time - $impl_start_time) / 1000]
 # puts "Implementation time = [expr $impl_time / 60]:[format %02d [expr $impl_time % 60]]"
+puts "========================================================="
+puts "\[[color 2 " [clock format [clock seconds] -format {%T %a %b %d %Y}]"]\] "
+puts "========================================================="
+puts "\[[color 2 "Reporting ${KERNEL_NAME} IPs....."]\] [color 1 "DONE!"]"
+puts "========================================================="
