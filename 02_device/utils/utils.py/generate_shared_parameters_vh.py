@@ -40,12 +40,14 @@ def get_config(config_data, algorithm):
     # Sort the keys and create the configuration array
     return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
 
-# Example algorithm selection
-algorithm = ALGORITHM_NAME
+# Define the filename based on the CAPABILITY
+if CAPABILITY == "Single":
+    topology = f"{CAPABILITY}.{ALGORITHM_NAME}"
+else:
+    topology = f"{CAPABILITY}"
 
 # Get the configuration for the selected algorithm
-CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, algorithm)
-
+CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, topology)
 
 # Extract bundles and transform to the desired format
 # CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
@@ -534,7 +536,6 @@ with open(output_file_bundle_top, "w") as file:
 
         file.write(f"                    end\n") 
         file.write(f"endgenerate\n")
-        file.write(f"// total_luts=\n\n") 
     
     file.write(f"// total_luts={total_luts}\n\n")   
 

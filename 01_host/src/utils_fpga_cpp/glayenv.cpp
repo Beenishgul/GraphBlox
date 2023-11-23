@@ -29,7 +29,7 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian, int entries)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian)
 {
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
@@ -37,10 +37,11 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->kernelName  = kernelName;
     glayHandle->ctrlMode    = ctrlMode;
     glayHandle->overlayPath = overlayPath;
-    glayHandle->entries     = entries;
     glayHandle->endian_read = endian;
     glayHandle->endian_write= 0;
     glayHandle->flush_enable= 0;
+
+    readGLAYDeviceEntriesFromFile(glayHandle);
 
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
 
@@ -75,6 +76,30 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     return glayHandle;
 }
+
+void readGLAYDeviceEntriesFromFile(struct xrtGLAYHandle *glayHandle) {
+    FILE *file = fopen( glayHandle->overlayPath, "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        // Check if the line contains the comment
+        if (strstr(line, "// Number of entries") != NULL) {
+            int entries;
+            // Extract the number of entries from the comment line
+            if (sscanf(line, "// Number of entries %d", &entries) == 1) {
+                glayHandle->entries = entries;
+                break;
+            }
+        }
+    }
+
+    fclose(file);
+}
+
 
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 {

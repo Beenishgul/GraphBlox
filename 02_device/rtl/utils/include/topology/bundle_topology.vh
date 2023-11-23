@@ -25,8 +25,6 @@ generate
 
                     end
 endgenerate
-// total_luts=
-
 
 generate
      if(ID_BUNDLE == 1)
@@ -65,8 +63,6 @@ generate
 
                     end
 endgenerate
-// total_luts=
-
 
 generate
      if(ID_BUNDLE == 2)
@@ -87,8 +83,6 @@ generate
 
                     end
 endgenerate
-// total_luts=
-
 
 generate
      if(ID_BUNDLE == 3)
@@ -109,7 +103,5 @@ generate
 
                     end
 endgenerate
-// total_luts=
-
 // total_luts=26029
 

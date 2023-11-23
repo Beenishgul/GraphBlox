@@ -29,7 +29,7 @@ output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
 output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
 # output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, verilog_template_filename)
-output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters", verilog_template_filename)
+output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "mapping", verilog_template_filename)
 
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_filename)
 
@@ -47,11 +47,14 @@ def get_config(config_data, algorithm):
     # Sort the keys and create the configuration array
     return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
 
-# Example algorithm selection
-algorithm = ALGORITHM_NAME
+# Define the filename based on the CAPABILITY
+if CAPABILITY == "Single":
+    topology = f"{CAPABILITY}.{ALGORITHM_NAME}"
+else:
+    topology = f"{CAPABILITY}"
 
 # Get the configuration for the selected algorithm
-CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, algorithm)
+CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, topology)
 
 # Extract bundles and transform to the desired format
 # CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
@@ -342,6 +345,7 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
 
     # Read the file and process entries and comments
     with open(filename, 'r') as file:
+
         for line in file:
             line = line.strip()  # Strip the leading and trailing whitespaces
 
@@ -459,7 +463,17 @@ CU_BUNDLES_ENGINE_CONFIG_ARRAY = [
 ]
 
 append_to_file(output_file_path_cpp, "}")
-append_to_file(output_file_path_ol, f"// Number of entries {entry_index}")
-append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
+append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
+append_to_file(output_file_path_cpp, f"// -->  {topology}  <-- ")
 append_to_file(output_file_path_cpp, f"// Number of entries {entry_index_cpp}")
+
+append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
+append_to_file(output_file_path_ol, f"// -->  {topology}  <-- ")
+append_to_file(output_file_path_ol, f"// Number of entries {entry_index}")
+
+append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
+append_to_file(output_file_path_vh, f"// -->  {topology}  <-- ")
+append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
+
+
 print(f"export NUM_ENTRIES={entry_index_vh}")

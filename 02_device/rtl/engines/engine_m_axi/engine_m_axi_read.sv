@@ -317,8 +317,8 @@ generate
     assign m_tvalid       = tvalid;
     assign m_tdata        = tdata;
     assign rready         = &m_tready;
-    assign wr_rst_busy[i] = 0;
-    assign rd_rst_busy[i] = 0;
+    assign wr_rst_busy = 0;
+    assign rd_rst_busy = 0;
   end
 endgenerate
 
