@@ -12,6 +12,7 @@ do
     export ARCHITECTURE=GLay
     export CAPABILITY=Single
     export XILINX_NUM_KERNELS=8
+    export TARGET=hw
 
     # Execute make and make build-hw in the background
     # nohup ensures the process is not killed if the terminal is closed
@@ -27,6 +28,7 @@ echo "Selected Single GLay algorithms are being processed in the background."
     export ARCHITECTURE=GLay
     export CAPABILITY=Lite
     export XILINX_NUM_KERNELS=4
+    export TARGET=hw
 
     # Execute make and make build-hw in the background
     # nohup ensures the process is not killed if the terminal is closed
@@ -41,6 +43,7 @@ echo "Selected Lite GLay algorithms are being processed in the background."
     export ARCHITECTURE=GLay
     export CAPABILITY=Full
     export XILINX_NUM_KERNELS=2
+    export TARGET=hw
 
     # Execute make and make build-hw in the background
     # nohup ensures the process is not killed if the terminal is closed
