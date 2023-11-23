@@ -38,7 +38,7 @@
         "buffer_8"        : "auxiliary_2",
         "buffer_9"        : "entries"
     },
-    "BFS": {  
+    "Single.BFS": {  
          "0": [
             ["ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"                  ],
             ["ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"     ],
@@ -60,7 +60,7 @@
             ["ENGINE_FORWARD_DATA"       ]
         ]
      },
-     "PR": {  
+     "Single.PR": {  
         "0": [
             ["ENGINE_ALU_OPS"     ],
             ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
@@ -81,7 +81,7 @@
             ["ENGINE_FORWARD_DATA"       ]
         ]
     },
-    "SPMV": {  
+    "Single.SPMV": {  
         "0": [
             ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
             ["ENGINE_ALU_OPS"     ],
@@ -105,7 +105,7 @@
             ["ENGINE_FORWARD_DATA"       ]
         ]
     },
-     "CC": {  
+     "Single.CC": {  
         "0": [
             ["ENGINE_ALU_OPS", "ENGINE_ALU_OPS"    , "ENGINE_MERGE_DATA(W:1)"   ],
             ["ENGINE_ALU_OPS", "ENGINE_ALU_OPS(C:0)"     ],
@@ -129,7 +129,7 @@
             ["ENGINE_FORWARD_DATA"       ]
         ]
     },
-     "TC": {  
+     "Single.TC": {  
         "0": [
             ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
             ["ENGINE_ALU_OPS"     ],
@@ -208,7 +208,7 @@
             ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
         ]
     },
-     "bundle": {  
+     "Test": {  
         "0": [
             ["ENGINE_ALU_OPS"     ],
             ["ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"             ],
@@ -227,6 +227,40 @@
         "3": [
             ["ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"      ],
             ["ENGINE_FORWARD_DATA"       ]
+        ]
+    },
+    "bundle": {  
+        "0":  [
+            ["ENGINE_READ_WRITE"           , "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0)"      , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0,1)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
+            ["ENGINE_CSR_INDEX(C:0,1,2)"   , "ENGINE_FILTER_COND"   ],
+            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
+            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
+        ],
+        "1": [
+            ["ENGINE_READ_WRITE"           , "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0)"      , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0,1)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
+            ["ENGINE_CSR_INDEX(C:0,1,2)"   , "ENGINE_FILTER_COND"   ],
+            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
+            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
+        ],
+        "2": [
+            ["ENGINE_READ_WRITE"           , "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0)"      , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0,1)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
+            ["ENGINE_CSR_INDEX(C:0,1,2)"   , "ENGINE_FILTER_COND"   ],
+            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
+            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
+        ],
+        "3": [
+            ["ENGINE_READ_WRITE"           , "ENGINE_MERGE_DATA(W:3)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0)"      , "ENGINE_MERGE_DATA(W:2)", "ENGINE_FILTER_COND"],
+            ["ENGINE_READ_WRITE(C:0,1)"    , "ENGINE_MERGE_DATA(W:1)", "ENGINE_FILTER_COND"],
+            ["ENGINE_CSR_INDEX(C:0,1,2)"   , "ENGINE_FILTER_COND"   ],
+            ["ENGINE_ALU_OPS"              , "ENGINE_FILTER_COND" ],
+            ["ENGINE_FORWARD_DATA"         , "ENGINE_FILTER_COND" ]
         ]
     }
 }

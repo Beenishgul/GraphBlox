@@ -96,6 +96,8 @@ always_ff @(posedge ap_clk) begin
   m_axi_write_out.awqos   <= m_axi_write.out.awqos  ; // Address write channel quality of service
   if(m_axi_write.out.wvalid)
     m_axi_write_out.wdata <= m_axi_write.out.wdata  ; // Write channel data
+  else
+    m_axi_write_out.wdata <= m_axi_write_out.wdata  ;
   m_axi_write_out.wstrb    <= m_axi_write.out.wstrb  ; // Write channel write strobe
   m_axi_write_out.wlast    <= m_axi_write.out.wlast  ; // Write channel last word flag
   m_axi_write_out.wvalid   <= m_axi_write.out.wvalid ; // Write channel valid
