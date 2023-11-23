@@ -3,13 +3,38 @@
 import shutil
 import subprocess
 import os
+import fnmatch
 
-def ignore_subdirectories(directory, subdirectories):
-    return [d for d in subdirectories if os.path.join(directory, d) in destination_directories]
+def read_gitignore_patterns(gitignore_path):
+    patterns = []
+    with open(gitignore_path, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                patterns.append(line)
+    return patterns
+
+def ignore_subdirectories(directory, subdirectories, patterns):
+    ignored = []
+    for subdir in subdirectories:
+        # Check against only the basename of the directory
+        if any(fnmatch.fnmatch(subdir, pattern) for pattern in patterns):
+            # print(f"Ignoring {subdir}")  # Debugging output
+            ignored.append(subdir)
+    return ignored
+    
+# Example Usage
+base_directory   = os.path.abspath('.')  # Current directory
+source_directory = base_directory
+gitignore_path   = os.path.join(source_directory, '.gitignore')
+ignore_patterns  = read_gitignore_patterns(gitignore_path)
+
+# def ignore_subdirectories(directory, subdirectories):
+#     return [d for d in subdirectories if os.path.join(directory, d) in destination_directories]
 
 def copy_directory(source, destination):
     try:
-        shutil.copytree(source, destination, ignore=lambda src, names: ignore_subdirectories(src, names))
+        shutil.copytree(source, destination, ignore=lambda src, names: ignore_subdirectories(src, names, ignore_patterns))
         print(f"Copied to: {destination}")
     except FileExistsError:
         print(f"Directory {destination} already exists.")
