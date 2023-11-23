@@ -352,11 +352,6 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
         overlay_program[i] = values[i];
     }
 
-
-    // overlay_program[2]  = graph->num_vertices       ;//  2  - Index_end
-    // overlay_program[8]  = xrt_buffer_device[2]      ;//  8  - BUFFER Array Pointer LHS
-    // overlay_program[9]  = xrt_buffer_device[2] >> 32;//  9  - BUFFER Array Pointer RHS
-    // overlay_program[10] = graph->num_vertices       ;//  10 - BUFFER size
     switch (algorithm)
     {
     case 0: // bfs
@@ -369,44 +364,19 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
         mapGLAYOverlayProgramBuffersPR(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
-    case 2: // SSSP-Delta
-    {
-
-    }
-    break;
-    case 3: // SSSP-Bellmanford
-    {
-
-    }
-    break;
-    case 4: // DFS
-    {
-
-    }
-    break;
     case 5: //SPMV
     {
-
+        mapGLAYOverlayProgramBuffersSPMV(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
     case 6: // Connected Components
     {
-
-    }
-    break;
-    case 7: // Betweenness Centrality
-    {
-
+        mapGLAYOverlayProgramBuffersCC(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
     case 8: // Triangle Counting
     {
         mapGLAYOverlayProgramBuffersTC(overlay_program_entries, algorithm, graph, overlayPath);
-    }
-    break;
-    case 9: // clustering
-    {
-
     }
     break;
     default:// BFS
@@ -415,12 +385,6 @@ void GLAYGraphCSRxrtBufferHandlePerBank::initializeGLAYOverlayConfiguration(size
     }
     break;
     }
-
-    // for (size_t i = 0; i < (overlay_program_entries+16384); i++)
-    // {
-    //     overlay_program[i] = 0;
-    // }
-
 
 }
 
