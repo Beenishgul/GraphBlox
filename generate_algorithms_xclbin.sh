@@ -1,51 +1,35 @@
 #!/bin/bash
 
 # Define an array of algorithm indices to be processed
-# Add or remove indices as needed
 algorithm_indices=(0 1 5 6 8)
+
+# Function to build with parameters
+build_with_params() {
+    local alg_index=$1
+    local arch=$2
+    local cap=$3
+    local num_kernels=$4
+    local target=$5
+
+    # Constructing the parameter list
+    local params="ALGORITHMS=$alg_index ARCHITECTURE=$arch CAPABILITY=$cap XILINX_NUM_KERNELS=$num_kernels TARGET=$target"
+
+    # Execute make with parameters, then make build-hw in the background
+    echo "nohup make $params && make build-hw $params > "algorithm_${alg_index}_${cap}.log" 2>&1 &"
+}
 
 # Loop through the specified algorithm indices
 for ALGORITHM_INDEX in "${algorithm_indices[@]}"
 do
-    # Export ALGORITHMS variable
-    export ALGORITHMS=$ALGORITHM_INDEX
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Single
-    export XILINX_NUM_KERNELS=8
-
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
+    build_with_params $ALGORITHM_INDEX GLay Single 8 hw
 done
 
-echo "Selected Single GLay algorithms are being processed in the background."
+# echo "xlcbin Single GLay algorithms are being processed in the background."
 
-    # Export ALGORITHMS variable
-    export ALGORITHMS=0
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Lite
-    export XILINX_NUM_KERNELS=4
+# Single run with Lite capability
+build_with_params 0 GLay Lite 4 hw
+# echo "xlcbin Lite GLay algorithm is being processed in the background."
 
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
-
-echo "Selected Lite GLay algorithms are being processed in the background."
-
-    # Export ALGORITHMS variable
-    export ALGORITHMS=0
-    export ARCHITECTURE=GLay
-    export CAPABILITY=Full
-    export XILINX_NUM_KERNELS=2
-
-    # Execute make and make build-hw in the background
-    # nohup ensures the process is not killed if the terminal is closed
-    # & puts the process in the background
-    # Output is redirected to a log file for each algorithm
-    nohup make && make build-hw > "algorithm_$ALGORITHM_INDEX.log" 2>&1 &
-
-echo "Selected Full GLay algorithms are being processed in the background."
+# Single run with Full capability
+build_with_params 0 GLay Full 2 hw
+# echo "xlcbin Full GLay algorithm is being processed in the background."
