@@ -15,7 +15,7 @@ if len(sys.argv) != 9:
 _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
 
 # Define the filename based on the CAPABILITY
-config_filename = "topology.json"
+config_filename = f"topology.json"
 overlay_template_filename = f"template.{ALGORITHM_NAME}.ol"
 
   
