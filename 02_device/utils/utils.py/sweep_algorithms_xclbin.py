@@ -16,7 +16,7 @@ def copy_directory(source, destination):
 
 def run_make_in_parallel(directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy):
     # Construct the make commands
-    make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={target} DESIGN_FREQ_HZ={freq}"
+    make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={cache} DESIGN_FREQ_HZ={freq} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={cache} DESIGN_FREQ_HZ={freq}"
     
     # Define the log file path
     log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}.log")
@@ -31,13 +31,15 @@ source_directory = base_directory
 # Parameters for different algorithm configurations
 algorithms = [
     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-    (0, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
-    (1, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
-    (5, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
-    (6, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
-    (8, "GLay", "Single", 8, "hw", 131072, 200000000, 1),
-    (0, "GLay", "Lite", 4, "hw", 131072, 200000000, 1),
-    (0, "GLay", "Full", 2, "hw", 131072, 200000000, 1),
+    (0, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (1, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (5, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (6, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (8, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Full", 2, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 2),
+    (0, "GLay", "Full", 2, "hw", 131072, 240000000, 2),
     # Add more tuples here for other algorithm configurations as needed
 ]
 

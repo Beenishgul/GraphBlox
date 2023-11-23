@@ -17,7 +17,7 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABI
 
 # Define the filename based on the CAPABILITY
 
-config_filename ="topology.json"
+config_filename = f"topology.json"
 
 config_topology_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
