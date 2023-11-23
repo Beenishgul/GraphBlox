@@ -8,33 +8,47 @@ import json
 
 # Validate the number of arguments
 if len(sys.argv) != 8:
-    print("Usage: <script> <FULL_SRC_IP_DIR_CONFIG> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
+    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_CONFIG, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
 
 # Define the filename based on the CAPABILITY
-if CAPABILITY == "Single":
-    config_filename = f"architecture.{ALGORITHM_NAME}.json"
-else:
-    config_filename = "architecture.json"
 
-config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
+config_filename = f"topology.json"
+
+config_topology_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
 output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
 output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_topology.vh")
-config_file_path = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, config_filename)
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_filename)
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
 
 mapping = config_data["mapping"]
+luts    = config_data["luts"]
+
+
+def get_config(config_data, algorithm):
+    # Default to 'bundle' if the specified algorithm is not found
+    selected_config = config_data.get(algorithm, config_data['bundle'])
+
+    # Sort the keys and create the configuration array
+    return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
+
+# Example algorithm selection
+algorithm = ALGORITHM_NAME
+
+# Get the configuration for the selected algorithm
+CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, algorithm)
+
 
 # Extract bundles and transform to the desired format
-CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
+# CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
 
 # Compute values based on CU_BUNDLES_CONFIG_ARRAY
 NUM_CUS_MAX = 1  # As there's only one CU
@@ -187,6 +201,25 @@ def generate_cu_bundles_config_array_engine_seq_min(seq_width_array):
 
     return prefix_sum_array
 
+def calculate_total_luts(luts, configuration):
+    total_luts = 0
+
+    if not isinstance(configuration, list):
+        raise ValueError("Configuration should be a list")
+
+    for engines in configuration:
+        if not isinstance(engines, list):
+            raise ValueError("Each item in configuration should be a list of engines")
+        for engine in engines:
+            if not isinstance(engine, list):
+                raise ValueError("Each engine should be a list")
+            for engine_instance in engine:
+                engine_name = engine_instance.split('(')[0]
+                total_luts += luts.get(engine_name, 0)
+
+    return total_luts
+
+total_luts = calculate_total_luts(luts, CU_BUNDLES_CONFIG_ARRAY)
 
 CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY = generate_config_cast_width_array()
 
@@ -432,6 +465,7 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + "\n")
+    file.write(f"// total_luts={total_luts}\n\n")  
    
 
 
@@ -500,7 +534,9 @@ with open(output_file_bundle_top, "w") as file:
 
         file.write(f"                    end\n") 
         file.write(f"endgenerate\n")
-        file.write(f"\n\n")  
+        file.write(f"// total_luts=\n\n") 
+    
+    file.write(f"// total_luts={total_luts}\n\n")   
 
 
 # Write to VHDL file
@@ -586,7 +622,9 @@ with open(output_file_lane_top, "w") as file:
 
             file.write(f"          end\n") 
             file.write(f"endgenerate\n")
-            file.write(f"\n\n")  
+            file.write(f"\n\n") 
+
+    file.write(f"// total_luts={total_luts}\n\n")   
                    
 
   
