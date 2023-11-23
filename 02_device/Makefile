@@ -652,7 +652,7 @@ clean-report-metrics: session-info
 .PHONY: run-sweep-xclbin
 run-sweep-xclbin:
 	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
-	python $(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/sweep_algorithms_xclbin.py 
+	python3 $(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/sweep_algorithms_xclbin.py 
 
 # =========================================================
 #  Help menu
