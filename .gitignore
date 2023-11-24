@@ -39,5 +39,6 @@ alg_*
 02_device/vivado_pid*.str   
 02_device/xilinx_*
 02_device/ol/*/template.*.ol
+02_device/ol/*/template.*.json
 02_device/alg_*
 01_host/alg_*
