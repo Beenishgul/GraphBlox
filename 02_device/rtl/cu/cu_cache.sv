@@ -147,50 +147,22 @@ end
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_write.in <= 0;
-  end
-  else begin
-    m_axi_write.in <= m_axi_write_in;
-  end
-end
-
+    assign m_axi_write.in = m_axi_write_in;
+ 
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_read.in <= 0;
-  end
-  else begin
-    m_axi_read.in <= m_axi_read_in;
-  end
-end
+    assign m_axi_read.in = m_axi_read_in;
 
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_write_out <= 0;
-  end
-  else begin
-    m_axi_write_out <= m_axi_write.out;
-  end
-end
+    assign m_axi_write_out = m_axi_write.out;
 
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_read_out <= 0;
-  end
-  else begin
-    m_axi_read_out <= m_axi_read.out;
-  end
-end
+    assign m_axi_read_out = m_axi_read.out;
 
 // --------------------------------------------------------------------------------------
 // AXI port cache

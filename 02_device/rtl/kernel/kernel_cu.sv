@@ -163,8 +163,6 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-  cu_cache_m_axi_read_in  <= m_axi_read_in;
-  cu_cache_m_axi_write_in <= m_axi_write_in;
   response_in_reg.payload <= kernel_cu_response_in.payload;
 end
 
@@ -190,13 +188,22 @@ end
 
 assign fifo_empty_int = cache_generator_fifo_request_signals_out.empty & cache_generator_fifo_response_signals_out.empty;
 
+
+
+
 always_ff @(posedge ap_clk) begin
-  m_axi_read_out                      <= cu_cache_m_axi_read_out ;
-  m_axi_write_out                     <= cu_cache_m_axi_write_out ;
   kernel_cu_fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
   kernel_cu_fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
   kernel_cu_request_out.payload       <= request_out_reg.payload;
 end
+
+// --------------------------------------------------------------------------------------
+// AXI Drive signals
+// --------------------------------------------------------------------------------------
+assign cu_cache_m_axi_read_in  = m_axi_read_in;
+assign cu_cache_m_axi_write_in = m_axi_write_in;
+assign m_axi_read_out          = cu_cache_m_axi_read_out ;
+assign m_axi_write_out         = cu_cache_m_axi_write_out ;
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor Control and Drive signals to other modules

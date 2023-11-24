@@ -64,6 +64,7 @@ eval $(python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_ov
 python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include"
 # python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
+rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${pkgs}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${engines}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${engines}
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${kernel}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${kernel}
