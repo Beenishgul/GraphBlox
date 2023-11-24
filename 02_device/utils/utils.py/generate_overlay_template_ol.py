@@ -17,17 +17,21 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_
 # Define the filename based on the CAPABILITY
 config_filename = f"topology.json"
 overlay_template_filename = f"template.{ALGORITHM_NAME}.ol"
-
+json_template_filename = f"template.{ALGORITHM_NAME}.json"
   
 cpp_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.cpp"
 verilog_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.vh"
 
-overlay_template_source= "Engines.Templates"
+
+json_template_source= "Engines.Templates/Templates.json"
+overlay_template_source= "Engines.Templates/Templates.ol"
 overlay_template_path= f"{ARCHITECTURE}.{CAPABILITY}"
 config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
 output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, overlay_template_filename)
+# output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
+output_file_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, json_template_filename)
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
 output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
 # output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, verilog_template_filename)
@@ -84,6 +88,11 @@ entries_vh = []
 entry_index_vh = 0
 engine_index_vh = 0
 
+combined_engine_template_json = {}
+entry_index_json = 0
+engine_index_json = 0
+
+
 def check_and_clean_file(file_path):
     # Check if the file exists
     if os.path.exists(file_path):
@@ -99,6 +108,7 @@ def append_to_file(file_path, line_to_append):
 
 # Before writing to the file, clean up any existing version of the file
 check_and_clean_file(output_file_path_ol)
+check_and_clean_file(output_file_path_json)
 check_and_clean_file(output_file_path_cpp)
 check_and_clean_file(output_file_path_vh)
 
@@ -114,27 +124,31 @@ def get_engine_id(engine_name):
     base_mapping = mapping.get(base_name, 0)
     base_cycles  = cycles.get(base_name, 0)
     engine_template_filename_ol = f"{base_name}.ol" 
-    template_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, overlay_template_source)
+    engine_template_filename_json = f"{base_name}.json" 
+    template_file_path_ol   = os.path.join(FULL_SRC_IP_DIR_OVERLAY, overlay_template_source)
+    template_file_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, json_template_source)
     
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     append_to_file(output_file_path_ol, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-    process_file_ol(template_file_path, engine_template_filename_ol)
+    process_file_ol(template_file_path_ol, engine_template_filename_ol)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
     append_to_file(output_file_path_vh, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
-    process_file_vh(template_file_path, engine_template_filename_ol, engine_name)
+    process_file_vh(template_file_path_ol, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
 
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
     append_to_file(output_file_path_cpp, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
-    process_file_cpp(template_file_path, engine_template_filename_ol, engine_name)
+    process_file_cpp(template_file_path_ol, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
+
+    process_file_json(template_file_path_json, engine_template_filename_json, engine_name)
 
 
     return base_mapping
@@ -166,51 +180,6 @@ def extract_buffer(token):
         end = token.find(")", start)   # Finds the end index, which is the closing ")"
         return token[start:end]        # Extracts and returns the substring
     return ""  # Returns an empty string if "(B:" is not found
-
-# def extract_buffer_details(token):
-#     """Extracts buffer details from a token. Handles both (B:buffer_name) and (B:buffer_name,start,end) formats."""
-#     if "(B:" in token:
-#         start = token.find("(B:") + 3
-#         end = token.find(")", start)
-#         details = token[start:end].split(',')
-
-#         buffer_name = details[0]  # Buffer name is always present
-#         start_value = '0'  # Default value
-#         end_value = '0'   # Default value
-
-#         # Update start and end values if present
-#         if len(details) > 1:
-#             start_value = details[1]
-#         if len(details) > 2:
-#             end_value = details[2]
-
-#         return buffer_name, start_value, end_value
-
-#     return "None", '0', '0'
-
-# def extract_buffer_details(token):
-#     """Extracts buffer details from a token. Handles (B:buffer_name,start,end) formats including mathematical operations."""
-#     if "(B:" in token:
-#         start = token.find("(B:") + 3
-#         end = token.find(")", start)
-#         details = token[start:end].split(',')
-
-#         buffer_name = details[0]  # Buffer name is always present
-#         start_value_ops = ['0']  # Default value
-#         end_value_ops = ['0']   # Default value
-
-#         # Define a regular expression pattern to split by operators while keeping the operators
-#         pattern = r'(\d+|\+|\-|\*|\/|\%|\(|\))'
-
-#         # Update start and end values if present, including parsing for operations
-#         if len(details) > 1:
-#             start_value_ops = re.findall(pattern, details[1])
-#         if len(details) > 2:
-#             end_value_ops = re.findall(pattern, details[2])
-
-#         return buffer_name, start_value_ops, end_value_ops
-
-#     return "None", ['0'], ['0']
 
 def extract_buffer_details(token):
     """Extracts buffer details from a token. Handles (B:buffer_name,start,end) formats including mathematical operations."""
@@ -453,6 +422,28 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
 
     engine_index_cpp += 1
 
+def process_file_json(template_file_path, engine_template_filename, engine_name):
+    # Define the size of a cache line in bytes and the size of each entry
+    global combined_engine_template_json
+    global entry_index__json
+    global engine_index_json
+    global output_file_path_json
+
+    engine_type = engine_name.split("(")[0]
+    filename = os.path.join(template_file_path, engine_template_filename)
+    engine_id = f"{engine_type}_{engine_index_json}"
+    # print(filename)
+
+    # Read the file and process entries and comments
+    with open(filename, 'r') as file:
+        # Load the JSON data from the file
+        json_engine_template = json.load(file)
+        # Combine the data
+        combined_engine_template_json[engine_id]=json_engine_template # Use extend for lists, update for dicts
+
+    engine_index_json += 1
+
+
 
 append_to_file(output_file_path_cpp, "#include \"glayenv.hpp\"")
 append_to_file(output_file_path_cpp, f"void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
@@ -477,5 +468,8 @@ append_to_file(output_file_path_vh, "// ----------------------------------------
 append_to_file(output_file_path_vh, f"// -->  {topology}  <-- ")
 append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
 
+# Write the combined data to a new file
+with open(output_file_path_json, 'w') as f:
+    json.dump(combined_engine_template_json, f, indent=4)
 
 print(f"export NUM_ENTRIES={entry_index_vh}")
