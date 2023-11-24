@@ -56,15 +56,15 @@ source_directory = base_directory
 # Parameters for different algorithm configurations
 algorithms = [
     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-    # (0, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
-    # (1, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
-    # (5, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
-    # (6, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
-    # (8, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 1),
-    # (0, "GLay", "Full", 2, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (1, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (5, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (6, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (8, "GLay", "Single", 8, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 1),
+    (0, "GLay", "Full", 2, "hw", 131072, 240000000, 1),
     # (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 2),
-    (0, "GLay", "Full", 2, "hw", 131072, 240000000, 2),
+    # (0, "GLay", "Full", 2, "hw", 131072, 240000000, 2),
     # Add more tuples here for other algorithm configurations as needed
 ]
 
