@@ -540,7 +540,7 @@ run-emu: session-info | $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(VIVADO_RUN_DIR)/
 	
 .PHONY: run-emu-debug
 run-emu-debug: DEBUG_CMD=1
-run-emu-debug: run-emu-cmd
+run-emu-debug: session-info | $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(VIVADO_RUN_DIR)/$(PLATFORM)-$(DEVICE_INDEX)-$(KERNEL_NAME)_$(TARGET).wdb
 	
 .PHONY: run-emu-wave
 run-emu-wave: DEBUG_CMD=0
