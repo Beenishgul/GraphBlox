@@ -194,7 +194,7 @@ struct xrtGLAYHandle
     xrt::ip::interrupt interruptHandle;
 };
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian);
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian, bool flush);
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle);
 void readGLAYDeviceEntriesFromFile(struct xrtGLAYHandle *glayHandle);
 
