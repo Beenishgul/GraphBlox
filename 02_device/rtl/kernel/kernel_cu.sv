@@ -414,5 +414,4 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-
 endmodule : kernel_cu

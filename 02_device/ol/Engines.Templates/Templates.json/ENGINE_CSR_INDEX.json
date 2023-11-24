@@ -1,4 +1,21 @@
-{
+{    
+    "type_memory_cmd": {
+        "CMD_INVALID"      :   1,
+        "CMD_MEM_READ"     :   2,
+        "CMD_MEM_WRITE"    :   4,
+        "CMD_MEM_RESPONSE" :   8,
+        "CMD_MEM_CONFIGURE":   16,
+        "CMD_ENGINE"       :   32,
+        "CMD_CONTROL"      :   64
+    },
+    "type_data_buffer": {
+        "STRUCT_INVALID"     :   1,
+        "STRUCT_CU_DATA"     :   2,
+        "STRUCT_ENGINE_DATA" :   4,
+        "STRUCT_CU_SETUP"    :   8,
+        "STRUCT_ENGINE_SETUP":   16,
+        "STRUCT_CU_FLUSH"    :   32
+    },
     "entries": {
         "entry_0": {
             "increment": {
@@ -42,7 +59,7 @@
         },
         "entry_4": {
             "granularity": {
-                "bits": "1",
+                "bits": "4",
                 "value": "0"
             },
             "direction": {
@@ -50,7 +67,7 @@
                 "value": "0"
             },
             "shift.amount": {
-                "bits": "1",
+                "bits": "4",
                 "value": "0"
             },
             "shift.direction": {
@@ -60,38 +77,38 @@
         },
         "entry_5": {
             "cmd": {
-                "bits": "1",
-                "value": "0"
+                "bits": "7",
+                "value": "CMD_INVALID"
             },
             "buffer": {
-                "bits": "1",
-                "value": "0"
+                "bits": "6",
+                "value": "STRUCT_INVALID"
             },
             "id_module": {
-                "bits": "1",
-                "value": "0"
+                "bits": "8",
+                "value": "0x00"
             },
             "id_engine": {
-                "bits": "1",
-                "value": "0"
+                "bits": "8",
+                "value": "0x00"
             }
         },
         "entry_6": {
-            "id_cu": {
-                "bits": "1",
-                "value": "0"
+           "id_cu": {
+                "bits": "8",
+                "value": "0x00"
             },
             "id_bundle": {
-                "bits": "1",
-                "value": "0"
+                "bits": "8",
+                "value": "0x00"
             },
             "id_lane": {
-                "bits": "1",
-                "value": "0"
+                "bits": "8",
+                "value": "0x00"
             },
             "id_buffer": {
-                "bits": "1",
-                "value": "0"
+                "bits": "8",
+                "value": "0x00"
             }
         },
         "entry_7": {
@@ -106,7 +123,7 @@
                 "value": "0x00000000"
             }
         },
-        "array_size": {
+        "entry_9": {
             "array_size": {
                 "bits": "32",
                 "value": "0x00000000"
