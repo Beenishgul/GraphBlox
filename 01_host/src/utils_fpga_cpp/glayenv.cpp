@@ -29,7 +29,7 @@
 // ***************                  XRT General                                  **************
 // ********************************************************************************************
 
-struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian)
+struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int deviceIndex, char *xclbinPath, char *overlayPath, char *kernelName, int ctrlMode, bool endian, bool flush)
 {
     glayHandle = (struct xrtGLAYHandle *) my_malloc(sizeof(struct xrtGLAYHandle));
     glayHandle->deviceIndex = deviceIndex;
@@ -39,15 +39,14 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->overlayPath = overlayPath;
     glayHandle->endian_read = endian;
     glayHandle->endian_write= 0;
-    glayHandle->flush_enable= 0;
+    glayHandle->flush_enable= flush;
+    glayHandle->entries     = 0;
 
-    readGLAYDeviceEntriesFromFile(glayHandle);
+    readGLAYDeviceEntriesFromFile(glayHandle); // set glayHandle->entries
 
     glayHandle->deviceHandle = xrt::device(glayHandle->deviceIndex);
-
-    glayHandle->xclbinUUID = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
-
-    glayHandle->xclbinHandle  = xrt::xclbin(glayHandle->xclbinPath);
+    glayHandle->xclbinUUID   = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
+    glayHandle->xclbinHandle = xrt::xclbin(glayHandle->xclbinPath);
 
     switch (glayHandle->ctrlMode)
     {
@@ -84,7 +83,7 @@ void readGLAYDeviceEntriesFromFile(struct xrtGLAYHandle *glayHandle) {
         return;
     }
 
-    char line[256];
+    char line[1024];
     while (fgets(line, sizeof(line), file)) {
         // Check if the line contains the comment
         if (strstr(line, "// Number of entries") != NULL) {
@@ -108,6 +107,10 @@ void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
     printf("DEVICE::NAME                    [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::name>().c_str() );
     printf("DEVICE::BDF                     [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::bdf>().c_str() );
     printf("DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld] \n", glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() );
+    printf("-----------------------------------------------------\n");
+    printf("DEVICE::endian_read [%d] \n", glayHandle->endian_read );
+    printf("DEVICE::endian_write [%d] \n", glayHandle->endian_write);
+    printf("DEVICE::flush_enable [%d] \n", glayHandle->flush_enable);
     printf("-----------------------------------------------------\n");
     printf(" \nKernel Arguments Offsets: HANDLE[%2u] \n", 0);
 
