@@ -1,11 +1,11 @@
 {
-    "alu_operations": {
-        "ALU_ACC": 8,
-        "ALU_ADD": 1,
-        "ALU_DIV": 16,
-        "ALU_MUL": 4,
-        "ALU_NOP": 0,
-        "ALU_SUB": 2
+    "type_ALU_operation": {
+        "ALU_NOP": 1,
+        "ALU_ADD": 2,
+        "ALU_SUB": 4,
+        "ALU_MUL": 8,
+        "ALU_ACC": 16,
+        "ALU_DIV": 32
     },
     "entries": {
         "entry_0": {
@@ -47,7 +47,7 @@
             }
         },
         "entry_5": {
-            "id_buffer": {
+            "id_cu": {
                 "bits": "8",
                 "value": "0x00"
             },
@@ -55,11 +55,11 @@
                 "bits": "8",
                 "value": "0x00"
             },
-            "id_cu": {
+            "id_lane": {
                 "bits": "8",
                 "value": "0x00"
             },
-            "id_lane": {
+            "id_buffer": {
                 "bits": "8",
                 "value": "0x00"
             }

@@ -2,8 +2,8 @@
     "entries": {
         "entry_0": {
             "hops": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "4",
+                "value": "0x0"
             }
         }
     }
