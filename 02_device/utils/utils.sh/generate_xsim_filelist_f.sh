@@ -62,6 +62,7 @@ utils_arbiter="arbiter"
 utils_fifo="fifo"
 utils_counter="counter"
 utils_include="include"
+utils_slice="slice"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -133,6 +134,8 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME_SV} "sv"
+
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_slice}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME_SV} "sv"
 

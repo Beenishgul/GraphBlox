@@ -188,22 +188,11 @@ end
 
 assign fifo_empty_int = cache_generator_fifo_request_signals_out.empty & cache_generator_fifo_response_signals_out.empty;
 
-
-
-
 always_ff @(posedge ap_clk) begin
   kernel_cu_fifo_request_signals_out  <= cache_generator_fifo_request_signals_out;
   kernel_cu_fifo_response_signals_out <= cache_generator_fifo_response_signals_out;
   kernel_cu_request_out.payload       <= request_out_reg.payload;
 end
-
-// --------------------------------------------------------------------------------------
-// AXI Drive signals
-// --------------------------------------------------------------------------------------
-assign cu_cache_m_axi_read_in  = m_axi_read_in;
-assign cu_cache_m_axi_write_in = m_axi_write_in;
-assign m_axi_read_out          = cu_cache_m_axi_read_out ;
-assign m_axi_write_out         = cu_cache_m_axi_write_out ;
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor Control and Drive signals to other modules
@@ -347,6 +336,30 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
+// AXI Drive signals
+// --------------------------------------------------------------------------------------
+assign cu_cache_m_axi_read_in  = m_axi_read_in;
+assign cu_cache_m_axi_write_in = m_axi_write_in;
+assign m_axi_read_out          = cu_cache_m_axi_read_out ;
+assign m_axi_write_out         = cu_cache_m_axi_write_out ;
+
+// --------------------------------------------------------------------------------------
+// CU CACHE (M->S) Register Slice
+// --------------------------------------------------------------------------------------
+// axi_register_slice_mid inst_axi_register_slice_mid (
+//   .ap_clk         (ap_clk                  ),
+//   .areset         (areset_axi_slice        ),
+//   .s_axi_read_out (cu_cache_m_axi_read_in  ),
+//   .s_axi_read_in  (cu_cache_m_axi_read_out ),
+//   .s_axi_write_out(cu_cache_m_axi_write_in ),
+//   .s_axi_write_in (cu_cache_m_axi_write_out),
+//   .m_axi_read_in  (m_axi_read_in           ),
+//   .m_axi_read_out (m_axi_read_out          ),
+//   .m_axi_write_in (m_axi_write_in          ),
+//   .m_axi_write_out(m_axi_write_out         )
+// );
+
+// --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
 cu_setup #(
@@ -371,9 +384,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),

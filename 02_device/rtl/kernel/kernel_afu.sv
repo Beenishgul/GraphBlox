@@ -78,10 +78,11 @@ module kernel_afu (
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_m_axi  ;
-logic areset_cu     ;
-logic areset_control;
-logic areset_cache  ;
+logic areset_m_axi    ;
+logic areset_cu       ;
+logic areset_control  ;
+logic areset_cache    ;
+logic areset_axi_slice;
 
 // --------------------------------------------------------------------------------------
 // AXI
@@ -130,10 +131,11 @@ parameter PULSE_HOLD    = 100;
 logic     areset_system      ;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-  areset_m_axi   <= areset_system;
-  areset_cu      <= areset_system;
-  areset_control <= areset_system;
-  areset_cache   <= areset_system;
+  areset_m_axi     <= areset_system;
+  areset_cu        <= areset_system;
+  areset_control   <= areset_system;
+  areset_cache     <= areset_system;
+  areset_axi_slice <= areset_system;
 end
 
 logic [PULSE_HOLD-1:0] sync_ff;
@@ -200,17 +202,17 @@ assign m_axi4_read.in.rresp   = m00_axi_rresp  ; // Read channel response
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-assign  m00_axi_arvalid = m_axi4_read.out.arvalid; // Address read channel valid
-assign  m00_axi_araddr  = m_axi4_read.out.araddr ; // Address read channel address
-assign  m00_axi_arlen   = m_axi4_read.out.arlen  ; // Address write channel burst length
-assign  m00_axi_rready  = m_axi4_read.out.rready ; // Read channel ready
-assign  m00_axi_arid    = m_axi4_read.out.arid   ; // Address read channel ID
-assign  m00_axi_arsize  = m_axi4_read.out.arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
-assign  m00_axi_arburst = m_axi4_read.out.arburst; // Address read channel burst type
-assign  m00_axi_arlock  = m_axi4_read.out.arlock ; // Address read channel lock type
-assign  m00_axi_arcache = m_axi4_read.out.arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-assign  m00_axi_arprot  = m_axi4_read.out.arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-assign  m00_axi_arqos   = m_axi4_read.out.arqos  ; // Address write channel quality of service
+assign m00_axi_arvalid = m_axi4_read.out.arvalid; // Address read channel valid
+assign m00_axi_araddr  = m_axi4_read.out.araddr ; // Address read channel address
+assign m00_axi_arlen   = m_axi4_read.out.arlen  ; // Address write channel burst length
+assign m00_axi_rready  = m_axi4_read.out.rready ; // Read channel ready
+assign m00_axi_arid    = m_axi4_read.out.arid   ; // Address read channel ID
+assign m00_axi_arsize  = m_axi4_read.out.arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
+assign m00_axi_arburst = m_axi4_read.out.arburst; // Address read channel burst type
+assign m00_axi_arlock  = m_axi4_read.out.arlock ; // Address read channel lock type
+assign m00_axi_arcache = m_axi4_read.out.arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+assign m00_axi_arprot  = m_axi4_read.out.arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+assign m00_axi_arqos   = m_axi4_read.out.arqos  ; // Address write channel quality of service
 
 
 // --------------------------------------------------------------------------------------
@@ -226,21 +228,21 @@ assign m_axi4_write.in.bvalid  = m00_axi_bvalid ; // Write response channel vali
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-assign  m00_axi_awvalid = m_axi4_write.out.awvalid; // Address write channel valid
-assign  m00_axi_awid    = m_axi4_write.out.awid   ; // Address write channel ID
-assign  m00_axi_awaddr  = m_axi4_write.out.awaddr ; // Address write channel address
-assign  m00_axi_awlen   = m_axi4_write.out.awlen  ; // Address write channel burst length
-assign  m00_axi_awsize  = m_axi4_write.out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
-assign  m00_axi_awburst = m_axi4_write.out.awburst; // Address write channel burst type
-assign  m00_axi_awlock  = m_axi4_write.out.awlock ; // Address write channel lock type
-assign  m00_axi_awcache = m_axi4_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-assign  m00_axi_awprot  = m_axi4_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-assign  m00_axi_awqos   = m_axi4_write.out.awqos  ; // Address write channel quality of service
-assign  m00_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write.out.wdata , endian_write_reg); // Write channel data
-assign  m00_axi_wstrb   = m_axi4_write.out.wstrb  ; // Write channel write strobe
-assign  m00_axi_wlast   = m_axi4_write.out.wlast  ; // Write channel last word flag
-assign  m00_axi_wvalid  = m_axi4_write.out.wvalid ; // Write channel valid
-assign  m00_axi_bready  = m_axi4_write.out.bready ; // Write response channel ready
+assign m00_axi_awvalid = m_axi4_write.out.awvalid; // Address write channel valid
+assign m00_axi_awid    = m_axi4_write.out.awid   ; // Address write channel ID
+assign m00_axi_awaddr  = m_axi4_write.out.awaddr ; // Address write channel address
+assign m00_axi_awlen   = m_axi4_write.out.awlen  ; // Address write channel burst length
+assign m00_axi_awsize  = m_axi4_write.out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
+assign m00_axi_awburst = m_axi4_write.out.awburst; // Address write channel burst type
+assign m00_axi_awlock  = m_axi4_write.out.awlock ; // Address write channel lock type
+assign m00_axi_awcache = m_axi4_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+assign m00_axi_awprot  = m_axi4_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+assign m00_axi_awqos   = m_axi4_write.out.awqos  ; // Address write channel quality of service
+assign m00_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write.out.wdata , endian_write_reg); // Write channel data
+assign m00_axi_wstrb   = m_axi4_write.out.wstrb  ; // Write channel write strobe
+assign m00_axi_wlast   = m_axi4_write.out.wlast  ; // Write channel last word flag
+assign m00_axi_wvalid  = m_axi4_write.out.wvalid ; // Write channel valid
+assign m00_axi_bready  = m_axi4_write.out.bready ; // Write response channel ready
 
 // --------------------------------------------------------------------------------------
 // DRIVE DESCRIPTOR
@@ -264,11 +266,6 @@ generate
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI
 // --------------------------------------------------------------------------------------
-    assign kernel_cache_m_axi4_read_in  = m_axi4_read.in  ;
-    assign m_axi4_read.out              = kernel_cache_m_axi4_read_out  ;
-    assign kernel_cache_m_axi4_write_in = m_axi4_write.in ;
-    assign m_axi4_write.out             = kernel_cache_m_axi4_write_out;
-
     kernel_cache inst_kernel_cache (
       .ap_clk            (ap_clk                       ),
       .areset            (areset_cache                 ),
@@ -284,16 +281,28 @@ generate
     );
   end else begin
     assign kernel_cache_setup_signal     = 0;
-    assign kernel_cache_m_axi4_read_in   = m_axi4_read.in  ;
-    assign m_axi4_read.out               = kernel_cache_m_axi4_read_out;
-    assign kernel_cache_m_axi4_write_in  = m_axi4_write.in ;
-    assign m_axi4_write.out              = kernel_cache_m_axi4_write_out;
     assign kernel_cache_s_axi_read_out   = kernel_cache_m_axi4_read_in;
     assign kernel_cache_m_axi4_read_out  = kernel_cache_s_axi_read_in;
     assign kernel_cache_s_axi_write_out  = kernel_cache_m_axi4_write_in;
     assign kernel_cache_m_axi4_write_out = kernel_cache_s_axi_write_in;
   end
 endgenerate
+
+// --------------------------------------------------------------------------------------
+// Kernel CACHE (M->S) Register Slice
+// --------------------------------------------------------------------------------------
+axi_register_slice_be inst_axi_register_slice_be (
+  .ap_clk         (ap_clk                       ),
+  .areset         (areset_axi_slice             ),
+  .s_axi_read_out (kernel_cache_m_axi4_read_in  ),
+  .s_axi_read_in  (kernel_cache_m_axi4_read_out ),
+  .s_axi_write_out(kernel_cache_m_axi4_write_in ),
+  .s_axi_write_in (kernel_cache_m_axi4_write_out),
+  .m_axi_read_in  (m_axi4_read.in               ),
+  .m_axi_read_out (m_axi4_read.out              ),
+  .m_axi_write_in (m_axi4_write.in              ),
+  .m_axi_write_out(m_axi4_write.out             )
+);
 
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]

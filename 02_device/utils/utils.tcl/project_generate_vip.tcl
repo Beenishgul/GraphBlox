@@ -224,11 +224,12 @@ set_property -dict [list                                    \
                       CONFIG.DATA_WIDTH {512}               \
                       CONFIG.ID_WIDTH {1}                   \
                       CONFIG.READ_WRITE_MODE {READ_WRITE}   \
-                      CONFIG.REG_AR {7}                     \
-                      CONFIG.REG_AW {7}                     \
-                      CONFIG.REG_B {7}                      \
+                      CONFIG.REG_AR {15}                    \
+                      CONFIG.REG_AW {15}                    \
+                      CONFIG.REG_B {15}                     \
                       CONFIG.REG_R {15}                     \
                       CONFIG.REG_W {15}                     \
+                      CONFIG.USE_AUTOPIPELINING {1}         \
                     ] [get_ips ${module_name}]
 
 set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
