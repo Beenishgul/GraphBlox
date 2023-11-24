@@ -61,14 +61,16 @@ verilog_text = """
 bit_lengths = {
     "CU_KERNEL_COUNT_WIDTH_BITS": 8,  # Replace with actual values
     "CU_BUNDLE_COUNT_WIDTH_BITS": 8,
-    "CU_LANE_COUNT_WIDTH_BITS": 8,
+    "CU_LANE_COUNT_WIDTH_BITS"  : 8,
     "CU_BUFFER_COUNT_WIDTH_BITS": 8,
-    "TYPE_MEMORY_CMD_BITS": 7,
+    "TYPE_MEMORY_CMD_BITS"      : 7,
     "TYPE_FILTER_OPERATION_BITS": 9,
-    "TYPE_ALU_OPERATION_BITS": 6,
-    "TYPE_DATA_STRUCTURE_BITS": 6,
-    "TYPE_SEQUENCE_STATE_BITS": 4,
+    "TYPE_ALU_OPERATION_BITS"   : 6,
+    "TYPE_DATA_STRUCTURE_BITS"  : 6,
+    "TYPE_SEQUENCE_STATE_BITS"  : 4,
     "NUM_FIELDS_MEMORYPACKETDATA": 4,
+    "M_AXI4_FE_ADDR_W"           : 64,
+
     # ... other bit length variables ...
 }
 

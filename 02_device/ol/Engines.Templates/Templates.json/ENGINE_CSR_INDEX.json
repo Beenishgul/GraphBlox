@@ -1,56 +1,115 @@
 {
     "entries": {
         "entry_0": {
+            "increment": {
+                "bits": "1",
+                "value": "0"
+            },
+            "decrement": {
+                "bits": "1",
+                "value": "0"
+            },
             "mode_sequence": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "1",
+                "value": "0"
+            },
+            "mode_buffer": {
+                "bits": "1",
+                "value": "0"
+            },
+            "mode_break": {
+                "bits": "1",
+                "value": "0"
             }
         },
         "entry_1": {
             "index_start": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "32",
+                "value": "0x00000000"
             }
         },
-        "entry_2": {},
+        "entry_2": {
+            "index_end": {
+                "bits": "32",
+                "value": "0x00000000"
+            }
+        },
         "entry_3": {
             "stride": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "32",
+                "value": "0x00000000"
             }
         },
         "entry_4": {
+            "granularity": {
+                "bits": "1",
+                "value": "0"
+            },
             "direction": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "1",
+                "value": "0"
+            },
+            "shift.amount": {
+                "bits": "1",
+                "value": "0"
+            },
+            "shift.direction": {
+                "bits": "1",
+                "value": "0"
             }
         },
         "entry_5": {
-            "id_engine": {
-                "bits": "0",
-                "value": "0x00"
+            "cmd": {
+                "bits": "1",
+                "value": "0"
+            },
+            "buffer": {
+                "bits": "1",
+                "value": "0"
             },
             "id_module": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "1",
+                "value": "0"
+            },
+            "id_engine": {
+                "bits": "1",
+                "value": "0"
             }
         },
         "entry_6": {
-            "id_buffer": {
-                "bits": "0",
-                "value": "0x00"
+            "id_cu": {
+                "bits": "1",
+                "value": "0"
             },
             "id_bundle": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "1",
+                "value": "0"
+            },
+            "id_lane": {
+                "bits": "1",
+                "value": "0"
+            },
+            "id_buffer": {
+                "bits": "1",
+                "value": "0"
             }
         },
-        "entry_7": {},
-        "entry_8": {},
-        "entry_9": {
+        "entry_7": {
+            "array_pointer": {
+                "bits": "32",
+                "value": "0x00000000"
+            }
+        },
+        "entry_8": {
+            "array_pointer": {
+                "bits": "32",
+                "value": "0x00000000"
+            }
+        },
+        "array_size": {
             "array_size": {
-                "bits": "0",
-                "value": "0x00"
+                "bits": "32",
+                "value": "0x00000000"
             }
         }
     }
