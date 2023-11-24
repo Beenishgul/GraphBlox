@@ -1,7 +1,7 @@
 # @Author: Abdullah
 # @Date:   2023-04-06 18:46:46
 # @Last Modified by:   Abdullah
-# @Last Modified time: 2023-11-08 01:58:38
+# @Last Modified time: 2023-11-24 16:50:10
 #!/bin/bash
 
 
@@ -64,6 +64,7 @@ utils_arbiter="arbiter"
 utils_counter="counter"
 utils_fifo="fifo"
 utils_include="include"
+utils_slice="slice"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -114,6 +115,8 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${ut
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME} "sv"
+
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_slice}/ ${CFG_FILE_NAME} "sv"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME} "sv"
 

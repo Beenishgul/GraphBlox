@@ -27,8 +27,8 @@ source ${PARAMS_SH_DIR}
 
 CFG_FILE_NAME="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_xrt.ini"
 
-debug_mode="batch"
-# debug_mode="gui"
+# debug_mode="batch"
+debug_mode="gui"
 user_pre_sim_script="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/cmd_xsim.tcl"
 runtime_log="console"
 
