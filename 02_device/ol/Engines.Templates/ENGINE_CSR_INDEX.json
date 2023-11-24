@@ -1,0 +1,57 @@
+{
+    "entries": {
+        "entry_0": {
+            "mode_sequence": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_1": {
+            "index_start": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_2": {},
+        "entry_3": {
+            "stride": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_4": {
+            "direction": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_5": {
+            "id_engine": {
+                "bits": "0",
+                "value": "0x00"
+            },
+            "id_module": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_6": {
+            "id_buffer": {
+                "bits": "0",
+                "value": "0x00"
+            },
+            "id_bundle": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        },
+        "entry_7": {},
+        "entry_8": {},
+        "entry_9": {
+            "array_size": {
+                "bits": "0",
+                "value": "0x00"
+            }
+        }
+    }
+}
