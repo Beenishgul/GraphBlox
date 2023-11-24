@@ -231,6 +231,8 @@ void printGLAYGraphCSRxrtBufferHandlePerBank();
 void mapGLAYOverlayProgramBuffersBFS(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath);
 void mapGLAYOverlayProgramBuffersPR(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath);
 void mapGLAYOverlayProgramBuffersTC(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath);
+void mapGLAYOverlayProgramBuffersSPMV(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath);
+void mapGLAYOverlayProgramBuffersCC(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath);
 };
 
 // ********************************************************************************************

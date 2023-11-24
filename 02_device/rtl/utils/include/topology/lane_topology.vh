@@ -114,6 +114,28 @@ generate
                assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
                assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
 
+               assign engines_response_merge_lane_in[1][0]        = engines_response_lane_in[1];
+               assign engines_fifo_response_merge_lane_in_signals_in[1][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[1] = engines_fifo_response_merge_lane_in_signals_out[1][0];
+               assign engines_request_lane_out[1]                  = engines_request_cast_lane_out[1][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[1][0].rd_en = engines_fifo_request_lane_out_signals_in[1].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[1] = engines_fifo_request_cast_lane_out_signals_out [1][0];
+
+          end
+endgenerate
+
+
+
+generate
+     if((ID_BUNDLE == 1) && (ID_LANE == 4))
+          begin
+               assign engines_response_merge_lane_in[0][0]        = engines_response_lane_in[0];
+               assign engines_fifo_response_merge_lane_in_signals_in[0][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[0] = engines_fifo_response_merge_lane_in_signals_out[0][0];
+               assign engines_request_lane_out[0]                  = engines_request_cast_lane_out[0][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
+
           end
 endgenerate
 
@@ -159,6 +181,17 @@ generate
                assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
                assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
 
+               assign engines_response_merge_lane_in[1][0]        = engines_response_lane_in[1];
+               assign engines_fifo_response_merge_lane_in_signals_in[1][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[1] = engines_fifo_response_merge_lane_in_signals_out[1][0];
+               assign engines_request_lane_out[1]                  = engines_request_cast_lane_out[1][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[1][0].rd_en = engines_fifo_request_lane_out_signals_in[1].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[1] = engines_fifo_request_cast_lane_out_signals_out [1][0];
+
+               assign engines_response_merge_lane_in[1][1]          = response_lane_in[1];
+               assign engines_fifo_response_merge_lane_in_signals_in[1][1].rd_en = 1'b1;
+               assign fifo_response_lane_in_signals_out[1] = engines_fifo_response_merge_lane_in_signals_out[1][1];
+
           end
 endgenerate
 
@@ -174,9 +207,50 @@ generate
                assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
                assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
 
+               assign request_lane_out[1]                  = engines_request_cast_lane_out[0][1];
+               assign engines_fifo_request_cast_lane_out_signals_in[0][1].rd_en = fifo_request_lane_out_signals_in[1].rd_en;
+               assign fifo_request_lane_out_signals_out[1] = engines_fifo_request_cast_lane_out_signals_out[0][1];
+
           end
 endgenerate
 
 
-// total_luts=26029
+
+generate
+     if((ID_BUNDLE == 3) && (ID_LANE == 2))
+          begin
+               assign engines_response_merge_lane_in[0][0]        = engines_response_lane_in[0];
+               assign engines_fifo_response_merge_lane_in_signals_in[0][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[0] = engines_fifo_response_merge_lane_in_signals_out[0][0];
+               assign engines_request_lane_out[0]                  = engines_request_cast_lane_out[0][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
+
+               assign engines_response_merge_lane_in[1][0]        = engines_response_lane_in[1];
+               assign engines_fifo_response_merge_lane_in_signals_in[1][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[1] = engines_fifo_response_merge_lane_in_signals_out[1][0];
+               assign engines_request_lane_out[1]                  = engines_request_cast_lane_out[1][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[1][0].rd_en = engines_fifo_request_lane_out_signals_in[1].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[1] = engines_fifo_request_cast_lane_out_signals_out [1][0];
+
+          end
+endgenerate
+
+
+
+generate
+     if((ID_BUNDLE == 3) && (ID_LANE == 3))
+          begin
+               assign engines_response_merge_lane_in[0][0]        = engines_response_lane_in[0];
+               assign engines_fifo_response_merge_lane_in_signals_in[0][0].rd_en = 1'b1;
+               assign engines_fifo_response_lane_in_signals_out[0] = engines_fifo_response_merge_lane_in_signals_out[0][0];
+               assign engines_request_lane_out[0]                  = engines_request_cast_lane_out[0][0];
+               assign engines_fifo_request_cast_lane_out_signals_in[0][0].rd_en = engines_fifo_request_lane_out_signals_in[0].rd_en ;
+               assign engines_fifo_request_lane_out_signals_out[0] = engines_fifo_request_cast_lane_out_signals_out [0][0];
+
+          end
+endgenerate
+
+
+// total_luts=44088
 
