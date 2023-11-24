@@ -37,6 +37,7 @@ logic areset_generator;
 logic areset_setup    ;
 logic areset_bundles  ;
 logic areset_cache    ;
+logic areset_axi_slice;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -144,6 +145,7 @@ always_ff @(posedge ap_clk) begin
   areset_generator <= areset;
   areset_bundles   <= areset;
   areset_cache     <= areset;
+  areset_axi_slice <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -290,12 +292,11 @@ assign kernel_cu_fifo_request_signals_in.rd_en  = ~(cu_cache_fifo_request_signal
 assign kernel_cu_fifo_response_signals_in.wr_en = 0;
 assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
-
+// --------------------------------------------------------------------------------------
 generate
   if(GLOBAL_CU_CACHE_IP == 1) begin
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI Kernel Cache
-// --------------------------------------------------------------------------------------
     cu_cache inst_cu_cache (
       .ap_clk                   (ap_clk                            ),
       .areset                   (areset_cache                      ),
@@ -313,9 +314,7 @@ generate
       .done_out                 (cu_cache_done_out                 )
     );
   end else begin
-// --------------------------------------------------------------------------------------
 // CU BUFFER -> AXI Kernel Cache
-// --------------------------------------------------------------------------------------
     cu_buffer inst_cu_buffer (
       .ap_clk                   (ap_clk                            ),
       .areset                   (areset_cache                      ),
@@ -333,31 +332,25 @@ generate
       .done_out                 (cu_cache_done_out                 )
     );
   end
+// --------------------------------------------------------------------------------------  
 endgenerate
-
 // --------------------------------------------------------------------------------------
-// AXI Drive signals
-// --------------------------------------------------------------------------------------
-assign cu_cache_m_axi_read_in  = m_axi_read_in;
-assign cu_cache_m_axi_write_in = m_axi_write_in;
-assign m_axi_read_out          = cu_cache_m_axi_read_out ;
-assign m_axi_write_out         = cu_cache_m_axi_write_out ;
 
 // --------------------------------------------------------------------------------------
 // CU CACHE (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-// axi_register_slice_mid inst_axi_register_slice_mid (
-//   .ap_clk         (ap_clk                  ),
-//   .areset         (areset_axi_slice        ),
-//   .s_axi_read_out (cu_cache_m_axi_read_in  ),
-//   .s_axi_read_in  (cu_cache_m_axi_read_out ),
-//   .s_axi_write_out(cu_cache_m_axi_write_in ),
-//   .s_axi_write_in (cu_cache_m_axi_write_out),
-//   .m_axi_read_in  (m_axi_read_in           ),
-//   .m_axi_read_out (m_axi_read_out          ),
-//   .m_axi_write_in (m_axi_write_in          ),
-//   .m_axi_write_out(m_axi_write_out         )
-// );
+axi_register_slice_mid inst_axi_register_slice_mid (
+  .ap_clk         (ap_clk                  ),
+  .areset         (areset_axi_slice        ),
+  .s_axi_read_out (cu_cache_m_axi_read_in  ),
+  .s_axi_read_in  (cu_cache_m_axi_read_out ),
+  .s_axi_write_out(cu_cache_m_axi_write_in ),
+  .s_axi_write_in (cu_cache_m_axi_write_out),
+  .m_axi_read_in  (m_axi_read_in           ),
+  .m_axi_read_out (m_axi_read_out          ),
+  .m_axi_write_in (m_axi_write_in          ),
+  .m_axi_write_out(m_axi_write_out         )
+);
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
