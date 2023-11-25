@@ -291,7 +291,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Kernel CACHE (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-axi_register_slice_be inst_axi_register_slice_be (
+axi_register_slice_back_end inst_axi_register_slice_be (
   .ap_clk         (ap_clk                       ),
   .areset         (areset_axi_slice             ),
   .s_axi_read_out (kernel_cache_m_axi4_read_in  ),

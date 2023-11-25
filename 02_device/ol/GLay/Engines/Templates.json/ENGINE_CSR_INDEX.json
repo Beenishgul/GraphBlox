@@ -1,4 +1,4 @@
-{
+{    
     "type_memory_cmd": {
         "CMD_INVALID"      :   1,
         "CMD_MEM_READ"     :   2,
@@ -58,14 +58,6 @@
             }
         },
         "entry_4": {
-            "granularity": {
-                "bits": "4",
-                "value": "0"
-            },
-            "direction": {
-                "bits": "1",
-                "value": "0"
-            },
             "shift.amount": {
                 "bits": "4",
                 "value": "0"
@@ -127,24 +119,6 @@
             "array_size": {
                 "bits": "32",
                 "value": "0x00000000"
-            }
-        },
-        "entry_10": {
-            "const_mask": {
-                "bits": "4",
-                "value": "0x0"
-            }
-        },
-        "entry_11": {
-            "const_value": {
-                "bits": "32",
-                "value": "0x00000000"
-            }
-        },
-        "entry_12": {
-            "ops_mask": {
-                "bits": "16",
-                "value": "0x00"
             }
         }
     }

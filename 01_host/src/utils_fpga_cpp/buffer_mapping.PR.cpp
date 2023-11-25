@@ -111,5 +111,5 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersPR(size_t o
 // --------------------------------------------------------------------------------------
 }
 // --------------------------------------------------------------------------------------
-// -->  Single.PR  <-- 
+// -->  CPP.Single.PR  <-- 
 // Number of entries 84

@@ -196,10 +196,16 @@ echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/sim/system_cache_512x64.vhd"
 echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice/hdl/axi_register_slice_v2_1_vl_rfs.v"
+newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/hdl/axi_register_slice_v2_1_vl_rfs.v"
 echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice/sim/axi_register_slice.v"
+newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/sim/axi_register_slice_be.v"
+echo $newtext >> ${CFG_FILE_NAME_IP_V}
+
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/hdl/axi_register_slice_v2_1_vl_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
+
+newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/sim/axi_register_slice_mid.v"
 echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/ ${CFG_FILE_NAME_SV} "sv"
