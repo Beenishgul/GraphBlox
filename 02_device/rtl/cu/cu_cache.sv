@@ -88,6 +88,17 @@ FIFOStateSignalsInput  fifo_response_signals_in_int  ;
 logic                  fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+logic                           areset_counter                  ;
+logic                           counter_load                    ;
+logic                           write_command_counter_is_zero   ;
+logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
+logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
+
+assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -147,22 +158,22 @@ end
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-    assign m_axi_write.in = m_axi_write_in;
- 
+assign m_axi_write.in = m_axi_write_in;
+
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
-    assign m_axi_read.in = m_axi_read_in;
+assign m_axi_read.in = m_axi_read_in;
 
 // --------------------------------------------------------------------------------------
 // WRITE AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-    assign m_axi_write_out = m_axi_write.out;
+assign m_axi_write_out = m_axi_write.out;
 
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS OUTPUT
 // --------------------------------------------------------------------------------------
-    assign m_axi_read_out = m_axi_read.out;
+assign m_axi_read_out = m_axi_read.out;
 
 // --------------------------------------------------------------------------------------
 // AXI port cache
@@ -309,9 +320,9 @@ always_comb begin
       next_state = CU_CACHE_CMD_READY;
     end
     CU_CACHE_CMD_READY : begin
-      if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) & cache_ctrl_out.wtb_empty)
+      if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
         next_state = CU_CACHE_CMD_READ_TRANS;
-      else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & cache_ctrl_out.wtb_empty)
+      else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~write_command_counter_is_zero)
         next_state = CU_CACHE_CMD_WRITE_TRANS;
       else
         next_state = CU_CACHE_CMD_READY;
@@ -329,12 +340,6 @@ always_comb begin
       next_state = CU_CACHE_CMD_WRITE;
     end
     CU_CACHE_CMD_WRITE : begin
-      next_state = CU_CACHE_CMD_WRITE_POST;
-    end
-    CU_CACHE_CMD_WRITE_POST : begin
-      next_state = CU_CACHE_CMD_WRITE_POST_2;
-    end
-    CU_CACHE_CMD_WRITE_POST_2 : begin
       next_state = CU_CACHE_CMD_POP_TRANS;
     end
     CU_CACHE_CMD_POP_TRANS : begin
@@ -353,11 +358,13 @@ end// always_comb
 always_ff @(posedge ap_clk) begin
   case (current_state)
     CU_CACHE_CMD_RESET : begin
+      counter_load                       <= 1'b1;
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
       cache_request_mem_reg.iob.valid    <= 1'b0;
     end
     CU_CACHE_CMD_READY : begin
+      counter_load                       <= 1'b0;
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
       cache_request_mem_reg.iob.valid    <= 1'b0;
@@ -378,16 +385,6 @@ always_ff @(posedge ap_clk) begin
       cache_request_mem_reg.iob.valid    <= 1'b1;
     end
     CU_CACHE_CMD_WRITE : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_WRITE_POST_2 : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_WRITE_POST : begin
       cache_request_mem_reg.iob.valid    <= 1'b0;
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
@@ -419,6 +416,22 @@ always_ff @(posedge ap_clk) begin
   cache_request_mem_reg.meta      <= fifo_request_dout.meta;
   cache_request_mem_reg.data      <= fifo_request_dout.data;
 end
+
+// --------------------------------------------------------------------------------------
+// Cache/Memory response counter
+// --------------------------------------------------------------------------------------
+counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
+  .ap_clk      (ap_clk                                                                                       ),
+  .ap_clken    (1'b1                                                                                         ),
+  .areset      (areset_counter                                                                               ),
+  .load        (counter_load                                                                                 ),
+  .incr        (fifo_response_signals_in_int.wr_en  & (fifo_response_din.meta.subclass.cmd == CMD_MEM_WRITE) ),
+  .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
+  .load_value  (write_command_counter_load_value                                                             ),
+  .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
+  .count       (write_command_counter_                                                                       ),
+  .is_zero     (write_command_counter_is_zero                                                                )
+);
 
 endmodule : cu_cache
 

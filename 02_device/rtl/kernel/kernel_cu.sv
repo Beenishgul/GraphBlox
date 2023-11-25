@@ -339,7 +339,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // CU CACHE (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-axi_register_slice_mid inst_axi_register_slice_mid (
+axi_register_slice_mid_end inst_axi_register_slice_mid (
   .ap_clk         (ap_clk                  ),
   .areset         (areset_axi_slice        ),
   .s_axi_read_out (cu_cache_m_axi_read_in  ),

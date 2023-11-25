@@ -16,28 +16,35 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_FPGA_UTILS_CPP, UTILS_
 
 # Define the filename based on the CAPABILITY
 config_filename = f"topology.json"
-overlay_template_filename = f"template.{ALGORITHM_NAME}.ol"
-json_template_filename = f"template.{ALGORITHM_NAME}.json"
-  
+overlay_template_filename = f"{ALGORITHM_NAME}.ol"
+json_template_filename = f"{ALGORITHM_NAME}.json"
+
+json_program_path= f"{CAPABILITY}.json"
+overlay_program_path= f"{CAPABILITY}.ol"  
+
 cpp_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.cpp"
 verilog_template_filename = f"buffer_mapping.{ALGORITHM_NAME}.vh"
 
+json_template_source= f"{ARCHITECTURE}/Engines/Templates.json"
+overlay_template_source= f"{ARCHITECTURE}/Engines/Templates.ol"
+config_architecture_path= f"{ARCHITECTURE}/{CAPABILITY}"
 
-json_template_source= "Engines.Templates/Templates.json"
-overlay_template_source= "Engines.Templates/Templates.ol"
-overlay_template_path= f"{ARCHITECTURE}.{CAPABILITY}"
-config_architecture_path= f"{ARCHITECTURE}.{CAPABILITY}"
 
 # Construct the full path for the file
-output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, overlay_template_filename)
+output_file_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, "Templates", overlay_template_filename)
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
-output_file_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, json_template_filename)
+output_file_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, "Templates", json_template_filename)
 # output_file_path_cpp = os.path.join(FULL_SRC_IP_DIR_CONFIG, config_architecture_path, cpp_template_filename)
 output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filename)
 # output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, verilog_template_filename)
 output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "mapping", verilog_template_filename)
 
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_filename)
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, config_filename)
+
+
+source_program_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, json_program_path, json_template_filename)
+output_program_path_ol = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, overlay_program_path, overlay_template_filename)
+
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
@@ -111,6 +118,7 @@ check_and_clean_file(output_file_path_ol)
 check_and_clean_file(output_file_path_json)
 check_and_clean_file(output_file_path_cpp)
 check_and_clean_file(output_file_path_vh)
+check_and_clean_file(output_program_path_ol)
 
 def get_engine_id(engine_name):
     global engine_index
@@ -444,6 +452,77 @@ def process_file_json(template_file_path, engine_template_filename, engine_name)
     engine_index_json += 1
 
 
+# Function to parse and construct the entries with compact comments
+def process_entries_json(output_program_path_ol, source_program_path_json):
+
+    global topology
+    total_number_entries = 0
+
+    with open(source_program_path_json, 'r') as file:
+        # Load the JSON data from the file
+        parsed_data = json.load(file)
+
+    for engine_name, engine_data in parsed_data.items():
+
+        entries = engine_data["entries"]
+        # Print engine name and number of entries
+        total_number_entries += len(entries)
+        append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+        append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
+        append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+        lookup_tables = {**engine_data.get('type_memory_cmd', {}), **engine_data.get('type_data_buffer', {}), **engine_data.get('type_ALU_operation', {})}
+
+        for key in entries:
+            entry = entries[key]
+            entry_value = 0
+
+            bits_prev = 0
+            comment_details = []  # List to store details for the comment
+
+            # Start from LSB to MSB
+            for param in entry:
+                bits = int(entry[param]["bits"])
+                value = entry[param]["value"]
+                original_value = value
+                original_flag = 0
+
+                # Replace symbolic values with their corresponding numeric values
+                if isinstance(value, str):
+                    original_flag = 1
+                    value = lookup_tables.get(value, value)
+                
+                # Convert to integer
+                if isinstance(value, str) and value.startswith("0x"):
+                    value = int(value, 16)
+                else:
+                    value = int(value)
+
+                # Shift and OR the value
+                value <<= bits_prev
+                entry_value |= value
+
+                # Calculate the bit range and format the value for the current parameter
+                bit_range = f"{bits_prev}:{bits_prev + bits - 1}"
+                if original_flag :
+                    formatted_value = original_value
+                else :
+                    formatted_value = f"0x{value >> bits_prev}"  # Short hex value
+
+                if bits == 1 and isinstance(formatted_value, int):
+                    formatted_value = "True" if formatted_value == 1 else "False"
+
+                comment_details.append(f"{param}[{bit_range}]={formatted_value}")
+                bits_prev += bits
+
+            # Convert to hexadecimal format
+            entry_hex = f"0x{entry_value:08X}"
+            # Create the compact comment
+            comment = f" // {key:10} <{bits_prev:2}b>: " + " || ".join(comment_details)
+            append_to_file(output_program_path_ol, f"{entry_hex}{comment}")
+    append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+    append_to_file(output_program_path_ol, f"// -->  Load.{topology}  <-- ")
+    append_to_file(output_program_path_ol, f"// Number of entries {total_number_entries}")
+
 
 append_to_file(output_file_path_cpp, "#include \"glayenv.hpp\"")
 append_to_file(output_file_path_cpp, f"void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
@@ -457,19 +536,21 @@ CU_BUNDLES_ENGINE_CONFIG_ARRAY = [
 
 append_to_file(output_file_path_cpp, "}")
 append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
-append_to_file(output_file_path_cpp, f"// -->  {topology}  <-- ")
+append_to_file(output_file_path_cpp, f"// -->  CPP.{topology}  <-- ")
 append_to_file(output_file_path_cpp, f"// Number of entries {entry_index_cpp}")
 
 append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-append_to_file(output_file_path_ol, f"// -->  {topology}  <-- ")
+append_to_file(output_file_path_ol, f"// -->  Template.{topology}  <-- ")
 append_to_file(output_file_path_ol, f"// Number of entries {entry_index}")
 
 append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
-append_to_file(output_file_path_vh, f"// -->  {topology}  <-- ")
+append_to_file(output_file_path_vh, f"// -->  Benchmark.{topology}  <-- ")
 append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
 
 # Write the combined data to a new file
 with open(output_file_path_json, 'w') as f:
     json.dump(combined_engine_template_json, f, indent=4)
+
+process_entries_json(output_program_path_ol, source_program_path_json)
 
 print(f"export NUM_ENTRIES={entry_index_vh}")

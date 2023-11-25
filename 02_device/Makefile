@@ -718,10 +718,8 @@ clean: session-info
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
-	rm -rf template.$(ALGORITHM_NAME).ol ;\
-	rm -rf $(ARCHITECTURE).$(CAPABILITY)/template.$(ALGORITHM_NAME).ol ;\
-	rm -rf template.$(ALGORITHM_NAME).json ;\
-	rm -rf $(ARCHITECTURE).$(CAPABILITY)/template.$(ALGORITHM_NAME).json
+	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).ol ;\
+	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).json
 
 .PHONY: clean-all
 clean-all: session-info 
@@ -736,7 +734,5 @@ clean-all: session-info
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
-	rm -rf template.*.ol ;\
-	rm -rf */template.*.ol ;\
-	rm -rf template.*.json ;\
-	rm -rf */template.*.json
+	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
+	rm -rf $(ARCHITECTURE)/*/Templates/*.json

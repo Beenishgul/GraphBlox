@@ -15,17 +15,13 @@ if len(sys.argv) != 8:
 # Assuming the script name is the first argument, and the directories follow after.
 _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
 
-# Define the filename based on the CAPABILITY
-
-config_filename = f"topology.json"
-
-config_topology_path= f"{ARCHITECTURE}.{CAPABILITY}"
-
 # Construct the full path for the file
+config_filename = f"topology.json"
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, config_filename)
+
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
 output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
 output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_topology.vh")
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_filename)
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)

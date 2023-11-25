@@ -210,9 +210,9 @@ export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${file
 # ----------------------------------------------------------------------------
 # Generate AXI Register Slice
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI Register Slice"]" 
+puts "[color 2 "                        Generate AXI Register Slice Mid-end"]" 
 
-set module_name axi_register_slice
+set module_name axi_register_slice_mid
 create_ip -name axi_register_slice      \
           -vendor xilinx.com            \
           -library ip                   \
@@ -242,8 +242,39 @@ export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -n
 export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
 
 # ----------------------------------------------------------------------------
-# Generate ${KERNEL_NAME} IPs..... DONE! 
+# Generate AXI Register Slice
 # ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate AXI Register Slice Back-end"]" 
+
+set module_name axi_register_slice_be
+create_ip -name axi_register_slice      \
+          -vendor xilinx.com            \
+          -library ip                   \
+          -version 2.*                  \
+          -module_name ${module_name}   >> $log_file
+          
+set_property -dict [list                                    \
+                      CONFIG.ADDR_WIDTH {64}                \
+                      CONFIG.DATA_WIDTH {512}               \
+                      CONFIG.ID_WIDTH {1}                   \
+                      CONFIG.READ_WRITE_MODE {READ_WRITE}   \
+                      CONFIG.REG_AR {15}                    \
+                      CONFIG.REG_AW {15}                    \
+                      CONFIG.REG_B {15}                     \
+                      CONFIG.REG_R {15}                     \
+                      CONFIG.REG_W {15}                     \
+                      CONFIG.USE_AUTOPIPELINING {1}         \
+                    ] [get_ips ${module_name}]
+
+set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
+set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
+set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
+set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
+generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
+generate_target all                          [get_files ${files_sources_xci}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
+
 
 puts "========================================================="
 puts "\[[color 4 "Check directory for VIP"]\]"

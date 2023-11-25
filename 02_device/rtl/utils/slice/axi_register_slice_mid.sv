@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module axi_register_slice_mid (
+module axi_register_slice_mid_end (
   // System Signals
   input  logic                            ap_clk         ,
   input  logic                            areset         ,
@@ -79,7 +79,7 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-axi_register_slice inst_register_slice_512x64 (
+axi_register_slice_mid inst_register_slice_mid_512x64 (
   .aclk          (ap_clk                   ),
   .aresetn       (areset_register_slice    ),
   .s_axi_araddr  (s_axi_read.in.araddr     ), // input read address read channel address
@@ -163,4 +163,4 @@ axi_register_slice inst_register_slice_512x64 (
   .m_axi_wvalid  (m_axi_write.out.wvalid   )  // output write channel valid
 );
 
-endmodule : axi_register_slice_mid
+endmodule : axi_register_slice_mid_end
