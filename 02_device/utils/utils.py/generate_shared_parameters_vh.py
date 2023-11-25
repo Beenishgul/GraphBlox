@@ -17,7 +17,7 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABI
 
 # Construct the full path for the file
 config_filename = f"topology.json"
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, config_filename)
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
 output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
 output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
@@ -32,7 +32,7 @@ luts    = config_data["luts"]
 
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
-    selected_config = config_data.get(algorithm, config_data['bundle'])
+    selected_config = config_data.get(algorithm, config_data[CAPABILITY])
 
     # Sort the keys and create the configuration array
     return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]

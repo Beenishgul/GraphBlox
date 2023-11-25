@@ -39,7 +39,7 @@ output_file_path_cpp = os.path.join(FULL_SRC_FPGA_UTILS_CPP, cpp_template_filena
 # output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, verilog_template_filename)
 output_file_path_vh = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "mapping", verilog_template_filename)
 
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, config_filename)
+config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
 
 source_program_path_json = os.path.join(FULL_SRC_IP_DIR_OVERLAY, config_architecture_path, json_program_path, json_template_filename)
@@ -55,7 +55,7 @@ buffers = config_data["buffers"]
 
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
-    selected_config = config_data.get(algorithm, config_data['bundle'])
+    selected_config = config_data.get(algorithm, config_data[CAPABILITY])
 
     # Sort the keys and create the configuration array
     return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
@@ -456,6 +456,9 @@ def process_file_json(template_file_path, engine_template_filename, engine_name)
 def process_entries_json(output_program_path_ol, source_program_path_json):
 
     global topology
+    CACHE_LINE_SIZE = 64
+    ENTRY_SIZE = 4  # Assuming 4 bytes per entry
+    entries_per_cache_line = CACHE_LINE_SIZE // ENTRY_SIZE
     total_number_entries = 0
 
     with open(source_program_path_json, 'r') as file:
@@ -466,13 +469,15 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
 
         entries = engine_data["entries"]
         # Print engine name and number of entries
-        total_number_entries += len(entries)
+        
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
         append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
         lookup_tables = {**engine_data.get('type_memory_cmd', {}), **engine_data.get('type_data_buffer', {}), **engine_data.get('type_ALU_operation', {})}
 
         for key in entries:
+            cache_line, offset = calculate_cache_info(total_number_entries, entries_per_cache_line)
+            total_number_entries += 1
             entry = entries[key]
             entry_value = 0
 
@@ -517,7 +522,7 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
             # Convert to hexadecimal format
             entry_hex = f"0x{entry_value:08X}"
             # Create the compact comment
-            comment = f" // {key:10} <{bits_prev:2}b>: " + " || ".join(comment_details)
+            comment = f" // {key:10} cacheline[{cache_line:3}][{offset:2}] <{bits_prev:2}b>: " + " || ".join(comment_details)
             append_to_file(output_program_path_ol, f"{entry_hex}{comment}")
     append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
     append_to_file(output_program_path_ol, f"// -->  Load.{topology}  <-- ")

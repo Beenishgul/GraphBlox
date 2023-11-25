@@ -103,19 +103,17 @@ parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM
 // --------------------------------------------------------------------------------------
 //   State Machine input sync
 // --------------------------------------------------------------------------------------
-typedef enum logic[11:0] {
+typedef enum logic[9:0] {
 	CU_CACHE_CMD_RESET        = 1 << 0,
 	CU_CACHE_CMD_READY        = 1 << 1,
 	CU_CACHE_CMD_READ_TRANS   = 1 << 2,
 	CU_CACHE_CMD_READ         = 1 << 3,
 	CU_CACHE_CMD_WRITE_TRANS  = 1 << 4,
 	CU_CACHE_CMD_WRITE        = 1 << 5,
-	CU_CACHE_CMD_WRITE_POST   = 1 << 6,
-	CU_CACHE_CMD_WRITE_POST_2 = 1 << 7,
-	CU_CACHE_CMD_PENDING      = 1 << 8,
-	CU_CACHE_CMD_POP_TRANS    = 1 << 9,
-	CU_CACHE_CMD_POP          = 1 << 10,
-	CU_CACHE_CMD_DONE         = 1 << 11
+	CU_CACHE_CMD_PENDING      = 1 << 6,
+	CU_CACHE_CMD_POP_TRANS    = 1 << 7,
+	CU_CACHE_CMD_POP          = 1 << 8,
+	CU_CACHE_CMD_DONE         = 1 << 9
 } cu_cache_command_generator_state;
 
 
