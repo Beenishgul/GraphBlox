@@ -717,9 +717,9 @@ clean: session-info
 	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
-	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
-	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).ol ;\
-	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).json
+# 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
+# 	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).ol ;\
+# 	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).json
 
 .PHONY: clean-all
 clean-all: session-info 
@@ -733,6 +733,6 @@ clean-all: session-info
 	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
 	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
 	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
-	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
-	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
-	rm -rf $(ARCHITECTURE)/*/Templates/*.json
+# 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
+# 	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
+# 	rm -rf $(ARCHITECTURE)/*/Templates/*.json
