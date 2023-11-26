@@ -292,46 +292,46 @@ module __KERNEL___testbench ();
 
 // Slave MM VIP instantiation
     slv_m00_axi_vip inst_slv_m00_axi_vip (
-        .aclk         (ap_clk           ),
-        .aresetn      (ap_rst_n         ),
-        .s_axi_awvalid(m00_axi_awvalid  ),
-        .s_axi_awready(m00_axi_awready  ),
-        .s_axi_awaddr (m00_axi_awaddr   ),
-        .s_axi_awlen  (m00_axi_awlen    ),
-        .s_axi_wvalid (m00_axi_wvalid   ),
-        .s_axi_wready (m00_axi_wready   ),
-        .s_axi_wdata  (m00_axi_wdata    ),
-        .s_axi_wstrb  (m00_axi_wstrb    ),
-        .s_axi_wlast  (m00_axi_wlast    ),
-        .s_axi_bvalid (m00_axi_bvalid   ),
-        .s_axi_bready (m00_axi_bready   ),
-        .s_axi_arvalid(m00_axi_arvalid  ),
-        .s_axi_arready(m00_axi_arready  ),
-        .s_axi_araddr (m00_axi_araddr   ),
-        .s_axi_arlen  (m00_axi_arlen    ),
-        .s_axi_rvalid (m00_axi_rvalid   ),
-        .s_axi_rready (m00_axi_rready   ),
-        .s_axi_rdata  (m00_axi_rdata    ),
-        .s_axi_rlast  (m00_axi_rlast    ),
+        .aclk         (ap_clk         ),
+        .aresetn      (ap_rst_n       ),
+        .s_axi_awvalid(m00_axi_awvalid),
+        .s_axi_awready(m00_axi_awready),
+        .s_axi_awaddr (m00_axi_awaddr ),
+        .s_axi_awlen  (m00_axi_awlen  ),
+        .s_axi_wvalid (m00_axi_wvalid ),
+        .s_axi_wready (m00_axi_wready ),
+        .s_axi_wdata  (m00_axi_wdata  ),
+        .s_axi_wstrb  (m00_axi_wstrb  ),
+        .s_axi_wlast  (m00_axi_wlast  ),
+        .s_axi_bvalid (m00_axi_bvalid ),
+        .s_axi_bready (m00_axi_bready ),
+        .s_axi_arvalid(m00_axi_arvalid),
+        .s_axi_arready(m00_axi_arready),
+        .s_axi_araddr (m00_axi_araddr ),
+        .s_axi_arlen  (m00_axi_arlen  ),
+        .s_axi_rvalid (m00_axi_rvalid ),
+        .s_axi_rready (m00_axi_rready ),
+        .s_axi_rdata  (m00_axi_rdata  ),
+        .s_axi_rlast  (m00_axi_rlast  ),
         
-        .s_axi_bid    (m00_axi_bid      ),
-        .s_axi_rid    (m00_axi_rid      ),
-        .s_axi_rresp  (m00_axi_rresp    ),
-        .s_axi_bresp  (m00_axi_bresp    ),
-        .s_axi_awid   (m00_axi_awid     ),
-        .s_axi_awsize (m00_axi_awsize   ),
-        .s_axi_awburst(m00_axi_awburst  ),
-        .s_axi_awlock (m00_axi_awlock   ),
-        .s_axi_awcache(m00_axi_awcache  ),
-        .s_axi_awprot (m00_axi_awprot   ),
-        .s_axi_awqos  (m00_axi_awqos    ),
-        .s_axi_arid   (m00_axi_arid     ),
-        .s_axi_arsize (m00_axi_arsize   ),
-        .s_axi_arburst(m00_axi_arburst  ),
-        .s_axi_arlock (m00_axi_arlock   ),
-        .s_axi_arcache(m00_axi_arcache  ),
-        .s_axi_arprot (m00_axi_arprot   ),
-        .s_axi_arqos  (m00_axi_arqos    )
+        .s_axi_bid    (m00_axi_bid    ),
+        .s_axi_rid    (m00_axi_rid    ),
+        .s_axi_rresp  (m00_axi_rresp  ),
+        .s_axi_bresp  (m00_axi_bresp  ),
+        .s_axi_awid   (m00_axi_awid   ),
+        .s_axi_awsize (m00_axi_awsize ),
+        .s_axi_awburst(m00_axi_awburst),
+        .s_axi_awlock (m00_axi_awlock ),
+        .s_axi_awcache(m00_axi_awcache),
+        .s_axi_awprot (m00_axi_awprot ),
+        .s_axi_awqos  (m00_axi_awqos  ),
+        .s_axi_arid   (m00_axi_arid   ),
+        .s_axi_arsize (m00_axi_arsize ),
+        .s_axi_arburst(m00_axi_arburst),
+        .s_axi_arlock (m00_axi_arlock ),
+        .s_axi_arcache(m00_axi_arcache),
+        .s_axi_arprot (m00_axi_arprot ),
+        .s_axi_arqos  (m00_axi_arqos  )
     );
 
         slv_m00_axi_vip_slv_mem_t m00_axi    ;
@@ -995,54 +995,76 @@ module __KERNEL___testbench ();
         endtask
 
         function automatic bit check___KERNEL___result(ref GraphCSR graph);
+            int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+            bit error_found = 0;
+            integer error_counter;
+            error_counter = 0;
+
+            o=0;
+            l=0;
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                // o++;
-                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                //     l++;
-                //     o=0;
-                // end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
             end
+
+            o=0;
+            l=0;
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_1*2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                // o++;
-                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                //     l++;
-                //     o=0;
-                // end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
             end
+
+            o=0;
+            l=0;
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = 0; i < graph.num_auxiliary_2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
                 $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
                 // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                // o++;
-                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                //     l++;
-                //     o=0;
-                // end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
             end
+
+            o=0;
+            l=0;
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
-                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                // o++;
-                // if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                //     l++;
-                //     o=0;
-                // end
+                 if (ret_rd_value !=  graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W) begin
+                    $display("ERROR: Starting num_auxiliary_2: %0d-%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                    error_found |= 1;
+                    error_counter++;
+                end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
             end
             $display("MSG: // ------------------------------------------------- \n");
+
+            error_counter = 0;
+            return(error_found);
         endfunction
-        
+
         bit         choose_pressure_type      = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
@@ -1065,7 +1087,6 @@ module __KERNEL___testbench ();
 
 
         function automatic void read_files_graphCSR(ref GraphCSR graph);
-
             int          realcount                 = 0;
             int          vertexcount               = 0;
             int o,l;
@@ -1132,9 +1153,6 @@ module __KERNEL___testbench ();
 
             `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
-            // $display("MSG: Starting graph.mem512_num_vertices: %0d\n", graph.mem512_num_vertices);
-            // $display("MSG: Starting graph.mem512_num_edges: %0d\n", graph.mem512_num_edges);
-
             for (int i = 0; i < graph.mem512_num_vertices; i++) begin
                 for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
                     graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
@@ -1168,7 +1186,7 @@ module __KERNEL___testbench ();
 
 
             for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
                     l++;
@@ -1180,7 +1198,7 @@ module __KERNEL___testbench ();
             l=0;
 
             for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] ={M_AXI4_FE_DATA_W{1'b1}};
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
                     l++;
@@ -1192,10 +1210,6 @@ module __KERNEL___testbench ();
                 // setup_temp = {31'b0,get_random_bit()};
 
                 graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-
-                if(graph.debug_counter_2 == 0)
-                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
-
                 graph.debug_counter_2 += 1;
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
@@ -1419,7 +1433,7 @@ module __KERNEL___testbench ();
             end
 
             #1000
-                multiple_iteration(5, error_found, graph);
+                multiple_iteration(1, error_found, graph);
 
             if (error_found == 1) begin
                 $display( "ERROR: Test Failed!");

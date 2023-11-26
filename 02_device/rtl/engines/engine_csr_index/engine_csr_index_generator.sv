@@ -109,6 +109,7 @@ module engine_csr_index_generator #(parameter
     MemoryPacket           fifo_request_din_reg         ;
     MemoryPacket           fifo_request_din_reg_S2      ;
     MemoryPacket           fifo_request_dout_reg        ;
+    MemoryPacket           fifo_request_dout_reg_S2     ;
     MemoryPacket           fifo_response_comb           ;
     MemoryPacketPayload    fifo_request_din             ;
     MemoryPacketPayload    fifo_request_dout            ;
@@ -486,7 +487,7 @@ module engine_csr_index_generator #(parameter
                 done_int_reg         <= 1'b0;
                 done_out_reg         <= 1'b0;
 
-                if(|configure_engine_int.payload.param.index_end & ~configure_engine_int.payload.param.mode_sequence) begin
+                if(|configure_engine_int.payload.param.index_end) begin
                     response_memory_counter_load_value <= configure_engine_int.payload.param.index_end-1;
                 end
 
@@ -709,21 +710,26 @@ module engine_csr_index_generator #(parameter
         .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
     );
 
-    always_ff  @(posedge ap_clk) begin
-        fifo_request_dout_reg.valid                      <= request_out_int.valid;
-        fifo_request_dout_reg.payload.data               <= request_out_int.payload.data;
-        fifo_request_dout_reg.payload.meta.subclass      <= request_out_int.payload.meta.subclass;
-        fifo_request_dout_reg.payload.meta.address       <= request_out_int.payload.meta.address;
-        fifo_request_dout_reg.payload.meta.route.from    <= request_out_int.payload.meta.route.from;
-        fifo_request_dout_reg.payload.meta.route.to      <= request_out_int.payload.meta.route.to;
-        fifo_request_dout_reg.payload.meta.route.hops    <= request_out_int.payload.meta.route.hops;
-        fifo_request_dout_reg.payload.meta.route.seq_src <= request_out_int.payload.meta.route.seq_src;
-        fifo_request_dout_reg.payload.meta.route.seq_id  <= request_out_int.payload.meta.route.seq_id;
+    logic fifo_request_signals_out_reg_empty;
 
-        if(response_memory_counter_is_zero & fifo_request_signals_out_int.empty) begin
-            fifo_request_dout_reg.payload.meta.route.seq_state <= SEQUENCE_DONE;
+    always_ff  @(posedge ap_clk) begin
+        fifo_request_dout_reg              <= request_out_int;
+        fifo_request_signals_out_reg_empty <= fifo_request_signals_out_int.empty;
+
+        fifo_request_dout_reg_S2.valid                      <= fifo_request_dout_reg.valid;
+        fifo_request_dout_reg_S2.payload.data               <= fifo_request_dout_reg.payload.data;
+        fifo_request_dout_reg_S2.payload.meta.subclass      <= fifo_request_dout_reg.payload.meta.subclass;
+        fifo_request_dout_reg_S2.payload.meta.address       <= fifo_request_dout_reg.payload.meta.address;
+        fifo_request_dout_reg_S2.payload.meta.route.from    <= fifo_request_dout_reg.payload.meta.route.from;
+        fifo_request_dout_reg_S2.payload.meta.route.to      <= fifo_request_dout_reg.payload.meta.route.to;
+        fifo_request_dout_reg_S2.payload.meta.route.hops    <= fifo_request_dout_reg.payload.meta.route.hops;
+        fifo_request_dout_reg_S2.payload.meta.route.seq_src <= fifo_request_dout_reg.payload.meta.route.seq_src;
+        fifo_request_dout_reg_S2.payload.meta.route.seq_id  <= fifo_request_dout_reg.payload.meta.route.seq_id;
+
+        if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
+            fifo_request_dout_reg_S2.payload.meta.route.seq_state <= SEQUENCE_DONE;
         end else begin
-            fifo_request_dout_reg.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
+            fifo_request_dout_reg_S2.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
         end
     end
 
@@ -760,11 +766,11 @@ module engine_csr_index_generator #(parameter
                 fifo_response_engine_in_signals_out_reg  <= 6'b010000;
                 fifo_response_control_in_signals_out_reg <= 6'b010000;
                 fifo_response_memory_in_signals_out_reg  <= 6'b010000;
-                request_engine_out_reg.valid             <= fifo_request_dout_reg.valid;
+                request_engine_out_reg.valid             <= fifo_request_dout_reg_S2.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
-                request_memory_out_reg.valid                      <= fifo_request_dout_reg.valid;
+                request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid;
                 fifo_response_engine_in_signals_out_reg           <= 6'b010000;
                 fifo_response_control_in_signals_out_reg          <= 6'b010000;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
@@ -775,10 +781,10 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
-            request_engine_out_reg.payload <= fifo_request_dout_reg.payload;
+            request_engine_out_reg.payload <= fifo_request_dout_reg_S2.payload;
             request_memory_out_reg.payload <= 0;
         end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
-            request_memory_out_reg.payload <= fifo_request_dout_reg.payload;
+            request_memory_out_reg.payload <= fifo_request_dout_reg_S2.payload;
             request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
 
