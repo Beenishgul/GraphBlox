@@ -56,18 +56,18 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersPR(size_t o
     overlay_program[41] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_auxiliary_2 )-( graph->num_auxiliary_2 * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[46] = ( graph->num_vertices );
+    overlay_program[46] = ( graph->num_auxiliary_2 );
    // --  2  - Index_End
-    overlay_program[47] = ( graph->num_vertices * 2 );
+    overlay_program[47] = ( graph->num_auxiliary_2 * 2 );
    // --  7  - Array_Pointer_LHS
     overlay_program[52] = xrt_buffer_device[8];
    // --  8  - Array_Pointer_RHS
     overlay_program[53] = xrt_buffer_device[8] >> 32;
    // --  9  - Array_size
-    overlay_program[54] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[54] = ( graph->num_auxiliary_2 * 2 )-( graph->num_auxiliary_2 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
@@ -92,18 +92,18 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersPR(size_t o
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_auxiliary_1 )-( graph->num_auxiliary_1 * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[71] = ( graph->num_vertices );
+    overlay_program[71] = ( graph->num_auxiliary_1 );
    // --  2  - Index_End
-    overlay_program[72] = ( graph->num_vertices * 2 );
+    overlay_program[72] = ( graph->num_auxiliary_1 * 2 );
    // --  7  - Array_Pointer_LHS
     overlay_program[77] = xrt_buffer_device[7];
    // --  8  - Array_Pointer_RHS
     overlay_program[78] = xrt_buffer_device[7] >> 32;
    // --  9  - Array_size
-    overlay_program[79] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[79] = ( graph->num_auxiliary_1 * 2 )-( graph->num_auxiliary_1 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 12   mapping 6    cycles 1    None-None ( 0 )-( 0 )

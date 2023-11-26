@@ -53,18 +53,18 @@
     graph.overlay_program[2][(M_AXI4_FE_DATA_W*9)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_auxiliary_2 )-( graph->num_auxiliary_2 * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    graph.overlay_program[2][(M_AXI4_FE_DATA_W*14)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
+    graph.overlay_program[2][(M_AXI4_FE_DATA_W*14)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_2 );
    // --  2  - Index_End
-    graph.overlay_program[2][(M_AXI4_FE_DATA_W*15)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 );
+    graph.overlay_program[2][(M_AXI4_FE_DATA_W*15)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_2 * 2 );
    // --  7  - Array_Pointer_LHS
     graph.overlay_program[3][(M_AXI4_FE_DATA_W*4)+:M_AXI4_FE_DATA_W]  = buffer_8_ptr[31:0];
    // --  8  - Array_Pointer_RHS
     graph.overlay_program[3][(M_AXI4_FE_DATA_W*5)+:M_AXI4_FE_DATA_W]  = buffer_8_ptr[63:32];
    // --  9  - Array_size
-    graph.overlay_program[3][(M_AXI4_FE_DATA_W*6)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 )-( graph.num_vertices );
+    graph.overlay_program[3][(M_AXI4_FE_DATA_W*6)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_2 * 2 )-( graph.num_auxiliary_2 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
@@ -89,18 +89,18 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_auxiliary_1 )-( graph->num_auxiliary_1 * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    graph.overlay_program[4][(M_AXI4_FE_DATA_W*7)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
+    graph.overlay_program[4][(M_AXI4_FE_DATA_W*7)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_1 );
    // --  2  - Index_End
-    graph.overlay_program[4][(M_AXI4_FE_DATA_W*8)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 );
+    graph.overlay_program[4][(M_AXI4_FE_DATA_W*8)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_1 * 2 );
    // --  7  - Array_Pointer_LHS
     graph.overlay_program[4][(M_AXI4_FE_DATA_W*13)+:M_AXI4_FE_DATA_W]  = buffer_7_ptr[31:0];
    // --  8  - Array_Pointer_RHS
     graph.overlay_program[4][(M_AXI4_FE_DATA_W*14)+:M_AXI4_FE_DATA_W]  = buffer_7_ptr[63:32];
    // --  9  - Array_size
-    graph.overlay_program[4][(M_AXI4_FE_DATA_W*15)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 )-( graph.num_vertices );
+    graph.overlay_program[4][(M_AXI4_FE_DATA_W*15)+:M_AXI4_FE_DATA_W]  = ( graph.num_auxiliary_1 * 2 )-( graph.num_auxiliary_1 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 12   mapping 6    cycles 1    None-None ( 0 )-( 0 )
