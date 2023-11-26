@@ -143,5 +143,5 @@ void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersBFS(size_t 
 // --------------------------------------------------------------------------------------
 }
 // --------------------------------------------------------------------------------------
-// -->  Single.BFS  <-- 
+// -->  CPP.Single.BFS  <-- 
 // Number of entries 122

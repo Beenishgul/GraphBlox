@@ -59,7 +59,7 @@
         },
         "entry_4": {
             "shift.amount": {
-                "bits": "4",
+                "bits": "31",
                 "value": "0"
             },
             "shift.direction": {
