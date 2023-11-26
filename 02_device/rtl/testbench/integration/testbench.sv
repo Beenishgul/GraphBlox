@@ -1168,51 +1168,7 @@ module __KERNEL___testbench ();
                 end
             end
 
-            o=0;
-            l=0;
-
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            o=0;
-            l=0;
-
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                // setup_temp = {31'b0,get_random_bit()};
-
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                graph.debug_counter_2 += 1;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
+            `include"initialize_testbench._ALGORITHM_NAME_.vh"
 
             for (int i = 0; i < graph.mem512_num_edges; i++) begin
                 for (int j = 0;j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
