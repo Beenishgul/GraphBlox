@@ -473,7 +473,7 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
         append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
-        lookup_tables = {**engine_data.get('type_memory_cmd', {}), **engine_data.get('type_data_buffer', {}), **engine_data.get('type_ALU_operation', {})}
+        lookup_tables = {**engine_data.get('type_memory_cmd', {}), **engine_data.get('type_data_buffer', {}), **engine_data.get('type_ALU_operation', {}), **engine_data.get('type_filter_operation', {})}
 
         for key in entries:
             cache_line, offset = calculate_cache_info(total_number_entries, entries_per_cache_line)

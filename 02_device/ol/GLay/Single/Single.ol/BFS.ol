@@ -1,183 +1,170 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 0    mapping 1    cycles 13  
+// Engine: ENGINE_READ_WRITE_0, Number of entries: 13
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 0    cacheline 0    offset 0    --  0  - Increment/Decrement
-0x00000000 // entry 1    cacheline 0    offset 1    --  1  - Index_start
-0x00000000 // entry 2    cacheline 0    offset 2    --  2  - Index_end
-0x00000001 // entry 3    cacheline 0    offset 3    --  3  - Stride
-0x80000002 // entry 4    cacheline 0    offset 4    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000204 // entry 5    cacheline 0    offset 5    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00000000 // entry 6    cacheline 0    offset 6    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 7    cacheline 0    offset 7    --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 8    cacheline 0    offset 8    --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 9    cacheline 0    offset 9    --  9  - BUFFER size
-0x00000000 // entry 10   cacheline 0    offset 10   --  10 - const_mask
-0x00000001 // entry 11   cacheline 0    offset 11   --  11 - const_value
-0x00002148 // entry 12   cacheline 0    offset 12   --  12 - ops_mask
+0x00000000 // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00000204 // entry_5    cacheline[  0][ 5] <29b>: cmd[0:6]=CMD_MEM_WRITE || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x00000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  0][ 8] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  0][ 9] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_10   cacheline[  0][10] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry_11   cacheline[  0][11] <32b>: const_value[0:31]=0x00000000
+0x00002148 // entry_12   cacheline[  0][12] <16b>: ops_mask[0:15]=0x2148
 // --------------------------------------------------------------------------------------
+// Engine: ENGINE_READ_WRITE_1, Number of entries: 13
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 13  
+0x00000000 // entry_0    cacheline[  0][13] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  0][14] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  0][15] <32b>: index_end[0:31]=0x00000000
+0x00000000 // entry_3    cacheline[  1][ 0] <32b>: stride[0:31]=0x00000000
+0x80000002 // entry_4    cacheline[  1][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00000204 // entry_5    cacheline[  1][ 2] <29b>: cmd[0:6]=CMD_MEM_WRITE || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x00000000 // entry_6    cacheline[  1][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  1][ 4] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  1][ 5] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  1][ 6] <32b>: array_size[0:31]=0x00000000
+0x00000001 // entry_10   cacheline[  1][ 7] < 4b>: const_mask[0:3]=0x1
+0x00000001 // entry_11   cacheline[  1][ 8] <32b>: const_value[0:31]=0x00000001
+0x00004182 // entry_12   cacheline[  1][ 9] <16b>: ops_mask[0:15]=0x4182
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 13   cacheline 0    offset 13   --  0  - Increment/Decrement
-0x00000000 // entry 14   cacheline 0    offset 14   --  1  - Index_start
-0x00000000 // entry 15   cacheline 0    offset 15   --  2  - Index_end
-0x00000001 // entry 16   cacheline 1    offset 0    --  3  - Stride
-0x80000002 // entry 17   cacheline 1    offset 1    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000204 // entry 18   cacheline 1    offset 2    --  5  - CMD_MEM_WRITE | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00000000 // entry 19   cacheline 1    offset 3    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 20   cacheline 1    offset 4    --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 21   cacheline 1    offset 5    --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 22   cacheline 1    offset 6    --  9  - BUFFER size
-0x00000001 // entry 23   cacheline 1    offset 7    --  10 - const_mask
-0x00000001 // entry 24   cacheline 1    offset 8    --  11 - const_value
-0x00004182 // entry 25   cacheline 1    offset 9    --  12 - ops_mask
+// Engine: ENGINE_CSR_INDEX_2, Number of entries: 10
 // --------------------------------------------------------------------------------------
+0x00000001 // entry_0    cacheline[  1][10] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  1][11] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  1][12] <32b>: index_end[0:31]=0x00000000
+0x00000000 // entry_3    cacheline[  1][13] <32b>: stride[0:31]=0x00000000
+0x00000000 // entry_4    cacheline[  1][14] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
+0x00000120 // entry_5    cacheline[  1][15] <29b>: cmd[0:6]=CMD_ENGINE || buffer[7:12]=STRUCT_CU_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x01070201 // entry_6    cacheline[  2][ 0] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x07 || id_buffer[24:31]=0x01
+0x00000000 // entry_7    cacheline[  2][ 1] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  2][ 2] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  2][ 3] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 0    mapping 2    cycles 10   None-NONE ( 0 )-( graph->num_vertices )
+// Engine: ENGINE_FORWARD_DATA_3, Number of entries: 1
 // --------------------------------------------------------------------------------------
-0x00000001 // entry 26   cacheline 1    offset 10   --  0  - Increment/Decrement
-0x00000000 // entry 27   cacheline 1    offset 11   --  1  - Index_start
-0x00000033 // entry 28   cacheline 1    offset 12   --  2  - Index_end
-0x00000001 // entry 29   cacheline 1    offset 13   --  3  - Stride
-0x00000000 // entry 30   cacheline 1    offset 14   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000120 // entry 31   cacheline 1    offset 15   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x01070201 // entry 32   cacheline 2    offset 0    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 33   cacheline 2    offset 1    --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 34   cacheline 2    offset 2    --  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 35   cacheline 2    offset 3    --  9  - BUFFER size
+0x00000001 // entry_0    cacheline[  2][ 4] < 4b>: hops[0:3]=0x1
 // --------------------------------------------------------------------------------------
+// Engine: ENGINE_READ_WRITE_4, Number of entries: 13
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 1    mapping 6    cycles 1    None-None ( 0 )-( 0 )
+0x00000000 // entry_0    cacheline[  2][ 5] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  2][ 6] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  2][ 7] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  2][ 8] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  2][ 9] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00002202 // entry_5    cacheline[  2][10] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
+0x00010401 // entry_6    cacheline[  2][11] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  2][12] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  2][13] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  2][14] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_10   cacheline[  2][15] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry_11   cacheline[  3][ 0] <32b>: const_value[0:31]=0x00000000
+0x00008412 // entry_12   cacheline[  3][ 1] <16b>: ops_mask[0:15]=0x8412
 // --------------------------------------------------------------------------------------
-0x00000001 // entry 36   cacheline 2    offset 4    --  0  - number of hops (forward till discards)
+// Engine: ENGINE_MERGE_DATA_5, Number of entries: 2
 // --------------------------------------------------------------------------------------
+0x00000007 // entry_0    cacheline[  3][ 2] < 4b>: merge_mask[0:3]=0x7
+0x00000000 // entry_1    cacheline[  3][ 3] < 4b>: merge_type[0:3]=0x0
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 13   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Engine: ENGINE_FILTER_COND_6, Number of entries: 9
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 37   cacheline 2    offset 5    --  0  - Increment/Decrement
-0x00000000 // entry 38   cacheline 2    offset 6    --  1  - Index_start
-0x00000033 // entry 39   cacheline 2    offset 7    --  2  - Index_end
-0x00000001 // entry 40   cacheline 2    offset 8    --  3  - Stride
-0x80000002 // entry 41   cacheline 2    offset 9    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00002202 // entry 42   cacheline 2    offset 10   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine -> 1 0001 0000 0010
-0x00010401 // entry 43   cacheline 2    offset 11   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 44   cacheline 2    offset 12   --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 45   cacheline 2    offset 13   --  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 46   cacheline 2    offset 14   --  9  - BUFFER size
-0x00000000 // entry 47   cacheline 2    offset 15   --  10 - const_mask
-0x00000000 // entry 48   cacheline 3    offset 0    --  11 - const_value
-0x00008412 // entry 49   cacheline 3    offset 1    --  12 - ops_mask
+0x00000008 // entry_0    cacheline[  3][ 4] < 9b>: filter_operation[0:8]=FILTER_EQ
+0x00000004 // entry_1    cacheline[  3][ 5] < 4b>: filter_mask[0:3]=0x4
+0x00000004 // entry_2    cacheline[  3][ 6] < 4b>: const_mask[0:3]=0x4
+0xFFFFFFFF // entry_3    cacheline[  3][ 7] <32b>: const_value[0:31]=0xFFFFFFFF
+0x00004821 // entry_4    cacheline[  3][ 8] <16b>: ops_mask[0:15]=0x4821
+0x00000000 // entry_5    cacheline[  3][ 9] < 7b>: break_flag[0:0]=0 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=0 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0
+0x00010401 // entry_6    cacheline[  3][10] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x04 || if_id_lane[16:23]=0x01 || if_id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  3][11] <32b>: else_id_cu[0:7]=0x00 || else_id_bundle[8:15]=0x00 || else_id_lane[16:23]=0x00 || else_id_buffer[24:31]=0x00
+0x00000000 // entry_8    cacheline[  3][12] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
+// Engine: ENGINE_READ_WRITE_7, Number of entries: 13
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA   ID 3    mapping 4    cycles 2    None-None ( 0 )-( 0 )
+0x00000000 // entry_0    cacheline[  3][13] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  3][14] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  3][15] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  4][ 0] <32b>: stride[0:31]=0x00000001
+0x80000000 // entry_4    cacheline[  4][ 1] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=1
+0x00002202 // entry_5    cacheline[  4][ 2] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
+0x00000000 // entry_6    cacheline[  4][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  4][ 4] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  4][ 5] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  4][ 6] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_10   cacheline[  4][ 7] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry_11   cacheline[  4][ 8] <32b>: const_value[0:31]=0x00000000
+0x00008412 // entry_12   cacheline[  4][ 9] <16b>: ops_mask[0:15]=0x8412
 // --------------------------------------------------------------------------------------
-0x00000007 // entry 50   cacheline 3    offset 2    --  0  - merge mask (W:2)
-0x00000000 // entry 51   cacheline 3    offset 3    --  1  - merge type (Serial|Parallel|Both)
+// Engine: ENGINE_READ_WRITE_8, Number of entries: 13
 // --------------------------------------------------------------------------------------
+0x00000000 // entry_0    cacheline[  4][10] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  4][11] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  4][12] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  4][13] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  4][14] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00002202 // entry_5    cacheline[  4][15] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
+0x00000000 // entry_6    cacheline[  5][ 0] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  5][ 1] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  5][ 2] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  5][ 3] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_10   cacheline[  5][ 4] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry_11   cacheline[  5][ 5] <32b>: const_value[0:31]=0x00000000
+0x00008412 // entry_12   cacheline[  5][ 6] <16b>: ops_mask[0:15]=0x8412
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 4    mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// Engine: ENGINE_FORWARD_DATA_9, Number of entries: 1
 // --------------------------------------------------------------------------------------
-0x00000008 // entry 52   cacheline 3    offset 4    --  0  - filter_operation
-0x00000004 // entry 53   cacheline 3    offset 5    --  1  - filter_mask
-0x00000004 // entry 54   cacheline 3    offset 6    --  2  - const_mask
-0xFFFFFFFF // entry 55   cacheline 3    offset 7    --  3  - const_value
-0x00004821 // entry 56   cacheline 3    offset 8    --  5  - ops_mask
-0x00000000 // entry 57   cacheline 3    offset 9    --  4  - break_flag | continue_flag | ternary_flag | conditional_flag
-0x00002202 // entry 58   cacheline 3    offset 10   --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 59   cacheline 3    offset 11   --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 60   cacheline 3    offset 12   --  7  - if -> id_engine id_module | else -> id_engine id_module
+0x00000001 // entry_0    cacheline[  5][ 7] < 4b>: hops[0:3]=0x1
 // --------------------------------------------------------------------------------------
+// Engine: ENGINE_CSR_INDEX_10, Number of entries: 10
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 5    mapping 1    cycles 13   buffer_1-out_degree ( 0 )-( graph->num_vertices )
+0x0000000D // entry_0    cacheline[  5][ 8] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  5][ 9] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  5][10] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  5][11] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  5][12] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00000202 // entry_5    cacheline[  5][13] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x00010801 // entry_6    cacheline[  5][14] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  5][15] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  6][ 0] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  6][ 1] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 61   cacheline 3    offset 13   --  0  - Increment/Decrement
-0x00000000 // entry 62   cacheline 3    offset 14   --  1  - Index_start
-0x00000033 // entry 63   cacheline 3    offset 15   --  2  - Index_end
-0x00000001 // entry 64   cacheline 4    offset 0    --  3  - Stride
-0x80000002 // entry 65   cacheline 4    offset 1    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00002202 // entry 66   cacheline 4    offset 2    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00000000 // entry 67   cacheline 4    offset 3    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 68   cacheline 4    offset 4    --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 69   cacheline 4    offset 5    --  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 70   cacheline 4    offset 6    --  9  - BUFFER size
-0x00000000 // entry 71   cacheline 4    offset 7    --  10 - const_mask
-0x00000000 // entry 72   cacheline 4    offset 8    --  11 - const_value
-0x00008412 // entry 73   cacheline 4    offset 9    --  12 - ops_mask
+// Engine: ENGINE_FORWARD_DATA_11, Number of entries: 1
 // --------------------------------------------------------------------------------------
+0x00000001 // entry_0    cacheline[  6][ 2] < 4b>: hops[0:3]=0x1
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Engine: ENGINE_READ_WRITE_12, Number of entries: 13
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 74   cacheline 4    offset 10   --  0  - Increment/Decrement
-0x00000000 // entry 75   cacheline 4    offset 11   --  1  - Index_start
-0x00000033 // entry 76   cacheline 4    offset 12   --  2  - Index_end
-0x00000001 // entry 77   cacheline 4    offset 13   --  3  - Stride
-0x80000002 // entry 78   cacheline 4    offset 14   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00002202 // entry 79   cacheline 4    offset 15   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00000000 // entry 80   cacheline 5    offset 0    --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 81   cacheline 5    offset 1    --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 82   cacheline 5    offset 2    --  8  - BUFFER Array Pointer RHS
-0x00000033 // entry 83   cacheline 5    offset 3    --  9  - BUFFER size
-0x00000000 // entry 84   cacheline 5    offset 4    --  10 - const_mask
-0x00000000 // entry 85   cacheline 5    offset 5    --  11 - const_value
-0x00008412 // entry 86   cacheline 5    offset 6    --  12 - ops_mask
+0x00000000 // entry_0    cacheline[  6][ 3] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  6][ 4] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  6][ 5] <32b>: index_end[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  6][ 6] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  6][ 7] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00000202 // entry_5    cacheline[  6][ 8] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x00030101 // entry_6    cacheline[  6][ 9] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x01 || id_lane[16:23]=0x03 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  6][10] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  6][11] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  6][12] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_10   cacheline[  6][13] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry_11   cacheline[  6][14] <32b>: const_value[0:31]=0x00000000
+0x00004812 // entry_12   cacheline[  6][15] <16b>: ops_mask[0:15]=0x4812
 // --------------------------------------------------------------------------------------
+// Engine: ENGINE_FILTER_COND_13, Number of entries: 9
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 7    mapping 6    cycles 1    None-None ( 0 )-( 0 )
+0x00000008 // entry_0    cacheline[  7][ 0] < 9b>: filter_operation[0:8]=FILTER_EQ
+0x00000004 // entry_1    cacheline[  7][ 1] < 4b>: filter_mask[0:3]=0x4
+0x00000004 // entry_2    cacheline[  7][ 2] < 4b>: const_mask[0:3]=0x4
+0x00000001 // entry_3    cacheline[  7][ 3] <32b>: const_value[0:31]=0x00000001
+0x00001824 // entry_4    cacheline[  7][ 4] <16b>: ops_mask[0:15]=0x1824
+0x00000001 // entry_5    cacheline[  7][ 5] < 7b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=0 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0
+0x00030101 // entry_6    cacheline[  7][ 6] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x01 || if_id_lane[16:23]=0x03 || if_id_buffer[24:31]=0x00
+0x00030101 // entry_7    cacheline[  7][ 7] <32b>: else_id_cu[0:7]=0x01 || else_id_bundle[8:15]=0x01 || else_id_lane[16:23]=0x03 || else_id_buffer[24:31]=0x00
+0x00000000 // entry_8    cacheline[  7][ 8] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
-0x00000001 // entry 87   cacheline 5    offset 7    --  0  - number of hops (forward till discards)
+// Engine: ENGINE_FORWARD_DATA_14, Number of entries: 1
 // --------------------------------------------------------------------------------------
+0x00000001 // entry_0    cacheline[  7][ 9] < 4b>: hops[0:3]=0x1
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
-// --------------------------------------------------------------------------------------
-0x0000001D // entry 88   cacheline 5    offset 8    --  0  - Increment/Decrement        0001  1110
-0x00000000 // entry 89   cacheline 5    offset 9    --  1  - Index_start
-0x00000000 // entry 90   cacheline 5    offset 10   --  2  - Index_end
-0x00000001 // entry 91   cacheline 5    offset 11   --  3  - Stride
-0x80000002 // entry 92   cacheline 5    offset 12   --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000202 // entry 93   cacheline 5    offset 13   --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00010801 // entry 94   cacheline 5    offset 14   --  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 95   cacheline 5    offset 15   --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 96   cacheline 6    offset 0    --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 97   cacheline 6    offset 1    --  9  - BUFFER size
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 9    mapping 6    cycles 1    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-0x00000001 // entry 72   cacheline 4    offset 8    -- //  0  - number of hops (forward till discards)
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 12   mapping 1    cycles 13  
-// --------------------------------------------------------------------------------------
-0x00000000 // entry 99   cacheline 6    offset 3    --  0  - Increment/Decrement
-0x00000000 // entry 100  cacheline 6    offset 4    --  1  - Index_start
-0x00000000 // entry 101  cacheline 6    offset 5    --  2  - Index_end
-0x00000001 // entry 102  cacheline 6    offset 6    --  3  - Stride
-0x80000002 // entry 103  cacheline 6    offset 7    --  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000202 // entry 104  cacheline 6    offset 8    --  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x00030101 // entry 105  cacheline 6    offset 9    --  6  - route  | Cast to first 2 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 106  cacheline 6    offset 10   --  7  - BUFFER Array Pointer LHS
-0x00000000 // entry 107  cacheline 6    offset 11   --  8  - BUFFER Array Pointer RHS
-0x00000000 // entry 108  cacheline 6    offset 12   --  9  - BUFFER size
-0x00000000 // entry 109  cacheline 6    offset 13   --  10 - const_mask
-0x00000000 // entry 110  cacheline 6    offset 14   --  11 - const_value
-0x00004812 // entry 111  cacheline 6    offset 15   --  12 - ops_mask
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 13   mapping 3    cycles 9   
-// --------------------------------------------------------------------------------------
-0x00000008 // entry 112  cacheline 7    offset 0    --  0  - filter_operation
-0x00000004 // entry 113  cacheline 7    offset 1    --  1  - filter_mask
-0x00000004 // entry 114  cacheline 7    offset 2    --  2  - const_mask
-0x00000001 // entry 115  cacheline 7    offset 3    --  3  - const_value
-0x00001824 // entry 116  cacheline 7    offset 4    --  5  - ops_mask
-0x00000001 // entry 117  cacheline 7    offset 5    --  4  - break_flag | break_pass | filter_post | filter_pass | continue_flag | ternary_flag | conditional_flag
-0x00030101 // entry 118  cacheline 7    offset 6    --  6  - if   | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00030101 // entry 119  cacheline 7    offset 7    --  7  - else | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 // entry 120  cacheline 7    offset 8    --  7  - if -> id_engine id_module | else -> id_engine id_module
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 14   mapping 6    cycles 1   
-// --------------------------------------------------------------------------------------
-0x00000001 // entry 121  cacheline 7    offset 9    --  0  - number of hops (forward till discards)
-// --------------------------------------------------------------------------------------
+// -->  Load.Single.BFS  <-- 
 // Number of entries 122
