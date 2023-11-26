@@ -461,8 +461,8 @@ module engine_alu_ops_generator #(parameter
         generator_engine_request_engine_reg_S2.payload.meta.address         <= generator_engine_request_engine_reg.payload.meta.address;
         generator_engine_request_engine_reg_S2.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
 
-        if(generator_engine_request_engine_reg_S2.valid)
-            $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
+        // if(generator_engine_request_engine_reg_S2.valid)
+        //     $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
 
     end
 
