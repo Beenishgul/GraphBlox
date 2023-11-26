@@ -290,8 +290,21 @@ parse_opt (int key, char *arg, struct argp_state *state)
         arguments->device_index = atoi(arg);
         break;
     case 'Q':
-        arguments->kernel_name = (char *) malloc((strlen(arg) + 20) * sizeof(char));
-        arguments->kernel_name  = strcpy (arguments->kernel_name, arg);
+        arguments->kernel_name = (char *) malloc(strlen(arg) + 1 + 20);
+
+        if (arguments->kernel_name == NULL) {
+            // Handle memory allocation failure
+            fprintf(stderr, "Memory allocation failed for kernel_name\n");
+            exit(1);
+        }
+
+        // Copy the arg string into kernel_name
+        strcpy(arguments->kernel_name, arg);
+
+        // Append "_1" to the string if ker_numThreads is greater than one
+        if (arguments->ker_numThreads > 1) {
+            strcat(arguments->kernel_name, "_1");
+        }
         break;
     case 'q':
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
