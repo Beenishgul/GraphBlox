@@ -107,7 +107,8 @@
             ],
             [
                 "ENGINE_ALU_OPS",
-                "ENGINE_ALU_OPS(C:0)"
+                "ENGINE_ALU_OPS",
+                "ENGINE_FILTER_COND"
             ],
             [
                 "ENGINE_FORWARD_DATA"

@@ -36,7 +36,7 @@
 0x00000001 // entry_0    cacheline[  1][10] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry_1    cacheline[  1][11] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  1][12] <32b>: index_end[0:31]=0x00000000
-0x00000000 // entry_3    cacheline[  1][13] <32b>: stride[0:31]=0x00000000
+0x00000001 // entry_3    cacheline[  1][13] <32b>: stride[0:31]=0x00000001
 0x00000000 // entry_4    cacheline[  1][14] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
 0x00000120 // entry_5    cacheline[  1][15] <29b>: cmd[0:6]=CMD_ENGINE || buffer[7:12]=STRUCT_CU_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
 0x01070201 // entry_6    cacheline[  2][ 0] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x07 || id_buffer[24:31]=0x01
