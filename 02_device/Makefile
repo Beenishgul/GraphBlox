@@ -524,6 +524,7 @@ ifeq ($(TARGET),hw_emu)
 	echo "INFO: Generating emulation config file for platform $(PLATFORM)" | perl $(COLOR_TAIL_EMU_PL) ;\
 	emconfigutil --platform $(PLATFORM) --od $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(VIVADO_RUN_DIR) | perl $(COLOR_TAIL_EMU_SUB_PL);\
 	echo "INFO: Enter Hardware Emulation Mode" | perl $(COLOR_TAIL_EMU_SUB_PL);\
+	rm -f ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	cp $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/bin/$(INTEGRATION)/$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) ;\
 	if [ $(DEBUG_CMD) -eq 1 ]; then \
 		gdb -ex=r --args ./$(APP_TEST)-$(INTEGRATION)-$(APP_LANG) -f $(FILE_BIN) $(ARGS) ;\
