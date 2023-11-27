@@ -18,7 +18,7 @@ module xpm_memory_spram_parent #(
 	parameter HEXFILE          = "none" ,
 	parameter DATA_W           = 8      ,
 	parameter ADDR_W           = 14     ,
-	parameter MEMORY_PRIMITIVE = "block",
+	parameter MEMORY_PRIMITIVE = "auto" ,
 	parameter BLOCK_DATA_DEPTH = (1024) ,
 	parameter READ_LATENCY_A   = 1      ,
 	parameter BYTE_WRITE_W     = DATA_W
@@ -41,7 +41,6 @@ module xpm_memory_spram_parent #(
 	// 		BLOCK_DATA_DEPTH = (4*1024);
 	// 		BLOCK_DATA_W = 72;
 	// 	end
-
 
 	// if (DATA_W > BLOCK_DATA_W)
 	// 	$error("DATA_W: %d has to be %d bit or less for %s RAM", DATA_W, BLOCK_DATA_W, MEMORY_PRIMITIVE);

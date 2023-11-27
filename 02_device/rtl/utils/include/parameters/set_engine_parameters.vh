@@ -70,8 +70,8 @@
 .ENGINE_MERGE_WIDTH                      (ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]              ),
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
-.FIFO_WRITE_DEPTH 					     (32                                               ),
-.PROG_THRESH      						 (16                                               ),
+.FIFO_WRITE_DEPTH 					     (FIFO_WRITE_DEPTH                                 ),
+.PROG_THRESH      						 (PROG_THRESH                                      ),
 .ENGINE_SEQ_WIDTH                        (ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]         ),
 .ENGINE_SEQ_MIN                          (ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]           ),
 .NUM_LANES                               (NUM_LANES                                        )
