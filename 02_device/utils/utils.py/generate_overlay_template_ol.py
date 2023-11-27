@@ -530,7 +530,7 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
 
 
 append_to_file(output_file_path_cpp, "#include \"glayenv.hpp\"")
-append_to_file(output_file_path_cpp, f"void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
+append_to_file(output_file_path_cpp, f"void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)")
 append_to_file(output_file_path_cpp, "{")
 
 # Get engine IDs and pad accordingly

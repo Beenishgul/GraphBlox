@@ -349,9 +349,9 @@ main (int argc, char **argv)
         static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 1;
     }
 
-    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
-    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx);
-    glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
+    GLAYGraphCSRxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+    glayGraphCSRxrtBufferHandlePerKernel = setupGLAYGraphCSRCtrlChain(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx, arguments->cache_size, arguments->algorithm);
+    glayGraphCSRxrtBufferHandlePerKernel->printGLAYGraphCSRxrtBufferHandlePerKernel();
 
     startGLAYCtrlChain(arguments->glayHandle);
 
