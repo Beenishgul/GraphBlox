@@ -70,16 +70,16 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13   buffer_1-out_degree ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 13   buffer_2-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[62] = ( 0 );
    // --  2  - Index_End
     overlay_program[63] = ( graph->num_vertices );
    // --  7  - Array_Pointer_LHS
-    overlay_program[68] = xrt_buffer_device[1];
+    overlay_program[68] = xrt_buffer_device[2];
    // --  8  - Array_Pointer_RHS
-    overlay_program[69] = xrt_buffer_device[1] >> 32;
+    overlay_program[69] = xrt_buffer_device[2] >> 32;
    // --  9  - Array_size
     overlay_program[70] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
@@ -102,58 +102,46 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 11   mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
+// Name ENGINE_CSR_INDEX    ID 11   mapping 2    cycles 10   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[89] = ( 0 );
    // --  2  - Index_End
     overlay_program[90] = ( graph->num_edges );
    // --  7  - Array_Pointer_LHS
-    overlay_program[95] = xrt_buffer_device[4];
+    overlay_program[95] = xrt_buffer_device[5];
    // --  8  - Array_Pointer_RHS
-    overlay_program[96] = xrt_buffer_device[4] >> 32;
+    overlay_program[96] = xrt_buffer_device[5] >> 32;
    // --  9  - Array_size
     overlay_program[97] = ( graph->num_edges )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 12   mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// Name ENGINE_FORWARD_DATA ID 12   mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_ALU_OPS      ID 13   mapping 5    cycles 6    None-None ( 0 )-( 0 )
+// Name ENGINE_READ_WRITE   ID 13   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    overlay_program[100] = ( graph->num_vertices );
+   // --  2  - Index_End
+    overlay_program[101] = ( graph->num_vertices * 2 );
+   // --  7  - Array_Pointer_LHS
+    overlay_program[106] = xrt_buffer_device[7];
+   // --  8  - Array_Pointer_RHS
+    overlay_program[107] = xrt_buffer_device[7] >> 32;
+   // --  9  - Array_size
+    overlay_program[108] = ( graph->num_vertices * 2 )-( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_ALU_OPS      ID 14   mapping 5    cycles 6    None-None ( 0 )-( 0 )
+// Name ENGINE_FILTER_COND  ID 14   mapping 3    cycles 9    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 15   mapping 6    cycles 1    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 16   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
-// --------------------------------------------------------------------------------------
-   // --  1  - Index_Start
-    overlay_program[121] = ( graph->num_vertices );
-   // --  2  - Index_End
-    overlay_program[122] = ( graph->num_vertices * 2 );
-   // --  7  - Array_Pointer_LHS
-    overlay_program[127] = xrt_buffer_device[7];
-   // --  8  - Array_Pointer_RHS
-    overlay_program[128] = xrt_buffer_device[7] >> 32;
-   // --  9  - Array_size
-    overlay_program[129] = ( graph->num_vertices * 2 )-( graph->num_vertices );
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 17   mapping 3    cycles 9    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 18   mapping 6    cycles 1    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
 }
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.BFS  <-- 
-// Number of entries 143
+// Number of entries 122

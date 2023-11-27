@@ -84,11 +84,6 @@
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
             ],
             [
-                "ENGINE_FILTER_COND",
-                "ENGINE_ALU_OPS",
-                "ENGINE_ALU_OPS"
-            ],
-            [
                 "ENGINE_FORWARD_DATA"
             ]
         ],
@@ -316,11 +311,11 @@
     },
     "buffers": {
         "buffer_0": "overlay_program",
-        "buffer_1": "out_degree",
-        "buffer_2": "in_degree",
+        "buffer_1": "in_degree",
+        "buffer_2": "out_degree",
         "buffer_3": "edges_idx",
-        "buffer_4": "edges_array_dest",
-        "buffer_5": "edges_array_src",
+        "buffer_4": "edges_array_src",
+        "buffer_5": "edges_array_dest",
         "buffer_6": "edges_array_weight",
         "buffer_7": "auxiliary_1",
         "buffer_8": "auxiliary_2",

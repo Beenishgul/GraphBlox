@@ -29,7 +29,7 @@
 0x00000000 // entry_9    cacheline[  1][ 6] <32b>: array_size[0:31]=0x00000000
 0x00000001 // entry_10   cacheline[  1][ 7] < 4b>: const_mask[0:3]=0x1
 0x00000001 // entry_11   cacheline[  1][ 8] <32b>: const_value[0:31]=0x00000001
-0x00004182 // entry_12   cacheline[  1][ 9] <16b>: ops_mask[0:15]=0x4182
+0x00002841 // entry_12   cacheline[  1][ 9] <16b>: ops_mask[0:15]=0x2841
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_2, Number of entries: 10
 // --------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@
 0x00000000 // entry_1    cacheline[  3][14] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  3][15] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  4][ 0] <32b>: stride[0:31]=0x00000001
-0x80000000 // entry_4    cacheline[  4][ 1] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=1
+0x80000002 // entry_4    cacheline[  4][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00002202 // entry_5    cacheline[  4][ 2] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
 0x00000000 // entry_6    cacheline[  4][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  4][ 4] <32b>: array_pointer[0:31]=0x00000000
