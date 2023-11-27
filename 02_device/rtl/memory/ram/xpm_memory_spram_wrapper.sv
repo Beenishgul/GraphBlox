@@ -18,7 +18,7 @@ module xpm_memory_spram_wrapper #(
   parameter HEXFILE          = "none" ,
   parameter DATA_W           = 8      ,
   parameter ADDR_W           = 14     ,
-  parameter MEMORY_PRIMITIVE = "block",
+  parameter MEMORY_PRIMITIVE = "auto" ,
   parameter READ_LATENCY_A   = 1      ,
   parameter BYTE_WRITE_W     = DATA_W
 ) (

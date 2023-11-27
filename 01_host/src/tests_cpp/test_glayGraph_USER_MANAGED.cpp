@@ -14,6 +14,7 @@
 // -----------------------------------------------------------------------------
 
 #include "glayenv.hpp"
+#include <thread>
 
 #ifdef __cplusplus
 extern "C" {
@@ -291,20 +292,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
         break;
     case 'Q':
         arguments->kernel_name = (char *) malloc(strlen(arg) + 1 + 20);
-
-        if (arguments->kernel_name == NULL) {
-            // Handle memory allocation failure
-            fprintf(stderr, "Memory allocation failed for kernel_name\n");
-            exit(1);
-        }
-
-        // Copy the arg string into kernel_name
-        strcpy(arguments->kernel_name, arg);
-
-        // Append "_1" to the string if ker_numThreads is greater than one
-        if (arguments->ker_numThreads > 1) {
-            strcat(arguments->kernel_name, "_1");
-        }
+        arguments->kernel_name = strcpy(arguments->kernel_name, arg);
         break;
     case 'q':
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));
@@ -329,22 +317,55 @@ main (int argc, char **argv)
 {
     struct Arguments *arguments = argumentsNew();
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    std::vector<xrtGLAYHandle *> glayHandlePerKernel;
+    // std::vector<GLAYGraphCSRxrtBufferHandlePerKernel *> glayGraphCSRxrtBufferHandlePerKernel;
+    std::vector<std::thread> glayTthreadJobs(arguments->ker_numThreads);
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
+
+    char *env_emu;
+    if (getenv("XCL_EMULATION_MODE")) {
+        env_emu = getenv("XCL_EMULATION_MODE");
+        std::string mode(env_emu);
+        if (mode == "hw_emu")
+        {
+            std::cout << "Program running in hardware emulation mode" << std::endl;
+        }
+        else
+        {
+            std::cout << "[ERROR] Unsupported Emulation Mode: " << mode << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
+    else {
+        std::cout << "Program running in hardware mode" << std::endl;
+    }
 
     int ctrlMode = 0;
     int endian = 0;
     int flush = 1;
-
     int bank_grp_idx = 0;
+
+    char* kernel_name_temp = (char *) malloc(strlen(arguments->kernel_name) + 1 + 20);
+    kernel_name_temp = strcpy(kernel_name_temp, arguments->kernel_name);
+
+     for (int i = 0; i < arguments->ker_numThreads; i++) {
+        sprintf(kernel_name_temp, "_%d", i + 1); // Create suffix "_1", "_2", etc.
+        arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, kernel_name_temp, ctrlMode, endian, flush);
+        glayHandlePerKernel.push_back(arguments->glayHandle);
+        kernel_name_temp = strcpy(kernel_name_temp, arguments->kernel_name);
+    }   
+
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
+
     arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, ctrlMode, endian, flush);
 
     if(arguments->glayHandle == NULL)
     {
         printf("ERROR:--> setupGLAYDevice\n");
     }
+
 
     uint32_t i;
 
@@ -358,19 +379,19 @@ main (int argc, char **argv)
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = 0; i < graphAuxiliary->num_auxiliary_1/2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
 
-        if(i == 0)
-            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+        // if(i == 0)
+        //     static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
 
     }
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i =  graphAuxiliary->num_auxiliary_1/2 ; i < graphAuxiliary->num_auxiliary_1 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
 
-        if(i == graphAuxiliary->num_auxiliary_1/2)
-            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
+        // if(i == graphAuxiliary->num_auxiliary_1/2)
+        //     static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
     }
 
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
@@ -382,7 +403,7 @@ main (int argc, char **argv)
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
     for(i = graphAuxiliary->num_auxiliary_2/2; i < graphAuxiliary->num_auxiliary_2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0;
     }
 
     Start(timer);

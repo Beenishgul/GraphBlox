@@ -118,19 +118,35 @@ module iob_cache_memory #(
          wire [FIFO_DATA_W-1:0] mem_r_data;
 
          // FIFO memory
-         iob_ram_2p #(
+         // iob_ram_2p #(
+         //    .DATA_W(FIFO_DATA_W),
+         //    .ADDR_W(FIFO_ADDR_W)
+         // ) iob_ram_2p0 (
+         //    .clk_i(clk_i),
+
+         //    .w_en_i  (mem_w_en),
+         //    .w_addr_i(mem_w_addr),
+         //    .w_data_i(mem_w_data),
+
+         //    .r_en_i  (mem_r_en),
+         //    .r_addr_i(mem_r_addr),
+         //    .r_data_o(mem_r_data)
+         // );
+
+         xpm_memory_sdpram_wrapper #(
             .DATA_W(FIFO_DATA_W),
             .ADDR_W(FIFO_ADDR_W)
          ) iob_ram_2p0 (
-            .clk_i(clk_i),
-
-            .w_en_i  (mem_w_en),
-            .w_addr_i(mem_w_addr),
-            .w_data_i(mem_w_data),
-
-            .r_en_i  (mem_r_en),
-            .r_addr_i(mem_r_addr),
-            .r_data_o(mem_r_data)
+            .ap_clk(clk_i     ),
+            .rstb  (reset_i   ),
+            
+            .w_en  (mem_w_en  ),
+            .w_addr(mem_w_addr),
+            .w_data(mem_w_data),
+            
+            .r_en  (mem_r_en  ),
+            .r_addr(mem_r_addr),
+            .r_data(mem_r_data)
          );
 
          iob_fifo_sync #(
@@ -262,18 +278,22 @@ module iob_cache_memory #(
             for (i = 0; i < BE_DATA_W / FE_DATA_W; i = i + 1) begin : g_BE_block
                iob_gen_sp_ram #(
                   .DATA_W(FE_DATA_W),
-                  .ADDR_W(NLINES_W)
+                  .ADDR_W(NLINES_W),
+                  .MEMORY_PRIMITIVE("ultra"),
+                  .BLOCK_DATA_DEPTH(4*1024)
                ) cache_memory (
-                  .clk_i(clk_i),
-                  .en_i(req_i),
-                  .we_i ({FE_NBYTES{way_hit[k]}} & line_wstrb[(j*(BE_DATA_W/FE_DATA_W)+i)*FE_NBYTES +: FE_NBYTES]),
-                  .addr_i((write_access & way_hit[k] & ((j*(BE_DATA_W/FE_DATA_W)+i) == offset))? index_reg[NLINES_W-1:0] : index[NLINES_W-1:0]),
-                  .data_i((replace_i) ? read_rdata_i[i*FE_DATA_W+:FE_DATA_W] : wdata_reg_i),
-                  .data_o(line_rdata[(k*(2**WORD_OFFSET_W)+j*(BE_DATA_W/FE_DATA_W)+i)*FE_DATA_W+:FE_DATA_W])
+                  .ap_clk(clk_i),
+                  .reset(reset_i),
+                  .en(req_i),
+                  .we({FE_NBYTES{way_hit[k]}} & line_wstrb[(j*(BE_DATA_W/FE_DATA_W)+i)*FE_NBYTES +: FE_NBYTES]),
+                  .addr((write_access & way_hit[k] & ((j*(BE_DATA_W/FE_DATA_W)+i) == offset))? index_reg[NLINES_W-1:0] : index[NLINES_W-1:0]),
+                  .data_in((replace_i) ? read_rdata_i[i*FE_DATA_W+:FE_DATA_W] : wdata_reg_i),
+                  .data_out(line_rdata[(k*(2**WORD_OFFSET_W)+j*(BE_DATA_W/FE_DATA_W)+i)*FE_DATA_W+:FE_DATA_W])
                );
             end
          end
       end
+
 
       // Cache Line Write Strobe
       if (LINE2BE_W > 0) begin : g_line2be_w
@@ -316,17 +336,32 @@ module iob_cache_memory #(
                else v[k] <= v_reg[(2**NLINES_W)*k+index];
 
             // tag-memory
-            iob_ram_sp #(
-               .DATA_W(TAG_W),
-               .ADDR_W(NLINES_W)
+            // iob_ram_sp #(
+            //    .DATA_W(TAG_W),
+            //    .ADDR_W(NLINES_W)
+            // ) tag_memory (
+            //    .clk_i (clk_i),
+            //    .en_i  (req_i),
+            //    .we_i  (way_select[k] & replace_req_o),
+            //    .addr_i(index[NLINES_W-1:0]),
+            //    .d_i   (tag),
+            //    .d_o   (line_tag[TAG_W*k+:TAG_W])
+            // );
+
+            xpm_memory_spram_parent #(
+               .DATA_W        (TAG_W   ),
+               .ADDR_W        (NLINES_W),
+               .READ_LATENCY_A(1       )
             ) tag_memory (
-               .clk_i (clk_i),
-               .en_i  (req_i),
-               .we_i  (way_select[k] & replace_req_o),
-               .addr_i(index[NLINES_W-1:0]),
-               .d_i   (tag),
-               .d_o   (line_tag[TAG_W*k+:TAG_W])
+               .ap_clk(clk_i                        ),
+               .rsta  (reset_i                      ),
+               .en    (req_i                        ),
+               .we    (way_select[k] & replace_req_o),
+               .addr  (index[NLINES_W-1:0]          ),
+               .din   (tag                          ),
+               .dout  (line_tag[TAG_W*k +: TAG_W]   )
             );
+
 
             // Way hit signal - hit or replacement
             assign way_hit[k] = (tag == line_tag[TAG_W*k+:TAG_W]) & v[k];
@@ -400,16 +435,30 @@ module iob_cache_memory #(
          end
 
          // tag-memory
-         iob_ram_sp #(
-            .DATA_W(TAG_W),
-            .ADDR_W(NLINES_W)
-         ) tag_memory (
-            .clk_i (clk_i),
-            .en_i  (req_i),
-            .we_i  (replace_req_o),
-            .addr_i(index),
-            .d_i   (tag),
-            .d_o   (line_tag)
+         // iob_ram_sp #(
+         //    .DATA_W(TAG_W),
+         //    .ADDR_W(NLINES_W)
+         // ) tag_memory (
+         //    .clk_i (clk_i),
+         //    .en_i  (req_i),
+         //    .we_i  (replace_req_o),
+         //    .addr_i(index),
+         //    .d_i   (tag),
+         //    .d_o   (line_tag)
+         // );
+
+         xpm_memory_spram_parent #(
+            .DATA_W(TAG_W           ),
+            .ADDR_W(CACHE_LINE_OFF_W),
+            .READ_LATENCY_A(1       )
+          ) tag_memory (
+            .ap_clk(ap_clk                       ),
+            .rsta  (reset                        ),
+            .en    (valid                        ),
+            .we    (way_select[k] & replace_valid),
+            .addr  (index                        ),
+            .din   (tag                          ),
+            .dout  (line_tag[TAG_W*k +: TAG_W]   )
          );
 
          // Cache hit signal that indicates which way has had the hit (also during replacement)
@@ -457,33 +506,89 @@ endmodule
 // For cycle that generated byte-width (single enable) single-port SRAM
 // older synthesis tool may require this approch
 
+// module iob_gen_sp_ram #(
+//    parameter DATA_W = 32,
+//    parameter ADDR_W = 10
+// ) (
+//    input                 clk_i,
+//    input                 en_i,
+//    input  [DATA_W/8-1:0] we_i,
+//    input  [  ADDR_W-1:0] addr_i,
+//    output [  DATA_W-1:0] data_o,
+//    input  [  DATA_W-1:0] data_i
+// );
+
+//    genvar i;
+//    generate
+//       for (i = 0; i < (DATA_W / 8); i = i + 1) begin : g_ram
+//          iob_ram_sp #(
+//             .DATA_W(8),
+//             .ADDR_W(ADDR_W)
+//          ) iob_cache_mem (
+//             .clk_i (clk_i),
+//             .en_i  (en_i),
+//             .we_i  (we_i[i]),
+//             .addr_i(addr_i),
+//             .d_o   (data_o[8*i+:8]),
+//             .d_i   (data_i[8*i+:8])
+//          );
+//       end
+//    endgenerate
+
+// endmodule
+
+
 module iob_gen_sp_ram #(
-   parameter DATA_W = 32,
-   parameter ADDR_W = 10
+   parameter DATA_W           = 32     ,
+   parameter ADDR_W           = 10     ,
+   parameter MEMORY_PRIMITIVE = "block",
+   parameter BLOCK_DATA_DEPTH = 1024
 ) (
-   input                 clk_i,
-   input                 en_i,
-   input  [DATA_W/8-1:0] we_i,
-   input  [  ADDR_W-1:0] addr_i,
-   output [  DATA_W-1:0] data_o,
-   input  [  DATA_W-1:0] data_i
+   input                 ap_clk  ,
+   input                 reset   ,
+   input                 en      ,
+   input  [DATA_W/8-1:0] we      ,
+   input  [  ADDR_W-1:0] addr    ,
+   output [  DATA_W-1:0] data_out,
+   input  [  DATA_W-1:0] data_in
 );
 
-   genvar i;
-   generate
-      for (i = 0; i < (DATA_W / 8); i = i + 1) begin : g_ram
-         iob_ram_sp #(
-            .DATA_W(8),
-            .ADDR_W(ADDR_W)
-         ) iob_cache_mem (
-            .clk_i (clk_i),
-            .en_i  (en_i),
-            .we_i  (we_i[i]),
-            .addr_i(addr_i),
-            .d_o   (data_o[8*i+:8]),
-            .d_i   (data_i[8*i+:8])
-         );
-      end
-   endgenerate
+   // genvar                                i;
+   // generate
+   //   for (i = 0; i < (DATA_W/8); i = i + 1)
+   //     begin : ram
+   //       iob_ram_sp
+   //         #(
+   //           .DATA_W(8),
+   //           .ADDR_W(ADDR_W)
+   //         )
+   //         iob_cache_mem
+   //           (
+   //             .ap_clk (ap_clk),
+   //             .en  (en),
+   //             .we  (we[i]),
+   //             .addr(addr),
+   //             .dout(data_out[8*i +: 8]),
+   //             .din (data_in [8*i +: 8])
+   //           );
+   //     end
+   // endgenerate
 
-endmodule
+   xpm_memory_spram_parent #(
+      .DATA_W          (DATA_W          ),
+      .ADDR_W          (ADDR_W          ),
+      .MEMORY_PRIMITIVE(MEMORY_PRIMITIVE),
+      .BLOCK_DATA_DEPTH(BLOCK_DATA_DEPTH),
+      .BYTE_WRITE_W    (8               ),
+      .READ_LATENCY_A  (1               )
+   ) iob_cache_mem (
+      .ap_clk(ap_clk  ),
+      .rsta  (reset   ),
+      .en    (en      ),
+      .we    (we      ),
+      .addr  (addr    ),
+      .dout  (data_out),
+      .din   (data_in )
+   );
+
+endmodule // iob_gen_sp_ram
