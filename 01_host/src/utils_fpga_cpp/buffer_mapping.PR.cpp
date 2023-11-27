@@ -1,5 +1,5 @@
 #include "glayenv.hpp"
-void GLAYGraphCSRxrtBufferHandlePerBank::mapGLAYOverlayProgramBuffersPR(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
+void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_ALU_OPS      ID 1    mapping 5    cycles 6    None-None ( 0 )-( 0 )

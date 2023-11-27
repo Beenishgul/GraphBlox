@@ -332,10 +332,14 @@ main (int argc, char **argv)
 
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
+    int ctrlMode = 0;
+    int endian = 0;
+    int flush = 1;
+
     int bank_grp_idx = 0;
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, 0, 0, 0);
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, ctrlMode, endian, flush);
 
     if(arguments->glayHandle == NULL)
     {
@@ -343,41 +347,95 @@ main (int argc, char **argv)
     }
 
     uint32_t i;
-    graphAuxiliary->num_auxiliary_1 = graph->vertices->num_vertices*2;
+
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices*2;
     graphAuxiliary->auxiliary_1  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-    graphAuxiliary->num_auxiliary_2 = graph->vertices->num_vertices*2;
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices*2;
     graphAuxiliary->auxiliary_2  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i = 0; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_1/2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
+
+        if(i == 0)
+            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+
+    }
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
+    for(i =  graphAuxiliary->num_auxiliary_1/2 ; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    {
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+
+        if(i == graphAuxiliary->num_auxiliary_1/2)
+            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
     }
 
     #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i = 0; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_2/2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 1;
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0;
     }
 
-    GLAYGraphCSRxrtBufferHandlePerBank *glayGraphCSRxrtBufferHandlePerBank;
-    glayGraphCSRxrtBufferHandlePerBank = setupGLAYGraphCSRUserManaged(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx);
-    glayGraphCSRxrtBufferHandlePerBank->printGLAYGraphCSRxrtBufferHandlePerBank();
-
-    startGLAYUserManaged(arguments->glayHandle);
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
+    for(i = graphAuxiliary->num_auxiliary_2/2; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    {
+        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
+    }
 
     Start(timer);
-    waitGLAYUserManaged(arguments->glayHandle);
+    GLAYGraphCSRxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+    glayGraphCSRxrtBufferHandlePerKernel = setupGLAYGraphCSRUserManaged(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx, arguments->cache_size, arguments->algorithm);
+    glayGraphCSRxrtBufferHandlePerKernel->printGLAYGraphCSRxrtBufferHandlePerKernel();
+    startGLAYUserManaged(arguments->glayHandle);
     Stop(timer);
-
     printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Time (S)");
+    printf("| %-9s | \n", "Setup Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-9f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
+    Start(timer);
+    waitGLAYUserManaged(arguments->glayHandle);
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Algorithm Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->readGLAYGraphCSRDeviceToHostBuffersPerKernel(arguments->glayHandle, graph, glayGraphCSRxrtBufferHandlePerKernel);
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Result Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+
+    for(i = 0; i < graphAuxiliary->num_auxiliary_1/2 ; i++)
+    {
+        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i]);
+    }
+    printf(" -----------------------------------------------------\n");
+    for(i = graphAuxiliary->num_auxiliary_1/2; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    {
+        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i]);
+    }
+    printf(" -----------------------------------------------------\n");
+    for(i = 0; i < graphAuxiliary->num_auxiliary_2/2 ; i++)
+    {
+        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i]);
+    }
+    printf(" -----------------------------------------------------\n");
+    for(i = graphAuxiliary->num_auxiliary_2/2; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    {
+        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i]);
+    }
+    printf(" -----------------------------------------------------\n");
     // closeGLAYUserManaged(arguments->glayHandle);
     if(graphAuxiliary->auxiliary_1)
         free(graphAuxiliary->auxiliary_1);
