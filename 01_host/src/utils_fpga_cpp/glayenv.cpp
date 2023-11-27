@@ -58,9 +58,9 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
 
     if (glayHandle->cuHandles.empty()) throw std::runtime_error(std::string("IP ") + glayHandle->kernelName + std::string(" not found in the provided xclbin"));
 
-    for (auto& mem : xclbin.get_mems()) {
+    for (auto& mem : glayHandle->xclbinHandle.get_mems()) {
         if (mem.get_used()) {
-            mem_used = mem;
+            glayHandle->mem_used = mem;
             break;
         }
     }

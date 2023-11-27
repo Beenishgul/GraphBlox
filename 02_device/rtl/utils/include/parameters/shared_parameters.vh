@@ -26,11 +26,11 @@ parameter NUM_ENGINES_INDEX = 3,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS DEFAULTS
 // --------------------------------------------------------------------------------------
-parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{4,4,3,2},
+parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{4,4,2,2},
 parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                             = '{1, 1, 1, 1},
 parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = '{'{1, 1, 1, 1}
 , '{3, 1, 1, 1}
-, '{1, 3, 1, 0}
+, '{1, 1, 0, 0}
 , '{2, 1, 0, 0}
 }
 ,
@@ -156,8 +156,8 @@ parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_M
 , '{6, 0, 0}
 }
 , '{'{2, 0, 0}
-, '{3, 5, 5}
 , '{6, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{1, 3, 0}
@@ -178,8 +178,8 @@ parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_M
 , '{1, 0, 0}
 }
 , '{'{10, 0, 0}
-, '{9, 6, 6}
 , '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{13, 9, 0}
@@ -200,21 +200,21 @@ parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX
 , '{87, 88, 88}
 }
 , '{'{88, 98, 98}
-, '{98, 107, 113}
-, '{119, 120, 120}
-, '{120, 120, 120}
+, '{98, 99, 99}
+, '{99, 99, 99}
+, '{99, 99, 99}
 }
-, '{'{120, 133, 142}
-, '{142, 143, 143}
-, '{143, 143, 143}
-, '{143, 143, 143}
+, '{'{99, 112, 121}
+, '{121, 122, 122}
+, '{122, 122, 122}
+, '{122, 122, 122}
 }
 }
 ,
-parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{4,4,3,2},
+parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{4,4,2,2},
 parameter int BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 1}
 , '{3, 1, 1, 1}
-, '{1, 3, 1, 0}
+, '{1, 1, 0, 0}
 , '{2, 1, 0, 0}
 }
 ,
@@ -229,12 +229,12 @@ parameter int BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINE
 , '{9, 0, 0}
 }
 , '{'{10, 0, 0}
-, '{11, 12, 13}
-, '{14, 0, 0}
+, '{11, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{15, 16, 0}
-, '{17, 0, 0}
+, '{'{12, 13, 0}
+, '{14, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
@@ -456,10 +456,10 @@ parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LAN
 // TOPOLOGY CONFIGURATIONS SETTINGS
 // --------------------------------------------------------------------------------------
 parameter CU_BUNDLES_COUNT_ARRAY                           = 4,
-parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{4,4,3,2},
+parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{4,4,2,2},
 parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 1}
 , '{3, 1, 1, 1}
-, '{1, 3, 1, 0}
+, '{1, 1, 0, 0}
 , '{2, 1, 0, 0}
 }
 ,
@@ -474,8 +474,8 @@ parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINE
 , '{6, 0, 0}
 }
 , '{'{2, 0, 0}
-, '{3, 5, 5}
 , '{6, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{1, 3, 0}
@@ -496,8 +496,8 @@ parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANE
 , '{1, 0, 0}
 }
 , '{'{10, 0, 0}
-, '{9, 6, 6}
 , '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{13, 9, 0}
@@ -518,14 +518,14 @@ parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_
 , '{87, 88, 88}
 }
 , '{'{88, 98, 98}
-, '{98, 107, 113}
-, '{119, 120, 120}
-, '{120, 120, 120}
+, '{98, 99, 99}
+, '{99, 99, 99}
+, '{99, 99, 99}
 }
-, '{'{120, 133, 142}
-, '{142, 143, 143}
-, '{143, 143, 143}
-, '{143, 143, 143}
+, '{'{99, 112, 121}
+, '{121, 122, 122}
+, '{122, 122, 122}
+, '{122, 122, 122}
 }
 }
 ,
@@ -540,12 +540,12 @@ parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENG
 , '{9, 0, 0}
 }
 , '{'{10, 0, 0}
-, '{11, 12, 13}
-, '{14, 0, 0}
+, '{11, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 }
-, '{'{15, 16, 0}
-, '{17, 0, 0}
+, '{'{12, 13, 0}
+, '{14, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
@@ -763,5 +763,5 @@ parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_
 }
 }
 
-// total_luts=45805
+// total_luts=36408
 

@@ -280,7 +280,7 @@
             "entry_12": {
                 "ops_mask": {
                     "bits": "16",
-                    "value": "0x4182"
+                    "value": "0x2841"
                 }
             }
         }
@@ -770,7 +770,7 @@
             "entry_4": {
                 "shift.amount": {
                     "bits": "31",
-                    "value": "0"
+                    "value": "2"
                 },
                 "shift.direction": {
                     "bits": "1",
