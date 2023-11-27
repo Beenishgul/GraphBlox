@@ -48,6 +48,23 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->xclbinUUID   = glayHandle->deviceHandle.load_xclbin(glayHandle->xclbinPath);
     glayHandle->xclbinHandle = xrt::xclbin(glayHandle->xclbinPath);
 
+    for (auto &kernel : glayHandle->xclbinHandle.get_kernels())
+    {
+        if (kernel.get_name() == glayHandle->kernelName)
+        {
+            glayHandle->cuHandles = kernel.get_cus();
+        }
+    }
+
+    if (glayHandle->cuHandles.empty()) throw std::runtime_error(std::string("IP ") + glayHandle->kernelName + std::string(" not found in the provided xclbin"));
+
+    for (auto& mem : xclbin.get_mems()) {
+        if (mem.get_used()) {
+            mem_used = mem;
+            break;
+        }
+    }
+
     switch (glayHandle->ctrlMode)
     {
     case 0:
@@ -60,16 +77,6 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     default:
         glayHandle->ipHandle = xrt::ip(glayHandle->deviceHandle, glayHandle->xclbinUUID, glayHandle->kernelName);
     }
-
-    for (auto &kernel : glayHandle->xclbinHandle.get_kernels())
-    {
-        if (kernel.get_name() == glayHandle->kernelName)
-        {
-            glayHandle->cuHandles = kernel.get_cus();
-        }
-    }
-
-    if (glayHandle->cuHandles.empty()) throw std::runtime_error(std::string("IP ") + glayHandle->kernelName + std::string(" not found in the provided xclbin"));
 
     printGLAYDevice(glayHandle);
 

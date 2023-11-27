@@ -84,6 +84,11 @@
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
             ],
             [
+                "ENGINE_FILTER_COND",
+                "ENGINE_ALU_OPS",
+                "ENGINE_ALU_OPS"
+            ],
+            [
                 "ENGINE_FORWARD_DATA"
             ]
         ],
