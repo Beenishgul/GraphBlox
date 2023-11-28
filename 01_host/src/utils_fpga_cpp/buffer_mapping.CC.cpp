@@ -114,16 +114,16 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersCC(size_t
     overlay_program[105] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 14   mapping 1    cycles 13   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 14   mapping 1    cycles 13   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[110] = ( 0 );
    // --  2  - Index_End
     overlay_program[111] = ( graph->num_vertices );
    // --  7  - Array_Pointer_LHS
-    overlay_program[116] = xrt_buffer_device[7];
+    overlay_program[116] = xrt_buffer_device[8];
    // --  8  - Array_Pointer_RHS
-    overlay_program[117] = xrt_buffer_device[7] >> 32;
+    overlay_program[117] = xrt_buffer_device[8] >> 32;
    // --  9  - Array_size
     overlay_program[118] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
@@ -146,18 +146,18 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersCC(size_t
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 17   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 17   mapping 1    cycles 13   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[134] = ( graph->num_vertices );
+    overlay_program[134] = ( 0 );
    // --  2  - Index_End
-    overlay_program[135] = ( graph->num_vertices * 2 );
+    overlay_program[135] = ( graph->num_vertices );
    // --  7  - Array_Pointer_LHS
     overlay_program[140] = xrt_buffer_device[7];
    // --  8  - Array_Pointer_RHS
     overlay_program[141] = xrt_buffer_device[7] >> 32;
    // --  9  - Array_size
-    overlay_program[142] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[142] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND  ID 18   mapping 3    cycles 9    None-None ( 0 )-( 0 )
