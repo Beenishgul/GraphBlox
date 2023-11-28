@@ -54,7 +54,7 @@
 0x00000001 // entry_3    cacheline[  2][ 3] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  2][ 4] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00002202 // entry_5    cacheline[  2][ 5] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
-0x00010401 // entry_6    cacheline[  2][ 6] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x00
+0x00040401 // entry_6    cacheline[  2][ 6] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x04 || id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  2][ 7] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  2][ 8] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  2][ 9] <32b>: array_size[0:31]=0x00000000
