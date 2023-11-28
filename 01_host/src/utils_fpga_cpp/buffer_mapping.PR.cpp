@@ -42,16 +42,16 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_1-out_degree ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_2-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[33] = ( 0 );
    // --  2  - Index_End
     overlay_program[34] = ( graph->num_vertices );
    // --  7  - Array_Pointer_LHS
-    overlay_program[39] = xrt_buffer_device[1];
+    overlay_program[39] = xrt_buffer_device[2];
    // --  8  - Array_Pointer_RHS
-    overlay_program[40] = xrt_buffer_device[1] >> 32;
+    overlay_program[40] = xrt_buffer_device[2] >> 32;
    // --  9  - Array_size
     overlay_program[41] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
@@ -74,16 +74,16 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 9    mapping 2    cycles 10   buffer_4-edges_array_dest ( 0 )-( graph->num_edges )
+// Name ENGINE_CSR_INDEX    ID 9    mapping 2    cycles 10   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[60] = ( 0 );
    // --  2  - Index_End
     overlay_program[61] = ( graph->num_edges );
    // --  7  - Array_Pointer_LHS
-    overlay_program[66] = xrt_buffer_device[4];
+    overlay_program[66] = xrt_buffer_device[5];
    // --  8  - Array_Pointer_RHS
-    overlay_program[67] = xrt_buffer_device[4] >> 32;
+    overlay_program[67] = xrt_buffer_device[5] >> 32;
    // --  9  - Array_size
     overlay_program[68] = ( graph->num_edges )-( 0 );
 // --------------------------------------------------------------------------------------
