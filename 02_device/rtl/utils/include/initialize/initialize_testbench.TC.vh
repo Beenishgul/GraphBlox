@@ -6,7 +6,7 @@
                 o++;
 
                 if(i == 0)begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = i;
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
                 end
 
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
