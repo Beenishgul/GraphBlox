@@ -983,11 +983,11 @@ module __KERNEL___testbench ();
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor fill the memory with the content.
             m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_entries);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.out_degree, 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.in_degree , 0, graph.mem512_num_vertices);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.in_degree, 0, graph.mem512_num_vertices);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.out_degree , 0, graph.mem512_num_vertices);
             m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
             m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
             m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
             m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
