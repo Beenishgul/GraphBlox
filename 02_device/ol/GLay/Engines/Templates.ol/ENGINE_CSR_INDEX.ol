@@ -1,14 +1,14 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 10   mapping 2    cycles 10  
+// Engine: ENGINE_CSR_INDEX_0, Number of entries: 10
 // --------------------------------------------------------------------------------------
-0x0000000D //  0  - Increment | Decrement | mode_sequence | mode_buffer | mode_break | mode_filter
-0x00000000 //  1  - Index_start
-0x00000000 //  2  - Index_end
-0x00000001 //  3  - Stride
-0x80000002 //  4  - Shift direction 1-left 0-right | (granularity - log2 value for shifting)
-0x00000102 //  5  - CMD_MEM_READ | STRUCT_ENGINE_DATA | id moddule | id engine
-0x01010801 //  6  - route  | Cast to first 3 Lanes in next bundle | BUNDLE-0 | VERTEX-0
-0x00000000 //  7  - BUFFER Array Pointer LHS
-0x00000000 //  8  - BUFFER Array Pointer RHS
-0x00000033 //  9  - BUFFER size
+0x00000000 // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
+0x00000000 // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
+0x00000000 // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
+0x00000081 // entry_5    cacheline[  0][ 5] <29b>: cmd[0:6]=CMD_INVALID || buffer[7:12]=STRUCT_INVALID || id_module[13:20]=0x00 || id_engine[21:28]=0x00
+0x00000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_8    cacheline[  0][ 8] <32b>: array_pointer[0:31]=0x00000000
+0x00000000 // entry_9    cacheline[  0][ 9] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
