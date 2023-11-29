@@ -1769,23 +1769,7 @@
             }
         }
     },
-    "ENGINE_MERGE_DATA_18": {
-        "entries": {
-            "entry_0": {
-                "merge_mask": {
-                    "bits": "4",
-                    "value": "0x0"
-                }
-            },
-            "entry_1": {
-                "merge_type": {
-                    "bits": "4",
-                    "value": "0x0"
-                }
-            }
-        }
-    },
-    "ENGINE_READ_WRITE_19": {
+    "ENGINE_READ_WRITE_18": {
         "type_memory_cmd": {
             "CMD_INVALID": 1,
             "CMD_MEM_READ": 2,
@@ -1924,6 +1908,22 @@
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
+                }
+            }
+        }
+    },
+    "ENGINE_MERGE_DATA_19": {
+        "entries": {
+            "entry_0": {
+                "merge_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_1": {
+                "merge_type": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             }
         }
