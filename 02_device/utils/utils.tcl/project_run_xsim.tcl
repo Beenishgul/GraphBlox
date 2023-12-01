@@ -31,9 +31,9 @@ proc color {foreground text} {
 # =========================================================
 # Step 1: Open vivado project and add design sources
 # =========================================================
-if {${VIVADO_GUI_FLAG} == "YES"} {
+# if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
-}
+# }
 
 open_project ${KERNEL_PROJECT_PKG_XPR} 
 # =========================================================
