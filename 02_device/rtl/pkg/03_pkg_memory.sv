@@ -27,18 +27,27 @@ import PKG_AXI4_FE::*;
 // FIFO Signals
 // --------------------------------------------------------------------------------------
 typedef struct packed {
+  logic empty    ;
+  logic prog_full;
+} FIFOStateSignalsOutput;
+
+typedef struct packed {
   logic full       ;
   logic empty      ;
   logic valid      ;
   logic prog_full  ;
   logic wr_rst_busy;
   logic rd_rst_busy;
-} FIFOStateSignalsOutput;
+} FIFOStateSignalsOutInternal;
+
+typedef struct packed {
+  logic rd_en;
+} FIFOStateSignalsInput;
 
 typedef struct packed {
   logic rd_en;
   logic wr_en;
-} FIFOStateSignalsInput;
+} FIFOStateSignalsInputInternal;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
@@ -236,5 +245,15 @@ typedef struct packed {
   logic                valid  ;
   CacheResponsePayload payload;
 } CacheResponse;
+
+function FIFOStateSignalsOutput map_internal_fifo_signals_to_output (FIFOStateSignalsOutInternal internal_fifo);
+
+  FIFOStateSignalsOutput output_fifo;
+
+  output_fifo.prog_full = internal_fifo.prog_full;
+  output_fifo.empty     = internal_fifo.empty;
+
+  return output_fifo;
+endfunction : map_internal_fifo_signals_to_output
 
 endpackage

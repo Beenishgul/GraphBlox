@@ -68,23 +68,23 @@ CacheResponsePayload engine_m_axi_response_mem   ;
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
 // --------------------------------------------------------------------------------------
-CacheRequestPayload    fifo_request_din                  ;
-CacheRequestPayload    fifo_request_dout                 ;
-FIFOStateSignalsOutput fifo_request_signals_out_int      ;
-FIFOStateSignalsInput  fifo_request_signals_in_reg       ;
-FIFOStateSignalsInput  fifo_request_signals_in_int       ;
-logic                  fifo_request_setup_signal_int     ;
-logic                  fifo_request_signals_out_valid_int;
+CacheRequestPayload           fifo_request_din                  ;
+CacheRequestPayload           fifo_request_dout                 ;
+FIFOStateSignalsOutInternal   fifo_request_signals_out_int      ;
+FIFOStateSignalsInput         fifo_request_signals_in_reg       ;
+FIFOStateSignalsInputInternal fifo_request_signals_in_int       ;
+logic                         fifo_request_setup_signal_int     ;
+logic                         fifo_request_signals_out_valid_int;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-CacheResponsePayload   fifo_response_din             ;
-CacheResponsePayload   fifo_response_dout            ;
-FIFOStateSignalsOutput fifo_response_signals_out_int ;
-FIFOStateSignalsInput  fifo_response_signals_in_reg  ;
-FIFOStateSignalsInput  fifo_response_signals_in_int  ;
-logic                  fifo_response_setup_signal_int;
+CacheResponsePayload          fifo_response_din             ;
+CacheResponsePayload          fifo_response_dout            ;
+FIFOStateSignalsOutInternal   fifo_response_signals_out_int ;
+FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
+FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
+logic                         fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // READ/WRITE ENGINE
@@ -161,8 +161,8 @@ end
 assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & write_transaction_tready_out;
 
 always_ff @(posedge ap_clk) begin
-  fifo_request_signals_out  <= fifo_request_signals_out_int;
-  fifo_response_signals_out <= fifo_response_signals_out_int;
+  fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
+  fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
   response_out.payload      <= response_in_int.payload;
 end
 

@@ -90,13 +90,13 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din             ;
-    MemoryPacketPayload    fifo_request_dout            ;
-    MemoryPacket           fifo_response_comb           ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_request_signals_out_int ;
-    logic                  fifo_request_setup_signal_int;
+    MemoryPacketPayload           fifo_request_din             ;
+    MemoryPacketPayload           fifo_request_dout            ;
+    MemoryPacket                  fifo_response_comb           ;
+    FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
+    FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
+    logic                         fifo_request_setup_signal_int;
 
     MemoryPacket response_engine_in_reg    ;
     MemoryPacket response_memory_in_reg    ;
@@ -129,12 +129,12 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
-    MemoryPacket           response_engine_in_int                  ;
-    MemoryPacketPayload    fifo_response_engine_in_din             ;
-    MemoryPacketPayload    fifo_response_engine_in_dout            ;
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_int ;
-    logic                  fifo_response_engine_in_setup_signal_int;
+    MemoryPacket                  response_engine_in_int                  ;
+    MemoryPacketPayload           fifo_response_engine_in_din             ;
+    MemoryPacketPayload           fifo_response_engine_in_dout            ;
+    FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
+    logic                         fifo_response_engine_in_setup_signal_int;
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ module engine_read_write_generator #(parameter
             configure_memory_setup              <= configure_memory_setup_reg;
             done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
             fifo_empty_reg                      <= fifo_empty_int;
-            fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
+            fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
         end
     end

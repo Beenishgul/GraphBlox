@@ -182,7 +182,7 @@ module top_control_s_axi #(parameter
     reg         int_ap_continue           ;
     reg         int_ap_ready        = 1'b0;
     wire        task_ap_ready             ;
-    reg         int_ap_done         = 1'b0;
+    // reg         int_ap_done         = 1'b0;
     wire        task_ap_done              ;
     reg         int_task_ap_done    = 1'b0;
     reg         int_ap_start        = 1'b0;
@@ -420,13 +420,13 @@ module top_control_s_axi #(parameter
     end
 
 // int_ap_done
-    always @(posedge ACLK) begin
-        if (ARESET)
-            int_ap_done <= 1'b0;
-        else if (ACLK_EN) begin
-            int_ap_done <= ap_done;
-        end
-    end
+    // always @(posedge ACLK) begin
+    //     if (ARESET)
+    //         int_ap_done <= 1'b0;
+    //     else if (ACLK_EN) begin
+    //         int_ap_done <= ap_done;
+    //     end
+    // end
 
 // int_task_ap_done
     always @(posedge ACLK) begin

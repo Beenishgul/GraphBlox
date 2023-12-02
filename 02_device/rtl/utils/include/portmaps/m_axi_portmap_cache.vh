@@ -35,3 +35,5 @@
   .axi_wready_i       (m_axi_write.in.wready   ), //Write channel ready
   .axi_wstrb_o        (m_axi_write.out.wstrb   ), //Write channel write strobe
   .axi_wvalid_o       (m_axi_write.out.wvalid  ), //Write channel valid
+  .axi_awregion_o     (m_axi_write.out.awregion), //Write channel valid
+  .axi_arregion_o     (m_axi_read.out.arregion ), //Read channel ready

@@ -70,18 +70,18 @@ cu_setup_state next_state   ;
 // --------------------------------------------------------------------------------------
 // Request FIFO OUTPUT
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload    fifo_request_din             ;
-MemoryPacketPayload    fifo_request_dout            ;
-FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-FIFOStateSignalsOutput fifo_request_signals_out_int ;
-logic                  fifo_request_setup_signal_int;
+MemoryPacketPayload           fifo_request_din             ;
+MemoryPacketPayload           fifo_request_dout            ;
+FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
+FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
+FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
+logic                         fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO INPUT
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput  fifo_response_signals_in_reg ;
-FIFOStateSignalsOutput fifo_response_signals_out_int;
+FIFOStateSignalsInput       fifo_response_signals_in_reg ;
+FIFOStateSignalsOutInternal fifo_response_signals_out_int;
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
@@ -176,8 +176,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_signals_out <= fifo_response_signals_out_int;
-    fifo_request_signals_out  <= fifo_request_signals_out_int;
+    fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
+    fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
     request_out.payload       <= request_out_int.payload;
 end
 
@@ -190,7 +190,7 @@ always_ff @(posedge ap_clk) begin
     else begin
         current_state <= next_state;
     end
-end // always_ff @(posedge ap_clk)
+end// always_ff @(posedge ap_clk)
 
 always_comb begin
     next_state = current_state;
@@ -258,7 +258,7 @@ always_comb begin
             next_state = CU_SETUP_FLUSH_DONE;
         end
     endcase
-end // always_comb
+end// always_comb
 
 always_ff @(posedge ap_clk) begin
     case (current_state)
@@ -353,7 +353,7 @@ always_ff @(posedge ap_clk) begin
             response_memory_counter_load_value     <= 0;
         end
     endcase
-end // always_ff @(posedge ap_clk)
+end// always_ff @(posedge ap_clk)
 
 
 // --------------------------------------------------------------------------------------
