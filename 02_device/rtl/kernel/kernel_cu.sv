@@ -280,16 +280,12 @@ cache_generator_response #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cac
 // --------------------------------------------------------------------------------------
 // cu_cache
 assign cu_cache_request_in                     = kernel_cu_request_out;
-assign cu_cache_fifo_request_signals_in.wr_en  = 0;
 assign cu_cache_fifo_request_signals_in.rd_en  = ~(kernel_cu_fifo_response_signals_out.prog_full);
-assign cu_cache_fifo_response_signals_in.wr_en = 0;
 assign cu_cache_fifo_response_signals_in.rd_en = ~(kernel_cu_fifo_response_signals_out.prog_full);
 
 // kernel_cu
 assign kernel_cu_response_in                    = cu_cache_response_out;
-assign kernel_cu_fifo_request_signals_in.wr_en  = 0;
 assign kernel_cu_fifo_request_signals_in.rd_en  = ~(cu_cache_fifo_request_signals_out.prog_full | cu_cache_fifo_response_signals_out.prog_full);
-assign kernel_cu_fifo_response_signals_in.wr_en = 0;
 assign kernel_cu_fifo_response_signals_in.rd_en = 0;
 
 // --------------------------------------------------------------------------------------

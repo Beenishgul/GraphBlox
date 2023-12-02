@@ -90,6 +90,8 @@ module iob_cache_axi #(
    input  [             2-1:0] axi_rresp_i,
    input  [             1-1:0] axi_rlast_i,
    input  [             1-1:0] axi_rvalid_i,
+   output [             4-1:0] axi_awregion_o,
+   output [             4-1:0] axi_arregion_o,
    output [             1-1:0] axi_rready_o
 );
 
@@ -112,6 +114,8 @@ module iob_cache_axi #(
 
    assign invalidate_o = ctrl_invalidate | invalidate_i;
    assign wtb_empty_o  = wtbuf_empty & wtb_empty_i;
+   assign axi_awregion_o = 0;
+   assign axi_arregion_o = 0;
 
    iob_cache_front_end #(
       .ADDR_W  (FE_ADDR_W - FE_NBYTES_W),

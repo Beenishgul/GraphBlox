@@ -55,15 +55,15 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload    fifo_response_memory_in_din             ;
-MemoryPacket           fifo_response_memory_in_dout_int        ;
-MemoryPacket           fifo_response_memory_in_dout_reg        ;
-MemoryPacketPayload    fifo_response_memory_in_dout            ;
-FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
-FIFOStateSignalsInput  fifo_response_memory_in_signals_in_int  ;
-FIFOStateSignalsOutput fifo_response_memory_in_signals_out_int ;
-logic                  fifo_response_memory_in_setup_signal_int;
-logic                  fifo_response_memory_in_push_filter     ;
+MemoryPacketPayload           fifo_response_memory_in_din             ;
+MemoryPacket                  fifo_response_memory_in_dout_int        ;
+MemoryPacket                  fifo_response_memory_in_dout_reg        ;
+MemoryPacketPayload           fifo_response_memory_in_dout            ;
+FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
+FIFOStateSignalsInputInternal fifo_response_memory_in_signals_in_int  ;
+FIFOStateSignalsOutInternal   fifo_response_memory_in_signals_out_int ;
+logic                         fifo_response_memory_in_setup_signal_int;
+logic                         fifo_response_memory_in_push_filter     ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
@@ -72,8 +72,8 @@ ReadWriteConfigurationPayload fifo_configure_memory_din             ;
 ReadWriteConfiguration        fifo_configure_memory_dout_int        ;
 ReadWriteConfigurationPayload fifo_configure_memory_dout            ;
 FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg  ;
-FIFOStateSignalsInput         fifo_configure_memory_signals_in_int  ;
-FIFOStateSignalsOutput        fifo_configure_memory_signals_out_int ;
+FIFOStateSignalsInputInternal fifo_configure_memory_signals_in_int  ;
+FIFOStateSignalsOutInternal   fifo_configure_memory_signals_out_int ;
 logic                         fifo_configure_memory_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
@@ -117,8 +117,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_int;
-    fifo_configure_memory_signals_out   <= fifo_configure_memory_signals_out_int;
+    fifo_response_memory_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_memory_in_signals_out_int);
+    fifo_configure_memory_signals_out   <= map_internal_fifo_signals_to_output(fifo_configure_memory_signals_out_int);
     configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
 end
 

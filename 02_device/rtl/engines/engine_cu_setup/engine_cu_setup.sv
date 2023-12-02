@@ -69,14 +69,14 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload    fifo_request_din             ;
-    MemoryPacket           fifo_request_din_reg         ;
-    MemoryPacketPayload    fifo_request_dout            ;
-    MemoryPacket           fifo_request_comb            ;
-    FIFOStateSignalsInput  fifo_request_signals_in_reg  ;
-    FIFOStateSignalsInput  fifo_request_signals_in_int  ;
-    FIFOStateSignalsOutput fifo_request_signals_out_int ;
-    logic                  fifo_request_setup_signal_int;
+    MemoryPacketPayload           fifo_request_din             ;
+    MemoryPacket                  fifo_request_din_reg         ;
+    MemoryPacketPayload           fifo_request_dout            ;
+    MemoryPacket                  fifo_request_comb            ;
+    FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
+    FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
+    logic                         fifo_request_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -137,7 +137,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_signals_out <= fifo_request_signals_out_int;
+        fifo_request_signals_out <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
         request_out.payload      <= request_out_int.payload;
     end
 
