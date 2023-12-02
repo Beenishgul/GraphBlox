@@ -157,7 +157,7 @@ assign fifo_response_dout_int.payload.data.field[1] = fifo_response_dout.data.fi
 assign fifo_response_dout_int.payload.data.field[2] = fifo_response_dout.data.field[1];
 assign fifo_response_dout_int.payload.data.field[3] = fifo_response_dout.data.field[2];
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
   .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
   .READ_DATA_WIDTH ($bits(CacheResponsePayload)),

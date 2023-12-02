@@ -322,7 +322,7 @@ assign fifo_response_lane_in_signals_in_int.rd_en = ~fifo_response_lane_in_signa
 assign response_lane_in_int.valid                 = fifo_response_lane_in_signals_out_int.valid;
 assign response_lane_in_int.payload               = fifo_response_lane_in_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
@@ -357,7 +357,7 @@ assign fifo_response_memory_in_signals_in_int.rd_en = ~fifo_response_memory_in_s
 assign response_memory_in_int.valid                 = fifo_response_memory_in_signals_out_int.valid;
 assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
@@ -392,7 +392,7 @@ assign fifo_response_control_in_signals_in_int.rd_en = ~fifo_response_control_in
 assign response_control_in_int.valid                 = fifo_response_control_in_signals_out_int.valid;
 assign response_control_in_int.payload               = fifo_response_control_in_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
@@ -427,7 +427,7 @@ assign fifo_request_lane_out_signals_in_int.rd_en = ~fifo_request_lane_out_signa
 assign request_lane_out_int.valid                 = fifo_request_lane_out_signals_out_int.valid;
 assign request_lane_out_int.payload               = fifo_request_lane_out_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
@@ -462,7 +462,7 @@ assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_s
 assign request_memory_out_int.valid                 = fifo_request_memory_out_signals_out_int.valid;
 assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
@@ -497,7 +497,7 @@ assign fifo_request_control_out_signals_in_int.rd_en = ~fifo_request_control_out
 assign request_control_out_int.valid                 = fifo_request_control_out_signals_out_int.valid;
 assign request_control_out_int.payload               = fifo_request_control_out_dout;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
     .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
     .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),

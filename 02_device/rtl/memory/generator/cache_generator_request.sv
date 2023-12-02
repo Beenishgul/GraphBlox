@@ -182,7 +182,7 @@ assign request_out_int.payload.iob       = fifo_request_dout.iob;
 assign request_out_int.payload.meta      = fifo_request_dout.meta;
 assign request_out_int.payload.data      = fifo_request_dout.data;
 
-xpm_fifo_sync_wrapper #(
+xpm_fifo_sync_bram_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
   .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
   .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
