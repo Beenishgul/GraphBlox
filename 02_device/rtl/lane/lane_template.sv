@@ -359,12 +359,12 @@ end
 // Generate Engines - in->[0]->[1]->[2]->[3]->[4]->out
 // --------------------------------------------------------------------------------------
 assign engines_response_lane_in[0] = response_lane_in_int;
-assign engines_fifo_response_lane_in_signals_in[0].rd_en = 1'b1;
+assign engines_fifo_response_lane_in_signals_in[0].rd_en = 1'b1; // fifo_response_lane_in_signals_in_reg.rd_en
 
 always_comb begin
     for (int i=1; i<NUM_ENGINES; i++) begin : generate_lane_template_intra_signals
         engines_response_lane_in[i] = engines_request_lane_out[i-1];
-        engines_fifo_request_lane_out_signals_in[i-1].rd_en = ~engines_fifo_response_lane_in_signals_out[i].prog_full;
+        engines_fifo_request_lane_out_signals_in[i-1].rd_en = ~engines_fifo_response_lane_in_signals_out[i].prog_full ;
         engines_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
     end
 end
@@ -438,7 +438,7 @@ arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_ENGINES)) inst_engine_arbiter
 assign engine_arbiter_1_to_N_memory_response_in = response_memory_in_int;
 always_comb begin
     for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_memory_response
-        engine_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full;
+        engine_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_memory_in_signals_out[i].prog_full & fifo_response_memory_in_signals_in_reg.rd_en;
         engines_response_memory_in[i] = engine_arbiter_1_to_N_memory_response_out[i];
         engines_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
     end
@@ -464,7 +464,7 @@ arbiter_1_to_N_response #(
 assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;
 always_comb begin
     for (int i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_control_response
-        engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_control_in_signals_out[i].prog_full;
+        engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_control_in_signals_out[i].prog_full & fifo_response_control_in_signals_in_reg.rd_en;
         engines_response_control_in[i] = engine_arbiter_1_to_N_control_response_out[i];
         engines_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
     end
