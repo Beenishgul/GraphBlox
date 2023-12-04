@@ -49,7 +49,6 @@ genvar i;
 // --------------------------------------------------------------------------------------
 logic areset_template_engine;
 logic areset_engine         ;
-logic areset_fifo           ;
 
 KernelDescriptor descriptor_in_reg;
 
@@ -69,11 +68,9 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------
-logic                  areset_engine_cast_arbiter_1_to_N                                         ;
-MemoryPacket           engine_cast_arbiter_1_to_N_request_in                                     ;
-FIFOStateSignalsInput  engine_cast_arbiter_1_to_N_fifo_request_signals_in [ENGINE_CAST_WIDTH-1:0];
-FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_request_signals_out                       ;
-logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal                              ;
+logic                  areset_engine_cast_arbiter_1_to_N                  ;
+FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_request_signals_out;
+logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal       ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -93,20 +90,17 @@ FIFOStateSignalsInput fifo_response_control_in_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engine OUTPUT Request MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput       fifo_request_engine_out_signals_in_reg ;
-FIFOStateSignalsOutInternal fifo_request_engine_out_signals_out_int;
+FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Memory Request Memory MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput       fifo_request_memory_out_signals_in_reg ;
-FIFOStateSignalsOutInternal fifo_request_memory_out_signals_out_int;
+FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT CONTROL Request Memory MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput       fifo_request_control_out_signals_in_reg ;
-FIFOStateSignalsOutInternal fifo_request_control_out_signals_out_int;
+FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
@@ -139,7 +133,6 @@ MemoryPacket           template_response_memory_in                              
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     areset_template_engine            <= areset;
-    areset_fifo                       <= areset;
     areset_engine                     <= areset;
     areset_engine_cast_arbiter_1_to_N <= areset;
 end
@@ -220,7 +213,7 @@ assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_request_signals_out.empt
 
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out   <= template_fifo_request_control_out_signals_out;
-    fifo_request_engine_out_signals_out[0] <= template_fifo_request_engine_out_signals_out;
+    fifo_request_engine_out_signals_out[0] <= template_fifo_request_engine_out_signals_out & engine_cast_arbiter_1_to_N_fifo_request_signals_out;
     fifo_request_memory_out_signals_out    <= template_fifo_request_memory_out_signals_out;
     fifo_response_control_in_signals_out   <= template_fifo_response_control_in_signals_out;
     fifo_response_engine_in_signals_out[0] <= template_fifo_response_engine_in_signals_out[0];
@@ -238,10 +231,12 @@ end
 generate
     if(ENGINE_CAST_WIDTH>0) begin
 // --------------------------------------------------------------------------------------
-        FIFOStateSignalsInput  fifo_request_engine_cast_signals_in   [ENGINE_CAST_WIDTH-1:0];
-        FIFOStateSignalsOutput fifo_request_engine_cast_signals_out  [ENGINE_CAST_WIDTH-1:0];
-        MemoryPacket           engine_cast_arbiter_1_to_N_request_out[ENGINE_CAST_WIDTH-1:0];
-        MemoryPacket           request_engine_cast                   [ENGINE_CAST_WIDTH-1:0];
+        FIFOStateSignalsInput  engine_cast_arbiter_1_to_N_fifo_request_signals_in[ENGINE_CAST_WIDTH-1:0];
+        FIFOStateSignalsInput  fifo_request_engine_cast_signals_in               [ENGINE_CAST_WIDTH-1:0];
+        FIFOStateSignalsOutput fifo_request_engine_cast_signals_out              [ENGINE_CAST_WIDTH-1:0];
+        MemoryPacket           engine_cast_arbiter_1_to_N_request_out            [ENGINE_CAST_WIDTH-1:0];
+        MemoryPacket           request_engine_cast                               [ENGINE_CAST_WIDTH-1:0];
+        MemoryPacket           engine_cast_arbiter_1_to_N_request_in                                    ;
 // --------------------------------------------------------------------------------------
         for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_drivers
             always_ff @(posedge ap_clk) begin
@@ -284,7 +279,6 @@ generate
     end else begin
         assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 2'b10;
         assign engine_cast_arbiter_1_to_N_fifo_setup_signal        = 0;
-        // assign engine_cast_arbiter_1_to_N_request_out              = 0;
     end
 endgenerate
 
