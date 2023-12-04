@@ -48,7 +48,6 @@ genvar j;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_lane_template;
-logic areset_fifo         ;
 
 KernelDescriptor descriptor_in_reg;
 
@@ -67,62 +66,32 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engines INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_response_lane_in_signals_in_int  ;
-FIFOStateSignalsInput         fifo_response_lane_in_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_response_lane_in_signals_out_int ;
-logic                         fifo_response_lane_in_setup_signal_int;
-MemoryPacketPayload           fifo_response_lane_in_din             ;
-MemoryPacketPayload           fifo_response_lane_in_dout            ;
+FIFOStateSignalsInput fifo_response_lane_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Memory Response MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_response_memory_in_signals_in_int  ;
-FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_response_memory_in_signals_out_int ;
-logic                         fifo_response_memory_in_setup_signal_int;
-MemoryPacketPayload           fifo_response_memory_in_din             ;
-MemoryPacketPayload           fifo_response_memory_in_dout            ;
+FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT CONTROL Response MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_response_control_in_signals_in_int  ;
-FIFOStateSignalsInput         fifo_response_control_in_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_response_control_in_signals_out_int ;
-logic                         fifo_response_control_in_setup_signal_int;
-MemoryPacketPayload           fifo_response_control_in_din             ;
-MemoryPacketPayload           fifo_response_control_in_dout            ;
+FIFOStateSignalsInput fifo_response_control_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engines OUTPUT Request MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_request_lane_out_signals_in_int  ;
-FIFOStateSignalsInput         fifo_request_lane_out_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_request_lane_out_signals_out_int ;
-logic                         fifo_request_lane_out_setup_signal_int;
-MemoryPacketPayload           fifo_request_lane_out_din             ;
-MemoryPacketPayload           fifo_request_lane_out_dout            ;
+FIFOStateSignalsInput fifo_request_lane_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Memory Request Memory MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_request_memory_out_signals_in_int  ;
-FIFOStateSignalsInput         fifo_request_memory_out_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_request_memory_out_signals_out_int ;
-logic                         fifo_request_memory_out_setup_signal_int;
-MemoryPacketPayload           fifo_request_memory_out_din             ;
-MemoryPacketPayload           fifo_request_memory_out_dout            ;
+FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT CONTROL Request CONTROL MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInputInternal fifo_request_control_out_signals_in_int  ;
-FIFOStateSignalsInput         fifo_request_control_out_signals_in_reg  ;
-FIFOStateSignalsOutInternal   fifo_request_control_out_signals_out_int ;
-logic                         fifo_request_control_out_setup_signal_int;
-MemoryPacketPayload           fifo_request_control_out_din             ;
-MemoryPacketPayload           fifo_request_control_out_dout            ;
+FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Request Generator
@@ -217,7 +186,6 @@ always_ff @(posedge ap_clk) begin
     areset_engine_arbiter_1_to_N_memory  <= areset;
     areset_engine_arbiter_N_to_1_control <= areset;
     areset_engine_arbiter_N_to_1_memory  <= areset;
-    areset_fifo                          <= areset;
     areset_lane_template                 <= areset;
 end
 
@@ -286,22 +254,22 @@ always_ff @(posedge ap_clk) begin
     else begin
         done_out                  <= (&engines_done_out_reg) & fifo_empty_reg;
         fifo_empty_reg            <= fifo_empty_int;
-        fifo_setup_signal         <= fifo_response_lane_in_setup_signal_int | fifo_response_control_in_setup_signal_int  | engine_arbiter_N_to_1_memory_fifo_setup_signal |  engine_arbiter_N_to_1_control_fifo_setup_signal |  engine_arbiter_1_to_N_memory_fifo_setup_signal | engine_arbiter_1_to_N_control_fifo_setup_signal | fifo_response_memory_in_setup_signal_int | fifo_request_lane_out_setup_signal_int | fifo_request_control_out_setup_signal_int | fifo_request_memory_out_setup_signal_int | (|engines_fifo_setup_signal_reg);
+        fifo_setup_signal         <= engine_arbiter_N_to_1_memory_fifo_setup_signal |  engine_arbiter_N_to_1_control_fifo_setup_signal |  engine_arbiter_1_to_N_memory_fifo_setup_signal | engine_arbiter_1_to_N_control_fifo_setup_signal | (|engines_fifo_setup_signal_reg);
         request_control_out.valid <= request_control_out_int.valid;
         request_lane_out[0].valid <= request_lane_out_int.valid ;
         request_memory_out.valid  <= request_memory_out_int.valid;
     end
 end
 
-assign fifo_empty_int = fifo_response_lane_in_signals_out_int.empty & fifo_response_control_in_signals_out_int.empty & fifo_response_memory_in_signals_out_int.empty & fifo_request_lane_out_signals_out_int.empty & fifo_request_memory_out_signals_out_int.empty & fifo_request_control_out_signals_out_int.empty & engine_arbiter_1_to_N_control_fifo_response_signals_out.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_N_to_1_control_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
+assign fifo_empty_int = engine_arbiter_1_to_N_control_fifo_response_signals_out.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_N_to_1_control_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
 
 always_ff @(posedge ap_clk) begin
-    fifo_request_control_out_signals_out <= map_internal_fifo_signals_to_output(fifo_request_control_out_signals_out_int);
-    fifo_request_lane_out_signals_out[0] <= map_internal_fifo_signals_to_output(fifo_request_lane_out_signals_out_int);
-    fifo_request_memory_out_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_memory_out_signals_out_int);
-    fifo_response_control_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_control_in_signals_out_int);
-    fifo_response_lane_in_signals_out[0] <= map_internal_fifo_signals_to_output(fifo_response_lane_in_signals_out_int);
-    fifo_response_memory_in_signals_out  <= map_internal_fifo_signals_to_output(fifo_response_memory_in_signals_out_int);
+    fifo_request_control_out_signals_out <= engine_arbiter_N_to_1_control_fifo_request_signals_out;
+    fifo_request_lane_out_signals_out[0] <= engines_fifo_request_lane_out_signals_out[NUM_ENGINES-1];
+    fifo_request_memory_out_signals_out  <= engine_arbiter_N_to_1_memory_fifo_request_signals_out;
+    fifo_response_control_in_signals_out <= engine_arbiter_1_to_N_control_fifo_response_signals_out;
+    fifo_response_lane_in_signals_out[0] <= engines_fifo_response_lane_in_signals_out[0];
+    fifo_response_memory_in_signals_out  <= engine_arbiter_1_to_N_memory_fifo_response_signals_out;
     request_control_out.payload          <= request_control_out_int.payload ;
     request_lane_out[0].payload          <= request_lane_out_int.payload;
     request_memory_out.payload           <= request_memory_out_int.payload ;
@@ -310,212 +278,32 @@ end
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engines Response MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_response_lane_in_setup_signal_int = fifo_response_lane_in_signals_out_int.wr_rst_busy | fifo_response_lane_in_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_response_lane_in_signals_in_int.wr_en = response_lane_in_reg.valid;
-assign fifo_response_lane_in_din                  = response_lane_in_reg.payload;
-
-// Pop
-assign fifo_response_lane_in_signals_in_int.rd_en = ~fifo_response_lane_in_signals_out_int.empty & fifo_response_lane_in_signals_in_reg.rd_en & ~engines_fifo_response_lane_in_signals_out[0].prog_full;
-assign response_lane_in_int.valid                 = fifo_response_lane_in_signals_out_int.valid;
-assign response_lane_in_int.payload               = fifo_response_lane_in_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseEnginesInput (
-    .clk        (ap_clk                                           ),
-    .srst       (areset_fifo                                      ),
-    .din        (fifo_response_lane_in_din                        ),
-    .wr_en      (fifo_response_lane_in_signals_in_int.wr_en       ),
-    .rd_en      (fifo_response_lane_in_signals_in_int.rd_en       ),
-    .dout       (fifo_response_lane_in_dout                       ),
-    .full       (fifo_response_lane_in_signals_out_int.full       ),
-    .empty      (fifo_response_lane_in_signals_out_int.empty      ),
-    .valid      (fifo_response_lane_in_signals_out_int.valid      ),
-    .prog_full  (fifo_response_lane_in_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_response_lane_in_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_response_lane_in_signals_out_int.rd_rst_busy)
-);
+assign response_lane_in_int = response_lane_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Memory Response MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_response_memory_in_setup_signal_int = fifo_response_memory_in_signals_out_int.wr_rst_busy | fifo_response_memory_in_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_response_memory_in_signals_in_int.wr_en = response_memory_in_reg.valid;
-assign fifo_response_memory_in_din                  = response_memory_in_reg.payload;
-
-// Pop
-assign fifo_response_memory_in_signals_in_int.rd_en = ~fifo_response_memory_in_signals_out_int.empty & fifo_response_memory_in_signals_in_reg.rd_en & ~engine_arbiter_1_to_N_memory_fifo_response_signals_out.prog_full;
-assign response_memory_in_int.valid                 = fifo_response_memory_in_signals_out_int.valid;
-assign response_memory_in_int.payload               = fifo_response_memory_in_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseMemoryInput (
-    .clk        (ap_clk                                             ),
-    .srst       (areset_fifo                                        ),
-    .din        (fifo_response_memory_in_din                        ),
-    .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
-    .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
-    .dout       (fifo_response_memory_in_dout                       ),
-    .full       (fifo_response_memory_in_signals_out_int.full       ),
-    .empty      (fifo_response_memory_in_signals_out_int.empty      ),
-    .valid      (fifo_response_memory_in_signals_out_int.valid      ),
-    .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
-);
+assign response_memory_in_int = response_memory_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT CONTROL Response MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_response_control_in_setup_signal_int = fifo_response_control_in_signals_out_int.wr_rst_busy | fifo_response_control_in_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_response_control_in_signals_in_int.wr_en = response_control_in_reg.valid;
-assign fifo_response_control_in_din                  = response_control_in_reg.payload;
-
-// Pop
-assign fifo_response_control_in_signals_in_int.rd_en = ~fifo_response_control_in_signals_out_int.empty & fifo_response_control_in_signals_in_reg.rd_en & ~engine_arbiter_1_to_N_control_fifo_response_signals_out.prog_full;
-assign response_control_in_int.valid                 = fifo_response_control_in_signals_out_int.valid;
-assign response_control_in_int.payload               = fifo_response_control_in_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseControlInput (
-    .clk        (ap_clk                                              ),
-    .srst       (areset_fifo                                         ),
-    .din        (fifo_response_control_in_din                        ),
-    .wr_en      (fifo_response_control_in_signals_in_int.wr_en       ),
-    .rd_en      (fifo_response_control_in_signals_in_int.rd_en       ),
-    .dout       (fifo_response_control_in_dout                       ),
-    .full       (fifo_response_control_in_signals_out_int.full       ),
-    .empty      (fifo_response_control_in_signals_out_int.empty      ),
-    .valid      (fifo_response_control_in_signals_out_int.valid      ),
-    .prog_full  (fifo_response_control_in_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_response_control_in_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_response_control_in_signals_out_int.rd_rst_busy)
-);
+assign response_control_in_int = response_control_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engines requests MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_request_lane_out_setup_signal_int = fifo_request_lane_out_signals_out_int.wr_rst_busy | fifo_request_lane_out_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_request_lane_out_signals_in_int.wr_en = engines_request_lane_out_int.valid;
-assign fifo_request_lane_out_din                  = engines_request_lane_out_int.payload;
-
-// Pop
-assign fifo_request_lane_out_signals_in_int.rd_en = ~fifo_request_lane_out_signals_out_int.empty & fifo_request_lane_out_signals_in_reg.rd_en;
-assign request_lane_out_int.valid                 = fifo_request_lane_out_signals_out_int.valid;
-assign request_lane_out_int.payload               = fifo_request_lane_out_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequestEnginesOutput (
-    .clk        (ap_clk                                           ),
-    .srst       (areset_fifo                                      ),
-    .din        (fifo_request_lane_out_din                        ),
-    .wr_en      (fifo_request_lane_out_signals_in_int.wr_en       ),
-    .rd_en      (fifo_request_lane_out_signals_in_int.rd_en       ),
-    .dout       (fifo_request_lane_out_dout                       ),
-    .full       (fifo_request_lane_out_signals_out_int.full       ),
-    .empty      (fifo_request_lane_out_signals_out_int.empty      ),
-    .valid      (fifo_request_lane_out_signals_out_int.valid      ),
-    .prog_full  (fifo_request_lane_out_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_request_lane_out_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_request_lane_out_signals_out_int.rd_rst_busy)
-);
+assign request_lane_out_int = engines_request_lane_out_int;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Memory requests MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_request_memory_out_setup_signal_int = fifo_request_memory_out_signals_out_int.wr_rst_busy | fifo_request_memory_out_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_request_memory_out_signals_in_int.wr_en = engine_arbiter_N_to_1_memory_request_out.valid;
-assign fifo_request_memory_out_din                  = engine_arbiter_N_to_1_memory_request_out.payload;
-
-// Pop
-assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en;
-assign request_memory_out_int.valid                 = fifo_request_memory_out_signals_out_int.valid;
-assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequestMemoryOutput (
-    .clk        (ap_clk                                             ),
-    .srst       (areset_fifo                                        ),
-    .din        (fifo_request_memory_out_din                        ),
-    .wr_en      (fifo_request_memory_out_signals_in_int.wr_en       ),
-    .rd_en      (fifo_request_memory_out_signals_in_int.rd_en       ),
-    .dout       (fifo_request_memory_out_dout                       ),
-    .full       (fifo_request_memory_out_signals_out_int.full       ),
-    .empty      (fifo_request_memory_out_signals_out_int.empty      ),
-    .valid      (fifo_request_memory_out_signals_out_int.valid      ),
-    .prog_full  (fifo_request_memory_out_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_request_memory_out_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_request_memory_out_signals_out_int.rd_rst_busy)
-);
+assign request_memory_out_int = engine_arbiter_N_to_1_memory_request_out;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT CONTROL requests MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_request_control_out_setup_signal_int = fifo_request_control_out_signals_out_int.wr_rst_busy | fifo_request_control_out_signals_out_int.rd_rst_busy;
-
-// Push
-assign fifo_request_control_out_signals_in_int.wr_en = engine_arbiter_N_to_1_control_request_out.valid;
-assign fifo_request_control_out_din                  = engine_arbiter_N_to_1_control_request_out.payload;
-
-// Pop
-assign fifo_request_control_out_signals_in_int.rd_en = ~fifo_request_control_out_signals_out_int.empty & fifo_request_control_out_signals_in_reg.rd_en;
-assign request_control_out_int.valid                 = fifo_request_control_out_signals_out_int.valid;
-assign request_control_out_int.payload               = fifo_request_control_out_dout;
-
-xpm_fifo_sync_bram_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequestControlOutput (
-    .clk        (ap_clk                                              ),
-    .srst       (areset_fifo                                         ),
-    .din        (fifo_request_control_out_din                        ),
-    .wr_en      (fifo_request_control_out_signals_in_int.wr_en       ),
-    .rd_en      (fifo_request_control_out_signals_in_int.rd_en       ),
-    .dout       (fifo_request_control_out_dout                       ),
-    .full       (fifo_request_control_out_signals_out_int.full       ),
-    .empty      (fifo_request_control_out_signals_out_int.empty      ),
-    .valid      (fifo_request_control_out_signals_out_int.valid      ),
-    .prog_full  (fifo_request_control_out_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_request_control_out_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_request_control_out_signals_out_int.rd_rst_busy)
-);
+assign request_control_out_int = engine_arbiter_N_to_1_control_request_out;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines
@@ -582,7 +370,7 @@ always_comb begin
 end
 
 assign engines_request_lane_out_int = engines_request_lane_out[NUM_ENGINES-1];
-assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = ~fifo_request_lane_out_signals_out_int.prog_full;
+assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = fifo_request_lane_out_signals_in_reg.rd_en;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Memory Arbitration
@@ -599,7 +387,7 @@ always_comb begin
     end
 end
 
-assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
+assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_ENGINES)) inst_engine_arbiter_N_to_1_memory_request_out (
     .ap_clk                  (ap_clk                                                ),
@@ -628,7 +416,7 @@ always_comb begin
     end
 end
 
-assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
+assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_ENGINES)) inst_engine_arbiter_N_to_1_control_request_out (
     .ap_clk                  (ap_clk                                                 ),
