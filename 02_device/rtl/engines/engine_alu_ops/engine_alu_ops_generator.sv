@@ -39,6 +39,7 @@ module engine_alu_ops_generator #(parameter
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     output MemoryPacket           request_engine_out                 ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
     output logic                  fifo_setup_signal                  ,
     output logic                  configure_memory_setup             ,
     output logic                  done_out
@@ -211,6 +212,7 @@ end
 
 always_ff @(posedge ap_clk) begin
     fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
+    fifo_request_engine_out_signals_out <= map_internal_fifo_signals_to_output(fifo_request_engine_out_signals_out_int);
 end
 
 // --------------------------------------------------------------------------------------

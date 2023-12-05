@@ -452,7 +452,7 @@ assign fifo_request_memory_out_signals_in_int.wr_en = generator_engine_request_m
 assign fifo_request_memory_out_din                  = generator_engine_request_memory_out.payload;
 
 // Pop
-assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en & request_memory_out_counter_fair;
+assign fifo_request_memory_out_signals_in_int.rd_en = ~fifo_request_memory_out_signals_out_int.empty & fifo_request_memory_out_signals_in_reg.rd_en;
 assign request_memory_out_int.valid                 = fifo_request_memory_out_signals_out_int.valid;
 assign request_memory_out_int.payload               = fifo_request_memory_out_dout;
 
@@ -660,43 +660,5 @@ engine_csr_index_generator #(
     .configure_engine_setup              (generator_engine_configure_engine_setup              ),
     .done_out                            (generator_engine_done_out                            )
 );
-
-// --------------------------------------------------------------------------------------
-// Fair Memory response counter
-// --------------------------------------------------------------------------------------
-assign clear_memory_in_out_counter     = ((response_memory_in_counter==0) && (response_memory_in_counter==0));
-assign response_memory_in_counter_fair = (response_memory_in_counter!= 0);
-assign request_memory_out_counter_fair = (request_memory_out_counter!= 0);
-
-// --------------------------------------------------------------------------------------
-// Fair memory command usage so no requests sends to bottle neck other engines
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
-        request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-    end
-    else begin
-        if(request_engine_out_int.valid & (request_engine_out_int.payload.meta.subclass.buffer != STRUCT_CU_SETUP) &  ~clear_memory_in_out_counter) begin
-            response_memory_in_counter <= response_memory_in_counter - 1;
-        end else if(request_engine_out_int.valid & (request_engine_out_int.payload.meta.subclass.buffer != STRUCT_CU_SETUP) & clear_memory_in_out_counter) begin
-            response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1) - 1;
-        end else if(~request_engine_out_int.valid & clear_memory_in_out_counter) begin
-            response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        end else begin
-            response_memory_in_counter <= response_memory_in_counter;
-        end
-
-        if(request_memory_out_int.valid & request_memory_out_counter_fair & ~clear_memory_in_out_counter)begin
-            request_memory_out_counter <= request_memory_out_counter - 1;
-        end else if(request_memory_out_int.valid  & clear_memory_in_out_counter)begin
-            request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1) - 1;
-        end else if(~request_memory_out_int.valid & clear_memory_in_out_counter)begin
-            request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        end else begin
-            request_memory_out_counter <= request_memory_out_counter;
-        end
-    end
-end
 
 endmodule : engine_csr_index
