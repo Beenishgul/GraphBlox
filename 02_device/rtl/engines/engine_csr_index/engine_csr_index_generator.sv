@@ -59,6 +59,7 @@ module engine_csr_index_generator #(parameter
     output FIFOStateSignalsOutput fifo_response_control_in_signals_out,
     output MemoryPacket           request_engine_out                  ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in  ,
+    input  FIFOStateSignalsOutput fifo_request_engine_out_signals_out ,
     output MemoryPacket           request_memory_out                  ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
     output logic                  fifo_setup_signal                   ,
@@ -135,6 +136,7 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutput fifo_response_control_in_signals_out_reg;
     FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg ;
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg ;
+    FIFOStateSignalsOutput fifo_request_engine_out_signals_out_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
@@ -262,6 +264,7 @@ module engine_csr_index_generator #(parameter
             fifo_response_control_in_signals_out <= fifo_response_control_in_signals_out_reg;
             fifo_response_engine_in_signals_out  <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out  <= fifo_response_memory_in_signals_out_reg;
+            fifo_request_engine_out_signals_out  <= fifo_request_engine_out_signals_out_reg;
             fifo_setup_signal                    <= fifo_request_setup_signal_int;
             request_engine_out.valid             <= request_engine_out_reg.valid;
             request_memory_out.valid             <= request_memory_out_reg.valid;
@@ -759,6 +762,7 @@ module engine_csr_index_generator #(parameter
             fifo_response_engine_in_signals_out_reg  <= 2'b10;
             fifo_response_memory_in_signals_out_reg  <= 2'b10;
             fifo_response_control_in_signals_out_reg <= 2'b10;
+            fifo_request_engine_out_signals_out_reg  <= 2'b10;
         end
         else begin
             if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
@@ -766,6 +770,7 @@ module engine_csr_index_generator #(parameter
                 fifo_response_engine_in_signals_out_reg  <= 2'b10;
                 fifo_response_control_in_signals_out_reg <= 2'b10;
                 fifo_response_memory_in_signals_out_reg  <= 2'b10;
+                fifo_request_engine_out_signals_out_reg  <= fifo_request_signals_out_int;
                 request_engine_out_reg.valid             <= fifo_request_dout_reg_S2.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
@@ -773,6 +778,7 @@ module engine_csr_index_generator #(parameter
                 request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid;
                 fifo_response_engine_in_signals_out_reg           <= 2'b10;
                 fifo_response_control_in_signals_out_reg          <= 2'b10;
+                fifo_request_engine_out_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 request_engine_out_reg.valid                      <= fifo_response_comb.valid;
             end
