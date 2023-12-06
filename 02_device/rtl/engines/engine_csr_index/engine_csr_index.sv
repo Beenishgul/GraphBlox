@@ -64,7 +64,6 @@ assign request_control_out                  = 0;
 logic areset_configure_engine;
 logic areset_configure_memory;
 logic areset_csr_engine      ;
-logic areset_fifo            ;
 logic areset_generator       ;
 
 KernelDescriptor descriptor_in_reg;
@@ -177,15 +176,6 @@ MemoryPacket           modules_response_engine_in                 [NUM_MODULES-1
 MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1:0];
 
 // --------------------------------------------------------------------------------------
-// Fair Memory response counter
-// --------------------------------------------------------------------------------------
-logic [CACHE_WTBUF_DEPTH_W-1:0] response_memory_in_counter     ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] request_memory_out_counter     ;
-logic                           clear_memory_in_out_counter    ;
-logic                           response_memory_in_counter_fair;
-logic                           request_memory_out_counter_fair;
-
-// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -194,7 +184,6 @@ always_ff @(posedge ap_clk) begin
     areset_configure_engine      <= areset;
     areset_configure_memory      <= areset;
     areset_csr_engine            <= areset;
-    areset_fifo                  <= areset;
     areset_generator             <= areset;
 end
 
@@ -449,7 +438,7 @@ assign modules_fifo_response_memory_in_signals_out[1]            = generator_eng
 
 assign generator_engine_fifo_request_engine_out_signals_in.rd_en = fifo_request_engine_out_signals_in_reg.rd_en;
 
-assign generator_engine_fifo_request_memory_out_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en & request_memory_out_counter_fair;
+assign generator_engine_fifo_request_memory_out_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
 
 engine_csr_index_generator #(
     .ID_CU           (ID_CU           ),
@@ -489,43 +478,5 @@ engine_csr_index_generator #(
     .configure_engine_setup              (generator_engine_configure_engine_setup              ),
     .done_out                            (generator_engine_done_out                            )
 );
-
-// --------------------------------------------------------------------------------------
-// Fair Memory response counter
-// --------------------------------------------------------------------------------------
-assign clear_memory_in_out_counter     = ((response_memory_in_counter==0) && (response_memory_in_counter==0));
-assign response_memory_in_counter_fair = (response_memory_in_counter!= 0);
-assign request_memory_out_counter_fair = (request_memory_out_counter!= 0);
-
-// --------------------------------------------------------------------------------------
-// Fair memory command usage so no requests sends to bottle neck other engines
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
-        request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-    end
-    else begin
-        if(request_engine_out_int.valid & (request_engine_out_int.payload.meta.subclass.buffer != STRUCT_CU_SETUP) &  ~clear_memory_in_out_counter) begin
-            response_memory_in_counter <= response_memory_in_counter - 1;
-        end else if(request_engine_out_int.valid & (request_engine_out_int.payload.meta.subclass.buffer != STRUCT_CU_SETUP) & clear_memory_in_out_counter) begin
-            response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1) - 1;
-        end else if(~request_engine_out_int.valid & clear_memory_in_out_counter) begin
-            response_memory_in_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        end else begin
-            response_memory_in_counter <= response_memory_in_counter;
-        end
-
-        if(request_memory_out_int.valid & request_memory_out_counter_fair & ~clear_memory_in_out_counter)begin
-            request_memory_out_counter <= request_memory_out_counter - 1;
-        end else if(request_memory_out_int.valid  & clear_memory_in_out_counter)begin
-            request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1) - 1;
-        end else if(~request_memory_out_int.valid & clear_memory_in_out_counter)begin
-            request_memory_out_counter <= ((CACHE_WTBUF_DEPTH_W**2)-1);
-        end else begin
-            request_memory_out_counter <= request_memory_out_counter;
-        end
-    end
-end
 
 endmodule : engine_csr_index
