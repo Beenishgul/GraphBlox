@@ -54,8 +54,10 @@ module engine_read_write_generator #(parameter
     output FIFOStateSignalsInput  fifo_response_memory_in_signals_out,
     output MemoryPacket           request_engine_out                 ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out,
     output MemoryPacket           request_memory_out                 ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
     output logic                  configure_memory_setup             ,
     output logic                  done_out
@@ -111,11 +113,13 @@ module engine_read_write_generator #(parameter
 
     FIFOStateSignalsInput fifo_response_memory_in_signals_out_reg;
 
-    FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
-    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
-    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
-    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
-    FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_configure_memory_in_signals_in_reg;
+    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg ;
+    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsOutput fifo_request_memory_out_signals_out_reg;
+    FIFOStateSignalsOutput fifo_request_engine_out_signals_out_reg;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
@@ -220,24 +224,28 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_setup_signal                   <= 1'b1;
-            request_engine_out.valid            <= 1'b0;
-            request_memory_out.valid            <= 1'b0;
             configure_memory_setup              <= 1'b0;
             done_out                            <= 1'b0;
             fifo_empty_reg                      <= 1'b1;
-            fifo_response_engine_in_signals_out <= 0;
-            fifo_response_memory_in_signals_out <= 0;
+            fifo_request_engine_out_signals_out <= 2'b01;
+            fifo_request_memory_out_signals_out <= 2'b01;
+            fifo_response_engine_in_signals_out <= 2'b01;
+            fifo_response_memory_in_signals_out <= 2'b01;
+            fifo_setup_signal                   <= 1'b1;
+            request_engine_out.valid            <= 1'b0;
+            request_memory_out.valid            <= 1'b0;
         end
         else begin
-            fifo_setup_signal                   <= fifo_request_setup_signal_int | fifo_response_engine_in_setup_signal_int;
-            request_engine_out.valid            <= request_engine_out_reg.valid;
-            request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
             fifo_empty_reg                      <= fifo_empty_int;
+            fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_reg;
+            fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_reg;
             fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
             fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
+            fifo_setup_signal                   <= fifo_request_setup_signal_int | fifo_response_engine_in_setup_signal_int;
+            request_engine_out.valid            <= request_engine_out_reg.valid;
+            request_memory_out.valid            <= request_memory_out_reg.valid;
         end
     end
 
@@ -577,12 +585,16 @@ module engine_read_write_generator #(parameter
             request_engine_out_reg.valid                  <= 1'b0;
             request_memory_out_reg.valid                  <= 1'b0;
             fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
+            fifo_request_engine_out_signals_out_reg       <= 2'b01;
+            fifo_request_memory_out_signals_out_reg       <= 2'b01;
         end
         else begin
             fifo_request_signals_in_reg                   <= fifo_request_memory_out_signals_in_reg;
             request_memory_out_reg.valid                  <= request_out_int.valid ;
             fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
             request_engine_out_reg.valid                  <= fifo_response_comb.valid ;
+            fifo_request_engine_out_signals_out_reg       <= 2'b10;
+            fifo_request_memory_out_signals_out_reg       <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
         end
     end
 

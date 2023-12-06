@@ -770,19 +770,19 @@ module engine_csr_index_generator #(parameter
         else begin
             if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
                 fifo_request_engine_out_signals_out_reg  <= fifo_request_signals_out_int;
-                fifo_request_memory_out_signals_out_reg  <= 2'b01;
+                fifo_request_memory_out_signals_out_reg  <= 2'b10;
                 fifo_request_signals_in_reg              <= fifo_request_engine_out_signals_in_reg;
-                fifo_response_control_in_signals_out_reg <= 2'b01;
-                fifo_response_engine_in_signals_out_reg  <= 2'b01;
-                fifo_response_memory_in_signals_out_reg  <= 2'b01;
+                fifo_response_control_in_signals_out_reg <= 2'b10;
+                fifo_response_engine_in_signals_out_reg  <= 2'b10;
+                fifo_response_memory_in_signals_out_reg  <= 2'b10;
                 request_engine_out_reg.valid             <= fifo_request_dout_reg_S2.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
                 fifo_request_engine_out_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 fifo_request_memory_out_signals_out_reg           <= fifo_request_signals_out_int;
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
-                fifo_response_control_in_signals_out_reg          <= 2'b01;
-                fifo_response_engine_in_signals_out_reg           <= 2'b01;
+                fifo_response_control_in_signals_out_reg          <= 2'b10;
+                fifo_response_engine_in_signals_out_reg           <= 2'b10;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 request_engine_out_reg.valid                      <= fifo_response_comb.valid;
                 request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid;

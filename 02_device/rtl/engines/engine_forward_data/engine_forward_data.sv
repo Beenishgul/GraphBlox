@@ -224,16 +224,11 @@ end
 assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty & configure_memory_fifo_response_memory_in_signals_out.empty & configure_memory_fifo_configure_memory_signals_out.empty ;
 
 always_ff @(posedge ap_clk) begin
+    fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
     fifo_request_engine_out_signals_out <= map_internal_fifo_signals_to_output(fifo_request_engine_out_signals_out_int);
     fifo_response_memory_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_memory_in_signals_out_int);
     request_engine_out.payload          <= request_engine_out_int.payload;
 end
-
-
-always_ff @(posedge ap_clk) begin
-    fifo_response_engine_in_signals_out <= fifo_response_engine_in_signals_out_int;
-end
-
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacket
