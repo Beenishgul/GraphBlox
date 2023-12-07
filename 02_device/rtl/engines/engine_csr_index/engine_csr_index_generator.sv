@@ -770,7 +770,7 @@ module engine_csr_index_generator #(parameter
         else begin
             if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
                 fifo_request_engine_out_signals_out_reg  <= fifo_request_signals_out_int;
-                fifo_request_memory_out_signals_out_reg  <= 2'b10;
+                fifo_request_memory_out_signals_out_reg  <= 2'b00;
                 fifo_request_signals_in_reg              <= fifo_request_engine_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg <= 2'b10;
                 fifo_response_engine_in_signals_out_reg  <= 2'b10;
