@@ -593,7 +593,7 @@ module engine_read_write_generator #(parameter
             request_memory_out_reg.valid                  <= request_out_int.valid ;
             fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
             request_engine_out_reg.valid                  <= fifo_response_comb.valid ;
-            fifo_request_engine_out_signals_out_reg       <= 2'b10;
+            fifo_request_engine_out_signals_out_reg       <= 2'b00;
             fifo_request_memory_out_signals_out_reg       <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
         end
     end
