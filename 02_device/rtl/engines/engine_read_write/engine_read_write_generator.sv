@@ -227,10 +227,10 @@ module engine_read_write_generator #(parameter
             configure_memory_setup              <= 1'b0;
             done_out                            <= 1'b0;
             fifo_empty_reg                      <= 1'b1;
-            fifo_request_engine_out_signals_out <= 2'b01;
-            fifo_request_memory_out_signals_out <= 2'b01;
-            fifo_response_engine_in_signals_out <= 2'b01;
-            fifo_response_memory_in_signals_out <= 2'b01;
+            fifo_request_engine_out_signals_out <= 2'b10;
+            fifo_request_memory_out_signals_out <= 2'b10;
+            fifo_response_engine_in_signals_out <= 2'b10;
+            fifo_response_memory_in_signals_out <= 2'b10;
             fifo_setup_signal                   <= 1'b1;
             request_engine_out.valid            <= 1'b0;
             request_memory_out.valid            <= 1'b0;
@@ -585,8 +585,8 @@ module engine_read_write_generator #(parameter
             request_engine_out_reg.valid                  <= 1'b0;
             request_memory_out_reg.valid                  <= 1'b0;
             fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
-            fifo_request_engine_out_signals_out_reg       <= 2'b01;
-            fifo_request_memory_out_signals_out_reg       <= 2'b01;
+            fifo_request_engine_out_signals_out_reg       <= 2'b10;
+            fifo_request_memory_out_signals_out_reg       <= 2'b10;
         end
         else begin
             fifo_request_signals_in_reg                   <= fifo_request_memory_out_signals_in_reg;

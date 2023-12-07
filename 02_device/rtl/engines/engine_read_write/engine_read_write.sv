@@ -56,8 +56,8 @@ module engine_read_write #(parameter
     output logic                  done_out
 );
 
-assign fifo_request_control_out_signals_out = 2'b01;
-assign fifo_response_control_in_signals_out = 2'b01;
+assign fifo_request_control_out_signals_out = 2'b10;
+assign fifo_response_control_in_signals_out = 2'b10;
 assign request_control_out                  = 0;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
