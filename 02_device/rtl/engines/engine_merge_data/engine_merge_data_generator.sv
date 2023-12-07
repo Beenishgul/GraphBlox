@@ -39,6 +39,7 @@ module engine_merge_data_generator #(parameter
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
     output MemoryPacket           request_engine_out                                             ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                             ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                            ,
     output logic                  fifo_setup_signal                                              ,
     output logic                  configure_memory_setup                                         ,
     output logic                  done_out
@@ -206,7 +207,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    request_engine_out.payload <= request_engine_out_int.payload;
+    request_engine_out.payload          <= request_engine_out_int.payload;
+    fifo_request_engine_out_signals_out <= map_internal_fifo_signals_to_output(fifo_request_engine_out_signals_out_int);
 end
 
 always_ff @(posedge ap_clk) begin
