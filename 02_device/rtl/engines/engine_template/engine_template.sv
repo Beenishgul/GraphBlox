@@ -277,7 +277,7 @@ generate
         );
 // --------------------------------------------------------------------------------------
     end else begin
-        assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 2'b01;
+        assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 2'b10;
         assign engine_cast_arbiter_1_to_N_fifo_setup_signal        = 0;
     end
 endgenerate
