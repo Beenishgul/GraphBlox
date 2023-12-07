@@ -65,10 +65,9 @@ assign request_memory_out                   = 0;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_csr_engine      ;
-logic areset_fifo            ;
-logic areset_configure_memory;
-logic areset_generator       ;
+logic areset_forward_data_engine;
+logic areset_configure_memory   ;
+logic areset_generator          ;
 
 KernelDescriptor descriptor_in_reg;
 
@@ -85,17 +84,17 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput         fifo_response_engine_in_signals_in_reg  ;
+FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Memory Response MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
+FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine OUTPUT Request MemoryPacket
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput         fifo_request_engine_out_signals_in_reg  ;
+FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
 // ENGINE CONFIGURATION AND GENERATION LOGIC
@@ -132,17 +131,16 @@ logic generator_engine_done_out              ;
 // Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    areset_csr_engine       <= areset;
-    areset_fifo             <= areset;
-    areset_configure_memory <= areset;
-    areset_generator        <= areset;
+    areset_forward_data_engine <= areset;
+    areset_configure_memory    <= areset;
+    areset_generator           <= areset;
 end
 
 // --------------------------------------------------------------------------------------
 // READ Descriptor
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
+    if (areset_forward_data_engine) begin
         descriptor_in_reg.valid <= 1'b0;
     end
     else begin
@@ -158,7 +156,7 @@ end
 // Drive input signals
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
+    if (areset_forward_data_engine) begin
         fifo_request_engine_out_signals_in_reg <= 0;
         fifo_response_memory_in_signals_in_reg <= 0;
         response_memory_in_reg.valid           <= 1'b0;
@@ -175,7 +173,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
+    if (areset_forward_data_engine) begin
         fifo_response_engine_in_signals_in_reg <= 0;
         response_engine_in_reg.valid           <= 1'b0;
     end
@@ -193,7 +191,7 @@ end
 // Drive output signals
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    if (areset_csr_engine) begin
+    if (areset_forward_data_engine) begin
         fifo_setup_signal        <= 1'b1;
         request_engine_out.valid <= 1'b0;
         done_out                 <= 1'b0;
