@@ -1384,15 +1384,15 @@ module __KERNEL___testbench ();
                 $finish();
             end
 
-            // #1000
-            //     multiple_iteration(5, error_found, graph);
+            #1000
+                multiple_iteration(5, error_found, graph);
 
-            // if (error_found == 1) begin
-            //     $display( "ERROR: Test Failed!");
-            //     $finish();
-            // end else begin
-            //     $display( "Test completed successfully");
-            // end
+            if (error_found == 1) begin
+                $display( "ERROR: Test Failed!");
+                $finish();
+            end else begin
+                $display( "Test completed successfully");
+            end
 
             #1000  $finish;
 
