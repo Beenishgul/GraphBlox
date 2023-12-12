@@ -22,7 +22,7 @@ module arbiter_1_to_N_request #(
   parameter ID_LEVEL             = 1                         ,
   parameter ID_BUNDLE            = 0                         ,
   parameter FIFO_WRITE_DEPTH     = 32                        ,
-  parameter PROG_THRESH          = 16
+  parameter PROG_THRESH          = 17
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
