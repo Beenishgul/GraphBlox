@@ -479,6 +479,7 @@ module engine_csr_index_generator #(parameter
                     configure_engine_int.valid                     <= 1'b1;
                     configure_engine_int.payload.param.index_start <= configure_engine_reg.payload.param.index_start;
                     configure_engine_int.payload.param.index_end   <= configure_engine_reg.payload.param.index_end;
+                    configure_engine_int.payload.param.array_size  <= configure_engine_reg.payload.param.array_size;
                     configure_engine_int.payload.data              <= configure_engine_reg.payload.data;
                 end
             end
@@ -493,9 +494,7 @@ module engine_csr_index_generator #(parameter
                 done_int_reg         <= 1'b0;
                 done_out_reg         <= 1'b0;
 
-                if(|configure_engine_int.payload.param.index_end) begin
-                    response_memory_counter_load_value <= configure_engine_int.payload.param.index_end-1;
-                end
+                response_memory_counter_load_value <= configure_engine_int.payload.param.array_size;
 
                 if(~configure_engine_int.payload.param.mode_sequence) begin
                     configure_engine_int.valid <= 1'b1;
@@ -671,7 +670,7 @@ module engine_csr_index_generator #(parameter
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
         .ap_clk      (ap_clk                            ),
         .ap_clken    (1'b1                              ),
-        .areset      (areset_counter  | counter_clear   ),
+        .areset      (areset_counter                    ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
         .decr        (request_out_int.valid             ),

@@ -18,7 +18,7 @@ module arbiter_N_to_1_request #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR),
   parameter FIFO_WRITE_DEPTH      = 32                             ,
-  parameter PROG_THRESH           = 16
+  parameter PROG_THRESH           = 17
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
