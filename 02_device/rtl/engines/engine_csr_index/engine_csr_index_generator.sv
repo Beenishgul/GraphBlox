@@ -681,7 +681,7 @@ module engine_csr_index_generator #(parameter
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_814x16_MemoryPacket
+// FIFO cache requests out MemoryPacketRequest
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
@@ -737,6 +737,8 @@ module engine_csr_index_generator #(parameter
             fifo_request_dout_reg_S2.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
         end
     end
+
+
 
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
