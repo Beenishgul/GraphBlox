@@ -139,6 +139,17 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
     logic                         fifo_response_engine_in_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// FIFO pending cache requests out fifo_oending_MemoryPacket
+// --------------------------------------------------------------------------------------
+    FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int;
+    FIFOStateSignalsOutInternal fifo_request_pending_signals_out_int;
+    logic fifo_request_pending_setup_signal_int;
+    MemoryPacket request_pending_out_int;
+    MemoryPacketPayload fifo_request_pending_din;
+    MemoryPacketPayload fifo_request_pending_dout;
+
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
@@ -341,7 +352,7 @@ module engine_read_write_generator #(parameter
             ENGINE_READ_WRITE_GEN_BUSY : begin
                 if (done_int_reg)
                     next_state = ENGINE_READ_WRITE_GEN_DONE_TRANS;
-                else if (fifo_request_signals_out_int.prog_full)
+                else if (fifo_request_signals_out_int.prog_full | fifo_request_pending_signals_out_int.prog_full)
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE_TRANS;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_BUSY;
@@ -350,7 +361,7 @@ module engine_read_write_generator #(parameter
                 next_state = ENGINE_READ_WRITE_GEN_PAUSE;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full)
+                if (~fifo_request_signals_out_int.prog_full && ~fifo_request_pending_signals_out_int.prog_full)
                     next_state = ENGINE_READ_WRITE_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE;
@@ -560,6 +571,43 @@ module engine_read_write_generator #(parameter
         .prog_full  (fifo_request_signals_out_int.prog_full  ),
         .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
         .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO pending cache requests out fifo_oending_MemoryPacket
+// --------------------------------------------------------------------------------------
+    assign fifo_request_pending_signals_in_int.rd_en = fifo_response_comb.valid;
+
+    // FIFO is resetting
+    assign fifo_request_pending_setup_signal_int = fifo_request_pending_signals_out_int.wr_rst_busy | fifo_request_pending_signals_out_int.rd_rst_busy ;
+
+    // Push
+    assign fifo_request_pending_signals_in_int.wr_en = request_memory_out_reg.valid;
+    assign fifo_request_pending_din                  = request_memory_out_reg.payload;
+
+    // Pop
+    assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & fifo_request_pending_signals_in_int.rd_en;
+    assign request_pending_out_int.valid             = fifo_request_pending_signals_out_int.valid;
+    assign request_pending_out_int.payload           = fifo_request_pending_dout;
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .PROG_THRESH     (PROG_THRESH               )
+    ) inst_fifo_MemoryPacketRequestPending (
+        .clk        (ap_clk                                  ),
+        .srst       (areset_fifo                             ),
+        .din        (fifo_request_pending_din                        ),
+        .wr_en      (fifo_request_pending_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_pending_signals_in_int.rd_en       ),
+        .dout       (fifo_request_pending_dout                       ),
+        .full       (fifo_request_pending_signals_out_int.full       ),
+        .empty      (fifo_request_pending_signals_out_int.empty      ),
+        .valid      (fifo_request_pending_signals_out_int.valid      ),
+        .prog_full  (fifo_request_pending_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_pending_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_pending_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
