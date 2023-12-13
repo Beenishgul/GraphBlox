@@ -370,7 +370,7 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full && ~fifo_request_pending_signals_out_int.prog_full)
+                if (~fifo_request_signals_out_int.prog_full && fifo_request_pending_signals_out_int.empty)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
@@ -829,6 +829,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg          <= 2'b10;
                 fifo_response_engine_in_signals_out_reg           <= 2'b10;
+                fifo_response_memory_in_signals_out_reg.empty     <= 1'b0;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 request_engine_out_reg.valid                      <= fifo_response_comb.valid;
                 request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid;
