@@ -21,7 +21,7 @@ module arbiter_1_to_N_request #(
   parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_REQUESTOR      ,
   parameter ID_LEVEL             = 1                         ,
   parameter ID_BUNDLE            = 0                         ,
-  parameter FIFO_WRITE_DEPTH     = (16*NUM_MEMORY_REQUESTOR) + 16  ,
+  parameter FIFO_WRITE_DEPTH     = 2**$clog2((16*NUM_MEMORY_REQUESTOR) + 32 ),
   parameter PROG_THRESH          = 17
 ) (
   input  logic                  ap_clk                                            ,
