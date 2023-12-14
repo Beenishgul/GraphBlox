@@ -688,6 +688,72 @@ parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_
 }
 }
 }
-
+,
+parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+, '{'{16, 16}
+, '{16, 0}
+, '{16, 0}
+, '{16, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_CONTROL[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
 // total_luts=26029
 

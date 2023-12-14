@@ -28,6 +28,9 @@ with open(config_file_path, "r") as file:
 
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
+fifo_control  = config_data["fifo_control"]
+fifo_memory   = config_data["fifo_memory"]
+fifo_engine   = config_data["fifo_engine"]
 
 
 def get_config(config_data, algorithm):
@@ -102,6 +105,18 @@ def get_width(engine_name):
 def get_engine_id(engine_name):
     base_name = engine_name.split("(")[0]
     return mapping.get(base_name, 0)
+
+def get_memory_fifo(engine_name):
+    base_name = engine_name.split("(")[0]
+    return fifo_memory.get(base_name, 0)
+
+def get_control_fifo(engine_name):
+    base_name = engine_name.split("(")[0]
+    return fifo_control.get(base_name, 0)
+
+def get_engine_fifo(engine_name):
+    base_name = engine_name.split("(")[0]
+    return fifo_engine.get(base_name, 0)
 
 def get_connect_array(engine_name):
     match = re.search(r'C:(\d+):(\d+)', engine_name)
@@ -351,6 +366,23 @@ def check_and_clean_file(file_path):
         os.remove(file_path)
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
+
+# Get engine IDs and pad accordingly
+CU_BUNDLES_FIFO_ARBITER_SIZE_MEMORY = [
+    pad_lane([pad_data([get_memory_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    for bundle in CU_BUNDLES_CONFIG_ARRAY
+]
+
+CU_BUNDLES_FIFO_ARBITER_SIZE_ENGINE = [
+    pad_lane([pad_data([get_engine_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    for bundle in CU_BUNDLES_CONFIG_ARRAY
+]
+
+CU_BUNDLES_FIFO_ARBITER_SIZE_CONTROL = [
+    pad_lane([pad_data([get_control_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    for bundle in CU_BUNDLES_CONFIG_ARRAY
+]
+
 check_and_clean_file(output_file_path)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
@@ -463,7 +495,13 @@ with open(output_file_path, "w") as file:
     file.write("parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY) + ",\n")
     file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + "\n")
+    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + ",\n")
+    
+    file.write("parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_FIFO_ARBITER_SIZE_MEMORY).replace("[", "'{").replace("]", "}\n") + ",\n")    
+    file.write("parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_FIFO_ARBITER_SIZE_ENGINE).replace("[", "'{").replace("]", "}\n") + ",\n")    
+    file.write("parameter int CU_BUNDLES_FIFO_ARBITER_SIZE_CONTROL[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_FIFO_ARBITER_SIZE_CONTROL).replace("[", "'{").replace("]", "}\n") + ",\n")    
+
+
     file.write(f"// total_luts={total_luts}\n\n")  
    
 
