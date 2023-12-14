@@ -370,7 +370,7 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full && fifo_request_pending_signals_out_int.empty)
+                if (fifo_request_signals_out_int.empty && fifo_request_pending_signals_out_int.empty)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
