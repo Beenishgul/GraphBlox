@@ -499,7 +499,10 @@ end
 
 assign bundle_arbiter_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
-arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_N_to_1_request_memory_out (
+arbiter_N_to_1_request #(
+    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                               ),
+    .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+) inst_bundle_arbiter_N_to_1_request_memory_out (
     .ap_clk                  (ap_clk                                        ),
     .areset                  (areset_arbiter_N_to_1                         ),
     .request_in              (bundle_arbiter_N_to_1_request_in              ),
@@ -528,7 +531,10 @@ end
 
 assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
-arbiter_N_to_1_request #(.NUM_MEMORY_REQUESTOR(NUM_BUNDLES)) inst_bundle_arbiter_control_N_to_1_request_control_out (
+arbiter_N_to_1_request #(
+    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                                ),
+    .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL)
+) inst_bundle_arbiter_control_N_to_1_request_control_out (
     .ap_clk                  (ap_clk                                                ),
     .areset                  (areset_arbiter_control_N_to_1                         ),
     .request_in              (bundle_arbiter_control_N_to_1_request_in              ),
@@ -556,8 +562,9 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
-    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES),
-    .ID_LEVEL            (1          )
+    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                               ),
+    .ID_LEVEL            (1                                         ),
+    .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_bundle_arbiter_1_to_N_response_memory_in (
     .ap_clk                   (ap_clk                                         ),
     .areset                   (areset_arbiter_1_to_N                          ),
@@ -584,8 +591,9 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
-    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES),
-    .ID_LEVEL            (1          )
+    .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                                ),
+    .ID_LEVEL            (1                                          ),
+    .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL)
 ) inst_bundle_arbiter_control_1_to_N_response_control_in (
     .ap_clk                   (ap_clk                                                 ),
     .areset                   (areset_arbiter_control_1_to_N                          ),
