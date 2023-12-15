@@ -248,7 +248,10 @@ assign cache_generator_arbiter_request_in[1] = ~cu_bundles_fifo_request_signals_
 // --------------------------------------------------------------------------------------
 assign request_out_reg = cache_generator_request_out;
 
-cache_generator_request #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_request (
+cache_generator_request #(
+  .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
+  .FIFO_WRITE_DEPTH    (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+) inst_cache_generator_request (
   .ap_clk                  (ap_clk                                   ),
   .areset                  (areset_generator                         ),
   .request_in              (cache_generator_request_in               ),
@@ -265,7 +268,10 @@ cache_generator_request #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cach
 // --------------------------------------------------------------------------------------
 assign cache_generator_response_in = response_in_reg;
 
-cache_generator_response #(.NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR)) inst_cache_generator_response (
+cache_generator_response #(
+  .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
+  .FIFO_WRITE_DEPTH    (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+) inst_cache_generator_response (
   .ap_clk                   (ap_clk                                    ),
   .areset                   (areset_generator                          ),
   .response_in              (cache_generator_response_in               ),
@@ -328,7 +334,7 @@ generate
       .done_out                 (cu_cache_done_out                 )
     );
   end
-// --------------------------------------------------------------------------------------  
+// --------------------------------------------------------------------------------------
 endgenerate
 // --------------------------------------------------------------------------------------
 
@@ -373,9 +379,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
