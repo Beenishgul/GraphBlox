@@ -422,8 +422,8 @@ end
 assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_request #(
-    .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                  ),
-    .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL)
+    .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                          ),
+    .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
 ) inst_engine_arbiter_N_to_1_control_request_out (
     .ap_clk                  (ap_clk                                                 ),
     .areset                  (areset_engine_arbiter_N_to_1_control                   ),
@@ -479,9 +479,9 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
-    .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                  ),
-    .ID_LEVEL            (3                                            ),
-    .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL)
+    .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                           ),
+    .ID_LEVEL            (3                                                     ),
+    .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
 ) inst_engine_arbiter_1_to_N_control_response_in (
     .ap_clk                   (ap_clk                                                 ),
     .areset                   (areset_engine_arbiter_1_to_N_control                   ),

@@ -496,8 +496,8 @@ end
 assign lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_request #(
-    .NUM_MEMORY_REQUESTOR(NUM_LANES                                    ),
-    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL)
+    .NUM_MEMORY_REQUESTOR(NUM_LANES                                            ),
+    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
 ) inst_lane_arbiter_N_to_1_control_request_out (
     .ap_clk                  (ap_clk                                              ),
     .areset                  (areset_lane_arbiter_N_to_1_control                  ),
@@ -557,9 +557,9 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
-    .NUM_MEMORY_REQUESTOR(NUM_LANES                                    ),
-    .ID_LEVEL            (2                                            ),
-    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL)
+    .NUM_MEMORY_REQUESTOR(NUM_LANES                                             ),
+    .ID_LEVEL            (2                                                     ),
+    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
 ) inst_lane_arbiter_1_to_N_control_response_in (
     .ap_clk                   (ap_clk                                               ),
     .areset                   (areset_lane_arbiter_1_to_N_control                   ),
