@@ -671,9 +671,18 @@
         "buffer_8": "auxiliary_2",
         "buffer_9": "entries"
     },
-    "fifo_control": {
+    "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,
         "ENGINE_CSR_INDEX": 16,
+        "ENGINE_FILTER_COND": 0,
+        "ENGINE_FORWARD_DATA": 0,
+        "ENGINE_MERGE_DATA": 0,
+        "ENGINE_PIPELINE": 0,
+        "ENGINE_READ_WRITE": 0
+    },
+    "fifo_control_request": {
+        "ENGINE_ALU_OPS": 0,
+        "ENGINE_CSR_INDEX": 0,
         "ENGINE_FILTER_COND": 16,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
