@@ -50,7 +50,6 @@ genvar j;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_lanes;
-logic areset_fifo ;
 
 KernelDescriptor descriptor_in_reg;
 
@@ -207,7 +206,6 @@ MemoryPacket           lanes_response_merge_engine_in               [NUM_LANES-1
 // Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    areset_fifo                        <= areset;
     areset_lane_arbiter_1_to_N_control <= areset;
     areset_lane_arbiter_1_to_N_lanes   <= areset;
     areset_lane_arbiter_1_to_N_memory  <= areset;
