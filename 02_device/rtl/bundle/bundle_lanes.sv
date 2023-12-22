@@ -101,7 +101,7 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out_int[NUM_LANES_MAX-1:0];
-FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg [NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg [NUM_LANES_MAX-1:0][NUM_LANES_MAX-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
@@ -394,12 +394,17 @@ end
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
 generate
-    for (i=0; i<NUM_LANES; i++) begin  : generate_response_lanes_backtrack_signals
+    for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
         assign fifo_response_lanes_backtrack_signals_out_int[i] = lanes_fifo_response_merge_lane_in_signals_out[i][0];
 
         always_ff @(posedge ap_clk) begin
             fifo_response_lanes_backtrack_signals_out[i] <= fifo_response_lanes_backtrack_signals_out_int[i];
-            fifo_response_lanes_backtrack_signals_in_reg[i]  <= fifo_response_lanes_backtrack_signals_in[i];
+        end
+        
+        for (j=0; j<NUM_LANES_MAX; j++) begin
+            always_ff @(posedge ap_clk) begin
+                fifo_response_lanes_backtrack_signals_in_reg[i][j]  <= fifo_response_lanes_backtrack_signals_in[j];
+            end
         end
     end
 endgenerate
@@ -605,7 +610,7 @@ generate
             .response_lane_in                        (lanes_response_merge_engine_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]               ),
             .fifo_response_lane_in_signals_in        (lanes_fifo_response_merge_lane_in_signals_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0] ),
             .fifo_response_lane_in_signals_out       (lanes_fifo_response_merge_lane_in_signals_out[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]),
-            .fifo_response_lanes_backtrack_signals_in(fifo_response_lanes_backtrack_signals_in_reg                                              ),
+            .fifo_response_lanes_backtrack_signals_in(fifo_response_lanes_backtrack_signals_in_reg[j]                                           ),
             .response_memory_in                      (lanes_response_memory_in[j]                                                               ),
             .fifo_response_memory_in_signals_in      (lanes_fifo_response_memory_in_signals_in[j]                                               ),
             .fifo_response_memory_in_signals_out     (lanes_fifo_response_memory_in_signals_out[j]                                              ),
