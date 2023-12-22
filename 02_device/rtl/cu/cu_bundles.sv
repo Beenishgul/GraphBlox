@@ -31,6 +31,7 @@ module cu_bundles #(
     output logic                  done_out
 );
 
+genvar i;
 genvar j;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
