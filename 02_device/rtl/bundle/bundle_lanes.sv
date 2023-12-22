@@ -16,7 +16,7 @@
 
 module bundle_lanes #(
     `include "bundle_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                      ,
     input  logic                  areset                                                      ,
@@ -598,30 +598,31 @@ generate
     for (j=0; j<NUM_LANES; j++) begin : generate_lane_template
         lane_template #(
             `include"set_lane_parameters.vh"
-        ) inst_lane_template (
-            .ap_clk                              (ap_clk                                                                                    ),
-            .areset                              (areset_lane[j]                                                                            ),
-            .descriptor_in                       (lanes_descriptor_in[j]                                                                    ),
-            .response_lane_in                    (lanes_response_merge_engine_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]               ),
-            .fifo_response_lane_in_signals_in    (lanes_fifo_response_merge_lane_in_signals_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0] ),
-            .fifo_response_lane_in_signals_out   (lanes_fifo_response_merge_lane_in_signals_out[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]),
-            .response_memory_in                  (lanes_response_memory_in[j]                                                               ),
-            .fifo_response_memory_in_signals_in  (lanes_fifo_response_memory_in_signals_in[j]                                               ),
-            .fifo_response_memory_in_signals_out (lanes_fifo_response_memory_in_signals_out[j]                                              ),
-            .response_control_in                 (lanes_response_control_in[j]                                                              ),
-            .fifo_response_control_in_signals_in (lanes_fifo_response_control_in_signals_in[j]                                              ),
-            .fifo_response_control_in_signals_out(lanes_fifo_response_control_in_signals_out[j]                                             ),
-            .request_lane_out                    (lanes_request_cast_lane_out[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]                   ),
-            .fifo_request_lane_out_signals_in    (lanes_fifo_request_cast_lane_out_signals_in[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]   ),
-            .fifo_request_lane_out_signals_out   (lanes_fifo_request_cast_lane_out_signals_out[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]  ),
-            .request_memory_out                  (lanes_request_memory_out[j]                                                               ),
-            .fifo_request_memory_out_signals_in  (lanes_fifo_request_memory_out_signals_in[j]                                               ),
-            .fifo_request_memory_out_signals_out (lanes_fifo_request_memory_out_signals_out[j]                                              ),
-            .request_control_out                 (lanes_request_control_out[j]                                                              ),
-            .fifo_request_control_out_signals_in (lanes_fifo_request_control_out_signals_in[j]                                              ),
-            .fifo_request_control_out_signals_out(lanes_fifo_request_control_out_signals_out[j]                                             ),
-            .fifo_setup_signal                   (lanes_fifo_setup_signal[j]                                                                ),
-            .done_out                            (lanes_done_out[j]                                                                         )
+            ) inst_lane_template (
+            .ap_clk                                  (ap_clk                                                                                    ),
+            .areset                                  (areset_lane[j]                                                                            ),
+            .descriptor_in                           (lanes_descriptor_in[j]                                                                    ),
+            .response_lane_in                        (lanes_response_merge_engine_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]               ),
+            .fifo_response_lane_in_signals_in        (lanes_fifo_response_merge_lane_in_signals_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0] ),
+            .fifo_response_lane_in_signals_out       (lanes_fifo_response_merge_lane_in_signals_out[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]),
+            .fifo_response_lanes_backtrack_signals_in(fifo_response_lanes_backtrack_signals_in_reg                                              ),
+            .response_memory_in                      (lanes_response_memory_in[j]                                                               ),
+            .fifo_response_memory_in_signals_in      (lanes_fifo_response_memory_in_signals_in[j]                                               ),
+            .fifo_response_memory_in_signals_out     (lanes_fifo_response_memory_in_signals_out[j]                                              ),
+            .response_control_in                     (lanes_response_control_in[j]                                                              ),
+            .fifo_response_control_in_signals_in     (lanes_fifo_response_control_in_signals_in[j]                                              ),
+            .fifo_response_control_in_signals_out    (lanes_fifo_response_control_in_signals_out[j]                                             ),
+            .request_lane_out                        (lanes_request_cast_lane_out[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]                   ),
+            .fifo_request_lane_out_signals_in        (lanes_fifo_request_cast_lane_out_signals_in[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]   ),
+            .fifo_request_lane_out_signals_out       (lanes_fifo_request_cast_lane_out_signals_out[j][LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]:0]  ),
+            .request_memory_out                      (lanes_request_memory_out[j]                                                               ),
+            .fifo_request_memory_out_signals_in      (lanes_fifo_request_memory_out_signals_in[j]                                               ),
+            .fifo_request_memory_out_signals_out     (lanes_fifo_request_memory_out_signals_out[j]                                              ),
+            .request_control_out                     (lanes_request_control_out[j]                                                              ),
+            .fifo_request_control_out_signals_in     (lanes_fifo_request_control_out_signals_in[j]                                              ),
+            .fifo_request_control_out_signals_out    (lanes_fifo_request_control_out_signals_out[j]                                             ),
+            .fifo_setup_signal                       (lanes_fifo_setup_signal[j]                                                                ),
+            .done_out                                (lanes_done_out[j]                                                                         )
         );
     end
 endgenerate

@@ -24,6 +24,7 @@ module lane_template #(
     input  MemoryPacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                 ,
     input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in[(1+LANE_MERGE_WIDTH)-1:0] ,
     output FIFOStateSignalsOutput fifo_response_lane_in_signals_out[(1+LANE_MERGE_WIDTH)-1:0],
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0],
     input  MemoryPacket           response_memory_in                                         ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                         ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                        ,
