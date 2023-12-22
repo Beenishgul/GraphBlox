@@ -16,30 +16,32 @@
 
 module bundle_lanes #(
     `include "bundle_parameters.vh"
-) (
+    ) (
     // System Signals
-    input  logic                  ap_clk                              ,
-    input  logic                  areset                              ,
-    input  KernelDescriptor       descriptor_in                       ,
-    input  MemoryPacket           response_lanes_in                   ,
-    input  FIFOStateSignalsInput  fifo_response_lanes_in_signals_in   ,
-    output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out  ,
-    input  MemoryPacket           response_memory_in                  ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in  ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out ,
-    input  MemoryPacket           response_control_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_control_in_signals_out,
-    output MemoryPacket           request_lanes_out                   ,
-    input  FIFOStateSignalsInput  fifo_request_lanes_out_signals_in   ,
-    output FIFOStateSignalsOutput fifo_request_lanes_out_signals_out  ,
-    output MemoryPacket           request_memory_out                  ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in  ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out ,
-    output MemoryPacket           request_control_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in ,
-    output FIFOStateSignalsOutput fifo_request_control_out_signals_out,
-    output logic                  fifo_setup_signal                   ,
+    input  logic                  ap_clk                                                      ,
+    input  logic                  areset                                                      ,
+    input  KernelDescriptor       descriptor_in                                               ,
+    input  MemoryPacket           response_lanes_in                                           ,
+    input  FIFOStateSignalsInput  fifo_response_lanes_in_signals_in                           ,
+    output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out                          ,
+    output FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out[NUM_LANES_MAX-1:0],
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in [NUM_LANES_MAX-1:0],
+    input  MemoryPacket           response_memory_in                                          ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                          ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                         ,
+    input  MemoryPacket           response_control_in                                         ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                         ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                        ,
+    output MemoryPacket           request_lanes_out                                           ,
+    input  FIFOStateSignalsInput  fifo_request_lanes_out_signals_in                           ,
+    output FIFOStateSignalsOutput fifo_request_lanes_out_signals_out                          ,
+    output MemoryPacket           request_memory_out                                          ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                          ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                         ,
+    output MemoryPacket           request_control_out                                         ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                         ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                        ,
+    output logic                  fifo_setup_signal                                           ,
     output logic                  done_out
 );
 
@@ -94,6 +96,12 @@ FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 // FIFO OUTPUT CONTROL Request CONTROL MemoryPacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
+
+// --------------------------------------------------------------------------------------
+// FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
+// --------------------------------------------------------------------------------------
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out_int[NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg [NUM_LANES_MAX-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
@@ -381,6 +389,21 @@ always_ff @(posedge ap_clk) begin
     end
 end
 
+
+// --------------------------------------------------------------------------------------
+// Generate FIFO backtrack signals - Signals: Lanes Response Generator
+// --------------------------------------------------------------------------------------
+generate
+    for (i=0; i<NUM_LANES; i++) begin  : generate_response_lanes_backtrack_signals
+        assign fifo_response_lanes_backtrack_signals_out_int[i] = lanes_fifo_response_merge_lane_in_signals_out[i][0];
+
+        always_ff @(posedge ap_clk) begin
+            fifo_response_lanes_backtrack_signals_out[i] <= fifo_response_lanes_backtrack_signals_out_int[i];
+            fifo_response_lanes_backtrack_signals_in_reg[i]  <= fifo_response_lanes_backtrack_signals_in[i];
+        end
+    end
+endgenerate
+
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Lanes Arbitration
 // --------------------------------------------------------------------------------------
@@ -388,13 +411,13 @@ end
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
 // --------------------------------------------------------------------------------------
-always_comb begin : generate_lane_arbiter_N_to_1_engine_request_in
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_N_to_1_lane_request_in[i]              = lanes_request_lane_out[i];
-        lane_arbiter_N_to_1_lane_lane_arbiter_request_in[i] = ~lanes_fifo_request_lane_out_signals_out[i].empty & ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full;
-        lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_engine_request_in
+        assign lane_arbiter_N_to_1_lane_request_in[i]              = lanes_request_lane_out[i];
+        assign lane_arbiter_N_to_1_lane_lane_arbiter_request_in[i] = ~lanes_fifo_request_lane_out_signals_out[i].empty & ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full;
+        assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
     end
-end
+endgenerate
 
 assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = fifo_request_lanes_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
@@ -420,13 +443,13 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 assign lane_arbiter_1_to_N_lanes_response_in = response_engine_in_int;
 
-always_comb begin : generate_lane_arbiter_1_to_N_engine_response
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full & fifo_response_lanes_in_signals_in_reg.rd_en;
-        lanes_response_engine_in[i] = lane_arbiter_1_to_N_lanes_response_out[i];
-        lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_engine_response
+        assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full & fifo_response_lanes_in_signals_in_reg.rd_en;
+        assign lanes_response_engine_in[i] = lane_arbiter_1_to_N_lanes_response_out[i];
+        assign lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_request #(
@@ -451,13 +474,13 @@ arbiter_1_to_N_request #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-always_comb begin : generate_lane_arbiter_N_to_1_memory_request_in
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_N_to_1_memory_request_in[i]              = lanes_request_memory_out[i];
-        lane_arbiter_N_to_1_memory_lane_arbiter_request_in[i] = ~lanes_fifo_request_memory_out_signals_out[i].empty & ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
-        lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i];
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_memory_request_in
+        assign lane_arbiter_N_to_1_memory_request_in[i]              = lanes_request_memory_out[i];
+        assign lane_arbiter_N_to_1_memory_lane_arbiter_request_in[i] = ~lanes_fifo_request_memory_out_signals_out[i].empty & ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+        assign lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i];
     end
-end
+endgenerate
 
 assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
@@ -483,13 +506,13 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: CONTROL Request Generator
 // --------------------------------------------------------------------------------------
-always_comb begin : generate_lane_arbiter_N_to_1_control_request_in
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_N_to_1_control_request_in[i]              = lanes_request_control_out[i];
-        lane_arbiter_N_to_1_control_lane_arbiter_request_in[i] = ~lanes_fifo_request_control_out_signals_out[i].empty & ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full;
-        lanes_fifo_request_control_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[i];
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_control_request_in
+        assign lane_arbiter_N_to_1_control_request_in[i]              = lanes_request_control_out[i];
+        assign lane_arbiter_N_to_1_control_lane_arbiter_request_in[i] = ~lanes_fifo_request_control_out_signals_out[i].empty & ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full;
+        assign lanes_fifo_request_control_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[i];
     end
-end
+endgenerate
 
 assign lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
@@ -515,13 +538,13 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 assign lane_arbiter_1_to_N_memory_response_in = response_memory_in_int;
 
-always_comb begin : generate_lane_arbiter_1_to_N_memory_response
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_memory_in_signals_out[i].prog_full & fifo_response_memory_in_signals_in_reg.rd_en;
-        lanes_response_memory_in[i] = lane_arbiter_1_to_N_memory_response_out[i];
-        lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_memory_response
+        assign lane_arbiter_1_to_N_memory_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_memory_in_signals_out[i].prog_full & fifo_response_memory_in_signals_in_reg.rd_en;
+        assign lanes_response_memory_in[i] = lane_arbiter_1_to_N_memory_response_out[i];
+        assign lanes_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
@@ -545,13 +568,13 @@ arbiter_1_to_N_response #(
 // --------------------------------------------------------------------------------------
 assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;
 
-always_comb begin : generate_lane_arbiter_1_to_N_control_response
-    for (int i=0; i<NUM_LANES; i++) begin
-        lane_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_control_in_signals_out[i].prog_full & fifo_response_control_in_signals_in_reg.rd_en;
-        lanes_response_control_in[i] = lane_arbiter_1_to_N_control_response_out[i];
-        lanes_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
+generate
+    for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_control_response
+        assign lane_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_control_in_signals_out[i].prog_full & fifo_response_control_in_signals_in_reg.rd_en;
+        assign lanes_response_control_in[i] = lane_arbiter_1_to_N_control_response_out[i];
+        assign lanes_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(

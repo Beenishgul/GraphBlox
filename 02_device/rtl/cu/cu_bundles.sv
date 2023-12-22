@@ -90,6 +90,12 @@ MemoryPacketPayload           fifo_request_control_out_din             ;
 MemoryPacketPayload           fifo_request_control_out_dout            ;
 
 // --------------------------------------------------------------------------------------
+// FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
+// --------------------------------------------------------------------------------------
+FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_out[NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_in [NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
+
+// --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput  bundle_fifo_request_control_out_signals_in [NUM_BUNDLES-1:0];
@@ -473,14 +479,20 @@ end
 assign bundle_response_lanes_in[0] = bundle_request_lanes_out[NUM_BUNDLES-1];
 assign bundle_fifo_request_lanes_out_signals_in[NUM_BUNDLES-1].rd_en = ~bundle_fifo_response_lanes_in_signals_out[0].prog_full;
 assign bundle_fifo_response_lanes_in_signals_in[0].rd_en = 1'b1;
-
-always_comb begin
-    for (int i=1; i<NUM_BUNDLES; i++) begin : generate_bundle_intra_signals
-        bundle_response_lanes_in[i] = bundle_request_lanes_out[i-1];
-        bundle_fifo_request_lanes_out_signals_in[i-1].rd_en = ~bundle_fifo_response_lanes_in_signals_out[i].prog_full;
-        bundle_fifo_response_lanes_in_signals_in[i].rd_en = 1'b1;
+generate
+    for (i=1; i<NUM_BUNDLES; i++) begin : generate_bundle_intra_signals
+        assign bundle_response_lanes_in[i] = bundle_request_lanes_out[i-1];
+        assign bundle_fifo_request_lanes_out_signals_in[i-1].rd_en = ~bundle_fifo_response_lanes_in_signals_out[i].prog_full;
+        assign bundle_fifo_response_lanes_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
+
+assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES] = bundle_fifo_response_lanes_backtrack_signals_out[0];
+generate
+    for (i=0; i<NUM_BUNDLES-1; i++) begin : generate_bundle_backtrack_signals
+        assign bundle_fifo_response_lanes_backtrack_signals_in[i] = bundle_fifo_response_lanes_backtrack_signals_out[i+1];
+    end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Memory Arbitration OUTPUT
@@ -489,13 +501,13 @@ end
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Arbiter Signals: Memory Request Generator
 // --------------------------------------------------------------------------------------
-always_comb begin
-    for (int i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_N_to_1_request_in
-        bundle_arbiter_N_to_1_request_in[i]         = bundle_request_memory_out[i];
-        bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
-        bundle_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
+generate
+    for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_N_to_1_request_in
+        assign bundle_arbiter_N_to_1_request_in[i]         = bundle_request_memory_out[i];
+        assign bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
+        assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
     end
-end
+endgenerate
 
 assign bundle_arbiter_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
@@ -521,13 +533,13 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Arbiter Signals: Memory Request CONTROL Generator
 // --------------------------------------------------------------------------------------
-always_comb begin
-    for (int i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
-        bundle_arbiter_control_N_to_1_request_in[i]         = bundle_request_control_out[i];
-        bundle_arbiter_control_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_control_out_signals_out[i].empty & ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full;
-        bundle_fifo_request_control_out_signals_in[i].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[i];
+generate 
+    for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
+        assign bundle_arbiter_control_N_to_1_request_in[i]         = bundle_request_control_out[i];
+        assign bundle_arbiter_control_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_control_out_signals_out[i].empty & ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full;
+        assign bundle_fifo_request_control_out_signals_in[i].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[i];
     end
-end
+endgenerate
 
 assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
@@ -552,13 +564,13 @@ arbiter_N_to_1_request #(
 // Generate Bundles - Arbiter Signals: Memory Response Generator
 // --------------------------------------------------------------------------------------
 assign bundle_arbiter_1_to_N_response_in = response_memory_in_int;
-always_comb begin
-    for (int i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_1_to_N_response
-        bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_memory_in_signals_out[i].prog_full;
-        bundle_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
-        bundle_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
+generate 
+    for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_1_to_N_response
+        assign bundle_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_memory_in_signals_out[i].prog_full;
+        assign bundle_response_memory_in[i] = bundle_arbiter_1_to_N_response_out[i];
+        assign bundle_fifo_response_memory_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
@@ -581,13 +593,13 @@ arbiter_1_to_N_response #(
 // Generate Bundles - Arbiter Signals: CONTROL Response Generator
 // --------------------------------------------------------------------------------------
 assign bundle_arbiter_control_1_to_N_response_in = response_control_in_int;
-always_comb begin
-    for (int i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_1_to_N_response
-        bundle_arbiter_control_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_control_in_signals_out[i].prog_full;
-        bundle_response_control_in[i] = bundle_arbiter_control_1_to_N_response_out[i];
-        bundle_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
+generate
+    for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_1_to_N_response
+        assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_control_in_signals_out[i].prog_full;
+        assign bundle_response_control_in[i] = bundle_arbiter_control_1_to_N_response_out[i];
+        assign bundle_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
     end
-end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response #(
@@ -611,30 +623,32 @@ generate
     for (j=0; j<NUM_BUNDLES; j++) begin : generate_bundle_lanes
         bundle_lanes #(
             `include"set_bundle_parameters.vh"
-        ) inst_bundle_lanes (
-            .ap_clk                              (ap_clk                                        ),
-            .areset                              (areset_bundle[j]                              ),
-            .descriptor_in                       (bundle_descriptor_in[j]                       ),
-            .response_lanes_in                   (bundle_response_lanes_in[j]                   ),
-            .fifo_response_lanes_in_signals_in   (bundle_fifo_response_lanes_in_signals_in[j]   ),
-            .fifo_response_lanes_in_signals_out  (bundle_fifo_response_lanes_in_signals_out[j]  ),
-            .response_memory_in                  (bundle_response_memory_in[j]                  ),
-            .fifo_response_memory_in_signals_in  (bundle_fifo_response_memory_in_signals_in[j]  ),
-            .fifo_response_memory_in_signals_out (bundle_fifo_response_memory_in_signals_out[j] ),
-            .response_control_in                 (bundle_response_control_in[j]                 ),
-            .fifo_response_control_in_signals_in (bundle_fifo_response_control_in_signals_in[j] ),
-            .fifo_response_control_in_signals_out(bundle_fifo_response_control_in_signals_out[j]),
-            .request_lanes_out                   (bundle_request_lanes_out[j]                   ),
-            .fifo_request_lanes_out_signals_in   (bundle_fifo_request_lanes_out_signals_in[j]   ),
-            .fifo_request_lanes_out_signals_out  (bundle_fifo_request_lanes_out_signals_out[j]  ),
-            .request_memory_out                  (bundle_request_memory_out[j]                  ),
-            .fifo_request_memory_out_signals_in  (bundle_fifo_request_memory_out_signals_in[j]  ),
-            .fifo_request_memory_out_signals_out (bundle_fifo_request_memory_out_signals_out[j] ),
-            .request_control_out                 (bundle_request_control_out[j]                 ),
-            .fifo_request_control_out_signals_in (bundle_fifo_request_control_out_signals_in[j] ),
-            .fifo_request_control_out_signals_out(bundle_fifo_request_control_out_signals_out[j]),
-            .fifo_setup_signal                   (bundle_fifo_setup_signal[j]                   ),
-            .done_out                            (bundle_done_out[j]                            )
+            ) inst_bundle_lanes (
+            .ap_clk                                   (ap_clk                                                                     ),
+            .areset                                   (areset_bundle[j]                                                           ),
+            .descriptor_in                            (bundle_descriptor_in[j]                                                    ),
+            .response_lanes_in                        (bundle_response_lanes_in[j]                                                ),
+            .fifo_response_lanes_in_signals_in        (bundle_fifo_response_lanes_in_signals_in[j]                                ),
+            .fifo_response_lanes_in_signals_out       (bundle_fifo_response_lanes_in_signals_out[j]                               ),
+            .fifo_response_lanes_backtrack_signals_out(bundle_fifo_response_lanes_backtrack_signals_out[j]                        ),
+            .fifo_response_lanes_backtrack_signals_in (bundle_fifo_response_lanes_backtrack_signals_in[j]                         ),
+            .response_memory_in                       (bundle_response_memory_in[j]                                               ),
+            .fifo_response_memory_in_signals_in       (bundle_fifo_response_memory_in_signals_in[j]                               ),
+            .fifo_response_memory_in_signals_out      (bundle_fifo_response_memory_in_signals_out[j]                              ),
+            .response_control_in                      (bundle_response_control_in[j]                                              ),
+            .fifo_response_control_in_signals_in      (bundle_fifo_response_control_in_signals_in[j]                              ),
+            .fifo_response_control_in_signals_out     (bundle_fifo_response_control_in_signals_out[j]                             ),
+            .request_lanes_out                        (bundle_request_lanes_out[j]                                                ),
+            .fifo_request_lanes_out_signals_in        (bundle_fifo_request_lanes_out_signals_in[j]                                ),
+            .fifo_request_lanes_out_signals_out       (bundle_fifo_request_lanes_out_signals_out[j]                               ),
+            .request_memory_out                       (bundle_request_memory_out[j]                                               ),
+            .fifo_request_memory_out_signals_in       (bundle_fifo_request_memory_out_signals_in[j]                               ),
+            .fifo_request_memory_out_signals_out      (bundle_fifo_request_memory_out_signals_out[j]                              ),
+            .request_control_out                      (bundle_request_control_out[j]                                              ),
+            .fifo_request_control_out_signals_in      (bundle_fifo_request_control_out_signals_in[j]                              ),
+            .fifo_request_control_out_signals_out     (bundle_fifo_request_control_out_signals_out[j]                             ),
+            .fifo_setup_signal                        (bundle_fifo_setup_signal[j]                                                ),
+            .done_out                                 (bundle_done_out[j]                                                         )
         );
     end
 endgenerate
