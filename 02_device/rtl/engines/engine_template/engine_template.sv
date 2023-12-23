@@ -111,28 +111,31 @@ FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MA
 // --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput  template_fifo_request_control_out_signals_in                             ;
-FIFOStateSignalsInput  template_fifo_request_engine_out_signals_in                              ;
-FIFOStateSignalsInput  template_fifo_request_memory_out_signals_in                              ;
-FIFOStateSignalsInput  template_fifo_response_control_in_signals_in                             ;
-FIFOStateSignalsInput  template_fifo_response_engine_in_signals_in  [(1+ENGINE_MERGE_WIDTH)-1:0];
-FIFOStateSignalsInput  template_fifo_response_memory_in_signals_in                              ;
-FIFOStateSignalsOutput template_fifo_request_control_out_signals_out                            ;
-FIFOStateSignalsOutput template_fifo_request_engine_out_signals_out                             ;
-FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out                             ;
-FIFOStateSignalsOutput template_fifo_response_control_in_signals_out                            ;
-FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out [(1+ENGINE_MERGE_WIDTH)-1:0];
-FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out                             ;
-KernelDescriptor       template_descriptor_in                                                   ;
-logic                  areset_template                                                          ;
-logic                  template_done_out                                                        ;
-logic                  template_fifo_setup_signal                                               ;
-MemoryPacket           template_request_control_out                                             ;
-MemoryPacket           template_request_engine_out                                              ;
-MemoryPacket           template_request_memory_out                                              ;
-MemoryPacket           template_response_control_in                                             ;
-MemoryPacket           template_response_engine_in                  [(1+ENGINE_MERGE_WIDTH)-1:0];
-MemoryPacket           template_response_memory_in                                              ;
+FIFOStateSignalsInput  template_fifo_request_control_out_signals_in                                 ;
+FIFOStateSignalsInput  template_fifo_request_engine_out_signals_in                                  ;
+FIFOStateSignalsInput  template_fifo_request_memory_out_signals_in                                  ;
+FIFOStateSignalsInput  template_fifo_response_control_in_signals_in                                 ;
+FIFOStateSignalsInput  template_fifo_response_engine_in_signals_in      [(1+ENGINE_MERGE_WIDTH)-1:0];
+FIFOStateSignalsInput  template_fifo_response_memory_in_signals_in                                  ;
+FIFOStateSignalsOutput template_fifo_request_control_out_signals_out                                ;
+FIFOStateSignalsOutput template_fifo_request_engine_out_signals_out                                 ;
+FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out                                 ;
+FIFOStateSignalsOutput template_fifo_response_control_in_signals_out                                ;
+FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out     [(1+ENGINE_MERGE_WIDTH)-1:0];
+FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out                                 ;
+FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in[         NUM_LANES_MAX-1:0];
+
+KernelDescriptor template_descriptor_in    ;
+logic            areset_template           ;
+logic            template_done_out         ;
+logic            template_fifo_setup_signal;
+
+MemoryPacket template_request_control_out                            ;
+MemoryPacket template_request_engine_out                             ;
+MemoryPacket template_request_memory_out                             ;
+MemoryPacket template_response_control_in                            ;
+MemoryPacket template_response_engine_in [(1+ENGINE_MERGE_WIDTH)-1:0];
+MemoryPacket template_response_memory_in                             ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -391,6 +394,7 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
 
             engine_pipeline #(
                 .ID_CU             (ID_CU             ),
@@ -450,6 +454,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_read_write #(
                 .ID_CU             (ID_CU             ),
@@ -509,6 +515,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_csr_index #(
                 .ID_CU             (ID_CU             ),
@@ -568,6 +576,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_filter_cond #(
                 .ID_CU             (ID_CU             ),
@@ -627,6 +637,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_merge_data #(
                 .ID_CU             (ID_CU             ),
@@ -686,6 +698,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_alu_ops #(
                 .ID_CU             (ID_CU             ),
@@ -745,6 +759,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_forward_data #(
                 .ID_CU             (ID_CU             ),
@@ -804,6 +820,8 @@ generate
             assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
+
 
             engine_pipeline #(
                 .ID_CU             (ID_CU             ),
