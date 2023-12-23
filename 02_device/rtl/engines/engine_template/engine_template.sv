@@ -24,6 +24,7 @@ module engine_template #(
     input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0] ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0]    ,
     input  MemoryPacket           response_memory_in                                             ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
@@ -101,6 +102,11 @@ FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 // FIFO OUTPUT CONTROL Request Memory MemoryPacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
+
+// --------------------------------------------------------------------------------------
+// Generate FIFO backtrack signals - Signals: Lanes Response Generator
+// --------------------------------------------------------------------------------------
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
@@ -186,6 +192,15 @@ always_ff @(posedge ap_clk) begin
     response_engine_in_reg.payload  <= response_engine_in[0].payload;
     response_memory_in_reg.payload  <= response_memory_in.payload;
 end
+
+
+generate
+    for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+        always_ff @(posedge ap_clk) begin
+            fifo_response_lanes_backtrack_signals_in_reg[j][i] <= fifo_response_lanes_backtrack_signals_in[i];
+        end
+    end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Drive output signals

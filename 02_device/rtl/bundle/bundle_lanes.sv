@@ -394,18 +394,24 @@ end
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
 generate
-    for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+    for (i=0; i<NUM_LANES; i++) begin  : generate_response_lanes_backtrack_signals
         assign fifo_response_lanes_backtrack_signals_out_int[i] = lanes_fifo_response_merge_lane_in_signals_out[i][0];
 
         always_ff @(posedge ap_clk) begin
             fifo_response_lanes_backtrack_signals_out[i] <= fifo_response_lanes_backtrack_signals_out_int[i];
         end
-        
+
         for (j=0; j<NUM_LANES_MAX; j++) begin
             always_ff @(posedge ap_clk) begin
                 fifo_response_lanes_backtrack_signals_in_reg[i][j]  <= fifo_response_lanes_backtrack_signals_in[j];
             end
         end
+    end
+endgenerate
+
+generate
+    for (i=NUM_LANES; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+        assign fifo_response_lanes_backtrack_signals_out_int[i] = 2'b10;
     end
 endgenerate
 
