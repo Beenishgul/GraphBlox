@@ -488,7 +488,9 @@ generate
     end
 endgenerate
 
-assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES] = bundle_fifo_response_lanes_backtrack_signals_out[0];
+    
+assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1] = bundle_fifo_response_lanes_backtrack_signals_out[0];
+
 generate
     for (i=0; i<NUM_BUNDLES-1; i++) begin : generate_bundle_backtrack_signals
         assign bundle_fifo_response_lanes_backtrack_signals_in[i] = bundle_fifo_response_lanes_backtrack_signals_out[i+1];
