@@ -410,7 +410,7 @@ generate
 endgenerate
 
 generate
-    for (i=NUM_LANES; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+    for (i=NUM_LANES; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals_spill
         assign fifo_response_lanes_backtrack_signals_out_int[i] = 2'b10;
     end
 endgenerate
