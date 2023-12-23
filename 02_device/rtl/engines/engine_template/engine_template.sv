@@ -193,11 +193,10 @@ always_ff @(posedge ap_clk) begin
     response_memory_in_reg.payload  <= response_memory_in.payload;
 end
 
-
 generate
     for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
         always_ff @(posedge ap_clk) begin
-            fifo_response_lanes_backtrack_signals_in_reg[j][i] <= fifo_response_lanes_backtrack_signals_in[i];
+            fifo_response_lanes_backtrack_signals_in_reg[i] <= fifo_response_lanes_backtrack_signals_in[i];
         end
     end
 endgenerate
