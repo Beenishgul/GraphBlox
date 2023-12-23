@@ -27,6 +27,7 @@ module engine_merge_data #(parameter
     FIFO_WRITE_DEPTH   = 32                            ,
     PROG_THRESH        = 16                            ,
     NUM_MODULES        = 2                             ,
+    NUM_LANES_MAX      = 4                             ,
     ENGINE_SEQ_WIDTH   = 16                            ,
     ENGINE_SEQ_MIN     = ID_RELATIVE * ENGINE_SEQ_WIDTH,
     PIPELINE_STAGES    = 2
@@ -38,6 +39,7 @@ module engine_merge_data #(parameter
     input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0] ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0]    ,
     input  MemoryPacket           response_memory_in                                             ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
