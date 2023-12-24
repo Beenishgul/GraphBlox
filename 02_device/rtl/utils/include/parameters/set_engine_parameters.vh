@@ -135,7 +135,7 @@
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
 .FIFO_WRITE_DEPTH 					     (32                                               ),
-.PROG_THRESH      						 (28                                               ),
+.PROG_THRESH      						 (27                                               ),
 .FIFO_WRITE_DEPTH_MEMORY                 (ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[j]),
 .FIFO_WRITE_DEPTH_ENGINE                 (ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[j]),
 .FIFO_WRITE_DEPTH_CONTROL_RESPONSE       (ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[j]),
