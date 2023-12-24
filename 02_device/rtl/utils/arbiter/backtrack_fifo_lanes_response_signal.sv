@@ -97,9 +97,8 @@ always_ff @(posedge ap_clk) begin
                 fifo_response_engine_in_signals_out_reg.rd_en <= fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_response_lanes_backtrack_signals_in_reg[i].prog_full;
             end
         end
-
     end else begin
-        fifo_response_engine_in_signals_out_reg.rd_en <= fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1].prog_full;
+        fifo_response_engine_in_signals_out_reg.rd_en <= 1'b0;;
     end
 end
 
