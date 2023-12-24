@@ -137,6 +137,7 @@ always_ff @(posedge ap_clk) begin
     areset_merge_data_engine <= areset;
     areset_configure_memory  <= areset;
     areset_generator         <= areset;
+    areset_backtrack         <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -323,6 +324,39 @@ engine_merge_data_generator #(
     .fifo_setup_signal                  (generator_engine_fifo_setup_signal                  ),
     .configure_memory_setup             (generator_engine_configure_memory_setup             ),
     .done_out                           (generator_engine_done_out                           )
+);
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+logic                  areset_backtrack                                                     ;
+logic                  backtrack_configure_route_valid                                      ;
+MemoryPacketArbitrate  backtrack_configure_route_in                                         ;
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                         ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                        ;
+
+assign backtrack_configure_route_valid                    = configure_memory_out.valid;
+assign backtrack_configure_route_in                       = configure_memory_out.payload.meta.route.to;
+assign backtrack_fifo_response_engine_in_signals_in       = fifo_request_engine_out_signals_in_reg;
+assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
+
+backtrack_fifo_lanes_response_signal #(
+    .ID_CU          (ID_CU          ),
+    .ID_BUNDLE      (ID_BUNDLE      ),
+    .ID_LANE        (ID_LANE        ),
+    .ID_ENGINE      (ID_ENGINE      ),
+    .ID_MODULE      (2              ),
+    .NUM_LANES_MAX  (NUM_LANES_MAX  ),
+    .NUM_BUNDLES_MAX(NUM_BUNDLES_MAX)
+) inst_backtrack_fifo_lanes_response_signal (
+    .ap_clk                                  (ap_clk                                            ),
+    .areset                                  (areset_backtrack                                  ),
+    .configure_route_valid                   (backtrack_configure_route_valid                   ),
+    .configure_route_in                      (backtrack_configure_route_in                      ),
+    .fifo_response_engine_in_signals_in      (backtrack_fifo_response_engine_in_signals_in      ),
+    .fifo_response_lanes_backtrack_signals_in(backtrack_fifo_response_lanes_backtrack_signals_in),
+    .fifo_response_engine_in_signals_out     (backtrack_fifo_response_engine_in_signals_out     )
 );
 
 endmodule : engine_merge_data
