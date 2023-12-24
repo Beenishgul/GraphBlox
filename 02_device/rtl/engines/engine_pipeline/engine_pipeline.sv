@@ -21,6 +21,7 @@ module engine_pipeline #(parameter
     ID_ENGINE        = 0                             ,
     ID_RELATIVE      = 0                             ,
     NUM_LANES_MAX    = 4                             ,
+    NUM_BUNDLES_MAX  = 4                             ,
     ENGINES_CONFIG   = 0                             ,
     FIFO_WRITE_DEPTH = 16                            ,
     PROG_THRESH      = 8                             ,

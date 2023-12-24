@@ -27,6 +27,7 @@ module engine_csr_index #(parameter
     PROG_THRESH        = 16                            ,
     NUM_MODULES        = 2                             ,
     NUM_LANES_MAX      = 4                             ,
+    NUM_BUNDLES_MAX    = 4                             ,
     ENGINE_SEQ_WIDTH   = 16                            ,
     ENGINE_SEQ_MIN     = ID_RELATIVE * ENGINE_SEQ_WIDTH,
     PIPELINE_STAGES    = 2
