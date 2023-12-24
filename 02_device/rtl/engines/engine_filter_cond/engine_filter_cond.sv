@@ -316,7 +316,9 @@ engine_filter_cond_generator #(
     .ENGINES_CONFIG    (ENGINES_CONFIG    ),
     .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
     .PROG_THRESH       (PROG_THRESH       ),
-    .PIPELINE_STAGES   (PIPELINE_STAGES   )
+    .PIPELINE_STAGES   (PIPELINE_STAGES   ),
+    .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+    .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   )
 ) inst_engine_filter_cond_generator (
     .ap_clk                                  (ap_clk                                               ),
     .areset                                  (areset_generator                                     ),
