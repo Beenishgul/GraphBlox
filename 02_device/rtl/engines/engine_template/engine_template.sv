@@ -407,6 +407,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -470,6 +471,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -533,6 +535,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -596,6 +599,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -659,6 +663,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -722,6 +727,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -785,6 +791,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
@@ -848,6 +855,7 @@ generate
                 .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
                 .PROG_THRESH       (PROG_THRESH       ),
                 .NUM_LANES_MAX     (NUM_LANES_MAX     ),
+                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
                 .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
                 .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
                 .ENGINES_CONFIG    (ENGINES_CONFIG    )
