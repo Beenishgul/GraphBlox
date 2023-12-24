@@ -179,6 +179,16 @@ MemoryPacket           modules_response_engine_in                 [NUM_MODULES-1
 MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1:0];
 
 // --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+logic                  areset_backtrack                                                     ;
+logic                  backtrack_configure_route_valid                                      ;
+MemoryPacketArbitrate  backtrack_configure_route_in                                         ;
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                         ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                        ;
+
+// --------------------------------------------------------------------------------------
 // Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -486,13 +496,6 @@ engine_csr_index_generator #(
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                  areset_backtrack                                                     ;
-logic                  backtrack_configure_route_valid                                      ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                         ;
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                         ;
-FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0];
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                        ;
-
 assign backtrack_configure_route_valid                    = configure_memory_out.valid;
 assign backtrack_configure_route_in                       = configure_memory_out.payload.meta.route.to;
 assign backtrack_fifo_response_engine_in_signals_in       = fifo_request_engine_out_signals_in_reg;
