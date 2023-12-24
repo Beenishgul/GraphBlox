@@ -305,7 +305,7 @@ always_comb begin
     end
 end
 
-assign generator_engine_fifo_request_engine_out_signals_in.rd_en = fifo_request_engine_out_signals_in_reg.rd_en;
+assign generator_engine_fifo_request_engine_out_signals_in.rd_en = backtrack_fifo_response_engine_in_signals_out.rd_en;
 
 engine_merge_data_generator #(
     .ID_CU             (ID_CU             ),

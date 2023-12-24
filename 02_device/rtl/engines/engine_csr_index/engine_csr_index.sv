@@ -450,7 +450,7 @@ assign generator_engine_response_memory_in                       = modules_respo
 assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en;
 assign modules_fifo_response_memory_in_signals_out[1]            = generator_engine_fifo_response_memory_in_signals_out;
 
-assign generator_engine_fifo_request_engine_out_signals_in.rd_en = fifo_request_engine_out_signals_in_reg.rd_en;
+assign generator_engine_fifo_request_engine_out_signals_in.rd_en = backtrack_fifo_response_engine_in_signals_out.rd_en;
 
 assign generator_engine_fifo_request_memory_out_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
 
