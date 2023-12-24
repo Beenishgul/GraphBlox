@@ -75,7 +75,7 @@ end
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk or negedge rst_n) begin : proc_
+always_ff @(posedge ap_clk) begin
     if (areset_backtrack) begin
         fifo_response_engine_in_signals_out <= 0;
     end else begin
