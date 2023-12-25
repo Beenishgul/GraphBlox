@@ -94,9 +94,18 @@ end
 always_comb begin
     signals_out_reg_rd_en = 0;
     if(configure_route_valid_reg & (next_module_id_bundle == configure_route_in_reg.id_bundle[NUM_BUNDLES_MAX-1:0]) & (|configure_route_in_reg.id_lane)) begin
-        for (int i = 0; i < NUM_LANES_MAX; i = i + 1) begin
+        for (int i = 0; i < NUM_LANES_MAX-1; i = i + 1) begin
             signals_out_reg_rd_en[i] = configure_route_in_reg.id_lane[i] ? ~fifo_response_lanes_backtrack_signals_in_reg[i].prog_full : 1'b1;
         end
+    end 
+
+    if(configure_route_valid_reg & (next_module_id_bundle != configure_route_in_reg.id_bundle[NUM_BUNDLES_MAX-1:0]) & (|configure_route_in_reg.id_lane)) begin
+        signals_out_reg_rd_en[NUM_LANES_MAX-2:0] = {(NUM_LANES_MAX-1){1'b1}};
+        signals_out_reg_rd_en[NUM_LANES_MAX-1] = configure_route_in_reg.id_lane[NUM_LANES_MAX-1] ? ~fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1].prog_full : 1'b1;
+    end 
+
+    if(configure_route_valid_reg & ~(|configure_route_in_reg.id_lane)) begin
+        signals_out_reg_rd_en[NUM_LANES_MAX-1:0] = {NUM_LANES_MAX{1'b1}};
     end 
 end
 

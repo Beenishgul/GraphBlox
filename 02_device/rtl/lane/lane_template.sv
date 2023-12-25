@@ -527,7 +527,7 @@ generate
             .response_engine_in                      (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
             .fifo_response_engine_in_signals_in      (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
             .fifo_response_engine_in_signals_out     (engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
-            .fifo_response_lanes_backtrack_signals_in(engine_fifo_response_lanes_backtrack_signals_in_reg[j]                                   ),
+            .fifo_response_lanes_backtrack_signals_in(engine_fifo_response_lanes_backtrack_signals_in_reg[j][NUM_LANES:0]                      ),
             .response_memory_in                      (engines_response_memory_in[j]                                                            ),
             .fifo_response_memory_in_signals_in      (engines_fifo_response_memory_in_signals_in[j]                                            ),
             .fifo_response_memory_in_signals_out     (engines_fifo_response_memory_in_signals_out[j]                                           ),
