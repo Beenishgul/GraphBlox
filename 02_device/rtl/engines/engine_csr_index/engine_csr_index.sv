@@ -181,12 +181,7 @@ MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                  areset_backtrack                                                           ;
-logic                  backtrack_configure_route_valid                                            ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                               ;
-FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+FIFOStateSignalsOutput generator_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -198,7 +193,6 @@ always_ff @(posedge ap_clk) begin
     areset_configure_memory      <= areset;
     areset_csr_engine            <= areset;
     areset_generator             <= areset;
-    areset_backtrack             <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -450,73 +444,55 @@ assign generator_engine_response_memory_in                       = modules_respo
 assign generator_engine_fifo_response_memory_in_signals_in.rd_en = modules_fifo_response_memory_in_signals_in[1].rd_en;
 assign modules_fifo_response_memory_in_signals_out[1]            = generator_engine_fifo_response_memory_in_signals_out;
 
-assign generator_engine_fifo_request_engine_out_signals_in.rd_en = backtrack_fifo_response_engine_in_signals_out.rd_en;
+assign generator_engine_fifo_request_engine_out_signals_in.rd_en = fifo_request_engine_out_signals_in_reg.rd_en;
 
 assign generator_engine_fifo_request_memory_out_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
-
-engine_csr_index_generator #(
-    .ID_CU           (ID_CU           ),
-    .ID_BUNDLE       (ID_BUNDLE       ),
-    .ID_LANE         (ID_LANE         ),
-    .ID_ENGINE       (ID_ENGINE       ),
-    .ID_MODULE       (1               ),
-    .ENGINES_CONFIG  (ENGINES_CONFIG  ),
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-    .PROG_THRESH     (PROG_THRESH     ),
-    .PIPELINE_STAGES (PIPELINE_STAGES )
-) inst_engine_csr_index_generator (
-    .ap_clk                              (ap_clk                                               ),
-    .areset                              (areset_generator                                     ),
-    .descriptor_in                       (descriptor_in_reg                                    ),
-    .configure_engine_in                 (generator_engine_configure_engine_in                 ),
-    .fifo_configure_engine_in_signals_in (generator_engine_fifo_configure_engine_in_signals_in ),
-    .configure_memory_in                 (generator_engine_configure_memory_in                 ),
-    .fifo_configure_memory_in_signals_in (generator_engine_fifo_configure_memory_in_signals_in ),
-    .response_engine_in                  (generator_engine_response_engine_in                  ),
-    .fifo_response_engine_in_signals_in  (generator_engine_fifo_response_engine_in_signals_in  ),
-    .fifo_response_engine_in_signals_out (generator_engine_fifo_response_engine_in_signals_out ),
-    .response_memory_in                  (generator_engine_response_memory_in                  ),
-    .fifo_response_memory_in_signals_in  (generator_engine_fifo_response_memory_in_signals_in  ),
-    .fifo_response_memory_in_signals_out (generator_engine_fifo_response_memory_in_signals_out ),
-    .response_control_in                 (generator_engine_response_control_in                 ),
-    .fifo_response_control_in_signals_in (generator_engine_fifo_response_control_in_signals_in ),
-    .fifo_response_control_in_signals_out(generator_engine_fifo_response_control_in_signals_out),
-    .request_engine_out                  (generator_engine_request_engine_out                  ),
-    .fifo_request_engine_out_signals_in  (generator_engine_fifo_request_engine_out_signals_in  ),
-    .fifo_request_engine_out_signals_out (generator_engine_fifo_request_engine_out_signals_out ),
-    .request_memory_out                  (generator_engine_request_memory_out                  ),
-    .fifo_request_memory_out_signals_in  (generator_engine_fifo_request_memory_out_signals_in  ),
-    .fifo_request_memory_out_signals_out (generator_engine_fifo_request_memory_out_signals_out ),
-    .fifo_setup_signal                   (generator_engine_fifo_setup_signal                   ),
-    .configure_memory_setup              (generator_engine_configure_memory_setup              ),
-    .configure_engine_setup              (generator_engine_configure_engine_setup              ),
-    .done_out                            (generator_engine_done_out                            )
-);
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-assign backtrack_configure_route_valid                    = configure_memory_out.valid;
-assign backtrack_configure_route_in                       = configure_memory_out.payload.meta.route.to;
-assign backtrack_fifo_response_engine_in_signals_in       = fifo_request_engine_out_signals_in_reg;
-assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
+assign generator_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
-backtrack_fifo_lanes_response_signal #(
+engine_csr_index_generator #(
     .ID_CU              (ID_CU              ),
     .ID_BUNDLE          (ID_BUNDLE          ),
     .ID_LANE            (ID_LANE            ),
     .ID_ENGINE          (ID_ENGINE          ),
-    .ID_MODULE          (2                  ),
+    .ID_MODULE          (1                  ),
+    .ENGINES_CONFIG     (ENGINES_CONFIG     ),
+    .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+    .PROG_THRESH        (PROG_THRESH        ),
+    .PIPELINE_STAGES    (PIPELINE_STAGES    ),
     .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
     .NUM_BUNDLES        (NUM_BUNDLES        )
-) inst_backtrack_fifo_lanes_response_signal (
-    .ap_clk                                  (ap_clk                                            ),
-    .areset                                  (areset_backtrack                                  ),
-    .configure_route_valid                   (backtrack_configure_route_valid                   ),
-    .configure_route_in                      (backtrack_configure_route_in                      ),
-    .fifo_response_engine_in_signals_in      (backtrack_fifo_response_engine_in_signals_in      ),
-    .fifo_response_lanes_backtrack_signals_in(backtrack_fifo_response_lanes_backtrack_signals_in),
-    .fifo_response_engine_in_signals_out     (backtrack_fifo_response_engine_in_signals_out     )
+) inst_engine_csr_index_generator (
+    .ap_clk                                  (ap_clk                                               ),
+    .areset                                  (areset_generator                                     ),
+    .descriptor_in                           (descriptor_in_reg                                    ),
+    .configure_engine_in                     (generator_engine_configure_engine_in                 ),
+    .fifo_configure_engine_in_signals_in     (generator_engine_fifo_configure_engine_in_signals_in ),
+    .configure_memory_in                     (generator_engine_configure_memory_in                 ),
+    .fifo_configure_memory_in_signals_in     (generator_engine_fifo_configure_memory_in_signals_in ),
+    .response_engine_in                      (generator_engine_response_engine_in                  ),
+    .fifo_response_engine_in_signals_in      (generator_engine_fifo_response_engine_in_signals_in  ),
+    .fifo_response_engine_in_signals_out     (generator_engine_fifo_response_engine_in_signals_out ),
+    .fifo_response_lanes_backtrack_signals_in(generator_fifo_response_lanes_backtrack_signals_in   ),
+    .response_memory_in                      (generator_engine_response_memory_in                  ),
+    .fifo_response_memory_in_signals_in      (generator_engine_fifo_response_memory_in_signals_in  ),
+    .fifo_response_memory_in_signals_out     (generator_engine_fifo_response_memory_in_signals_out ),
+    .response_control_in                     (generator_engine_response_control_in                 ),
+    .fifo_response_control_in_signals_in     (generator_engine_fifo_response_control_in_signals_in ),
+    .fifo_response_control_in_signals_out    (generator_engine_fifo_response_control_in_signals_out),
+    .request_engine_out                      (generator_engine_request_engine_out                  ),
+    .fifo_request_engine_out_signals_in      (generator_engine_fifo_request_engine_out_signals_in  ),
+    .fifo_request_engine_out_signals_out     (generator_engine_fifo_request_engine_out_signals_out ),
+    .request_memory_out                      (generator_engine_request_memory_out                  ),
+    .fifo_request_memory_out_signals_in      (generator_engine_fifo_request_memory_out_signals_in  ),
+    .fifo_request_memory_out_signals_out     (generator_engine_fifo_request_memory_out_signals_out ),
+    .fifo_setup_signal                       (generator_engine_fifo_setup_signal                   ),
+    .configure_memory_setup                  (generator_engine_configure_memory_setup              ),
+    .configure_engine_setup                  (generator_engine_configure_engine_setup              ),
+    .done_out                                (generator_engine_done_out                            )
 );
 
 endmodule : engine_csr_index
