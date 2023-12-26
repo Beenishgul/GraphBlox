@@ -14,7 +14,9 @@
 
 `include "global_package.vh"
 
-module engine_template #(`include "engine_parameters.vh") (
+module engine_template #(
+    `include "engine_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
