@@ -488,10 +488,10 @@ generate
     end
 endgenerate
 
-assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1][LANES_COUNT_ARRAY[0]:0] = bundle_fifo_response_lanes_backtrack_signals_out[0][LANES_COUNT_ARRAY[0]:0];
+assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1][LANES_COUNT_ARRAY[0]-1:0] = bundle_fifo_response_lanes_backtrack_signals_out[0][LANES_COUNT_ARRAY[0]-1:0];
 generate
     for (i=0; i<NUM_BUNDLES-1; i++) begin : generate_bundle_backtrack_signals
-        assign bundle_fifo_response_lanes_backtrack_signals_in[i][LANES_COUNT_ARRAY[i+1]:0] = bundle_fifo_response_lanes_backtrack_signals_out[i+1][LANES_COUNT_ARRAY[i+1]:0];
+        assign bundle_fifo_response_lanes_backtrack_signals_in[i][LANES_COUNT_ARRAY[i+1]-1:0] = bundle_fifo_response_lanes_backtrack_signals_out[i+1][LANES_COUNT_ARRAY[i+1]-1:0];
     end
 endgenerate
 
@@ -624,15 +624,15 @@ generate
     for (j=0; j<NUM_BUNDLES; j++) begin : generate_bundle_lanes
         bundle_lanes #(
             `include"set_bundle_parameters.vh"
-        ) inst_bundle_lanes (
+            ) inst_bundle_lanes (
             .ap_clk                                   (ap_clk                                                                                      ),
             .areset                                   (areset_bundle[j]                                                                            ),
             .descriptor_in                            (bundle_descriptor_in[j]                                                                     ),
             .response_lanes_in                        (bundle_response_lanes_in[j]                                                                 ),
             .fifo_response_lanes_in_signals_in        (bundle_fifo_response_lanes_in_signals_in[j]                                                 ),
             .fifo_response_lanes_in_signals_out       (bundle_fifo_response_lanes_in_signals_out[j]                                                ),
-            .fifo_response_lanes_backtrack_signals_out(bundle_fifo_response_lanes_backtrack_signals_out[j][LANES_COUNT_ARRAY[j]:0]                 ),
-            .fifo_response_lanes_backtrack_signals_in (bundle_fifo_response_lanes_backtrack_signals_in[j][LANES_COUNT_ARRAY[(j+1)%NUM_BUNDLES]:0]  ),
+            .fifo_response_lanes_backtrack_signals_out(bundle_fifo_response_lanes_backtrack_signals_out[j][LANES_COUNT_ARRAY[j]-1:0]               ),
+            .fifo_response_lanes_backtrack_signals_in (bundle_fifo_response_lanes_backtrack_signals_in[j][LANES_COUNT_ARRAY[(j+1)%NUM_BUNDLES]-1:0]),
             .response_memory_in                       (bundle_response_memory_in[j]                                                                ),
             .fifo_response_memory_in_signals_in       (bundle_fifo_response_memory_in_signals_in[j]                                                ),
             .fifo_response_memory_in_signals_out      (bundle_fifo_response_memory_in_signals_out[j]                                               ),
