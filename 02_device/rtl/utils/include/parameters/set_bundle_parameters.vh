@@ -126,4 +126,5 @@
 .ID_CU                                   (ID_CU                                            ),
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
+.NUM_BACKTRACK_LANES                     (LANES_COUNT_ARRAY[(j+1)%NUM_BUNDLES]             ), 
 .NUM_LANES                               (LANES_COUNT_ARRAY[j]                             )

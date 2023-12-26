@@ -129,4 +129,5 @@
 .LANE_MERGE_WIDTH                        (LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]           ),
 .NUM_BUNDLES                             (NUM_BUNDLES                                      ),
 .NUM_ENGINES                             (ENGINES_COUNT_ARRAY[j]                           ),
+.NUM_BACKTRACK_LANES                     (NUM_BACKTRACK_LANES                              ),   
 .NUM_LANES                               (NUM_LANES                                        )                 

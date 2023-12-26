@@ -142,4 +142,5 @@
 .FIFO_WRITE_DEPTH_CONTROL_REQUEST        (ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[j]),
 .ENGINE_SEQ_WIDTH                        (ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]         ),
 .ENGINE_SEQ_MIN                          (ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]           ),
+.NUM_BACKTRACK_LANES                     (NUM_BACKTRACK_LANES                              ),
 .NUM_LANES                               (NUM_LANES                                        )

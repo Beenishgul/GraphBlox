@@ -16,6 +16,7 @@ parameter NUM_ENGINES_MAX = 2,
 parameter NUM_CUS     = 1,
 parameter NUM_BUNDLES = 4,
 parameter NUM_LANES   = 4,
+parameter NUM_BACKTRACK_LANES   = 4,
 parameter NUM_ENGINES = 2,
 
 parameter NUM_CUS_INDEX     = 1,
