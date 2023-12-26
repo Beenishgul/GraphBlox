@@ -751,8 +751,6 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO pending cache requests out fifo_oending_MemoryPacket
 // --------------------------------------------------------------------------------------
-    assign fifo_request_pending_signals_in_int.rd_en = fifo_response_comb.valid;
-
     // FIFO is resetting
     assign fifo_request_pending_setup_signal_int = fifo_request_pending_signals_out_int.wr_rst_busy | fifo_request_pending_signals_out_int.rd_rst_busy ;
 
@@ -761,7 +759,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_pending_din                  = request_memory_out_reg.payload;
 
     // Pop
-    assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & fifo_request_pending_signals_in_int.rd_en;
+    assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & fifo_response_comb.valid;
     assign request_pending_out_int.valid             = fifo_request_pending_signals_out_int.valid;
     assign request_pending_out_int.payload           = fifo_request_pending_dout;
 
