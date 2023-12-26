@@ -701,7 +701,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_din                  = fifo_request_din_reg_S2.payload;
 
     // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
     assign request_out_int.valid             = fifo_request_signals_out_int.valid;
     assign request_out_int.payload           = fifo_request_dout;
 

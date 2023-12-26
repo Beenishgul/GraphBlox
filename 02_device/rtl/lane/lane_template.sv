@@ -14,7 +14,9 @@
 
 `include "global_package.vh"
 
-module lane_template #(`include "lane_parameters.vh") (
+module lane_template #(
+    `include "lane_parameters.vh"
+    ) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
