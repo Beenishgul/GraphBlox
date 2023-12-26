@@ -15,21 +15,21 @@
 `include "global_package.vh"
 
 module backtrack_fifo_lanes_response_signal #(parameter
-    ID_CU           = 0,
-    ID_BUNDLE       = 0,
-    ID_LANE         = 0,
-    ID_ENGINE       = 0,
-    ID_MODULE       = 0,
-    NUM_LANES_MAX   = 4,
-    NUM_BUNDLES_MAX = 4
+    ID_CU               = 0,
+    ID_BUNDLE           = 0,
+    ID_LANE             = 0,
+    ID_ENGINE           = 0,
+    ID_MODULE           = 0,
+    NUM_BACKTRACK_LANES = 4,
+    NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                  ap_clk                                                     ,
-    input  logic                  areset                                                     ,
-    input  logic                  configure_route_valid                                      ,
-    input  MemoryPacketArbitrate  configure_route_in                                         ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                         ,
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0],
+    input  logic                  ap_clk                                                           ,
+    input  logic                  areset                                                           ,
+    input  logic                  configure_route_valid                                            ,
+    input  MemoryPacketArbitrate  configure_route_in                                               ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
     output FIFOStateSignalsInput  fifo_response_engine_in_signals_out
 );
 
@@ -38,15 +38,15 @@ module backtrack_fifo_lanes_response_signal #(parameter
 // --------------------------------------------------------------------------------------
 logic areset_backtrack;
 
-logic                       configure_route_valid_reg                                      ;
-MemoryPacketArbitrate       configure_route_in_reg                                         ;
-FIFOStateSignalsInput       fifo_response_engine_in_signals_in_reg                         ;
-FIFOStateSignalsOutput      fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1:0];
-FIFOStateSignalsInput       fifo_response_engine_in_signals_out_reg                        ;
-logic [NUM_BUNDLES_MAX-1:0] next_module_id_bundle                                          ;
-logic [NUM_LANES_MAX-1:0]   signals_out_reg_rd_en                                          ;
+logic                           configure_route_valid_reg                                            ;
+MemoryPacketArbitrate           configure_route_in_reg                                               ;
+FIFOStateSignalsInput           fifo_response_engine_in_signals_in_reg                               ;
+FIFOStateSignalsOutput          fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput           fifo_response_engine_in_signals_out_reg                              ;
+logic [        NUM_BUNDLES-1:0] next_module_id_bundle                                                ;
+logic [NUM_BACKTRACK_LANES-1:0] signals_out_reg_rd_en                                                ;
 
-assign next_module_id_bundle = (1 << (ID_BUNDLE+1)) | ( 1 >> (NUM_BUNDLES_MAX-(ID_BUNDLE+1)));
+assign next_module_id_bundle = (1 << (ID_BUNDLE+1)) | ( 1 >> (NUM_BUNDLES-(ID_BUNDLE+1)));
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -93,20 +93,20 @@ end
 // --------------------------------------------------------------------------------------
 always_comb begin
     signals_out_reg_rd_en = 0;
-    if(configure_route_valid_reg & (next_module_id_bundle == configure_route_in_reg.id_bundle[NUM_BUNDLES_MAX-1:0]) & (|configure_route_in_reg.id_lane)) begin
-        for (int i = 0; i < NUM_LANES_MAX-1; i = i + 1) begin
+    if(configure_route_valid_reg & (next_module_id_bundle == configure_route_in_reg.id_bundle[NUM_BUNDLES-1:0]) & (|configure_route_in_reg.id_lane)) begin
+        for (int i = 0; i < NUM_BACKTRACK_LANES-1; i = i + 1) begin
             signals_out_reg_rd_en[i] = configure_route_in_reg.id_lane[i] ? ~fifo_response_lanes_backtrack_signals_in_reg[i].prog_full : 1'b1;
         end
-    end 
+    end
 
-    if(configure_route_valid_reg & (next_module_id_bundle != configure_route_in_reg.id_bundle[NUM_BUNDLES_MAX-1:0]) & (|configure_route_in_reg.id_lane)) begin
-        signals_out_reg_rd_en[NUM_LANES_MAX-2:0] = {(NUM_LANES_MAX-1){1'b1}};
-        signals_out_reg_rd_en[NUM_LANES_MAX-1] = configure_route_in_reg.id_lane[NUM_LANES_MAX-1] ? ~fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1].prog_full : 1'b1;
-    end 
+    if(configure_route_valid_reg & (next_module_id_bundle != configure_route_in_reg.id_bundle[NUM_BUNDLES-1:0]) & (|configure_route_in_reg.id_lane)) begin
+        signals_out_reg_rd_en[NUM_BACKTRACK_LANES-2:0] = {(NUM_BACKTRACK_LANES-1){1'b1}};
+        signals_out_reg_rd_en[NUM_BACKTRACK_LANES-1]   = configure_route_in_reg.id_lane[NUM_BACKTRACK_LANES-1] ? ~fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES-1].prog_full : 1'b1;
+    end
 
     if(configure_route_valid_reg & ~(|configure_route_in_reg.id_lane)) begin
-        signals_out_reg_rd_en[NUM_LANES_MAX-1:0] = {NUM_LANES_MAX{1'b1}};
-    end 
+        signals_out_reg_rd_en[NUM_BACKTRACK_LANES-1:0] = {NUM_BACKTRACK_LANES{1'b1}};
+    end
 end
 
 assign fifo_response_engine_in_signals_out_reg.rd_en = &signals_out_reg_rd_en & fifo_response_engine_in_signals_in_reg.rd_en;

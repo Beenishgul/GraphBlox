@@ -14,33 +14,31 @@
 
 `include "global_package.vh"
 
-module lane_template #(
-    `include "lane_parameters.vh"
-) (
+module lane_template #(`include "lane_parameters.vh") (
     // System Signals
-    input  logic                  ap_clk                                                     ,
-    input  logic                  areset                                                     ,
-    input  KernelDescriptor       descriptor_in                                              ,
-    input  MemoryPacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                 ,
-    input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in[(1+LANE_MERGE_WIDTH)-1:0] ,
-    output FIFOStateSignalsOutput fifo_response_lane_in_signals_out[(1+LANE_MERGE_WIDTH)-1:0],
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0],
-    input  MemoryPacket           response_memory_in                                         ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                        ,
-    input  MemoryPacket           response_control_in                                        ,
-    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                        ,
-    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                       ,
-    output MemoryPacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                 ,
-    input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in[ (1+LANE_CAST_WIDTH)-1:0] ,
-    output FIFOStateSignalsOutput fifo_request_lane_out_signals_out[ (1+LANE_CAST_WIDTH)-1:0],
-    output MemoryPacket           request_memory_out                                         ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                        ,
-    output MemoryPacket           request_control_out                                        ,
-    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                        ,
-    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                       ,
-    output logic                  fifo_setup_signal                                          ,
+    input  logic                  ap_clk                                                           ,
+    input  logic                  areset                                                           ,
+    input  KernelDescriptor       descriptor_in                                                    ,
+    input  MemoryPacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                       ,
+    input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in[(1+LANE_MERGE_WIDTH)-1:0]       ,
+    output FIFOStateSignalsOutput fifo_response_lane_in_signals_out[(1+LANE_MERGE_WIDTH)-1:0]      ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
+    input  MemoryPacket           response_memory_in                                               ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
+    input  MemoryPacket           response_control_in                                              ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
+    output MemoryPacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                       ,
+    input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in[ (1+LANE_CAST_WIDTH)-1:0]       ,
+    output FIFOStateSignalsOutput fifo_request_lane_out_signals_out[ (1+LANE_CAST_WIDTH)-1:0]      ,
+    output MemoryPacket           request_memory_out                                               ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
+    output MemoryPacket           request_control_out                                              ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
+    output logic                  fifo_setup_signal                                                ,
     output logic                  done_out
 );
 
@@ -99,7 +97,7 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput engine_fifo_response_lanes_backtrack_signals_in_reg[NUM_ENGINES-1:0][NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput engine_fifo_response_lanes_backtrack_signals_in_reg[NUM_ENGINES-1:0][NUM_BACKTRACK_LANES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Request Generator
@@ -218,7 +216,7 @@ end
 // --------------------------------------------------------------------------------------
 generate
     for (j=0; j<NUM_ENGINES; j++) begin  : generate_response_lanes_backtrack_signals_engines
-        for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+        for (i=0; i<NUM_BACKTRACK_LANES; i++) begin  : generate_response_lanes_backtrack_signals
             always_ff @(posedge ap_clk) begin
                 engine_fifo_response_lanes_backtrack_signals_in_reg[j][i] <= fifo_response_lanes_backtrack_signals_in[i];
             end
@@ -520,14 +518,14 @@ generate
     for (j=0; j<NUM_ENGINES; j++) begin : generate_engine_template
         engine_template #(
             `include"set_engine_parameters.vh"
-            ) inst_engine_template (
+        ) inst_engine_template (
             .ap_clk                                  (ap_clk                                                                                   ),
             .areset                                  (areset_engine[j]                                                                         ),
             .descriptor_in                           (engines_descriptor_in[j]                                                                 ),
             .response_engine_in                      (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
             .fifo_response_engine_in_signals_in      (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
             .fifo_response_engine_in_signals_out     (engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
-            .fifo_response_lanes_backtrack_signals_in(engine_fifo_response_lanes_backtrack_signals_in_reg[j][NUM_LANES:0]                      ),
+            .fifo_response_lanes_backtrack_signals_in(engine_fifo_response_lanes_backtrack_signals_in_reg[j][NUM_BACKTRACK_LANES:0]            ),
             .response_memory_in                      (engines_response_memory_in[j]                                                            ),
             .fifo_response_memory_in_signals_in      (engines_fifo_response_memory_in_signals_in[j]                                            ),
             .fifo_response_memory_in_signals_out     (engines_fifo_response_memory_in_signals_out[j]                                           ),

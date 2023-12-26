@@ -120,6 +120,7 @@
 .ID_CU                                   (ID_CU                                            ),
 .NUM_BUNDLES                             (NUM_BUNDLES_MAX                                  ),
 .NUM_ENGINES                             (NUM_ENGINES                                      ),
+.NUM_BACKTRACK_LANES                     (NUM_BACKTRACK_LANES                              ),
 .NUM_LANES                               (NUM_LANES                                        )
 
 

@@ -14,33 +14,31 @@
 
 `include "global_package.vh"
 
-module engine_template #(
-    `include "engine_parameters.vh"
-) (
+module engine_template #(`include "engine_parameters.vh") (
     // System Signals
-    input  logic                  ap_clk                                                         ,
-    input  logic                  areset                                                         ,
-    input  KernelDescriptor       descriptor_in                                                  ,
-    input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0] ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0],
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0]    ,
-    input  MemoryPacket           response_memory_in                                             ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                             ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                            ,
-    input  MemoryPacket           response_control_in                                            ,
-    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                            ,
-    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                           ,
-    output MemoryPacket           request_engine_out[(1+ENGINE_CAST_WIDTH)-1:0]                  ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in[(1+ENGINE_CAST_WIDTH)-1:0]  ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out[(1+ENGINE_CAST_WIDTH)-1:0] ,
-    output MemoryPacket           request_memory_out                                             ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                             ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                            ,
-    output MemoryPacket           request_control_out                                            ,
-    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                            ,
-    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                           ,
-    output logic                  fifo_setup_signal                                              ,
+    input  logic                  ap_clk                                                           ,
+    input  logic                  areset                                                           ,
+    input  KernelDescriptor       descriptor_in                                                    ,
+    input  MemoryPacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                   ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]   ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0]  ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
+    input  MemoryPacket           response_memory_in                                               ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
+    input  MemoryPacket           response_control_in                                              ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
+    output MemoryPacket           request_engine_out[(1+ENGINE_CAST_WIDTH)-1:0]                    ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in[(1+ENGINE_CAST_WIDTH)-1:0]    ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out[(1+ENGINE_CAST_WIDTH)-1:0]   ,
+    output MemoryPacket           request_memory_out                                               ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
+    output MemoryPacket           request_control_out                                              ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
+    output logic                  fifo_setup_signal                                                ,
     output logic                  done_out
 );
 
@@ -106,7 +104,7 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
@@ -123,7 +121,7 @@ FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out             
 FIFOStateSignalsOutput template_fifo_response_control_in_signals_out                                ;
 FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out     [(1+ENGINE_MERGE_WIDTH)-1:0];
 FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out                                 ;
-FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in[         NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in[   NUM_BACKTRACK_LANES-1:0];
 
 KernelDescriptor template_descriptor_in    ;
 logic            areset_template           ;
@@ -197,7 +195,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 generate
-    for (i=0; i<NUM_LANES_MAX; i++) begin  : generate_response_lanes_backtrack_signals
+    for (i=0; i<NUM_BACKTRACK_LANES; i++) begin  : generate_response_lanes_backtrack_signals
         always_ff @(posedge ap_clk) begin
             fifo_response_lanes_backtrack_signals_in_reg[i] <= fifo_response_lanes_backtrack_signals_in[i];
         end
@@ -397,20 +395,20 @@ generate
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
 
             engine_pipeline #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_pipeline (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -461,20 +459,20 @@ generate
 
 
             engine_read_write #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_read_write (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -525,20 +523,20 @@ generate
 
 
             engine_csr_index #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_csr_index (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -589,20 +587,20 @@ generate
 
 
             engine_filter_cond #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_filter_cond (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -653,20 +651,20 @@ generate
 
 
             engine_merge_data #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_merge_data (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -717,20 +715,20 @@ generate
 
 
             engine_alu_ops #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_alu_ops (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -781,20 +779,20 @@ generate
 
 
             engine_forward_data #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_forward_data (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),
@@ -845,20 +843,20 @@ generate
 
 
             engine_pipeline #(
-                .ID_CU             (ID_CU             ),
-                .ID_BUNDLE         (ID_BUNDLE         ),
-                .ID_LANE           (ID_LANE           ),
-                .ID_ENGINE         (ID_ENGINE         ),
-                .ID_RELATIVE       (ID_RELATIVE       ),
-                .ENGINE_CAST_WIDTH (ENGINE_CAST_WIDTH ),
-                .ENGINE_MERGE_WIDTH(ENGINE_MERGE_WIDTH),
-                .FIFO_WRITE_DEPTH  (FIFO_WRITE_DEPTH  ),
-                .PROG_THRESH       (PROG_THRESH       ),
-                .NUM_LANES_MAX     (NUM_LANES_MAX     ),
-                .NUM_BUNDLES_MAX   (NUM_BUNDLES_MAX   ),
-                .ENGINE_SEQ_WIDTH  (ENGINE_SEQ_WIDTH  ),
-                .ENGINE_SEQ_MIN    (ENGINE_SEQ_MIN    ),
-                .ENGINES_CONFIG    (ENGINES_CONFIG    )
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
             ) inst_engine_pipeline (
                 .ap_clk                                  (ap_clk                                           ),
                 .areset                                  (areset_template                                  ),

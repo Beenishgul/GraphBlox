@@ -484,6 +484,7 @@ with open(output_file_path, "w") as file:
     file.write(f"parameter NUM_CUS     = {NUM_CUS},\n")
     file.write(f"parameter NUM_BUNDLES = {NUM_BUNDLES},\n")
     file.write(f"parameter NUM_LANES   = {NUM_LANES},\n")
+    file.write(f"parameter NUM_BACKTRACK_LANES   = {NUM_LANES},\n")
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES},\n\n")
 
     file.write(f"parameter NUM_CUS_INDEX     = {NUM_CUS},\n")

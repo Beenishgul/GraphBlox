@@ -15,47 +15,47 @@
 `include "global_package.vh"
 
 module engine_csr_index #(parameter
-    ID_CU              = 0                             ,
-    ID_BUNDLE          = 0                             ,
-    ID_LANE            = 0                             ,
-    ID_ENGINE          = 0                             ,
-    ID_RELATIVE        = 0                             ,
-    ENGINE_CAST_WIDTH  = 1                             ,
-    ENGINE_MERGE_WIDTH = 1                             ,
-    ENGINES_CONFIG     = 0                             ,
-    FIFO_WRITE_DEPTH   = 32                            ,
-    PROG_THRESH        = 16                            ,
-    NUM_MODULES        = 2                             ,
-    NUM_LANES_MAX      = 4                             ,
-    NUM_BUNDLES_MAX    = 4                             ,
-    ENGINE_SEQ_WIDTH   = 16                            ,
-    ENGINE_SEQ_MIN     = ID_RELATIVE * ENGINE_SEQ_WIDTH,
-    PIPELINE_STAGES    = 2
+    ID_CU               = 0                             ,
+    ID_BUNDLE           = 0                             ,
+    ID_LANE             = 0                             ,
+    ID_ENGINE           = 0                             ,
+    ID_RELATIVE         = 0                             ,
+    ENGINE_CAST_WIDTH   = 1                             ,
+    ENGINE_MERGE_WIDTH  = 1                             ,
+    ENGINES_CONFIG      = 0                             ,
+    FIFO_WRITE_DEPTH    = 32                            ,
+    PROG_THRESH         = 16                            ,
+    NUM_MODULES         = 2                             ,
+    NUM_BACKTRACK_LANES = 4                             ,
+    NUM_BUNDLES         = 4                             ,
+    ENGINE_SEQ_WIDTH    = 16                            ,
+    ENGINE_SEQ_MIN      = ID_RELATIVE * ENGINE_SEQ_WIDTH,
+    PIPELINE_STAGES     = 2
 ) (
     // System Signals
-    input  logic                  ap_clk                                                     ,
-    input  logic                  areset                                                     ,
-    input  KernelDescriptor       descriptor_in                                              ,
-    input  MemoryPacket           response_engine_in                                         ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                        ,
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0],
-    input  MemoryPacket           response_memory_in                                         ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                        ,
-    input  MemoryPacket           response_control_in                                        ,
-    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                        ,
-    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                       ,
-    output MemoryPacket           request_engine_out                                         ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                        ,
-    output MemoryPacket           request_memory_out                                         ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                         ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                        ,
-    output MemoryPacket           request_control_out                                        ,
-    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                        ,
-    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                       ,
-    output logic                  fifo_setup_signal                                          ,
+    input  logic                  ap_clk                                                           ,
+    input  logic                  areset                                                           ,
+    input  KernelDescriptor       descriptor_in                                                    ,
+    input  MemoryPacket           response_engine_in                                               ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
+    input  MemoryPacket           response_memory_in                                               ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
+    input  MemoryPacket           response_control_in                                              ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
+    output MemoryPacket           request_engine_out                                               ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
+    output MemoryPacket           request_memory_out                                               ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
+    output MemoryPacket           request_control_out                                              ,
+    input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
+    output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
+    output logic                  fifo_setup_signal                                                ,
     output logic                  done_out
 );
 
@@ -181,12 +181,12 @@ MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                  areset_backtrack                                                     ;
-logic                  backtrack_configure_route_valid                                      ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                         ;
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                         ;
-FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_LANES_MAX-1:0];
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                        ;
+logic                  areset_backtrack                                                           ;
+logic                  backtrack_configure_route_valid                                            ;
+MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                               ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -502,13 +502,13 @@ assign backtrack_fifo_response_engine_in_signals_in       = fifo_request_engine_
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(
-    .ID_CU          (ID_CU          ),
-    .ID_BUNDLE      (ID_BUNDLE      ),
-    .ID_LANE        (ID_LANE        ),
-    .ID_ENGINE      (ID_ENGINE      ),
-    .ID_MODULE      (2              ),
-    .NUM_LANES_MAX  (NUM_LANES_MAX  ),
-    .NUM_BUNDLES_MAX(NUM_BUNDLES_MAX)
+    .ID_CU              (ID_CU              ),
+    .ID_BUNDLE          (ID_BUNDLE          ),
+    .ID_LANE            (ID_LANE            ),
+    .ID_ENGINE          (ID_ENGINE          ),
+    .ID_MODULE          (2                  ),
+    .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+    .NUM_BUNDLES        (NUM_BUNDLES        )
 ) inst_backtrack_fifo_lanes_response_signal (
     .ap_clk                                  (ap_clk                                            ),
     .areset                                  (areset_backtrack                                  ),
