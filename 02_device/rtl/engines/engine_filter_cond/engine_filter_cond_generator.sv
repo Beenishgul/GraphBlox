@@ -130,7 +130,6 @@ MemoryPacketPayload           fifo_request_control_out_dout            ;
 logic                  areset_backtrack                                                           ;
 logic                  backtrack_configure_route_valid                                            ;
 MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_in                               ;
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
@@ -605,7 +604,7 @@ assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_e
 assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S4.payload;
 
 // Pop
-assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en;
+assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
 assign request_engine_out_int.valid                 = fifo_request_engine_out_signals_out_int.valid & fifo_request_engine_out_signals_in_int.rd_en ;
 assign request_engine_out_int.payload               = fifo_request_engine_out_dout;
 
@@ -635,7 +634,6 @@ xpm_fifo_sync_wrapper #(
 // --------------------------------------------------------------------------------------
 assign backtrack_configure_route_valid                    = fifo_request_engine_out_signals_out_int.valid;
 assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.to;
-assign backtrack_fifo_response_engine_in_signals_in       = fifo_request_engine_out_signals_in_reg;
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(
@@ -651,7 +649,6 @@ backtrack_fifo_lanes_response_signal #(
     .areset                                  (areset_backtrack                                  ),
     .configure_route_valid                   (backtrack_configure_route_valid                   ),
     .configure_route_in                      (backtrack_configure_route_in                      ),
-    .fifo_response_engine_in_signals_in      (backtrack_fifo_response_engine_in_signals_in      ),
     .fifo_response_lanes_backtrack_signals_in(backtrack_fifo_response_lanes_backtrack_signals_in),
     .fifo_response_engine_in_signals_out     (backtrack_fifo_response_engine_in_signals_out     )
 );
