@@ -693,7 +693,7 @@ module engine_csr_index_generator #(parameter
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
         .ap_clk      (ap_clk                            ),
         .ap_clken    (1'b1                              ),
-        .areset      (areset_counter                    ),
+        .areset      (areset_counter | counter_clear    ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
         .decr        (request_out_int.valid             ),
