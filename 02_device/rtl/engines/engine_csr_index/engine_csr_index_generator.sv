@@ -571,7 +571,10 @@ module engine_csr_index_generator #(parameter
                 done_int_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 fifo_request_din_reg.valid <= 1'b0;
-                counter_clear              <= 1'b0;
+                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg)
+                    counter_clear <= 1'b1;
+                else
+                    counter_clear <= 1'b0;
                 done_out_reg               <= 1'b0;
                 counter_load               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
@@ -581,7 +584,10 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
                 done_int_reg               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
-                counter_clear              <= 1'b0;
+                if((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg)
+                    counter_clear <= 1'b1;
+                else
+                    counter_clear <= 1'b0;
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -693,7 +699,7 @@ module engine_csr_index_generator #(parameter
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
         .ap_clk      (ap_clk                            ),
         .ap_clken    (1'b1                              ),
-        .areset      (areset_counter | counter_clear    ),
+        .areset      (areset_counter  |  counter_clear  ),
         .load        (counter_load                      ),
         .incr        (1'b0                              ),
         .decr        (request_out_int.valid             ),
@@ -792,8 +798,8 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_pending_setup_signal_int = fifo_request_pending_signals_out_int.wr_rst_busy | fifo_request_pending_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_pending_signals_in_int.wr_en = request_memory_out_reg.valid;
-    assign fifo_request_pending_din                  = request_memory_out_reg.payload;
+    assign fifo_request_pending_signals_in_int.wr_en = fifo_request_dout_reg_S2.valid & configure_engine_int.payload.param.mode_buffer;
+    assign fifo_request_pending_din                  = fifo_request_dout_reg_S2.payload;
 
     // Pop
     assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & fifo_response_comb.valid;
