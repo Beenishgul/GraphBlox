@@ -111,14 +111,15 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutInternal   fifo_request_signals_out_int      ;
     logic                         fifo_request_setup_signal_int     ;
     logic                         fifo_request_signals_out_reg_empty;
-    MemoryPacket                  fifo_request_comb                 ;
-    MemoryPacket                  fifo_request_din_reg              ;
-    MemoryPacket                  fifo_request_din_reg_S2           ;
-    MemoryPacket                  fifo_request_dout_reg             ;
-    MemoryPacket                  fifo_request_dout_reg_S2          ;
-    MemoryPacket                  fifo_response_comb                ;
-    MemoryPacketPayload           fifo_request_din                  ;
-    MemoryPacketPayload           fifo_request_dout                 ;
+
+    MemoryPacket        fifo_request_comb       ;
+    MemoryPacket        fifo_request_din_reg    ;
+    MemoryPacket        fifo_request_din_reg_S2 ;
+    MemoryPacket        fifo_request_dout_reg   ;
+    MemoryPacket        fifo_request_dout_reg_S2;
+    MemoryPacket        fifo_response_comb      ;
+    MemoryPacketPayload fifo_request_din        ;
+    MemoryPacketPayload fifo_request_dout       ;
 
     MemoryPacket response_control_in_reg   ;
     MemoryPacket response_engine_in_reg    ;
@@ -531,17 +532,12 @@ module engine_csr_index_generator #(parameter
                 counter_load               <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE_TRANS : begin
-                if(((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) & ~fifo_request_signals_out_reg_empty) begin
+                if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty)) begin
                     done_int_reg               <= 1'b1;
                     counter_clear              <= 1'b1;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
-                else begin
-                    done_int_reg               <= 1'b0;
-                    counter_clear              <= 1'b0;
-                    fifo_request_din_reg.valid <= 1'b1;
-                end
-
+               
                 counter_enable <= 1'b0;
                 counter_load   <= 1'b0;
                 done_out_reg   <= 1'b0;
@@ -549,7 +545,7 @@ module engine_csr_index_generator #(parameter
                     response_engine_in_break_flag_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_BUSY : begin
-                if(((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) & ~fifo_request_signals_out_reg_empty) begin
+                if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty)) begin
                     done_int_reg               <= 1'b1;
                     counter_enable             <= 1'b0;
                     counter_clear              <= 1'b1;
@@ -572,10 +568,9 @@ module engine_csr_index_generator #(parameter
                 done_int_reg               <= 1'b0;
                 counter_enable             <= 1'b1;
                 fifo_request_din_reg.valid <= 1'b0;
-                if(((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) & ~fifo_request_signals_out_reg_empty)
+                if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty))
                     counter_clear <= 1'b1;
-                else
-                    counter_clear <= 1'b0;
+               
                 done_out_reg               <= 1'b0;
                 counter_load               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
@@ -585,10 +580,9 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
                 done_int_reg               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
-                if(((counter_count >= configure_engine_int.payload.param.index_end) | response_engine_in_break_flag_reg) & ~fifo_request_signals_out_reg_empty)
+                if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty))
                     counter_clear <= 1'b1;
-                else
-                    counter_clear <= 1'b0;
+               
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 done_out_reg               <= 1'b0;
