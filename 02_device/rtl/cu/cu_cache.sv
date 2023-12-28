@@ -416,6 +416,10 @@ always_ff @(posedge ap_clk) begin
   cache_request_mem_reg.iob.wdata <= fifo_request_dout.iob.wdata;
   cache_request_mem_reg.meta      <= fifo_request_dout.meta;
   cache_request_mem_reg.data      <= fifo_request_dout.data;
+
+  // if(cache_request_mem.iob.valid  && ($clog2(cache_request_mem.meta.route.from.id_bundle) == 0) && ($clog2(cache_request_mem.meta.route.from.id_lane) == 1) )
+  //           $display("%t - Cache %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,cache_request_mem.meta.subclass.cmd.name(),$clog2(cache_request_mem.meta.route.from.id_bundle) , $clog2(cache_request_mem.meta.route.from.id_lane) , cache_request_mem.data.field[0], cache_request_mem.data.field[1], cache_request_mem.data.field[2], cache_request_mem.data.field[3]);
+
 end
 
 // --------------------------------------------------------------------------------------
