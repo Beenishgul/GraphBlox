@@ -154,7 +154,7 @@ end
 always_comb begin
   address_base = 0;
   if(arbiter_bus_out.valid & descriptor_in_reg.valid) begin
-    case (arbiter_bus_out.payload.meta.route.from.id_buffer)
+    case (arbiter_bus_out.payload.meta.route.to.id_buffer)
       (1 << 0) : begin
         address_base = descriptor_in_reg.payload.buffer_1;
       end
@@ -180,7 +180,7 @@ always_comb begin
         address_base = descriptor_in_reg.payload.buffer_8;
       end
       default : begin
-        address_base = 0;
+        address_base = descriptor_in_reg.payload.buffer_0;
       end
     endcase
   end

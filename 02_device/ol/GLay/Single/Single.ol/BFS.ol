@@ -7,7 +7,7 @@
 0x00000001 // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000204 // entry_5    cacheline[  0][ 5] <29b>: cmd[0:6]=CMD_MEM_WRITE || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x80000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x80
 0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  0][ 8] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  0][ 9] <32b>: array_size[0:31]=0x00000000
@@ -23,7 +23,7 @@
 0x00000000 // entry_3    cacheline[  1][ 0] <32b>: stride[0:31]=0x00000000
 0x80000002 // entry_4    cacheline[  1][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000204 // entry_5    cacheline[  1][ 2] <29b>: cmd[0:6]=CMD_MEM_WRITE || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00000000 // entry_6    cacheline[  1][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x80000000 // entry_6    cacheline[  1][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x80
 0x00000000 // entry_7    cacheline[  1][ 4] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  1][ 5] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  1][ 6] <32b>: array_size[0:31]=0x00000000
@@ -39,7 +39,7 @@
 0x00000001 // entry_3    cacheline[  1][13] <32b>: stride[0:31]=0x00000001
 0x00000000 // entry_4    cacheline[  1][14] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
 0x00000120 // entry_5    cacheline[  1][15] <29b>: cmd[0:6]=CMD_ENGINE || buffer[7:12]=STRUCT_CU_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x01070201 // entry_6    cacheline[  2][ 0] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x07 || id_buffer[24:31]=0x01
+0x00070201 // entry_6    cacheline[  2][ 0] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x07 || id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  2][ 1] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  2][ 2] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  2][ 3] <32b>: array_size[0:31]=0x00000000
@@ -56,7 +56,7 @@
 0x00000001 // entry_3    cacheline[  2][ 8] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  2][ 9] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00002202 // entry_5    cacheline[  2][10] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x01 || id_engine[21:28]=0x00
-0x00010401 // entry_6    cacheline[  2][11] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x00
+0x04010401 // entry_6    cacheline[  2][11] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x04
 0x00000000 // entry_7    cacheline[  2][12] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  2][13] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  2][14] <32b>: array_size[0:31]=0x00000000
@@ -89,7 +89,7 @@
 0x00000001 // entry_3    cacheline[  4][ 0] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  4][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000202 // entry_5    cacheline[  4][ 2] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00000000 // entry_6    cacheline[  4][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x02000000 // entry_6    cacheline[  4][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x02
 0x00000000 // entry_7    cacheline[  4][ 4] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  4][ 5] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  4][ 6] <32b>: array_size[0:31]=0x00000000
@@ -105,7 +105,7 @@
 0x00000001 // entry_3    cacheline[  4][13] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  4][14] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000202 // entry_5    cacheline[  4][15] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00000000 // entry_6    cacheline[  5][ 0] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x40000000 // entry_6    cacheline[  5][ 0] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x40
 0x00000000 // entry_7    cacheline[  5][ 1] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  5][ 2] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  5][ 3] <32b>: array_size[0:31]=0x00000000
@@ -125,7 +125,7 @@
 0x00000001 // entry_3    cacheline[  5][11] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  5][12] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000202 // entry_5    cacheline[  5][13] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00010801 // entry_6    cacheline[  5][14] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x00
+0x10010801 // entry_6    cacheline[  5][14] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x10
 0x00000000 // entry_7    cacheline[  5][15] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  6][ 0] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  6][ 1] <32b>: array_size[0:31]=0x00000000
@@ -142,7 +142,7 @@
 0x00000001 // entry_3    cacheline[  6][ 6] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  6][ 7] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000202 // entry_5    cacheline[  6][ 8] <29b>: cmd[0:6]=CMD_MEM_READ || buffer[7:12]=STRUCT_ENGINE_DATA || id_module[13:20]=0x00 || id_engine[21:28]=0x00
-0x00030101 // entry_6    cacheline[  6][ 9] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x01 || id_lane[16:23]=0x03 || id_buffer[24:31]=0x00
+0x40030101 // entry_6    cacheline[  6][ 9] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x01 || id_lane[16:23]=0x03 || id_buffer[24:31]=0x40
 0x00000000 // entry_7    cacheline[  6][10] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  6][11] <32b>: array_pointer[0:31]=0x00000000
 0x00000000 // entry_9    cacheline[  6][12] <32b>: array_size[0:31]=0x00000000
