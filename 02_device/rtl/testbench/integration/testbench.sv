@@ -1048,9 +1048,9 @@ module __KERNEL___testbench ();
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
-                // if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W])
-                //     $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                // $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
+                if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W])
+                    $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
                     l++;
