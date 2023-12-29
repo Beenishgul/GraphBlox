@@ -101,7 +101,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x80"
                 }
             },
             "entry_7": {
@@ -244,7 +244,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x80"
                 }
             },
             "entry_7": {
@@ -387,7 +387,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x00"
                 }
             },
             "entry_7": {
@@ -522,7 +522,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x04"
                 }
             },
             "entry_7": {
@@ -810,7 +810,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x02"
                 }
             },
             "entry_7": {
@@ -953,7 +953,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x40"
                 }
             },
             "entry_7": {
@@ -1106,7 +1106,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x10"
                 }
             },
             "entry_7": {
@@ -1241,7 +1241,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x40"
                 }
             },
             "entry_7": {

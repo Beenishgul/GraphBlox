@@ -254,6 +254,7 @@ cache_generator_request #(
 ) inst_cache_generator_request (
   .ap_clk                  (ap_clk                                   ),
   .areset                  (areset_generator                         ),
+  .descriptor_in           (descriptor_in_reg                        ),
   .request_in              (cache_generator_request_in               ),
   .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
   .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
@@ -379,9 +380,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
