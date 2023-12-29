@@ -31,9 +31,9 @@ proc color {foreground text} {
 # =========================================================
 # Step 1: Open vivado project and add design sources
 # =========================================================
-if {${VIVADO_GUI_FLAG} == "YES"} {
+# if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
-}
+# }
 
 open_project ${KERNEL_PROJECT_PKG_XPR} 
 # =========================================================
@@ -54,8 +54,8 @@ update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_N
 puts "[color 4 "                        INFO: Update compile order: sim_1"]"
 update_compile_order -fileset sim_1 >> $log_file
 
-# launch_simulation -simset sim_1 -mode post-synthesis -type functional
-launch_simulation -simset sim_1 -mode behavioral
+launch_simulation -simset sim_1 -mode post-synthesis -type functional
+# launch_simulation -simset sim_1 -mode behavioral
 
 log_wave -r *
 run -all
