@@ -77,7 +77,6 @@ module engine_read_write_generator #(parameter
     KernelDescriptor descriptor_in_reg;
 
     ReadWriteConfiguration configure_memory_reg;
-    ReadWriteConfiguration configure_engine_reg;
     MemoryPacket           request_out_int     ;
 
     logic fifo_empty_int;
@@ -106,6 +105,7 @@ module engine_read_write_generator #(parameter
 
     MemoryPacket response_engine_in_reg    ;
     MemoryPacket response_memory_in_reg    ;
+    MemoryPacket response_memory_in_reg_S2 ;
     logic        configure_memory_setup_reg;
 
     logic                            configure_engine_param_valid;
@@ -233,7 +233,6 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            configure_engine_reg.valid <= 1'b0;
             configure_memory_reg.valid <= 1'b0;
         end
         else begin
@@ -575,7 +574,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
+    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en & ~fifo_request_pending_signals_out_int.prog_full;
     assign request_out_int.valid             = fifo_request_signals_out_int.valid;
     assign request_out_int.payload           = fifo_request_dout;
 
@@ -634,7 +633,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_pending_din                  = request_memory_out_reg.payload;
 
     // Pop
-    assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & fifo_response_comb.valid;
+    assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & response_memory_in_reg.valid;
     assign request_pending_out_int.valid             = fifo_request_pending_signals_out_int.valid;
     assign request_pending_out_int.payload           = fifo_request_pending_dout;
 
@@ -661,14 +660,18 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                     = response_memory_in_reg.valid;
-    assign fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
+    assign fifo_response_comb.valid                     = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
+    assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
     assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
-    assign fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
+    assign fifo_response_comb.payload.data              = response_memory_in_reg_S2.payload.data;
+
+    always_ff @(posedge ap_clk) begin
+       response_memory_in_reg_S2 <= response_memory_in_reg;
+    end
 
     always_comb begin
-        if(response_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
+        if(response_memory_in_reg_S2.payload.meta.route.to.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
