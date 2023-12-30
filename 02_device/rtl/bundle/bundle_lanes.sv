@@ -16,7 +16,7 @@
 
 module bundle_lanes #(
     `include "bundle_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                            ,
     input  logic                  areset                                                            ,
@@ -111,7 +111,6 @@ FIFOStateSignalsOutput lane_arbiter_N_to_1_lane_fifo_request_signals_out        
 logic                  areset_lane_arbiter_N_to_1_lanes                                ;
 logic                  lane_arbiter_N_to_1_lane_fifo_setup_signal                      ;
 logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_lane_lane_arbiter_grant_out                 ;
-logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_lane_lane_arbiter_request_in                ;
 MemoryPacket           lane_arbiter_N_to_1_lane_request_in              [NUM_LANES-1:0];
 MemoryPacket           lane_arbiter_N_to_1_lane_request_out                            ;
 
@@ -135,7 +134,6 @@ FIFOStateSignalsOutput lane_arbiter_N_to_1_memory_fifo_request_signals_out      
 logic                  areset_lane_arbiter_N_to_1_memory                                 ;
 logic                  lane_arbiter_N_to_1_memory_fifo_setup_signal                      ;
 logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_memory_lane_arbiter_grant_out                 ;
-logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_memory_lane_arbiter_request_in                ;
 MemoryPacket           lane_arbiter_N_to_1_memory_request_in              [NUM_LANES-1:0];
 MemoryPacket           lane_arbiter_N_to_1_memory_request_out                            ;
 
@@ -147,7 +145,6 @@ FIFOStateSignalsOutput lane_arbiter_N_to_1_control_fifo_request_signals_out     
 logic                  areset_lane_arbiter_N_to_1_control                                 ;
 logic                  lane_arbiter_N_to_1_control_fifo_setup_signal                      ;
 logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_control_lane_arbiter_grant_out                 ;
-logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_control_lane_arbiter_request_in                ;
 MemoryPacket           lane_arbiter_N_to_1_control_request_in              [NUM_LANES-1:0];
 MemoryPacket           lane_arbiter_N_to_1_control_request_out                            ;
 
@@ -416,8 +413,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 generate
     for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_engine_request_in
-        assign lane_arbiter_N_to_1_lane_request_in[i]              = lanes_request_lane_out[i];
-        assign lane_arbiter_N_to_1_lane_lane_arbiter_request_in[i] = ~lanes_fifo_request_lane_out_signals_out[i].empty & ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full;
+        assign lane_arbiter_N_to_1_lane_request_in[i] = lanes_request_lane_out[i];
         assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
     end
 endgenerate
@@ -433,7 +429,6 @@ arbiter_N_to_1_request #(
     .request_in              (lane_arbiter_N_to_1_lane_request_in              ),
     .fifo_request_signals_in (lane_arbiter_N_to_1_lane_fifo_request_signals_in ),
     .fifo_request_signals_out(lane_arbiter_N_to_1_lane_fifo_request_signals_out),
-    .arbiter_request_in      (lane_arbiter_N_to_1_lane_lane_arbiter_request_in ),
     .arbiter_grant_out       (lane_arbiter_N_to_1_lane_lane_arbiter_grant_out  ),
     .request_out             (lane_arbiter_N_to_1_lane_request_out             ),
     .fifo_setup_signal       (lane_arbiter_N_to_1_lane_fifo_setup_signal       )
@@ -479,8 +474,7 @@ arbiter_1_to_N_request #(
 // --------------------------------------------------------------------------------------
 generate
     for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_memory_request_in
-        assign lane_arbiter_N_to_1_memory_request_in[i]              = lanes_request_memory_out[i];
-        assign lane_arbiter_N_to_1_memory_lane_arbiter_request_in[i] = ~lanes_fifo_request_memory_out_signals_out[i].empty & ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+        assign lane_arbiter_N_to_1_memory_request_in[i] = lanes_request_memory_out[i];
         assign lanes_fifo_request_memory_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i];
     end
 endgenerate
@@ -496,7 +490,6 @@ arbiter_N_to_1_request #(
     .request_in              (lane_arbiter_N_to_1_memory_request_in              ),
     .fifo_request_signals_in (lane_arbiter_N_to_1_memory_fifo_request_signals_in ),
     .fifo_request_signals_out(lane_arbiter_N_to_1_memory_fifo_request_signals_out),
-    .arbiter_request_in      (lane_arbiter_N_to_1_memory_lane_arbiter_request_in ),
     .arbiter_grant_out       (lane_arbiter_N_to_1_memory_lane_arbiter_grant_out  ),
     .request_out             (lane_arbiter_N_to_1_memory_request_out             ),
     .fifo_setup_signal       (lane_arbiter_N_to_1_memory_fifo_setup_signal       )
@@ -511,8 +504,7 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 generate
     for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_control_request_in
-        assign lane_arbiter_N_to_1_control_request_in[i]              = lanes_request_control_out[i];
-        assign lane_arbiter_N_to_1_control_lane_arbiter_request_in[i] = ~lanes_fifo_request_control_out_signals_out[i].empty & ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full;
+        assign lane_arbiter_N_to_1_control_request_in[i] = lanes_request_control_out[i];
         assign lanes_fifo_request_control_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[i];
     end
 endgenerate
@@ -528,7 +520,6 @@ arbiter_N_to_1_request #(
     .request_in              (lane_arbiter_N_to_1_control_request_in              ),
     .fifo_request_signals_in (lane_arbiter_N_to_1_control_fifo_request_signals_in ),
     .fifo_request_signals_out(lane_arbiter_N_to_1_control_fifo_request_signals_out),
-    .arbiter_request_in      (lane_arbiter_N_to_1_control_lane_arbiter_request_in ),
     .arbiter_grant_out       (lane_arbiter_N_to_1_control_lane_arbiter_grant_out  ),
     .request_out             (lane_arbiter_N_to_1_control_request_out             ),
     .fifo_setup_signal       (lane_arbiter_N_to_1_control_fifo_setup_signal       )
