@@ -688,7 +688,7 @@ module engine_read_write_generator #(parameter
             request_memory_out_reg.valid            <= 1'b0;
         end
         else begin
-            fifo_request_engine_out_signals_out_reg           <= 2'b00;
+            fifo_request_engine_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_pending_signals_out_int);
             fifo_request_memory_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
             fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
             fifo_response_memory_in_signals_out_reg.empty     <= 1'b0;

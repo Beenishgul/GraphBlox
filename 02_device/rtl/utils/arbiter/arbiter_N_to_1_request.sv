@@ -60,15 +60,15 @@ logic                         fifo_request_push_filter     ;
 MemoryPacket arbiter_bus_out                           ;
 MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
-logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant      ;
-logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request    ;
-logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid  ;
+logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant    ;
+logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request  ;
+logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid;
 
 // --------------------------------------------------------------------------------------
 // FIFO Request INPUT Arbiter MemoryPacket
 // --------------------------------------------------------------------------------------
-MemoryPacket          request_arbiter_in_int                [(NUM_MEMORY_REQUESTOR)-1:0];
-MemoryPacket          request_arbiter_in_reg                [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacket request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacket request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
 
 MemoryPacketPayload                fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
 MemoryPacketPayload                fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
@@ -165,19 +165,19 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_arbiter) begin
-    for (int i=0; i<= NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
       request_arbiter_in_reg[i].valid           <= 1'b0;
     end
   end
   else begin
-    for (int i=0; i<= NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
       request_arbiter_in_reg[i].valid           <= request_in[i].valid;
     end
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  for (int i=0; i<= NUM_MEMORY_REQUESTOR; i++) begin
+  for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
     request_arbiter_in_reg[i].payload <= request_in[i].payload;
   end
 end
