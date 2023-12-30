@@ -200,7 +200,7 @@ generate
       .FIFO_WRITE_DEPTH(16                        ),
       .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
       .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-      .PROG_THRESH     (8                         )
+      .PROG_THRESH     (12                        )
     ) inst_fifo_MemoryPacketRequestArbiter (
       .clk        (ap_clk                                                ),
       .srst       (areset_fifo                                           ),
