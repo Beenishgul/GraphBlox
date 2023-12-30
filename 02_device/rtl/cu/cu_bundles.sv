@@ -505,7 +505,6 @@ endgenerate
 generate
     for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_N_to_1_request_in
         assign bundle_arbiter_N_to_1_request_in[i]         = bundle_request_memory_out[i];
-        assign bundle_arbiter_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_memory_out_signals_out[i].empty & ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full;
         assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_N_to_1_arbiter_grant_out[i];
     end
 endgenerate
@@ -521,7 +520,6 @@ arbiter_N_to_1_request #(
     .request_in              (bundle_arbiter_N_to_1_request_in              ),
     .fifo_request_signals_in (bundle_arbiter_N_to_1_fifo_request_signals_in ),
     .fifo_request_signals_out(bundle_arbiter_N_to_1_fifo_request_signals_out),
-    .arbiter_request_in      (bundle_arbiter_N_to_1_arbiter_request_in      ),
     .arbiter_grant_out       (bundle_arbiter_N_to_1_arbiter_grant_out       ),
     .request_out             (bundle_arbiter_N_to_1_request_out             ),
     .fifo_setup_signal       (bundle_arbiter_N_to_1_fifo_setup_signal       )
@@ -537,7 +535,6 @@ arbiter_N_to_1_request #(
 generate
     for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
         assign bundle_arbiter_control_N_to_1_request_in[i]         = bundle_request_control_out[i];
-        assign bundle_arbiter_control_N_to_1_arbiter_request_in[i] = ~bundle_fifo_request_control_out_signals_out[i].empty & ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full;
         assign bundle_fifo_request_control_out_signals_in[i].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[i];
     end
 endgenerate
@@ -553,7 +550,6 @@ arbiter_N_to_1_request #(
     .request_in              (bundle_arbiter_control_N_to_1_request_in              ),
     .fifo_request_signals_in (bundle_arbiter_control_N_to_1_fifo_request_signals_in ),
     .fifo_request_signals_out(bundle_arbiter_control_N_to_1_fifo_request_signals_out),
-    .arbiter_request_in      (bundle_arbiter_control_N_to_1_arbiter_request_in      ),
     .arbiter_grant_out       (bundle_arbiter_control_N_to_1_arbiter_grant_out       ),
     .request_out             (bundle_arbiter_control_N_to_1_request_out             ),
     .fifo_setup_signal       (bundle_arbiter_control_N_to_1_fifo_setup_signal       )

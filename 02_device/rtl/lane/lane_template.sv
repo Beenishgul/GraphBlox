@@ -16,7 +16,7 @@
 
 module lane_template #(
     `include "lane_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
@@ -109,7 +109,6 @@ FIFOStateSignalsOutput  engine_arbiter_N_to_1_memory_fifo_request_signals_out   
 logic                   areset_engine_arbiter_N_to_1_memory                                    ;
 logic                   engine_arbiter_N_to_1_memory_fifo_setup_signal                         ;
 logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_grant_out                  ;
-logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_request_in                 ;
 MemoryPacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
 MemoryPacket            engine_arbiter_N_to_1_memory_request_out                               ;
 
@@ -121,7 +120,6 @@ FIFOStateSignalsOutput  engine_arbiter_N_to_1_control_fifo_request_signals_out  
 logic                   areset_engine_arbiter_N_to_1_control                                    ;
 logic                   engine_arbiter_N_to_1_control_fifo_setup_signal                         ;
 logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_control_engine_arbiter_grant_out                  ;
-logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_control_engine_arbiter_request_in                 ;
 MemoryPacket            engine_arbiter_N_to_1_control_request_in               [NUM_ENGINES-1:0];
 MemoryPacket            engine_arbiter_N_to_1_control_request_out                               ;
 
@@ -402,8 +400,7 @@ assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = fifo_requ
 // --------------------------------------------------------------------------------------
 generate
     for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
-        assign engine_arbiter_N_to_1_memory_request_in[i]                = engines_request_memory_out[i];
-        assign engine_arbiter_N_to_1_memory_engine_arbiter_request_in[i] = ~engines_fifo_request_memory_out_signals_out[i].empty & ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full;
+        assign engine_arbiter_N_to_1_memory_request_in[i] = engines_request_memory_out[i];
         assign engines_fifo_request_memory_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i];
     end
 endgenerate
@@ -414,15 +411,14 @@ arbiter_N_to_1_request #(
     .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                 ),
     .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_engine_arbiter_N_to_1_memory_request_out (
-    .ap_clk                  (ap_clk                                                ),
-    .areset                  (areset_engine_arbiter_N_to_1_memory                   ),
-    .request_in              (engine_arbiter_N_to_1_memory_request_in               ),
-    .fifo_request_signals_in (engine_arbiter_N_to_1_memory_fifo_request_signals_in  ),
-    .fifo_request_signals_out(engine_arbiter_N_to_1_memory_fifo_request_signals_out ),
-    .arbiter_request_in      (engine_arbiter_N_to_1_memory_engine_arbiter_request_in),
-    .arbiter_grant_out       (engine_arbiter_N_to_1_memory_engine_arbiter_grant_out ),
-    .request_out             (engine_arbiter_N_to_1_memory_request_out              ),
-    .fifo_setup_signal       (engine_arbiter_N_to_1_memory_fifo_setup_signal        )
+    .ap_clk                  (ap_clk                                               ),
+    .areset                  (areset_engine_arbiter_N_to_1_memory                  ),
+    .request_in              (engine_arbiter_N_to_1_memory_request_in              ),
+    .fifo_request_signals_in (engine_arbiter_N_to_1_memory_fifo_request_signals_in ),
+    .fifo_request_signals_out(engine_arbiter_N_to_1_memory_fifo_request_signals_out),
+    .arbiter_grant_out       (engine_arbiter_N_to_1_memory_engine_arbiter_grant_out),
+    .request_out             (engine_arbiter_N_to_1_memory_request_out             ),
+    .fifo_setup_signal       (engine_arbiter_N_to_1_memory_fifo_setup_signal       )
 );
 
 // --------------------------------------------------------------------------------------
@@ -434,8 +430,7 @@ arbiter_N_to_1_request #(
 // --------------------------------------------------------------------------------------
 generate
     for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_control_request_in
-        assign engine_arbiter_N_to_1_control_request_in[i]                = engines_request_control_out[i];
-        assign engine_arbiter_N_to_1_control_engine_arbiter_request_in[i] = ~engines_fifo_request_control_out_signals_out[i].empty & ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full;
+        assign engine_arbiter_N_to_1_control_request_in[i] = engines_request_control_out[i];
         assign engines_fifo_request_control_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[i];
     end
 endgenerate
@@ -446,15 +441,14 @@ arbiter_N_to_1_request #(
     .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                          ),
     .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
 ) inst_engine_arbiter_N_to_1_control_request_out (
-    .ap_clk                  (ap_clk                                                 ),
-    .areset                  (areset_engine_arbiter_N_to_1_control                   ),
-    .request_in              (engine_arbiter_N_to_1_control_request_in               ),
-    .fifo_request_signals_in (engine_arbiter_N_to_1_control_fifo_request_signals_in  ),
-    .fifo_request_signals_out(engine_arbiter_N_to_1_control_fifo_request_signals_out ),
-    .arbiter_request_in      (engine_arbiter_N_to_1_control_engine_arbiter_request_in),
-    .arbiter_grant_out       (engine_arbiter_N_to_1_control_engine_arbiter_grant_out ),
-    .request_out             (engine_arbiter_N_to_1_control_request_out              ),
-    .fifo_setup_signal       (engine_arbiter_N_to_1_control_fifo_setup_signal        )
+    .ap_clk                  (ap_clk                                                ),
+    .areset                  (areset_engine_arbiter_N_to_1_control                  ),
+    .request_in              (engine_arbiter_N_to_1_control_request_in              ),
+    .fifo_request_signals_in (engine_arbiter_N_to_1_control_fifo_request_signals_in ),
+    .fifo_request_signals_out(engine_arbiter_N_to_1_control_fifo_request_signals_out),
+    .arbiter_grant_out       (engine_arbiter_N_to_1_control_engine_arbiter_grant_out),
+    .request_out             (engine_arbiter_N_to_1_control_request_out             ),
+    .fifo_setup_signal       (engine_arbiter_N_to_1_control_fifo_setup_signal       )
 );
 
 // --------------------------------------------------------------------------------------
