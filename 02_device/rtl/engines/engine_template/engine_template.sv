@@ -16,7 +16,7 @@
 
 module engine_template #(
     `include "engine_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
@@ -282,7 +282,9 @@ generate
 // --------------------------------------------------------------------------------------
         arbiter_1_to_N_response #(
             .NUM_MEMORY_REQUESTOR(ENGINE_CAST_WIDTH),
-            .ID_LEVEL            (5                )
+            .ID_LEVEL            (5                ),
+            .FIFO_WRITE_DEPTH    (FIFO_WRITE_DEPTH ),
+            .PROG_THRESH         (PROG_THRESH      )
         ) inst_engine_cast_arbiter_1_to_N_request (
             .ap_clk                   (ap_clk                                             ),
             .areset                   (areset_engine_cast_arbiter_1_to_N                  ),
