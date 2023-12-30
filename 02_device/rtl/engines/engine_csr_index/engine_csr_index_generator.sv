@@ -62,10 +62,10 @@ module engine_csr_index_generator #(parameter
     output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
     output MemoryPacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
-    input  FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
     output MemoryPacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
-    input  FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output logic                  fifo_setup_signal                                                ,
     output logic                  configure_memory_setup                                           ,
     output logic                  configure_engine_setup                                           ,
@@ -538,7 +538,7 @@ module engine_csr_index_generator #(parameter
                     counter_clear              <= 1'b1;
                     fifo_request_din_reg.valid <= 1'b0;
                 end
-               
+
                 counter_enable <= 1'b0;
                 counter_load   <= 1'b0;
                 done_out_reg   <= 1'b0;
@@ -571,7 +571,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid <= 1'b0;
                 if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty))
                     counter_clear <= 1'b1;
-               
+
                 done_out_reg               <= 1'b0;
                 counter_load               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
@@ -583,7 +583,7 @@ module engine_csr_index_generator #(parameter
                 configure_engine_int.valid <= 1'b1;
                 if((counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty))
                     counter_clear <= 1'b1;
-               
+
                 counter_enable             <= 1'b0;
                 counter_load               <= 1'b0;
                 done_out_reg               <= 1'b0;
@@ -830,7 +830,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_response_comb.payload.data              = response_memory_in_reg_S2.payload.data;
 
     always_ff @(posedge ap_clk) begin
-       response_memory_in_reg_S2 <= response_memory_in_reg;
+        response_memory_in_reg_S2 <= response_memory_in_reg;
     end
 
     always_comb begin
@@ -854,7 +854,7 @@ module engine_csr_index_generator #(parameter
         end
         else begin
             if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
-                fifo_request_engine_out_signals_out_reg  <= fifo_request_signals_out_int;
+                fifo_request_engine_out_signals_out_reg  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
                 fifo_request_memory_out_signals_out_reg  <= 2'b10;
                 fifo_request_signals_in_reg              <= fifo_request_engine_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg <= 2'b10;
