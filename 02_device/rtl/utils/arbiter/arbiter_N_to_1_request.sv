@@ -138,13 +138,15 @@ end
 
 always_ff @(posedge ap_clk) begin
   for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
-    arbiter_grant_out[i] <= ~fifo_request_arbiter_in_signals_out_int[i].prog_full;
+    arbiter_grant_out[i] <= ~fifo_request_arbiter_in_signals_out_int[i].prog_full & ~fifo_request_signals_out_int.prog_full;
   end
 end
 
 // --------------------------------------------------------------------------------------
 // Generate requests
 // --------------------------------------------------------------------------------------
+
+
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     fifo_request_din_reg.valid <= 0;
