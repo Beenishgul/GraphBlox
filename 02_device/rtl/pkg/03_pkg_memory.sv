@@ -120,11 +120,11 @@ typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [CU_KERNEL_COUNT_WIDTH_BITS-1:0] id_cu    ; // SIZE = 8 bits  - up to 8 vertex cu - pending
-  logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
-  logic [  CU_LANE_COUNT_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
-  logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
-  logic [CU_MODULE_COUNT_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
+  logic [    NUM_CUS_WIDTH_BITS-1:0] id_cu    ; // SIZE = 8 bits  - up to 8 vertex cu - pending
+  logic [NUM_BUNDLES_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
+  logic [  NUM_LANES_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
+  logic [NUM_ENGINES_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
+  logic [NUM_MODULES_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
 } MemoryPacketArbitrate;
 
 typedef struct packed{
@@ -133,7 +133,7 @@ typedef struct packed{
   MemoryPacketArbitrate                   seq_src  ;
   type_sequence_state                     seq_state;
   logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id   ;
-  logic [ CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops     ;
+  logic [     NUM_BUNDLES_WIDTH_BITS-1:0] hops     ;
 } MemoryPacketRoute;
 
 typedef struct packed{

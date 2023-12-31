@@ -11,6 +11,7 @@
 // Revise : 2023-08-28 14:41:10
 // Editor : sublime text4, tab size (4)
 // -----------------------------------------------------------------------------
+`include "global_timescale.vh"
 package PKG_GLOBALS;
 
 // ********************************************************************************************
@@ -20,46 +21,54 @@ package PKG_GLOBALS;
 // ********************************************************************************************
 
 // --------------------------------------------------------------------------------------
-//  COMPUTE UNITS GLOBALS
+//  COMPUTE UNITS GLOBALS 
 // --------------------------------------------------------------------------------------
-
+//  topolgy config-- include is auto generated
+// --------------------------------------------------------------------------------------
+`include "config_parameters.vh"
+// -- include is auto generated
+// parameter NUM_CUS     = 1;
+// parameter NUM_BUNDLES = 4;
+// parameter NUM_LANES   = 4;
+// parameter NUM_ENGINES = 2;
+// parameter NUM_MODULES = 3;
+// parameter NUM_CUS_WIDTH_BITS     = 1;
+// parameter NUM_BUNDLES_WIDTH_BITS = 4;
+// parameter NUM_LANES_WIDTH_BITS   = 4;
+// parameter NUM_ENGINES_WIDTH_BITS = 2;
+// parameter NUM_MODULES_WIDTH_BITS = 3;
+// -- include is auto generated --
 // --------------------------------------------------------------------------------------
 // Maximum supported engines/lanes/bundles/buffers
 // --------------------------------------------------------------------------------------
-	parameter CU_KERNEL_COUNT_TOTAL       = 8 ;
-	parameter CU_BUNDLE_COUNT_TOTAL       = 8 ;
-	parameter CU_LANE_COUNT_TOTAL         = 8 ;
-	parameter CU_ENGINE_COUNT_TOTAL       = 8 ;
-	parameter CU_MODULE_COUNT_TOTAL       = 8 ;
-	parameter CU_BUFFER_COUNT_TOTAL       = 8 ;
 	parameter CU_PACKET_SEQ_ID_WIDTH_BITS = 16;
 
 // --------------------------------------------------------------------------------------
-	parameter CU_KERNEL_COUNT_WIDTH_BITS = CU_KERNEL_COUNT_TOTAL;
-	parameter CU_BUNDLE_COUNT_WIDTH_BITS = CU_BUNDLE_COUNT_TOTAL;
-	parameter CU_LANE_COUNT_WIDTH_BITS   = CU_LANE_COUNT_TOTAL  ;
-	parameter CU_ENGINE_COUNT_WIDTH_BITS = CU_ENGINE_COUNT_TOTAL;
-	parameter CU_MODULE_COUNT_WIDTH_BITS = CU_MODULE_COUNT_TOTAL;
-	parameter CU_BUFFER_COUNT_WIDTH_BITS = CU_BUFFER_COUNT_TOTAL;
+	parameter CU_KERNEL_COUNT_MAX_WIDTH_BITS = 8;
+	parameter CU_BUNDLE_COUNT_MAX_WIDTH_BITS = 8;
+	parameter CU_LANE_COUNT_MAX_WIDTH_BITS   = 8;
+	parameter CU_ENGINE_COUNT_MAX_WIDTH_BITS = 8;
+	parameter CU_MODULE_COUNT_MAX_WIDTH_BITS = 8;
+	parameter CU_BUFFER_COUNT_WIDTH_BITS     = 8;
 
 // --------------------------------------------------------------------------------------
 //  KERNEL COMMON GLOBALS
 // --------------------------------------------------------------------------------------
 //  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
-	parameter GLOBAL_SYSTEM_CACHE_IP = 1 ;
-	parameter GLOBAL_CU_CACHE_IP     = 1 ;
+	parameter GLOBAL_SYSTEM_CACHE_IP = 1;
+	parameter GLOBAL_CU_CACHE_IP     = 1;
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
 //   State Machine input sync
 // --------------------------------------------------------------------------------------
-typedef enum logic[4:0] {
-	CU_ENGINE_M_AXI_RESET        = 1 << 0,
-	CU_ENGINE_M_AXI_READY        = 1 << 1,
-	CU_ENGINE_M_AXI_CMD_TRANS    = 1 << 2,
-	CU_ENGINE_M_AXI_PEND         = 1 << 3,
-	CU_ENGINE_M_AXI_DONE         = 1 << 4
-} cu_engine_m_axi_state;
+	typedef enum logic[4:0] {
+		CU_ENGINE_M_AXI_RESET     = 1 << 0,
+		CU_ENGINE_M_AXI_READY     = 1 << 1,
+		CU_ENGINE_M_AXI_CMD_TRANS = 1 << 2,
+		CU_ENGINE_M_AXI_PEND      = 1 << 3,
+		CU_ENGINE_M_AXI_DONE      = 1 << 4
+	} cu_engine_m_axi_state;
 
 endpackage

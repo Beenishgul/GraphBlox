@@ -19,7 +19,8 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABI
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
-output_file_path = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
+output_file_path_shared = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
+output_file_path_global = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global" ,"config_parameters.vh")
 output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
 output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_topology.vh")
 
@@ -455,14 +456,28 @@ CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE  = sum(CU_BUNDLES_CONFIG_BUNDLE_FI
 CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
 CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
 
-check_and_clean_file(output_file_path)
+check_and_clean_file(output_file_path_global)
+check_and_clean_file(output_file_path_shared)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
 
 # Write to VHDL file
-with open(output_file_path, "w") as file:
-    # file.write("parameter NUM_MEMORY_REQUESTOR = 2,\n")
-    # file.write("parameter ID_CU                = 0,\n")
+with open(output_file_path_global, "w") as file:
+
+    file.write(f"parameter NUM_CUS     = {NUM_CUS};\n")
+    file.write(f"parameter NUM_BUNDLES = {NUM_BUNDLES};\n")
+    file.write(f"parameter NUM_LANES   = {NUM_LANES};\n")
+    file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
+    file.write(f"parameter NUM_MODULES = 3;\n")
+
+    file.write(f"parameter NUM_CUS_WIDTH_BITS     = {NUM_CUS};\n")
+    file.write(f"parameter NUM_BUNDLES_WIDTH_BITS = {NUM_BUNDLES};\n")
+    file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
+    file.write(f"parameter NUM_ENGINES_WIDTH_BITS = {NUM_ENGINES};\n")
+    file.write(f"parameter NUM_MODULES_WIDTH_BITS = 3;\n")
+
+# Write to VHDL file
+with open(output_file_path_shared, "w") as file:
 
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// FIFO SETTINGS\n")
