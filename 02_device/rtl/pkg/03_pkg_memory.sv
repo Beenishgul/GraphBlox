@@ -137,14 +137,14 @@ typedef struct packed{
 } MemoryPacketRoute;
 
 typedef struct packed{
-  logic                                direction; // 0 - right, 1 left
-  logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = 64 bits
+  logic                                direction; // 0 - right, 1 left  1 bits
+  logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = clog2(offset) bits
 } MemoryPacketAddressShift;
 
 typedef struct packed{
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
-  logic [          M_AXI4_FE_DATA_W-1:0] offset   ; // SIZE = 64 bits
-  MemoryPacketAddressShift               shift    ; // SIZE = 64 bits
+  logic [          M_AXI4_FE_DATA_W-1:0] offset   ; // SIZE = clog2(4GB) bits
+  MemoryPacketAddressShift               shift    ; // SIZE = clog2(offset) bits + 1
 } MemoryPacketAddress;
 
 typedef struct packed{
