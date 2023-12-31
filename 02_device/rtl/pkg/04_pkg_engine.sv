@@ -50,18 +50,18 @@ typedef enum logic[15:0] {
 } engine_csr_index_generator_state;
 
 typedef struct packed{
-    logic                                increment    ;
-    logic                                decrement    ;
-    logic                                mode_sequence;
-    logic                                mode_buffer  ;
-    logic                                mode_break   ;
-    logic [        M_AXI4_FE_ADDR_W-1:0] array_pointer;
-    logic [        M_AXI4_FE_DATA_W-1:0] array_size   ;
-    logic [        M_AXI4_FE_DATA_W-1:0] index_start  ;
-    logic [        M_AXI4_FE_DATA_W-1:0] index_end    ;
-    logic [        M_AXI4_FE_DATA_W-1:0] stride       ;
-    logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] granularity  ;
-    logic                                direction    ;
+    logic                                  increment    ;
+    logic                                  decrement    ;
+    logic                                  mode_sequence;
+    logic                                  mode_buffer  ;
+    logic                                  mode_break   ;
+    logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer    ;
+    logic [          M_AXI4_FE_DATA_W-1:0] array_size   ;
+    logic [          M_AXI4_FE_DATA_W-1:0] index_start  ;
+    logic [          M_AXI4_FE_DATA_W-1:0] index_end    ;
+    logic [          M_AXI4_FE_DATA_W-1:0] stride       ;
+    logic [  $clog2(M_AXI4_FE_ADDR_W)-1:0] granularity  ;
+    logic                                  direction    ;
 } CSRIndexConfigurationParameters;
 
 typedef struct packed{
@@ -283,7 +283,7 @@ typedef struct packed{
     logic                                                                    mode_sequence;
     logic                                                                    mode_buffer  ;
     logic                                                                    mode_counter ;
-    logic [           M_AXI4_FE_ADDR_W-1:0]                                  array_pointer;
+    logic [ CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                  id_buffer    ;
     logic [           M_AXI4_FE_DATA_W-1:0]                                  array_size   ;
     logic [           M_AXI4_FE_DATA_W-1:0]                                  index_start  ;
     logic [           M_AXI4_FE_DATA_W-1:0]                                  index_end    ;
@@ -331,16 +331,16 @@ typedef enum logic[8:0] {
 } engine_cu_setup_state;
 
 typedef struct packed{
-    logic                                increment    ;
-    logic                                decrement    ;
-    logic                                flush_mode   ;
-    logic                                flush_enable ;
-    logic [        M_AXI4_FE_ADDR_W-1:0] array_pointer;
-    logic [        M_AXI4_FE_DATA_W-1:0] array_size   ;
-    logic [        M_AXI4_FE_DATA_W-1:0] start_read   ;
-    logic [        M_AXI4_FE_DATA_W-1:0] end_read     ;
-    logic [        M_AXI4_FE_DATA_W-1:0] stride       ;
-    logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] granularity  ;
+    logic                                  increment   ;
+    logic                                  decrement   ;
+    logic                                  flush_mode  ;
+    logic                                  flush_enable;
+    logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer   ;
+    logic [          M_AXI4_FE_DATA_W-1:0] array_size  ;
+    logic [          M_AXI4_FE_DATA_W-1:0] start_read  ;
+    logic [          M_AXI4_FE_DATA_W-1:0] end_read    ;
+    logic [          M_AXI4_FE_DATA_W-1:0] stride      ;
+    logic [  $clog2(M_AXI4_FE_ADDR_W)-1:0] granularity ;
 } CUSetupEngineConfigurationParameters;
 
 typedef struct packed{

@@ -125,7 +125,6 @@ typedef struct packed{
   logic [  CU_LANE_COUNT_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
   logic [CU_ENGINE_COUNT_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
   logic [CU_MODULE_COUNT_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
-  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
 } MemoryPacketArbitrate;
 
 typedef struct packed{
@@ -143,9 +142,9 @@ typedef struct packed{
 } MemoryPacketAddressShift;
 
 typedef struct packed{
-  logic [M_AXI4_FE_ADDR_W-1:0] base  ; // SIZE = 64 bits
-  logic [M_AXI4_FE_DATA_W-1:0] offset; // SIZE = 64 bits
-  MemoryPacketAddressShift     shift ; // SIZE = 64 bits
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
+  logic [          M_AXI4_FE_DATA_W-1:0] offset   ; // SIZE = 64 bits
+  MemoryPacketAddressShift               shift    ; // SIZE = 64 bits
 } MemoryPacketAddress;
 
 typedef struct packed{

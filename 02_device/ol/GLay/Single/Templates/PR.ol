@@ -9,7 +9,7 @@
 0x00000000 // entry 5    cacheline 0    offset 5    -- // entry_5    cacheline[  0][ 5] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 1    mapping 2    cycles 10   None-NONE ( 0 )-( graph->num_vertices )
+// Name ENGINE_CSR_INDEX    ID 1    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 6    cacheline 0    offset 6    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 7    cacheline 0    offset 7    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -28,7 +28,7 @@
 0x00000000 // entry 16   cacheline 1    offset 0    -- // entry_0    cacheline[  0][ 0] < 4b>: hops[0:3]=0x0
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 3    mapping 1    cycles 13   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 3    mapping 1    cycles 11   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 17   cacheline 1    offset 1    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 18   cacheline 1    offset 2    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -51,7 +51,7 @@
 0x00000000 // entry 31   cacheline 1    offset 15   -- // entry_1    cacheline[  0][ 1] < 4b>: merge_type[0:3]=0x0
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 5    mapping 1    cycles 13   buffer_2-out_degree ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 5    mapping 1    cycles 11   buffer_2-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 32   cacheline 2    offset 0    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 33   cacheline 2    offset 1    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -68,7 +68,7 @@
 0x00000000 // entry 44   cacheline 2    offset 12   -- // entry_12   cacheline[  0][12] <16b>: ops_mask[0:15]=0x00
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 13   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 45   cacheline 2    offset 13   -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 46   cacheline 2    offset 14   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -90,7 +90,7 @@
 0x00000000 // entry 58   cacheline 3    offset 10   -- // entry_0    cacheline[  0][ 0] < 4b>: hops[0:3]=0x0
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 10   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
+// Name ENGINE_CSR_INDEX    ID 8    mapping 2    cycles 8    buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 59   cacheline 3    offset 11   -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 60   cacheline 3    offset 12   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -109,7 +109,7 @@
 0x00000000 // entry 69   cacheline 4    offset 5    -- // entry_0    cacheline[  0][ 0] < 4b>: hops[0:3]=0x0
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 10   mapping 1    cycles 13   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 10   mapping 1    cycles 11   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 70   cacheline 4    offset 6    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 71   cacheline 4    offset 7    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
