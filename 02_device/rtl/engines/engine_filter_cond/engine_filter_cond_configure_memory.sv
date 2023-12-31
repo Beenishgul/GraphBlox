@@ -55,15 +55,10 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload           fifo_response_memory_in_din             ;
-MemoryPacket                  fifo_response_memory_in_dout_int        ;
-MemoryPacket                  fifo_response_memory_in_dout_reg        ;
-MemoryPacketPayload           fifo_response_memory_in_dout            ;
-FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
-FIFOStateSignalsInputInternal fifo_response_memory_in_signals_in_int  ;
-FIFOStateSignalsOutInternal   fifo_response_memory_in_signals_out_int ;
-logic                         fifo_response_memory_in_setup_signal_int;
-logic                         fifo_response_memory_in_push_filter     ;
+MemoryPacket          fifo_response_memory_in_dout_int      ;
+MemoryPacket          fifo_response_memory_in_dout_reg      ;
+FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
+logic                 fifo_response_memory_in_push_filter   ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
@@ -111,13 +106,13 @@ always_ff @(posedge ap_clk) begin
         fifo_setup_signal          <= 1'b1;
         configure_memory_out.valid <= 0;
     end else begin
-        fifo_setup_signal          <= fifo_response_memory_in_setup_signal_int | fifo_configure_memory_setup_signal_int;
+        fifo_setup_signal          <= fifo_configure_memory_setup_signal_int;
         configure_memory_out.valid <= fifo_configure_memory_dout_int.valid;
     end
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_memory_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_memory_in_signals_out_int);
+    fifo_response_memory_in_signals_out <= map_internal_fifo_signals_to_output(fifo_configure_memory_signals_out_int);
     fifo_configure_memory_signals_out   <= map_internal_fifo_signals_to_output(fifo_configure_memory_signals_out_int);
     configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
 end
@@ -129,17 +124,17 @@ end
 assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
 assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
-assign configure_memory_meta_int.route.from.id_cu        = 1 << ID_CU;
-assign configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
-assign configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
-assign configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
-assign configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
+assign configure_memory_meta_int.route.from.id_cu     = 1 << ID_CU;
+assign configure_memory_meta_int.route.from.id_bundle = 1 << ID_BUNDLE;
+assign configure_memory_meta_int.route.from.id_lane   = 1 << ID_LANE;
+assign configure_memory_meta_int.route.from.id_engine = 1 << ID_ENGINE;
+assign configure_memory_meta_int.route.from.id_module = 1 << ID_MODULE;
 
-assign configure_memory_meta_int.route.to.id_cu          = 0;
-assign configure_memory_meta_int.route.to.id_bundle      = 0;
-assign configure_memory_meta_int.route.to.id_lane        = 0;
-assign configure_memory_meta_int.route.to.id_engine      = 0;
-assign configure_memory_meta_int.route.to.id_module      = 1;
+assign configure_memory_meta_int.route.to.id_cu     = 0;
+assign configure_memory_meta_int.route.to.id_bundle = 0;
+assign configure_memory_meta_int.route.to.id_lane   = 0;
+assign configure_memory_meta_int.route.to.id_engine = 0;
+assign configure_memory_meta_int.route.to.id_module = 1;
 
 assign configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
 assign configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
@@ -188,14 +183,14 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.route.to           <= configure_memory_meta_int.route.to;
-    configure_memory_reg.payload.meta.route.from         <= configure_memory_meta_int.route.from;
-    configure_memory_reg.payload.meta.route.seq_src      <= configure_memory_meta_int.route.seq_src;
-    configure_memory_reg.payload.meta.route.seq_state    <= configure_memory_meta_int.route.seq_state;
-    configure_memory_reg.payload.meta.route.seq_id       <= configure_memory_meta_int.route.seq_id;
-    configure_memory_reg.payload.meta.route.hops         <= configure_memory_meta_int.route.hops;
-    configure_memory_reg.payload.meta.address            <= configure_memory_meta_int.address;
-    configure_memory_reg.payload.meta.subclass           <= configure_memory_meta_int.subclass;
+    configure_memory_reg.payload.meta.route.to        <= configure_memory_meta_int.route.to;
+    configure_memory_reg.payload.meta.route.from      <= configure_memory_meta_int.route.from;
+    configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
+    configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
+    configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
+    configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
+    configure_memory_reg.payload.meta.address         <= configure_memory_meta_int.address;
+    configure_memory_reg.payload.meta.subclass        <= configure_memory_meta_int.subclass;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -265,40 +260,12 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO memory response out fifo MemoryPacket
+// memory response out fifo MemoryPacket
 // --------------------------------------------------------------------------------------
-// FIFO is resetting
-assign fifo_response_memory_in_setup_signal_int = fifo_response_memory_in_signals_out_int.wr_rst_busy  | fifo_response_memory_in_signals_out_int.rd_rst_busy;
-
 // Push
-assign fifo_response_memory_in_push_filter          = ((response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
-assign fifo_response_memory_in_signals_in_int.wr_en = response_memory_in_reg.valid & fifo_response_memory_in_push_filter;
-assign fifo_response_memory_in_din                  = response_memory_in_reg.payload;
-
-// Pop
-assign fifo_response_memory_in_signals_in_int.rd_en = ~fifo_response_memory_in_signals_out_int.empty & fifo_response_memory_in_signals_in_reg.rd_en & ~(configure_memory_valid_int) & ~fifo_configure_memory_signals_out_int.prog_full ;
-assign fifo_response_memory_in_dout_int.valid       = fifo_response_memory_in_signals_out_int.valid;
-assign fifo_response_memory_in_dout_int.payload     = fifo_response_memory_in_dout;
-
-xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseMemoryInput (
-    .clk        (ap_clk                                             ),
-    .srst       (areset_fifo                                        ),
-    .din        (fifo_response_memory_in_din                        ),
-    .wr_en      (fifo_response_memory_in_signals_in_int.wr_en       ),
-    .rd_en      (fifo_response_memory_in_signals_in_int.rd_en       ),
-    .dout       (fifo_response_memory_in_dout                       ),
-    .full       (fifo_response_memory_in_signals_out_int.full       ),
-    .empty      (fifo_response_memory_in_signals_out_int.empty      ),
-    .valid      (fifo_response_memory_in_signals_out_int.valid      ),
-    .prog_full  (fifo_response_memory_in_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_response_memory_in_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_response_memory_in_signals_out_int.rd_rst_busy)
-);
+assign fifo_response_memory_in_push_filter      = ((response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid & fifo_response_memory_in_push_filter;
+assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
 // --------------------------------------------------------------------------------------
 // FIFO memory configure_memory out fifo MemoryPacket
