@@ -195,7 +195,6 @@ always_ff @(posedge ap_clk) begin
     configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
     configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
     configure_memory_reg.payload.meta.route.hops        <= configure_memory_meta_int.route.hops;
-    configure_memory_reg.payload.meta.address.id_buffer <= configure_memory_meta_int.address.id_buffer;
     configure_memory_reg.payload.meta.address.offset    <= configure_memory_meta_int.address.offset;
 end
 

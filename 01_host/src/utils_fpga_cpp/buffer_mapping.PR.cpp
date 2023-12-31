@@ -23,11 +23,11 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // Name ENGINE_READ_WRITE   ID 4    mapping 1    cycles 11   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[18] = ( 0 );
+    overlay_program[16] = ( 0 );
    // --  2  - Index_End
-    overlay_program[19] = ( graph->num_vertices );
+    overlay_program[17] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[24] = ( graph->num_vertices )-( 0 );
+    overlay_program[22] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_MERGE_DATA   ID 5    mapping 4    cycles 2    None-None ( 0 )-( 0 )
@@ -37,21 +37,21 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // Name ENGINE_READ_WRITE   ID 6    mapping 1    cycles 11   buffer_2-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[33] = ( 0 );
+    overlay_program[29] = ( 0 );
    // --  2  - Index_End
-    overlay_program[34] = ( graph->num_vertices );
+    overlay_program[30] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[39] = ( graph->num_vertices )-( 0 );
+    overlay_program[35] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE   ID 7    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[46] = ( graph->num_vertices );
+    overlay_program[40] = ( graph->num_vertices );
    // --  2  - Index_End
-    overlay_program[47] = ( graph->num_vertices * 2 );
+    overlay_program[41] = ( graph->num_vertices * 2 );
    // --  7  - Array_size
-    overlay_program[52] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[46] = ( graph->num_vertices * 2 )-( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 8    mapping 6    cycles 1    None-None ( 0 )-( 0 )
@@ -61,11 +61,11 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // Name ENGINE_CSR_INDEX    ID 9    mapping 2    cycles 8    buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[60] = ( 0 );
+    overlay_program[52] = ( 0 );
    // --  2  - Index_End
-    overlay_program[61] = ( graph->num_edges );
+    overlay_program[53] = ( graph->num_edges );
    // --  7  - Array_size
-    overlay_program[66] = ( graph->num_edges )-( 0 );
+    overlay_program[58] = ( graph->num_edges )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 10   mapping 6    cycles 1    None-None ( 0 )-( 0 )
@@ -75,11 +75,11 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 // Name ENGINE_READ_WRITE   ID 11   mapping 1    cycles 11   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[71] = ( graph->num_vertices );
+    overlay_program[61] = ( graph->num_vertices );
    // --  2  - Index_End
-    overlay_program[72] = ( graph->num_vertices * 2 );
+    overlay_program[62] = ( graph->num_vertices * 2 );
    // --  7  - Array_size
-    overlay_program[77] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[67] = ( graph->num_vertices * 2 )-( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA ID 12   mapping 6    cycles 1    None-None ( 0 )-( 0 )
@@ -88,4 +88,4 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(size_t
 }
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.PR  <-- 
-// Number of entries 84
+// Number of entries 72

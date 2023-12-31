@@ -8,7 +8,5 @@
 0x00000000 // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
 0x00000081 // entry_5    cacheline[  0][ 5] <29b>: cmd[0:6]=CMD_INVALID || buffer[7:12]=STRUCT_INVALID || id_module[13:20]=0x00 || id_engine[21:28]=0x00
 0x00000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
-0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_pointer[0:31]=0x00000000
-0x00000000 // entry_8    cacheline[  0][ 8] <32b>: array_pointer[0:31]=0x00000000
-0x00000000 // entry_9    cacheline[  0][ 9] <32b>: array_size[0:31]=0x00000000
+0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
