@@ -104,18 +104,6 @@
             }
         },
         "entry_7": {
-            "array_pointer": {
-                "bits": "32",
-                "value": "0x00000000"
-            }
-        },
-        "entry_8": {
-            "array_pointer": {
-                "bits": "32",
-                "value": "0x00000000"
-            }
-        },
-        "entry_9": {
             "array_size": {
                 "bits": "32",
                 "value": "0x00000000"

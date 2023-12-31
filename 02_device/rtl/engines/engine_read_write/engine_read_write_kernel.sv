@@ -78,7 +78,7 @@ module engine_read_write_kernel (
     if (config_params_valid_in & data_valid_reg) begin
       address_int.shift.amount    = config_params_in.granularity;
       address_int.shift.direction = config_params_in.direction;
-      address_int.base            = config_params_in.array_pointer;
+      address_int.id_buffer       = config_params_in.id_buffer;
       if(address_int.shift.direction ) begin
         address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) << address_int.shift.amount;
       end else begin

@@ -638,10 +638,9 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.route.from.id_bundle = configure_engine_int.payload.meta.route.from.id_bundle;
     assign fifo_request_comb.payload.meta.route.from.id_lane   = configure_engine_int.payload.meta.route.from.id_lane;
     assign fifo_request_comb.payload.meta.route.from.id_engine = configure_engine_int.payload.meta.route.from.id_engine;
-    assign fifo_request_comb.payload.meta.route.from.id_buffer = configure_engine_int.payload.meta.route.from.id_buffer;
     assign fifo_request_comb.payload.meta.route.seq_state      = configure_engine_int.payload.meta.route.seq_state;
     assign fifo_request_comb.payload.meta.route.seq_id         = seq_id_counter;
-    assign fifo_request_comb.payload.meta.address.base         = configure_engine_int.payload.param.array_pointer;
+    assign fifo_request_comb.payload.meta.address.id_buffer    = configure_engine_int.payload.meta.address.id_buffer;
     assign fifo_request_comb.payload.meta.address.shift        = configure_engine_int.payload.meta.address.shift;
     assign fifo_request_comb.payload.meta.subclass             = configure_engine_int.payload.meta.subclass;
 

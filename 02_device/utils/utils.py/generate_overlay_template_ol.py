@@ -344,19 +344,7 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                         append_to_file(output_file_path_vh, f"   // --  2  - Index_End")
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = {buffer_end_ops};")
                     elif local_count == 7:
-                        append_to_file(output_file_path_vh, f"   // --  7  - Array_Pointer_LHS")
-                        if buffer_key != "None":
-                            append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = {buffer_key}_ptr[31:0];")
-                        else:
-                            append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = 0;")
-                    elif local_count == 8:
-                        append_to_file(output_file_path_vh, f"   // --  8  - Array_Pointer_RHS")
-                        if buffer_key != "None":
-                            append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = {buffer_key}_ptr[63:32];")
-                        else:
-                            append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = 0;")
-                    elif local_count == 9:
-                        append_to_file(output_file_path_vh, f"   // --  9  - Array_size")
+                        append_to_file(output_file_path_vh, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M_AXI4_FE_DATA_W*{offset})+:M_AXI4_FE_DATA_W]  = {buffer_end_ops}-{buffer_start_ops};")
 
                 entry_index_vh += 1
@@ -408,19 +396,7 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                         append_to_file(output_file_path_cpp, f"   // --  2  - Index_End")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops};")
                     elif local_count == 7:
-                        append_to_file(output_file_path_cpp, f"   // --  7  - Array_Pointer_LHS")
-                        if buffer_key != "None":
-                            append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = xrt_buffer_device[{buffer_index}];")
-                        else:
-                            append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = 0;")
-                    elif local_count == 8:
-                        append_to_file(output_file_path_cpp, f"   // --  8  - Array_Pointer_RHS")
-                        if buffer_key != "None":
-                            append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = xrt_buffer_device[{buffer_index}] >> 32;")
-                        else:
-                            append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = 0;")
-                    elif local_count == 9:
-                        append_to_file(output_file_path_cpp, f"   // --  9  - Array_size")
+                        append_to_file(output_file_path_cpp, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
 
                 entry_index_cpp += 1

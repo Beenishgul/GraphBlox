@@ -325,10 +325,10 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
 
-    assign fifo_request_comb.payload.meta.route         = configuration_reg.payload.meta.route;
-    assign fifo_request_comb.payload.meta.address.base  = configuration_reg.payload.param.array_pointer;
-    assign fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
+    assign fifo_request_comb.payload.meta.route             = configuration_reg.payload.meta.route;
+    assign fifo_request_comb.payload.meta.address.id_buffer = configuration_reg.payload.meta.address.id_buffer;
+    assign fifo_request_comb.payload.meta.address.shift     = configuration_reg.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass          = configuration_reg.payload.meta.subclass;
 
     always_comb begin
         if(configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin

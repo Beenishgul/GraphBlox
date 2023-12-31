@@ -134,23 +134,23 @@ assign configure_memory_meta_int.route.from.id_bundle    = 1 << ID_BUNDLE;
 assign configure_memory_meta_int.route.from.id_lane      = 1 << ID_LANE;
 assign configure_memory_meta_int.route.from.id_engine    = 1 << ID_ENGINE;
 assign configure_memory_meta_int.route.from.id_module    = 1 << ID_MODULE;
-assign configure_memory_meta_int.route.from.id_buffer    = 0;
+
 assign configure_memory_meta_int.route.to.id_cu          = 0;
 assign configure_memory_meta_int.route.to.id_bundle      = 0;
 assign configure_memory_meta_int.route.to.id_lane        = 0;
 assign configure_memory_meta_int.route.to.id_engine      = 0;
 assign configure_memory_meta_int.route.to.id_module      = 1;
-assign configure_memory_meta_int.route.to.id_buffer      = 0;
+
 assign configure_memory_meta_int.route.seq_src.id_cu     = 1 << ID_CU;
 assign configure_memory_meta_int.route.seq_src.id_bundle = 1 << ID_BUNDLE;
 assign configure_memory_meta_int.route.seq_src.id_lane   = 1 << ID_LANE;
 assign configure_memory_meta_int.route.seq_src.id_engine = 1 << ID_ENGINE;
 assign configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
-assign configure_memory_meta_int.route.seq_src.id_buffer = 0;
+
 assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
 assign configure_memory_meta_int.route.seq_id            = 0;
 assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
-assign configure_memory_meta_int.address.base            = 0;
+assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
@@ -192,9 +192,9 @@ always_ff @(posedge ap_clk) begin
     configure_memory_reg.payload.meta.route.seq_src   <= configure_memory_meta_int.route.seq_src;
     configure_memory_reg.payload.meta.route.seq_state <= configure_memory_meta_int.route.seq_state;
     configure_memory_reg.payload.meta.route.seq_id    <= configure_memory_meta_int.route.seq_id;
-    configure_memory_reg.payload.meta.route.hops      <= configure_memory_meta_int.route.hops;
-    configure_memory_reg.payload.meta.address.base    <= configure_memory_meta_int.address.base;
-    configure_memory_reg.payload.meta.address.offset  <= configure_memory_meta_int.address.offset;
+    configure_memory_reg.payload.meta.route.hops         <= configure_memory_meta_int.route.hops;
+    configure_memory_reg.payload.meta.address.id_buffer  <= configure_memory_meta_int.address.id_buffer;
+    configure_memory_reg.payload.meta.address.offset     <= configure_memory_meta_int.address.offset;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -221,7 +221,7 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.meta.route.to.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_KERNEL_COUNT_WIDTH_BITS)-1:0];
                 configure_memory_reg.payload.meta.route.to.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:CU_KERNEL_COUNT_WIDTH_BITS];
                 configure_memory_reg.payload.meta.route.to.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
-                configure_memory_reg.payload.meta.route.to.id_buffer <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
+                configure_memory_reg.payload.meta.address.id_buffer  <= fifo_response_memory_in_dout_reg.payload.data.field[0][(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)-1:(CU_LANE_COUNT_WIDTH_BITS+CU_BUNDLE_COUNT_WIDTH_BITS+CU_KERNEL_COUNT_WIDTH_BITS)];
             end
             // (1 << 6) : begin
             // end

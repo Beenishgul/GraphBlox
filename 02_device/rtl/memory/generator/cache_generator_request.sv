@@ -154,7 +154,7 @@ end
 always_comb begin
   address_base = 0;
   if(arbiter_bus_out.valid & descriptor_in_reg.valid) begin
-    case (arbiter_bus_out.payload.meta.route.to.id_buffer)
+    case (arbiter_bus_out.payload.meta.address.id_buffer)
       (1 << 0) : begin
         address_base = descriptor_in_reg.payload.buffer_1;
       end
@@ -191,7 +191,6 @@ assign fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
 assign fifo_request_comb.payload.data      = arbiter_bus_out.payload.data;
 assign fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
 assign fifo_request_comb.payload.iob.addr  = address_base + arbiter_bus_out.payload.meta.address.offset;
-// assign fifo_request_comb.payload.iob.addr  = arbiter_bus_out.payload.meta.address.base + arbiter_bus_out.payload.meta.address.offset;
 assign fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
 
 always_comb begin

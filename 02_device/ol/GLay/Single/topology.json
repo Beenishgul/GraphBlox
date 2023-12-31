@@ -366,12 +366,12 @@
     },
     "cycles": {
         "ENGINE_ALU_OPS": 6,
-        "ENGINE_CSR_INDEX": 10,
+        "ENGINE_CSR_INDEX": 8,
         "ENGINE_FILTER_COND": 9,
         "ENGINE_FORWARD_DATA": 1,
         "ENGINE_MERGE_DATA": 2,
         "ENGINE_PIPELINE": 0,
-        "ENGINE_READ_WRITE": 13
+        "ENGINE_READ_WRITE": 11
     },
     "luts": {
         "ENGINE_ALU_OPS": 2805,
