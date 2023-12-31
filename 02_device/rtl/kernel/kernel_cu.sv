@@ -359,9 +359,9 @@ axi_register_slice_mid_end inst_axi_register_slice_mid (
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
 cu_setup #(
-  .ID_CU    ({CU_KERNEL_COUNT_WIDTH_BITS{1'b1}}),
-  .ID_BUNDLE({CU_BUNDLE_COUNT_WIDTH_BITS{1'b1}}),
-  .ID_LANE  ({CU_LANE_COUNT_WIDTH_BITS{1'b1}}  )
+  .ID_CU    ({NUM_CUS_WIDTH_BITS{1'b1}}    ),
+  .ID_BUNDLE({NUM_BUNDLES_WIDTH_BITS{1'b1}}),
+  .ID_LANE  ({NUM_LANES_WIDTH_BITS{1'b1}}  )
 ) inst_cu_setup (
   .ap_clk                   (ap_clk                            ),
   .areset                   (areset_setup                      ),

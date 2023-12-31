@@ -135,7 +135,7 @@ typedef enum logic[12:0] {
 } engine_forward_data_generator_state;
 
 typedef struct packed{
-    logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops;
+    logic [NUM_BUNDLES_WIDTH_BITS-1:0] hops;
 } ForwardDataConfigurationParameters;
 
 typedef struct packed{
@@ -213,9 +213,8 @@ typedef enum logic[14:0] {
 } engine_filter_cond_generator_state;
 
 typedef struct packed{
-    MemoryPacketArbitrate                  _if  ;
-    MemoryPacketArbitrate                  _else;
-    logic [CU_BUNDLE_COUNT_WIDTH_BITS-1:0] hops ;
+    MemoryPacketArbitrate              _if  ;
+    MemoryPacketArbitrate              _else;
 } FilterCondMemoryPacketRoute;
 
 typedef struct packed{

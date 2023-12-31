@@ -149,7 +149,7 @@ assign configure_memory_meta_int.route.seq_src.id_module = 1 << ID_MODULE;
 
 assign configure_memory_meta_int.route.seq_state         = SEQUENCE_INVALID;
 assign configure_memory_meta_int.route.seq_id            = 0;
-assign configure_memory_meta_int.route.hops              = CU_BUNDLE_COUNT_WIDTH_BITS;
+assign configure_memory_meta_int.route.hops              = NUM_BUNDLES_WIDTH_BITS;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
 assign configure_memory_meta_int.address.shift.amount    = 0;
@@ -184,7 +184,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0] <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+    fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0] <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0];
 end
 
 always_ff @(posedge ap_clk) begin
@@ -195,7 +195,7 @@ always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
-                configure_memory_reg.payload.param.hops <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                configure_memory_reg.payload.param.hops <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0];
             end
             // (1 << 1) : begin
             // end

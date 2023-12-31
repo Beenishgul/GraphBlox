@@ -378,8 +378,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x1"
+                    "bits": "8",
+                    "value": "0x01"
                 }
             }
         }
@@ -926,8 +926,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x1"
+                    "bits": "8",
+                    "value": "0x01"
                 }
             }
         }
@@ -1049,8 +1049,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x1"
+                    "bits": "8",
+                    "value": "0x01"
                 }
             }
         }
@@ -1319,8 +1319,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x1"
+                    "bits": "8",
+                    "value": "0x01"
                 }
             }
         }
