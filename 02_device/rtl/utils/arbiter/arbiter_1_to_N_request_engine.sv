@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : arbiter_1_to_N_request.sv
+// File   : arbiter_1_to_N_request_engine.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-06-17 07:17:55
 // Editor : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module arbiter_1_to_N_request #(
+module arbiter_1_to_N_request_engine #(
   parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)      ,
   parameter ID_LEVEL              = 1                               ,
   parameter ID_BUNDLE             = 0                               ,
@@ -373,4 +373,4 @@ xpm_fifo_sync_wrapper #(
   .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
 );
 
-endmodule : arbiter_1_to_N_request
+endmodule : arbiter_1_to_N_request_engine

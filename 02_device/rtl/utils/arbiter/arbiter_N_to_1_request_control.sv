@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : arbiter_N_to_1_request.sv
+// File   : arbiter_N_to_1_request_control.sv
 // Create : 2023-06-17 07:18:54
 // Revise : 2023-06-17 07:19:17
 // Editor : sublime text4, tab size (2)
@@ -14,19 +14,19 @@
 
 `include "global_package.vh"
 
-module arbiter_N_to_1_request #(
-  parameter NUM_MEMORY_REQUESTOR  = 2                               ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR) ,
+module arbiter_N_to_1_request_control #(
+  parameter NUM_CONTROL_REQUESTOR  = 2                               ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_REQUESTOR) ,
   parameter FIFO_ARBITER_DEPTH    = 16                              ,
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+17),
   parameter PROG_THRESH           = 2**$clog2(16)
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
-  input  ControlPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
+  input  ControlPacket                     request_in [NUM_CONTROL_REQUESTOR-1:0],
   input  FIFOStateSignalsInput            fifo_request_signals_in              ,
   output FIFOStateSignalsOutput           fifo_request_signals_out             ,
-  output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                    ,
+  output logic [NUM_CONTROL_REQUESTOR-1:0] arbiter_grant_out                    ,
   output ControlPacket                     request_out                          ,
   output logic                            fifo_setup_signal
 );
@@ -39,8 +39,8 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-ControlPacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
-ControlPacket request_out_int                          ;
+ControlPacket request_in_reg [NUM_CONTROL_REQUESTOR-1:0];
+ControlPacket request_out_int                           ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
@@ -67,14 +67,14 @@ logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid;
 // --------------------------------------------------------------------------------------
 // FIFO Request INPUT Arbiter ControlPacket
 // --------------------------------------------------------------------------------------
-ControlPacket request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
-ControlPacket request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
+ControlPacket request_arbiter_in_int[(NUM_CONTROL_REQUESTOR)-1:0];
+ControlPacket request_arbiter_in_reg[(NUM_CONTROL_REQUESTOR)-1:0];
 
-ControlPacketPayload               fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
-ControlPacketPayload               fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
-FIFOStateSignalsInputInternal      fifo_request_arbiter_in_signals_in_int  [(NUM_MEMORY_REQUESTOR)-1:0];
-FIFOStateSignalsOutInternal        fifo_request_arbiter_in_signals_out_int [(NUM_MEMORY_REQUESTOR)-1:0];
-logic [(NUM_MEMORY_REQUESTOR)-1:0] fifo_request_arbiter_in_setup_signal_int                            ;
+ControlPacketPayload                fifo_request_arbiter_in_din             [(NUM_CONTROL_REQUESTOR)-1:0];
+ControlPacketPayload                fifo_request_arbiter_in_dout            [(NUM_CONTROL_REQUESTOR)-1:0];
+FIFOStateSignalsInputInternal       fifo_request_arbiter_in_signals_in_int  [(NUM_CONTROL_REQUESTOR)-1:0];
+FIFOStateSignalsOutInternal         fifo_request_arbiter_in_signals_out_int [(NUM_CONTROL_REQUESTOR)-1:0];
+logic [(NUM_CONTROL_REQUESTOR)-1:0] fifo_request_arbiter_in_setup_signal_int                             ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -99,19 +99,19 @@ end
 
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
-    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i<NUM_CONTROL_REQUESTOR; i++) begin
       request_in_reg[i].valid  <= 1'b0;
     end
   end
   else begin
-    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i<NUM_CONTROL_REQUESTOR; i++) begin
       request_in_reg[i].valid  <= request_in[i].valid;
     end
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+  for (int i=0; i<NUM_CONTROL_REQUESTOR; i++) begin
     request_in_reg[i].payload  <= request_in[i].payload ;
   end
 end
@@ -137,7 +137,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-  for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
+  for (int i=0; i<NUM_CONTROL_REQUESTOR; i++) begin : generate_arbiter_bus_in
     arbiter_grant_out[i] <= ~fifo_request_arbiter_in_signals_out_int[i].prog_full & ~fifo_request_signals_out_int.prog_full;
   end
 end
@@ -163,25 +163,25 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_arbiter) begin
-    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i< NUM_CONTROL_REQUESTOR; i++) begin
       request_arbiter_in_reg[i].valid           <= 1'b0;
     end
   end
   else begin
-    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
+    for (int i=0; i< NUM_CONTROL_REQUESTOR; i++) begin
       request_arbiter_in_reg[i].valid           <= request_in[i].valid;
     end
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
+  for (int i=0; i< NUM_CONTROL_REQUESTOR; i++) begin
     request_arbiter_in_reg[i].payload <= request_in[i].payload;
   end
 end
 
 generate
-  for (i=0; i<(NUM_MEMORY_REQUESTOR); i++) begin : generate_fifo_request_arbiter_in_din
+  for (i=0; i<(NUM_CONTROL_REQUESTOR); i++) begin : generate_fifo_request_arbiter_in_din
     // FIFO is resetting
     assign fifo_request_arbiter_in_setup_signal_int[i] = fifo_request_arbiter_in_signals_out_int[i].wr_rst_busy | fifo_request_arbiter_in_signals_out_int[i].rd_rst_busy;
 
@@ -257,12 +257,12 @@ xpm_fifo_sync_wrapper #(
 // Bus arbiter for requests fifo_942x16_ControlPacket
 // --------------------------------------------------------------------------------------
 always_comb begin
-  for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
+  for (int i=0; i<NUM_CONTROL_REQUESTOR; i++) begin : generate_arbiter_bus_in
     arbiter_bus_in[i]    = request_arbiter_in_int[i];
     arbiter_bus_valid[i] = request_arbiter_in_int[i].valid;
     arbiter_request[i]   = ~fifo_request_arbiter_in_signals_out_int[i].empty;
   end
-  for (int i=NUM_MEMORY_REQUESTOR; i<NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
+  for (int i=NUM_CONTROL_REQUESTOR; i<NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
     arbiter_bus_in[i]    = 0;
     arbiter_bus_valid[i] = 0;
     arbiter_request[i]   = 0;
@@ -270,8 +270,8 @@ always_comb begin
 end
 
 arbiter_bus_N_in_1_out #(
-  .WIDTH    (NUM_MEMORY_REQUESTOR),
-  .BUS_WIDTH($bits(ControlPacket))
+  .WIDTH    (NUM_CONTROL_REQUESTOR),
+  .BUS_WIDTH($bits(ControlPacket) )
 ) inst_arbiter_bus_N_in_1_out (
   .ap_clk           (ap_clk           ),
   .areset           (areset_arbiter   ),
@@ -282,4 +282,4 @@ arbiter_bus_N_in_1_out #(
   .arbiter_bus_out  (arbiter_bus_out  )
 );
 
-endmodule : arbiter_N_to_1_request
+endmodule : arbiter_N_to_1_request_control

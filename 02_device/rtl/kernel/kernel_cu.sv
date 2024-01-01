@@ -58,13 +58,13 @@ FIFOStateSignalsInput fifo_request_signals_in_reg ;
 CacheResponse          cache_generator_response_in                                         ;
 FIFOStateSignalsInput  cache_generator_fifo_response_signals_in                            ;
 FIFOStateSignalsOutput cache_generator_fifo_response_signals_out                           ;
-EnginePacket           cache_generator_response_out              [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket           cache_generator_response_out              [NUM_MEMORY_REQUESTOR-1:0];
 logic                  cache_generator_fifo_response_setup_signal                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-EnginePacket                     cache_generator_request_in               [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket                     cache_generator_request_in               [NUM_MEMORY_REQUESTOR-1:0];
 FIFOStateSignalsInput            cache_generator_fifo_request_signals_in                            ;
 FIFOStateSignalsOutput           cache_generator_fifo_request_signals_out                           ;
 logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_request_in                                 ;
@@ -76,10 +76,10 @@ logic                            cache_generator_fifo_request_setup_signal      
 // Signals setup and configuration reading
 // --------------------------------------------------------------------------------------
 KernelDescriptor       cu_setup_descriptor               ;
-EnginePacket           cu_setup_response_in              ;
+MemoryPacket           cu_setup_response_in              ;
 FIFOStateSignalsOutput cu_setup_fifo_response_signals_out;
 FIFOStateSignalsInput  cu_setup_fifo_response_signals_in ;
-EnginePacket           cu_setup_request_out              ;
+MemoryPacket           cu_setup_request_out              ;
 FIFOStateSignalsOutput cu_setup_fifo_request_signals_out ;
 FIFOStateSignalsInput  cu_setup_fifo_request_signals_in  ;
 logic                  cu_setup_fifo_setup_signal        ;
@@ -90,10 +90,10 @@ logic                  cu_setup_done_out                 ;
 // Signals for CU
 // --------------------------------------------------------------------------------------
 KernelDescriptor       cu_bundles_descriptor               ;
-EnginePacket           cu_bundles_response_in              ;
+MemoryPacket           cu_bundles_response_in              ;
 FIFOStateSignalsOutput cu_bundles_fifo_response_signals_out;
 FIFOStateSignalsInput  cu_bundles_fifo_response_signals_in ;
-EnginePacket           cu_bundles_request_out              ;
+MemoryPacket           cu_bundles_request_out              ;
 FIFOStateSignalsOutput cu_bundles_fifo_request_signals_out ;
 FIFOStateSignalsInput  cu_bundles_fifo_request_signals_in  ;
 logic                  cu_bundles_fifo_setup_signal        ;
@@ -380,7 +380,9 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+cu_bundles #(
+  `include"set_cu_parameters.vh"
+  ) inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),

@@ -54,15 +54,16 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-parameter TYPE_MEMORY_CMD_BITS = 7;
+parameter TYPE_MEMORY_CMD_BITS = 8;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
-  CMD_INVALID       = 1 << 0,
-  CMD_MEM_READ      = 1 << 1,
-  CMD_MEM_WRITE     = 1 << 2,
-  CMD_MEM_RESPONSE  = 1 << 3,
-  CMD_MEM_CONFIGURE = 1 << 4,
-  CMD_ENGINE        = 1 << 5,
-  CMD_CONTROL       = 1 << 6
+  CMD_INVALID      = 1 << 0,
+  CMD_MEM_READ     = 1 << 1,
+  CMD_MEM_WRITE    = 1 << 2,
+  CMD_MEM_RESPONSE = 1 << 3,
+  CMD_MEM_PROGRAM  = 1 << 4,
+  CMD_MEM_FLUSH    = 1 << 5,
+  CMD_ENGINE       = 1 << 6,
+  CMD_CONTROL      = 1 << 7
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
@@ -213,13 +214,13 @@ typedef struct packed{
 //   Generic Control packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  PacketRouteAddress packet_destination;
+  PacketRouteAddress                           packet_destination;
+  type_sequence_state                          sequence_state    ;
+  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
 } ControlPacketRouteAttributes;
 
 typedef struct packed{
-  ControlPacketRouteAttributes                 route         ;
-  type_sequence_state                          sequence_state;
-  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id   ;
+  ControlPacketRouteAttributes route;
 } ControlPacketPayload;
 
 typedef struct packed{
@@ -257,8 +258,8 @@ typedef struct packed {
 
 typedef struct packed {
   CacheRequestIOB  iob ;
-  EnginePacketMeta meta;
-  EnginePacketData data;
+  MemoryPacketMeta meta;
+  MemoryPacketData data;
 } CacheRequestPayload;
 
 typedef struct packed {
@@ -277,8 +278,8 @@ typedef struct packed {
 
 typedef struct packed {
   CacheResponseIOB iob ;
-  EnginePacketMeta meta;
-  EnginePacketData data;
+  MemoryPacketMeta meta;
+  MemoryPacketData data;
 } CacheResponsePayload;
 
 typedef struct packed {
@@ -358,28 +359,30 @@ function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input EnginePacke
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_CacheRequest
 // --------------------------------------------------------------------------------------
-function EnginePacket map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet, input valid_packet);
+function EnginePacketPayload map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet);
 
-  EnginePacket output_packet;
+  EnginePacketPayload output_packet;
 
-  output_packet.valid                 = valid_packet;
-  output_packet.payload.meta          = input_packet.meta;
-  output_packet.payload.data.field[0] = input_packet.iob.rdata;
+  output_packet.meta          = input_packet.meta;
+  output_packet.data.field[0] = input_packet.iob.rdata;
 
   return output_packet;
 endfunction : map_CacheResponse_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function EnginePacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet);
+function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet);
 
-  EnginePacketPayload  output_packet;
+  MemoryPacketPayload  output_packet;
 
-  output_packet  = input_packet;
+  output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source;
+  output_packet.meta.address              = input_packet.meta.address;
+  output_packet.meta.subclass.cmd         = input_packet.meta.subclass.cmd;
+  output_packet.data.field[0]             = input_packet.data.field[0];
 
   return output_packet;
 endfunction : map_EnginePacket_to_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
-function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input EnginePacketData input_packet, input EnginePacketData pending_packet);
+function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketData input_packet, input EnginePacketData pending_packet);
 
   EnginePacketData output_packet;
 
@@ -396,7 +399,9 @@ function EnginePacketPayload  map_EnginePacket_to_ControlPacket (input EnginePac
 
   EnginePacketPayload  output_packet;
 
-  output_packet  = input_packet;
+  output_packet.meta.route.packet_destination  = input_packet.meta.route.sequence_source;
+  output_packet.meta.route.sequence_state      = input_packet.meta.route.sequence_state;
+  output_packet.meta.route.sequence_id         = input_packet.meta.route.sequence_id;
 
   return output_packet;
 endfunction : map_EnginePacket_to_ControlPacket
