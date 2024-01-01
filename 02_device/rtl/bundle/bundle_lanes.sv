@@ -509,11 +509,11 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
-arbiter_1_to_N_response_engine #(
-    .NUM_ENGINE_RECEIVER(NUM_LANES                                   ),
-    .ID_LEVEL           (2                                           ),
-    .ID_BUNDLE          (ID_BUNDLE                                   ),
-    .FIFO_ARBITER_DEPTH (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
+arbiter_1_to_N_request_engine #(
+    .NUM_ENGINE_REQUESTOR(NUM_LANES                                   ),
+    .ID_LEVEL            (2                                           ),
+    .ID_BUNDLE           (ID_BUNDLE                                   ),
+    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
 ) inst_lane_arbiter_1_to_N_engine_response_in (
     .ap_clk                  (ap_clk                                             ),
     .areset                  (areset_lane_arbiter_1_to_N_lanes                   ),
