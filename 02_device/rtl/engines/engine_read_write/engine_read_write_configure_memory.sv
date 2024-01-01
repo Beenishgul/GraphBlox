@@ -29,7 +29,7 @@ module engine_read_write_configure_memory #(parameter
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
-    input  EnginePacket           response_memory_in                 ,
+    input  MemoryPacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output ReadWriteConfiguration configure_memory_out               ,
@@ -44,7 +44,7 @@ module engine_read_write_configure_memory #(parameter
 logic areset_read_write_generator;
 logic areset_fifo                ;
 
-EnginePacket                 response_memory_in_reg                          ;
+MemoryPacket                 response_memory_in_reg                          ;
 EnginePacketMeta             configure_memory_meta_int                       ;
 ReadWriteConfiguration       configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
@@ -55,15 +55,10 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-EnginePacketPayload           fifo_response_memory_in_din             ;
-EnginePacket                  fifo_response_memory_in_dout_int        ;
-EnginePacket                  fifo_response_memory_in_dout_reg        ;
-EnginePacketPayload           fifo_response_memory_in_dout            ;
-FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
-FIFOStateSignalsInputInternal fifo_response_memory_in_signals_in_int  ;
-FIFOStateSignalsOutInternal   fifo_response_memory_in_signals_out_int ;
-logic                         fifo_response_memory_in_setup_signal_int;
-logic                         fifo_response_memory_in_push_filter     ;
+MemoryPacket          fifo_response_memory_in_dout_int      ;
+MemoryPacket          fifo_response_memory_in_dout_reg      ;
+FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
+logic                 fifo_response_memory_in_push_filter   ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
@@ -129,35 +124,33 @@ end
 assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
 assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
-always_comb begin
-    configure_memory_meta_int.route.packet_source.id_cu     = 1 << ID_CU;
-    configure_memory_meta_int.route.packet_source.id_bundle = 1 << ID_BUNDLE;
-    configure_memory_meta_int.route.packet_source.id_lane   = 1 << ID_LANE;
-    configure_memory_meta_int.route.packet_source.id_engine = 1 << ID_ENGINE;
-    configure_memory_meta_int.route.packet_source.id_module = 1 << ID_MODULE;
 
-    configure_memory_meta_int.route.packet_destination.id_cu     = 0;
-    configure_memory_meta_int.route.packet_destination.id_bundle = 0;
-    configure_memory_meta_int.route.packet_destination.id_lane   = 0;
-    configure_memory_meta_int.route.packet_destination.id_engine = 0;
-    configure_memory_meta_int.route.packet_destination.id_module = 1;
+assign configure_memory_meta_int.route.packet_source.id_cu          = 1 << ID_CU;
+assign configure_memory_meta_int.route.packet_source.id_bundle      = 1 << ID_BUNDLE;
+assign configure_memory_meta_int.route.packet_source.id_lane        = 1 << ID_LANE;
+assign configure_memory_meta_int.route.packet_source.id_engine      = 1 << ID_ENGINE;
+assign configure_memory_meta_int.route.packet_source.id_module      = 1 << ID_MODULE;
 
-    configure_memory_meta_int.route.sequence_source.id_cu     = 1 << ID_CU;
-    configure_memory_meta_int.route.sequence_source.id_bundle = 1 << ID_BUNDLE;
-    configure_memory_meta_int.route.sequence_source.id_lane   = 1 << ID_LANE;
-    configure_memory_meta_int.route.sequence_source.id_engine = 1 << ID_ENGINE;
-    configure_memory_meta_int.route.sequence_source.id_module = 1 << ID_MODULE;
+assign configure_memory_meta_int.route.packet_destination.id_cu     = 0;
+assign configure_memory_meta_int.route.packet_destination.id_bundle = 0;
+assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
+assign configure_memory_meta_int.route.packet_destination.id_engine = 0;
+assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 
-    configure_memory_meta_int.route.sequence_state    = SEQUENCE_INVALID;
-    configure_memory_meta_int.route.sequence_id       = 0;
-    configure_memory_meta_int.route.hops              = NUM_BUNDLES_WIDTH_BITS;
-    configure_memory_meta_int.address.id_buffer       = 0;
-    configure_memory_meta_int.address.offset          = $clog2(M_AXI4_FE_DATA_W/8);
-    configure_memory_meta_int.address.shift.amount    = 0;
-    configure_memory_meta_int.address.shift.direction = 1'b1;
-    configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
-    configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
-end
+assign configure_memory_meta_int.route.sequence_source.id_cu        = 1 << ID_CU;
+assign configure_memory_meta_int.route.sequence_source.id_bundle    = 1 << ID_BUNDLE;
+assign configure_memory_meta_int.route.sequence_source.id_lane      = 1 << ID_LANE;
+assign configure_memory_meta_int.route.sequence_source.id_engine    = 1 << ID_ENGINE;
+assign configure_memory_meta_int.route.sequence_source.id_module    = 1 << ID_MODULE;
+assign configure_memory_meta_int.route.sequence_state               = SEQUENCE_INVALID;
+assign configure_memory_meta_int.route.sequence_id                  = 0;
+
+assign configure_memory_meta_int.route.hops                         = NUM_BUNDLES_WIDTH_BITS;
+assign configure_memory_meta_int.address.id_buffer                  = 0;
+assign configure_memory_meta_int.address.offset                     = $clog2(M_AXI4_FE_DATA_W/8);
+assign configure_memory_meta_int.address.shift.amount               = 0;
+assign configure_memory_meta_int.address.shift.direction            = 1'b1;
+assign configure_memory_meta_int.subclass.cmd                       = CMD_INVALID;
 
 always_ff @(posedge ap_clk) begin
     if(areset_read_write_generator) begin
@@ -225,9 +218,8 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << 5) : begin
                 configure_memory_reg.payload.meta.subclass.cmd                       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[0][TYPE_MEMORY_CMD_BITS-1:0]);
-                configure_memory_reg.payload.meta.subclass.buffer                    <= type_data_buffer'(fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)-1:TYPE_MEMORY_CMD_BITS]);
-                configure_memory_reg.payload.meta.route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS)];
-                configure_memory_reg.payload.meta.route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_DATA_STRUCTURE_BITS+TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
+                configure_memory_reg.payload.meta.route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS)];
+                configure_memory_reg.payload.meta.route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[0][(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
             end
             (1 << 6) : begin
                 configure_memory_reg.payload.meta.route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[0][(NUM_CUS_WIDTH_BITS)-1:0];
@@ -271,7 +263,7 @@ end
 // memory response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
-assign fifo_response_memory_in_push_filter      = ((response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+assign fifo_response_memory_in_push_filter      = (response_memory_in_reg.payload.meta.subclass.cmd == CMD_MEM_PROGRAM) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
 assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid & fifo_response_memory_in_push_filter;
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
@@ -279,7 +271,7 @@ assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload
 // FIFO memory configure_memory out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
-assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy  | fifo_configure_memory_signals_out_int.rd_rst_busy;
+assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy | fifo_configure_memory_signals_out_int.rd_rst_busy;
 
 // Push
 assign fifo_configure_memory_signals_in_int.wr_en = configure_memory_reg.valid;

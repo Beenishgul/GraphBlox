@@ -52,13 +52,13 @@ module engine_read_write_generator #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  EnginePacket           response_memory_in                                               ,
+    input  MemoryPacket           response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output EnginePacket           request_memory_out                                               ,
+    output MemoryPacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output logic                  fifo_setup_signal                                                ,
@@ -104,8 +104,8 @@ module engine_read_write_generator #(parameter
     logic                         fifo_request_setup_signal_int;
 
     EnginePacket response_engine_in_reg    ;
-    EnginePacket response_memory_in_reg    ;
-    EnginePacket response_memory_in_reg_S2 ;
+    MemoryPacket response_memory_in_reg    ;
+    MemoryPacket response_memory_in_reg_S2 ;
     logic        configure_memory_setup_reg;
 
     logic                            configure_engine_param_valid;
@@ -128,10 +128,10 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic                   read_write_response_engine_in_valid_reg    ;
-    logic                   read_write_response_engine_in_valid_flag   ;
-    logic                   read_write_response_engine_in_valid_flag_S2;
-    EnginePacketData        result_int                                 ;
+    logic             read_write_response_engine_in_valid_reg    ;
+    logic             read_write_response_engine_in_valid_flag   ;
+    logic             read_write_response_engine_in_valid_flag_S2;
+    EnginePacketData  result_int                                 ;
     PacketDataAddress address_int                                ;
 
 // --------------------------------------------------------------------------------------
@@ -166,11 +166,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                    areset_backtrack                                                           ;
-    logic                    backtrack_configure_route_valid                                            ;
-    PacketRouteAddress backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                  areset_backtrack                                                           ;
+    logic                  backtrack_configure_route_valid                                            ;
+    PacketRouteAddress     backtrack_configure_route_in                                               ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -659,9 +659,9 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                     = request_pending_out_int.valid;
-    assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
+    assign fifo_response_comb.valid                = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route   = request_pending_out_int.payload.meta.route;
+    assign fifo_response_comb.payload.meta.address = request_pending_out_int.payload.meta.address;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
