@@ -281,7 +281,7 @@ assign response_in_int.payload.iob.valid = fifo_response_signals_out_int.valid;
 assign response_in_int.payload.iob.ready = fifo_response_signals_out_int.valid;
 
 always_comb begin
-  if(fifo_response_dout.meta.subclass.cmd == CMD_MEM_READ)
+  if((fifo_response_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_PROGRAM) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_FLUSH))
     response_in_int.payload.iob.rdata = read_transaction_tdata_out_reg;
   else
     response_in_int.payload.iob.rdata = write_transaction_tdata_in_reg;
@@ -330,7 +330,7 @@ always_comb begin
       next_state = CU_ENGINE_M_AXI_READY;
     end
     CU_ENGINE_M_AXI_READY : begin
-      if(~fifo_response_signals_out_int.prog_full & ~read_transaction_prog_full & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
+      if(~fifo_response_signals_out_int.prog_full & ~read_transaction_prog_full & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_PROGRAM) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_FLUSH))
         next_state = CU_ENGINE_M_AXI_CMD_TRANS;
       else if(~fifo_response_signals_out_int.prog_full & engine_m_axi_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))
         next_state = CU_ENGINE_M_AXI_CMD_TRANS;
@@ -400,7 +400,7 @@ assign engine_m_axi_response_mem.iob.ready = write_transaction_tready_out & (fif
 assign engine_m_axi_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
 assign engine_m_axi_response_mem.iob.rdata = read_transaction_tdata_out;
 assign read_transaction_length_in          = 1;
-assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & ((fifo_response_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_PROGRAM) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_FLUSH));
 assign read_transaction_offset_in          = engine_m_axi_request_mem_reg.iob.addr;
 assign read_transaction_tready_in          = fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------

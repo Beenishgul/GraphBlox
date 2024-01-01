@@ -24,7 +24,7 @@ module cache_generator_response #(
   input  CacheResponse          response_in                            ,
   input  FIFOStateSignalsInput  fifo_response_signals_in               ,
   output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output EnginePacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
+  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
   output logic                  fifo_setup_signal
 );
 
@@ -35,14 +35,14 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_demux  ;
 
-EnginePacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
 CacheResponse response_in_reg                           ;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
 CacheResponsePayload          fifo_response_din             ;
-EnginePacket                  fifo_response_dout_int        ;
+MemoryPacket                  fifo_response_dout_int        ;
 CacheResponsePayload          fifo_response_dout            ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
@@ -113,12 +113,12 @@ end
 
 always_comb begin
   if(fifo_response_dout_int.valid) begin
-    case (fifo_response_dout_int.payload.meta.subclass.buffer)
-      STRUCT_CU_SETUP : begin
+    case (fifo_response_dout_int.payload.meta.subclass.cmd)
+      CMD_MEM_PROGRAM : begin
         response_out_reg[0] = fifo_response_dout_int;
         response_out_reg[1] = fifo_response_dout_int;
       end
-      STRUCT_CU_FLUSH : begin
+      CMD_MEM_FLUSH   : begin
         response_out_reg[0] = fifo_response_dout_int;
         response_out_reg[1] = 0;
       end
@@ -140,17 +140,15 @@ end
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_response_signals_in_int.wr_en     = response_in_reg.valid;
-assign fifo_response_din.iob                  = response_in_reg.payload.iob;
-assign fifo_response_din.meta.address         = response_in_reg.payload.meta.address ;
-assign fifo_response_din.meta.route           = response_in_reg.payload.meta.route;
-assign fifo_response_din.meta.subclass.buffer = response_in_reg.payload.meta.subclass.buffer;
-assign fifo_response_din.meta.subclass.cmd    = CMD_MEM_RESPONSE;
-assign fifo_response_din.data                 = response_in_reg.payload.data;
+assign fifo_response_signals_in_int.wr_en  = response_in_reg.valid;
+assign fifo_response_din.iob               = response_in_reg.payload.iob;
+assign fifo_response_din.meta              = response_in_reg.payload.meta;
+assign fifo_response_din.data              = response_in_reg.payload.data;
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-always_comb fifo_response_dout_int        = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, fifo_response_signals_out_int.valid);
+assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
+always_comb fifo_response_dout_int.payload   = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout);
 
 xpm_fifo_sync_bram_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),

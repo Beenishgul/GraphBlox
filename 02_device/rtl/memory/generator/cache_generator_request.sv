@@ -23,7 +23,7 @@ module cache_generator_request #(
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
   input  KernelDescriptor                 descriptor_in                        ,
-  input  EnginePacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
+  input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
   input  FIFOStateSignalsInput            fifo_request_signals_in              ,
   output FIFOStateSignalsOutput           fifo_request_signals_out             ,
   input  logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_request_in                   ,
@@ -39,7 +39,7 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-EnginePacket                 request_in_reg   [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket                 request_in_reg   [NUM_MEMORY_REQUESTOR-1:0];
 CacheRequest                 request_out_int                            ;
 KernelDescriptor             descriptor_in_reg                          ;
 logic [M_AXI4_FE_ADDR_W-1:0] address_base                               ;
@@ -60,8 +60,8 @@ logic                         fifo_request_push_filter     ;
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-EnginePacket arbiter_bus_out                           ;
-EnginePacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
+MemoryPacket arbiter_bus_out                           ;
+MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant      ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request    ;
@@ -223,7 +223,7 @@ end
 
 arbiter_bus_N_in_1_out #(
   .WIDTH    (NUM_MEMORY_REQUESTOR),
-  .BUS_WIDTH($bits(EnginePacket) )
+  .BUS_WIDTH($bits(MemoryPacket) )
 ) inst_arbiter_bus_N_in_1_out (
   .ap_clk           (ap_clk           ),
   .areset           (areset_arbiter   ),

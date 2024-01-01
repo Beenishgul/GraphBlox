@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : arbiter_N_to_1_request.sv
+// File   : arbiter_N_to_1_request_memory.sv
 // Create : 2023-06-17 07:18:54
 // Revise : 2023-06-17 07:19:17
 // Editor : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module arbiter_N_to_1_request #(
+module arbiter_N_to_1_request_memory #(
   parameter NUM_MEMORY_REQUESTOR  = 2                               ,
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR) ,
   parameter FIFO_ARBITER_DEPTH    = 16                              ,
@@ -282,4 +282,4 @@ arbiter_bus_N_in_1_out #(
   .arbiter_bus_out  (arbiter_bus_out  )
 );
 
-endmodule : arbiter_N_to_1_request
+endmodule : arbiter_N_to_1_request_memory

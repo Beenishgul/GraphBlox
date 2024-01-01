@@ -321,7 +321,7 @@ always_comb begin
       next_state = CU_CACHE_CMD_READY;
     end
     CU_CACHE_CMD_READY : begin
-      if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ))
+      if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_PROGRAM) | (fifo_request_dout.meta.subclass.cmd == CMD_MEM_FLUSH)))
         next_state = CU_CACHE_CMD_READ_TRANS;
       else if(cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~write_command_counter_is_zero)
         next_state = CU_CACHE_CMD_WRITE_TRANS;

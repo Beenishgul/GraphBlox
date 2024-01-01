@@ -29,10 +29,10 @@ module cu_setup #(
     input  logic                  areset                   ,
     input  logic                  cu_flush                 ,
     input  KernelDescriptor       descriptor_in            ,
-    input  EnginePacket           response_in              ,
+    input  MemoryPacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
-    output EnginePacket           request_out              ,
+    output MemoryPacket           request_out              ,
     input  FIFOStateSignalsInput  fifo_request_signals_in  ,
     output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
@@ -54,8 +54,8 @@ logic counter_load ;
 logic            cu_flush_reg     ;
 logic            cu_flush_mode    ;
 KernelDescriptor descriptor_in_reg;
-EnginePacket     response_in_reg  ;
-EnginePacket     request_out_int  ;
+MemoryPacket     response_in_reg  ;
+MemoryPacket     request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -70,8 +70,8 @@ cu_setup_state next_state   ;
 // --------------------------------------------------------------------------------------
 // Request FIFO OUTPUT
 // --------------------------------------------------------------------------------------
-EnginePacketPayload           fifo_request_din             ;
-EnginePacketPayload           fifo_request_dout            ;
+MemoryPacketPayload           fifo_request_din             ;
+MemoryPacketPayload           fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -89,7 +89,7 @@ FIFOStateSignalsOutInternal fifo_response_signals_out_int;
 CUSetupEngineConfiguration engine_cu_setup_configuration_in        ;
 CUSetupEngineConfiguration configuration_comb_program              ;
 CUSetupEngineConfiguration configuration_comb_flush                ;
-EnginePacket               engine_cu_setup_request_out             ;
+MemoryPacket               engine_cu_setup_request_out             ;
 FIFOStateSignalsOutput     engine_cu_setup_fifo_request_signals_out;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_in ;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_reg;
@@ -374,25 +374,11 @@ assign configuration_comb_program.payload.meta.route.packet_source.id_bundle    
 assign configuration_comb_program.payload.meta.route.packet_source.id_lane        = {NUM_LANES_WIDTH_BITS{1'b1}};
 assign configuration_comb_program.payload.meta.route.packet_source.id_engine      = {NUM_ENGINES_WIDTH_BITS{1'b1}};
 assign configuration_comb_program.payload.meta.route.packet_source.id_module      = 1;
-assign configuration_comb_program.payload.meta.route.packet_destination.id_cu     = ID_CU;
-assign configuration_comb_program.payload.meta.route.packet_destination.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_destination.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_destination.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_destination.id_module = 1; // routes to memory configuration modules in engines
-assign configuration_comb_program.payload.meta.route.sequence_source.id_cu        = ID_CU;
-assign configuration_comb_program.payload.meta.route.sequence_source.id_bundle    = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.sequence_source.id_lane      = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.sequence_source.id_engine    = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.sequence_source.id_module    = 1;
-assign configuration_comb_program.payload.meta.route.sequence_state               = SEQUENCE_INVALID;
-assign configuration_comb_program.payload.meta.route.sequence_id                  = 0;
-assign configuration_comb_program.payload.meta.route.hops                         = NUM_BUNDLES_WIDTH_BITS;
 assign configuration_comb_program.payload.meta.address.id_buffer                  = 0;
 assign configuration_comb_program.payload.meta.address.offset                     = 0;
 assign configuration_comb_program.payload.meta.address.shift.amount               = $clog2(M_AXI4_FE_DATA_W/8);
 assign configuration_comb_program.payload.meta.address.shift.direction            = 1'b1;
-assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_READ;
-assign configuration_comb_program.payload.meta.subclass.buffer                    = STRUCT_CU_SETUP;
+assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_PROGRAM;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet FLUSH
@@ -412,8 +398,7 @@ assign configuration_comb_flush.payload.meta.address.id_buffer       = 0;
 assign configuration_comb_flush.payload.meta.address.offset          = 0;
 assign configuration_comb_flush.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
 assign configuration_comb_flush.payload.meta.address.shift.direction = 1'b1;
-assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_READ;
-assign configuration_comb_flush.payload.meta.subclass.buffer         = STRUCT_CU_FLUSH;
+assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_FLUSH;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
@@ -460,7 +445,7 @@ counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
 );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out EnginePacket
+// FIFO cache requests out MemoryPacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
@@ -476,10 +461,10 @@ assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_EnginePacketRequest (
+) inst_fifo_MemoryPacketRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
     .din        (fifo_request_din                        ),
