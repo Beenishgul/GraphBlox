@@ -21,10 +21,10 @@ module cu_bundles #(
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
     input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_memory_in                 ,
+    input  EnginePacket           response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_memory_out                 ,
+    output EnginePacket           request_memory_out                 ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
@@ -41,54 +41,54 @@ logic areset_fifo      ;
 
 KernelDescriptor descriptor_in_reg;
 
-MemoryPacket request_control_out_int;
-MemoryPacket request_memory_out_int ;
-MemoryPacket response_control_in_int;
-MemoryPacket response_control_in_reg;
-MemoryPacket response_memory_in_int ;
-MemoryPacket response_memory_in_reg ;
+EnginePacket request_control_out_int;
+EnginePacket request_memory_out_int ;
+EnginePacket response_control_in_int;
+EnginePacket response_control_in_reg;
+EnginePacket response_memory_in_int ;
+EnginePacket response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Response MemoryPacket
+// FIFO INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInputInternal fifo_response_memory_in_signals_in_int  ;
 FIFOStateSignalsInput         fifo_response_memory_in_signals_in_reg  ;
 FIFOStateSignalsOutInternal   fifo_response_memory_in_signals_out_int ;
 logic                         fifo_response_memory_in_setup_signal_int;
-MemoryPacketPayload           fifo_response_memory_in_din             ;
-MemoryPacketPayload           fifo_response_memory_in_dout            ;
+EnginePacketPayload           fifo_response_memory_in_din             ;
+EnginePacketPayload           fifo_response_memory_in_dout            ;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Response MemoryPacket
+// FIFO INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInputInternal fifo_response_control_in_signals_in_int  ;
 FIFOStateSignalsInput         fifo_response_control_in_signals_in_reg  ;
 FIFOStateSignalsOutInternal   fifo_response_control_in_signals_out_int ;
 logic                         fifo_response_control_in_setup_signal_int;
-MemoryPacketPayload           fifo_response_control_in_din             ;
-MemoryPacketPayload           fifo_response_control_in_dout            ;
+EnginePacketPayload           fifo_response_control_in_din             ;
+EnginePacketPayload           fifo_response_control_in_dout            ;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT Request MemoryPacket
+// FIFO OUTPUT Request EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInputInternal fifo_request_memory_out_signals_in_int  ;
 FIFOStateSignalsInput         fifo_request_memory_out_signals_in_reg  ;
 FIFOStateSignalsOutInternal   fifo_request_memory_out_signals_out_int ;
 logic                         fifo_request_memory_out_setup_signal_int;
-MemoryPacketPayload           fifo_request_memory_out_din             ;
-MemoryPacketPayload           fifo_request_memory_out_dout            ;
+EnginePacketPayload           fifo_request_memory_out_din             ;
+EnginePacketPayload           fifo_request_memory_out_dout            ;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT CONTROL Request MemoryPacket
+// FIFO OUTPUT CONTROL Request EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInputInternal fifo_request_control_out_signals_in_int  ;
 FIFOStateSignalsInput         fifo_request_control_out_signals_in_reg  ;
 FIFOStateSignalsOutInternal   fifo_request_control_out_signals_out_int ;
 logic                         fifo_request_control_out_setup_signal_int;
-MemoryPacketPayload           fifo_request_control_out_din             ;
-MemoryPacketPayload           fifo_request_control_out_dout            ;
+EnginePacketPayload           fifo_request_control_out_din             ;
+EnginePacketPayload           fifo_request_control_out_dout            ;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
@@ -115,12 +115,12 @@ KernelDescriptor       bundle_descriptor_in                       [NUM_BUNDLES-1
 logic                  areset_bundle                              [NUM_BUNDLES-1:0];
 logic                  bundle_done_out                            [NUM_BUNDLES-1:0];
 logic                  bundle_fifo_setup_signal                   [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_request_control_out                 [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_request_lanes_out                   [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_request_memory_out                  [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_response_control_in                 [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_response_lanes_in                   [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_response_memory_in                  [NUM_BUNDLES-1:0];
+EnginePacket           bundle_request_control_out                 [NUM_BUNDLES-1:0];
+EnginePacket           bundle_request_lanes_out                   [NUM_BUNDLES-1:0];
+EnginePacket           bundle_request_memory_out                  [NUM_BUNDLES-1:0];
+EnginePacket           bundle_response_control_in                 [NUM_BUNDLES-1:0];
+EnginePacket           bundle_response_lanes_in                   [NUM_BUNDLES-1:0];
+EnginePacket           bundle_response_memory_in                  [NUM_BUNDLES-1:0];
 
 logic [NUM_BUNDLES-1:0] bundle_fifo_setup_signal_reg;
 logic [NUM_BUNDLES-1:0] bundle_done_out_reg         ;
@@ -138,8 +138,8 @@ logic                   areset_arbiter_N_to_1                                   
 logic                   bundle_arbiter_N_to_1_fifo_setup_signal                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_grant_out                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_N_to_1_arbiter_request_in                       ;
-MemoryPacket            bundle_arbiter_N_to_1_request_in              [NUM_BUNDLES-1:0];
-MemoryPacket            bundle_arbiter_N_to_1_request_out                              ;
+EnginePacket            bundle_arbiter_N_to_1_request_in              [NUM_BUNDLES-1:0];
+EnginePacket            bundle_arbiter_N_to_1_request_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -152,8 +152,8 @@ logic                   areset_arbiter_control_N_to_1                           
 logic                   bundle_arbiter_control_N_to_1_fifo_setup_signal                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_control_N_to_1_arbiter_grant_out                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_control_N_to_1_arbiter_request_in                       ;
-MemoryPacket            bundle_arbiter_control_N_to_1_request_in              [NUM_BUNDLES-1:0];
-MemoryPacket            bundle_arbiter_control_N_to_1_request_out                              ;
+EnginePacket            bundle_arbiter_control_N_to_1_request_in              [NUM_BUNDLES-1:0];
+EnginePacket            bundle_arbiter_control_N_to_1_request_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -164,8 +164,8 @@ FIFOStateSignalsInput  bundle_arbiter_1_to_N_fifo_response_signals_in [NUM_BUNDL
 FIFOStateSignalsOutput bundle_arbiter_1_to_N_fifo_response_signals_out                 ;
 logic                  areset_arbiter_1_to_N                                           ;
 logic                  bundle_arbiter_1_to_N_fifo_setup_signal                         ;
-MemoryPacket           bundle_arbiter_1_to_N_response_in                               ;
-MemoryPacket           bundle_arbiter_1_to_N_response_out             [NUM_BUNDLES-1:0];
+EnginePacket           bundle_arbiter_1_to_N_response_in                               ;
+EnginePacket           bundle_arbiter_1_to_N_response_out             [NUM_BUNDLES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -176,8 +176,8 @@ FIFOStateSignalsInput  bundle_arbiter_control_1_to_N_fifo_response_signals_in [N
 FIFOStateSignalsOutput bundle_arbiter_control_1_to_N_fifo_response_signals_out                 ;
 logic                  areset_arbiter_control_1_to_N                                           ;
 logic                  bundle_arbiter_control_1_to_N_fifo_setup_signal                         ;
-MemoryPacket           bundle_arbiter_control_1_to_N_response_in                               ;
-MemoryPacket           bundle_arbiter_control_1_to_N_response_out             [NUM_BUNDLES-1:0];
+EnginePacket           bundle_arbiter_control_1_to_N_response_in                               ;
+EnginePacket           bundle_arbiter_control_1_to_N_response_out             [NUM_BUNDLES-1:0];
 
 // --------------------------------------------------------------------------------------
 // CONTROL Variables
@@ -186,8 +186,8 @@ FIFOStateSignalsInput  fifo_request_control_out_signals_in ;
 FIFOStateSignalsInput  fifo_response_control_in_signals_in ;
 FIFOStateSignalsOutput fifo_request_control_out_signals_out;
 FIFOStateSignalsOutput fifo_response_control_in_signals_out;
-MemoryPacket           request_control_out                 ;
-MemoryPacket           response_control_in                 ;
+EnginePacket           request_control_out                 ;
+EnginePacket           response_control_in                 ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -283,7 +283,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Response MemoryPacket
+// FIFO INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_memory_in_setup_signal_int = fifo_response_memory_in_signals_out_int.wr_rst_busy | fifo_response_memory_in_signals_out_int.rd_rst_busy;
@@ -299,10 +299,10 @@ assign response_memory_in_int.payload               = fifo_response_memory_in_do
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseInput (
+) inst_fifo_EnginePacketResponseInput (
     .clk        (ap_clk                                             ),
     .srst       (areset_fifo                                        ),
     .din        (fifo_response_memory_in_din                        ),
@@ -318,7 +318,7 @@ xpm_fifo_sync_wrapper #(
 );
 
 // --------------------------------------------------------------------------------------
-// FIFO CONTROL INPUT Response MemoryPacket
+// FIFO CONTROL INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_control_in_setup_signal_int = fifo_response_control_in_signals_out_int.wr_rst_busy | fifo_response_control_in_signals_out_int.rd_rst_busy;
@@ -334,10 +334,10 @@ assign response_control_in_int.payload               = fifo_response_control_in_
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponseControlInput (
+) inst_fifo_EnginePacketResponseControlInput (
     .clk        (ap_clk                                              ),
     .srst       (areset_fifo                                         ),
     .din        (fifo_response_control_in_din                        ),
@@ -353,7 +353,7 @@ xpm_fifo_sync_wrapper #(
 );
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT requests MemoryPacket
+// FIFO OUTPUT requests EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_request_memory_out_setup_signal_int = fifo_request_memory_out_signals_out_int.wr_rst_busy | fifo_request_memory_out_signals_out_int.rd_rst_busy;
@@ -369,10 +369,10 @@ assign request_memory_out_int.payload               = fifo_request_memory_out_do
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequestOutput (
+) inst_fifo_EnginePacketRequestOutput (
     .clk        (ap_clk                                             ),
     .srst       (areset_fifo                                        ),
     .din        (fifo_request_memory_out_din                        ),
@@ -388,7 +388,7 @@ xpm_fifo_sync_wrapper #(
 );
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT requests CONTROL MemoryPacket
+// FIFO OUTPUT requests CONTROL EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_request_control_out_setup_signal_int = fifo_request_control_out_signals_out_int.wr_rst_busy | fifo_request_control_out_signals_out_int.rd_rst_busy;
@@ -404,10 +404,10 @@ assign request_control_out_int.payload               = fifo_request_control_out_
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequestControlOutput (
+) inst_fifo_EnginePacketRequestControlOutput (
     .clk        (ap_clk                                              ),
     .srst       (areset_fifo                                         ),
     .din        (fifo_request_control_out_din                        ),

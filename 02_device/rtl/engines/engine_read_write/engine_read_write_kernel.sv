@@ -20,33 +20,33 @@ module engine_read_write_kernel (
   input  logic                            config_params_valid_in,
   input  ReadWriteConfigurationParameters config_params_in      ,
   input  logic                            data_valid_in         ,
-  input  MemoryPacketData                 data_in               ,
-  output MemoryPacketDataAddress              address_out           ,
-  output MemoryPacketData                 result_out
+  input  EnginePacketData                 data_in               ,
+  output PacketDataAddress              address_out           ,
+  output EnginePacketData                 result_out
 );
 
 // Define internal signals
-MemoryPacketData        ops_value_reg ;
-MemoryPacketDataAddress address_int   ;
-MemoryPacketData        org_value_reg ;
-MemoryPacketData        org_data_int  ;
+EnginePacketData        ops_value_reg ;
+PacketDataAddress address_int   ;
+EnginePacketData        org_value_reg ;
+EnginePacketData        org_data_int  ;
 logic                   data_valid_reg;
 
 // Process input data and mask
 always_ff @(posedge ap_clk) begin
   if (areset) begin
     data_valid_reg <= 1'b0;
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       ops_value_reg.field[i] <= 0;
       org_value_reg.field[i] <= 0;
     end
   end else begin
     data_valid_reg <= data_valid_in;
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       if(config_params_in.const_mask[i] & config_params_valid_in) begin
         ops_value_reg.field[i] <= config_params_in.const_value;
       end else if (config_params_valid_in) begin
-        for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
           if(config_params_in.ops_mask[i][j]) begin
             ops_value_reg.field[i] <= data_in.field[j];
           end
@@ -56,9 +56,9 @@ always_ff @(posedge ap_clk) begin
       end
     end
 
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       if (config_params_valid_in) begin
-        for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
           if(config_params_in.ops_mask[i][j]) begin
             org_value_reg.field[i] <= data_in.field[j];
           end
@@ -93,7 +93,7 @@ always_ff @(posedge ap_clk) begin
     result_out  <= 0;
     address_out <= 0;
   end else begin
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       result_out.field[i] <= org_data_int.field[i];
     end
     address_out <= address_int;

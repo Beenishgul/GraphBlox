@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : arbiter_1_from_N_response.sv
+// File   : arbiter_1_to_N_response_memory.sv
 // Create : 2023-01-11 23:47:45
 // Revise : 2023-06-17 07:17:55
 // Edifromr : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module arbiter_1_to_N_response #(
+module arbiter_1_to_N_response_memory #(
   parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)      ,
   parameter ID_LEVEL              = 1                               ,
   parameter ID_BUNDLE             = 0                               ,
@@ -348,4 +348,4 @@ xpm_fifo_sync_wrapper #(
   .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
 );
 
-endmodule : arbiter_1_to_N_response
+endmodule : arbiter_1_to_N_response_memory

@@ -48,17 +48,17 @@ module engine_read_write_generator #(parameter
     input  KernelDescriptor       descriptor_in                                                    ,
     input  ReadWriteConfiguration configure_memory_in                                              ,
     input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                              ,
-    input  MemoryPacket           response_engine_in                                               ,
+    input  EnginePacket           response_engine_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  EnginePacket           response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    output MemoryPacket           request_engine_out                                               ,
+    output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacket           request_memory_out                                               ,
+    output EnginePacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output logic                  fifo_setup_signal                                                ,
@@ -77,7 +77,7 @@ module engine_read_write_generator #(parameter
     KernelDescriptor descriptor_in_reg;
 
     ReadWriteConfiguration configure_memory_reg;
-    MemoryPacket           request_out_int     ;
+    EnginePacket           request_out_int     ;
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
@@ -95,25 +95,25 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload           fifo_request_din             ;
-    MemoryPacketPayload           fifo_request_dout            ;
-    MemoryPacket                  fifo_response_comb           ;
+    EnginePacketPayload           fifo_request_din             ;
+    EnginePacketPayload           fifo_request_dout            ;
+    EnginePacket                  fifo_response_comb           ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
     FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
     logic                         fifo_request_setup_signal_int;
 
-    MemoryPacket response_engine_in_reg    ;
-    MemoryPacket response_memory_in_reg    ;
-    MemoryPacket response_memory_in_reg_S2 ;
+    EnginePacket response_engine_in_reg    ;
+    EnginePacket response_memory_in_reg    ;
+    EnginePacket response_memory_in_reg_S2 ;
     logic        configure_memory_setup_reg;
 
     logic                            configure_engine_param_valid;
     ReadWriteConfigurationParameters configure_engine_param_int  ;
 
-    MemoryPacket generator_engine_request_engine_reg;
-    MemoryPacket request_engine_out_reg             ;
-    MemoryPacket request_memory_out_reg             ;
+    EnginePacket generator_engine_request_engine_reg;
+    EnginePacket request_engine_out_reg             ;
+    EnginePacket request_memory_out_reg             ;
 
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg;
 
@@ -131,29 +131,29 @@ module engine_read_write_generator #(parameter
     logic                   read_write_response_engine_in_valid_reg    ;
     logic                   read_write_response_engine_in_valid_flag   ;
     logic                   read_write_response_engine_in_valid_flag_S2;
-    MemoryPacketData        result_int                                 ;
-    MemoryPacketDataAddress address_int                                ;
+    EnginePacketData        result_int                                 ;
+    PacketDataAddress address_int                                ;
 
 // --------------------------------------------------------------------------------------
-// FIFO Engine INPUT Response MemoryPacket
+// FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
-    MemoryPacket                  response_engine_in_int                  ;
-    MemoryPacketPayload           fifo_response_engine_in_din             ;
-    MemoryPacketPayload           fifo_response_engine_in_dout            ;
+    EnginePacket                  response_engine_in_int                  ;
+    EnginePacketPayload           fifo_response_engine_in_din             ;
+    EnginePacketPayload           fifo_response_engine_in_dout            ;
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
     FIFOStateSignalsOutput        fifo_response_engine_in_signals_out_temp;
     logic                         fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// FIFO pending cache requests out fifo_oending_MemoryPacket
+// FIFO pending cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
     FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
     logic                         fifo_request_pending_setup_signal_int;
-    MemoryPacket                  request_pending_out_int              ;
-    MemoryPacketPayload           fifo_request_pending_din             ;
-    MemoryPacketPayload           fifo_request_pending_dout            ;
+    EnginePacket                  request_pending_out_int              ;
+    EnginePacketPayload           fifo_request_pending_din             ;
+    EnginePacketPayload           fifo_request_pending_dout            ;
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
@@ -168,7 +168,7 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic                    areset_backtrack                                                           ;
     logic                    backtrack_configure_route_valid                                            ;
-    MemoryPacketRouteAddress backtrack_configure_route_in                                               ;
+    PacketRouteAddress backtrack_configure_route_in                                               ;
     FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
     FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
 
@@ -284,7 +284,7 @@ module engine_read_write_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Engine Response MemoryPacket
+// FIFO INPUT Engine Response EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_response_engine_in_setup_signal_int = fifo_response_engine_in_signals_out_int.wr_rst_busy | fifo_response_engine_in_signals_out_int.rd_rst_busy;
@@ -300,10 +300,10 @@ module engine_read_write_generator #(parameter
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
-    ) inst_fifo_MemoryPacketResponseEngineInput (
+    ) inst_fifo_EnginePacketResponseEngineInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
         .din        (fifo_response_engine_in_din                        ),
@@ -563,7 +563,7 @@ module engine_read_write_generator #(parameter
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_814x16_MemoryPacket
+// FIFO cache requests out fifo_814x16_EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
@@ -579,10 +579,10 @@ module engine_read_write_generator #(parameter
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
-    ) inst_fifo_MemoryPacketRequest (
+    ) inst_fifo_EnginePacketRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
         .din        (fifo_request_din                        ),
@@ -622,7 +622,7 @@ module engine_read_write_generator #(parameter
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO pending cache requests out fifo_oending_MemoryPacket
+// FIFO pending cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_pending_setup_signal_int = fifo_request_pending_signals_out_int.wr_rst_busy | fifo_request_pending_signals_out_int.rd_rst_busy;
@@ -638,10 +638,10 @@ module engine_read_write_generator #(parameter
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
         .PROG_THRESH     (PROG_THRESH               )
-    ) inst_fifo_MemoryPacketRequestPending (
+    ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
         .din        (fifo_request_pending_din                        ),

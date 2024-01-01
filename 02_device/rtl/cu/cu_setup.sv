@@ -29,10 +29,10 @@ module cu_setup #(
     input  logic                  areset                   ,
     input  logic                  cu_flush                 ,
     input  KernelDescriptor       descriptor_in            ,
-    input  MemoryPacket           response_in              ,
+    input  EnginePacket           response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
-    output MemoryPacket           request_out              ,
+    output EnginePacket           request_out              ,
     input  FIFOStateSignalsInput  fifo_request_signals_in  ,
     output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
@@ -54,8 +54,8 @@ logic counter_load ;
 logic            cu_flush_reg     ;
 logic            cu_flush_mode    ;
 KernelDescriptor descriptor_in_reg;
-MemoryPacket     response_in_reg  ;
-MemoryPacket     request_out_int  ;
+EnginePacket     response_in_reg  ;
+EnginePacket     request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -70,8 +70,8 @@ cu_setup_state next_state   ;
 // --------------------------------------------------------------------------------------
 // Request FIFO OUTPUT
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload           fifo_request_din             ;
-MemoryPacketPayload           fifo_request_dout            ;
+EnginePacketPayload           fifo_request_din             ;
+EnginePacketPayload           fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -89,7 +89,7 @@ FIFOStateSignalsOutInternal fifo_response_signals_out_int;
 CUSetupEngineConfiguration engine_cu_setup_configuration_in        ;
 CUSetupEngineConfiguration configuration_comb_program              ;
 CUSetupEngineConfiguration configuration_comb_flush                ;
-MemoryPacket               engine_cu_setup_request_out             ;
+EnginePacket               engine_cu_setup_request_out             ;
 FIFOStateSignalsOutput     engine_cu_setup_fifo_request_signals_out;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_in ;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_reg;
@@ -460,7 +460,7 @@ counter #(.C_WIDTH(COUNTER_WIDTH)) inst_response_memory_counter (
 );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out MemoryPacket
+// FIFO cache requests out EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
@@ -476,10 +476,10 @@ assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
     .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketRequest (
+) inst_fifo_EnginePacketRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
     .din        (fifo_request_din                        ),
