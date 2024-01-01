@@ -179,7 +179,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0] <= fifo_response_memory_in_dout_int.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0];
+    fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS-1:0] <= fifo_response_memory_in_dout_int.payload.data.field[NUM_BUNDLES_WIDTH_BITS-1:0];
 end
 
 always_ff @(posedge ap_clk) begin
@@ -190,7 +190,7 @@ always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
-                configure_memory_reg.payload.param.hops <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_BUNDLES_WIDTH_BITS-1:0];
+                configure_memory_reg.payload.param.hops <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS-1:0];
             end
             // (1 << 1) : begin
             // end

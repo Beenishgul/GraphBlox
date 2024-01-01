@@ -189,10 +189,10 @@ always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
-                configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+                configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
             end
             (1 << 1) : begin
-                configure_memory_reg.payload.param.merge_type <= fifo_response_memory_in_dout_reg.payload.data.field[0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+                configure_memory_reg.payload.param.merge_type <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
             end
             // (1 << 2) : begin
             // end

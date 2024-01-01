@@ -341,7 +341,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     end
 
     always_comb begin
-        fifo_request_comb.payload.data.field[0] = counter_count;
+        fifo_request_comb.payload.data.field = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin

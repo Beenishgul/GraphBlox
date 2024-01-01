@@ -208,6 +208,10 @@ typedef struct packed{
 
 typedef struct packed{
   ControlPacketRouteAttributes route;
+} ControlPacketMeta;
+
+typedef struct packed{
+  ControlPacketMeta meta;
 } ControlPacketPayload;
 
 typedef struct packed{
@@ -290,7 +294,7 @@ endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
-function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input EnginePacket input_packet, input KernelDescriptor  descriptor);
+function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input MemoryPacket input_packet, input KernelDescriptor  descriptor);
 
   CacheRequest output_packet;
   logic [M_AXI4_FE_ADDR_W-1:0] address_base;
@@ -346,9 +350,9 @@ function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input EnginePacke
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_CacheRequest
 // --------------------------------------------------------------------------------------
-function EnginePacketPayload map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet);
+function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet);
 
-  EnginePacketPayload output_packet;
+  MemoryPacketPayload output_packet;
 
   output_packet.meta          = input_packet.meta;
   output_packet.data.field[0] = input_packet.iob.rdata;
@@ -364,7 +368,7 @@ function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input Eng
   output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source;
   output_packet.meta.address              = input_packet.meta.address;
   output_packet.meta.subclass.cmd         = input_packet.meta.subclass.cmd;
-  output_packet.data.field[0]             = input_packet.data.field[0];
+  output_packet.data.field                = input_packet.data.field[0];
 
   return output_packet;
 endfunction : map_EnginePacket_to_MemoryRequestPacket
@@ -373,7 +377,7 @@ function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (inpu
 
   EnginePacketData output_packet;
 
-  output_packet.field[0] = input_packet.field[0];
+  output_packet.field[0] = input_packet.field;
   for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     output_packet.field[i] = pending_packet.field[i-1];
   end
@@ -382,9 +386,9 @@ function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (inpu
 endfunction : map_MemoryResponsePacketData_to_EnginePacketData
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function EnginePacketPayload  map_EnginePacket_to_ControlPacket (input EnginePacketPayload  input_packet);
+function ControlPacketPayload  map_EnginePacket_to_ControlPacket (input EnginePacketPayload  input_packet);
 
-  EnginePacketPayload  output_packet;
+  ControlPacketPayload  output_packet;
 
   output_packet.meta.route.packet_destination  = input_packet.meta.route.sequence_source;
   output_packet.meta.route.sequence_state      = input_packet.meta.route.sequence_state;

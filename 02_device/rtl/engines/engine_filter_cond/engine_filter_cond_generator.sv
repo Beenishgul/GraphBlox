@@ -525,7 +525,6 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S3.payload.meta.route.hops            <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
-    generator_engine_request_engine_reg_S3.payload.meta.subclass.buffer       <= generator_engine_request_engine_reg_S2.payload.meta.subclass.buffer;
 
     if(sequence_flow_reg[0])begin
         if(configure_engine_int.payload.param.conditional_flag) begin

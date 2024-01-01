@@ -138,8 +138,8 @@ logic                   areset_arbiter_memory_N_to_1                            
 logic                   bundle_arbiter_memory_N_to_1_fifo_setup_signal                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_memory_N_to_1_arbiter_grant_out                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_memory_N_to_1_arbiter_request_in                       ;
-EnginePacket            bundle_arbiter_memory_N_to_1_request_in              [NUM_BUNDLES-1:0];
-EnginePacket            bundle_arbiter_memory_N_to_1_request_out                              ;
+MemoryPacket            bundle_arbiter_memory_N_to_1_request_in              [NUM_BUNDLES-1:0];
+MemoryPacket            bundle_arbiter_memory_N_to_1_request_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -164,8 +164,8 @@ FIFOStateSignalsInput  bundle_arbiter_memory_1_to_N_fifo_response_signals_in [NU
 FIFOStateSignalsOutput bundle_arbiter_memory_1_to_N_fifo_response_signals_out                 ;
 logic                  areset_arbiter_memory_1_to_N                                           ;
 logic                  bundle_arbiter_memory_1_to_N_fifo_setup_signal                         ;
-EnginePacket           bundle_arbiter_memory_1_to_N_response_in                               ;
-EnginePacket           bundle_arbiter_memory_1_to_N_response_out             [NUM_BUNDLES-1:0];
+MemoryPacket           bundle_arbiter_memory_1_to_N_response_in                               ;
+MemoryPacket           bundle_arbiter_memory_1_to_N_response_out             [NUM_BUNDLES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -511,7 +511,7 @@ endgenerate
 
 assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
 // --------------------------------------------------------------------------------------
-arbiter_N_to_1_request_memory_ #(
+arbiter_N_to_1_request_memory #(
     .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                               ),
     .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_bundle_arbiter_memory_N_to_1_request_memory_out (
@@ -570,7 +570,7 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
-arbiter_1_to_N_response_memory_ #(
+arbiter_1_to_N_response_memory #(
     .NUM_MEMORY_RECEIVER(NUM_BUNDLES                               ),
     .ID_LEVEL           (1                                         ),
     .FIFO_ARBITER_DEPTH (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
