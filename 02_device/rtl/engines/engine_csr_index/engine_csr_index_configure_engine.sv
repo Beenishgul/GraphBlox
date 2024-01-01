@@ -148,7 +148,7 @@ end
 // engine response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
-assign fifo_response_engine_in_push_filter      = ((response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
+assign fifo_response_engine_in_push_filter      = (response_engine_in_reg.payload.meta.subclass.cmd == CMD_ENGINE_PROGRAM);
 assign fifo_response_engine_in_dout_int.valid   = response_engine_in_reg.valid & fifo_response_engine_in_push_filter;
 assign fifo_response_engine_in_dout_int.payload = response_engine_in_reg.payload;
 

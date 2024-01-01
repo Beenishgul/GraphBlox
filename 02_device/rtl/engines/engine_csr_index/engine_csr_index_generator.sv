@@ -54,16 +54,16 @@ module engine_csr_index_generator #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  EnginePacket           response_memory_in                                               ,
+    input  MemoryPacket           response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    input  EnginePacket           response_control_in                                              ,
+    input  ControlPacket          response_control_in                                              ,
     input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
     output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output EnginePacket           request_memory_out                                               ,
+    output MemoryPacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output logic                  fifo_setup_signal                                                ,
@@ -120,12 +120,12 @@ module engine_csr_index_generator #(parameter
     EnginePacketPayload fifo_request_din        ;
     EnginePacketPayload fifo_request_dout       ;
 
-    EnginePacket response_control_in_reg   ;
-    EnginePacket response_engine_in_reg    ;
-    EnginePacket response_memory_in_reg    ;
-    EnginePacket response_memory_in_reg_S2 ;
-    logic        configure_engine_setup_reg;
-    logic        configure_memory_setup_reg;
+    ControlPacket response_control_in_reg   ;
+    EnginePacket  response_engine_in_reg    ;
+    MemoryPacket  response_memory_in_reg    ;
+    MemoryPacket  response_memory_in_reg_S2 ;
+    logic         configure_engine_setup_reg;
+    logic         configure_memory_setup_reg;
 
     CSRIndexConfiguration configure_engine_int;
 
@@ -174,11 +174,11 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                    areset_backtrack                                                           ;
-    logic                    backtrack_configure_route_valid                                            ;
-    PacketRouteAddress backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                  areset_backtrack                                                           ;
+    logic                  backtrack_configure_route_valid                                            ;
+    PacketRouteAddress     backtrack_configure_route_in                                               ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -813,10 +813,9 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                     = request_pending_out_int.valid;
-    assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
-    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
+    assign fifo_response_comb.valid                = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route   = request_pending_out_int.payload.meta.route;
+    assign fifo_response_comb.payload.meta.address = request_pending_out_int.payload.meta.address;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
@@ -825,9 +824,9 @@ module engine_csr_index_generator #(parameter
 
     always_comb begin
         if(response_memory_in_reg_S2.payload.meta.route.packet_destination.id_module == 2'b01) begin
-            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
+            fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_PROGRAM;
         end else begin
-            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
+            fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;
         end
     end
 

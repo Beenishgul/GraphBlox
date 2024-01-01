@@ -54,16 +54,17 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 //   Generic Memory request packet
 // --------------------------------------------------------------------------------------
-parameter TYPE_MEMORY_CMD_BITS = 8;
+parameter TYPE_MEMORY_CMD_BITS = 9;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
-  CMD_INVALID      = 1 << 0,
-  CMD_MEM_READ     = 1 << 1,
-  CMD_MEM_WRITE    = 1 << 2,
-  CMD_MEM_RESPONSE = 1 << 3,
-  CMD_MEM_PROGRAM  = 1 << 4,
-  CMD_MEM_FLUSH    = 1 << 5,
-  CMD_ENGINE       = 1 << 6,
-  CMD_CONTROL      = 1 << 7
+  CMD_INVALID        = 1 << 0,
+  CMD_MEM_READ       = 1 << 1,
+  CMD_MEM_WRITE      = 1 << 2,
+  CMD_MEM_RESPONSE   = 1 << 3,
+  CMD_MEM_PROGRAM    = 1 << 4,
+  CMD_MEM_FLUSH      = 1 << 5,
+  CMD_ENGINE_DATA    = 1 << 6,
+  CMD_ENGINE_PROGRAM = 1 << 7,
+  CMD_CONTROL        = 1 << 8
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
@@ -154,8 +155,7 @@ typedef struct packed{
 } EnginePacketRouteAttributes;
 
 typedef struct packed{
-  type_memory_cmd  cmd   ; // SIZE = 5 bits
-  type_data_buffer buffer; // SIZE = 12 bits
+  type_memory_cmd cmd;
 } EnginePacketType;
 
 typedef struct packed{
