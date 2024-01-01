@@ -41,19 +41,19 @@ module engine_forward_data #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  EnginePacket           response_memory_in                                               ,
+    input  MemoryPacket           response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    input  EnginePacket           response_control_in                                              ,
+    input  ControlPacket          response_control_in                                              ,
     input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
     output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output EnginePacket           request_memory_out                                               ,
+    output MemoryPacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
-    output EnginePacket           request_control_out                                              ,
+    output ControlPacket          request_control_out                                              ,
     input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
     output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
     output logic                  fifo_setup_signal                                                ,
@@ -75,11 +75,11 @@ logic areset_generator          ;
 KernelDescriptor descriptor_in_reg;
 
 EnginePacket response_engine_in_reg;
-EnginePacket response_memory_in_reg;
+MemoryPacket response_memory_in_reg;
 
 EnginePacket request_engine_out_int;
 EnginePacket response_engine_in_int;
-EnginePacket response_memory_in_int;
+MemoryPacket response_memory_in_int;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -104,7 +104,7 @@ FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 logic configure_fifo_setup_signal;
 
-EnginePacket             configure_memory_response_memory_in                 ;
+MemoryPacket             configure_memory_response_memory_in                 ;
 FIFOStateSignalsInput    configure_memory_fifo_response_memory_in_signals_in ;
 FIFOStateSignalsOutput   configure_memory_fifo_response_memory_in_signals_out;
 ForwardDataConfiguration configure_memory_out                                ;
