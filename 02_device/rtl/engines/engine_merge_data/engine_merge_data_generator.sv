@@ -115,11 +115,11 @@ logic                         fifo_request_engine_out_setup_signal_int;
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                    areset_backtrack                                                           ;
-logic                    backtrack_configure_route_valid                                            ;
-PacketRouteAddress backtrack_configure_route_in                                               ;
-FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
+logic                  areset_backtrack                                                           ;
+logic                  backtrack_configure_route_valid                                            ;
+PacketRouteAddress     backtrack_configure_route_in                                               ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
