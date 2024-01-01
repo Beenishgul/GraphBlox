@@ -29,7 +29,7 @@ module engine_forward_data_configure_memory #(parameter
 ) (
     input  logic                    ap_clk                             ,
     input  logic                    areset                             ,
-    input  EnginePacket             response_memory_in                 ,
+    input  MemoryPacket             response_memory_in                 ,
     input  FIFOStateSignalsInput    fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput   fifo_response_memory_in_signals_out,
     output ForwardDataConfiguration configure_memory_out               ,
@@ -44,7 +44,7 @@ module engine_forward_data_configure_memory #(parameter
 logic areset_forward_data_generator;
 logic areset_fifo                  ;
 
-EnginePacket                 response_memory_in_reg                          ;
+MemoryPacket                 response_memory_in_reg                          ;
 EnginePacketMeta             configure_memory_meta_int                       ;
 ForwardDataConfiguration     configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
@@ -55,8 +55,8 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-EnginePacket          fifo_response_memory_in_dout_int      ;
-EnginePacket          fifo_response_memory_in_dout_reg      ;
+MemoryPacket          fifo_response_memory_in_dout_int      ;
+MemoryPacket          fifo_response_memory_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 logic                 fifo_response_memory_in_push_filter   ;
 
@@ -142,15 +142,15 @@ assign configure_memory_meta_int.route.sequence_source.id_lane   = 1 << ID_LANE;
 assign configure_memory_meta_int.route.sequence_source.id_engine = 1 << ID_ENGINE;
 assign configure_memory_meta_int.route.sequence_source.id_module = 1 << ID_MODULE;
 
-assign configure_memory_meta_int.route.sequence_state         = SEQUENCE_INVALID;
-assign configure_memory_meta_int.route.sequence_id            = 0;
+assign configure_memory_meta_int.route.sequence_state    = SEQUENCE_INVALID;
+assign configure_memory_meta_int.route.sequence_id       = 0;
 assign configure_memory_meta_int.route.hops              = NUM_BUNDLES_WIDTH_BITS;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
 assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
-assign configure_memory_meta_int.subclass.buffer         = STRUCT_INVALID;
+
 
 always_ff @(posedge ap_clk) begin
     if(areset_forward_data_generator) begin
@@ -235,7 +235,7 @@ end
 // memory response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
-assign fifo_response_memory_in_push_filter      = ((response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+assign fifo_response_memory_in_push_filter      = (response_memory_in_reg.payload.meta.subclass.cmd == CMD_ENGINE_PROGRAM) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
 assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid & fifo_response_memory_in_push_filter;
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
