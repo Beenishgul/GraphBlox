@@ -29,7 +29,7 @@ module engine_filter_cond_configure_memory #(parameter
 ) (
     input  logic                   ap_clk                             ,
     input  logic                   areset                             ,
-    input  MemoryPacket            response_memory_in                 ,
+    input  EnginePacket            response_memory_in                 ,
     input  FIFOStateSignalsInput   fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput  fifo_response_memory_in_signals_out,
     output FilterCondConfiguration configure_memory_out               ,
@@ -44,8 +44,8 @@ module engine_filter_cond_configure_memory #(parameter
 logic areset_filter_cond_generator;
 logic areset_fifo                 ;
 
-MemoryPacket                 response_memory_in_reg                          ;
-MemoryPacketMeta             configure_memory_meta_int                       ;
+EnginePacket                 response_memory_in_reg                          ;
+EnginePacketMeta             configure_memory_meta_int                       ;
 FilterCondConfiguration      configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
@@ -55,8 +55,8 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacket          fifo_response_memory_in_dout_int      ;
-MemoryPacket          fifo_response_memory_in_dout_reg      ;
+EnginePacket          fifo_response_memory_in_dout_int      ;
+EnginePacket          fifo_response_memory_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 logic                 fifo_response_memory_in_push_filter   ;
 
@@ -200,16 +200,16 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.param.filter_operation <= type_filter_operation'(fifo_response_memory_in_dout_reg.payload.data.field[0][TYPE_FILTER_OPERATION_BITS-1:0]);
             end
             (1 << 1) : begin
-                configure_memory_reg.payload.param.filter_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                configure_memory_reg.payload.param.filter_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
             end
             (1 << 2) : begin
-                configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][NUM_FIELDS_MEMORYPACKETDATA-1:0];
+                configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
             end
             (1 << 3) : begin
                 configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field[0];
             end
             (1 << 4) : begin
-                configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][(NUM_FIELDS_MEMORYPACKETDATA*NUM_FIELDS_MEMORYPACKETDATA)-1:0];
+                configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[0][(ENGINE_PACKET_DATA_NUM_FIELDS*ENGINE_PACKET_DATA_NUM_FIELDS)-1:0];
             end
             (1 << 5) : begin
                 configure_memory_reg.payload.param.break_flag       <= fifo_response_memory_in_dout_reg.payload.data.field[0][0];
@@ -260,7 +260,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// memory response out fifo MemoryPacket
+// memory response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
 assign fifo_response_memory_in_push_filter      = ((response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_memory_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP)) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
@@ -268,7 +268,7 @@ assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid &
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
 // --------------------------------------------------------------------------------------
-// FIFO memory configure_memory out fifo MemoryPacket
+// FIFO memory configure_memory out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy  | fifo_configure_memory_signals_out_int.rd_rst_busy;
@@ -287,7 +287,7 @@ xpm_fifo_sync_wrapper #(
     .WRITE_DATA_WIDTH($bits(FilterCondConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(FilterCondConfigurationPayload)),
     .PROG_THRESH     (PROG_THRESH                          )
-) inst_fifo_MemoryPacketResponseConigurationInput (
+) inst_fifo_EnginePacketResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
     .din        (fifo_configure_memory_din                        ),

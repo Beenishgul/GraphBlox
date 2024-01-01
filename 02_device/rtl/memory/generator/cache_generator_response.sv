@@ -24,7 +24,7 @@ module cache_generator_response #(
   input  CacheResponse          response_in                            ,
   input  FIFOStateSignalsInput  fifo_response_signals_in               ,
   output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
+  output EnginePacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
   output logic                  fifo_setup_signal
 );
 
@@ -35,14 +35,14 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_demux  ;
 
-MemoryPacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
+EnginePacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
 CacheResponse response_in_reg                           ;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
 CacheResponsePayload          fifo_response_din             ;
-MemoryPacket                  fifo_response_dout_int        ;
+EnginePacket                  fifo_response_dout_int        ;
 CacheResponsePayload          fifo_response_dout            ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;

@@ -105,36 +105,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -248,36 +236,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -391,18 +367,6 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
@@ -414,8 +378,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "8",
+                    "value": "0x00"
                 }
             }
         }
@@ -526,36 +490,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -814,36 +766,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -957,36 +897,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -998,8 +926,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "8",
+                    "value": "0x00"
                 }
             }
         }
@@ -1110,18 +1038,6 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
@@ -1133,8 +1049,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "8",
+                    "value": "0x00"
                 }
             }
         }
@@ -1245,36 +1161,24 @@
                 }
             },
             "entry_7": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
-                "array_pointer": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_9": {
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_8": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_11": {
+            "entry_9": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_12": {
+            "entry_10": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -1415,8 +1319,8 @@
         "entries": {
             "entry_0": {
                 "hops": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "8",
+                    "value": "0x00"
                 }
             }
         }

@@ -82,7 +82,7 @@ typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
 } type_filter_operation;
 
 // --------------------------------------------------------------------------------------
-//   Generic Memory Filter Type
+//   Generic ALU ops Type
 // --------------------------------------------------------------------------------------
 parameter TYPE_ALU_OPERATION_BITS = 6;
 typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
@@ -95,7 +95,7 @@ typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
 } type_ALU_operation;
 
 // --------------------------------------------------------------------------------------
-//   Graph CSR structure types
+// structure types
 // --------------------------------------------------------------------------------------
 parameter TYPE_DATA_STRUCTURE_BITS = 6;
 typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
@@ -108,7 +108,7 @@ typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
 } type_data_buffer;
 
 // --------------------------------------------------------------------------------------
-//   Graph CSR structure types
+// SEQUENCE_STATE
 // --------------------------------------------------------------------------------------
 parameter TYPE_SEQUENCE_STATE_BITS = 4;
 typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
@@ -119,7 +119,7 @@ typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
 } type_sequence_state;
 
 // --------------------------------------------------------------------------------------
-//   Generic Memory request packet
+// Generic sequence_state
 // --------------------------------------------------------------------------------------
 typedef struct packed{
   logic [    NUM_CUS_WIDTH_BITS-1:0] id_cu    ; // SIZE = 8 bits  - up to 8 vertex cu - pending
@@ -127,42 +127,76 @@ typedef struct packed{
   logic [  NUM_LANES_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
   logic [NUM_ENGINES_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
   logic [NUM_MODULES_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
-} MemoryPacketRouteAddress;
-
-typedef struct packed{
-  MemoryPacketRouteAddress                     packet_source     ;
-  MemoryPacketRouteAddress                     packet_destination;
-  MemoryPacketRouteAddress                     sequence_source   ;
-  type_sequence_state                          sequence_state    ;
-  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
-  logic [          NUM_BUNDLES_WIDTH_BITS-1:0] hops              ;
-} MemoryPacketRouteAttributes;
+} PacketRouteAddress;
 
 typedef struct packed{
   logic                                direction; // 0 - right, 1 left  1 bits
   logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = clog2(offset) bits
-} MemoryPacketDataAddressShift;
+} PacketDataAddressShift;
 
 typedef struct packed{
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
   logic [          M_AXI4_FE_DATA_W-1:0] offset   ; // SIZE = clog2(4GB) bits
-  MemoryPacketDataAddressShift           shift    ; // SIZE = clog2(offset) bits + 1
-} MemoryPacketDataAddress;
+  PacketDataAddressShift                 shift    ; // SIZE = clog2(offset) bits + 1
+} PacketDataAddress;
+
+// --------------------------------------------------------------------------------------
+// Generic Engine Packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  PacketRouteAddress                           packet_source     ;
+  PacketRouteAddress                           packet_destination;
+  PacketRouteAddress                           sequence_source   ;
+  type_sequence_state                          sequence_state    ;
+  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
+  logic [          NUM_BUNDLES_WIDTH_BITS-1:0] hops              ;
+} EnginePacketRouteAttributes;
 
 typedef struct packed{
   type_memory_cmd  cmd   ; // SIZE = 5 bits
   type_data_buffer buffer; // SIZE = 12 bits
+} EnginePacketType;
+
+typedef struct packed{
+  EnginePacketRouteAttributes route   ;
+  PacketDataAddress           address ;
+  EnginePacketType            subclass;
+} EnginePacketMeta;
+
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
+typedef struct packed{
+  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M_AXI4_FE_DATA_W-1:0] field;
+} EnginePacketData;
+
+typedef struct packed{
+  EnginePacketMeta meta;
+  EnginePacketData data;
+} EnginePacketPayload;
+
+typedef struct packed{
+  logic               valid  ;
+  EnginePacketPayload payload;
+} EnginePacket;
+
+// --------------------------------------------------------------------------------------
+// Generic Memory Packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  type_memory_cmd cmd; // SIZE = 5 bits
 } MemoryPacketType;
 
 typedef struct packed{
+  PacketRouteAddress packet_source;
+} MemoryPacketRouteAttributes;
+
+typedef struct packed{
   MemoryPacketRouteAttributes route   ;
-  MemoryPacketDataAddress     address ;
+  PacketDataAddress           address ;
   MemoryPacketType            subclass;
 } MemoryPacketMeta;
 
-parameter NUM_FIELDS_MEMORYPACKETDATA = 4;
 typedef struct packed{
-  logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][M_AXI4_FE_DATA_W-1:0] field;
+  logic [M_AXI4_FE_DATA_W-1:0] field;
 } MemoryPacketData;
 
 typedef struct packed{
@@ -176,40 +210,21 @@ typedef struct packed{
 } MemoryPacket;
 
 // --------------------------------------------------------------------------------------
-// Generic Memory Request Packet
-// --------------------------------------------------------------------------------------
-typedef struct packed{
-  MemoryPacketRouteAddress source  ;
-  MemoryPacketDataAddress  address ;
-  MemoryPacketType         subclass;
-} MemoryRequestPacketMeta;
-
-typedef struct packed{
-  logic [M_AXI4_FE_DATA_W-1:0] field;
-} MemoryRequestPacketData;
-
-typedef struct packed{
-  MemoryRequestPacketMeta meta;
-  MemoryRequestPacketData data;
-} MemoryRequestPacketPayload;
-
-typedef struct packed{
-  logic               valid  ;
-  MemoryPacketPayload payload;
-} MemoryRequestPacket;
-
-// --------------------------------------------------------------------------------------
 //   Generic Control packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  MemoryPacketRouteAddress                     packet_destination;
-  type_sequence_state                          sequence_state    ;
-  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
+  PacketRouteAddress packet_destination;
+} ControlPacketRouteAttributes;
+
+typedef struct packed{
+  ControlPacketRouteAttributes                 route         ;
+  type_sequence_state                          sequence_state;
+  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id   ;
 } ControlPacketPayload;
 
 typedef struct packed{
-  logic               valid  ;
-  MemoryPacketPayload payload;
+  logic                valid  ;
+  ControlPacketPayload payload;
 } ControlPacket;
 
 // --------------------------------------------------------------------------------------
@@ -242,8 +257,8 @@ typedef struct packed {
 
 typedef struct packed {
   CacheRequestIOB  iob ;
-  MemoryPacketMeta meta;
-  MemoryPacketData data;
+  EnginePacketMeta meta;
+  EnginePacketData data;
 } CacheRequestPayload;
 
 typedef struct packed {
@@ -262,8 +277,8 @@ typedef struct packed {
 
 typedef struct packed {
   CacheResponseIOB iob ;
-  MemoryPacketMeta meta;
-  MemoryPacketData data;
+  EnginePacketMeta meta;
+  EnginePacketData data;
 } CacheResponsePayload;
 
 typedef struct packed {
@@ -287,7 +302,7 @@ endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
-function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input MemoryPacket input_packet, input KernelDescriptor  descriptor);
+function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input EnginePacket input_packet, input KernelDescriptor  descriptor);
 
   CacheRequest output_packet;
   logic [M_AXI4_FE_ADDR_W-1:0] address_base;
@@ -343,9 +358,9 @@ function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input MemoryPacke
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_CacheRequest
 // --------------------------------------------------------------------------------------
-function MemoryPacket map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet, input valid_packet);
+function EnginePacket map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet, input valid_packet);
 
-  MemoryPacket output_packet;
+  EnginePacket output_packet;
 
   output_packet.valid                 = valid_packet;
   output_packet.payload.meta          = input_packet.meta;
@@ -355,21 +370,21 @@ function MemoryPacket map_CacheResponse_to_MemoryResponsePacket (input CacheResp
 endfunction : map_CacheResponse_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input MemoryPacketPayload  input_packet);
+function EnginePacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet);
 
-  MemoryPacketPayload  output_packet;
+  EnginePacketPayload  output_packet;
 
   output_packet  = input_packet;
 
   return output_packet;
 endfunction : map_EnginePacket_to_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
-function MemoryPacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketData input_packet, input MemoryPacketData pending_packet);
+function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input EnginePacketData input_packet, input EnginePacketData pending_packet);
 
-  MemoryPacketData output_packet;
+  EnginePacketData output_packet;
 
   output_packet.field[0] = input_packet.field[0];
-  for (int i = 1; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+  for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     output_packet.field[i] = pending_packet.field[i-1];
   end
 
@@ -377,9 +392,9 @@ function MemoryPacketData map_MemoryResponsePacketData_to_EnginePacketData (inpu
 endfunction : map_MemoryResponsePacketData_to_EnginePacketData
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload  map_EnginePacket_to_ControlPacket (input MemoryPacketPayload  input_packet);
+function EnginePacketPayload  map_EnginePacket_to_ControlPacket (input EnginePacketPayload  input_packet);
 
-  MemoryPacketPayload  output_packet;
+  EnginePacketPayload  output_packet;
 
   output_packet  = input_packet;
 

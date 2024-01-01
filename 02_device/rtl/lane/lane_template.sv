@@ -21,23 +21,23 @@ module lane_template #(
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
     input  KernelDescriptor       descriptor_in                                                    ,
-    input  MemoryPacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                       ,
+    input  EnginePacket           response_lane_in[(1+LANE_MERGE_WIDTH)-1:0]                       ,
     input  FIFOStateSignalsInput  fifo_response_lane_in_signals_in[(1+LANE_MERGE_WIDTH)-1:0]       ,
     output FIFOStateSignalsOutput fifo_response_lane_in_signals_out[(1+LANE_MERGE_WIDTH)-1:0]      ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  EnginePacket           response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    input  MemoryPacket           response_control_in                                              ,
+    input  EnginePacket           response_control_in                                              ,
     input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
     output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
-    output MemoryPacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                       ,
+    output EnginePacket           request_lane_out[ (1+LANE_CAST_WIDTH)-1:0]                       ,
     input  FIFOStateSignalsInput  fifo_request_lane_out_signals_in[ (1+LANE_CAST_WIDTH)-1:0]       ,
     output FIFOStateSignalsOutput fifo_request_lane_out_signals_out[ (1+LANE_CAST_WIDTH)-1:0]      ,
-    output MemoryPacket           request_memory_out                                               ,
+    output EnginePacket           request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
-    output MemoryPacket           request_control_out                                              ,
+    output EnginePacket           request_control_out                                              ,
     input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
     output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
     output logic                  fifo_setup_signal                                                ,
@@ -53,45 +53,45 @@ logic areset_lane_template;
 
 KernelDescriptor descriptor_in_reg;
 
-MemoryPacket request_control_out_int;
-MemoryPacket request_lane_out_int   ;
-MemoryPacket request_memory_out_int ;
-MemoryPacket response_control_in_int;
-MemoryPacket response_control_in_reg;
-MemoryPacket response_lane_in_int   ;
-MemoryPacket response_lane_in_reg   ;
-MemoryPacket response_memory_in_int ;
-MemoryPacket response_memory_in_reg ;
+EnginePacket request_control_out_int;
+EnginePacket request_lane_out_int   ;
+EnginePacket request_memory_out_int ;
+EnginePacket response_control_in_int;
+EnginePacket response_control_in_reg;
+EnginePacket response_lane_in_int   ;
+EnginePacket response_lane_in_reg   ;
+EnginePacket response_memory_in_int ;
+EnginePacket response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
-// FIFO Engines INPUT Response MemoryPacket
+// FIFO Engines INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_response_lane_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Memory Response MemoryPacket
+// FIFO INPUT Memory Response EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT CONTROL Response MemoryPacket
+// FIFO INPUT CONTROL Response EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_response_control_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO Engines OUTPUT Request MemoryPacket
+// FIFO Engines OUTPUT Request EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_lane_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT Memory Request Memory MemoryPacket
+// FIFO OUTPUT Memory Request Memory EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT CONTROL Request CONTROL MemoryPacket
+// FIFO OUTPUT CONTROL Request CONTROL EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 
@@ -109,8 +109,8 @@ FIFOStateSignalsOutput  engine_arbiter_N_to_1_memory_fifo_request_signals_out   
 logic                   areset_engine_arbiter_N_to_1_memory                                    ;
 logic                   engine_arbiter_N_to_1_memory_fifo_setup_signal                         ;
 logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_memory_engine_arbiter_grant_out                  ;
-MemoryPacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
-MemoryPacket            engine_arbiter_N_to_1_memory_request_out                               ;
+EnginePacket            engine_arbiter_N_to_1_memory_request_in               [NUM_ENGINES-1:0];
+EnginePacket            engine_arbiter_N_to_1_memory_request_out                               ;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: CONTROL Request Generator
@@ -120,8 +120,8 @@ FIFOStateSignalsOutput  engine_arbiter_N_to_1_control_fifo_request_signals_out  
 logic                   areset_engine_arbiter_N_to_1_control                                    ;
 logic                   engine_arbiter_N_to_1_control_fifo_setup_signal                         ;
 logic [NUM_ENGINES-1:0] engine_arbiter_N_to_1_control_engine_arbiter_grant_out                  ;
-MemoryPacket            engine_arbiter_N_to_1_control_request_in               [NUM_ENGINES-1:0];
-MemoryPacket            engine_arbiter_N_to_1_control_request_out                               ;
+EnginePacket            engine_arbiter_N_to_1_control_request_in               [NUM_ENGINES-1:0];
+EnginePacket            engine_arbiter_N_to_1_control_request_out                               ;
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Response Generator
@@ -130,8 +130,8 @@ FIFOStateSignalsInput  engine_arbiter_1_to_N_memory_fifo_response_signals_in [NU
 FIFOStateSignalsOutput engine_arbiter_1_to_N_memory_fifo_response_signals_out                 ;
 logic                  areset_engine_arbiter_1_to_N_memory                                    ;
 logic                  engine_arbiter_1_to_N_memory_fifo_setup_signal                         ;
-MemoryPacket           engine_arbiter_1_to_N_memory_response_in                               ;
-MemoryPacket           engine_arbiter_1_to_N_memory_response_out             [NUM_ENGINES-1:0];
+EnginePacket           engine_arbiter_1_to_N_memory_response_in                               ;
+EnginePacket           engine_arbiter_1_to_N_memory_response_out             [NUM_ENGINES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Response Generator
@@ -140,8 +140,8 @@ FIFOStateSignalsInput  engine_arbiter_1_to_N_control_fifo_response_signals_in [N
 FIFOStateSignalsOutput engine_arbiter_1_to_N_control_fifo_response_signals_out                 ;
 logic                  areset_engine_arbiter_1_to_N_control                                    ;
 logic                  engine_arbiter_1_to_N_control_fifo_setup_signal                         ;
-MemoryPacket           engine_arbiter_1_to_N_control_response_in                               ;
-MemoryPacket           engine_arbiter_1_to_N_control_response_out             [NUM_ENGINES-1:0];
+EnginePacket           engine_arbiter_1_to_N_control_response_in                               ;
+EnginePacket           engine_arbiter_1_to_N_control_response_out             [NUM_ENGINES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Engines
@@ -164,15 +164,15 @@ logic                   engines_done_out                            [NUM_ENGINES
 logic                   engines_fifo_setup_signal                   [NUM_ENGINES-1:0];
 logic [NUM_ENGINES-1:0] engines_done_out_reg                                         ;
 logic [NUM_ENGINES-1:0] engines_fifo_setup_signal_reg                                ;
-MemoryPacket            engines_request_control_out                 [NUM_ENGINES-1:0];
-MemoryPacket            engines_request_control_out_int                              ;
-MemoryPacket            engines_request_lane_out                    [NUM_ENGINES-1:0];
-MemoryPacket            engines_request_lane_out_int                                 ;
-MemoryPacket            engines_request_memory_out                  [NUM_ENGINES-1:0];
-MemoryPacket            engines_request_memory_out_int                               ;
-MemoryPacket            engines_response_control_in                 [NUM_ENGINES-1:0];
-MemoryPacket            engines_response_lane_in                    [NUM_ENGINES-1:0];
-MemoryPacket            engines_response_memory_in                  [NUM_ENGINES-1:0];
+EnginePacket            engines_request_control_out                 [NUM_ENGINES-1:0];
+EnginePacket            engines_request_control_out_int                              ;
+EnginePacket            engines_request_lane_out                    [NUM_ENGINES-1:0];
+EnginePacket            engines_request_lane_out_int                                 ;
+EnginePacket            engines_request_memory_out                  [NUM_ENGINES-1:0];
+EnginePacket            engines_request_memory_out_int                               ;
+EnginePacket            engines_response_control_in                 [NUM_ENGINES-1:0];
+EnginePacket            engines_response_lane_in                    [NUM_ENGINES-1:0];
+EnginePacket            engines_response_memory_in                  [NUM_ENGINES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - instants
@@ -181,8 +181,8 @@ FIFOStateSignalsInput  engines_fifo_request_cast_lane_out_signals_in  [NUM_ENGIN
 FIFOStateSignalsInput  engines_fifo_response_merge_lane_in_signals_in [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
 FIFOStateSignalsOutput engines_fifo_request_cast_lane_out_signals_out [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
 FIFOStateSignalsOutput engines_fifo_response_merge_lane_in_signals_out[NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
-MemoryPacket           engines_request_cast_lane_out                  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
-MemoryPacket           engines_response_merge_lane_in                 [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
+EnginePacket           engines_request_cast_lane_out                  [NUM_ENGINES-1:0][ (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY)-1:0];
+EnginePacket           engines_response_merge_lane_in                 [NUM_ENGINES-1:0][(1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY)-1:0];
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -295,32 +295,32 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Engines Response MemoryPacket
+// FIFO INPUT Engines Response EnginePacket
 // --------------------------------------------------------------------------------------
 assign response_lane_in_int = response_lane_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Memory Response MemoryPacket
+// FIFO INPUT Memory Response EnginePacket
 // --------------------------------------------------------------------------------------
 assign response_memory_in_int = response_memory_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT CONTROL Response MemoryPacket
+// FIFO INPUT CONTROL Response EnginePacket
 // --------------------------------------------------------------------------------------
 assign response_control_in_int = response_control_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT Engines requests MemoryPacket
+// FIFO OUTPUT Engines requests EnginePacket
 // --------------------------------------------------------------------------------------
 assign request_lane_out_int = engines_request_lane_out_int;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT Memory requests MemoryPacket
+// FIFO OUTPUT Memory requests EnginePacket
 // --------------------------------------------------------------------------------------
 assign request_memory_out_int = engine_arbiter_N_to_1_memory_request_out;
 
 // --------------------------------------------------------------------------------------
-// FIFO OUTPUT CONTROL requests MemoryPacket
+// FIFO OUTPUT CONTROL requests EnginePacket
 // --------------------------------------------------------------------------------------
 assign request_control_out_int = engine_arbiter_N_to_1_control_request_out;
 

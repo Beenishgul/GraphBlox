@@ -20,16 +20,16 @@ module engine_filter_cond_kernel (
   input  logic                             config_params_valid,
   input  FilterCondConfigurationParameters config_params      ,
   input  logic                             data_valid         ,
-  input  MemoryPacketData                  data               ,
+  input  EnginePacketData                  data               ,
   output logic                             result_flag        ,
-  output MemoryPacketData                  result_data
+  output EnginePacketData                  result_data
 );
 
 // Define internal signals
-MemoryPacketData ops_value_reg  ;
-MemoryPacketData result_data_int;
-MemoryPacketData org_value_reg  ;
-MemoryPacketData org_data_int   ;
+EnginePacketData ops_value_reg  ;
+EnginePacketData result_data_int;
+EnginePacketData org_value_reg  ;
+EnginePacketData org_data_int   ;
 logic            result_flag_int;
 logic            data_valid_reg ;
 
@@ -37,17 +37,17 @@ logic            data_valid_reg ;
 always_ff @(posedge ap_clk) begin
   if (areset) begin
     data_valid_reg <= 1'b0;
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       ops_value_reg.field[i] <= 0;
       org_value_reg.field[i] <= 0;
     end
   end else begin
     data_valid_reg <= data_valid;
-    for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       if(config_params.const_mask[i] & config_params_valid) begin
         ops_value_reg.field[i] <= config_params.const_value;
       end else if (config_params_valid) begin
-        for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
           if(config_params.ops_mask[i][j]) begin
             ops_value_reg.field[i] <= data.field[j];
           end
@@ -56,9 +56,9 @@ always_ff @(posedge ap_clk) begin
         ops_value_reg.field[i] <= data.field[i];
       end
 
-      for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA; i++) begin
+      for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
         if (config_params_valid) begin
-          for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
+          for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
             if(config_params.ops_mask[i][j]) begin
               org_value_reg.field[i] <= data.field[j];
             end
@@ -84,7 +84,7 @@ always_comb begin
       end
 
       FILTER_GT : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             result_flag_int = result_flag_int & (result_data_int.field[i] > ops_value_reg.field[i+1]);
           end
@@ -92,7 +92,7 @@ always_comb begin
       end
 
       FILTER_LT : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             result_flag_int = result_flag_int & (result_data_int.field[i] < ops_value_reg.field[i+1]);
           end
@@ -100,7 +100,7 @@ always_comb begin
       end
 
       FILTER_EQ : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             result_flag_int = result_flag_int & (result_data_int.field[i] == ops_value_reg.field[i+1]);
           end
@@ -108,7 +108,7 @@ always_comb begin
       end
 
       FILTER_NOT_EQ : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             result_flag_int = result_flag_int & (result_data_int.field[i] != ops_value_reg.field[i+1]);
           end
@@ -116,7 +116,7 @@ always_comb begin
       end
 
       FILTER_GT_TERN : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             if(result_data_int.field[i] > ops_value_reg.field[i+1]) begin
               result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -133,7 +133,7 @@ always_comb begin
       end
 
       FILTER_LT_TERN : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             if(result_data_int.field[i] < ops_value_reg.field[i+1]) begin
               result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -150,7 +150,7 @@ always_comb begin
       end
 
       FILTER_EQ_TERN : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             if(result_data_int.field[i] == ops_value_reg.field[i+1]) begin
               result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
@@ -167,7 +167,7 @@ always_comb begin
       end
 
       FILTER_NOT_EQ_TERN : begin
-        for (int i = 0; i<NUM_FIELDS_MEMORYPACKETDATA-1; i++) begin
+        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params.filter_mask[i]) begin
             if(result_data_int.field[i] != ops_value_reg.field[i+1]) begin
               result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];

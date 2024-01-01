@@ -27,7 +27,7 @@ module engine_csr_index_configure_engine #(parameter
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
-    input  MemoryPacket           response_engine_in                 ,
+    input  EnginePacket           response_engine_in                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     output CSRIndexConfiguration  configure_engine_out               ,
@@ -42,14 +42,14 @@ module engine_csr_index_configure_engine #(parameter
 logic areset_csr_index_generator;
 logic areset_fifo               ;
 
-MemoryPacket          response_engine_in_reg;
+EnginePacket          response_engine_in_reg;
 CSRIndexConfiguration configure_engine_reg  ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacket          fifo_response_engine_in_dout_int      ;
-MemoryPacket          fifo_response_engine_in_dout_reg      ;
+EnginePacket          fifo_response_engine_in_dout_int      ;
+EnginePacket          fifo_response_engine_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 logic                 fifo_response_engine_in_push_filter   ;
 
@@ -145,7 +145,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// engine response out fifo MemoryPacket
+// engine response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
 assign fifo_response_engine_in_push_filter      = ((response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_CU_SETUP)|(response_engine_in_reg.payload.meta.subclass.buffer == STRUCT_ENGINE_SETUP));
@@ -153,7 +153,7 @@ assign fifo_response_engine_in_dout_int.valid   = response_engine_in_reg.valid &
 assign fifo_response_engine_in_dout_int.payload = response_engine_in_reg.payload;
 
 // --------------------------------------------------------------------------------------
-// FIFO engine configure_engine out fifo MemoryPacket
+// FIFO engine configure_engine out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_configure_engine_setup_signal_int = fifo_configure_engine_signals_out_int.wr_rst_busy  | fifo_configure_engine_signals_out_int.rd_rst_busy;
@@ -172,7 +172,7 @@ xpm_fifo_sync_wrapper #(
     .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
     .PROG_THRESH     (FIFO_WRITE_DEPTH- 4                )
-) inst_fifo_MemoryPacketResponseConigurationInput (
+) inst_fifo_EnginePacketResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
     .din        (fifo_configure_engine_din                        ),

@@ -66,8 +66,8 @@ typedef struct packed{
 
 typedef struct packed{
     CSRIndexConfigurationParameters param;
-    MemoryPacketMeta                meta ;
-    MemoryPacketData                data ;
+    EnginePacketMeta                meta ;
+    EnginePacketData                data ;
 } CSRIndexConfigurationPayload;
 
 typedef struct packed{
@@ -98,13 +98,13 @@ typedef enum logic[12:0] {
 } engine_merge_data_generator_state;
 
 typedef struct packed{
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] merge_mask;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0] merge_type;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_type;
 } MergeDataConfigurationParameters;
 
 typedef struct packed{
     MergeDataConfigurationParameters param;
-    MemoryPacketMeta                 meta ;
+    EnginePacketMeta                 meta ;
 } MergeDataConfigurationPayload;
 
 typedef struct packed{
@@ -140,7 +140,7 @@ typedef struct packed{
 
 typedef struct packed{
     ForwardDataConfigurationParameters param;
-    MemoryPacketMeta                   meta ;
+    EnginePacketMeta                   meta ;
 } ForwardDataConfigurationPayload;
 
 typedef struct packed{
@@ -171,16 +171,16 @@ typedef enum logic[12:0] {
 } engine_alu_ops_generator_state;
 
 typedef struct packed{
-    type_ALU_operation                                                       alu_operation;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  alu_mask     ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask   ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  const_value  ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask     ;
+    type_ALU_operation                                                           alu_operation;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    alu_mask     ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value  ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask     ;
 } ALUOpsConfigurationParameters;
 
 typedef struct packed{
     ALUOpsConfigurationParameters param;
-    MemoryPacketMeta              meta ;
+    EnginePacketMeta              meta ;
 } ALUOpsConfigurationPayload;
 
 typedef struct packed{
@@ -213,29 +213,29 @@ typedef enum logic[14:0] {
 } engine_filter_cond_generator_state;
 
 typedef struct packed{
-    MemoryPacketRouteAddress _if  ;
-    MemoryPacketRouteAddress _else;
-} FilterCondMemoryPacketRoute;
+    PacketRouteAddress _if  ;
+    PacketRouteAddress _else;
+} FilterCondEnginePacketRoute;
 
 typedef struct packed{
-    type_filter_operation                                                    filter_operation;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  filter_mask     ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask      ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  const_value     ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask        ;
-    logic                                                                    break_flag      ;
-    logic                                                                    break_pass      ;
-    logic                                                                    filter_post     ;
-    logic                                                                    filter_pass     ;
-    logic                                                                    continue_flag   ;
-    logic                                                                    ternary_flag    ;
-    logic                                                                    conditional_flag;
-    FilterCondMemoryPacketRoute                                              filter_route    ;
+    type_filter_operation                                                        filter_operation;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    filter_mask     ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask      ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value     ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask        ;
+    logic                                                                        break_flag      ;
+    logic                                                                        break_pass      ;
+    logic                                                                        filter_post     ;
+    logic                                                                        filter_pass     ;
+    logic                                                                        continue_flag   ;
+    logic                                                                        ternary_flag    ;
+    logic                                                                        conditional_flag;
+    FilterCondEnginePacketRoute                                                  filter_route    ;
 } FilterCondConfigurationParameters;
 
 typedef struct packed{
     FilterCondConfigurationParameters param;
-    MemoryPacketMeta                  meta ;
+    EnginePacketMeta                  meta ;
 } FilterCondConfigurationPayload;
 
 typedef struct packed{
@@ -277,26 +277,26 @@ typedef enum logic[15:0] {
 } engine_read_write_generator_state;
 
 typedef struct packed{
-    logic                                                                    increment    ;
-    logic                                                                    decrement    ;
-    logic                                                                    mode_sequence;
-    logic                                                                    mode_buffer  ;
-    logic                                                                    mode_counter ;
-    logic [ CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                  id_buffer    ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  array_size   ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  index_start  ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  index_end    ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  stride       ;
-    logic [   $clog2(M_AXI4_FE_ADDR_W)-1:0]                                  granularity  ;
-    logic                                                                    direction    ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0]                                  const_mask   ;
-    logic [           M_AXI4_FE_DATA_W-1:0]                                  const_value  ;
-    logic [NUM_FIELDS_MEMORYPACKETDATA-1:0][NUM_FIELDS_MEMORYPACKETDATA-1:0] ops_mask     ;
+    logic                                                                        increment    ;
+    logic                                                                        decrement    ;
+    logic                                                                        mode_sequence;
+    logic                                                                        mode_buffer  ;
+    logic                                                                        mode_counter ;
+    logic [   CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                    id_buffer    ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    array_size   ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    index_start  ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    index_end    ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    stride       ;
+    logic [     $clog2(M_AXI4_FE_ADDR_W)-1:0]                                    granularity  ;
+    logic                                                                        direction    ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;
+    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value  ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask     ;
 } ReadWriteConfigurationParameters;
 
 typedef struct packed{
     ReadWriteConfigurationParameters param;
-    MemoryPacketMeta                 meta ;
+    EnginePacketMeta                 meta ;
 } ReadWriteConfigurationPayload;
 
 typedef struct packed{
@@ -344,7 +344,7 @@ typedef struct packed{
 
 typedef struct packed{
     CUSetupEngineConfigurationParameters param;
-    MemoryPacketMeta                     meta ;
+    EnginePacketMeta                     meta ;
 } CUSetupEngineConfigurationPayload;
 
 
