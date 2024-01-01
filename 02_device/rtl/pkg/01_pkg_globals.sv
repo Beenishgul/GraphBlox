@@ -23,7 +23,7 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 //  COMPUTE UNITS GLOBALS 
 // --------------------------------------------------------------------------------------
-//  topolgy config-- include is auto generated
+//  Topology config-- include is auto generated
 // --------------------------------------------------------------------------------------
 `include "config_parameters.vh"
 // -- include is auto generated
@@ -41,7 +41,7 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 // Maximum supported engines/lanes/bundles/buffers
 // --------------------------------------------------------------------------------------
-	parameter CU_PACKET_SEQ_ID_WIDTH_BITS = 16;
+	parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = 16;
 
 // --------------------------------------------------------------------------------------
 	parameter CU_KERNEL_COUNT_MAX_WIDTH_BITS = 8;

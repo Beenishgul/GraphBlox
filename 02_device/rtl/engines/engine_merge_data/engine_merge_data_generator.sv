@@ -117,7 +117,7 @@ logic                         fifo_request_engine_out_setup_signal_int;
 // --------------------------------------------------------------------------------------
 logic                  areset_backtrack                                                           ;
 logic                  backtrack_configure_route_valid                                            ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
+MemoryPacketRouteAddress  backtrack_configure_route_in                                               ;
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
@@ -524,7 +524,7 @@ xpm_fifo_sync_wrapper #(
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
 assign backtrack_configure_route_valid                    = fifo_request_engine_out_signals_out_int.valid;
-assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.to;
+assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.packet_destination;
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(

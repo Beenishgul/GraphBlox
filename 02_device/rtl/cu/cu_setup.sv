@@ -359,40 +359,40 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet Program
 // --------------------------------------------------------------------------------------
-assign configuration_comb_program.payload.param.increment              = 1'b1;
-assign configuration_comb_program.payload.param.decrement              = 1'b0;
-assign configuration_comb_program.payload.param.flush_mode             = 1'b0;
-assign configuration_comb_program.payload.param.flush_enable           = descriptor_in_reg.payload.buffer_9[2];
-assign configuration_comb_program.payload.param.id_buffer              = 0;
-assign configuration_comb_program.payload.param.array_size             = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.start_read             = 0;
-assign configuration_comb_program.payload.param.end_read               = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.stride                 = 1;
-assign configuration_comb_program.payload.param.granularity            = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.route.from.id_cu        = ID_CU;
-assign configuration_comb_program.payload.meta.route.from.id_bundle    = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.from.id_lane      = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.from.id_engine    = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.from.id_module    = 1;
-assign configuration_comb_program.payload.meta.route.to.id_cu          = ID_CU;
-assign configuration_comb_program.payload.meta.route.to.id_bundle      = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.to.id_lane        = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.to.id_engine      = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.to.id_module      = 1; // routes to memory configuration modules in engines
-assign configuration_comb_program.payload.meta.route.seq_src.id_cu     = ID_CU;
-assign configuration_comb_program.payload.meta.route.seq_src.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.seq_src.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.seq_src.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.seq_src.id_module = 1;
-assign configuration_comb_program.payload.meta.route.seq_state         = SEQUENCE_INVALID;
-assign configuration_comb_program.payload.meta.route.seq_id            = 0;
-assign configuration_comb_program.payload.meta.route.hops              = NUM_BUNDLES_WIDTH_BITS;
-assign configuration_comb_program.payload.meta.address.id_buffer       = 0;
-assign configuration_comb_program.payload.meta.address.offset          = 0;
-assign configuration_comb_program.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.address.shift.direction = 1'b1;
-assign configuration_comb_program.payload.meta.subclass.cmd            = CMD_MEM_READ;
-assign configuration_comb_program.payload.meta.subclass.buffer         = STRUCT_CU_SETUP;
+assign configuration_comb_program.payload.param.increment                         = 1'b1;
+assign configuration_comb_program.payload.param.decrement                         = 1'b0;
+assign configuration_comb_program.payload.param.flush_mode                        = 1'b0;
+assign configuration_comb_program.payload.param.flush_enable                      = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_program.payload.param.id_buffer                         = 0;
+assign configuration_comb_program.payload.param.array_size                        = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.payload.param.start_read                        = 0;
+assign configuration_comb_program.payload.param.end_read                          = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.payload.param.stride                            = 1;
+assign configuration_comb_program.payload.param.granularity                       = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.payload.meta.route.packet_source.id_cu          = ID_CU;
+assign configuration_comb_program.payload.meta.route.packet_source.id_bundle      = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_lane        = {NUM_LANES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_engine      = {NUM_ENGINES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_module      = 1;
+assign configuration_comb_program.payload.meta.route.packet_destination.id_cu     = ID_CU;
+assign configuration_comb_program.payload.meta.route.packet_destination.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_destination.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_destination.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_destination.id_module = 1; // routes to memory configuration modules in engines
+assign configuration_comb_program.payload.meta.route.sequence_source.id_cu        = ID_CU;
+assign configuration_comb_program.payload.meta.route.sequence_source.id_bundle    = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.sequence_source.id_lane      = {NUM_LANES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.sequence_source.id_engine    = {NUM_ENGINES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.sequence_source.id_module    = 1;
+assign configuration_comb_program.payload.meta.route.sequence_state               = SEQUENCE_INVALID;
+assign configuration_comb_program.payload.meta.route.sequence_id                  = 0;
+assign configuration_comb_program.payload.meta.route.hops                         = NUM_BUNDLES_WIDTH_BITS;
+assign configuration_comb_program.payload.meta.address.id_buffer                  = 0;
+assign configuration_comb_program.payload.meta.address.offset                     = 0;
+assign configuration_comb_program.payload.meta.address.shift.amount               = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.payload.meta.address.shift.direction            = 1'b1;
+assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_READ;
+assign configuration_comb_program.payload.meta.subclass.buffer                    = STRUCT_CU_SETUP;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet FLUSH

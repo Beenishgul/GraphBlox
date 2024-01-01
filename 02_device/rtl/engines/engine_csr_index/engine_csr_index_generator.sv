@@ -86,13 +86,12 @@ module engine_csr_index_generator #(parameter
 
     logic        response_engine_in_break_flag_int;
     logic        response_engine_in_break_flag_reg;
-    logic        response_engine_in_done_flag_int ;
     logic        response_engine_in_done_flag_reg ;
     MemoryPacket request_out_int                  ;
 
-    logic                                   fifo_empty_int;
-    logic                                   fifo_empty_reg;
-    logic [CU_PACKET_SEQ_ID_WIDTH_BITS-1:0] seq_id_counter;
+    logic                                        fifo_empty_int     ;
+    logic                                        fifo_empty_reg     ;
+    logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id_counter;
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
@@ -175,11 +174,11 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                  areset_backtrack                                                           ;
-    logic                  backtrack_configure_route_valid                                            ;
-    MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                    areset_backtrack                                                           ;
+    logic                    backtrack_configure_route_valid                                            ;
+    MemoryPacketRouteAddress backtrack_configure_route_in                                               ;
+    FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+    FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -250,16 +249,16 @@ module engine_csr_index_generator #(parameter
         if (areset_generator) begin
             configure_engine_reg.valid <= 1'b0;
             configure_memory_reg.valid <= 1'b0;
-            seq_id_counter             <= 0;
+            sequence_id_counter        <= 0;
         end
         else begin
             configure_engine_reg.valid <= configure_engine_in.valid;
             configure_memory_reg.valid <= configure_memory_in.valid;
 
             if(configure_memory_reg.valid | configure_engine_reg.valid)
-                seq_id_counter <= seq_id_counter + 1;
+                sequence_id_counter <= sequence_id_counter + 1;
             else
-                seq_id_counter <= seq_id_counter;
+                sequence_id_counter <= sequence_id_counter;
         end
     end
 
@@ -304,7 +303,7 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= request_memory_out_reg.payload;
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload);
     end
 
 // --------------------------------------------------------------------------------------
@@ -592,15 +591,13 @@ module engine_csr_index_generator #(parameter
                     response_engine_in_break_flag_reg <= 1'b1;
             end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
-                configure_engine_int.valid <= 1'b1;
-                counter_clear              <= 1'b1;
-                counter_enable             <= 1'b0;
-                counter_load               <= 1'b0;
-                done_int_reg               <= 1'b1;
-                done_out_reg               <= 1'b0;
-                fifo_request_din_reg.valid <= 1'b0;
-                if(response_engine_in_done_flag_int)
-                    response_engine_in_done_flag_reg <= 1'b1;
+                configure_engine_int.valid        <= 1'b1;
+                counter_clear                     <= 1'b1;
+                counter_enable                    <= 1'b0;
+                counter_load                      <= 1'b0;
+                done_int_reg                      <= 1'b1;
+                done_out_reg                      <= 1'b0;
+                fifo_request_din_reg.valid        <= 1'b0;
                 response_engine_in_break_flag_reg <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
@@ -620,29 +617,22 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
-    // always_comb begin
-    //     response_engine_in_break_flag_int = 1'b0;
-    //     response_engine_in_done_flag_int  = 1'b0 | ~configure_engine_int.payload.param.mode_break;
-    //     if(configure_engine_int.valid & configure_engine_int.payload.param.mode_break) begin
-    assign response_engine_in_done_flag_int  = ((response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_DONE)  & response_control_in_reg.valid) | ~configure_engine_int.payload.param.mode_break;
-    assign response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.seq_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.seq_id == seq_id_counter) ;
-    //     end
-    // end
+    assign response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.sequence_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.sequence_id == sequence_id_counter) ;
 
-    assign fifo_request_comb.valid                             = 1'b0;
-    assign fifo_request_comb.payload.meta.route.to             = configure_engine_int.payload.meta.route.to;
-    assign fifo_request_comb.payload.meta.route.hops           = configure_engine_int.payload.meta.route.hops;
-    assign fifo_request_comb.payload.meta.route.seq_src        = configure_engine_int.payload.meta.route.seq_src;
-    assign fifo_request_comb.payload.meta.route.from.id_module = 1 << ID_MODULE;
-    assign fifo_request_comb.payload.meta.route.from.id_cu     = configure_engine_int.payload.meta.route.from.id_cu ;
-    assign fifo_request_comb.payload.meta.route.from.id_bundle = configure_engine_int.payload.meta.route.from.id_bundle;
-    assign fifo_request_comb.payload.meta.route.from.id_lane   = configure_engine_int.payload.meta.route.from.id_lane;
-    assign fifo_request_comb.payload.meta.route.from.id_engine = configure_engine_int.payload.meta.route.from.id_engine;
-    assign fifo_request_comb.payload.meta.route.seq_state      = configure_engine_int.payload.meta.route.seq_state;
-    assign fifo_request_comb.payload.meta.route.seq_id         = seq_id_counter;
-    assign fifo_request_comb.payload.meta.address.id_buffer    = configure_engine_int.payload.meta.address.id_buffer;
-    assign fifo_request_comb.payload.meta.address.shift        = configure_engine_int.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.subclass             = configure_engine_int.payload.meta.subclass;
+    assign fifo_request_comb.valid                                      = 1'b0;
+    assign fifo_request_comb.payload.meta.route.packet_destination      = configure_engine_int.payload.meta.route.packet_destination;
+    assign fifo_request_comb.payload.meta.route.hops                    = configure_engine_int.payload.meta.route.hops;
+    assign fifo_request_comb.payload.meta.route.sequence_source         = configure_engine_int.payload.meta.route.sequence_source;
+    assign fifo_request_comb.payload.meta.route.packet_source.id_module = 1 << ID_MODULE;
+    assign fifo_request_comb.payload.meta.route.packet_source.id_cu     = configure_engine_int.payload.meta.route.packet_source.id_cu ;
+    assign fifo_request_comb.payload.meta.route.packet_source.id_bundle = configure_engine_int.payload.meta.route.packet_source.id_bundle;
+    assign fifo_request_comb.payload.meta.route.packet_source.id_lane   = configure_engine_int.payload.meta.route.packet_source.id_lane;
+    assign fifo_request_comb.payload.meta.route.packet_source.id_engine = configure_engine_int.payload.meta.route.packet_source.id_engine;
+    assign fifo_request_comb.payload.meta.route.sequence_state          = configure_engine_int.payload.meta.route.sequence_state;
+    assign fifo_request_comb.payload.meta.route.sequence_id             = sequence_id_counter;
+    assign fifo_request_comb.payload.meta.address.id_buffer             = configure_engine_int.payload.meta.address.id_buffer;
+    assign fifo_request_comb.payload.meta.address.shift                 = configure_engine_int.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass                      = configure_engine_int.payload.meta.subclass;
 
     always_comb begin
         if(configure_engine_int.payload.meta.address.shift.direction) begin
@@ -743,20 +733,20 @@ module engine_csr_index_generator #(parameter
         fifo_request_dout_reg              <= request_out_int;
         fifo_request_signals_out_reg_empty <= fifo_request_signals_out_int.empty;
 
-        fifo_request_dout_reg_S2.valid                      <= fifo_request_dout_reg.valid;
-        fifo_request_dout_reg_S2.payload.data               <= fifo_request_dout_reg.payload.data;
-        fifo_request_dout_reg_S2.payload.meta.subclass      <= fifo_request_dout_reg.payload.meta.subclass;
-        fifo_request_dout_reg_S2.payload.meta.address       <= fifo_request_dout_reg.payload.meta.address;
-        fifo_request_dout_reg_S2.payload.meta.route.from    <= fifo_request_dout_reg.payload.meta.route.from;
-        fifo_request_dout_reg_S2.payload.meta.route.to      <= fifo_request_dout_reg.payload.meta.route.to;
-        fifo_request_dout_reg_S2.payload.meta.route.hops    <= fifo_request_dout_reg.payload.meta.route.hops;
-        fifo_request_dout_reg_S2.payload.meta.route.seq_src <= fifo_request_dout_reg.payload.meta.route.seq_src;
-        fifo_request_dout_reg_S2.payload.meta.route.seq_id  <= fifo_request_dout_reg.payload.meta.route.seq_id;
+        fifo_request_dout_reg_S2.valid                                 <= fifo_request_dout_reg.valid;
+        fifo_request_dout_reg_S2.payload.data                          <= fifo_request_dout_reg.payload.data;
+        fifo_request_dout_reg_S2.payload.meta.subclass                 <= fifo_request_dout_reg.payload.meta.subclass;
+        fifo_request_dout_reg_S2.payload.meta.address                  <= fifo_request_dout_reg.payload.meta.address;
+        fifo_request_dout_reg_S2.payload.meta.route.packet_source      <= fifo_request_dout_reg.payload.meta.route.packet_source;
+        fifo_request_dout_reg_S2.payload.meta.route.packet_destination <= fifo_request_dout_reg.payload.meta.route.packet_destination;
+        fifo_request_dout_reg_S2.payload.meta.route.hops               <= fifo_request_dout_reg.payload.meta.route.hops;
+        fifo_request_dout_reg_S2.payload.meta.route.sequence_source    <= fifo_request_dout_reg.payload.meta.route.sequence_source;
+        fifo_request_dout_reg_S2.payload.meta.route.sequence_id        <= fifo_request_dout_reg.payload.meta.route.sequence_id;
 
         if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
-            fifo_request_dout_reg_S2.payload.meta.route.seq_state <= SEQUENCE_DONE;
+            fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_DONE;
         end else begin
-            fifo_request_dout_reg_S2.payload.meta.route.seq_state <= SEQUENCE_RUNNING;
+            fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_RUNNING;
         end
     end
 
@@ -764,7 +754,7 @@ module engine_csr_index_generator #(parameter
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
-    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.to;
+    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
@@ -826,14 +816,14 @@ module engine_csr_index_generator #(parameter
     assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
     assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
     assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
-    assign fifo_response_comb.payload.data              = response_memory_in_reg_S2.payload.data;
+    always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
         response_memory_in_reg_S2 <= response_memory_in_reg;
     end
 
     always_comb begin
-        if(response_memory_in_reg_S2.payload.meta.route.to.id_module == 2'b01) begin
+        if(response_memory_in_reg_S2.payload.meta.route.packet_destination.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;

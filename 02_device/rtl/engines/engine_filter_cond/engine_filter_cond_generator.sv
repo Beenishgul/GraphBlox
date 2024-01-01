@@ -127,11 +127,11 @@ MemoryPacketPayload           fifo_request_control_out_dout            ;
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                  areset_backtrack                                                           ;
-logic                  backtrack_configure_route_valid                                            ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
-FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+logic                    areset_backtrack                                                           ;
+logic                    backtrack_configure_route_valid                                            ;
+MemoryPacketRouteAddress backtrack_configure_route_in                                               ;
+FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - Filter data [0-4] -> Gen
@@ -474,7 +474,7 @@ assign filter_flow_int      = (result_flag_int ^ configure_engine_int.payload.pa
 assign break_flow_int       = (result_flag_int ^ configure_engine_int.payload.param.break_pass)  & configure_engine_int.payload.param.break_flag & generator_engine_request_engine_reg_S2.valid & ~break_running_reg;
 assign done_flow_int        = configure_engine_int.payload.param.break_flag | sequence_done_int;
 
-assign sequence_done_int = ((generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE) & generator_engine_request_engine_reg_S2.valid);
+assign sequence_done_int = ((generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state == SEQUENCE_DONE) & generator_engine_request_engine_reg_S2.valid);
 assign sequence_flow_int = break_flow_int | sequence_done_int | break_done_int;
 assign break_done_int    = break_running_reg & sequence_done_int;
 
@@ -519,66 +519,66 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    generator_engine_request_engine_reg_S3.payload.data                 <= result_data_int;
-    generator_engine_request_engine_reg_S3.payload.meta.address         <= generator_engine_request_engine_reg_S2.payload.meta.address;
-    generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
-    generator_engine_request_engine_reg_S3.payload.meta.route.hops      <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
-    generator_engine_request_engine_reg_S3.payload.meta.route.seq_id    <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_id;
-    generator_engine_request_engine_reg_S3.payload.meta.route.seq_src   <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
-    generator_engine_request_engine_reg_S3.payload.meta.subclass.buffer <= generator_engine_request_engine_reg_S2.payload.meta.subclass.buffer;
+    generator_engine_request_engine_reg_S3.payload.data                       <= result_data_int;
+    generator_engine_request_engine_reg_S3.payload.meta.address               <= generator_engine_request_engine_reg_S2.payload.meta.address;
+    generator_engine_request_engine_reg_S3.payload.meta.route.packet_source   <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
+    generator_engine_request_engine_reg_S3.payload.meta.route.hops            <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
+    generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
+    generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg_S3.payload.meta.subclass.buffer       <= generator_engine_request_engine_reg_S2.payload.meta.subclass.buffer;
 
     if(sequence_flow_reg[0])begin
         if(configure_engine_int.payload.param.conditional_flag) begin
             if(conditional_flow_int) begin
-                generator_engine_request_engine_reg_S3.payload.meta.route.to <= configure_engine_int.payload.param.filter_route._if;
+                generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= configure_engine_int.payload.param.filter_route._if;
             end else begin
-                generator_engine_request_engine_reg_S3.payload.meta.route.to <= configure_engine_int.payload.param.filter_route._else;
+                generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= configure_engine_int.payload.param.filter_route._else;
             end
         end else begin
-            generator_engine_request_engine_reg_S3.payload.meta.route.to <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
         end
 
         if (done_flow_int)
-            generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
+            generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= SEQUENCE_DONE;
         else
-            generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+            generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
 
-        generator_engine_request_engine_reg_S3.payload.meta.route.from   <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
-        generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
+        generator_engine_request_engine_reg_S3.payload.meta.route.packet_source <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
+        generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd        <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
     end else begin
-        if (generator_engine_request_engine_reg_S2.payload.meta.route.seq_state == SEQUENCE_DONE) begin
-            generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
-            generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= CMD_CONTROL;
+        if (generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state == SEQUENCE_DONE) begin
+            generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= SEQUENCE_DONE;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= CMD_CONTROL;
         end else if (break_flow_int) begin
-            generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_BREAK;
-            generator_engine_request_engine_reg_S3.payload.meta.route.to        <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg_S3.payload.meta.route.from      <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_src;
-            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd    <= CMD_CONTROL;
+            generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= SEQUENCE_BREAK;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= CMD_CONTROL;
         end else begin
 
             if (done_flow_int)
-                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= SEQUENCE_DONE;
+                generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= SEQUENCE_DONE;
             else
-                generator_engine_request_engine_reg_S3.payload.meta.route.seq_state <= generator_engine_request_engine_reg_S2.payload.meta.route.seq_state;
+                generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
 
-            generator_engine_request_engine_reg_S3.payload.meta.route.from   <= generator_engine_request_engine_reg_S2.payload.meta.route.from;
-            generator_engine_request_engine_reg_S3.payload.meta.route.to     <= generator_engine_request_engine_reg_S2.payload.meta.route.to;
-            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
+            generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
+            generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
         end
     end
 end
 
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload  <= generator_engine_request_engine_reg_S3.payload;
-    generator_engine_request_control_reg_S4.payload <= generator_engine_request_engine_reg_S3.payload;
+    generator_engine_request_control_reg_S4.payload <= map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S3.payload);
 
     // if(generator_engine_request_engine_reg_S4.valid)
     //      $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S4.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S4.payload.data.field[0], generator_engine_request_engine_reg_S4.payload.data.field[1], generator_engine_request_engine_reg_S4.payload.data.field[2], generator_engine_request_engine_reg_S4.payload.data.field[3]);
 
     // if(generator_engine_request_control_reg_S4.valid)
-    //     $display("%t - C %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_control_reg_S4.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_control_reg_S4.payload.data.field[0], generator_engine_request_control_reg_S4.payload.data.field[3]);
+    //     $display("%t - C %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_control_reg_S4.payload.meta.route.sequence_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_control_reg_S4.payload.data.field[0], generator_engine_request_control_reg_S4.payload.data.field[3]);
 end
 
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
@@ -633,7 +633,7 @@ xpm_fifo_sync_wrapper #(
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
 assign backtrack_configure_route_valid                    = fifo_request_engine_out_signals_out_int.valid;
-assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.to;
+assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.packet_destination;
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(

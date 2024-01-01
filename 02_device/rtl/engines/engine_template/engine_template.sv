@@ -221,7 +221,7 @@ always_ff @(posedge ap_clk) begin
         fifo_empty_reg            <= fifo_empty_int;
         fifo_setup_signal         <= engine_cast_arbiter_1_to_N_fifo_setup_signal | template_fifo_setup_signal;
         request_control_out.valid <= request_control_out_int.valid;
-        request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.to);
+        request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.packet_destination);
         request_memory_out.valid  <= request_memory_out_int.valid;
     end
 end

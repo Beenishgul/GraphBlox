@@ -118,7 +118,7 @@ logic                         fifo_request_engine_out_setup_signal_int;
 // --------------------------------------------------------------------------------------
 logic                  areset_backtrack                                                           ;
 logic                  backtrack_configure_route_valid                                            ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
+MemoryPacketRouteAddress  backtrack_configure_route_in                                               ;
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
@@ -431,11 +431,11 @@ end
 
 always_ff @(posedge ap_clk) begin
     if(response_engine_in_int.valid & configure_engine_param_valid) begin
-        generator_engine_request_engine_reg.payload.meta.route.from      <= response_engine_in_int.payload.meta.route.from;
-        generator_engine_request_engine_reg.payload.meta.route.to        <= response_engine_in_int.payload.meta.route.to;
-        generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-        generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-        generator_engine_request_engine_reg.payload.meta.route.seq_id    <= response_engine_in_int.payload.meta.route.seq_id;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source      <= response_engine_in_int.payload.meta.route.packet_source;
+        generator_engine_request_engine_reg.payload.meta.route.packet_destination        <= response_engine_in_int.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_source   <= response_engine_in_int.payload.meta.route.sequence_source;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_state <= response_engine_in_int.payload.meta.route.sequence_state;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_id    <= response_engine_in_int.payload.meta.route.sequence_id;
         generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
         generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
         generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data;
@@ -495,7 +495,7 @@ xpm_fifo_sync_wrapper #(
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
 assign backtrack_configure_route_valid                    = fifo_request_engine_out_signals_out_int.valid;
-assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.to;
+assign backtrack_configure_route_in                       = fifo_request_engine_out_dout.meta.route.packet_destination;
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(
