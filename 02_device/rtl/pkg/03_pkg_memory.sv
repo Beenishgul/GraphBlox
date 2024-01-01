@@ -97,19 +97,6 @@ typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
 } type_ALU_operation;
 
 // --------------------------------------------------------------------------------------
-// structure types
-// --------------------------------------------------------------------------------------
-parameter TYPE_DATA_STRUCTURE_BITS = 6;
-typedef enum logic[TYPE_DATA_STRUCTURE_BITS-1:0] {
-  STRUCT_INVALID      = 1 << 0,
-  STRUCT_CU_DATA      = 1 << 1,
-  STRUCT_ENGINE_DATA  = 1 << 2,
-  STRUCT_CU_SETUP     = 1 << 3,
-  STRUCT_ENGINE_SETUP = 1 << 4,
-  STRUCT_CU_FLUSH     = 1 << 5
-} type_data_buffer;
-
-// --------------------------------------------------------------------------------------
 // SEQUENCE_STATE
 // --------------------------------------------------------------------------------------
 parameter TYPE_SEQUENCE_STATE_BITS = 4;
