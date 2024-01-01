@@ -509,7 +509,7 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
-arbiter_1_to_N_request_engine #(
+arbiter_1_to_N_response_engine #(
     .NUM_ENGINE_REQUESTOR(NUM_LANES                                   ),
     .ID_LEVEL            (2                                           ),
     .ID_BUNDLE           (ID_BUNDLE                                   ),
