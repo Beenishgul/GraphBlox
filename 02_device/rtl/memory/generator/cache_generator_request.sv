@@ -150,59 +150,7 @@ end
 // --------------------------------------------------------------------------------------
 // Generate Cache requests from generic memory requests
 // --------------------------------------------------------------------------------------
-
-always_comb begin
-  address_base = 0;
-  if(arbiter_bus_out.valid & descriptor_in_reg.valid) begin
-    case (arbiter_bus_out.payload.meta.address.id_buffer)
-      (1 << 0) : begin
-        address_base = descriptor_in_reg.payload.buffer_1;
-      end
-      (1 << 1) : begin
-        address_base = descriptor_in_reg.payload.buffer_2;
-      end
-      (1 << 2) : begin
-        address_base = descriptor_in_reg.payload.buffer_3;
-      end
-      (1 << 3) : begin
-        address_base = descriptor_in_reg.payload.buffer_4;
-      end
-      (1 << 4) : begin
-        address_base = descriptor_in_reg.payload.buffer_5;
-      end
-      (1 << 5) : begin
-        address_base = descriptor_in_reg.payload.buffer_6;
-      end
-      (1 << 6) : begin
-        address_base = descriptor_in_reg.payload.buffer_7;
-      end
-      (1 << 7) : begin
-        address_base = descriptor_in_reg.payload.buffer_8;
-      end
-      default : begin
-        address_base = descriptor_in_reg.payload.buffer_0;
-      end
-    endcase
-  end
-end
-
-assign fifo_request_comb.valid             = arbiter_bus_out.valid;
-assign fifo_request_comb.payload.meta      = arbiter_bus_out.payload.meta;
-assign fifo_request_comb.payload.data      = arbiter_bus_out.payload.data;
-assign fifo_request_comb.payload.iob.valid = arbiter_bus_out.valid;
-assign fifo_request_comb.payload.iob.addr  = address_base + arbiter_bus_out.payload.meta.address.offset;
-assign fifo_request_comb.payload.iob.wdata = arbiter_bus_out.payload.data.field[0];
-
-always_comb begin
-  case (arbiter_bus_out.payload.meta.subclass.cmd)
-    CMD_MEM_WRITE : begin
-      fifo_request_comb.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
-    end
-    default : begin
-      fifo_request_comb.payload.iob.wstrb = 0;
-    end
-  endcase
-end
+always_comb fifo_request_comb = map_MemoryRequestPacket_to_CacheRequest(arbiter_bus_out, descriptor_in_reg);
 
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
@@ -216,6 +164,7 @@ end
 always_ff @(posedge ap_clk) begin
   fifo_request_din_reg.payload <= fifo_request_comb.payload;
 end
+
 // --------------------------------------------------------------------------------------
 // FIFO cache Ready
 // --------------------------------------------------------------------------------------

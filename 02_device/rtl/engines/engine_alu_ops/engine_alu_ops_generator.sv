@@ -120,7 +120,7 @@ logic                         fifo_request_engine_out_setup_signal_int;
 // --------------------------------------------------------------------------------------
 logic                  areset_backtrack                                                           ;
 logic                  backtrack_configure_route_valid                                            ;
-MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
+MemoryPacketRouteAddress  backtrack_configure_route_in                                               ;
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
@@ -441,24 +441,24 @@ end
 
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.payload.data                 <= response_engine_in_int.payload.data  ;
-    generator_engine_request_engine_reg.payload.meta.route.from      <= configure_memory_reg.payload.meta.route.from;
-    generator_engine_request_engine_reg.payload.meta.route.to        <= configure_memory_reg.payload.meta.route.to;
-    generator_engine_request_engine_reg.payload.meta.route.seq_src   <= response_engine_in_int.payload.meta.route.seq_src;
-    generator_engine_request_engine_reg.payload.meta.route.seq_state <= response_engine_in_int.payload.meta.route.seq_state;
-    generator_engine_request_engine_reg.payload.meta.route.seq_id    <= response_engine_in_int.payload.meta.route.seq_id;
+    generator_engine_request_engine_reg.payload.meta.route.packet_source      <= configure_memory_reg.payload.meta.route.packet_source;
+    generator_engine_request_engine_reg.payload.meta.route.packet_destination        <= configure_memory_reg.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_source   <= response_engine_in_int.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_state <= response_engine_in_int.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_id    <= response_engine_in_int.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg.payload.meta.route.hops      <= response_engine_in_int.payload.meta.route.hops;
     generator_engine_request_engine_reg.payload.meta.address         <= response_engine_in_int.payload.meta.address;
     generator_engine_request_engine_reg.payload.meta.subclass        <= response_engine_in_int.payload.meta.subclass;
 end
 
 always_ff @(posedge ap_clk) begin
-    if((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE & result_flag) begin
+    if((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE & result_flag) begin
         generator_engine_request_engine_reg_S2.valid <= 1'b1;
         engine_alu_ops_clear                         <= 1'b1;
-    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state != SEQUENCE_DONE & ~result_flag) begin
+    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state != SEQUENCE_DONE & ~result_flag) begin
         generator_engine_request_engine_reg_S2.valid <= 1'b0;
         engine_alu_ops_clear                         <= 1'b0;
-    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.seq_state == SEQUENCE_DONE & ~result_flag) begin
+    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE & ~result_flag) begin
         generator_engine_request_engine_reg_S2.valid <= 1'b0;
         engine_alu_ops_clear                         <= 1'b0;
     end else begin
@@ -467,17 +467,17 @@ always_ff @(posedge ap_clk) begin
     end
 
     generator_engine_request_engine_reg_S2.payload.data                 <= result_int;
-    generator_engine_request_engine_reg_S2.payload.meta.route.from      <= generator_engine_request_engine_reg.payload.meta.route.from;
-    generator_engine_request_engine_reg_S2.payload.meta.route.to        <= generator_engine_request_engine_reg.payload.meta.route.to;
-    generator_engine_request_engine_reg_S2.payload.meta.route.seq_src   <= generator_engine_request_engine_reg.payload.meta.route.seq_src;
-    generator_engine_request_engine_reg_S2.payload.meta.route.seq_state <= generator_engine_request_engine_reg.payload.meta.route.seq_state;
-    generator_engine_request_engine_reg_S2.payload.meta.route.seq_id    <= generator_engine_request_engine_reg.payload.meta.route.seq_id;
+    generator_engine_request_engine_reg_S2.payload.meta.route.packet_source      <= generator_engine_request_engine_reg.payload.meta.route.packet_source;
+    generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination        <= generator_engine_request_engine_reg.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source   <= generator_engine_request_engine_reg.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state <= generator_engine_request_engine_reg.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id    <= generator_engine_request_engine_reg.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S2.payload.meta.route.hops      <= generator_engine_request_engine_reg.payload.meta.route.hops;
     generator_engine_request_engine_reg_S2.payload.meta.address         <= generator_engine_request_engine_reg.payload.meta.address;
     generator_engine_request_engine_reg_S2.payload.meta.subclass        <= generator_engine_request_engine_reg.payload.meta.subclass;
 
     // if(generator_engine_request_engine_reg_S2.valid)
-    //     $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.seq_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
+    //     $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
 
 end
 
@@ -497,7 +497,7 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
 assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
-assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.to;
+assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.packet_destination;
 assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
 backtrack_fifo_lanes_response_signal #(

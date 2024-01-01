@@ -128,11 +128,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic               read_write_response_engine_in_valid_reg    ;
-    logic               read_write_response_engine_in_valid_flag   ;
-    logic               read_write_response_engine_in_valid_flag_S2;
-    MemoryPacketData    result_int                                 ;
-    MemoryPacketAddress address_int                                ;
+    logic                   read_write_response_engine_in_valid_reg    ;
+    logic                   read_write_response_engine_in_valid_flag   ;
+    logic                   read_write_response_engine_in_valid_flag_S2;
+    MemoryPacketData        result_int                                 ;
+    MemoryPacketDataAddress address_int                                ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response MemoryPacket
@@ -166,11 +166,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                  areset_backtrack                                                           ;
-    logic                  backtrack_configure_route_valid                                            ;
-    MemoryPacketArbitrate  backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                    areset_backtrack                                                           ;
+    logic                    backtrack_configure_route_valid                                            ;
+    MemoryPacketRouteAddress backtrack_configure_route_in                                               ;
+    FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+    FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -280,7 +280,7 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= request_memory_out_reg.payload;
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload);
     end
 
 // --------------------------------------------------------------------------------------
@@ -535,19 +535,19 @@ module engine_read_write_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data                      <= result_int;
-        generator_engine_request_engine_reg.payload.meta.address              <= address_int;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_module <= 1 << ID_MODULE;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_cu     <= configure_memory_reg.payload.meta.route.from.id_cu ;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_bundle <= configure_memory_reg.payload.meta.route.from.id_bundle;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_lane   <= configure_memory_reg.payload.meta.route.from.id_lane;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_engine <= configure_memory_reg.payload.meta.route.from.id_engine;
-        generator_engine_request_engine_reg.payload.meta.route.to             <= configure_memory_reg.payload.meta.route.to;
-        generator_engine_request_engine_reg.payload.meta.route.seq_src        <= response_engine_in_int.payload.meta.route.seq_src;
-        generator_engine_request_engine_reg.payload.meta.route.seq_state      <= response_engine_in_int.payload.meta.route.seq_state;
-        generator_engine_request_engine_reg.payload.meta.route.seq_id         <= response_engine_in_int.payload.meta.route.seq_id;
-        generator_engine_request_engine_reg.payload.meta.route.hops           <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.subclass             <= configure_memory_reg.payload.meta.subclass;
+        generator_engine_request_engine_reg.payload.data                               <= result_int;
+        generator_engine_request_engine_reg.payload.meta.address                       <= address_int;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source.id_module <= 1 << ID_MODULE;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source.id_cu     <= configure_memory_reg.payload.meta.route.packet_source.id_cu ;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source.id_bundle <= configure_memory_reg.payload.meta.route.packet_source.id_bundle;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source.id_lane   <= configure_memory_reg.payload.meta.route.packet_source.id_lane;
+        generator_engine_request_engine_reg.payload.meta.route.packet_source.id_engine <= configure_memory_reg.payload.meta.route.packet_source.id_engine;
+        generator_engine_request_engine_reg.payload.meta.route.packet_destination      <= configure_memory_reg.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_source         <= response_engine_in_int.payload.meta.route.sequence_source;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_state          <= response_engine_in_int.payload.meta.route.sequence_state;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_id             <= response_engine_in_int.payload.meta.route.sequence_id;
+        generator_engine_request_engine_reg.payload.meta.route.hops                    <= response_engine_in_int.payload.meta.route.hops;
+        generator_engine_request_engine_reg.payload.meta.subclass                      <= configure_memory_reg.payload.meta.subclass;
     end
 
     engine_read_write_kernel inst_engine_read_write_kernel (
@@ -601,7 +601,7 @@ module engine_read_write_generator #(parameter
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
-    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.to;
+    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
@@ -663,14 +663,14 @@ module engine_read_write_generator #(parameter
     assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
     assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
     assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
-    assign fifo_response_comb.payload.data              = response_memory_in_reg_S2.payload.data;
+    always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
-       response_memory_in_reg_S2 <= response_memory_in_reg;
+        response_memory_in_reg_S2 <= response_memory_in_reg;
     end
 
     always_comb begin
-        if(response_memory_in_reg_S2.payload.meta.route.to.id_module == 2'b01) begin
+        if(response_memory_in_reg_S2.payload.meta.route.packet_destination.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
         end else begin
             fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
@@ -701,8 +701,8 @@ module engine_read_write_generator #(parameter
         request_memory_out_reg.payload <= request_out_int.payload;
         request_engine_out_reg.payload <= fifo_response_comb.payload;
 
-          // if(request_memory_out_reg.valid && (ID_BUNDLE== 0) && (ID_LANE== 1) )
-          //   $display("%t - MEM %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.data.field[0], request_memory_out_reg.payload.data.field[1], request_memory_out_reg.payload.data.field[2], request_memory_out_reg.payload.data.field[3]);
+        // if(request_memory_out_reg.valid && (ID_BUNDLE== 0) && (ID_LANE== 1) )
+        //   $display("%t - MEM %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.data.field[0], request_memory_out_reg.payload.data.field[1], request_memory_out_reg.payload.data.field[2], request_memory_out_reg.payload.data.field[3]);
 
     end
 

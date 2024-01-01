@@ -213,8 +213,8 @@ typedef enum logic[14:0] {
 } engine_filter_cond_generator_state;
 
 typedef struct packed{
-    MemoryPacketArbitrate              _if  ;
-    MemoryPacketArbitrate              _else;
+    MemoryPacketRouteAddress _if  ;
+    MemoryPacketRouteAddress _else;
 } FilterCondMemoryPacketRoute;
 
 typedef struct packed{

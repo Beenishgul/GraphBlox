@@ -149,13 +149,8 @@ assign fifo_response_din.meta.subclass.cmd    = CMD_MEM_RESPONSE;
 assign fifo_response_din.data                 = response_in_reg.payload.data;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en           = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
-assign fifo_response_dout_int.valid                 = fifo_response_signals_out_int.valid;
-assign fifo_response_dout_int.payload.meta          = fifo_response_dout.meta;
-assign fifo_response_dout_int.payload.data.field[0] = fifo_response_dout.iob.rdata;
-assign fifo_response_dout_int.payload.data.field[1] = fifo_response_dout.data.field[0];
-assign fifo_response_dout_int.payload.data.field[2] = fifo_response_dout.data.field[1];
-assign fifo_response_dout_int.payload.data.field[3] = fifo_response_dout.data.field[2];
+assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+always_comb fifo_response_dout_int        = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, fifo_response_signals_out_int.valid);
 
 xpm_fifo_sync_bram_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),

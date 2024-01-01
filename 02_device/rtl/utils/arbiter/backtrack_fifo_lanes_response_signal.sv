@@ -27,7 +27,7 @@ module backtrack_fifo_lanes_response_signal #(parameter
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
     input  logic                  configure_route_valid                                            ,
-    input  MemoryPacketArbitrate  configure_route_in                                               ,
+    input  MemoryPacketRouteAddress  configure_route_in                                               ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
     output FIFOStateSignalsInput  fifo_response_engine_in_signals_out
 );
@@ -38,7 +38,7 @@ module backtrack_fifo_lanes_response_signal #(parameter
 logic areset_backtrack;
 
 logic                           configure_route_valid_reg                                            ;
-MemoryPacketArbitrate           configure_route_in_reg                                               ;
+MemoryPacketRouteAddress        configure_route_in_reg                                               ;
 FIFOStateSignalsOutput          fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput           fifo_response_engine_in_signals_out_reg                              ;
 logic [        NUM_BUNDLES-1:0] next_module_id_bundle                                                ;
@@ -58,8 +58,8 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_backtrack) begin
-        configure_route_valid_reg              <= 1'b0;
-        configure_route_in_reg                 <= 0;
+        configure_route_valid_reg <= 1'b0;
+        configure_route_in_reg    <= 0;
     end
     else begin
         if(configure_route_valid) begin
