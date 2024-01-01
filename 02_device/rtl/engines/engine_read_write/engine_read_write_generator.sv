@@ -669,7 +669,7 @@ module engine_read_write_generator #(parameter
     end
 
     always_comb begin
-        if(response_memory_in_reg_S2.payload.meta.route.packet_destination.id_module == 2'b01) begin
+        if(response_memory_in_reg_S2.payload.meta.route.packet_source.id_module == 2'b01) begin
             fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_PROGRAM;
         end else begin
             fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;

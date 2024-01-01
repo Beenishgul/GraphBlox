@@ -288,7 +288,7 @@ always_comb begin
 end
 
 // --------------------------------------------------------------------------------------
-arbiter_1_to_N_response #(
+arbiter_1_to_N_response_memory #(
     .NUM_MEMORY_REQUESTOR(2),
     .ID_LEVEL            (4)
 ) inst_arbiter_1_to_N_memory_response_in (
