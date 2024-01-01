@@ -26,11 +26,11 @@ module engine_read_write_kernel (
 );
 
 // Define internal signals
-EnginePacketData        ops_value_reg ;
+EnginePacketData  ops_value_reg ;
 PacketDataAddress address_int   ;
-EnginePacketData        org_value_reg ;
-EnginePacketData        org_data_int  ;
-logic                   data_valid_reg;
+EnginePacketData  org_value_reg ;
+EnginePacketData  org_data_int  ;
+logic             data_valid_reg;
 
 // Process input data and mask
 always_ff @(posedge ap_clk) begin
