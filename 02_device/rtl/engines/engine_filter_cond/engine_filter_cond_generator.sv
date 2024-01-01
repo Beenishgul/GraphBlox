@@ -43,7 +43,7 @@ module engine_filter_cond_generator #(parameter
     output EnginePacket            request_engine_out                                               ,
     input  FIFOStateSignalsInput   fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput  fifo_request_engine_out_signals_out                              ,
-    output EnginePacket            request_control_out                                              ,
+    output ControlPacket            request_control_out                                              ,
     input  FIFOStateSignalsInput   fifo_request_control_out_signals_in                              ,
     output FIFOStateSignalsOutput  fifo_request_control_out_signals_out                             ,
     output logic                   fifo_setup_signal                                                ,
@@ -87,12 +87,12 @@ FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 FilterCondConfiguration configure_engine_int;
 
 FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
-EnginePacket          generator_engine_request_control_reg_S4;
+ControlPacket         generator_engine_request_control_reg_S4;
 EnginePacket          generator_engine_request_engine_reg    ;
 EnginePacket          generator_engine_request_engine_reg_S2 ;
 EnginePacket          generator_engine_request_engine_reg_S3 ;
 EnginePacket          generator_engine_request_engine_reg_S4 ;
-EnginePacket          request_control_out_int                ;
+ControlPacket         request_control_out_int                ;
 EnginePacket          request_engine_out_int                 ;
 
 // --------------------------------------------------------------------------------------
@@ -121,17 +121,17 @@ FIFOStateSignalsInputInternal fifo_request_control_out_signals_in_int  ;
 FIFOStateSignalsInput         fifo_request_control_out_signals_in_reg  ;
 FIFOStateSignalsOutInternal   fifo_request_control_out_signals_out_int ;
 logic                         fifo_request_control_out_setup_signal_int;
-EnginePacketPayload           fifo_request_control_out_din             ;
-EnginePacketPayload           fifo_request_control_out_dout            ;
+ControlPacketPayload          fifo_request_control_out_din             ;
+ControlPacketPayload          fifo_request_control_out_dout            ;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                    areset_backtrack                                                           ;
-logic                    backtrack_configure_route_valid                                            ;
-PacketRouteAddress backtrack_configure_route_in                                               ;
-FIFOStateSignalsOutput   backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsInput    backtrack_fifo_response_engine_in_signals_out                              ;
+logic                  areset_backtrack                                                           ;
+logic                  backtrack_configure_route_valid                                            ;
+PacketRouteAddress     backtrack_configure_route_in                                               ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - Filter data [0-4] -> Gen
@@ -669,10 +669,10 @@ assign request_control_out_int.valid                 = fifo_request_control_out_
 assign request_control_out_int.payload               = fifo_request_control_out_dout;
 
 xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-    .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
+    .WRITE_DATA_WIDTH($bits(ControlPacketPayload)),
+    .READ_DATA_WIDTH ($bits(ControlPacketPayload)),
+    .PROG_THRESH     (PROG_THRESH                )
 ) inst_fifo_EnginePacketRequestcontrolOutput (
     .clk        (ap_clk                                              ),
     .srst       (areset_fifo                                         ),
