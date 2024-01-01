@@ -16,7 +16,7 @@
 
 module engine_template #(
     `include "engine_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
@@ -69,9 +69,9 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------
-logic                  areset_engine_cast_arbiter_1_to_N                  ;
-FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_request_signals_out;
-logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal       ;
+logic                  areset_engine_cast_arbiter_1_to_N                   ;
+FIFOStateSignalsOutput engine_cast_arbiter_1_to_N_fifo_response_signals_out;
+logic                  engine_cast_arbiter_1_to_N_fifo_setup_signal        ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
@@ -226,11 +226,11 @@ always_ff @(posedge ap_clk) begin
     end
 end
 
-assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_request_signals_out.empty;
+assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_response_signals_out.empty;
 
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out   <= template_fifo_request_control_out_signals_out;
-    fifo_request_engine_out_signals_out[0] <= template_fifo_request_engine_out_signals_out & engine_cast_arbiter_1_to_N_fifo_request_signals_out;
+    fifo_request_engine_out_signals_out[0] <= template_fifo_request_engine_out_signals_out & engine_cast_arbiter_1_to_N_fifo_response_signals_out;
     fifo_request_memory_out_signals_out    <= template_fifo_request_memory_out_signals_out;
     fifo_response_control_in_signals_out   <= template_fifo_response_control_in_signals_out;
     fifo_response_engine_in_signals_out[0] <= template_fifo_response_engine_in_signals_out[0];
@@ -248,36 +248,36 @@ end
 generate
     if(ENGINE_CAST_WIDTH>0) begin
 // --------------------------------------------------------------------------------------
-        FIFOStateSignalsInput  engine_cast_arbiter_1_to_N_fifo_request_signals_in[ENGINE_CAST_WIDTH-1:0];
-        FIFOStateSignalsInput  fifo_request_engine_cast_signals_in               [ENGINE_CAST_WIDTH-1:0];
-        FIFOStateSignalsOutput fifo_request_engine_cast_signals_out              [ENGINE_CAST_WIDTH-1:0];
-        EnginePacket           engine_cast_arbiter_1_to_N_request_out            [ENGINE_CAST_WIDTH-1:0];
-        EnginePacket           request_engine_cast                               [ENGINE_CAST_WIDTH-1:0];
-        EnginePacket           engine_cast_arbiter_1_to_N_request_in                                    ;
+        FIFOStateSignalsInput  engine_cast_arbiter_1_to_N_fifo_response_signals_in[ENGINE_CAST_WIDTH-1:0];
+        FIFOStateSignalsInput  fifo_response_engine_cast_signals_in               [ENGINE_CAST_WIDTH-1:0];
+        FIFOStateSignalsOutput fifo_response_engine_cast_signals_out              [ENGINE_CAST_WIDTH-1:0];
+        EnginePacket           engine_cast_arbiter_1_to_N_response_out            [ENGINE_CAST_WIDTH-1:0];
+        EnginePacket           response_engine_cast                               [ENGINE_CAST_WIDTH-1:0];
+        EnginePacket           engine_cast_arbiter_1_to_N_response_in                                    ;
 // --------------------------------------------------------------------------------------
         for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_drivers
             always_ff @(posedge ap_clk) begin
                 if (areset_template_engine) begin
-                    fifo_request_engine_cast_signals_in[i].rd_en <= 1'b0;
+                    fifo_response_engine_cast_signals_in[i].rd_en <= 1'b0;
                     request_engine_out[i+1].valid <= 1'b0;
                 end
                 else begin
-                    fifo_request_engine_cast_signals_in[i].rd_en <= fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
-                    request_engine_out[i+1].valid <= request_engine_cast[i].valid;
+                    fifo_response_engine_cast_signals_in[i].rd_en <= fifo_request_engine_out_signals_in[i+1].rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
+                    request_engine_out[i+1].valid <= response_engine_cast[i].valid;
                 end
             end
 
             always_ff @(posedge ap_clk) begin
-                fifo_request_engine_out_signals_out[i+1] <= fifo_request_engine_cast_signals_out[i];
-                request_engine_out[i+1].payload          <= request_engine_cast[i].payload;
+                fifo_request_engine_out_signals_out[i+1] <= fifo_response_engine_cast_signals_out[i];
+                request_engine_out[i+1].payload          <= response_engine_cast[i].payload;
             end
         end
 // --------------------------------------------------------------------------------------
-        assign engine_cast_arbiter_1_to_N_request_in = request_engine_out_int;
-        for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_request
-            assign engine_cast_arbiter_1_to_N_fifo_request_signals_in[i].rd_en = fifo_request_engine_cast_signals_in[i].rd_en;
-            assign fifo_request_engine_cast_signals_out[i] = engine_cast_arbiter_1_to_N_fifo_request_signals_out;
-            assign request_engine_cast[i]                  = engine_cast_arbiter_1_to_N_request_out[i];
+        assign engine_cast_arbiter_1_to_N_response_in = request_engine_out_int;
+        for (i=0; i<ENGINE_CAST_WIDTH; i++) begin : generate_engine_cast_arbiter_1_to_N_response
+            assign engine_cast_arbiter_1_to_N_fifo_response_signals_in[i].rd_en = fifo_response_engine_cast_signals_in[i].rd_en;
+            assign fifo_response_engine_cast_signals_out[i] = engine_cast_arbiter_1_to_N_fifo_response_signals_out;
+            assign response_engine_cast[i]                  = engine_cast_arbiter_1_to_N_response_out[i];
         end
 // --------------------------------------------------------------------------------------
         arbiter_1_to_N_response_engine #(
@@ -285,21 +285,21 @@ generate
             .ID_LEVEL           (5                ),
             .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH ),
             .PROG_THRESH        (PROG_THRESH      )
-        ) inst_engine_cast_arbiter_1_to_N_request (
-            .ap_clk                   (ap_clk                                             ),
-            .areset                   (areset_engine_cast_arbiter_1_to_N                  ),
-            .response_in              (engine_cast_arbiter_1_to_N_request_in              ),
-            .fifo_response_signals_in (engine_cast_arbiter_1_to_N_fifo_request_signals_in ),
-            .fifo_response_signals_out(engine_cast_arbiter_1_to_N_fifo_request_signals_out),
-            .response_out             (engine_cast_arbiter_1_to_N_request_out             ),
-            .fifo_setup_signal        (engine_cast_arbiter_1_to_N_fifo_setup_signal       )
+        ) inst_engine_cast_arbiter_1_to_N_response (
+            .ap_clk                   (ap_clk                                              ),
+            .areset                   (areset_engine_cast_arbiter_1_to_N                   ),
+            .response_in              (engine_cast_arbiter_1_to_N_response_in              ),
+            .fifo_response_signals_in (engine_cast_arbiter_1_to_N_fifo_response_signals_in ),
+            .fifo_response_signals_out(engine_cast_arbiter_1_to_N_fifo_response_signals_out),
+            .response_out             (engine_cast_arbiter_1_to_N_response_out             ),
+            .fifo_setup_signal        (engine_cast_arbiter_1_to_N_fifo_setup_signal        )
         );
 // --------------------------------------------------------------------------------------
     end else begin
-        assign engine_cast_arbiter_1_to_N_fifo_request_signals_out = 2'b10;
-        assign engine_cast_arbiter_1_to_N_fifo_setup_signal        = 0;
+        assign engine_cast_arbiter_1_to_N_fifo_response_signals_out = 2'b10;
+        assign engine_cast_arbiter_1_to_N_fifo_setup_signal         = 0;
     end
-endgenerate
+    endgenerate
 
 
 // --------------------------------------------------------------------------------------
@@ -393,7 +393,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -456,7 +456,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -520,7 +520,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -584,7 +584,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -648,7 +648,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -712,7 +712,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -776,7 +776,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
@@ -840,7 +840,7 @@ generate
             assign template_response_engine_in[0]                     = response_engine_in_int;
             assign template_response_memory_in                        = response_memory_in_int;
 
-            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_request_signals_out.prog_full;
+            assign template_fifo_request_engine_out_signals_in.rd_en  = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
             assign template_fifo_request_memory_out_signals_in.rd_en  = fifo_request_memory_out_signals_in_reg.rd_en;
             assign template_fifo_request_control_out_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
             assign template_fifo_response_lanes_backtrack_signals_in  = fifo_response_lanes_backtrack_signals_in_reg;
