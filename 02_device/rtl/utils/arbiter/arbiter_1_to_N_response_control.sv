@@ -15,7 +15,7 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response #(
-  parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)      ,
+  parameter DEMUX_DATA_WIDTH      = $bits(ControlPacketPayload)      ,
   parameter ID_LEVEL              = 1                               ,
   parameter ID_BUNDLE             = 0                               ,
   parameter NUM_MEMORY_REQUESTOR  = 2                               ,
@@ -28,10 +28,10 @@ module arbiter_1_to_N_response #(
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
-  input  EnginePacket           response_in                                        ,
+  input  ControlPacket           response_in                                        ,
   input  FIFOStateSignalsInput  fifo_response_signals_in [NUM_MEMORY_REQUESTOR-1:0],
   output FIFOStateSignalsOutput fifo_response_signals_out                          ,
-  output EnginePacket           response_out [NUM_MEMORY_REQUESTOR-1:0]            ,
+  output ControlPacket           response_out [NUM_MEMORY_REQUESTOR-1:0]            ,
   output logic                  fifo_setup_signal
 );
 
@@ -41,16 +41,16 @@ module arbiter_1_to_N_response #(
 logic areset_control;
 logic areset_fifo   ;
 
-EnginePacket                     response_in_reg;
+ControlPacket                    response_in_reg;
 logic [NUM_MEMORY_REQUESTOR-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-EnginePacketPayload              fifo_response_din                    ;
-EnginePacket                     fifo_response_dout_int               ;
-EnginePacket                     fifo_response_dout_reg               ;
-EnginePacketPayload              fifo_response_dout                   ;
+ControlPacketPayload             fifo_response_din                    ;
+ControlPacket                    fifo_response_dout_int               ;
+ControlPacket                    fifo_response_dout_reg               ;
+ControlPacketPayload             fifo_response_dout                   ;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en   ;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_mask_int;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_mask_reg;
@@ -104,35 +104,35 @@ generate
     0 : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_cu[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[i]);
         end
       end
     end
     1 : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_bundle[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_bundle[i]);
         end
       end
     end
     2 : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_lane[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_lane[i]);
         end
       end
     end
     3 : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_engine[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_engine[i]);
         end
       end
     end
     4 : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_module[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_module[i]);
         end
       end
     end
@@ -146,7 +146,7 @@ generate
     default : begin
       always_comb begin
         for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_source.id_cu[i]);
+          fifo_response_signals_in_reg_mask_int[i] = (fifo_response_signals_in_reg_rd_en[i] & fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[i]);
         end
       end
     end
@@ -156,25 +156,25 @@ endgenerate
 generate
   case (ID_LEVEL)
     0 : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
     end
     1 : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_bundle[NUM_MEMORY_REQUESTOR-1:0]);
     end
     2 : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_lane[NUM_MEMORY_REQUESTOR-1:0]);
     end
     3 : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_engine[NUM_MEMORY_REQUESTOR-1:0]);
     end
     4 : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_module[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_module[NUM_MEMORY_REQUESTOR-1:0]);
     end
     5 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == id_mask[NUM_MEMORY_REQUESTOR-1:0]);
     end
     default : begin
-      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_source.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
+      assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[NUM_MEMORY_REQUESTOR-1:0]);
     end
   endcase
 endgenerate
@@ -207,7 +207,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_cu[i]     & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_cu[i]     & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -220,7 +220,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_bundle[i] & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_bundle[i] & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -233,7 +233,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_lane[i] & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_lane[i] & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -246,7 +246,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_engine[i] & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_engine[i] & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -259,7 +259,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_module[i] & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_module[i] & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -285,7 +285,7 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_source.id_cu[i] & fifo_response_dout_reg.valid;
+            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_cu[i] & fifo_response_dout_reg.valid;
           end
         end
       end
@@ -313,13 +313,13 @@ end
 
 
 // --------------------------------------------------------------------------------------
-// FIFO memory response out fifo EnginePacket
+// FIFO memory response out fifo ControlPacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_source);
+assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_destination);
 assign fifo_response_din                  = response_in_reg.payload;
 
 // Pop
@@ -328,12 +328,12 @@ assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid 
 assign fifo_response_dout_int.payload     = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-  .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-  .PROG_THRESH     (PROG_THRESH               ),
-  .READ_MODE       ("fwft"                    )
-) inst_fifo_EnginePacket (
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
+  .WRITE_DATA_WIDTH($bits(ControlPacketPayload)),
+  .READ_DATA_WIDTH ($bits(ControlPacketPayload)),
+  .PROG_THRESH     (PROG_THRESH                ),
+  .READ_MODE       ("fwft"                     )
+) inst_fifo_ControlPacket (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
   .din        (fifo_response_din                        ),

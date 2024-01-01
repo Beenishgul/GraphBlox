@@ -15,7 +15,7 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_memory #(
-  parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)      ,
+  parameter DEMUX_DATA_WIDTH      = $bits(MemoryPacketPayload)      ,
   parameter ID_LEVEL              = 1                               ,
   parameter ID_BUNDLE             = 0                               ,
   parameter NUM_MEMORY_REQUESTOR  = 2                               ,
@@ -28,10 +28,10 @@ module arbiter_1_to_N_response_memory #(
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
-  input  EnginePacket           response_in                                        ,
+  input  MemoryPacket           response_in                                        ,
   input  FIFOStateSignalsInput  fifo_response_signals_in [NUM_MEMORY_REQUESTOR-1:0],
   output FIFOStateSignalsOutput fifo_response_signals_out                          ,
-  output EnginePacket           response_out [NUM_MEMORY_REQUESTOR-1:0]            ,
+  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0]            ,
   output logic                  fifo_setup_signal
 );
 
@@ -41,16 +41,16 @@ module arbiter_1_to_N_response_memory #(
 logic areset_control;
 logic areset_fifo   ;
 
-EnginePacket                     response_in_reg;
+MemoryPacket                     response_in_reg;
 logic [NUM_MEMORY_REQUESTOR-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-EnginePacketPayload              fifo_response_din                    ;
-EnginePacket                     fifo_response_dout_int               ;
-EnginePacket                     fifo_response_dout_reg               ;
-EnginePacketPayload              fifo_response_dout                   ;
+MemoryPacketPayload              fifo_response_din                    ;
+MemoryPacket                     fifo_response_dout_int               ;
+MemoryPacket                     fifo_response_dout_reg               ;
+MemoryPacketPayload              fifo_response_dout                   ;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_rd_en   ;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_mask_int;
 logic [NUM_MEMORY_REQUESTOR-1:0] fifo_response_signals_in_reg_mask_reg;
@@ -313,7 +313,7 @@ end
 
 
 // --------------------------------------------------------------------------------------
-// FIFO memory response out fifo EnginePacket
+// FIFO memory response out fifo MemoryPacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
@@ -329,11 +329,11 @@ assign fifo_response_dout_int.payload     = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-  .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
   .PROG_THRESH     (PROG_THRESH               ),
   .READ_MODE       ("fwft"                    )
-) inst_fifo_EnginePacket (
+) inst_fifo_MemoryPacket (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
   .din        (fifo_response_din                        ),

@@ -23,11 +23,11 @@ module arbiter_N_to_1_request #(
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
-  input  EnginePacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
+  input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
   input  FIFOStateSignalsInput            fifo_request_signals_in              ,
   output FIFOStateSignalsOutput           fifo_request_signals_out             ,
   output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                    ,
-  output EnginePacket                     request_out                          ,
+  output MemoryPacket                     request_out                          ,
   output logic                            fifo_setup_signal
 );
 
@@ -39,15 +39,15 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-EnginePacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
-EnginePacket request_out_int                          ;
+MemoryPacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket request_out_int                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-EnginePacketPayload           fifo_request_din             ;
-EnginePacket                  fifo_request_din_reg         ;
-EnginePacketPayload           fifo_request_dout            ;
+MemoryPacketPayload           fifo_request_din             ;
+MemoryPacket                  fifo_request_din_reg         ;
+MemoryPacketPayload           fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -57,21 +57,21 @@ logic                         fifo_request_push_filter     ;
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-EnginePacket arbiter_bus_out                           ;
-EnginePacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
+MemoryPacket arbiter_bus_out                           ;
+MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant    ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request  ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid;
 
 // --------------------------------------------------------------------------------------
-// FIFO Request INPUT Arbiter EnginePacket
+// FIFO Request INPUT Arbiter MemoryPacket
 // --------------------------------------------------------------------------------------
-EnginePacket request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
-EnginePacket request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacket request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacket request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
 
-EnginePacketPayload                fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
-EnginePacketPayload                fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketPayload                fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketPayload                fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsInputInternal      fifo_request_arbiter_in_signals_in_int  [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsOutInternal        fifo_request_arbiter_in_signals_out_int [(NUM_MEMORY_REQUESTOR)-1:0];
 logic [(NUM_MEMORY_REQUESTOR)-1:0] fifo_request_arbiter_in_setup_signal_int                            ;
@@ -159,7 +159,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Engine Response EnginePacket
+// FIFO INPUT Engine Response MemoryPacket
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_arbiter) begin
@@ -196,10 +196,10 @@ generate
 
     xpm_fifo_sync_wrapper #(
       .FIFO_WRITE_DEPTH(16                        ),
-      .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-      .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+      .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+      .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
       .PROG_THRESH     (12                        )
-    ) inst_fifo_EnginePacketRequestArbiter (
+    ) inst_fifo_MemoryPacketRequestArbiter (
       .clk        (ap_clk                                                ),
       .srst       (areset_fifo                                           ),
       .din        (fifo_request_arbiter_in_din[i]                        ),
@@ -225,9 +225,8 @@ endgenerate
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_push_filter          = (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_MEM_RESPONSE);
-assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid & fifo_request_push_filter;
-assign fifo_request_din                  = fifo_request_din_reg.payload ;
+assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
+assign fifo_request_din                  = fifo_request_din_reg.payload;
 
 // Pop
 assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
@@ -236,10 +235,10 @@ assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-  .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
   .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_EnginePacket (
+) inst_fifo_MemoryPacket (
   .clk        (ap_clk                                  ),
   .srst       (areset_fifo                             ),
   .din        (fifo_request_din                        ),
@@ -255,7 +254,7 @@ xpm_fifo_sync_wrapper #(
 );
 
 // --------------------------------------------------------------------------------------
-// Bus arbiter for requests fifo_942x16_EnginePacket
+// Bus arbiter for requests fifo_942x16_MemoryPacket
 // --------------------------------------------------------------------------------------
 always_comb begin
   for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
@@ -272,7 +271,7 @@ end
 
 arbiter_bus_N_in_1_out #(
   .WIDTH    (NUM_MEMORY_REQUESTOR),
-  .BUS_WIDTH($bits(EnginePacket) )
+  .BUS_WIDTH($bits(MemoryPacket) )
 ) inst_arbiter_bus_N_in_1_out (
   .ap_clk           (ap_clk           ),
   .areset           (areset_arbiter   ),
