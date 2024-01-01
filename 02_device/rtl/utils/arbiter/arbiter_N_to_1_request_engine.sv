@@ -225,9 +225,8 @@ endgenerate
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_push_filter          = (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_MEM_RESPONSE);
-assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid & fifo_request_push_filter;
-assign fifo_request_din                  = fifo_request_din_reg.payload ;
+assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
+assign fifo_request_din                  = fifo_request_din_reg.payload;
 
 // Pop
 assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
