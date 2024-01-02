@@ -118,7 +118,6 @@ typedef struct packed{
 
 typedef struct packed{
     MergeDataConfigurationParameters param;
-    EnginePacketMeta                 meta ;
 } MergeDataConfigurationPayload;
 
 typedef struct packed{
