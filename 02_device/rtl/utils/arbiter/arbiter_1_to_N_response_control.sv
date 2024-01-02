@@ -319,8 +319,18 @@ end
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_destination);
-assign fifo_response_din                  = response_in_reg.payload;
+generate
+  case (ID_LEVEL)
+    5       : begin
+      assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
+    end
+    default : begin
+      assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_destination);
+    end
+  endcase
+endgenerate
+
+assign fifo_response_din = response_in_reg.payload;
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_int_rd_en;

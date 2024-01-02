@@ -12,6 +12,10 @@
     parameter FIFO_WRITE_DEPTH_ENGINE            = 16,
     parameter FIFO_WRITE_DEPTH_CONTROL_RESPONSE  = 16,
     parameter FIFO_WRITE_DEPTH_CONTROL_REQUEST   = 16,
+    parameter ARBITER_NUM_MEMORY                 = 1,
+    parameter ARBITER_NUM_ENGINE                 = 1,
+    parameter ARBITER_NUM_CONTROL_RESPONSE       = 1,
+    parameter ARBITER_NUM_CONTROL_REQUEST        = 1,
     parameter ENGINE_SEQ_WIDTH                   = 16,
     parameter ENGINE_SEQ_MIN                     = ID_RELATIVE * ENGINE_SEQ_WIDTH,
 // --------------------------------------------------------------------------------------
