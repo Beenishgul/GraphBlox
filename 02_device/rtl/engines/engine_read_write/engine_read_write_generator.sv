@@ -77,7 +77,7 @@ module engine_read_write_generator #(parameter
     KernelDescriptor descriptor_in_reg;
 
     ReadWriteConfiguration configure_memory_reg;
-    EnginePacket           request_out_int     ;
+    EnginePacketFull           request_out_int     ;
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
@@ -95,8 +95,8 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    EnginePacketPayload           fifo_request_din             ;
-    EnginePacketPayload           fifo_request_dout            ;
+    EnginePacketFullPayload           fifo_request_din             ;
+    EnginePacketFullPayload           fifo_request_dout            ;
     EnginePacket                  fifo_response_comb           ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
     FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
@@ -111,9 +111,9 @@ module engine_read_write_generator #(parameter
     logic                            configure_engine_param_valid;
     ReadWriteConfigurationParameters configure_engine_param_int  ;
 
-    EnginePacket generator_engine_request_engine_reg;
+    EnginePacketFull generator_engine_request_engine_reg;
     EnginePacket request_engine_out_reg             ;
-    EnginePacket request_memory_out_reg             ;
+    EnginePacketFull request_memory_out_reg             ;
 
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg;
 
@@ -589,8 +589,8 @@ module engine_read_write_generator #(parameter
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
         .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_EnginePacketRequest (
         .clk        (ap_clk                                  ),
@@ -639,7 +639,7 @@ module engine_read_write_generator #(parameter
 
     // Push
     assign fifo_request_pending_signals_in_int.wr_en = request_memory_out_reg.valid;
-    assign fifo_request_pending_din                  = request_memory_out_reg.payload;
+    assign fifo_request_pending_din                  = map_EnginePacketFull_to_EnginePacket(request_memory_out_reg.payload);
 
     // Pop
     assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & response_memory_in_reg.valid;
@@ -671,7 +671,6 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign fifo_response_comb.valid                = request_pending_out_int.valid;
     assign fifo_response_comb.payload.meta.route   = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address = request_pending_out_int.payload.meta.address;
     assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 

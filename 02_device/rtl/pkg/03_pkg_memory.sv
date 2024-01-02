@@ -146,7 +146,6 @@ typedef struct packed{
 
 typedef struct packed{
   EnginePacketRouteAttributes route   ;
-  PacketDataAddress           address ;
   EnginePacketType            subclass;
 } EnginePacketMeta;
 
@@ -169,7 +168,7 @@ typedef struct packed{
 typedef struct packed{
   EnginePacketMetaFull meta;
   EnginePacketData     data;
-} EnginePacketPayloadFull;
+} EnginePacketFullPayload;
 
 typedef struct packed{
   logic               valid  ;
@@ -178,7 +177,7 @@ typedef struct packed{
 
 typedef struct packed{
   logic                   valid  ;
-  EnginePacketPayloadFull payload;
+  EnginePacketFullPayload payload;
 } EnginePacketFull;
 
 // --------------------------------------------------------------------------------------
@@ -376,7 +375,7 @@ function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input Ca
 endfunction : map_CacheResponse_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet, input PacketRouteAddress packet_source);
+function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketFullPayload  input_packet, input PacketRouteAddress packet_source);
 
   MemoryPacketPayload  output_packet;
 
@@ -387,6 +386,18 @@ function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input Eng
 
   return output_packet;
 endfunction : map_EnginePacket_to_MemoryRequestPacket
+// --------------------------------------------------------------------------------------
+function EnginePacketPayload  map_EnginePacketFull_to_EnginePacket (input EnginePacketFullPayload  input_packet);
+
+  EnginePacketFullPayload  output_packet;
+
+  output_packet.meta.route     = input_packet.meta.route;
+  output_packet.meta.subclass  = input_packet.meta.subclass;
+  output_packet.data           = input_packet.data;
+
+  return output_packet;
+endfunction : map_EnginePacketFull_to_EnginePacket
+// --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketData input_packet, input EnginePacketData pending_packet);
 

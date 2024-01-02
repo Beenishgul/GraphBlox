@@ -84,10 +84,10 @@ module engine_csr_index_generator #(parameter
     CSRIndexConfiguration configure_engine_reg;
     CSRIndexConfiguration configure_memory_reg;
 
-    logic        response_engine_in_break_flag_int;
-    logic        response_engine_in_break_flag_reg;
-    logic        response_engine_in_done_flag_reg ;
-    EnginePacket request_out_int                  ;
+    logic            response_engine_in_break_flag_int;
+    logic            response_engine_in_break_flag_reg;
+    logic            response_engine_in_done_flag_reg ;
+    EnginePacketFull request_out_int                  ;
 
     logic                                        fifo_empty_int     ;
     logic                                        fifo_empty_reg     ;
@@ -111,14 +111,14 @@ module engine_csr_index_generator #(parameter
     logic                         fifo_request_setup_signal_int     ;
     logic                         fifo_request_signals_out_reg_empty;
 
-    EnginePacket        fifo_request_comb       ;
-    EnginePacket        fifo_request_din_reg    ;
-    EnginePacket        fifo_request_din_reg_S2 ;
-    EnginePacket        fifo_request_dout_reg   ;
-    EnginePacket        fifo_request_dout_reg_S2;
-    EnginePacket        fifo_response_comb      ;
-    EnginePacketPayload fifo_request_din        ;
-    EnginePacketPayload fifo_request_dout       ;
+    EnginePacketFull        fifo_request_comb       ;
+    EnginePacketFull        fifo_request_din_reg    ;
+    EnginePacketFull        fifo_request_din_reg_S2 ;
+    EnginePacketFull        fifo_request_dout_reg   ;
+    EnginePacketFull        fifo_request_dout_reg_S2;
+    EnginePacket            fifo_response_comb      ;
+    EnginePacketFullPayload fifo_request_din        ;
+    EnginePacketFullPayload fifo_request_dout       ;
 
     ControlPacket response_control_in_reg   ;
     EnginePacket  response_engine_in_reg    ;
@@ -723,10 +723,10 @@ module engine_csr_index_generator #(parameter
     assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (PROG_THRESH               )
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH              ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
+        .PROG_THRESH     (PROG_THRESH                   )
     ) inst_fifo_EnginePacketRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
@@ -794,7 +794,7 @@ module engine_csr_index_generator #(parameter
 
     // Push
     assign fifo_request_pending_signals_in_int.wr_en = fifo_request_dout_reg_S2.valid & configure_engine_int.payload.param.mode_buffer;
-    assign fifo_request_pending_din                  = fifo_request_dout_reg_S2.payload;
+    assign fifo_request_pending_din                  = map_EnginePacketFull_to_EnginePacket(fifo_request_dout_reg_S2.payload);
 
     // Pop
     assign fifo_request_pending_signals_in_int.rd_en = ~fifo_request_pending_signals_out_int.empty & response_memory_in_reg.valid;
@@ -826,7 +826,6 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign fifo_response_comb.valid                     = request_pending_out_int.valid;
     assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address      = request_pending_out_int.payload.meta.address;
     assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
@@ -871,7 +870,7 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         if(~configure_engine_int.payload.param.mode_buffer) begin // (0) engine buffer (1) memory buffer
-            request_engine_out_reg.payload <= fifo_request_dout_reg_S2.payload;
+            request_engine_out_reg.payload <= map_EnginePacketFull_to_EnginePacket(fifo_request_dout_reg_S2.payload);
             request_memory_out_reg.payload <= 0;
         end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
             request_memory_out_reg.payload <= fifo_request_dout_reg_S2.payload;

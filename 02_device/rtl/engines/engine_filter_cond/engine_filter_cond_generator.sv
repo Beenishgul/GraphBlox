@@ -520,7 +520,6 @@ end
 
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S3.payload.data                       <= result_data_int;
-    generator_engine_request_engine_reg_S3.payload.meta.address               <= generator_engine_request_engine_reg_S2.payload.meta.address;
     generator_engine_request_engine_reg_S3.payload.meta.route.hops            <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
