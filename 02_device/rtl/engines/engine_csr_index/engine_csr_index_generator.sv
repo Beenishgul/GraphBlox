@@ -129,8 +129,8 @@ module engine_csr_index_generator #(parameter
 
     CSRIndexConfiguration configure_engine_int;
 
-    EnginePacket request_engine_out_reg;
-    EnginePacket request_memory_out_reg;
+    EnginePacket     request_engine_out_reg;
+    EnginePacketFull request_memory_out_reg;
 
     FIFOStateSignalsInput  fifo_configure_engine_in_signals_in_reg ;
     FIFOStateSignalsInput  fifo_configure_memory_in_signals_in_reg ;
@@ -824,8 +824,8 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                     = request_pending_out_int.valid;
-    assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
+    assign fifo_response_comb.valid              = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route = request_pending_out_int.payload.meta.route;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
