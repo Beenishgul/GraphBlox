@@ -172,7 +172,7 @@ end
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_push_filter          = (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_MEM_RESPONSE) & (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_INVALID) & (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_ENGINE_DATA) & (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_ENGINE_PROGRAM);
+assign fifo_request_push_filter          = (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_MEM_RESPONSE) & (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_INVALID) & (fifo_request_din_reg.payload.meta.subclass.cmd != CMD_ENGINE_DATA);
 assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid & fifo_request_push_filter;
 assign fifo_request_din.iob              = fifo_request_din_reg.payload.iob;
 assign fifo_request_din.meta             = fifo_request_din_reg.payload.meta ;
