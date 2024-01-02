@@ -344,7 +344,7 @@ typedef struct packed{
 
 typedef struct packed{
     CUSetupEngineConfigurationParameters param;
-    EnginePacketMeta                     meta ;
+    MemoryPacketMeta                     meta ;
 } CUSetupEngineConfigurationPayload;
 
 
