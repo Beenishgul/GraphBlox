@@ -68,7 +68,7 @@ logic areset_fifo           ;
 KernelDescriptor descriptor_in_reg;
 
 EnginePacket response_engine_in_reg;
-EnginePacket response_memory_in_reg;
+MemoryPacket response_memory_in_reg;
 
 EnginePacket request_engine_out_int;
 MemoryPacket request_memory_out_int;
