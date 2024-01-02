@@ -77,7 +77,7 @@ module engine_read_write_generator #(parameter
     KernelDescriptor descriptor_in_reg;
 
     ReadWriteConfiguration configure_memory_reg;
-    EnginePacketFull           request_out_int     ;
+    EnginePacketFull       request_out_int     ;
 
     logic fifo_empty_int;
     logic fifo_empty_reg;
@@ -95,8 +95,8 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    EnginePacketFullPayload           fifo_request_din             ;
-    EnginePacketFullPayload           fifo_request_dout            ;
+    EnginePacketFullPayload       fifo_request_din             ;
+    EnginePacketFullPayload       fifo_request_dout            ;
     EnginePacket                  fifo_response_comb           ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
     FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
@@ -112,7 +112,7 @@ module engine_read_write_generator #(parameter
     ReadWriteConfigurationParameters configure_engine_param_int  ;
 
     EnginePacketFull generator_engine_request_engine_reg;
-    EnginePacket request_engine_out_reg             ;
+    EnginePacket     request_engine_out_reg             ;
     EnginePacketFull request_memory_out_reg             ;
 
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg;
@@ -550,14 +550,14 @@ module engine_read_write_generator #(parameter
     end
 
     always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data                               <= result_int;
-        generator_engine_request_engine_reg.payload.meta.address                       <= address_int;
-        generator_engine_request_engine_reg.payload.meta.route.packet_destination      <= configure_memory_reg.payload.meta.route.packet_destination;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_source         <= response_engine_in_int.payload.meta.route.sequence_source;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_state          <= response_engine_in_int.payload.meta.route.sequence_state;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_id             <= response_engine_in_int.payload.meta.route.sequence_id;
-        generator_engine_request_engine_reg.payload.meta.route.hops                    <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.subclass                      <= configure_memory_reg.payload.meta.subclass;
+        generator_engine_request_engine_reg.payload.data                          <= result_int;
+        generator_engine_request_engine_reg.payload.meta.address                  <= address_int;
+        generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
+        generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
+        generator_engine_request_engine_reg.payload.meta.route.hops               <= response_engine_in_int.payload.meta.route.hops;
+        generator_engine_request_engine_reg.payload.meta.subclass                 <= configure_memory_reg.payload.meta.subclass;
     end
 
     engine_read_write_kernel inst_engine_read_write_kernel (
@@ -588,10 +588,10 @@ module engine_read_write_generator #(parameter
     assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH              ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
-        .PROG_THRESH     (PROG_THRESH               )
+        .PROG_THRESH     (PROG_THRESH                   )
     ) inst_fifo_EnginePacketRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
@@ -669,9 +669,8 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                = request_pending_out_int.valid;
-    assign fifo_response_comb.payload.meta.route   = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;
+    assign fifo_response_comb.valid              = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route = request_pending_out_int.payload.meta.route;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
