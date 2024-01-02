@@ -624,11 +624,6 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.route.packet_destination      = configure_engine_int.payload.meta.route.packet_destination;
     assign fifo_request_comb.payload.meta.route.hops                    = configure_engine_int.payload.meta.route.hops;
     assign fifo_request_comb.payload.meta.route.sequence_source         = configure_engine_int.payload.meta.route.sequence_source;
-    assign fifo_request_comb.payload.meta.route.packet_source.id_module = 1 << ID_MODULE;
-    assign fifo_request_comb.payload.meta.route.packet_source.id_cu     = configure_engine_int.payload.meta.route.packet_source.id_cu ;
-    assign fifo_request_comb.payload.meta.route.packet_source.id_bundle = configure_engine_int.payload.meta.route.packet_source.id_bundle;
-    assign fifo_request_comb.payload.meta.route.packet_source.id_lane   = configure_engine_int.payload.meta.route.packet_source.id_lane;
-    assign fifo_request_comb.payload.meta.route.packet_source.id_engine = configure_engine_int.payload.meta.route.packet_source.id_engine;
     assign fifo_request_comb.payload.meta.route.sequence_state          = configure_engine_int.payload.meta.route.sequence_state;
     assign fifo_request_comb.payload.meta.route.sequence_id             = sequence_id_counter;
     assign fifo_request_comb.payload.meta.address.id_buffer             = configure_engine_int.payload.meta.address.id_buffer;
@@ -738,7 +733,6 @@ module engine_csr_index_generator #(parameter
         fifo_request_dout_reg_S2.payload.data                          <= fifo_request_dout_reg.payload.data;
         fifo_request_dout_reg_S2.payload.meta.subclass                 <= fifo_request_dout_reg.payload.meta.subclass;
         fifo_request_dout_reg_S2.payload.meta.address                  <= fifo_request_dout_reg.payload.meta.address;
-        fifo_request_dout_reg_S2.payload.meta.route.packet_source      <= fifo_request_dout_reg.payload.meta.route.packet_source;
         fifo_request_dout_reg_S2.payload.meta.route.packet_destination <= fifo_request_dout_reg.payload.meta.route.packet_destination;
         fifo_request_dout_reg_S2.payload.meta.route.hops               <= fifo_request_dout_reg.payload.meta.route.hops;
         fifo_request_dout_reg_S2.payload.meta.route.sequence_source    <= fifo_request_dout_reg.payload.meta.route.sequence_source;

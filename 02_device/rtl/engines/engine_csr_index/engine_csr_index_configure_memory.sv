@@ -124,12 +124,6 @@ end
 assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
 assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
 
-assign configure_memory_meta_int.route.packet_source.id_cu     = 1 << ID_CU;
-assign configure_memory_meta_int.route.packet_source.id_bundle = 1 << ID_BUNDLE;
-assign configure_memory_meta_int.route.packet_source.id_lane   = 1 << ID_LANE;
-assign configure_memory_meta_int.route.packet_source.id_engine = 1 << ID_ENGINE;
-assign configure_memory_meta_int.route.packet_source.id_module = 1 << ID_MODULE;
-
 assign configure_memory_meta_int.route.packet_destination.id_cu     = 0;
 assign configure_memory_meta_int.route.packet_destination.id_bundle = 0;
 assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
@@ -182,7 +176,6 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.route.packet_source   <= configure_memory_meta_int.route.packet_source;
     configure_memory_reg.payload.meta.route.sequence_source <= configure_memory_meta_int.route.sequence_source;
     configure_memory_reg.payload.meta.route.sequence_state  <= configure_memory_meta_int.route.sequence_state;
     configure_memory_reg.payload.meta.route.sequence_id     <= configure_memory_meta_int.route.sequence_id;
