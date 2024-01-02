@@ -289,7 +289,7 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_memory #(
-    .NUM_MEMORY_REQUESTOR(2),
+    .NUM_MEMORY_RECEIVER (2),
     .ID_LEVEL            (4)
 ) inst_arbiter_1_to_N_memory_response_in (
     .ap_clk                   (ap_clk                                         ),

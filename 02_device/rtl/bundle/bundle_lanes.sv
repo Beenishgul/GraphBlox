@@ -510,7 +510,7 @@ endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_engine #(
-    .NUM_ENGINE_REQUESTOR(NUM_LANES                                   ),
+    .NUM_ENGINE_RECEIVER (NUM_LANES                                   ),
     .ID_LEVEL            (2                                           ),
     .ID_BUNDLE           (ID_BUNDLE                                   ),
     .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
