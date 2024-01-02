@@ -193,8 +193,16 @@ typedef struct packed{
 } ALUOpsConfigurationParameters;
 
 typedef struct packed{
+    PacketRouteAddress packet_destination;
+} ALUOpsConfigurationRouteAttributes;
+
+typedef struct packed{
+    ALUOpsConfigurationRouteAttributes route;
+} ALUOpsConfigurationMeta;
+
+typedef struct packed{
     ALUOpsConfigurationParameters param;
-    EnginePacketMeta              meta ;
+    ALUOpsConfigurationMeta       meta ;
 } ALUOpsConfigurationPayload;
 
 typedef struct packed{
@@ -249,7 +257,6 @@ typedef struct packed{
 
 typedef struct packed{
     FilterCondConfigurationParameters param;
-    EnginePacketMeta                  meta ;
 } FilterCondConfigurationPayload;
 
 typedef struct packed{

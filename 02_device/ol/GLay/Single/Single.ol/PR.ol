@@ -6,7 +6,7 @@
 0x00000000 // entry_2    cacheline[  0][ 2] < 4b>: const_mask[0:3]=0x0
 0x00000000 // entry_3    cacheline[  0][ 3] <32b>: const_value[0:31]=0x00000000
 0x00008421 // entry_4    cacheline[  0][ 4] <16b>: ops_mask[0:15]=0x8421
-0x00040201 // entry_5    cacheline[  0][ 5] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x04 || id_buffer[24:31]=0x00
+0x00040201 // entry_5    cacheline[  0][ 5] <24b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x04
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_1, Number of entries: 8
 // --------------------------------------------------------------------------------------
