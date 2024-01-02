@@ -59,10 +59,6 @@
                 "id_lane": {
                     "bits": "8",
                     "value": "0x04"
-                },
-                "id_buffer": {
-                    "bits": "8",
-                    "value": "0x00"
                 }
             }
         }

@@ -45,7 +45,7 @@ logic areset_alu_ops_generator;
 logic areset_fifo             ;
 
 MemoryPacket                 response_memory_in_reg                          ;
-EnginePacketMeta             configure_memory_meta_int                       ;
+ALUOpsConfigurationMeta      configure_memory_meta_int                       ;
 ALUOpsConfiguration          configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
@@ -130,21 +130,6 @@ assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
 assign configure_memory_meta_int.route.packet_destination.id_engine = 0;
 assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 
-assign configure_memory_meta_int.route.sequence_source.id_cu     = 1 << ID_CU;
-assign configure_memory_meta_int.route.sequence_source.id_bundle = 1 << ID_BUNDLE;
-assign configure_memory_meta_int.route.sequence_source.id_lane   = 1 << ID_LANE;
-assign configure_memory_meta_int.route.sequence_source.id_engine = 1 << ID_ENGINE;
-assign configure_memory_meta_int.route.sequence_source.id_module = 1 << (ID_MODULE+1);
-
-assign configure_memory_meta_int.route.sequence_state    = SEQUENCE_INVALID;
-assign configure_memory_meta_int.route.sequence_id       = 0;
-assign configure_memory_meta_int.route.hops              = NUM_BUNDLES_WIDTH_BITS;
-assign configure_memory_meta_int.address.id_buffer       = 0;
-assign configure_memory_meta_int.address.offset          = $clog2(CACHE_FRONTEND_DATA_W/8);
-assign configure_memory_meta_int.address.shift.amount    = 0;
-assign configure_memory_meta_int.address.shift.direction = 1'b1;
-assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
-
 always_ff @(posedge ap_clk) begin
     if(areset_alu_ops_generator) begin
         configure_memory_reg.valid             <= 1'b0;
@@ -176,15 +161,6 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.route.sequence_source <= configure_memory_meta_int.route.sequence_source;
-    configure_memory_reg.payload.meta.route.sequence_state  <= configure_memory_meta_int.route.sequence_state;
-    configure_memory_reg.payload.meta.route.sequence_id     <= configure_memory_meta_int.route.sequence_id;
-    configure_memory_reg.payload.meta.route.hops            <= configure_memory_meta_int.route.hops;
-    configure_memory_reg.payload.meta.address.id_buffer     <= configure_memory_meta_int.address.id_buffer;
-    configure_memory_reg.payload.meta.address.offset        <= configure_memory_meta_int.address.offset;
-end
-
-always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
@@ -208,7 +184,6 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.meta.route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];
                 configure_memory_reg.payload.meta.route.packet_destination.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_BUNDLES_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:CU_KERNEL_COUNT_MAX_WIDTH_BITS];
                 configure_memory_reg.payload.meta.route.packet_destination.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
-                configure_memory_reg.payload.meta.address.id_buffer                  <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
             end
             // (1 << 6) : begin
             // end
