@@ -27,585 +27,7 @@ parameter NUM_ENGINES_INDEX = 2,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS DEFAULTS
 // --------------------------------------------------------------------------------------
-parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{3,4,2,2},
-parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                             = '{1, 1, 1, 0},
-parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = '{'{1, 1, 1, 0}
-, '{2, 1, 1, 1}
-, '{1, 1, 0, 0}
-, '{1, 1, 0, 0}
-}
-,
-parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = '{5, 0}
-,
-parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_ENGINES_MAX]                           ='{6, 0}
-,
-parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_ENGINES_MAX]                             ='{0, 6}
-,
-parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = '{0, 0}
-,
-parameter int ENGINES_CONFIG_MERGE_WIDTH_ARRAY[NUM_ENGINES_MAX]                              = '{0, 0}
-,
-parameter int ENGINES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                           = '{0, 0, 0, 0}
-,
-parameter int ENGINES_CONFIG_CAST_WIDTH_ARRAY[NUM_ENGINES_MAX]                               = '{0, 0}
-,
-parameter int ENGINES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                            = '{0, 0, 0, 0}
-,
-parameter int ENGINES_CONFIG_MERGE_CONNECT_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]              = '{'{0}
-, '{0}
-}
-,
-parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]       = '{'{0}
-, '{0}
-}
-,
-parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = 0,
-parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = 0,
-parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
-parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
-parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
-parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
-parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = 16,
-parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = 48,
-parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= 16,
-parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= 0,
-parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY    = 0,
-parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE    = 16,
-parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE   = 0,
-parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST   = 0,
-parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_ENGINES_MAX]  = '{0, 0}
-,
-parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_ENGINES_MAX]  = '{16, 0}
-,
-parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_ENGINES_MAX] = '{0, 0}
-,
-parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_ENGINES_MAX] = '{0, 0}
-,
-parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = '{'{5, 0}
-, '{2, 0}
-, '{6, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   ='{'{6, 0}
-, '{8, 0}
-, '{1, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     ='{'{0, 6}
-, '{6, 14}
-, '{14, 15}
-, '{15, 15}
-}
-,
-parameter int LANES_ENGINE_ID_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                 = '{'{0, 0}
-, '{1, 0}
-, '{2, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_MERGE_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                        = '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                    = '{0, 0, 0, 0}
-,
-parameter int LANES_CONFIG_CAST_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                         = '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                     = '{0, 0, 0, 0}
-,
-parameter int LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY                                                = 0,
-parameter int LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY                                               = 0,
-parameter int LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                     = '{0, 0, 0, 0}
-,
-parameter int LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                      = '{0, 0, 0, 0}
-,
-parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX]        = '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-,
-parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-,
-parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
-parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
-parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
-parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
-parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = 16,
-parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = 48,
-parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= 16,
-parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= 0,
-parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX] = '{0, 16, 0, 0}
-,
-parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX] = '{16, 16, 16, 0}
-,
-parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX]= '{0, 16, 0, 0}
-,
-parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX]= '{0, 0, 0, 0}
-,
-parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = '{'{16, 0}
-, '{16, 0}
-, '{16, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-,
-parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-,
-parameter BUNDLES_COUNT_ARRAY                                                                                  = 4,
-parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{5, 0}
-, '{2, 0}
-, '{6, 0}
-, '{0, 0}
-}
-, '{'{1, 4}
-, '{1, 0}
-, '{1, 0}
-, '{6, 0}
-}
-, '{'{2, 0}
-, '{6, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{1, 0}
-, '{6, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{6, 0}
-, '{8, 0}
-, '{1, 0}
-, '{0, 0}
-}
-, '{'{11, 2}
-, '{11, 0}
-, '{11, 0}
-, '{1, 0}
-}
-, '{'{8, 0}
-, '{1, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{11, 0}
-, '{1, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 6}
-, '{6, 14}
-, '{14, 15}
-, '{15, 15}
-}
-, '{'{15, 26}
-, '{28, 39}
-, '{39, 50}
-, '{50, 51}
-}
-, '{'{51, 59}
-, '{59, 60}
-, '{60, 60}
-, '{60, 60}
-}
-, '{'{60, 71}
-, '{71, 72}
-, '{72, 72}
-, '{72, 72}
-}
-}
-,
-parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{3,4,2,2},
-parameter int BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 0}
-, '{2, 1, 1, 1}
-, '{1, 1, 0, 0}
-, '{1, 1, 0, 0}
-}
-,
-parameter int BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = '{'{'{0, 0}
-, '{1, 0}
-, '{2, 0}
-, '{0, 0}
-}
-, '{'{3, 4}
-, '{5, 0}
-, '{6, 0}
-, '{7, 0}
-}
-, '{'{8, 0}
-, '{9, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{10, 0}
-, '{11, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = '{'{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 1}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = '{'{0, 0, 0, 0}
-, '{1, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = '{'{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{1, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
-, '{0, 1, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = '{0, 1, 0, 0}
-,
-parameter int BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = '{0, 1, 0, 0}
-,
-parameter int BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
-, '{1, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = '{'{0, 0, 0, 0}
-, '{0, 1, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-}
-,
-parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-, '{'{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-, '{'{0}
-, '{0}
-}
-}
-}
-,
-parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
-parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
-parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
-parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
-parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = '{16, 48, 16, 16}
-,
-parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = '{48, 80, 32, 32}
-,
-parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{16, 0, 16, 0}
-,
-parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
-,
-parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 16, 0, 0}
-, '{16, 16, 16, 0}
-, '{16, 0, 0, 0}
-, '{16, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{16, 16, 16, 0}
-, '{32, 16, 16, 16}
-, '{16, 16, 0, 0}
-, '{16, 16, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 16, 0, 0}
-, '{0, 0, 0, 0}
-, '{16, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
-,
-parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
-, '{16, 0}
-, '{16, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{16, 0}
-, '{16, 0}
-, '{16, 0}
-, '{0, 0}
-}
-, '{'{16, 16}
-, '{16, 0}
-, '{16, 0}
-, '{16, 0}
-}
-, '{'{16, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
-, '{16, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-// --------------------------------------------------------------------------------------
-// TOPOLOGY CONFIGURATIONS SETTINGS
-// --------------------------------------------------------------------------------------
 parameter CU_BUNDLES_COUNT_ARRAY                           = 4,
-parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{3,4,2,2},
-parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 0}
-, '{2, 1, 1, 1}
-, '{1, 1, 0, 0}
-, '{1, 1, 0, 0}
-}
-,
 parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{5, 0}
 , '{2, 0}
 , '{6, 0}
@@ -623,28 +45,6 @@ parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINE
 }
 , '{'{1, 0}
 , '{6, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{6, 0}
-, '{8, 0}
-, '{1, 0}
-, '{0, 0}
-}
-, '{'{11, 2}
-, '{11, 0}
-, '{11, 0}
-, '{1, 0}
-}
-, '{'{8, 0}
-, '{1, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{11, 0}
-, '{1, 0}
 , '{0, 0}
 , '{0, 0}
 }
@@ -672,55 +72,43 @@ parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_
 }
 }
 ,
-parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = '{'{'{0, 0}
+parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{6, 0}
+, '{8, 0}
 , '{1, 0}
-, '{2, 0}
 , '{0, 0}
 }
-, '{'{3, 4}
-, '{5, 0}
-, '{6, 0}
-, '{7, 0}
+, '{'{11, 2}
+, '{11, 0}
+, '{11, 0}
+, '{1, 0}
 }
 , '{'{8, 0}
-, '{9, 0}
+, '{1, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{10, 0}
-, '{11, 0}
-, '{0, 0}
-, '{0, 0}
-}
-}
-,
-parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = '{'{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 1}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
-, '{0, 0}
-, '{0, 0}
-}
-, '{'{0, 0}
-, '{0, 0}
+, '{'{11, 0}
+, '{1, 0}
 , '{0, 0}
 , '{0, 0}
 }
 }
 ,
-parameter int CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = '{'{0, 0, 0, 0}
-, '{1, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-}
+parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{1, 0, 1, 0}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = '{3, 5, 2, 2}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = '{1, 3, 1, 1}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{16, 0, 16, 0}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = '{48, 80, 32, 32}
+,
+parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = '{16, 48, 16, 16}
 ,
 parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = '{'{'{0, 0}
 , '{0, 0}
@@ -744,17 +132,241 @@ parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]
 }
 }
 ,
+parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{1, 0}
+, '{1, 0}
+, '{1, 0}
+, '{0, 0}
+}
+, '{'{1, 1}
+, '{1, 0}
+, '{1, 0}
+, '{1, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{1, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+, '{'{16, 16}
+, '{16, 0}
+, '{16, 0}
+, '{16, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 1, 0, 0}
+, '{0, 0, 0, 0}
+, '{1, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{1, 1, 1, 0}
+, '{2, 1, 1, 1}
+, '{1, 1, 0, 0}
+, '{1, 1, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 1, 0, 0}
+, '{1, 1, 1, 0}
+, '{1, 0, 0, 0}
+, '{1, 0, 0, 0}
+}
+,
 parameter int CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
 , '{0, 1, 0, 0}
 , '{0, 0, 0, 0}
 , '{0, 0, 0, 0}
 }
 ,
+parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 16, 0, 0}
+, '{0, 0, 0, 0}
+, '{16, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{16, 16, 16, 0}
+, '{32, 16, 16, 16}
+, '{16, 16, 0, 0}
+, '{16, 16, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 16, 0, 0}
+, '{16, 16, 16, 0}
+, '{16, 0, 0, 0}
+, '{16, 0, 0, 0}
+}
+,
 parameter int CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = '{0, 1, 0, 0}
 ,
 parameter int CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = '{0, 1, 0, 0}
 ,
-parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
+parameter int CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = '{'{0, 0, 0, 0}
 , '{1, 0, 0, 0}
 , '{0, 0, 0, 0}
 , '{0, 0, 0, 0}
@@ -762,6 +374,12 @@ parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES
 ,
 parameter int CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = '{'{0, 0, 0, 0}
 , '{0, 1, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
+, '{1, 0, 0, 0}
 , '{0, 0, 0, 0}
 , '{0, 0, 0, 0}
 }
@@ -874,65 +492,311 @@ parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_
 }
 }
 ,
-parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
-parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
-parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
+parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 1}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = '{'{'{0, 0}
+, '{1, 0}
+, '{2, 0}
+, '{0, 0}
+}
+, '{'{3, 4}
+, '{5, 0}
+, '{6, 0}
+, '{7, 0}
+}
+, '{'{8, 0}
+, '{9, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{10, 0}
+, '{11, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{3,4,2,2},
+parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 0}
+, '{2, 1, 1, 1}
+, '{1, 1, 0, 0}
+, '{1, 1, 0, 0}
+}
+,
+parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  0 ,
+parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  2 ,
+parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  12 ,
+parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  6 ,
 parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
-parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = '{16, 48, 16, 16}
-,
-parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = '{48, 80, 32, 32}
-,
-parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{16, 0, 16, 0}
-,
-parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
-,
-parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 16, 0, 0}
-, '{16, 16, 16, 0}
-, '{16, 0, 0, 0}
-, '{16, 0, 0, 0}
+parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
+parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
+parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
+parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  0 ,
+parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  2 ,
+parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  12 ,
+parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  6 ,
+parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
+parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
+parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
+parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
+parameter BUNDLES_COUNT_ARRAY                                                                                  = 4,
+parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = '{'{'{5, 0}
+, '{2, 0}
+, '{6, 0}
+, '{0, 0}
+}
+, '{'{1, 4}
+, '{1, 0}
+, '{1, 0}
+, '{6, 0}
+}
+, '{'{2, 0}
+, '{6, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{6, 0}
+, '{0, 0}
+, '{0, 0}
+}
 }
 ,
-parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{16, 16, 16, 0}
-, '{32, 16, 16, 16}
-, '{16, 16, 0, 0}
-, '{16, 16, 0, 0}
+parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 6}
+, '{6, 14}
+, '{14, 15}
+, '{15, 15}
+}
+, '{'{15, 26}
+, '{28, 39}
+, '{39, 50}
+, '{50, 51}
+}
+, '{'{51, 59}
+, '{59, 60}
+, '{60, 60}
+, '{60, 60}
+}
+, '{'{60, 71}
+, '{71, 72}
+, '{72, 72}
+, '{72, 72}
+}
 }
 ,
-parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 16, 0, 0}
-, '{0, 0, 0, 0}
-, '{16, 0, 0, 0}
-, '{0, 0, 0, 0}
+parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{6, 0}
+, '{8, 0}
+, '{1, 0}
+, '{0, 0}
+}
+, '{'{11, 2}
+, '{11, 0}
+, '{11, 0}
+, '{1, 0}
+}
+, '{'{8, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{11, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
 }
 ,
-parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
-, '{0, 0, 0, 0}
+parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{1, 0, 1, 0}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = '{3, 5, 2, 2}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = '{1, 3, 1, 1}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= '{0, 0, 0, 0}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= '{16, 0, 16, 0}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = '{48, 80, 32, 32}
+,
+parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = '{16, 48, 16, 16}
+,
+parameter int BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
 }
 ,
-parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{1, 0}
+, '{1, 0}
+, '{1, 0}
+, '{0, 0}
+}
+, '{'{1, 1}
+, '{1, 0}
+, '{1, 0}
+, '{1, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{1, 0}
+, '{1, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{1, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
 , '{16, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{16, 0}
-, '{16, 0}
-, '{16, 0}
-, '{0, 0}
-}
-, '{'{16, 0}
+, '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
 , '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
 }
 ,
-parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{16, 0}
+parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{16, 0}
 , '{16, 0}
 , '{16, 0}
 , '{0, 0}
@@ -954,17 +818,223 @@ parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX]
 }
 }
 ,
-parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
 , '{16, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{0, 0}
+, '{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+, '{'{16, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
 , '{'{16, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 1, 0, 0}
+, '{0, 0, 0, 0}
+, '{1, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{1, 1, 1, 0}
+, '{2, 1, 1, 1}
+, '{1, 1, 0, 0}
+, '{1, 1, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 1, 0, 0}
+, '{1, 1, 1, 0}
+, '{1, 0, 0, 0}
+, '{1, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
+, '{0, 1, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= '{'{0, 16, 0, 0}
+, '{0, 0, 0, 0}
+, '{16, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{16, 16, 16, 0}
+, '{32, 16, 16, 16}
+, '{16, 16, 0, 0}
+, '{16, 16, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = '{'{0, 16, 0, 0}
+, '{16, 16, 16, 0}
+, '{16, 0, 0, 0}
+, '{16, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = '{0, 1, 0, 0}
+,
+parameter int BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = '{0, 1, 0, 0}
+,
+parameter int BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = '{'{0, 0, 0, 0}
+, '{1, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = '{'{0, 0, 0, 0}
+, '{0, 1, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = '{'{0, 0, 0, 0}
+, '{1, 0, 0, 0}
+, '{0, 0, 0, 0}
+, '{0, 0, 0, 0}
+}
+,
+parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+}
+,
+parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+, '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+}
+,
+parameter int BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = '{'{'{0, 0}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 1}
+, '{0, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
@@ -976,27 +1046,262 @@ parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BU
 }
 }
 ,
-parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = '{'{'{0, 0}
+parameter int BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = '{'{'{0, 0}
+, '{1, 0}
+, '{2, 0}
+, '{0, 0}
+}
+, '{'{3, 4}
+, '{5, 0}
+, '{6, 0}
+, '{7, 0}
+}
+, '{'{8, 0}
+, '{9, 0}
+, '{0, 0}
+, '{0, 0}
+}
+, '{'{10, 0}
+, '{11, 0}
+, '{0, 0}
+, '{0, 0}
+}
+}
+,
+parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{3,4,2,2},
+parameter int BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = '{'{1, 1, 1, 0}
+, '{2, 1, 1, 1}
+, '{1, 1, 0, 0}
+, '{1, 1, 0, 0}
+}
+,
+parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = '{'{5, 0}
+, '{2, 0}
+, '{6, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     ='{'{0, 6}
+, '{6, 14}
+, '{14, 15}
+, '{15, 15}
+}
+,
+parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   ='{'{6, 0}
+, '{8, 0}
+, '{1, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= 0,
+parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= 1,
+parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = 3,
+parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = 1,
+parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= 0,
+parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= 16,
+parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = 48,
+parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = 16,
+parameter int LANES_CONFIG_CAST_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                         = '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{0, 0}
+,
+parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{0, 0}
+,
+parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = '{'{1, 0}
+, '{1, 0}
+, '{1, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
+, '{1, 0}
+, '{0, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
-, '{'{0, 0}
+,
+parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = '{'{16, 0}
+, '{16, 0}
+, '{16, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = '{'{0, 0}
+, '{16, 0}
+, '{0, 0}
+, '{0, 0}
+}
+,
+parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX]= '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX]= '{0, 1, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_LANES_MAX] = '{1, 1, 1, 0}
+,
+parameter int LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_LANES_MAX] = '{0, 1, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                     = '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX]= '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX]= '{0, 16, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX] = '{16, 16, 16, 0}
+,
+parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX] = '{0, 16, 0, 0}
+,
+parameter int LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY                                                = 0,
+parameter int LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY                                               = 0,
+parameter int LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                    = '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                      = '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                     = '{0, 0, 0, 0}
+,
+parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX]        = '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+,
+parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = '{'{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+, '{'{0}
+, '{0}
+}
+}
+,
+parameter int LANES_CONFIG_MERGE_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                        = '{'{0, 0}
 , '{0, 0}
 , '{0, 0}
 , '{0, 0}
 }
+,
+parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{3,4,2,2},
+parameter int LANES_ENGINE_ID_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                 = '{'{0, 0}
+, '{1, 0}
+, '{2, 0}
+, '{0, 0}
 }
-
+,
+parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = '{'{1, 1, 1, 0}
+, '{2, 1, 1, 1}
+, '{1, 1, 0, 0}
+, '{1, 1, 0, 0}
+}
+,
+parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  0 ,
+parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  2 ,
+parameter int LANES_CONFIG_CU_ARBITER_NUM_ENGINE =  12 ,
+parameter int LANES_CONFIG_CU_ARBITER_NUM_MEMORY =  6 ,
+parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
+parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
+parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
+parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96 ,
+parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = '{5, 0}
+,
+parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_ENGINES_MAX]                             ='{0, 6}
+,
+parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_ENGINES_MAX]                           ='{6, 0}
+,
+parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= 0,
+parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= 1,
+parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = 3,
+parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = 1,
+parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= 0,
+parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= 16,
+parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = 48,
+parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = 16,
+parameter int ENGINES_CONFIG_CAST_WIDTH_ARRAY[NUM_ENGINES_MAX]                               = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_ENGINES_MAX] = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_ENGINES_MAX] = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_ENGINES_MAX]  = '{1, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_ENGINES_MAX]  = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_ENGINES_MAX] = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_ENGINES_MAX] = '{0, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_ENGINES_MAX]  = '{16, 0}
+,
+parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_ENGINES_MAX]  = '{0, 0}
+,
+parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST   = 0,
+parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE   = 0,
+parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_ENGINE    = 1,
+parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY    = 0,
+parameter int ENGINES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                            = '{0, 0, 0, 0}
+,
+parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST   = 0,
+parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE   = 0,
+parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE    = 16,
+parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY    = 0,
+parameter int ENGINES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                           = '{0, 0, 0, 0}
+,
+parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = 0,
+parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = 0,
+parameter int ENGINES_CONFIG_MERGE_CONNECT_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]              = '{'{0}
+, '{0}
+}
+,
+parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]       = '{'{0}
+, '{0}
+}
+,
+parameter int ENGINES_CONFIG_MERGE_WIDTH_ARRAY[NUM_ENGINES_MAX]                              = '{0, 0}
+,
+parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                             = '{1, 1, 1, 0},
+parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = '{0, 0}
+,
+parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  0 ,
+parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  2 ,
+parameter int ENGINES_CONFIG_CU_ARBITER_NUM_ENGINE =  12 ,
+parameter int ENGINES_CONFIG_CU_ARBITER_NUM_MEMORY =  6 ,
+parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  0 ,
+parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  32 ,
+parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  192 ,
+parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  96
 // total_luts=26029
 
