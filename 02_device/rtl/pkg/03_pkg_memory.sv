@@ -145,8 +145,7 @@ typedef struct packed{
 } EnginePacketType;
 
 typedef struct packed{
-  EnginePacketRouteAttributes route   ;
-  EnginePacketType            subclass;
+  EnginePacketRouteAttributes route;
 } EnginePacketMeta;
 
 typedef struct packed{
@@ -392,7 +391,6 @@ function EnginePacketPayload  map_EnginePacketFull_to_EnginePacket (input Engine
   EnginePacketPayload  output_packet;
 
   output_packet.meta.route     = input_packet.meta.route;
-  output_packet.meta.subclass  = input_packet.meta.subclass;
   output_packet.data           = input_packet.data;
 
   return output_packet;

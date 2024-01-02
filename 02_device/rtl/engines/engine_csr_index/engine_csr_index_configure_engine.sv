@@ -130,7 +130,7 @@ end
 always_ff @(posedge ap_clk) begin
     configure_engine_reg.payload.meta.route.packet_destination <= fifo_response_engine_in_dout_reg.payload.meta.route.packet_destination ;
     configure_engine_reg.payload.meta.address                  <= 0;
-    configure_engine_reg.payload.meta.subclass.cmd             <= fifo_response_engine_in_dout_reg.payload.meta.subclass.cmd;
+    configure_engine_reg.payload.meta.subclass.cmd             <= CMD_ENGINE_PROGRAM;
     configure_engine_reg.payload.data                          <= fifo_response_engine_in_dout_reg.payload.data;
     configure_engine_reg.payload.param.increment               <= 1'b0;
     configure_engine_reg.payload.param.decrement               <= 1'b0;

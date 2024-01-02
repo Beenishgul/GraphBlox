@@ -826,7 +826,6 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign fifo_response_comb.valid                     = request_pending_out_int.valid;
     assign fifo_response_comb.payload.meta.route        = request_pending_out_int.payload.meta.route;
-    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE_DATA;
     always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin

@@ -446,7 +446,6 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
     generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg.payload.meta.route.hops               <= response_engine_in_int.payload.meta.route.hops;
-    generator_engine_request_engine_reg.payload.meta.subclass                 <= response_engine_in_int.payload.meta.subclass;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -470,7 +469,6 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg.payload.meta.route.sequence_state;
     generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S2.payload.meta.route.hops               <= generator_engine_request_engine_reg.payload.meta.route.hops;
-    generator_engine_request_engine_reg_S2.payload.meta.subclass                 <= generator_engine_request_engine_reg.payload.meta.subclass;
 
     // if(generator_engine_request_engine_reg_S2.valid)
     //     $display("%t - D %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S2.payload.data.field[0], generator_engine_request_engine_reg_S2.payload.data.field[2], generator_engine_request_engine_reg_S2.payload.data.field[3]);
