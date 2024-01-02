@@ -521,7 +521,6 @@ end
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S3.payload.data                       <= result_data_int;
     generator_engine_request_engine_reg_S3.payload.meta.address               <= generator_engine_request_engine_reg_S2.payload.meta.address;
-    generator_engine_request_engine_reg_S3.payload.meta.route.packet_source   <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
     generator_engine_request_engine_reg_S3.payload.meta.route.hops            <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
@@ -542,18 +541,15 @@ always_ff @(posedge ap_clk) begin
         else
             generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
 
-        generator_engine_request_engine_reg_S3.payload.meta.route.packet_source <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
-        generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd        <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
+        generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
     end else begin
         if (generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state == SEQUENCE_DONE) begin
             generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= SEQUENCE_DONE;
             generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
-            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
             generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= CMD_CONTROL;
         end else if (break_flow_int) begin
             generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= SEQUENCE_BREAK;
             generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
-            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
             generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= CMD_CONTROL;
         end else begin
 
@@ -561,8 +557,6 @@ always_ff @(posedge ap_clk) begin
                 generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= SEQUENCE_DONE;
             else
                 generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
-
-            generator_engine_request_engine_reg_S3.payload.meta.route.packet_source      <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_source;
             generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
             generator_engine_request_engine_reg_S3.payload.meta.subclass.cmd             <= generator_engine_request_engine_reg_S2.payload.meta.subclass.cmd;
         end
