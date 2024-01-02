@@ -365,7 +365,7 @@ function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input Eng
 
   MemoryPacketPayload  output_packet;
 
-  output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source;
+  output_packet.meta.route.packet_source  = input_packet.meta.route.sequence_source;
   output_packet.meta.address              = input_packet.meta.address;
   output_packet.meta.subclass.cmd         = input_packet.meta.subclass.cmd;
   output_packet.data.field                = input_packet.data.field[0];
