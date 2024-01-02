@@ -154,7 +154,6 @@ typedef struct packed{
 
 typedef struct packed{
     ForwardDataConfigurationParameters param;
-    EnginePacketMeta                   meta ;
 } ForwardDataConfigurationPayload;
 
 typedef struct packed{
