@@ -65,8 +65,22 @@ typedef struct packed{
 } CSRIndexConfigurationParameters;
 
 typedef struct packed{
+    PacketRouteAddress packet_destination;
+} CSRIndexConfigurationRouteAttributes;
+
+typedef struct packed{
+    type_memory_cmd cmd;
+} CSRIndexConfigurationType;
+
+typedef struct packed{
+    CSRIndexConfigurationRouteAttributes route   ;
+    CSRIndexConfigurationType            subclass;
+    PacketDataAddress                    address ;
+} CSRIndexConfigurationMeta;
+
+typedef struct packed{
     CSRIndexConfigurationParameters param;
-    EnginePacketMeta                meta ;
+    CSRIndexConfigurationMeta       meta ;
     EnginePacketData                data ;
 } CSRIndexConfigurationPayload;
 
@@ -295,8 +309,22 @@ typedef struct packed{
 } ReadWriteConfigurationParameters;
 
 typedef struct packed{
+    PacketRouteAddress packet_destination;
+} ReadWriteConfigurationRouteAttributes;
+
+typedef struct packed{
+    type_memory_cmd cmd;
+} ReadWriteConfigurationType;
+
+typedef struct packed{
+    ReadWriteConfigurationRouteAttributes route   ;
+    ReadWriteConfigurationType            subclass;
+    PacketDataAddress                     address ;
+} ReadWriteConfigurationMeta;
+
+typedef struct packed{
     ReadWriteConfigurationParameters param;
-    EnginePacketMeta                 meta ;
+    ReadWriteConfigurationMeta       meta ;
 } ReadWriteConfigurationPayload;
 
 typedef struct packed{

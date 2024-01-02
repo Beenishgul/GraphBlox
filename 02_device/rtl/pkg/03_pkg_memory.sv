@@ -168,7 +168,7 @@ typedef struct packed{
 
 typedef struct packed{
   EnginePacketMetaFull meta;
-  EnginePacketData data;
+  EnginePacketData     data;
 } EnginePacketPayloadFull;
 
 typedef struct packed{
@@ -177,7 +177,7 @@ typedef struct packed{
 } EnginePacket;
 
 typedef struct packed{
-  logic               valid  ;
+  logic                   valid  ;
   EnginePacketPayloadFull payload;
 } EnginePacketFull;
 
@@ -376,11 +376,11 @@ function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input Ca
 endfunction : map_CacheResponse_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet);
+function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketPayload  input_packet, input PacketRouteAddress packet_source);
 
   MemoryPacketPayload  output_packet;
 
-  output_packet.meta.route.packet_source  = input_packet.meta.route.sequence_source;
+  output_packet.meta.route.packet_source  = packet_source;
   output_packet.meta.address              = input_packet.meta.address;
   output_packet.meta.subclass.cmd         = input_packet.meta.subclass.cmd;
   output_packet.data.field                = input_packet.data.field[0];
