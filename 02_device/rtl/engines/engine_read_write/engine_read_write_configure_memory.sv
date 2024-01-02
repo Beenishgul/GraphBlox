@@ -141,7 +141,7 @@ assign configure_memory_meta_int.route.sequence_source.id_cu     = 1 << ID_CU;
 assign configure_memory_meta_int.route.sequence_source.id_bundle = 1 << ID_BUNDLE;
 assign configure_memory_meta_int.route.sequence_source.id_lane   = 1 << ID_LANE;
 assign configure_memory_meta_int.route.sequence_source.id_engine = 1 << ID_ENGINE;
-assign configure_memory_meta_int.route.sequence_source.id_module = 1 << ID_MODULE;
+assign configure_memory_meta_int.route.sequence_source.id_module = 1 << (ID_MODULE+1);
 assign configure_memory_meta_int.route.sequence_state            = SEQUENCE_INVALID;
 assign configure_memory_meta_int.route.sequence_id               = 0;
 
