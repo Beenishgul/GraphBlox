@@ -173,6 +173,21 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+    EnginePacketRouteAttributes engine_read_write_route;
+// --------------------------------------------------------------------------------------
+    assign engine_read_write_route.packet_destination        = 0;
+    assign engine_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
+    assign engine_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
+    assign engine_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
+    assign engine_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
+    assign engine_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
+    assign engine_read_write_route.sequence_state            = SEQUENCE_INVALID;
+    assign engine_read_write_route.sequence_id               = 0;
+    assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -280,7 +295,7 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload);
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_read_write_route.sequence_source);
     end
 
 // --------------------------------------------------------------------------------------

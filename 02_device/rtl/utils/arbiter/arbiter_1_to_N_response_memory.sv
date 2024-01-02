@@ -319,7 +319,6 @@ end
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-// Push
 generate
   case (ID_LEVEL)
     5       : begin

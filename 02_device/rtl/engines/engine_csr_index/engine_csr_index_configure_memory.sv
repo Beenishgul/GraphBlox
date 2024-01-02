@@ -45,7 +45,7 @@ logic areset_csr_index_generator;
 logic areset_fifo               ;
 
 MemoryPacket                 response_memory_in_reg                          ;
-EnginePacketMeta             configure_memory_meta_int                       ;
+CSRIndexConfigurationMeta    configure_memory_meta_int                       ;
 CSRIndexConfiguration        configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
@@ -130,17 +130,8 @@ assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
 assign configure_memory_meta_int.route.packet_destination.id_engine = 0;
 assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 
-assign configure_memory_meta_int.route.sequence_source.id_cu     = 1 << ID_CU;
-assign configure_memory_meta_int.route.sequence_source.id_bundle = 1 << ID_BUNDLE;
-assign configure_memory_meta_int.route.sequence_source.id_lane   = 1 << ID_LANE;
-assign configure_memory_meta_int.route.sequence_source.id_engine = 1 << ID_ENGINE;
-assign configure_memory_meta_int.route.sequence_source.id_module = 1 << (ID_MODULE+1);
-assign configure_memory_meta_int.route.sequence_state            = SEQUENCE_INVALID;
-assign configure_memory_meta_int.route.sequence_id               = 0;
-assign configure_memory_meta_int.route.hops                      = NUM_BUNDLES_WIDTH_BITS;
-
 assign configure_memory_meta_int.address.id_buffer       = 0;
-assign configure_memory_meta_int.address.offset          = $clog2(M_AXI4_FE_DATA_W/8);
+assign configure_memory_meta_int.address.offset          = 0;
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
 assign configure_memory_meta_int.subclass.cmd            = CMD_INVALID;
@@ -176,12 +167,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.route.sequence_source <= configure_memory_meta_int.route.sequence_source;
-    configure_memory_reg.payload.meta.route.sequence_state  <= configure_memory_meta_int.route.sequence_state;
-    configure_memory_reg.payload.meta.route.sequence_id     <= configure_memory_meta_int.route.sequence_id;
-    configure_memory_reg.payload.meta.route.hops            <= configure_memory_meta_int.route.hops;
-    configure_memory_reg.payload.meta.address.offset        <= configure_memory_meta_int.address.offset;
-    configure_memory_reg.payload.data                       <= 0;
+    configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
+    configure_memory_reg.payload.data                <= 0;
 end
 
 always_ff @(posedge ap_clk) begin

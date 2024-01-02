@@ -181,6 +181,23 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+    EnginePacketRouteAttributes engine_csr_index_route;
+// --------------------------------------------------------------------------------------
+    assign engine_csr_index_route.packet_destination        = 0;
+    assign engine_csr_index_route.sequence_source.id_cu     = 1 << ID_CU;
+    assign engine_csr_index_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
+    assign engine_csr_index_route.sequence_source.id_lane   = 1 << ID_LANE;
+    assign engine_csr_index_route.sequence_source.id_engine = 1 << ID_ENGINE;
+    assign engine_csr_index_route.sequence_source.id_module = 1 << ID_MODULE;
+    assign engine_csr_index_route.sequence_state            = SEQUENCE_INVALID;
+    assign engine_csr_index_route.sequence_id               = 0;
+    assign engine_csr_index_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
+
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -303,7 +320,7 @@ module engine_csr_index_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload);
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_csr_index_route.sequence_source);
     end
 
 // --------------------------------------------------------------------------------------
@@ -620,15 +637,15 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.sequence_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.sequence_id == sequence_id_counter) ;
 
-    assign fifo_request_comb.valid                                      = 1'b0;
-    assign fifo_request_comb.payload.meta.route.packet_destination      = configure_engine_int.payload.meta.route.packet_destination;
-    assign fifo_request_comb.payload.meta.route.hops                    = configure_engine_int.payload.meta.route.hops;
-    assign fifo_request_comb.payload.meta.route.sequence_source         = configure_engine_int.payload.meta.route.sequence_source;
-    assign fifo_request_comb.payload.meta.route.sequence_state          = configure_engine_int.payload.meta.route.sequence_state;
-    assign fifo_request_comb.payload.meta.route.sequence_id             = sequence_id_counter;
-    assign fifo_request_comb.payload.meta.address.id_buffer             = configure_engine_int.payload.meta.address.id_buffer;
-    assign fifo_request_comb.payload.meta.address.shift                 = configure_engine_int.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.subclass                      = configure_engine_int.payload.meta.subclass;
+    assign fifo_request_comb.valid                                 = 1'b0;
+    assign fifo_request_comb.payload.meta.route.packet_destination = configure_engine_int.payload.meta.route.packet_destination;
+    assign fifo_request_comb.payload.meta.route.hops               = engine_csr_index_route.hops;
+    assign fifo_request_comb.payload.meta.route.sequence_source    = engine_csr_index_route.sequence_source;
+    assign fifo_request_comb.payload.meta.route.sequence_state     = engine_csr_index_route.sequence_state;
+    assign fifo_request_comb.payload.meta.route.sequence_id        = sequence_id_counter;
+    assign fifo_request_comb.payload.meta.address.id_buffer        = configure_engine_int.payload.meta.address.id_buffer;
+    assign fifo_request_comb.payload.meta.address.shift            = configure_engine_int.payload.meta.address.shift;
+    assign fifo_request_comb.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
 
     always_comb begin
         if(configure_engine_int.payload.meta.address.shift.direction) begin
