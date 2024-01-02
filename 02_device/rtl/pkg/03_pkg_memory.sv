@@ -389,7 +389,7 @@ endfunction : map_EnginePacket_to_MemoryRequestPacket
 // --------------------------------------------------------------------------------------
 function EnginePacketPayload  map_EnginePacketFull_to_EnginePacket (input EnginePacketFullPayload  input_packet);
 
-  EnginePacketFullPayload  output_packet;
+  EnginePacketPayload  output_packet;
 
   output_packet.meta.route     = input_packet.meta.route;
   output_packet.meta.subclass  = input_packet.meta.subclass;
