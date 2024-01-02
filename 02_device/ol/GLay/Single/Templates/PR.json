@@ -73,17 +73,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -138,12 +132,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -196,17 +186,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -261,12 +245,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -343,17 +323,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -408,12 +382,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -474,17 +444,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -539,12 +503,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -615,17 +575,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -680,12 +634,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -738,17 +688,11 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_MEM_RESPONSE": 8,
-            "CMD_MEM_CONFIGURE": 16,
-            "CMD_ENGINE": 32,
-            "CMD_CONTROL": 64
-        },
-        "type_data_buffer": {
-            "STRUCT_INVALID": 1,
-            "STRUCT_CU_DATA": 2,
-            "STRUCT_ENGINE_DATA": 4,
-            "STRUCT_CU_SETUP": 8,
-            "STRUCT_ENGINE_SETUP": 16,
-            "STRUCT_CU_FLUSH": 32
+            "CMD_MEM_PROGRAM": 16,
+            "CMD_MEM_FLUSH": 32,
+            "CMD_ENGINE_DATA": 64,
+            "CMD_ENGINE_PROGRAM": 128,
+            "CMD_CONTROL": 256
         },
         "entries": {
             "entry_0": {
@@ -803,12 +747,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "7",
+                    "bits": "9",
                     "value": "CMD_INVALID"
-                },
-                "buffer": {
-                    "bits": "6",
-                    "value": "STRUCT_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
