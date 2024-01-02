@@ -435,7 +435,6 @@ always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
         generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
         generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
-        generator_engine_request_engine_reg.payload.meta.address                  <= response_engine_in_int.payload.meta.address;
         generator_engine_request_engine_reg.payload.meta.subclass                 <= response_engine_in_int.payload.meta.subclass;
         generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data;
 
