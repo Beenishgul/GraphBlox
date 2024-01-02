@@ -355,7 +355,7 @@ function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input Ca
   MemoryPacketPayload output_packet;
 
   output_packet.meta          = input_packet.meta;
-  output_packet.data.field[0] = input_packet.iob.rdata;
+  output_packet.data.field    = input_packet.iob.rdata;
 
   return output_packet;
 endfunction : map_CacheResponse_to_MemoryResponsePacket
