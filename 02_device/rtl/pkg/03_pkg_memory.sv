@@ -336,7 +336,7 @@ function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input MemoryPacke
   output_packet.payload.data      = input_packet.payload.data;
   output_packet.payload.iob.valid = input_packet.valid;
   output_packet.payload.iob.addr  = address_base + input_packet.payload.meta.address.offset;
-  output_packet.payload.iob.wdata = input_packet.payload.data.field[0];
+  output_packet.payload.iob.wdata = input_packet.payload.data.field;
 
   case (input_packet.payload.meta.subclass.cmd)
     CMD_MEM_WRITE : begin
