@@ -41,8 +41,6 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 // Maximum supported engines/lanes/bundles/buffers
 // --------------------------------------------------------------------------------------
-	parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = 16;
-
 // --------------------------------------------------------------------------------------
 	parameter CU_KERNEL_COUNT_MAX_WIDTH_BITS = 8;
 	parameter CU_BUNDLE_COUNT_MAX_WIDTH_BITS = 8;
