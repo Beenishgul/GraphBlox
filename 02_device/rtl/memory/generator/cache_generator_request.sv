@@ -15,10 +15,11 @@
 `include "global_package.vh"
 
 module cache_generator_request #(
-  parameter NUM_MEMORY_REQUESTOR  = 2                              ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR),
-  parameter FIFO_WRITE_DEPTH      = 32                             ,
-  parameter PROG_THRESH           = 16
+  parameter NUM_MEMORY_REQUESTOR  = 2                                ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)  ,
+  parameter FIFO_ARBITER_DEPTH    = 16                               ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
+  parameter PROG_THRESH           = 2**$clog2(8*NUM_MEMORY_REQUESTOR)
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
@@ -185,7 +186,7 @@ assign request_out_int.payload.iob       = fifo_request_dout.iob;
 assign request_out_int.payload.meta      = fifo_request_dout.meta;
 assign request_out_int.payload.data      = fifo_request_dout.data;
 
-xpm_fifo_sync_bram_wrapper #(
+xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
   .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
   .READ_DATA_WIDTH ($bits(CacheRequestPayload)),

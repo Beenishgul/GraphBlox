@@ -126,19 +126,19 @@ def get_engine_fifo(engine_name):
 
 def get_memory_arbiter_num(engine_name):
     base_name = engine_name.split("(")[0]
-    return (fifo_memory.get(base_name, 0)//16)
+    return (fifo_memory.get(base_name, 0)//8)
 
 def get_control_arbiter_num_response(engine_name):
     base_name = engine_name.split("(")[0]
-    return (fifo_control_response.get(base_name, 0)//16)
+    return (fifo_control_response.get(base_name, 0)//8)
 
 def get_control_arbiter_num_request(engine_name):
     base_name = engine_name.split("(")[0]
-    return (fifo_control_request.get(base_name, 0)//16)
+    return (fifo_control_request.get(base_name, 0)//8)
 
 def get_engine_arbiter_num(engine_name):
     base_name = engine_name.split("(")[0]
-    return (fifo_engine.get(base_name, 0)//16)
+    return (fifo_engine.get(base_name, 0)//8)
 
 
 def get_connect_array(engine_name):
@@ -572,7 +572,7 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES_WIDTH_BITS = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES_WIDTH_BITS = 3;\n")
-    file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(16*NUM_BUNDLES));\n")
+    file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n")
     
 
 # Write to VHDL file

@@ -15,16 +15,16 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_control #(
-  parameter DEMUX_DATA_WIDTH      = $bits(ControlPacketPayload)     ,
-  parameter ID_LEVEL              = 1                               ,
-  parameter ID_BUNDLE             = 0                               ,
-  parameter NUM_CONTROL_RECEIVER  = 2                               ,
-  parameter DEMUX_BUS_WIDTH       = NUM_CONTROL_RECEIVER            ,
-  parameter DEMUX_SEL_WIDTH       = NUM_CONTROL_RECEIVER            ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_RECEIVER) ,
-  parameter FIFO_ARBITER_DEPTH    = 16                              ,
-  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+17),
-  parameter PROG_THRESH           = 2**$clog2(16)
+  parameter DEMUX_DATA_WIDTH      = $bits(ControlPacketPayload)      ,
+  parameter ID_LEVEL              = 1                                ,
+  parameter ID_BUNDLE             = 0                                ,
+  parameter NUM_CONTROL_RECEIVER  = 2                                ,
+  parameter DEMUX_BUS_WIDTH       = NUM_CONTROL_RECEIVER             ,
+  parameter DEMUX_SEL_WIDTH       = NUM_CONTROL_RECEIVER             ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_RECEIVER)  ,
+  parameter FIFO_ARBITER_DEPTH    = NUM_CONTROL_RECEIVER*2           ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
+  parameter PROG_THRESH           = 2**$clog2(8*NUM_CONTROL_RECEIVER)
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,

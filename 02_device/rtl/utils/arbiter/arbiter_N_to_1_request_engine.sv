@@ -15,11 +15,11 @@
 `include "global_package.vh"
 
 module arbiter_N_to_1_request_engine #(
-  parameter NUM_ENGINE_REQUESTOR  = 2                               ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_REQUESTOR) ,
-  parameter FIFO_ARBITER_DEPTH    = 16                              ,
-  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+17),
-  parameter PROG_THRESH           = 2**$clog2(16)
+  parameter NUM_ENGINE_REQUESTOR  = 2                                ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_REQUESTOR)  ,
+  parameter FIFO_ARBITER_DEPTH    = NUM_ENGINE_REQUESTOR*8           ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
+  parameter PROG_THRESH           = 2**$clog2(8*NUM_ENGINE_REQUESTOR)
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
