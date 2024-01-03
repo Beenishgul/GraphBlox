@@ -15,16 +15,16 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_engine #(
-  parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)      ,
-  parameter ID_LEVEL              = 1                               ,
-  parameter ID_BUNDLE             = 0                               ,
-  parameter NUM_ENGINE_RECEIVER   = 2                               ,
-  parameter DEMUX_BUS_WIDTH       = NUM_ENGINE_RECEIVER             ,
-  parameter DEMUX_SEL_WIDTH       = NUM_ENGINE_RECEIVER             ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_RECEIVER)  ,
-  parameter FIFO_ARBITER_DEPTH   = 8                              ,
-  parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH          = 2**$clog2(8)
+  parameter DEMUX_DATA_WIDTH      = $bits(EnginePacketPayload)     ,
+  parameter ID_LEVEL              = 1                              ,
+  parameter ID_BUNDLE             = 0                              ,
+  parameter NUM_ENGINE_RECEIVER   = 2                              ,
+  parameter DEMUX_BUS_WIDTH       = NUM_ENGINE_RECEIVER            ,
+  parameter DEMUX_SEL_WIDTH       = NUM_ENGINE_RECEIVER            ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_RECEIVER) ,
+  parameter FIFO_ARBITER_DEPTH    = 8                              ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
+  parameter PROG_THRESH           = 2**$clog2(8)
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
