@@ -137,56 +137,6 @@ typedef struct packed{
 } PacketDataAddress;
 
 // --------------------------------------------------------------------------------------
-// Generic Engine Packet
-// --------------------------------------------------------------------------------------
-typedef struct packed{
-  PacketRouteAddress                           packet_destination;
-  PacketRouteAddress                           sequence_source   ;
-  type_sequence_state                          sequence_state    ;
-  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
-  logic [          NUM_BUNDLES_WIDTH_BITS-1:0] hops              ;
-} EnginePacketRouteAttributes;
-
-typedef struct packed{
-  type_engine_cmd cmd;
-} EnginePacketType;
-
-typedef struct packed{
-  EnginePacketRouteAttributes route;
-} EnginePacketMeta;
-
-typedef struct packed{
-  EnginePacketRouteAttributes route   ;
-  PacketDataAddress           address ;
-  EnginePacketType            subclass;
-} EnginePacketMetaFull;
-
-parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
-typedef struct packed{
-  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M_AXI4_FE_DATA_W-1:0] field;
-} EnginePacketData;
-
-typedef struct packed{
-  EnginePacketMeta meta;
-  EnginePacketData data;
-} EnginePacketPayload;
-
-typedef struct packed{
-  EnginePacketMetaFull meta;
-  EnginePacketData     data;
-} EnginePacketFullPayload;
-
-typedef struct packed{
-  logic               valid  ;
-  EnginePacketPayload payload;
-} EnginePacket;
-
-typedef struct packed{
-  logic                   valid  ;
-  EnginePacketFullPayload payload;
-} EnginePacketFull;
-
-// --------------------------------------------------------------------------------------
 // Generic Memory Packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
@@ -216,6 +166,56 @@ typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
 } MemoryPacket;
+
+// --------------------------------------------------------------------------------------
+// Generic Engine Packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  PacketRouteAddress                           packet_destination;
+  PacketRouteAddress                           sequence_source   ;
+  type_sequence_state                          sequence_state    ;
+  logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id       ;
+  logic [          NUM_BUNDLES_WIDTH_BITS-1:0] hops              ;
+} EnginePacketRouteAttributes;
+
+typedef struct packed{
+  type_engine_cmd cmd;
+} EnginePacketType;
+
+typedef struct packed{
+  EnginePacketRouteAttributes route;
+} EnginePacketMeta;
+
+typedef struct packed{
+  EnginePacketRouteAttributes route   ;
+  PacketDataAddress           address ;
+  MemoryPacketType            subclass;
+} EnginePacketMetaFull;
+
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
+typedef struct packed{
+  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M_AXI4_FE_DATA_W-1:0] field;
+} EnginePacketData;
+
+typedef struct packed{
+  EnginePacketMeta meta;
+  EnginePacketData data;
+} EnginePacketPayload;
+
+typedef struct packed{
+  EnginePacketMetaFull meta;
+  EnginePacketData     data;
+} EnginePacketFullPayload;
+
+typedef struct packed{
+  logic               valid  ;
+  EnginePacketPayload payload;
+} EnginePacket;
+
+typedef struct packed{
+  logic                   valid  ;
+  EnginePacketFullPayload payload;
+} EnginePacketFull;
 
 // --------------------------------------------------------------------------------------
 //   Generic Control packet

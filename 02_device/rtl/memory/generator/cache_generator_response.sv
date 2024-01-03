@@ -98,8 +98,8 @@ always_ff @(posedge ap_clk ) begin
     response_out[0].valid <= 1'b0;
     response_out[1].valid <= 1'b0;
   end else begin
-    response_out[0].valid <= fifo_response_dout_int.valid & ((&fifo_response_dout_int.payload.meta.route.packet_destination) | ~(&fifo_response_dout_int.payload.meta.route.packet_destination));
-    response_out[1].valid <= fifo_response_dout_int.valid & (|fifo_response_dout_int.payload.meta.route.packet_destination);
+    response_out[0].valid <= fifo_response_dout_int.valid & ((&fifo_response_dout_int.payload.meta.route.packet_source) | ~(&fifo_response_dout_int.payload.meta.route.packet_source));
+    response_out[1].valid <= fifo_response_dout_int.valid & (|fifo_response_dout_int.payload.meta.route.packet_source);
   end
 end
 

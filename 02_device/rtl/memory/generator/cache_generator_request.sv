@@ -122,7 +122,7 @@ end
 
 always_ff @(posedge ap_clk) begin
   for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-    request_in_reg[i].payload  <= request_in[i].payload ;
+    request_in_reg[i].payload  <= request_in[i].payload;
   end
 end
 
