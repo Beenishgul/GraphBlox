@@ -994,9 +994,80 @@ module __KERNEL___testbench ();
 
         endtask
 
-        function automatic bit check___KERNEL___result(ref GraphCSR graph);
+        function automatic bit check_BFS_result(ref GraphCSR graph);
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+            bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
+            bit error_found = 0;
+            integer error_counter;
+            error_counter = 0;
+
+            o=0;
+            l=0;
+            $display("MSG: // ------------------------------------------------- \n");
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
+                // $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            // o=0;
+            // l=0;
+            $display("MSG: // ------------------------------------------------- \n");
+            for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_1*2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
+                // $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            o=0;
+            l=0;
+            $display("MSG: // ------------------------------------------------- \n");
+            for (int i = 0; i < graph.num_auxiliary_2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            // o=0;
+            // l=0;
+            $display("MSG: // ------------------------------------------------- \n");
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
+                // if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W])
+                //     $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+            $display("MSG: // ------------------------------------------------- \n");
+
+            error_counter = 0;
+            return(error_found);
+        endfunction
+
+        function automatic bit check_PR_result(ref GraphCSR graph);
+            int o,l;
+            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+            bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
             bit error_found = 0;
             integer error_counter;
             error_counter = 0;
@@ -1063,6 +1134,14 @@ module __KERNEL___testbench ();
             return(error_found);
         endfunction
 
+        function automatic bit check___KERNEL___result(ref GraphCSR graph);
+            bit error_found = 0;
+
+            error_found |= check__ALGORITHM_NAME__result(graph)   ;
+
+            return(error_found);
+        endfunction
+
         bit         choose_pressure_type      = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
@@ -1082,7 +1161,6 @@ module __KERNEL___testbench ();
                 end
             end
         endfunction
-
 
         function automatic void read_files_graphCSR(ref GraphCSR graph);
             int          realcount                 = 0;

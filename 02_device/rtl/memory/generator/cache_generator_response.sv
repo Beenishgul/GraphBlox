@@ -63,8 +63,8 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if(areset_control) begin
-    response_in_reg.valid        <= 0;
-    fifo_response_signals_in_reg <= 0;
+    response_in_reg.valid              <= 1'b0;
+    fifo_response_signals_in_reg.rd_en <= 1'b0;
   end else begin
     response_in_reg.valid              <= response_in.valid;
     fifo_response_signals_in_reg.rd_en <= fifo_response_signals_in.rd_en;
@@ -95,42 +95,17 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk ) begin
   if(areset_control) begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-      response_out[i].valid <= 0;
-    end
+    response_out[0].valid <= 1'b0;
+    response_out[1].valid <= 1'b0;
   end else begin
-    for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-      response_out[i].valid <= response_out_reg[i].valid;
-    end
+    response_out[0].valid <= fifo_response_dout_int.valid & ((&fifo_response_dout_int.payload.meta.route.packet_destination) | ~(&fifo_response_dout_int.payload.meta.route.packet_destination));
+    response_out[1].valid <= fifo_response_dout_int.valid & (|fifo_response_dout_int.payload.meta.route.packet_destination);
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  for (int i=0; i < NUM_MEMORY_REQUESTOR; i++) begin
-    response_out[i].payload <= response_out_reg[i].payload;
-  end
-end
-
-always_comb begin
-  if(fifo_response_dout_int.valid) begin
-    case (fifo_response_dout_int.payload.meta.subclass.cmd)
-      CMD_MEM_PROGRAM : begin
-        response_out_reg[0] = fifo_response_dout_int;
-        response_out_reg[1] = fifo_response_dout_int;
-      end
-      CMD_MEM_FLUSH   : begin
-        response_out_reg[0] = fifo_response_dout_int;
-        response_out_reg[1] = 0;
-      end
-      default : begin
-        response_out_reg[0] = 0;
-        response_out_reg[1] = fifo_response_dout_int;
-      end
-    endcase
-  end else begin
-    response_out_reg[0] = 0;
-    response_out_reg[1] = 0;
-  end
+    response_out[0].payload <= fifo_response_dout_int.payload;
+    response_out[1].payload <= fifo_response_dout_int.payload;
 end
 
 // --------------------------------------------------------------------------------------

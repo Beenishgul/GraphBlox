@@ -378,7 +378,7 @@ assign configuration_comb_program.payload.meta.address.id_buffer                
 assign configuration_comb_program.payload.meta.address.offset                     = 0;
 assign configuration_comb_program.payload.meta.address.shift.amount               = $clog2(M_AXI4_FE_DATA_W/8);
 assign configuration_comb_program.payload.meta.address.shift.direction            = 1'b1;
-assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_PROGRAM;
+assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_READ;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet FLUSH
@@ -398,7 +398,7 @@ assign configuration_comb_flush.payload.meta.address.id_buffer       = 0;
 assign configuration_comb_flush.payload.meta.address.offset          = 0;
 assign configuration_comb_flush.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
 assign configuration_comb_flush.payload.meta.address.shift.direction = 1'b1;
-assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_FLUSH;
+assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_READ;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
