@@ -572,6 +572,8 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES_WIDTH_BITS = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES_WIDTH_BITS = 3;\n")
+    file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(16*NUM_BUNDLES));\n")
+    
 
 # Write to VHDL file
 with open(output_file_path_shared, "w") as file:
