@@ -999,7 +999,7 @@ module __KERNEL___testbench ();
             // Backdoor read the memory with the content.
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
+            // bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},1'b1};
             bit error_found = 0;
             integer error_counter;
             error_counter = 0;
@@ -1071,7 +1071,7 @@ module __KERNEL___testbench ();
             // Backdoor read the memory with the content.
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
+            // bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},1'b1};
             bit error_found = 0;
             integer error_counter;
             error_counter = 0;
