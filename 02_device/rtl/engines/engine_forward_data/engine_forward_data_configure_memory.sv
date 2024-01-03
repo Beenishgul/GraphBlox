@@ -202,7 +202,7 @@ end
 // memory response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
-assign fifo_response_memory_in_push_filter      = (response_memory_in_reg.payload.meta.subclass.cmd == CMD_MEM_PROGRAM) & (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
+assign fifo_response_memory_in_push_filter      = (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
 assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid & fifo_response_memory_in_push_filter;
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 

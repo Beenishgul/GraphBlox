@@ -52,20 +52,25 @@ typedef struct packed {
 } FIFOStateSignalsInputInternal;
 
 // --------------------------------------------------------------------------------------
-//   Generic Memory request packet
+//   Generic Memory request type
 // --------------------------------------------------------------------------------------
-parameter TYPE_MEMORY_CMD_BITS = 9;
+parameter TYPE_MEMORY_CMD_BITS = 3;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
-  CMD_INVALID        = 1 << 0,
+  CMD_MEM_INVALID    = 1 << 0,
   CMD_MEM_READ       = 1 << 1,
-  CMD_MEM_WRITE      = 1 << 2,
-  CMD_MEM_RESPONSE   = 1 << 3,
-  CMD_MEM_PROGRAM    = 1 << 4,
-  CMD_MEM_FLUSH      = 1 << 5,
-  CMD_ENGINE_DATA    = 1 << 6,
-  CMD_ENGINE_PROGRAM = 1 << 7,
-  CMD_CONTROL        = 1 << 8
+  CMD_MEM_WRITE      = 1 << 2
 } type_memory_cmd;
+
+// --------------------------------------------------------------------------------------
+//   Generic Engine request type
+// --------------------------------------------------------------------------------------
+parameter TYPE_ENGINE_CMD_BITS = 4;
+typedef enum logic[TYPE_ENGINE_CMD_BITS-1:0] {
+  CMD_ENGINE_INVALID = 1 << 0,
+  CMD_ENGINE_DATA    = 1 << 1,
+  CMD_ENGINE_PROGRAM = 1 << 2,
+  CMD_CONTROL        = 1 << 3
+} type_engine_cmd;
 
 // --------------------------------------------------------------------------------------
 //   Generic Memory Filter Type
@@ -141,7 +146,7 @@ typedef struct packed{
 } EnginePacketRouteAttributes;
 
 typedef struct packed{
-  type_memory_cmd cmd;
+  type_engine_cmd cmd;
 } EnginePacketType;
 
 typedef struct packed{
