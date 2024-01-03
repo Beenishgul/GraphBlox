@@ -250,7 +250,7 @@ assign request_out_reg = cache_generator_request_out;
 
 cache_generator_request #(
   .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
-  .FIFO_WRITE_DEPTH    (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+  .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_request (
   .ap_clk                  (ap_clk                                   ),
   .areset                  (areset_generator                         ),
@@ -271,7 +271,7 @@ assign cache_generator_response_in = response_in_reg;
 
 cache_generator_response #(
   .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
-  .FIFO_WRITE_DEPTH    (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+  .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_response (
   .ap_clk                   (ap_clk                                    ),
   .areset                   (areset_generator                          ),

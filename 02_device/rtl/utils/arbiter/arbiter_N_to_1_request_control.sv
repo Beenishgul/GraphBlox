@@ -15,20 +15,20 @@
 `include "global_package.vh"
 
 module arbiter_N_to_1_request_control #(
-  parameter NUM_CONTROL_REQUESTOR  = 2                               ,
-  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_REQUESTOR) ,
-  parameter FIFO_ARBITER_DEPTH    = 16                              ,
-  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+17),
-  parameter PROG_THRESH           = 2**$clog2(16)
+  parameter NUM_CONTROL_REQUESTOR = 2                                 ,
+  parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_REQUESTOR)  ,
+  parameter FIFO_ARBITER_DEPTH    = NUM_CONTROL_REQUESTOR*2           ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9)   ,
+  parameter PROG_THRESH           = 2**$clog2(8*NUM_CONTROL_REQUESTOR)
 ) (
-  input  logic                            ap_clk                               ,
-  input  logic                            areset                               ,
+  input  logic                             ap_clk                                ,
+  input  logic                             areset                                ,
   input  ControlPacket                     request_in [NUM_CONTROL_REQUESTOR-1:0],
-  input  FIFOStateSignalsInput            fifo_request_signals_in              ,
-  output FIFOStateSignalsOutput           fifo_request_signals_out             ,
-  output logic [NUM_CONTROL_REQUESTOR-1:0] arbiter_grant_out                    ,
-  output ControlPacket                     request_out                          ,
-  output logic                            fifo_setup_signal
+  input  FIFOStateSignalsInput             fifo_request_signals_in               ,
+  output FIFOStateSignalsOutput            fifo_request_signals_out              ,
+  output logic [NUM_CONTROL_REQUESTOR-1:0] arbiter_grant_out                     ,
+  output ControlPacket                     request_out                           ,
+  output logic                             fifo_setup_signal
 );
 
 genvar i;

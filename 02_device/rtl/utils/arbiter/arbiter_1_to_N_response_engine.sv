@@ -22,9 +22,9 @@ module arbiter_1_to_N_response_engine #(
   parameter DEMUX_BUS_WIDTH       = NUM_ENGINE_RECEIVER             ,
   parameter DEMUX_SEL_WIDTH       = NUM_ENGINE_RECEIVER             ,
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_RECEIVER)  ,
-  parameter FIFO_ARBITER_DEPTH    = 16                              ,
-  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+17),
-  parameter PROG_THRESH           = 2**$clog2(16)
+  parameter FIFO_ARBITER_DEPTH    = NUM_ENGINE_RECEIVER*8           ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9) ,
+  parameter PROG_THRESH           = 2**$clog2(8*NUM_ENGINE_RECEIVER)
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,

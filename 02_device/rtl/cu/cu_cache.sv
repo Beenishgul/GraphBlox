@@ -38,10 +38,7 @@ module cu_cache #(
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_m_axi  ;
 logic areset_fifo   ;
-logic areset_arbiter;
-logic areset_setup  ;
 logic areset_cache  ;
 logic areset_control;
 
@@ -102,10 +99,7 @@ assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-  areset_m_axi   <= areset;
   areset_fifo    <= areset;
-  areset_arbiter <= areset;
-  areset_setup   <= areset;
   areset_control <= areset;
   areset_cache   <= areset;
   areset_counter <= areset;

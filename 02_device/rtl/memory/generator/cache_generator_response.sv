@@ -15,9 +15,10 @@
 `include "global_package.vh"
 
 module cache_generator_response #(
-  parameter NUM_MEMORY_REQUESTOR = 2 ,
-  parameter FIFO_WRITE_DEPTH     = 32,
-  parameter PROG_THRESH          = 16
+  parameter NUM_MEMORY_REQUESTOR = 2                                ,
+  parameter FIFO_ARBITER_DEPTH   = 16                               ,
+  parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
+  parameter PROG_THRESH          = 2**$clog2(8*NUM_MEMORY_REQUESTOR)
 ) (
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
@@ -125,7 +126,7 @@ assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty
 assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
 always_comb fifo_response_dout_int.payload   = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout);
 
-xpm_fifo_sync_bram_wrapper #(
+xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
   .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
   .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
