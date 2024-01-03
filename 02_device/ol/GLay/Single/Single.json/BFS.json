@@ -1,15 +1,11 @@
 {
     "ENGINE_READ_WRITE_0": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -64,7 +60,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_WRITE"
                 },
                 "id_module": {
@@ -122,15 +118,11 @@
     },
     "ENGINE_READ_WRITE_1": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -185,7 +177,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_WRITE"
                 },
                 "id_module": {
@@ -243,15 +235,11 @@
     },
     "ENGINE_CSR_INDEX_2": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -306,8 +294,8 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
-                    "value": "CMD_ENGINE_DATA"
+                    "bits": "5",
+                    "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
                     "bits": "8",
@@ -356,15 +344,11 @@
     },
     "ENGINE_READ_WRITE_4": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -419,7 +403,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_READ"
                 },
                 "id_module": {
@@ -622,15 +606,11 @@
     },
     "ENGINE_READ_WRITE_7": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -685,7 +665,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_READ"
                 },
                 "id_module": {
@@ -743,15 +723,11 @@
     },
     "ENGINE_READ_WRITE_8": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -806,7 +782,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_READ"
                 },
                 "id_module": {
@@ -874,15 +850,11 @@
     },
     "ENGINE_CSR_INDEX_10": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -937,7 +909,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_READ"
                 },
                 "id_module": {
@@ -987,15 +959,11 @@
     },
     "ENGINE_READ_WRITE_12": {
         "type_memory_cmd": {
-            "CMD_INVALID"        :   1,
+            "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
             "CMD_MEM_WRITE"      :   4,
-            "CMD_MEM_RESPONSE"   :   8,
-            "CMD_MEM_PROGRAM"    :   16,
-            "CMD_MEM_FLUSH"      :   32,
-            "CMD_ENGINE_DATA"    :   64,
-            "CMD_ENGINE_PROGRAM" :   128,
-            "CMD_CONTROL"        :   256
+            "CMD_STREAM_READ"    :   8,
+            "CMD_STREAM_WRITE"   :   16
         },
         "entries": {
             "entry_0": {
@@ -1050,7 +1018,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "9",
+                    "bits": "5",
                     "value": "CMD_MEM_READ"
                 },
                 "id_module": {

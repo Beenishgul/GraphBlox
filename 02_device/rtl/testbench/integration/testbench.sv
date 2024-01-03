@@ -995,6 +995,8 @@ module __KERNEL___testbench ();
         endtask
 
         function automatic bit check_BFS_result(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the memory with the content.
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
             bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
@@ -1065,6 +1067,8 @@ module __KERNEL___testbench ();
         endfunction
 
         function automatic bit check_PR_result(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the memory with the content.
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
             bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},{1'b1}};
@@ -1135,6 +1139,8 @@ module __KERNEL___testbench ();
         endfunction
 
         function automatic bit check___KERNEL___result(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the memory with the content.
             bit error_found = 0;
 
             error_found |= check__ALGORITHM_NAME__result(graph)   ;
@@ -1148,6 +1154,7 @@ module __KERNEL___testbench ();
 
         GraphCSR graph;
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         // Helper function to find the index of a substring within a string
         function int find_str(string str, string substr);
             automatic int i;
@@ -1163,6 +1170,8 @@ module __KERNEL___testbench ();
         endfunction
 
         function automatic void read_files_graphCSR(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
             int          realcount                 = 0;
             int          vertexcount               = 0;
             int o,l;
@@ -1266,6 +1275,8 @@ module __KERNEL___testbench ();
         endfunction : read_files_graphCSR
 
         task automatic initalize_graph (ref GraphCSR graph);
+             /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
             graph.graph_name = "_GRAPH_NAME_";
 
             graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ARCHITECTURE_/_CAPABILITY_/_CAPABILITY_.ol/_ALGORITHM_NAME_.ol", "r");
@@ -1327,9 +1338,9 @@ module __KERNEL___testbench ();
             graph.display();
         endtask
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
-// The task will poll the DONE bit and check the results when complete.
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        // Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
+        // The task will poll the DONE bit and check the results when complete.
         task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
