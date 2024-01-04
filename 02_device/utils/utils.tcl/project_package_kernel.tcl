@@ -221,8 +221,8 @@ set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
 set_property value        32           $bifparam
 set_property value_source constant     $bifparam
 
-ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
-ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
+# ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
+# ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
 
 # =========================================================
 # Specify the freq_hz parameter
@@ -249,8 +249,8 @@ set_property value_resolve_type user $clkbifparam
 # associate AXI/AXIS interface with clock
 # =========================================================
 puts "[color 4 "                        Associate AXI/AXIS interface with clock"]" 
-ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core
-ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core
+ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core >> $log_file
+ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core >> $log_file
 
 # =========================================================
 # associate reset signal with clock

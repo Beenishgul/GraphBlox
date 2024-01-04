@@ -14,7 +14,7 @@
 0x00000000 // entry 10   cacheline 0    offset 10   -- // entry_10   cacheline[  0][10] <16b>: ops_mask[0:15]=0x00
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 11   cacheline 0    offset 11   -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry 12   cacheline 0    offset 12   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000

@@ -407,7 +407,7 @@ neighbor list and updates the frontier data.
 
 ![Figure 6: BFS algorithm on GLay](./04_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
 
-GLay Graph Description Language (GGDL)
+GraphIt integration ... Comming soon. -- GLay Graph Description Language (GGDL)
 ======================================
 
 GGDL is a description language that helps compile and port any graph
