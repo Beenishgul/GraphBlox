@@ -1471,9 +1471,9 @@ module __KERNEL___testbench ();
                     1 : slv_random_delay_rvalid();
                 endcase
 
+                update_graph_auxiliary_buffers(graph);
                 set_scalar_registers();
                 set_memory_pointers();
-                update_graph_auxiliary_buffers(graph);
                 backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
                 poll_idle_register();
