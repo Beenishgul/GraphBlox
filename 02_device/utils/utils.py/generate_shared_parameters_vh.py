@@ -1049,7 +1049,10 @@ with open(output_file_lane_arbitration, "w") as file:
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
-                      
+
+                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
+                    file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{ID_ENGINE}] = 0;\n")
+
                 file.write(f"               assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
                 file.write(f"          end\n") 
                 file.write(f"endgenerate\n")
@@ -1087,6 +1090,9 @@ with open(output_file_lane_arbitration, "w") as file:
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
+                
+                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
+                    file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{ID_ENGINE}] = 0;\n")
 
                 file.write(f"               assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
                 file.write(f"          end\n") 
@@ -1128,6 +1134,9 @@ with open(output_file_lane_arbitration, "w") as file:
                         file.write(f"               assign engines_response_control_in[{ID_ENGINE}] = 0;\n")
                         file.write(f"               assign engines_fifo_response_control_in_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
 
+                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
+                    file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_ENGINE}].rd_en = 1'b0;\n")
+
                 file.write(f"               assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
                 file.write(f"          end\n") 
                 file.write(f"endgenerate\n")
@@ -1158,6 +1167,9 @@ with open(output_file_bundle_arbitration, "w") as file:
                     REAL_ID_LANE += 1
                 else:
                     file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
+
+            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
+                file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{ID_LANE}] = 0;\n")
                    
             file.write(f"               assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
             file.write(f"          end\n") 
@@ -1187,6 +1199,9 @@ with open(output_file_bundle_arbitration, "w") as file:
                     REAL_ID_LANE += 1
                 else:
                     file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
+
+            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
+                file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{ID_LANE}] = 0;\n")
 
             file.write(f"               assign lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
             file.write(f"          end\n") 
@@ -1219,6 +1234,9 @@ with open(output_file_bundle_arbitration, "w") as file:
                     file.write(f"               assign lanes_response_control_in[{ID_LANE}] = 0;\n")
                     file.write(f"               assign lanes_fifo_response_control_in_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
 
+            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
+                file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_LANE}].rd_en = 1'b0;\n")
+                   
 
             file.write(f"               assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
             file.write(f"          end\n") 
@@ -1245,6 +1263,9 @@ with open(output_file_cu_arbitration, "w") as file:
                 REAL_ID_BUNDLE += 1
             else:
                 file.write(f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
+
+        for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
+            file.write(f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n")
                
         file.write(f"               assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;\n")
         file.write(f"          end\n") 
@@ -1268,6 +1289,9 @@ with open(output_file_cu_arbitration, "w") as file:
                 REAL_ID_BUNDLE += 1
             else:
                 file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
+
+        for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
+            file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}] = 0;\n")
 
         file.write(f"               assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;\n")
         file.write(f"          end\n") 
@@ -1293,6 +1317,10 @@ with open(output_file_cu_arbitration, "w") as file:
             else:
                 file.write(f"               assign bundle_response_control_in[{ID_BUNDLE}] = 0;\n")
                 file.write(f"               assign bundle_fifo_response_control_in_signals_in[{ID_BUNDLE}].rd_en = 1'b0;\n")
+
+        for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
+            file.write(f"               assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[{ID_BUNDLE}].rd_en = 1'b0;\n")
+
 
         file.write(f"               assign bundle_arbiter_control_1_to_N_response_in = response_control_in_int;\n")
         file.write(f"          end\n") 
