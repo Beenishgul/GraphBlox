@@ -505,24 +505,18 @@ endgenerate
 generate
     if(BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY>0) begin
 // --------------------------------------------------------------------------------------
-        for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_memory_N_to_1_request_in
-            assign bundle_arbiter_memory_N_to_1_request_in[i] = bundle_request_memory_out[i];
-            assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = ~bundle_arbiter_memory_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_memory_N_to_1_arbiter_grant_out[i];
-        end
-        assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;
-// --------------------------------------------------------------------------------------
         arbiter_N_to_1_request_memory #(
-            .NUM_MEMORY_REQUESTOR(NUM_BUNDLES                               ),
+            .NUM_MEMORY_REQUESTOR(BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY      ),
             .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
         ) inst_bundle_arbiter_memory_N_to_1_request_memory_out (
-            .ap_clk                  (ap_clk                                               ),
-            .areset                  (areset_arbiter_memory_N_to_1                         ),
-            .request_in              (bundle_arbiter_memory_N_to_1_request_in              ),
-            .fifo_request_signals_in (bundle_arbiter_memory_N_to_1_fifo_request_signals_in ),
-            .fifo_request_signals_out(bundle_arbiter_memory_N_to_1_fifo_request_signals_out),
-            .arbiter_grant_out       (bundle_arbiter_memory_N_to_1_arbiter_grant_out       ),
-            .request_out             (bundle_arbiter_memory_N_to_1_request_out             ),
-            .fifo_setup_signal       (bundle_arbiter_memory_N_to_1_fifo_setup_signal       )
+            .ap_clk                  (ap_clk                                                                                  ),
+            .areset                  (areset_arbiter_memory_N_to_1                                                            ),
+            .request_in              (bundle_arbiter_memory_N_to_1_request_in[BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY-1:0]       ),
+            .fifo_request_signals_in (bundle_arbiter_memory_N_to_1_fifo_request_signals_in                                    ),
+            .fifo_request_signals_out(bundle_arbiter_memory_N_to_1_fifo_request_signals_out                                   ),
+            .arbiter_grant_out       (bundle_arbiter_memory_N_to_1_arbiter_grant_out[BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY-1:0]),
+            .request_out             (bundle_arbiter_memory_N_to_1_request_out                                                ),
+            .fifo_setup_signal       (bundle_arbiter_memory_N_to_1_fifo_setup_signal                                          )
         );
 // --------------------------------------------------------------------------------------
     end else begin
@@ -546,24 +540,18 @@ endgenerate
 generate
     if(BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST>0) begin
 // --------------------------------------------------------------------------------------
-        for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
-            assign bundle_arbiter_control_N_to_1_request_in[i] = bundle_request_control_out[i];
-            assign bundle_fifo_request_control_out_signals_in[i].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[i];
-        end
-        assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
-// --------------------------------------------------------------------------------------
         arbiter_N_to_1_request_control #(
-            .NUM_CONTROL_REQUESTOR(NUM_BUNDLES                                        ),
+            .NUM_CONTROL_REQUESTOR(BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST      ),
             .FIFO_ARBITER_DEPTH   (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
         ) inst_bundle_arbiter_control_N_to_1_request_control_out (
-            .ap_clk                  (ap_clk                                                ),
-            .areset                  (areset_arbiter_control_N_to_1                         ),
-            .request_in              (bundle_arbiter_control_N_to_1_request_in              ),
-            .fifo_request_signals_in (bundle_arbiter_control_N_to_1_fifo_request_signals_in ),
-            .fifo_request_signals_out(bundle_arbiter_control_N_to_1_fifo_request_signals_out),
-            .arbiter_grant_out       (bundle_arbiter_control_N_to_1_arbiter_grant_out       ),
-            .request_out             (bundle_arbiter_control_N_to_1_request_out             ),
-            .fifo_setup_signal       (bundle_arbiter_control_N_to_1_fifo_setup_signal       )
+            .ap_clk                  (ap_clk                                                                                            ),
+            .areset                  (areset_arbiter_control_N_to_1                                                                     ),
+            .request_in              (bundle_arbiter_control_N_to_1_request_in[BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST-1:0]       ),
+            .fifo_request_signals_in (bundle_arbiter_control_N_to_1_fifo_request_signals_in                                             ),
+            .fifo_request_signals_out(bundle_arbiter_control_N_to_1_fifo_request_signals_out                                            ),
+            .arbiter_grant_out       (bundle_arbiter_control_N_to_1_arbiter_grant_out[BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST-1:0]),
+            .request_out             (bundle_arbiter_control_N_to_1_request_out                                                         ),
+            .fifo_setup_signal       (bundle_arbiter_control_N_to_1_fifo_setup_signal                                                   )
         );
 // --------------------------------------------------------------------------------------
     end else begin
@@ -614,25 +602,18 @@ arbiter_1_to_N_response_memory #(
 generate
     if(BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE>0) begin
 // --------------------------------------------------------------------------------------
-        assign bundle_arbiter_control_1_to_N_response_in = response_control_in_int;
-        for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_1_to_N_response
-            assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[i].rd_en = ~bundle_fifo_response_control_in_signals_out[i].prog_full;
-            assign bundle_response_control_in[i] = bundle_arbiter_control_1_to_N_response_out[i];
-            assign bundle_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
-        end
-// --------------------------------------------------------------------------------------
         arbiter_1_to_N_response_control #(
-            .NUM_CONTROL_RECEIVER(NUM_BUNDLES                                         ),
+            .NUM_CONTROL_RECEIVER(BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE      ),
             .ID_LEVEL            (1                                                   ),
             .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
         ) inst_bundle_arbiter_control_1_to_N_response_control_in (
-            .ap_clk                   (ap_clk                                                 ),
-            .areset                   (areset_arbiter_control_1_to_N                          ),
-            .response_in              (bundle_arbiter_control_1_to_N_response_in              ),
-            .fifo_response_signals_in (bundle_arbiter_control_1_to_N_fifo_response_signals_in ),
-            .fifo_response_signals_out(bundle_arbiter_control_1_to_N_fifo_response_signals_out),
-            .response_out             (bundle_arbiter_control_1_to_N_response_out             ),
-            .fifo_setup_signal        (bundle_arbiter_control_1_to_N_fifo_setup_signal        )
+            .ap_clk                   (ap_clk                                                                                                    ),
+            .areset                   (areset_arbiter_control_1_to_N                                                                             ),
+            .response_in              (bundle_arbiter_control_1_to_N_response_in                                                                 ),
+            .fifo_response_signals_in (bundle_arbiter_control_1_to_N_fifo_response_signals_in[BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE-1:0]),
+            .fifo_response_signals_out(bundle_arbiter_control_1_to_N_fifo_response_signals_out                                                   ),
+            .response_out             (bundle_arbiter_control_1_to_N_response_out[BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE-1:0]            ),
+            .fifo_setup_signal        (bundle_arbiter_control_1_to_N_fifo_setup_signal                                                           )
         );
 // --------------------------------------------------------------------------------------
     end else begin
@@ -682,5 +663,10 @@ generate
         );
     end
 endgenerate
+
+// --------------------------------------------------------------------------------------
+// Generate bundle MERGE/CAST wires
+// --------------------------------------------------------------------------------------
+`include "cu_arbitration.vh"
 
 endmodule : cu_bundles

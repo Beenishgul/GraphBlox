@@ -24,7 +24,7 @@ module arbiter_1_to_N_response_control #(
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_RECEIVER),
   parameter FIFO_ARBITER_DEPTH    = 8                              ,
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH           = 2**$clog2(8)
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3
 ) (
   input  logic                  ap_clk                                             ,
   input  logic                  areset                                             ,
@@ -34,6 +34,10 @@ module arbiter_1_to_N_response_control #(
   output ControlPacket          response_out [NUM_CONTROL_RECEIVER-1:0]            ,
   output logic                  fifo_setup_signal
 );
+
+// --------------------------------------------------------------------------------------
+// local parameters
+// --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
 // Cache response variables

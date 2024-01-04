@@ -794,7 +794,7 @@ module __KERNEL___testbench ();
             buffer_6_ptr[62:0] = get_random_ptr();
             buffer_7_ptr[62:0] = get_random_ptr();
             buffer_8_ptr[62:0] = get_random_ptr();
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b0, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -926,7 +926,7 @@ module __KERNEL___testbench ();
 
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-                $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+                // $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
                 graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
                 if (o == 0) begin
                     l++;
@@ -936,7 +936,7 @@ module __KERNEL___testbench ();
             end
             for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
-                $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+                // $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
                 graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
                 if (o == 0) begin
                     l++;
