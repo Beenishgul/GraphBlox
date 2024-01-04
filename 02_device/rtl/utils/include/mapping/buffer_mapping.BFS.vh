@@ -1,22 +1,22 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    graph.overlay_program[0][(M_AXI4_FE_DATA_W*1)+:M_AXI4_FE_DATA_W]  = ( 0 );
+    graph.overlay_program[0][(M_AXI4_FE_DATA_W*1)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
    // --  2  - Index_End
-    graph.overlay_program[0][(M_AXI4_FE_DATA_W*2)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
+    graph.overlay_program[0][(M_AXI4_FE_DATA_W*2)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 );
    // --  7  - Array_size
-    graph.overlay_program[0][(M_AXI4_FE_DATA_W*7)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices )-( 0 );
+    graph.overlay_program[0][(M_AXI4_FE_DATA_W*7)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 )-( graph.num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    graph.overlay_program[0][(M_AXI4_FE_DATA_W*12)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
+    graph.overlay_program[0][(M_AXI4_FE_DATA_W*12)+:M_AXI4_FE_DATA_W]  = ( 0 );
    // --  2  - Index_End
-    graph.overlay_program[0][(M_AXI4_FE_DATA_W*13)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 );
+    graph.overlay_program[0][(M_AXI4_FE_DATA_W*13)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices );
    // --  7  - Array_size
-    graph.overlay_program[1][(M_AXI4_FE_DATA_W*2)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 )-( graph.num_vertices );
+    graph.overlay_program[1][(M_AXI4_FE_DATA_W*2)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 3    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )

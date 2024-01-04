@@ -2,24 +2,24 @@
 void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[1] = ( 0 );
+    overlay_program[1] = ( graph->num_vertices );
    // --  2  - Index_End
-    overlay_program[2] = ( graph->num_vertices );
+    overlay_program[2] = ( graph->num_vertices * 2 );
    // --  7  - Array_size
-    overlay_program[7] = ( graph->num_vertices )-( 0 );
+    overlay_program[7] = ( graph->num_vertices * 2 )-( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[12] = ( graph->num_vertices );
+    overlay_program[12] = ( 0 );
    // --  2  - Index_End
-    overlay_program[13] = ( graph->num_vertices * 2 );
+    overlay_program[13] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[18] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[18] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX    ID 3    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )
