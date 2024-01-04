@@ -53,42 +53,42 @@ parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINE
 parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 11, 11}
 , '{11, 22, 22}
 , '{22, 30, 30}
-, '{30, 31, 31}
+, '{30, 30, 30}
 }
-, '{'{31, 42, 44}
-, '{53, 64, 64}
-, '{64, 75, 75}
-, '{75, 76, 76}
+, '{'{30, 41, 43}
+, '{52, 63, 63}
+, '{63, 74, 74}
+, '{74, 74, 74}
 }
-, '{'{76, 84, 84}
-, '{84, 85, 85}
-, '{85, 85, 85}
-, '{85, 85, 85}
+, '{'{74, 82, 82}
+, '{82, 82, 82}
+, '{82, 82, 82}
+, '{82, 82, 82}
 }
-, '{'{85, 96, 105}
-, '{105, 106, 106}
-, '{106, 106, 106}
-, '{106, 106, 106}
+, '{'{82, 93, 102}
+, '{102, 102, 102}
+, '{102, 102, 102}
+, '{102, 102, 102}
 }
 }
 ,
 parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{11, 0, 0}
 , '{11, 0, 0}
 , '{8, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 }
 , '{'{11, 2, 9}
 , '{11, 0, 0}
 , '{11, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 }
 , '{'{8, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{11, 9, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
@@ -617,42 +617,42 @@ parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_M
 parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ='{'{'{0, 11, 11}
 , '{11, 22, 22}
 , '{22, 30, 30}
-, '{30, 31, 31}
+, '{30, 30, 30}
 }
-, '{'{31, 42, 44}
-, '{53, 64, 64}
-, '{64, 75, 75}
-, '{75, 76, 76}
+, '{'{30, 41, 43}
+, '{52, 63, 63}
+, '{63, 74, 74}
+, '{74, 74, 74}
 }
-, '{'{76, 84, 84}
-, '{84, 85, 85}
-, '{85, 85, 85}
-, '{85, 85, 85}
+, '{'{74, 82, 82}
+, '{82, 82, 82}
+, '{82, 82, 82}
+, '{82, 82, 82}
 }
-, '{'{85, 96, 105}
-, '{105, 106, 106}
-, '{106, 106, 106}
-, '{106, 106, 106}
+, '{'{82, 93, 102}
+, '{102, 102, 102}
+, '{102, 102, 102}
+, '{102, 102, 102}
 }
 }
 ,
 parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ='{'{'{11, 0, 0}
 , '{11, 0, 0}
 , '{8, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 }
 , '{'{11, 2, 9}
 , '{11, 0, 0}
 , '{11, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 }
 , '{'{8, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
 , '{'{11, 9, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 , '{0, 0, 0}
 , '{0, 0, 0}
 }
@@ -1148,13 +1148,13 @@ parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                
 parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     ='{'{0, 11, 11}
 , '{11, 22, 22}
 , '{22, 30, 30}
-, '{30, 31, 31}
+, '{30, 30, 30}
 }
 ,
 parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   ='{'{11, 0, 0}
 , '{11, 0, 0}
 , '{8, 0, 0}
-, '{1, 0, 0}
+, '{0, 0, 0}
 }
 ,
 parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= 0,

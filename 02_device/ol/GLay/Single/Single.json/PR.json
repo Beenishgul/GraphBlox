@@ -162,16 +162,6 @@
             }
         }
     },
-    "ENGINE_FORWARD_DATA_2": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x01"
-                }
-            }
-        }
-    },
     "ENGINE_READ_WRITE_3": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
@@ -539,16 +529,6 @@
             }
         }
     },
-    "ENGINE_FORWARD_DATA_7": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x01"
-                }
-            }
-        }
-    },
     "ENGINE_CSR_INDEX_8": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
@@ -644,16 +624,6 @@
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
-                }
-            }
-        }
-    },
-    "ENGINE_FORWARD_DATA_9": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x01"
                 }
             }
         }
@@ -771,16 +741,6 @@
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x4812"
-                }
-            }
-        }
-    },
-    "ENGINE_FORWARD_DATA_11": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x01"
                 }
             }
         }
