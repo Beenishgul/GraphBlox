@@ -1267,7 +1267,7 @@ with open(output_file_cu_arbitration, "w") as file:
         for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
             file.write(f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n")
                
-        file.write(f"               assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_memory_out_signals_out_int.prog_full;\n")
+        file.write(f"               assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
         file.write(f"          end\n") 
         file.write(f"endgenerate\n")
         file.write(f"\n\n") 
@@ -1293,7 +1293,7 @@ with open(output_file_cu_arbitration, "w") as file:
         for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
             file.write(f"               assign bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]  = 0;\n")
 
-        file.write(f"               assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;\n")
+        file.write(f"               assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
         file.write(f"          end\n") 
         file.write(f"endgenerate\n")
         file.write(f"\n\n") 
@@ -1310,7 +1310,7 @@ with open(output_file_cu_arbitration, "w") as file:
             MAP_BUNDLE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE_TEMP[ID_BUNDLE]
 
             if MAP_BUNDLE:
-                file.write(f"               assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[{REAL_ID_BUNDLE}].rd_en = ~bundle_fifo_response_control_in_signals_out[{ID_BUNDLE}].prog_full;\n")
+                file.write(f"               assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[{REAL_ID_BUNDLE}].rd_en = ~bundle_fifo_response_control_in_signals_out[{ID_BUNDLE}].prog_full & fifo_response_control_in_signals_in_reg.rd_en;\n")
                 file.write(f"               assign bundle_response_control_in[{ID_BUNDLE}] = bundle_arbiter_control_1_to_N_response_out[{REAL_ID_BUNDLE}];\n")
                 file.write(f"               assign bundle_fifo_response_control_in_signals_in[{ID_BUNDLE}].rd_en = 1'b1;\n")
                 REAL_ID_BUNDLE += 1
