@@ -1470,7 +1470,57 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_bfs(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_PR(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+            error_found = 0;
+
+            $display("Starting: multiple_iteration");
+            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+
+                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_backpressure_wready();
+                    1 : slv_random_backpressure_wready();
+                endcase
+                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_delay_rvalid();
+                    1 : slv_random_delay_rvalid();
+                endcase
+
+                set_scalar_registers();
+                set_memory_pointers();
+                initalize_graph (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Wait for interrupt being asserted or poll done register
+                // @(posedge interrupt);
+                // poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                // Service the interrupt
+                // service_interrupts();
+                // wait(interrupt == 0);
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+            end
+        endtask
+
+        task automatic multiple_iteration_BFS(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting iteration: %d / %d", 0, num_iterations);
@@ -1563,15 +1613,15 @@ module __KERNEL___testbench ();
             // enable_interrupts();
             disable_interrupts();
 
-            #1000
-                multiple_iteration(1, error_found, graph);
-            if (error_found == 1) begin
-                $display( "ERROR: Test Failed!");
-                $finish();
-            end
+            // #1000
+            //     multiple_iteration(1, error_found, graph);
+            // if (error_found == 1) begin
+            //     $display( "ERROR: Test Failed!");
+            //     $finish();
+            // end
 
-            #1000
-                multiple_iteration_bfs(5, error_found, graph);
+            // #1000
+                multiple_iteration__ALGORITHM_NAME_(5, error_found, graph);
 
             if (error_found == 1) begin
                 $display( "ERROR: Test Failed!");
