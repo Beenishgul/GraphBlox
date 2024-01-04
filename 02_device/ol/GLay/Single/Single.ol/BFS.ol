@@ -21,7 +21,7 @@
 0x00000000 // entry_3    cacheline[  0][14] <32b>: stride[0:31]=0x00000000
 0x80000002 // entry_4    cacheline[  0][15] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00000004 // entry_5    cacheline[  1][ 0] <21b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00
-0x80000000 // entry_6    cacheline[  1][ 1] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x80
+0x40000000 // entry_6    cacheline[  1][ 1] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x40
 0x00000000 // entry_7    cacheline[  1][ 2] <32b>: array_size[0:31]=0x00000000
 0x00000001 // entry_8    cacheline[  1][ 3] < 4b>: const_mask[0:3]=0x1
 0x00000001 // entry_9    cacheline[  1][ 4] <32b>: const_value[0:31]=0x00000001

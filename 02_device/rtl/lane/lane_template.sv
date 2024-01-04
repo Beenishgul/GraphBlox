@@ -400,25 +400,18 @@ assign engines_fifo_request_lane_out_signals_in[NUM_ENGINES-1].rd_en = fifo_requ
 // --------------------------------------------------------------------------------------
 generate
     if(ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY>0) begin
-// --------------------------------------------------------------------------------------
-        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
-            assign engine_arbiter_N_to_1_memory_request_in[i] = engines_request_memory_out[i];
-            assign engines_fifo_request_memory_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i];
-        end
-        assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
-// --------------------------------------------------------------------------------------
         arbiter_N_to_1_request_memory #(
-            .NUM_MEMORY_REQUESTOR(NUM_ENGINES                                 ),
+            .NUM_MEMORY_REQUESTOR(ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY      ),
             .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY)
         ) inst_engine_arbiter_N_to_1_memory_request_out (
-            .ap_clk                  (ap_clk                                               ),
-            .areset                  (areset_engine_arbiter_N_to_1_memory                  ),
-            .request_in              (engine_arbiter_N_to_1_memory_request_in              ),
-            .fifo_request_signals_in (engine_arbiter_N_to_1_memory_fifo_request_signals_in ),
-            .fifo_request_signals_out(engine_arbiter_N_to_1_memory_fifo_request_signals_out),
-            .arbiter_grant_out       (engine_arbiter_N_to_1_memory_engine_arbiter_grant_out),
-            .request_out             (engine_arbiter_N_to_1_memory_request_out             ),
-            .fifo_setup_signal       (engine_arbiter_N_to_1_memory_fifo_setup_signal       )
+            .ap_clk                  (ap_clk                                                                                           ),
+            .areset                  (areset_engine_arbiter_N_to_1_memory                                                              ),
+            .request_in              (engine_arbiter_N_to_1_memory_request_in[ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY-1:0]              ),
+            .fifo_request_signals_in (engine_arbiter_N_to_1_memory_fifo_request_signals_in                                             ),
+            .fifo_request_signals_out(engine_arbiter_N_to_1_memory_fifo_request_signals_out                                            ),
+            .arbiter_grant_out       (engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY-1:0]),
+            .request_out             (engine_arbiter_N_to_1_memory_request_out                                                         ),
+            .fifo_setup_signal       (engine_arbiter_N_to_1_memory_fifo_setup_signal                                                   )
         );
     end else begin
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
@@ -440,25 +433,18 @@ endgenerate
 // --------------------------------------------------------------------------------------
 generate
     if(ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST>0) begin
-// --------------------------------------------------------------------------------------
-        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_control_request_in
-            assign engine_arbiter_N_to_1_control_request_in[i] = engines_request_control_out[i];
-            assign engines_fifo_request_control_out_signals_in[i].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[i];
-        end
-        assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
-// --------------------------------------------------------------------------------------
         arbiter_N_to_1_request_control #(
-            .NUM_CONTROL_REQUESTOR(NUM_ENGINES                                          ),
+            .NUM_CONTROL_REQUESTOR(ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST      ),
             .FIFO_ARBITER_DEPTH   (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
         ) inst_engine_arbiter_N_to_1_control_request_out (
-            .ap_clk                  (ap_clk                                                ),
-            .areset                  (areset_engine_arbiter_N_to_1_control                  ),
-            .request_in              (engine_arbiter_N_to_1_control_request_in              ),
-            .fifo_request_signals_in (engine_arbiter_N_to_1_control_fifo_request_signals_in ),
-            .fifo_request_signals_out(engine_arbiter_N_to_1_control_fifo_request_signals_out),
-            .arbiter_grant_out       (engine_arbiter_N_to_1_control_engine_arbiter_grant_out),
-            .request_out             (engine_arbiter_N_to_1_control_request_out             ),
-            .fifo_setup_signal       (engine_arbiter_N_to_1_control_fifo_setup_signal       )
+            .ap_clk                  (ap_clk                                                                                                     ),
+            .areset                  (areset_engine_arbiter_N_to_1_control                                                                       ),
+            .request_in              (engine_arbiter_N_to_1_control_request_in[ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST-1:0]              ),
+            .fifo_request_signals_in (engine_arbiter_N_to_1_control_fifo_request_signals_in                                                      ),
+            .fifo_request_signals_out(engine_arbiter_N_to_1_control_fifo_request_signals_out                                                     ),
+            .arbiter_grant_out       (engine_arbiter_N_to_1_control_engine_arbiter_grant_out[ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST-1:0]),
+            .request_out             (engine_arbiter_N_to_1_control_request_out                                                                  ),
+            .fifo_setup_signal       (engine_arbiter_N_to_1_control_fifo_setup_signal                                                            )
         );
     end else begin
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_control_request_in
@@ -505,26 +491,18 @@ arbiter_1_to_N_response_memory #(
 // --------------------------------------------------------------------------------------
 generate
     if(ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE>0) begin
-// --------------------------------------------------------------------------------------
-        assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;
-        for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_control_response
-            assign engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~engines_fifo_response_control_in_signals_out[i].prog_full & fifo_response_control_in_signals_in_reg.rd_en;
-            assign engines_response_control_in[i] = engine_arbiter_1_to_N_control_response_out[i];
-            assign engines_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
-        end
-// --------------------------------------------------------------------------------------
         arbiter_1_to_N_response_control #(
-            .NUM_CONTROL_RECEIVER(NUM_ENGINES                                           ),
+            .NUM_CONTROL_RECEIVER(ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE      ),
             .ID_LEVEL            (3                                                     ),
             .FIFO_ARBITER_DEPTH  (ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
         ) inst_engine_arbiter_1_to_N_control_response_in (
-            .ap_clk                   (ap_clk                                                 ),
-            .areset                   (areset_engine_arbiter_1_to_N_control                   ),
-            .response_in              (engine_arbiter_1_to_N_control_response_in              ),
-            .fifo_response_signals_in (engine_arbiter_1_to_N_control_fifo_response_signals_in ),
-            .fifo_response_signals_out(engine_arbiter_1_to_N_control_fifo_response_signals_out),
-            .response_out             (engine_arbiter_1_to_N_control_response_out             ),
-            .fifo_setup_signal        (engine_arbiter_1_to_N_control_fifo_setup_signal        )
+            .ap_clk                   (ap_clk                                                                                                      ),
+            .areset                   (areset_engine_arbiter_1_to_N_control                                                                        ),
+            .response_in              (engine_arbiter_1_to_N_control_response_in                                                                   ),
+            .fifo_response_signals_in (engine_arbiter_1_to_N_control_fifo_response_signals_in[ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE-1:0]),
+            .fifo_response_signals_out(engine_arbiter_1_to_N_control_fifo_response_signals_out                                                     ),
+            .response_out             (engine_arbiter_1_to_N_control_response_out[ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE-1:0]            ),
+            .fifo_setup_signal        (engine_arbiter_1_to_N_control_fifo_setup_signal                                                             )
         );
 // --------------------------------------------------------------------------------------
     end else begin
@@ -578,5 +556,6 @@ endgenerate
 // Generate Lanes MERGE/CAST wires
 // --------------------------------------------------------------------------------------
 `include "lane_topology.vh"
+`include "lane_arbitration.vh"
 
 endmodule : lane_template

@@ -204,7 +204,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x80"
+                    "value": "0x40"
                 }
             },
             "entry_7": {
