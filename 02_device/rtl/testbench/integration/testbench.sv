@@ -80,12 +80,12 @@ endfunction
 
 endclass
 
-class __KERNEL__xrtBufferHandlePerKernel;
-    bit [63:0] xrt_buffer_ptr[];
-    bit [63:0] xrt_buffer_host[];
-    bit [63:0] xrt_buffer_device[];
-    bit [63:0] xrt_buffer_size[];
-endclass
+    class __KERNEL__xrtBufferHandlePerKernel;
+        bit [63:0] xrt_buffer_ptr[];
+        bit [63:0] xrt_buffer_host[];
+        bit [63:0] xrt_buffer_device[];
+        bit [63:0] xrt_buffer_size[];
+    endclass
 
 module __KERNEL___testbench ();
         parameter integer LP_MAX_LENGTH              = 8192                    ;
@@ -794,7 +794,7 @@ module __KERNEL___testbench ();
             buffer_6_ptr[62:0] = get_random_ptr();
             buffer_7_ptr[62:0] = get_random_ptr();
             buffer_8_ptr[62:0] = get_random_ptr();
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b0, 1'b1};
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -908,52 +908,63 @@ module __KERNEL___testbench ();
             m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
         endtask
 
-        task automatic update_graph_auxiliary_buffers(ref GraphCSR graph);
+        task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
+
+            int cache_line_size = 64; // Cache line size in bytes
+            int bytes_per_read = M_AXI4_FE_DATA_W / 8; // Number of bytes read in each iteration
+            int words_per_read = M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W; // Number of bytes read in each iteration
+
+
             // Backdoor fill the memory with the content.
             int o,l;
             bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            o=0;
+
             l=0;
+            o= words_per_read;
+            o--;
 
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
+                $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
                 graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                if (o == 0) begin
                     l++;
-                    o=0;
+                    o= words_per_read;
                 end
+                o--;
             end
             for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
+                $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
                 graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                if (o == 0) begin
                     l++;
-                    o=0;
+                    o= words_per_read;
                 end
+                o--;
             end
 
-            o=0;
             l=0;
+            o= words_per_read;
+            o--;
 
             for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
                 graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                if (o == 0) begin
                     l++;
-                    o=0;
+                    o= words_per_read;
                 end
+                o--;
             end
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                if (o == 0) begin
                     l++;
-                    o=0;
+                    o= words_per_read;
                 end
+                o--;
             end
         endtask
 
@@ -1254,7 +1265,7 @@ module __KERNEL___testbench ();
             initialize__ALGORITHM_NAME__auxiliary_struct(graph);
         endfunction : read_files_graphCSR
 
-        function automatic void initalize_graph (ref GraphCSR graph);
+        function automatic void initalize_GraphCSR (ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the files then send to backdoor memory with the content.
             graph.graph_name = "_GRAPH_NAME_";
@@ -1286,7 +1297,7 @@ module __KERNEL___testbench ();
             graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
             graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
-            graph.bfs_source = 0;
+            graph.bfs_source = _ROOT_;
 
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
@@ -1343,7 +1354,7 @@ module __KERNEL___testbench ();
 
                 set_scalar_registers();
                 set_memory_pointers();
-                initalize_graph (graph);
+                initalize_GraphCSR (graph);
                 // backdoor_fill_memories();
                 backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
@@ -1393,7 +1404,7 @@ module __KERNEL___testbench ();
 
                 set_scalar_registers();
                 set_memory_pointers();
-                initalize_graph (graph);
+                initalize_GraphCSR (graph);
                 // backdoor_fill_memories();
                 backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
@@ -1437,10 +1448,9 @@ module __KERNEL___testbench ();
                 0 : slv_no_delay_rvalid();
                 1 : slv_random_delay_rvalid();
             endcase
-
+            initalize_GraphCSR (graph);
             set_scalar_registers();
             set_memory_pointers();
-            initalize_graph (graph);
             backdoor_buffer_fill_memories(graph);
             // Check that __KERNEL__ is IDLE before starting.
             poll_idle_register();
@@ -1471,7 +1481,7 @@ module __KERNEL___testbench ();
                     1 : slv_random_delay_rvalid();
                 endcase
 
-                update_graph_auxiliary_buffers(graph);
+                update_BFS_auxiliary_struct(graph);
                 set_scalar_registers();
                 set_memory_pointers();
                 backdoor_buffer_fill_memories(graph);

@@ -9,7 +9,7 @@
     graph.overlay_program[0][(M_AXI4_FE_DATA_W*7)+:M_AXI4_FE_DATA_W]  = ( graph.num_vertices * 2 )-( graph.num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_8-auxiliary_2 ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     graph.overlay_program[0][(M_AXI4_FE_DATA_W*12)+:M_AXI4_FE_DATA_W]  = ( 0 );
