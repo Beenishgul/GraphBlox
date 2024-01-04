@@ -72,12 +72,12 @@ logic areset_generator         ;
 
 KernelDescriptor descriptor_in_reg;
 
-EnginePacket request_control_out_int;
-EnginePacket request_engine_out_int ;
-EnginePacket response_engine_in_int ;
-EnginePacket response_engine_in_reg ;
-MemoryPacket response_memory_in_int ;
-MemoryPacket response_memory_in_reg ;
+ControlPacket request_control_out_int;
+EnginePacket  request_engine_out_int ;
+EnginePacket  response_engine_in_int ;
+EnginePacket  response_engine_in_reg ;
+MemoryPacket  response_memory_in_int ;
+MemoryPacket  response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -127,7 +127,7 @@ FIFOStateSignalsOutput  generator_engine_fifo_request_engine_out_signals_out ;
 FIFOStateSignalsOutput  generator_engine_fifo_request_control_out_signals_out;
 FilterCondConfiguration generator_engine_configure_memory_in                 ;
 EnginePacket            generator_engine_response_engine_in                  ;
-EnginePacket            generator_engine_request_control_out                 ;
+ControlPacket           generator_engine_request_control_out                 ;
 EnginePacket            generator_engine_request_engine_out                  ;
 
 logic generator_engine_fifo_setup_signal     ;

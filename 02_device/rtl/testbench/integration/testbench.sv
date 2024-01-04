@@ -65,6 +65,8 @@ function new ();
     this.mem512_overlay_program_entries = 4;
 endfunction
 
+
+
 function void display ();
     $display("---------------------------------------------------------------------------");
     $display("MSG: GRAPH CSR : %s", this.graph_name);
@@ -76,6 +78,13 @@ function void display ();
     $display("---------------------------------------------------------------------------");
 endfunction
 
+endclass
+
+class __KERNEL__xrtBufferHandlePerKernel;
+    bit [63:0] xrt_buffer_ptr[];
+    bit [63:0] xrt_buffer_host[];
+    bit [63:0] xrt_buffer_device[];
+    bit [63:0] xrt_buffer_size[];
 endclass
 
 module __KERNEL___testbench ();
@@ -897,7 +906,6 @@ module __KERNEL___testbench ();
             m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
             m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
             m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
-
         endtask
 
         task automatic update_graph_auxiliary_buffers(ref GraphCSR graph);
@@ -947,7 +955,6 @@ module __KERNEL___testbench ();
                     o=0;
                 end
             end
-
         endtask
 
         function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
@@ -1118,6 +1125,8 @@ module __KERNEL___testbench ();
         endfunction
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
+        // Global read the files then send to backdoor memory with the content.
+        /////////////////////////////////////////////////////////////////////////////////////////////////
 
         bit         choose_pressure_type      = 0;
         bit         axis_choose_pressure_type = 0;
@@ -1243,10 +1252,9 @@ module __KERNEL___testbench ();
             end
 
             initialize__ALGORITHM_NAME__auxiliary_struct(graph);
-
         endfunction : read_files_graphCSR
 
-        function automatic initalize_graph (ref GraphCSR graph);
+        function automatic void initalize_graph (ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the files then send to backdoor memory with the content.
             graph.graph_name = "_GRAPH_NAME_";
