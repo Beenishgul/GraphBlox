@@ -23,6 +23,7 @@ integer mem512_num_edges              ;
 integer mem512_overlay_program_entries;
 integer debug_counter_1               ;
 integer debug_counter_2               ;
+integer bfs_source                    ;
 
 integer file_error               ;
 integer file_ptr_overlay_program ;
@@ -920,7 +921,115 @@ module __KERNEL___testbench ();
 
             for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
                 ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            o=0;
+            l=0;
+
+            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
+
+        endtask
+
+        function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor fill the memory with the content.
+
+            int o,l;
+            o=0;
+            l=0;
+
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                if(i == graph.bfs_source)begin
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = graph.bfs_source;
+                end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
                 graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+
+                if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
+                end
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            o=0;
+            l=0;
+
+            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+        endfunction
+
+        function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor fill the memory with the content.
+
+            int o,l;
+            o=0;
+            l=0;
+
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                o++;
+                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    l++;
+                    o=0;
+                end
+            end
+
+            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
                     l++;
@@ -941,19 +1050,14 @@ module __KERNEL___testbench ();
             end
 
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
                 o++;
                 if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
                     l++;
                     o=0;
                 end
             end
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
-
-        endtask
+        endfunction
 
         function automatic bit check_BFS_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1228,7 +1332,7 @@ module __KERNEL___testbench ();
                 end
             end
 
-            `include"initialize_testbench._ALGORITHM_NAME_.vh"
+            // `include"initialize_testbench._ALGORITHM_NAME_.vh"
 
             for (int i = 0; i < graph.mem512_num_edges; i++) begin
                 for (int j = 0;j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
@@ -1242,6 +1346,8 @@ module __KERNEL___testbench ();
                     // $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
                 end
             end
+
+            initialize__ALGORITHM_NAME__auxiliary_struct(graph);
 
         endfunction : read_files_graphCSR
 
@@ -1276,6 +1382,8 @@ module __KERNEL___testbench ();
 
             graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
             graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
+
+            graph.bfs_source = 0;
 
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
@@ -1393,7 +1501,7 @@ module __KERNEL___testbench ();
             poll_ready_register();
 
             poll_done_register();
-            
+
             ///////////////////////////////////////////////////////////////////////////
             error_found |= check___KERNEL___result(graph)   ;
 
