@@ -25,8 +25,8 @@ generate
                assign bundle_fifo_request_control_out_signals_in[2].rd_en  = 1'b0;
                assign bundle_arbiter_control_N_to_1_request_in[1] = bundle_request_control_out[3];
                assign bundle_fifo_request_control_out_signals_in[3].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[1];
-               assign bundle_fifo_request_control_out_signals_in[2] = 0;
-               assign bundle_fifo_request_control_out_signals_in[3] = 0;
+               assign bundle_arbiter_control_N_to_1_request_in[2]  = 0;
+               assign bundle_arbiter_control_N_to_1_request_in[2]  = 0;
                assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;
           end
 endgenerate

@@ -1291,7 +1291,7 @@ with open(output_file_cu_arbitration, "w") as file:
                 file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
 
         for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
-            file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}] = 0;\n")
+            file.write(f"               assign bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]  = 0;\n")
 
         file.write(f"               assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = ~fifo_request_control_out_signals_out_int.prog_full;\n")
         file.write(f"          end\n") 
