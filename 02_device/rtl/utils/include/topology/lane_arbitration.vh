@@ -37,6 +37,8 @@ generate
           begin
                assign engine_arbiter_N_to_1_memory_request_in[0] = engines_request_memory_out[0];
                 assign engines_fifo_request_memory_out_signals_in[0].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[0];
+               assign engines_fifo_request_memory_out_signals_in[1].rd_en  = 1'b0;
+               assign engines_fifo_request_memory_out_signals_in[2].rd_en  = 1'b0;
                assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
           end
 endgenerate
@@ -81,6 +83,7 @@ generate
           begin
                assign engine_arbiter_N_to_1_memory_request_in[0] = engines_request_memory_out[0];
                 assign engines_fifo_request_memory_out_signals_in[0].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[0];
+               assign engines_fifo_request_memory_out_signals_in[1].rd_en  = 1'b0;
                assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;
           end
 endgenerate
@@ -90,8 +93,10 @@ endgenerate
 generate
      if((ID_BUNDLE == 1) && (ID_LANE == 0))
           begin
+               assign engines_fifo_request_control_out_signals_in[0].rd_en  = 1'b0;
+               assign engines_fifo_request_control_out_signals_in[1].rd_en  = 1'b0;
                assign engine_arbiter_N_to_1_control_request_in[0] = engines_request_control_out[2];
-               assign engines_fifo_request_control_out_signals_in[0].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[2];
+               assign engines_fifo_request_control_out_signals_in[2].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[0];
                assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
           end
 endgenerate
@@ -101,8 +106,9 @@ endgenerate
 generate
      if((ID_BUNDLE == 3) && (ID_LANE == 0))
           begin
+               assign engines_fifo_request_control_out_signals_in[0].rd_en  = 1'b0;
                assign engine_arbiter_N_to_1_control_request_in[0] = engines_request_control_out[1];
-               assign engines_fifo_request_control_out_signals_in[0].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[1];
+               assign engines_fifo_request_control_out_signals_in[1].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[0];
                assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;
           end
 endgenerate
