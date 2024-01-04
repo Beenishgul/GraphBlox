@@ -63,13 +63,13 @@ module engine_forward_data #(parameter
 assign fifo_request_control_out_signals_out = 2'b10;
 assign fifo_request_memory_out_signals_out  = 2'b10;
 assign fifo_response_control_in_signals_out = 2'b10;
+assign fifo_response_memory_in_signals_out  = 2'b10;
 assign request_control_out                  = 0;
 assign request_memory_out                   = 0;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_forward_data_engine;
-logic areset_configure_memory   ;
 logic areset_generator          ;
 
 KernelDescriptor descriptor_in_reg;
@@ -81,8 +81,6 @@ EnginePacket request_engine_out_int;
 EnginePacket response_engine_in_int;
 MemoryPacket response_memory_in_int;
 
-logic fifo_empty_int;
-logic fifo_empty_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
@@ -90,34 +88,13 @@ logic fifo_empty_reg;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Memory Response EnginePacket
-// --------------------------------------------------------------------------------------
-FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
-
-// --------------------------------------------------------------------------------------
 // FIFO Engine OUTPUT Request EnginePacket
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// ENGINE CONFIGURATION AND GENERATION LOGIC
-// --------------------------------------------------------------------------------------
-logic configure_fifo_setup_signal;
-
-MemoryPacket             configure_memory_response_memory_in                 ;
-FIFOStateSignalsInput    configure_memory_fifo_response_memory_in_signals_in ;
-FIFOStateSignalsOutput   configure_memory_fifo_response_memory_in_signals_out;
-ForwardDataConfiguration configure_memory_out                                ;
-FIFOStateSignalsInput    configure_memory_fifo_configure_memory_signals_in   ;
-FIFOStateSignalsOutput   configure_memory_fifo_configure_memory_signals_out  ;
-logic                    configure_memory_fifo_setup_signal                  ;
-
-// --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-ForwardDataConfiguration generator_engine_configure_memory_in                ;
-FIFOStateSignalsInput    generator_engine_fifo_configure_memory_in_signals_in;
-
 EnginePacket           generator_engine_response_engine_in                 ;
 FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
 FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
@@ -126,9 +103,8 @@ FIFOStateSignalsOutput generator_engine_fifo_request_engine_out_signals_out;
 EnginePacket          generator_engine_request_engine_out                ;
 FIFOStateSignalsInput generator_engine_fifo_request_engine_out_signals_in;
 
-logic generator_engine_fifo_setup_signal     ;
-logic generator_engine_configure_memory_setup;
-logic generator_engine_done_out              ;
+logic generator_engine_fifo_setup_signal;
+logic generator_engine_done_out         ;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
@@ -140,7 +116,6 @@ FIFOStateSignalsOutput generator_fifo_response_lanes_backtrack_signals_in[NUM_BA
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     areset_forward_data_engine <= areset;
-    areset_configure_memory    <= areset;
     areset_generator           <= areset;
 end
 
@@ -166,18 +141,10 @@ end
 always_ff @(posedge ap_clk) begin
     if (areset_forward_data_engine) begin
         fifo_request_engine_out_signals_in_reg <= 0;
-        fifo_response_memory_in_signals_in_reg <= 0;
-        response_memory_in_reg.valid           <= 1'b0;
     end
     else begin
         fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
-        fifo_response_memory_in_signals_in_reg <= fifo_response_memory_in_signals_in;
-        response_memory_in_reg.valid           <= response_memory_in.valid ;
     end
-end
-
-always_ff @(posedge ap_clk) begin
-    response_memory_in_reg.payload <= response_memory_in.payload;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -203,22 +170,17 @@ always_ff @(posedge ap_clk) begin
         fifo_setup_signal        <= 1'b1;
         request_engine_out.valid <= 1'b0;
         done_out                 <= 1'b0;
-        fifo_empty_reg           <= 1'b1;
     end
     else begin
-        fifo_setup_signal        <= configure_fifo_setup_signal | generator_engine_fifo_setup_signal;
+        fifo_setup_signal        <= generator_engine_fifo_setup_signal;
         request_engine_out.valid <= request_engine_out_int.valid;
-        done_out                 <= generator_engine_done_out & fifo_empty_reg;
-        fifo_empty_reg           <= fifo_empty_int;
+        done_out                 <= generator_engine_done_out;
     end
 end
-
-assign fifo_empty_int = configure_memory_fifo_response_memory_in_signals_out.empty & configure_memory_fifo_configure_memory_signals_out.empty ;
 
 always_ff @(posedge ap_clk) begin
     fifo_response_engine_in_signals_out <= generator_engine_fifo_response_engine_in_signals_out;
     fifo_request_engine_out_signals_out <= generator_engine_fifo_request_engine_out_signals_out;
-    fifo_response_memory_in_signals_out <= configure_memory_fifo_response_memory_in_signals_out;
     request_engine_out.payload          <= request_engine_out_int.payload;
 end
 
@@ -238,47 +200,8 @@ assign response_memory_in_int = response_memory_in_reg;
 assign request_engine_out_int = generator_engine_request_engine_out;
 
 // --------------------------------------------------------------------------------------
-// Configuration modules
-// --------------------------------------------------------------------------------------
-assign configure_fifo_setup_signal = configure_memory_fifo_setup_signal;
-
-// --------------------------------------------------------------------------------------
-// Configuration module - Memory permanent
-// --------------------------------------------------------------------------------------
-assign configure_memory_fifo_configure_memory_signals_in.rd_en = generator_engine_configure_memory_setup;
-
-assign configure_memory_response_memory_in                       = response_memory_in_int;
-assign configure_memory_fifo_response_memory_in_signals_in.rd_en = fifo_response_memory_in_signals_in_reg.rd_en;
-
-engine_forward_data_configure_memory #(
-    .ID_CU           (ID_CU           ),
-    .ID_BUNDLE       (ID_BUNDLE       ),
-    .ID_LANE         (ID_LANE         ),
-    .ID_ENGINE       (ID_ENGINE       ),
-    .ID_RELATIVE     (ID_RELATIVE     ),
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
-    .PROG_THRESH     (PROG_THRESH     ),
-    .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
-    .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  ),
-    .ID_MODULE       (0               )
-) inst_engine_forward_data_configure_memory (
-    .ap_clk                             (ap_clk                                              ),
-    .areset                             (areset_configure_memory                             ),
-    .response_memory_in                 (configure_memory_response_memory_in                 ),
-    .fifo_response_memory_in_signals_in (configure_memory_fifo_response_memory_in_signals_in ),
-    .fifo_response_memory_in_signals_out(configure_memory_fifo_response_memory_in_signals_out),
-    .configure_memory_out               (configure_memory_out                                ),
-    .fifo_configure_memory_signals_in   (configure_memory_fifo_configure_memory_signals_in   ),
-    .fifo_configure_memory_signals_out  (configure_memory_fifo_configure_memory_signals_out  ),
-    .fifo_setup_signal                  (configure_memory_fifo_setup_signal                  )
-);
-
-// --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-assign generator_engine_configure_memory_in                       = configure_memory_out;
-assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
-
 
 assign generator_engine_response_engine_in                       = response_engine_in_int ;
 assign generator_engine_fifo_response_engine_in_signals_in.rd_en = fifo_response_engine_in_signals_in_reg.rd_en;
@@ -308,8 +231,6 @@ engine_forward_data_generator #(
     .ap_clk                                  (ap_clk                                              ),
     .areset                                  (areset_generator                                    ),
     .descriptor_in                           (descriptor_in_reg                                   ),
-    .configure_memory_in                     (generator_engine_configure_memory_in                ),
-    .fifo_configure_memory_in_signals_in     (generator_engine_fifo_configure_memory_in_signals_in),
     .response_engine_in                      (generator_engine_response_engine_in                 ),
     .fifo_response_engine_in_signals_in      (generator_engine_fifo_response_engine_in_signals_in ),
     .fifo_response_engine_in_signals_out     (generator_engine_fifo_response_engine_in_signals_out),
@@ -318,7 +239,6 @@ engine_forward_data_generator #(
     .fifo_request_engine_out_signals_in      (generator_engine_fifo_request_engine_out_signals_in ),
     .fifo_request_engine_out_signals_out     (generator_engine_fifo_request_engine_out_signals_out),
     .fifo_setup_signal                       (generator_engine_fifo_setup_signal                  ),
-    .configure_memory_setup                  (generator_engine_configure_memory_setup             ),
     .done_out                                (generator_engine_done_out                           )
 );
 

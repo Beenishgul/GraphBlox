@@ -34,8 +34,6 @@ module engine_forward_data_generator #(parameter
     input  logic                    ap_clk                                                           ,
     input  logic                    areset                                                           ,
     input  KernelDescriptor         descriptor_in                                                    ,
-    input  ForwardDataConfiguration configure_memory_in                                              ,
-    input  FIFOStateSignalsInput    fifo_configure_memory_in_signals_in                              ,
     input  EnginePacket             response_engine_in                                               ,
     input  FIFOStateSignalsInput    fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput   fifo_response_engine_in_signals_out                              ,
@@ -44,7 +42,6 @@ module engine_forward_data_generator #(parameter
     input  FIFOStateSignalsInput    fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput   fifo_request_engine_out_signals_out                              ,
     output logic                    fifo_setup_signal                                                ,
-    output logic                    configure_memory_setup                                           ,
     output logic                    done_out
 );
 
@@ -53,14 +50,9 @@ genvar i;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_generator;
-logic areset_counter  ;
 logic areset_fifo     ;
 
 KernelDescriptor descriptor_in_reg;
-
-ForwardDataConfiguration configure_memory_reg;
-
-logic configure_memory_setup_reg;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -80,13 +72,8 @@ logic done_out_reg;
 EnginePacket          response_engine_in_int                ;
 EnginePacket          response_engine_in_reg                ;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
-
-logic                              configure_engine_param_valid;
-ForwardDataConfigurationParameters configure_engine_param_int  ;
-
-EnginePacket          generator_engine_request_engine_reg    ;
-EnginePacket          request_engine_out_int                 ;
-FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
+EnginePacket          generator_engine_request_engine_reg   ;
+EnginePacket          request_engine_out_int                ;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
@@ -127,7 +114,6 @@ FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out            
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     areset_generator <= areset;
-    areset_counter   <= areset;
     areset_fifo      <= areset;
     areset_backtrack <= areset;
 end
@@ -149,32 +135,14 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// Configure Engine
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        configure_memory_reg.valid <= 1'b0;
-    end
-    else begin
-        configure_memory_reg.valid <= configure_memory_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload <= configure_memory_in.payload;
-end
-
-// --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
-        fifo_configure_memory_in_signals_in_reg <= 0;
-        fifo_request_engine_out_signals_in_reg  <= 0;
+        fifo_request_engine_out_signals_in_reg <= 0;
     end
     else begin
-        fifo_configure_memory_in_signals_in_reg <= fifo_configure_memory_in_signals_in;
-        fifo_request_engine_out_signals_in_reg  <= fifo_request_engine_out_signals_in;
+        fifo_request_engine_out_signals_in_reg <= fifo_request_engine_out_signals_in;
     end
 end
 
@@ -200,14 +168,12 @@ always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
         fifo_setup_signal        <= 1'b1;
         request_engine_out.valid <= 1'b0;
-        configure_memory_setup   <= 1'b0;
         done_out                 <= 1'b0;
         fifo_empty_reg           <= 1'b1;
     end
     else begin
         fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_request_engine_out_setup_signal_int;
         request_engine_out.valid <= request_engine_out_int.valid;
-        configure_memory_setup   <= configure_memory_setup_reg;
         done_out                 <= done_out_reg;
         fifo_empty_reg           <= fifo_empty_int;
     end
@@ -278,24 +244,9 @@ always_comb begin
         end
         ENGINE_FORWARD_DATA_GEN_IDLE : begin
             if(descriptor_in_reg.valid)
-                next_state = ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_IDLE;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE : begin
-            if(fifo_configure_memory_in_signals_in.rd_en)
-                next_state = ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY : begin
-            if(configure_memory_reg.valid) // (0) direct mode (get count from memory)
                 next_state = ENGINE_FORWARD_DATA_GEN_START_TRANS;
             else
-                next_state = ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY;
+                next_state = ENGINE_FORWARD_DATA_GEN_IDLE;
         end
         ENGINE_FORWARD_DATA_GEN_START_TRANS : begin
             next_state = ENGINE_FORWARD_DATA_GEN_START;
@@ -341,40 +292,20 @@ end// always_comb
 always_ff @(posedge ap_clk) begin
     case (current_state)
         ENGINE_FORWARD_DATA_GEN_RESET : begin
-            done_int_reg                    <= 1'b1;
-            done_out_reg                    <= 1'b1;
-            configure_memory_setup_reg      <= 1'b0;
-            configure_engine_param_valid    <= 1'b0;
-            configure_engine_param_int.hops <= ~0;
+            done_int_reg <= 1'b1;
+            done_out_reg <= 1'b1;
         end
         ENGINE_FORWARD_DATA_GEN_IDLE : begin
-            done_int_reg               <= 1'b1;
-            done_out_reg               <= 1'b0;
-            configure_memory_setup_reg <= 1'b0;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_IDLE : begin
-            done_int_reg               <= 1'b1;
-            done_out_reg               <= 1'b0;
-            configure_memory_setup_reg <= 1'b0;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY_TRANS : begin
-            configure_memory_setup_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_SETUP_MEMORY : begin
-            configure_memory_setup_reg   <= 1'b0;
-            configure_engine_param_valid <= 1'b0;
-            if(configure_memory_reg.valid)
-                configure_engine_param_int <= configure_memory_reg.payload.param;
+            done_int_reg <= 1'b1;
+            done_out_reg <= 1'b0;
         end
         ENGINE_FORWARD_DATA_GEN_START_TRANS : begin
-            done_int_reg                 <= 1'b0;
-            done_out_reg                 <= 1'b0;
-            configure_engine_param_valid <= 1'b1;
+            done_int_reg <= 1'b0;
+            done_out_reg <= 1'b0;
         end
         ENGINE_FORWARD_DATA_GEN_START : begin
-            done_int_reg                 <= 1'b0;
-            done_out_reg                 <= 1'b1;
-            configure_engine_param_valid <= 1'b1;
+            done_int_reg <= 1'b0;
+            done_out_reg <= 1'b1;
         end
         ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS : begin
             done_int_reg <= 1'b0;
@@ -397,10 +328,8 @@ always_ff @(posedge ap_clk) begin
             done_out_reg <= 1'b1;
         end
         ENGINE_FORWARD_DATA_GEN_DONE : begin
-            done_int_reg                    <= 1'b1;
-            done_out_reg                    <= 1'b1;
-            configure_engine_param_valid    <= 1'b0;
-            configure_engine_param_int.hops <= ~0;
+            done_int_reg <= 1'b1;
+            done_out_reg <= 1'b1;
         end
     endcase
 end// always_ff @(posedge ap_clk)
@@ -418,7 +347,7 @@ always_ff @(posedge ap_clk) begin
     else begin
         generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
 
-        if(response_engine_in_int.valid & configure_engine_param_valid) begin
+        if(response_engine_in_int.valid) begin
             forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.hops);
         end else begin
             if(forward_data_response_engine_in_valid_flag)
@@ -430,23 +359,19 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    if(response_engine_in_int.valid & configure_engine_param_valid) begin
+    if(response_engine_in_int.valid) begin
         generator_engine_request_engine_reg.payload.meta.route.packet_destination <= response_engine_in_int.payload.meta.route.packet_destination;
         generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
         generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
         generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
         generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data;
 
-        if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-            generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
+        if (response_engine_in_int.payload.meta.route.hops >= 1'b1) begin
+            generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - 1'b1;
         end else begin
             generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
         end
-        if (response_engine_in_int.payload.meta.route.hops >= configure_engine_param_int.hops) begin
-            generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - configure_engine_param_int.hops;
-        end else begin
-            generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-        end
+
     end else begin
         generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
     end

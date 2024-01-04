@@ -333,14 +333,7 @@
         }
     },
     "ENGINE_FORWARD_DATA_3": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x00"
-                }
-            }
-        }
+        "entries": {}
     },
     "ENGINE_READ_WRITE_4": {
         "type_memory_cmd": {
@@ -839,14 +832,7 @@
         }
     },
     "ENGINE_FORWARD_DATA_9": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x00"
-                }
-            }
-        }
+        "entries": {}
     },
     "ENGINE_CSR_INDEX_10": {
         "type_memory_cmd": {
@@ -948,14 +934,7 @@
         }
     },
     "ENGINE_FORWARD_DATA_11": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x00"
-                }
-            }
-        }
+        "entries": {}
     },
     "ENGINE_READ_WRITE_12": {
         "type_memory_cmd": {
@@ -1204,13 +1183,6 @@
         }
     },
     "ENGINE_FORWARD_DATA_14": {
-        "entries": {
-            "entry_0": {
-                "hops": {
-                    "bits": "8",
-                    "value": "0x00"
-                }
-            }
-        }
+        "entries": {}
     }
 }
