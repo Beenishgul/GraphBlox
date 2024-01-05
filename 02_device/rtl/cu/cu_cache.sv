@@ -15,8 +15,8 @@
 `include "global_package.vh"
 
 module cu_cache #(
-  parameter FIFO_WRITE_DEPTH = 32,
-  parameter PROG_THRESH      = 16
+  parameter FIFO_WRITE_DEPTH = 64,
+  parameter PROG_THRESH      = 32
 ) (
   // System Signals
   input  logic                             ap_clk                   ,
