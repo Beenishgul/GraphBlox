@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module cache_generator_response #(
+module arbiter_1_to_N_response_cache #(
   parameter NUM_MEMORY_REQUESTOR = 2                                ,
   parameter FIFO_ARBITER_DEPTH   = 16                               ,
   parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
@@ -32,9 +32,9 @@ module cache_generator_response #(
 // --------------------------------------------------------------------------------------
 // Cache response variables
 // --------------------------------------------------------------------------------------
-logic areset_control;
-logic areset_fifo   ;
-logic areset_demux  ;
+logic areset_control        ;
+logic areset_fifo           ;
+logic areset_demux          ;
 logic cu_setup_push_filter  ;
 logic cu_bundles_push_filter;
 
@@ -93,13 +93,11 @@ always_ff @(posedge ap_clk) begin
   fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
 end
 
-
-
 // --------------------------------------------------------------------------------------
 // drive Responses
 // --------------------------------------------------------------------------------------
 
-assign cu_setup_push_filter = ((&{fifo_response_dout_int.payload.meta.route.packet_source.id_cu,fifo_response_dout_int.payload.meta.route.packet_source.id_bundle,fifo_response_dout_int.payload.meta.route.packet_source.id_lane,fifo_response_dout_int.payload.meta.route.packet_source.id_engine}) | ~(|fifo_response_dout_int.payload.meta.route.packet_source));
+assign cu_setup_push_filter   = ((&{fifo_response_dout_int.payload.meta.route.packet_source.id_cu,fifo_response_dout_int.payload.meta.route.packet_source.id_bundle,fifo_response_dout_int.payload.meta.route.packet_source.id_lane,fifo_response_dout_int.payload.meta.route.packet_source.id_engine}) | ~(|fifo_response_dout_int.payload.meta.route.packet_source));
 assign cu_bundles_push_filter = (|fifo_response_dout_int.payload.meta.route.packet_source);
 
 always_ff @(posedge ap_clk ) begin
@@ -113,8 +111,8 @@ always_ff @(posedge ap_clk ) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    response_out[0].payload <= fifo_response_dout_int.payload;
-    response_out[1].payload <= fifo_response_dout_int.payload;
+  response_out[0].payload <= fifo_response_dout_int.payload;
+  response_out[1].payload <= fifo_response_dout_int.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -124,22 +122,20 @@ end
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_response_signals_in_int.wr_en  = response_in_reg.valid;
-assign fifo_response_din.iob               = response_in_reg.payload.iob;
-assign fifo_response_din.meta              = response_in_reg.payload.meta;
-assign fifo_response_din.data              = response_in_reg.payload.data;
+assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
+assign fifo_response_din                  = map_CacheResponse_to_MemoryResponsePacket(response_in_reg.payload);
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
 assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
-always_comb fifo_response_dout_int.payload   = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout);
+assign fifo_response_dout_int.payload     = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
-  .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
-  .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
-  .PROG_THRESH     (PROG_THRESH                )
-) inst_fifo_CacheResponse (
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
+  .PROG_THRESH     (PROG_THRESH               )
+) inst_fifo_MemoryPacketResponse (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
   .din        (fifo_response_din                        ),
@@ -154,4 +150,4 @@ xpm_fifo_sync_wrapper #(
   .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
 );
 
-endmodule : cache_generator_response
+endmodule : arbiter_1_to_N_response_cache

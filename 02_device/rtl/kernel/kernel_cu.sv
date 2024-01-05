@@ -265,7 +265,7 @@ arbiter_N_to_1_request_cache #(
 // --------------------------------------------------------------------------------------
 assign cache_generator_response_in = response_in_reg;
 
-cache_generator_response #(
+arbiter_1_to_N_response_cache #(
   .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
   .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_response (

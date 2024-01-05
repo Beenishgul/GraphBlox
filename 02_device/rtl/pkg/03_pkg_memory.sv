@@ -350,7 +350,7 @@ endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
-function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketPayload input_packet, input KernelDescriptorPayload  descriptor);
+function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketPayload input_packet, input KernelDescriptorPayload  descriptor, input input_packet_valid);
 
   CacheRequestPayload output_packet;
   logic [M_AXI4_FE_ADDR_W-1:0] address_base;
@@ -387,6 +387,7 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
 
   output_packet.meta      = input_packet.meta;
   output_packet.data      = input_packet.data;
+  output_packet.iob.valid = input_packet_valid;
   output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
   output_packet.iob.wdata = input_packet.data.field;
 
