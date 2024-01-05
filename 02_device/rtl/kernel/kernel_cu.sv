@@ -98,7 +98,6 @@ FIFOStateSignalsInput  cu_bundles_fifo_request_signals_in  ;
 logic                  cu_bundles_fifo_setup_signal        ;
 
 // --------------------------------------------------------------------------------------
-parameter              PULSE_HOLD             = 128;
 logic [PULSE_HOLD-1:0] cu_bundles_done_hold        ;
 logic                  cu_bundles_done_out         ;
 logic                  cu_bundles_done_assert      ;
