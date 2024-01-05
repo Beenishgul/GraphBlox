@@ -64,13 +64,13 @@ logic                  cache_generator_fifo_response_setup_signal               
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
-MemoryPacket                     cache_generator_request_in               [NUM_MEMORY_REQUESTOR-1:0];
-FIFOStateSignalsInput            cache_generator_fifo_request_signals_in                            ;
-FIFOStateSignalsOutput           cache_generator_fifo_request_signals_out                           ;
-logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_request_in                                 ;
-logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_grant_out                                  ;
-CacheRequest                     cache_generator_request_out                                        ;
-logic                            cache_generator_fifo_request_setup_signal                          ;
+MemoryPacket           cache_generator_request_in              [NUM_MEMORY_REQUESTOR-1:0];
+FIFOStateSignalsInput  cache_generator_fifo_request_signals_in                           ;
+FIFOStateSignalsOutput cache_generator_fifo_request_signals_out                          ;
+// logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_request_in                                 ;
+logic [NUM_MEMORY_REQUESTOR-1:0] cache_generator_arbiter_grant_out        ;
+CacheRequest                     cache_generator_request_out              ;
+logic                            cache_generator_fifo_request_setup_signal;
 
 // --------------------------------------------------------------------------------------
 // Signals setup and configuration reading
@@ -234,21 +234,37 @@ assign cu_bundles_fifo_response_signals_in.rd_en = 1'b1;
 // Arbiter Signals: Cache Request Generator
 // --------------------------------------------------------------------------------------
 // cu_setup
-assign cu_setup_response_in                  = cache_generator_response_out[0];
-assign cache_generator_request_in[0]         = cu_setup_request_out;
-assign cache_generator_arbiter_request_in[0] = ~cu_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
+assign cu_setup_response_in          = cache_generator_response_out[0];
+assign cache_generator_request_in[0] = cu_setup_request_out;
+// assign cache_generator_arbiter_request_in[0] = ~cu_setup_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full;
 
 // vertex_cu
-assign cu_bundles_response_in                = cache_generator_response_out[1];
-assign cache_generator_request_in[1]         = cu_bundles_request_out;
-assign cache_generator_arbiter_request_in[1] = ~cu_bundles_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
+assign cu_bundles_response_in        = cache_generator_response_out[1];
+assign cache_generator_request_in[1] = cu_bundles_request_out;
+// assign cache_generator_arbiter_request_in[1] = ~cu_bundles_fifo_request_signals_out.empty & ~cache_generator_fifo_request_signals_out.prog_full ;
 
 // --------------------------------------------------------------------------------------
 // Cache request generator
 // --------------------------------------------------------------------------------------
 assign request_out_reg = cache_generator_request_out;
 
-cache_generator_request #(
+// cache_generator_request #(
+//   .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
+//   .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+// ) inst_cache_generator_request (
+//   .ap_clk                  (ap_clk                                   ),
+//   .areset                  (areset_generator                         ),
+//   .descriptor_in           (descriptor_in_reg                        ),
+//   .request_in              (cache_generator_request_in               ),
+//   .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
+//   .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
+//   .arbiter_request_in      (cache_generator_arbiter_request_in       ),
+//   .arbiter_grant_out       (cache_generator_arbiter_grant_out        ),
+//   .request_out             (cache_generator_request_out              ),
+//   .fifo_setup_signal       (cache_generator_fifo_request_setup_signal)
+// );
+
+arbiter_N_to_1_request_cache #(
   .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
   .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_request (
@@ -258,7 +274,6 @@ cache_generator_request #(
   .request_in              (cache_generator_request_in               ),
   .fifo_request_signals_in (cache_generator_fifo_request_signals_in  ),
   .fifo_request_signals_out(cache_generator_fifo_request_signals_out ),
-  .arbiter_request_in      (cache_generator_arbiter_request_in       ),
   .arbiter_grant_out       (cache_generator_arbiter_grant_out        ),
   .request_out             (cache_generator_request_out              ),
   .fifo_setup_signal       (cache_generator_fifo_request_setup_signal)
