@@ -172,7 +172,7 @@ xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
     .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-    .PROG_THRESH     (FIFO_WRITE_DEPTH- 4                )
+    .PROG_THRESH     (PROG_THRESH                        )
 ) inst_fifo_EnginePacketResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
