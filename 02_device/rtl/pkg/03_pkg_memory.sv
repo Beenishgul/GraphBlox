@@ -414,6 +414,17 @@ function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input Ca
 endfunction : map_CacheResponse_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
+function MemoryPacketResponsePayload  map_MemoryRequestPacket_to_MemoryResponsePacket (input MemoryPacketRequestPayload input_packet);
+
+  MemoryPacketResponsePayload  output_packet;
+
+  output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
+  output_packet.data.field                = input_packet.data.field;
+
+  return output_packet;
+endfunction : map_MemoryRequestPacket_to_MemoryResponsePacket
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketFullPayload  input_packet, input PacketRouteAddress packet_source);
 
   MemoryPacketPayload  output_packet;
