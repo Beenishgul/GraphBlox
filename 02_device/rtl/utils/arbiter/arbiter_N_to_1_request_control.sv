@@ -122,7 +122,7 @@ end
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     fifo_setup_signal        <= 1'b1;
-    fifo_request_signals_out <= 0;
+    fifo_request_signals_out <= 2'b10;
     request_out.valid        <= 1'b0;
   end
   else begin
@@ -147,7 +147,7 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
-    fifo_request_din_reg.valid <= 0;
+    fifo_request_din_reg.valid <= 1'b0;
   end
   else begin
     fifo_request_din_reg.valid <= arbiter_bus_out.valid;

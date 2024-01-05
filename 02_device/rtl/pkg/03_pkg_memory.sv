@@ -350,56 +350,52 @@ endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
-function CacheRequest map_MemoryRequestPacket_to_CacheRequest (input MemoryPacket input_packet, input KernelDescriptor  descriptor);
+function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketPayload input_packet, input KernelDescriptorPayload  descriptor);
 
-  CacheRequest output_packet;
+  CacheRequestPayload output_packet;
   logic [M_AXI4_FE_ADDR_W-1:0] address_base;
 
-  if(input_packet.valid & descriptor.valid) begin
-    case (input_packet.payload.meta.address.id_buffer)
-      (1 << 0) : begin
-        address_base = descriptor.payload.buffer_1;
-      end
-      (1 << 1) : begin
-        address_base = descriptor.payload.buffer_2;
-      end
-      (1 << 2) : begin
-        address_base = descriptor.payload.buffer_3;
-      end
-      (1 << 3) : begin
-        address_base = descriptor.payload.buffer_4;
-      end
-      (1 << 4) : begin
-        address_base = descriptor.payload.buffer_5;
-      end
-      (1 << 5) : begin
-        address_base = descriptor.payload.buffer_6;
-      end
-      (1 << 6) : begin
-        address_base = descriptor.payload.buffer_7;
-      end
-      (1 << 7) : begin
-        address_base = descriptor.payload.buffer_8;
-      end
-      default : begin
-        address_base = descriptor.payload.buffer_0;
-      end
-    endcase
-  end
-
-  output_packet.valid             = input_packet.valid;
-  output_packet.payload.meta      = input_packet.payload.meta;
-  output_packet.payload.data      = input_packet.payload.data;
-  output_packet.payload.iob.valid = input_packet.valid;
-  output_packet.payload.iob.addr  = address_base + input_packet.payload.meta.address.offset;
-  output_packet.payload.iob.wdata = input_packet.payload.data.field;
-
-  case (input_packet.payload.meta.subclass.cmd)
-    CMD_MEM_WRITE : begin
-      output_packet.payload.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
+  case (input_packet.meta.address.id_buffer)
+    (1 << 0) : begin
+      address_base = descriptor.buffer_1;
+    end
+    (1 << 1) : begin
+      address_base = descriptor.buffer_2;
+    end
+    (1 << 2) : begin
+      address_base = descriptor.buffer_3;
+    end
+    (1 << 3) : begin
+      address_base = descriptor.buffer_4;
+    end
+    (1 << 4) : begin
+      address_base = descriptor.buffer_5;
+    end
+    (1 << 5) : begin
+      address_base = descriptor.buffer_6;
+    end
+    (1 << 6) : begin
+      address_base = descriptor.buffer_7;
+    end
+    (1 << 7) : begin
+      address_base = descriptor.buffer_8;
     end
     default : begin
-      output_packet.payload.iob.wstrb = 0;
+      address_base = descriptor.buffer_0;
+    end
+  endcase
+
+  output_packet.meta      = input_packet.meta;
+  output_packet.data      = input_packet.data;
+  output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
+  output_packet.iob.wdata = input_packet.data.field;
+
+  case (input_packet.meta.subclass.cmd)
+    CMD_MEM_WRITE : begin
+      output_packet.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
+    end
+    default : begin
+      output_packet.iob.wstrb = 0;
     end
   endcase
 
