@@ -34,7 +34,6 @@ module arbiter_1_to_N_response_cache #(
 // --------------------------------------------------------------------------------------
 logic areset_control        ;
 logic areset_fifo           ;
-logic areset_demux          ;
 logic cu_setup_push_filter  ;
 logic cu_bundles_push_filter;
 
@@ -44,9 +43,9 @@ CacheResponse response_in_reg                           ;
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-CacheResponsePayload          fifo_response_din             ;
+MemoryPacketPayload           fifo_response_din             ;
 MemoryPacket                  fifo_response_dout_int        ;
-CacheResponsePayload          fifo_response_dout            ;
+MemoryPacketPayload           fifo_response_dout            ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_response_signals_out_int ;
@@ -58,7 +57,6 @@ logic                         fifo_response_setup_signal_int;
 always_ff @(posedge ap_clk) begin
   areset_control <= areset;
   areset_fifo    <= areset;
-  areset_demux   <= areset;
 end
 
 // --------------------------------------------------------------------------------------
