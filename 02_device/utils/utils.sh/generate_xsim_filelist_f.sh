@@ -49,7 +49,6 @@ testbench="testbench"
 
 memory="memory"
 memory_cache="cache"
-memory_generator="generator"
 memory_ram="ram"
 
 control="control"
@@ -145,8 +144,6 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memo
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME_V} "v"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME_SV} "sv"
-
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${cu}/ ${CFG_FILE_NAME_SV} "sv"
@@ -154,8 +151,6 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${cu}/ ${CFG_FIL
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${lane}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${control}/ ${CFG_FILE_NAME_SV} "sv"
-
-# generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_ops}      ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index}    ${CFG_FILE_NAME_SV} "sv"

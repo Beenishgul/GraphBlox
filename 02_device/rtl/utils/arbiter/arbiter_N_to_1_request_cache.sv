@@ -41,15 +41,15 @@ logic areset_fifo   ;
 logic areset_arbiter;
 
 MemoryPacket     request_in_reg   [NUM_MEMORY_REQUESTOR-1:0];
-CacheRequest     request_out_int                            ;
+MemoryPacket     request_out_int                            ;
 KernelDescriptor descriptor_in_reg                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-CacheRequestPayload           fifo_request_din             ;
-CacheRequest                  fifo_request_din_reg         ;
-CacheRequestPayload           fifo_request_dout            ;
+MemoryPacketPayload           fifo_request_din             ;
+MemoryPacket                  fifo_request_din_reg         ;
+MemoryPacketPayload           fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -150,7 +150,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-  request_out.payload <= request_out_int.payload ;
+  request_out.payload <= map_MemoryRequestPacket_to_CacheRequest(request_out_int.payload, descriptor_in_reg.payload, request_out_int.valid & descriptor_in_reg.valid);
 end
 
 always_ff @(posedge ap_clk) begin
@@ -165,16 +165,14 @@ end
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     fifo_request_din_reg.valid <= 1'b0;
-    fifo_request_din_reg.payload.iob.valid <= 1'b0;
   end
   else begin
-    fifo_request_din_reg.valid             <= arbiter_bus_out.valid & descriptor_in_reg.valid;
-    fifo_request_din_reg.payload.iob.valid <= fifo_request_din_reg.payload.iob.valid & descriptor_in_reg.valid;
+    fifo_request_din_reg.valid <= arbiter_bus_out.valid & descriptor_in_reg.valid;
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  fifo_request_din_reg.payload <= map_MemoryRequestPacket_to_CacheRequest(arbiter_bus_out.payload, descriptor_in_reg.payload);
+  fifo_request_din_reg.payload <= arbiter_bus_out.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -183,12 +181,12 @@ end
 always_ff @(posedge ap_clk) begin
   if (areset_arbiter) begin
     for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
-      request_arbiter_in_reg[i].valid           <= 1'b0;
+      request_arbiter_in_reg[i].valid <= 1'b0;
     end
   end
   else begin
     for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
-      request_arbiter_in_reg[i].valid           <= request_in[i].valid;
+      request_arbiter_in_reg[i].valid <= request_in[i].valid;
     end
   end
 end
@@ -254,10 +252,10 @@ assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
-  .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
   .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacket (
+) inst_fifo_MemoryPacketRequest (
   .clk        (ap_clk                                  ),
   .srst       (areset_fifo                             ),
   .din        (fifo_request_din                        ),

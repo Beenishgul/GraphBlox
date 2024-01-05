@@ -15,7 +15,6 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_control #(
-  parameter DEMUX_DATA_WIDTH      = $bits(ControlPacketPayload)    ,
   parameter ID_LEVEL              = 1                              ,
   parameter ID_BUNDLE             = 0                              ,
   parameter NUM_CONTROL_RECEIVER  = 2                              ,

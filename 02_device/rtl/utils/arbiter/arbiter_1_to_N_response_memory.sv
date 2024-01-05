@@ -15,7 +15,6 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_memory #(
-  parameter DEMUX_DATA_WIDTH     = $bits(MemoryPacketPayload)     ,
   parameter ID_LEVEL             = 1                              ,
   parameter ID_BUNDLE            = 0                              ,
   parameter NUM_MEMORY_RECEIVER  = 2                              ,
