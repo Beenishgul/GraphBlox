@@ -99,7 +99,7 @@ end
 // drive Responses
 // --------------------------------------------------------------------------------------
 
-assign cu_setup_push_filter = ((&{fifo_response_dout_int.payload.meta.route.packet_source.id_cu,fifo_response_dout_int.payload.meta.route.packet_source.id_bundle,fifo_response_dout_int.payload.meta.route.packet_source.id_lane,fifo_response_dout_int.payload.meta.route.packet_source.id_engine}) | ~(|fifo_response_dout_int.payload.meta.route.packet_source))
+assign cu_setup_push_filter = ((&{fifo_response_dout_int.payload.meta.route.packet_source.id_cu,fifo_response_dout_int.payload.meta.route.packet_source.id_bundle,fifo_response_dout_int.payload.meta.route.packet_source.id_lane,fifo_response_dout_int.payload.meta.route.packet_source.id_engine}) | ~(|fifo_response_dout_int.payload.meta.route.packet_source));
 assign cu_bundles_push_filter = (|fifo_response_dout_int.payload.meta.route.packet_source);
 
 always_ff @(posedge ap_clk ) begin
