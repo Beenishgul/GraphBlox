@@ -19,7 +19,7 @@ module cache_generator_request #(
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR)  ,
   parameter FIFO_ARBITER_DEPTH    = 16                               ,
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
-  parameter PROG_THRESH           = 2**$clog2(8*NUM_MEMORY_REQUESTOR)
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,

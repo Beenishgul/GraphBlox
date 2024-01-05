@@ -18,7 +18,7 @@ module cache_generator_response #(
   parameter NUM_MEMORY_REQUESTOR = 2                                ,
   parameter FIFO_ARBITER_DEPTH   = 16                               ,
   parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
-  parameter PROG_THRESH          = 2**$clog2(8*NUM_MEMORY_REQUESTOR)
+  parameter PROG_THRESH          = (FIFO_WRITE_DEPTH/2) + 3
 ) (
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
@@ -35,6 +35,8 @@ module cache_generator_response #(
 logic areset_control;
 logic areset_fifo   ;
 logic areset_demux  ;
+logic cu_setup_push_filter  ;
+logic cu_bundles_push_filter;
 
 MemoryPacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
 CacheResponse response_in_reg                           ;
@@ -91,16 +93,22 @@ always_ff @(posedge ap_clk) begin
   fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
 end
 
+
+
 // --------------------------------------------------------------------------------------
 // drive Responses
 // --------------------------------------------------------------------------------------
+
+assign cu_setup_push_filter = ((&{fifo_response_dout_int.payload.meta.route.packet_source.id_cu,fifo_response_dout_int.payload.meta.route.packet_source.id_bundle,fifo_response_dout_int.payload.meta.route.packet_source.id_lane,fifo_response_dout_int.payload.meta.route.packet_source.id_engine}) | ~(|fifo_response_dout_int.payload.meta.route.packet_source))
+assign cu_bundles_push_filter = (|fifo_response_dout_int.payload.meta.route.packet_source);
+
 always_ff @(posedge ap_clk ) begin
   if(areset_control) begin
     response_out[0].valid <= 1'b0;
     response_out[1].valid <= 1'b0;
   end else begin
-    response_out[0].valid <= fifo_response_dout_int.valid & ((&fifo_response_dout_int.payload.meta.route.packet_source) | ~(&fifo_response_dout_int.payload.meta.route.packet_source));
-    response_out[1].valid <= fifo_response_dout_int.valid & (|fifo_response_dout_int.payload.meta.route.packet_source);
+    response_out[0].valid <= fifo_response_dout_int.valid & cu_setup_push_filter;
+    response_out[1].valid <= fifo_response_dout_int.valid & cu_bundles_push_filter;
   end
 end
 

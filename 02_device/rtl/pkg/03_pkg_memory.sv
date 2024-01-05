@@ -56,11 +56,11 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 parameter TYPE_MEMORY_CMD_BITS = 5;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
-  CMD_MEM_INVALID    = 1 << 0,
-  CMD_MEM_READ       = 1 << 1,
-  CMD_MEM_WRITE      = 1 << 2,
-  CMD_STREAM_READ    = 1 << 3,
-  CMD_STREAM_WRITE   = 1 << 4
+  CMD_MEM_INVALID  = 1 << 0,
+  CMD_MEM_READ     = 1 << 1,
+  CMD_MEM_WRITE    = 1 << 2,
+  CMD_STREAM_READ  = 1 << 3,
+  CMD_STREAM_WRITE = 1 << 4
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
@@ -166,6 +166,42 @@ typedef struct packed{
   logic               valid  ;
   MemoryPacketPayload payload;
 } MemoryPacket;
+
+// --------------------------------------------------------------------------------------
+// Request Memory Packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  MemoryPacketRouteAttributes route   ;
+  PacketDataAddress           address ;
+  MemoryPacketType            subclass;
+} MemoryPacketRequestMeta;
+
+typedef struct packed{
+  MemoryPacketRequestMeta meta;
+  MemoryPacketData        data;
+} MemoryPacketRequestPayload;
+
+typedef struct packed{
+  logic                      valid  ;
+  MemoryPacketRequestPayload payload;
+} MemoryPacketRequest;
+
+// --------------------------------------------------------------------------------------
+// Response Memory Packet
+// --------------------------------------------------------------------------------------
+typedef struct packed{
+  MemoryPacketRouteAttributes route;
+} MemoryPacketResponseMeta;
+
+typedef struct packed{
+  MemoryPacketResponseMeta meta;
+  MemoryPacketData         data;
+} MemoryPacketResponsePayload;
+
+typedef struct packed{
+  logic                       valid  ;
+  MemoryPacketResponsePayload payload;
+} MemoryPacketResponse;
 
 // --------------------------------------------------------------------------------------
 // Generic Engine Packet
