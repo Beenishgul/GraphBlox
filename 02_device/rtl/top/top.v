@@ -17,7 +17,9 @@
 `default_nettype none
 `include "global_timescale.vh"
 // Top level of the kernel. Do not modify module name, parameters or ports.
-module top #(`include "m_axi_portmaps_afu.vh") (
+module top #(
+  `include "top_parameters.vh"
+  ) (
   // System Signals
   input  wire                                    ap_clk               ,
   input  wire                                    ap_rst_n             ,
@@ -48,7 +50,7 @@ module top #(`include "m_axi_portmaps_afu.vh") (
   // RESP - Not useful in most acceleration platforms.
   //
   // AXI4 master interface m00_axi
-  `include "m_axi_portmaps_afu.vh"
+  `include "m_axi_ports_top.vh"
   // AXI4-Lite slave interface
   input  wire                                    s_axi_control_awvalid,
   output wire                                    s_axi_control_awready,
