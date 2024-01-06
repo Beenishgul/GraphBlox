@@ -170,9 +170,17 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Request Memory Packet
 // --------------------------------------------------------------------------------------
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
+
+typedef struct packed{
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
+  type_memory_request_address            offset   ; // SIZE = clog2(4GB) bits
+  PacketDataAddressShift                 shift    ; // SIZE = clog2(offset) bits + 1
+} PacketRequestDataAddress;
+
 typedef struct packed{
   MemoryPacketRouteAttributes route   ;
-  PacketDataAddress           address ;
+  PacketRequestDataAddress    address ;
   MemoryPacketType            subclass;
 } MemoryPacketRequestMeta;
 
@@ -189,8 +197,15 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Response Memory Packet
 // --------------------------------------------------------------------------------------
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
+
 typedef struct packed{
-  MemoryPacketRouteAttributes route;
+  type_memory_response_address offset; // SIZE = clog2(4GB) bits
+} PacketResponseDataAddress;
+
+typedef struct packed{
+  MemoryPacketRouteAttributes route  ;
+  PacketResponseDataAddress   address;
 } MemoryPacketResponseMeta;
 
 typedef struct packed{
@@ -419,6 +434,7 @@ function MemoryPacketResponsePayload  map_MemoryRequestPacket_to_MemoryResponseP
   MemoryPacketResponsePayload  output_packet;
 
   output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
+  output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
   output_packet.data.field                = input_packet.data.field;
 
   return output_packet;
