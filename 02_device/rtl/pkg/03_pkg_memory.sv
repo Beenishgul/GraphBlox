@@ -319,9 +319,9 @@ typedef struct packed {
 } CacheRequestIOB;
 
 typedef struct packed {
-  CacheRequestIOB  iob ;
-  MemoryPacketMeta meta;
-  MemoryPacketData data;
+  CacheRequestIOB         iob ;
+  MemoryPacketRequestMeta meta;
+  MemoryPacketData        data;
 } CacheRequestPayload;
 
 typedef struct packed {
@@ -339,9 +339,9 @@ typedef struct packed {
 } CacheResponseIOB;
 
 typedef struct packed {
-  CacheResponseIOB iob ;
-  MemoryPacketMeta meta;
-  MemoryPacketData data;
+  CacheResponseIOB         iob ;
+  MemoryPacketResponseMeta meta;
+  MemoryPacketData         data;
 } CacheResponsePayload;
 
 typedef struct packed {
@@ -365,7 +365,7 @@ endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
-function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketPayload input_packet, input KernelDescriptorPayload  descriptor, input input_packet_valid);
+function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketRequestPayload input_packet, input KernelDescriptorPayload  descriptor, input input_packet_valid);
 
   CacheRequestPayload output_packet;
   logic [M_AXI4_FE_ADDR_W-1:0] address_base;
@@ -403,6 +403,7 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
   output_packet.meta      = input_packet.meta;
   output_packet.data      = input_packet.data;
   output_packet.iob.valid = input_packet_valid;
+  // output_packet.iob.addr  = address_base + (input_packet.meta.address.offset << input_packet.meta.address.shift.amount);
   output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
   output_packet.iob.wdata = input_packet.data.field;
 
@@ -418,15 +419,30 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_CacheRequest
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload map_CacheResponse_to_MemoryResponsePacket (input CacheResponsePayload input_packet);
+function CacheResponsePayload map_CacheResponse_to_CacheResponse (input CacheRequestPayload input_packet);
 
-  MemoryPacketPayload output_packet;
+  CacheResponsePayload output_packet;
 
-  output_packet.meta          = input_packet.meta;
-  output_packet.data.field    = input_packet.iob.rdata;
+  output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
+  output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
+  output_packet.meta.address.offset       = input_packet.meta.address.offset;
+  output_packet.data.field                = input_packet.iob.rdata;
+
+  return output_packet;
+endfunction : map_CacheResponse_to_CacheResponse
+// --------------------------------------------------------------------------------------
+function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (input CacheRequestPayload input_packet_req, input CacheResponsePayload input_packet_resp);
+
+  MemoryPacketResponsePayload output_packet;
+
+  output_packet.meta.route.packet_source  = input_packet_req.meta.route.packet_source ;
+  output_packet.meta.address.offset       = input_packet_req.meta.address.offset;
+  // output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
+  output_packet.data.field    = input_packet_resp.iob.rdata;
 
   return output_packet;
 endfunction : map_CacheResponse_to_MemoryResponsePacket
+
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 function MemoryPacketResponsePayload  map_MemoryRequestPacket_to_MemoryResponsePacket (input MemoryPacketRequestPayload input_packet);
@@ -434,16 +450,17 @@ function MemoryPacketResponsePayload  map_MemoryRequestPacket_to_MemoryResponseP
   MemoryPacketResponsePayload  output_packet;
 
   output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
-  output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
+  output_packet.meta.address.offset       = input_packet.meta.address.offset;
+  // output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
   output_packet.data.field                = input_packet.data.field;
 
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_MemoryResponsePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function MemoryPacketPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketFullPayload  input_packet, input PacketRouteAddress packet_source);
+function MemoryPacketRequestPayload  map_EnginePacket_to_MemoryRequestPacket (input EnginePacketFullPayload  input_packet, input PacketRouteAddress packet_source);
 
-  MemoryPacketPayload  output_packet;
+  MemoryPacketRequestPayload  output_packet;
 
   output_packet.meta.route.packet_source  = packet_source;
   output_packet.meta.address              = input_packet.meta.address;
@@ -464,7 +481,7 @@ function EnginePacketPayload  map_EnginePacketFull_to_EnginePacket (input Engine
 endfunction : map_EnginePacketFull_to_EnginePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketData input_packet, input EnginePacketData pending_packet);
+function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketResponseData input_packet, input EnginePacketData pending_packet);
 
   EnginePacketData output_packet;
 

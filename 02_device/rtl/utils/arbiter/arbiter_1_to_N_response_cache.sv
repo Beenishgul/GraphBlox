@@ -22,10 +22,10 @@ module arbiter_1_to_N_response_cache #(
 ) (
   input  logic                  ap_clk                                 ,
   input  logic                  areset                                 ,
-  input  CacheResponse          response_in                            ,
+  input  MemoryPacketResponse   response_in                            ,
   input  FIFOStateSignalsInput  fifo_response_signals_in               ,
   output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output MemoryPacket           response_out [NUM_MEMORY_REQUESTOR-1:0],
+  output MemoryPacketResponse   response_out [NUM_MEMORY_REQUESTOR-1:0],
   output logic                  fifo_setup_signal
 );
 
@@ -37,15 +37,15 @@ logic areset_fifo           ;
 logic cu_setup_push_filter  ;
 logic cu_bundles_push_filter;
 
-MemoryPacket  response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
-CacheResponse response_in_reg                           ;
+MemoryPacketResponse response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacketResponse response_in_reg                           ;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload           fifo_response_din             ;
-MemoryPacket                  fifo_response_dout_int        ;
-MemoryPacketPayload           fifo_response_dout            ;
+MemoryPacketResponsePayload   fifo_response_din             ;
+MemoryPacketResponse          fifo_response_dout_int        ;
+MemoryPacketResponsePayload   fifo_response_dout            ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_response_signals_out_int ;
@@ -114,14 +114,14 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO cache response out fifo CacheResponse
+// FIFO cache response out fifo MemoryPacketResponse
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
 assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-assign fifo_response_din                  = map_CacheResponse_to_MemoryResponsePacket(response_in_reg.payload);
+assign fifo_response_din                  = response_in_reg.payload;
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
@@ -129,11 +129,11 @@ assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid;
 assign fifo_response_dout_int.payload     = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-  .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_MemoryPacketResponse (
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
+  .PROG_THRESH     (PROG_THRESH                       )
+) inst_fifo_MemoryPacketResponseResponse (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
   .din        (fifo_response_din                        ),

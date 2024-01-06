@@ -52,7 +52,6 @@ FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
 logic                         fifo_request_setup_signal_int;
-logic                         fifo_request_push_filter     ;
 
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals

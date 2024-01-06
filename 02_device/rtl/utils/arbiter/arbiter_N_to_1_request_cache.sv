@@ -23,12 +23,11 @@ module arbiter_N_to_1_request_cache #(
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
-  input  KernelDescriptor                 descriptor_in                        ,
-  input  MemoryPacket                     request_in [NUM_MEMORY_REQUESTOR-1:0],
+  input  MemoryPacketRequest              request_in [NUM_MEMORY_REQUESTOR-1:0],
   input  FIFOStateSignalsInput            fifo_request_signals_in              ,
   output FIFOStateSignalsOutput           fifo_request_signals_out             ,
   output logic [NUM_MEMORY_REQUESTOR-1:0] arbiter_grant_out                    ,
-  output CacheRequest                     request_out                          ,
+  output MemoryPacketRequest              request_out                          ,
   output logic                            fifo_setup_signal
 );
 
@@ -40,9 +39,8 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-MemoryPacket     request_in_reg   [NUM_MEMORY_REQUESTOR-1:0];
-MemoryPacket     request_out_int                            ;
-KernelDescriptor descriptor_in_reg                          ;
+MemoryPacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacket request_out_int                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
@@ -84,21 +82,6 @@ always_ff @(posedge ap_clk) begin
   areset_control <= areset;
   areset_fifo    <= areset;
   areset_arbiter <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor Control and Drive signals to other modules
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_control) begin
-    descriptor_in_reg.valid <= 0;
-  end
-  else begin
-    if(descriptor_in.valid)begin
-      descriptor_in_reg.valid   <= descriptor_in.valid;
-      descriptor_in_reg.payload <= descriptor_in.payload;
-    end
-  end
 end
 
 // --------------------------------------------------------------------------------------
@@ -149,7 +132,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-  request_out.payload <= map_MemoryRequestPacket_to_CacheRequest(request_out_int.payload, descriptor_in_reg.payload, request_out_int.valid & descriptor_in_reg.valid);
+  request_out.payload <= request_out_int.payload;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -166,7 +149,7 @@ always_ff @(posedge ap_clk) begin
     fifo_request_din_reg.valid <= 1'b0;
   end
   else begin
-    fifo_request_din_reg.valid <= arbiter_bus_out.valid & descriptor_in_reg.valid;
+    fifo_request_din_reg.valid <= arbiter_bus_out.valid;
   end
 end
 
@@ -211,10 +194,10 @@ generate
     assign request_arbiter_in_int[i].payload               = fifo_request_arbiter_in_dout[i];
 
     xpm_fifo_sync_wrapper #(
-      .FIFO_WRITE_DEPTH(16                        ),
-      .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-      .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-      .PROG_THRESH     (12                        )
+      .FIFO_WRITE_DEPTH(32                               ),
+      .WRITE_DATA_WIDTH($bits(MemoryPacketRequestPayload)),
+      .READ_DATA_WIDTH ($bits(MemoryPacketRequestPayload)),
+      .PROG_THRESH     (24                               )
     ) inst_fifo_MemoryPacketRequestArbiter (
       .clk        (ap_clk                                                ),
       .srst       (areset_fifo                                           ),
@@ -250,10 +233,10 @@ assign request_out_int.valid             = fifo_request_signals_out_int.valid;
 assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-  .PROG_THRESH     (PROG_THRESH               )
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                 ),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketRequestPayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketRequestPayload)),
+  .PROG_THRESH     (PROG_THRESH                      )
 ) inst_fifo_MemoryPacketRequest (
   .clk        (ap_clk                                  ),
   .srst       (areset_fifo                             ),
@@ -286,8 +269,8 @@ always_comb begin
 end
 
 arbiter_bus_N_in_1_out #(
-  .WIDTH    (NUM_MEMORY_REQUESTOR),
-  .BUS_WIDTH($bits(MemoryPacket) )
+  .WIDTH    (NUM_MEMORY_REQUESTOR      ),
+  .BUS_WIDTH($bits(MemoryPacketRequest))
 ) inst_arbiter_bus_N_in_1_out (
   .ap_clk           (ap_clk           ),
   .areset           (areset_arbiter   ),
