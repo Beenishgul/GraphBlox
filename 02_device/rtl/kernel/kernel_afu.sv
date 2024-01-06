@@ -107,25 +107,25 @@ KernelDescriptor kernel_cu_descriptor_in;
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI Mutli channels support
 // --------------------------------------------------------------------------------------
-logic areset_axi_slice[GLOBAL_NUM_CHANNELS-1:0];
-logic areset_cache    [GLOBAL_NUM_CHANNELS-1:0];
+logic areset_axi_slice[NUM_CHANNELS-1:0];
+logic areset_cache    [NUM_CHANNELS-1:0];
 // --------------------------------------------------------------------------------------
 // AXI
 // --------------------------------------------------------------------------------------
-AXI4BEMasterReadInterface  m_axi4_read [GLOBAL_NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterface m_axi4_write[GLOBAL_NUM_CHANNELS-1:0];
+AXI4BEMasterReadInterface  m_axi4_read [NUM_CHANNELS-1:0];
+AXI4BEMasterWriteInterface m_axi4_write[NUM_CHANNELS-1:0];
 
-AXI4MIDSlaveReadInterfaceOutput  kernel_s_axi_read_out [GLOBAL_NUM_CHANNELS-1:0];
-AXI4MIDSlaveReadInterfaceInput   kernel_s_axi_read_in  [GLOBAL_NUM_CHANNELS-1:0];
-AXI4MIDSlaveWriteInterfaceOutput kernel_s_axi_write_out[GLOBAL_NUM_CHANNELS-1:0];
-AXI4MIDSlaveWriteInterfaceInput  kernel_s_axi_write_in [GLOBAL_NUM_CHANNELS-1:0];
+AXI4MIDSlaveReadInterfaceOutput  kernel_s_axi_read_out [NUM_CHANNELS-1:0];
+AXI4MIDSlaveReadInterfaceInput   kernel_s_axi_read_in  [NUM_CHANNELS-1:0];
+AXI4MIDSlaveWriteInterfaceOutput kernel_s_axi_write_out[NUM_CHANNELS-1:0];
+AXI4MIDSlaveWriteInterfaceInput  kernel_s_axi_write_in [NUM_CHANNELS-1:0];
 
-AXI4BEMasterReadInterfaceInput   kernel_m_axi4_read_in  [GLOBAL_NUM_CHANNELS-1:0];
-AXI4BEMasterReadInterfaceOutput  kernel_m_axi4_read_out [GLOBAL_NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterfaceInput  kernel_m_axi4_write_in [GLOBAL_NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterfaceOutput kernel_m_axi4_write_out[GLOBAL_NUM_CHANNELS-1:0];
+AXI4BEMasterReadInterfaceInput   kernel_m_axi4_read_in  [NUM_CHANNELS-1:0];
+AXI4BEMasterReadInterfaceOutput  kernel_m_axi4_read_out [NUM_CHANNELS-1:0];
+AXI4BEMasterWriteInterfaceInput  kernel_m_axi4_write_in [NUM_CHANNELS-1:0];
+AXI4BEMasterWriteInterfaceOutput kernel_m_axi4_write_out[NUM_CHANNELS-1:0];
 
-logic [GLOBAL_NUM_CHANNELS-1:0] kernel_cache_setup_signal;
+logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
@@ -138,7 +138,7 @@ always_ff @(posedge ap_clk) begin
   areset_cu      <= areset_system;
   areset_control <= areset_system;
 
-  for (int i = 0; i < GLOBAL_NUM_CHANNELS; i++) begin
+  for (int i = 0; i < NUM_CHANNELS; i++) begin
     areset_cache[i]     <= areset_system;
     areset_axi_slice[i] <= areset_system;
   end
@@ -295,7 +295,7 @@ generate
 endgenerate
 
 generate
-  if(GLOBAL_NUM_CHANNELS > 1) begin
+  if(NUM_CHANNELS > 1) begin
     if(GLOBAL_SYSTEM_STREAM_IP == 1) begin
 // --------------------------------------------------------------------------------------
 // System Cache CH 1 -> AXI
@@ -328,7 +328,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 generate
-  for (i=0; i<(GLOBAL_NUM_CHANNELS); i++) begin : generate_axi_register_slice_be_ch
+  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_be_ch
 // --------------------------------------------------------------------------------------
     axi_register_slice_back_end inst_axi_register_slice_be (
       .ap_clk         (ap_clk                    ),
@@ -352,8 +352,8 @@ endgenerate
 assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
 
 kernel_cu #(
-  .ID_CU       (0                  ),
-  .NUM_CHANNELS(GLOBAL_NUM_CHANNELS)
+  .ID_CU       (0           ),
+  .NUM_CHANNELS(NUM_CHANNELS)
 ) inst_kernel_cu (
   .ap_clk           (ap_clk                     ),
   .areset           (areset_cu                  ),

@@ -37,6 +37,7 @@ package PKG_GLOBALS;
 // parameter NUM_LANES_WIDTH_BITS   = 4;
 // parameter NUM_ENGINES_WIDTH_BITS = 2;
 // parameter NUM_MODULES_WIDTH_BITS = 3;
+// parameter NUM_CHANNELS           = 1;
 // parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2((CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE*NUM_BUNDLES)+(16*NUM_BUNDLES));
 // -- include is auto generated --
 // --------------------------------------------------------------------------------------
@@ -51,7 +52,6 @@ package PKG_GLOBALS;
 	parameter CU_BUFFER_COUNT_WIDTH_BITS     = 8;
 	parameter GLOBAL_OVERLAY_SIZE_WIDTH_BITS = 12; // 4*2^10 entries max or 4KB 
 	parameter GLOBAL_BUFFER_SIZE_WIDTH_BITS  = 32; // 4*2^30 Buffers max or 4GB 
-	parameter GLOBAL_NUM_CHANNELS            = 2;  // number of channels per CU -> 32bank = 32 channels 
 
 // --------------------------------------------------------------------------------------
 //  KERNEL COMMON GLOBALS
