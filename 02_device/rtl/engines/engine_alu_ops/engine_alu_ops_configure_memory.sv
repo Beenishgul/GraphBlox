@@ -49,8 +49,8 @@ ALUOpsConfigurationMeta      configure_memory_meta_int                       ;
 ALUOpsConfiguration          configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
-logic [M_AXI4_FE_ADDR_W-1:0] response_memory_in_reg_offset_sequence          ;
-logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
+type_memory_response_offset  response_memory_in_reg_offset_sequence          ;
+type_memory_response_offset  fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO

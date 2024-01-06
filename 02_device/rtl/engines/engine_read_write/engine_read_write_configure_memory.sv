@@ -49,8 +49,8 @@ ReadWriteConfigurationMeta   configure_memory_meta_int                       ;
 ReadWriteConfiguration       configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
-type_memory_response_address response_memory_in_reg_offset_sequence          ;
-type_memory_response_address fifo_response_memory_in_dout_int_offset_sequence;
+type_memory_response_offset response_memory_in_reg_offset_sequence          ;
+type_memory_response_offset fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
