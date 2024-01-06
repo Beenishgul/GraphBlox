@@ -40,7 +40,7 @@ module engine_read_write #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  MemoryPacketResponse   response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     input  ControlPacket          response_control_in                                              ,
@@ -49,7 +49,7 @@ module engine_read_write #(parameter
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacket           request_memory_out                                               ,
+    output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output ControlPacket          request_control_out                                              ,
@@ -71,13 +71,13 @@ logic areset_generator        ;
 
 KernelDescriptor descriptor_in_reg;
 
-EnginePacket response_engine_in_reg;
-MemoryPacket response_memory_in_reg;
+EnginePacket         response_engine_in_reg;
+MemoryPacketResponse response_memory_in_reg;
 
-EnginePacket request_engine_out_int;
-MemoryPacket request_memory_out_int;
-EnginePacket response_engine_in_int;
-MemoryPacket response_memory_in_int;
+EnginePacket         request_engine_out_int;
+MemoryPacketRequest  request_memory_out_int;
+EnginePacket         response_engine_in_int;
+MemoryPacketResponse response_memory_in_int;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -110,7 +110,7 @@ logic configure_fifo_setup_signal;
 ReadWriteConfiguration configure_engine_out                              ;
 FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out;
 
-MemoryPacket           configure_memory_response_memory_in                 ;
+MemoryPacketResponse   configure_memory_response_memory_in                 ;
 FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
 FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
 ReadWriteConfiguration configure_memory_out                                ;
@@ -135,9 +135,9 @@ logic                  generator_engine_configure_memory_setup             ;
 logic                  generator_engine_done_out                           ;
 logic                  generator_engine_fifo_setup_signal                  ;
 EnginePacket           generator_engine_request_engine_out                 ;
-MemoryPacket           generator_engine_request_memory_out                 ;
+MemoryPacketRequest    generator_engine_request_memory_out                 ;
 EnginePacket           generator_engine_response_engine_in                 ;
-MemoryPacket           generator_engine_response_memory_in                 ;
+MemoryPacketResponse   generator_engine_response_memory_in                 ;
 ReadWriteConfiguration generator_engine_configure_engine_in                ;
 ReadWriteConfiguration generator_engine_configure_memory_in                ;
 
@@ -145,13 +145,13 @@ ReadWriteConfiguration generator_engine_configure_memory_in                ;
 // Generate Lanes - Arbiter Signals: Memory Response/Engine Generator
 // --------------------------------------------------------------------------------------
 logic                  areset_arbiter_1_to_N_memory                                    ;
-MemoryPacket           arbiter_1_to_N_memory_response_in                               ;
+MemoryPacketResponse   arbiter_1_to_N_memory_response_in                               ;
 FIFOStateSignalsInput  arbiter_1_to_N_memory_fifo_response_signals_in [NUM_MODULES-1:0];
 FIFOStateSignalsOutput arbiter_1_to_N_memory_fifo_response_signals_out                 ;
 MemoryPacket           arbiter_1_to_N_memory_response_out             [NUM_MODULES-1:0];
 logic                  arbiter_1_to_N_memory_fifo_setup_signal                         ;
 
-MemoryPacket           modules_response_memory_in                 [NUM_MODULES-1:0];
+MemoryPacketResponse   modules_response_memory_in                 [NUM_MODULES-1:0];
 FIFOStateSignalsInput  modules_fifo_response_memory_in_signals_in [NUM_MODULES-1:0];
 FIFOStateSignalsOutput modules_fifo_response_memory_in_signals_out[NUM_MODULES-1:0];
 
@@ -289,8 +289,8 @@ end
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_memory #(
-    .NUM_MEMORY_RECEIVER (2),
-    .ID_LEVEL            (4)
+    .NUM_MEMORY_RECEIVER(2),
+    .ID_LEVEL           (4)
 ) inst_arbiter_1_to_N_memory_response_in (
     .ap_clk                   (ap_clk                                         ),
     .areset                   (areset_arbiter_1_to_N_memory                   ),
