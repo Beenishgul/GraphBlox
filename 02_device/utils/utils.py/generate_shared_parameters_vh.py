@@ -19,19 +19,27 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABI
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
-output_folder_path_topology = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
+output_folder_path_topology   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
+output_folder_path_global     = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
+output_folder_path_parameters = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
 
 if not os.path.exists(output_folder_path_topology):
     os.makedirs(output_folder_path_topology)
 
-output_file_path_shared = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
-output_file_path_global = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global" ,"config_parameters.vh")
-output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
-output_file_lane_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_topology.vh")
+if not os.path.exists(output_folder_path_global):
+    os.makedirs(output_folder_path_global)
 
-output_file_cu_arbitration = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "cu_arbitration.vh")
-output_file_bundle_arbitration = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_arbitration.vh")
-output_file_lane_arbitration = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" ,"lane_arbitration.vh")
+if not os.path.exists(output_folder_path_parameters):
+    os.makedirs(output_folder_path_parameters)
+
+output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
+output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
+output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
+output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
+
+output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
+output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
+output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
