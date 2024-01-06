@@ -52,13 +52,13 @@ module engine_read_write_generator #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  MemoryPacketResponse   response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacket           request_memory_out                                               ,
+    output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output logic                  fifo_setup_signal                                                ,
@@ -103,10 +103,10 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
     logic                         fifo_request_setup_signal_int;
 
-    EnginePacket response_engine_in_reg    ;
-    MemoryPacket response_memory_in_reg    ;
-    MemoryPacket response_memory_in_reg_S2 ;
-    logic        configure_memory_setup_reg;
+    EnginePacket         response_engine_in_reg    ;
+    MemoryPacketResponse response_memory_in_reg    ;
+    MemoryPacketResponse response_memory_in_reg_S2 ;
+    logic                configure_memory_setup_reg;
 
     logic                            configure_engine_param_valid;
     ReadWriteConfigurationParameters configure_engine_param_int  ;
@@ -669,13 +669,13 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid              = request_pending_out_int.valid;
-    assign fifo_response_comb.payload.meta.route = request_pending_out_int.payload.meta.route;
-    always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
-
     always_ff @(posedge ap_clk) begin
         response_memory_in_reg_S2 <= response_memory_in_reg;
     end
+
+    assign fifo_response_comb.valid              = request_pending_out_int.valid;
+    assign fifo_response_comb.payload.meta.route = request_pending_out_int.payload.meta.route;
+    always_comb fifo_response_comb.payload.data         = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, request_pending_out_int.payload.data);
 
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin

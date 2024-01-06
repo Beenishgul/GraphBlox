@@ -239,7 +239,7 @@ typedef struct packed{
 
 typedef struct packed{
   EnginePacketRouteAttributes route   ;
-  PacketDataAddress           address ;
+  MemoryPacketRequestMeta     address ;
   MemoryPacketType            subclass;
 } EnginePacketMetaFull;
 
@@ -437,8 +437,8 @@ function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (
 
   output_packet.meta.route.packet_source  = input_packet_req.meta.route.packet_source ;
   output_packet.meta.address.offset       = input_packet_req.meta.address.offset;
-  // output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
-  output_packet.data.field    = input_packet_resp.iob.rdata;
+  output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
+  output_packet.data.field                = input_packet_resp.iob.rdata;
 
   return output_packet;
 endfunction : map_CacheResponse_to_MemoryResponsePacket
