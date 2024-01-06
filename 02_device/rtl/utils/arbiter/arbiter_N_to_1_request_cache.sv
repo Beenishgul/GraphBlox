@@ -39,15 +39,15 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-MemoryPacket request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
-MemoryPacket request_out_int                          ;
+MemoryPacketRequest request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacketRequest request_out_int                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload           fifo_request_din             ;
-MemoryPacket                  fifo_request_din_reg         ;
-MemoryPacketPayload           fifo_request_dout            ;
+MemoryPacketRequesttPayload   fifo_request_din             ;
+MemoryPacketRequest           fifo_request_din_reg         ;
+MemoryPacketRequesttPayload   fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -56,21 +56,21 @@ logic                         fifo_request_setup_signal_int;
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-MemoryPacket arbiter_bus_out                           ;
-MemoryPacket arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
+MemoryPacketRequest arbiter_bus_out                           ;
+MemoryPacketRequest arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
 
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant    ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request  ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid;
 
 // --------------------------------------------------------------------------------------
-// FIFO Request INPUT Arbiter MemoryPacket
+// FIFO Request INPUT Arbiter MemoryPacketRequest
 // --------------------------------------------------------------------------------------
-MemoryPacket request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
-MemoryPacket request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequest request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequest request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
 
-MemoryPacketPayload                fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
-MemoryPacketPayload                fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequesttPayload        fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequesttPayload        fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsInputInternal      fifo_request_arbiter_in_signals_in_int  [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsOutInternal        fifo_request_arbiter_in_signals_out_int [(NUM_MEMORY_REQUESTOR)-1:0];
 logic [(NUM_MEMORY_REQUESTOR)-1:0] fifo_request_arbiter_in_setup_signal_int                            ;
@@ -158,7 +158,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Engine Response MemoryPacket
+// FIFO INPUT Engine Response MemoryPacketRequest
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_arbiter) begin
