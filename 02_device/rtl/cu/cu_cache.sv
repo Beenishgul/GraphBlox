@@ -284,7 +284,7 @@ xpm_fifo_sync_wrapper #(
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-always_comb fifo_response_din = map_CacheResponse_to_MemoryResponsePacket(cache_request_mem,cache_response_mem);
+always_comb fifo_response_din = map_CacheResponse_to_MemoryResponsePacket(cache_request_mem, cache_response_mem);
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
@@ -443,7 +443,7 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .ap_clken    (1'b1                                                                                         ),
   .areset      (areset_counter                                                                               ),
   .load        (counter_load                                                                                 ),
-  .incr        (fifo_response_signals_in_int.wr_en  & (fifo_response_din.meta.subclass.cmd == CMD_MEM_WRITE) ),
+  .incr        (fifo_response_signals_in_int.wr_en  & (cache_request_mem.meta.subclass.cmd == CMD_MEM_WRITE) ),
   .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
   .load_value  (write_command_counter_load_value                                                             ),
   .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
