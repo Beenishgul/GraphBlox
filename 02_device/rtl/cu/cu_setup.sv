@@ -15,13 +15,13 @@
 `include "global_package.vh"
 
 module cu_setup #(
-    parameter ID_CU            = 0                    ,
-    parameter ID_BUNDLE        = 0                    ,
-    parameter ID_LANE          = 0                    ,
-    parameter ID_ENGINE        = 0                    ,
-    parameter ID_MODULE        = 0                    ,
-    parameter FIFO_WRITE_DEPTH = 32                   ,
-    parameter PROG_THRESH      = 16                   ,
+    parameter ID_CU            = 0               ,
+    parameter ID_BUNDLE        = 0               ,
+    parameter ID_LANE          = 0               ,
+    parameter ID_ENGINE        = 0               ,
+    parameter ID_MODULE        = 0               ,
+    parameter FIFO_WRITE_DEPTH = 32              ,
+    parameter PROG_THRESH      = 16              ,
     parameter COUNTER_WIDTH    = M_AXI4_FE_DATA_W
 ) (
     // System Signals
@@ -29,10 +29,10 @@ module cu_setup #(
     input  logic                  areset                   ,
     input  logic                  cu_flush                 ,
     input  KernelDescriptor       descriptor_in            ,
-    input  MemoryPacket           response_in              ,
+    input  MemoryPacketResponse   response_in              ,
     input  FIFOStateSignalsInput  fifo_response_signals_in ,
     output FIFOStateSignalsOutput fifo_response_signals_out,
-    output MemoryPacket           request_out              ,
+    output MemoryPacketRequest    request_out              ,
     input  FIFOStateSignalsInput  fifo_request_signals_in  ,
     output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
@@ -51,11 +51,11 @@ logic areset_counter    ;
 logic counter_clear;
 logic counter_load ;
 
-logic            cu_flush_reg     ;
-logic            cu_flush_mode    ;
-KernelDescriptor descriptor_in_reg;
-MemoryPacket     response_in_reg  ;
-MemoryPacket     request_out_int  ;
+logic                cu_flush_reg     ;
+logic                cu_flush_mode    ;
+KernelDescriptor     descriptor_in_reg;
+MemoryPacketResponse response_in_reg  ;
+MemoryPacketRequest  request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 // Setup state machine signals
@@ -70,8 +70,8 @@ cu_setup_state next_state   ;
 // --------------------------------------------------------------------------------------
 // Request FIFO OUTPUT
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload           fifo_request_din             ;
-MemoryPacketPayload           fifo_request_dout            ;
+MemoryPacketRequestPayload    fifo_request_din             ;
+MemoryPacketRequestPayload    fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -89,7 +89,7 @@ FIFOStateSignalsOutInternal fifo_response_signals_out_int;
 CUSetupEngineConfiguration engine_cu_setup_configuration_in        ;
 CUSetupEngineConfiguration configuration_comb_program              ;
 CUSetupEngineConfiguration configuration_comb_flush                ;
-MemoryPacket               engine_cu_setup_request_out             ;
+MemoryPacketRequest        engine_cu_setup_request_out             ;
 FIFOStateSignalsOutput     engine_cu_setup_fifo_request_signals_out;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_in ;
 FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_reg;
@@ -359,26 +359,26 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet Program
 // --------------------------------------------------------------------------------------
-assign configuration_comb_program.payload.param.increment                         = 1'b1;
-assign configuration_comb_program.payload.param.decrement                         = 1'b0;
-assign configuration_comb_program.payload.param.flush_mode                        = 1'b0;
-assign configuration_comb_program.payload.param.flush_enable                      = descriptor_in_reg.payload.buffer_9[2];
-assign configuration_comb_program.payload.param.id_buffer                         = 0;
-assign configuration_comb_program.payload.param.array_size                        = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.start_read                        = 0;
-assign configuration_comb_program.payload.param.end_read                          = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.stride                            = 1;
-assign configuration_comb_program.payload.param.granularity                       = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.route.packet_source.id_cu          = ID_CU;
-assign configuration_comb_program.payload.meta.route.packet_source.id_bundle      = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_lane        = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_engine      = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_module      = 1;
-assign configuration_comb_program.payload.meta.address.id_buffer                  = 0;
-assign configuration_comb_program.payload.meta.address.offset                     = 0;
-assign configuration_comb_program.payload.meta.address.shift.amount               = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.address.shift.direction            = 1'b1;
-assign configuration_comb_program.payload.meta.subclass.cmd                       = CMD_MEM_READ;
+assign configuration_comb_program.payload.param.increment                    = 1'b1;
+assign configuration_comb_program.payload.param.decrement                    = 1'b0;
+assign configuration_comb_program.payload.param.flush_mode                   = 1'b0;
+assign configuration_comb_program.payload.param.flush_enable                 = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_program.payload.param.id_buffer                    = 0;
+assign configuration_comb_program.payload.param.array_size                   = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.payload.param.start_read                   = 0;
+assign configuration_comb_program.payload.param.end_read                     = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.payload.param.stride                       = 1;
+assign configuration_comb_program.payload.param.granularity                  = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.payload.meta.route.packet_source.id_cu     = ID_CU;
+assign configuration_comb_program.payload.meta.route.packet_source.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.payload.meta.route.packet_source.id_module = 1;
+assign configuration_comb_program.payload.meta.address.id_buffer             = 0;
+assign configuration_comb_program.payload.meta.address.offset                = 0;
+assign configuration_comb_program.payload.meta.address.shift.amount          = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.payload.meta.address.shift.direction       = 1'b1;
+assign configuration_comb_program.payload.meta.subclass.cmd                  = CMD_MEM_READ;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet FLUSH
@@ -460,10 +460,10 @@ assign request_out_int.valid             = fifo_request_signals_out_int.valid;
 assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-    .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-    .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
+    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                 ),
+    .WRITE_DATA_WIDTH($bits(MemoryPacketRequestPayload)),
+    .READ_DATA_WIDTH ($bits(MemoryPacketRequestPayload)),
+    .PROG_THRESH     (PROG_THRESH                      )
 ) inst_fifo_MemoryPacketRequest (
     .clk        (ap_clk                                  ),
     .srst       (areset_fifo                             ),
