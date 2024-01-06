@@ -68,7 +68,8 @@ fifo_memory   = config_data["fifo_memory"]
 fifo_engine   = config_data["fifo_engine"]
 
 
-NUM_CHANNELS_TOP = max(int(properties[0]) for properties in channels.values())
+DISTINCT_CHANNELS = set(int(properties[0]) for properties in channels.values())
+NUM_CHANNELS_TOP = len(DISTINCT_CHANNELS)
 
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
@@ -654,7 +655,7 @@ parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = 64 ,
 parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = 512,
 parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1,
 """
-    for channel in range(int(NUM_CHANNELS_TOP)):
+    for channel in DISTINCT_CHANNELS:
         output_lines.append(ports_template.format(channel))
     
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
@@ -1387,61 +1388,61 @@ with open(output_file_cu_arbitration, "w") as file:
 with open(output_file_channel_top, 'w') as file:
     output_lines = []
 
-    for channel in range(int(NUM_CHANNELS_TOP)):
+    for channel, channel_dist in zip(range(int(NUM_CHANNELS_TOP)), DISTINCT_CHANNELS):
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel}")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel} READ AXI4 SIGNALS INPUT")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rvalid  = m{channel:02d}_axi_rvalid ; // Read channel valid")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.arready = m{channel:02d}_axi_arready; // Address read channel ready")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rlast   = m{channel:02d}_axi_rlast  ; // Read channel last word")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rdata   = swap_endianness_cacheline_axi_be(m{channel:02d}_axi_rdata, endian_read_reg)  ; // Read channel data")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rid     = m{channel:02d}_axi_rid    ; // Read channel ID")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rresp   = m{channel:02d}_axi_rresp  ; // Read channel response")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rvalid  = m{channel_dist:02d}_axi_rvalid ; // Read channel valid")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.arready = m{channel_dist:02d}_axi_arready; // Address read channel ready")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rlast   = m{channel_dist:02d}_axi_rlast  ; // Read channel last word")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rdata   = swap_endianness_cacheline_axi_be(m{channel_dist:02d}_axi_rdata, endian_read_reg)  ; // Read channel data")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rid     = m{channel_dist:02d}_axi_rid    ; // Read channel ID")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rresp   = m{channel_dist:02d}_axi_rresp  ; // Read channel response")
         output_lines.append("")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel} READ AXI4 SIGNALS OUTPUT")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"assign m{channel:02d}_axi_arvalid = m_axi4_read[{channel}].out.arvalid; // Address read channel valid")
-        output_lines.append(f"assign m{channel:02d}_axi_araddr  = m_axi4_read[{channel}].out.araddr ; // Address read channel address")
-        output_lines.append(f"assign m{channel:02d}_axi_arlen   = m_axi4_read[{channel}].out.arlen  ; // Address write channel burst length")
-        output_lines.append(f"assign m{channel:02d}_axi_rready  = m_axi4_read[{channel}].out.rready ; // Read channel ready")
-        output_lines.append(f"assign m{channel:02d}_axi_arid    = m_axi4_read[{channel}].out.arid   ; // Address read channel ID")
-        output_lines.append(f"assign m{channel:02d}_axi_arsize  = m_axi4_read[{channel}].out.arsize ; // Address read channel burst size")
-        output_lines.append(f"assign m{channel:02d}_axi_arburst = m_axi4_read[{channel}].out.arburst; // Address read channel burst type")
-        output_lines.append(f"assign m{channel:02d}_axi_arlock  = m_axi4_read[{channel}].out.arlock ; // Address read channel lock type")
-        output_lines.append(f"assign m{channel:02d}_axi_arcache = m_axi4_read[{channel}].out.arcache; // Address read channel memory type")
-        output_lines.append(f"assign m{channel:02d}_axi_arprot  = m_axi4_read[{channel}].out.arprot ; // Address write channel protection type")
-        output_lines.append(f"assign m{channel:02d}_axi_arqos   = m_axi4_read[{channel}].out.arqos  ; // Address write channel quality of service")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arvalid = m_axi4_read[{channel}].out.arvalid; // Address read channel valid")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_araddr  = m_axi4_read[{channel}].out.araddr ; // Address read channel address")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arlen   = m_axi4_read[{channel}].out.arlen  ; // Address write channel burst length")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_rready  = m_axi4_read[{channel}].out.rready ; // Read channel ready")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arid    = m_axi4_read[{channel}].out.arid   ; // Address read channel ID")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arsize  = m_axi4_read[{channel}].out.arsize ; // Address read channel burst size")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arburst = m_axi4_read[{channel}].out.arburst; // Address read channel burst type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arlock  = m_axi4_read[{channel}].out.arlock ; // Address read channel lock type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arcache = m_axi4_read[{channel}].out.arcache; // Address read channel memory type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arprot  = m_axi4_read[{channel}].out.arprot ; // Address write channel protection type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_arqos   = m_axi4_read[{channel}].out.arqos  ; // Address write channel quality of service")
         output_lines.append("")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel} WRITE AXI4 SIGNALS INPUT")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"assign m_axi4_write[{channel}].in.awready = m{channel:02d}_axi_awready; // Address write channel ready")
-        output_lines.append(f"assign m_axi4_write[{channel}].in.wready  = m{channel:02d}_axi_wready ; // Write channel ready")
-        output_lines.append(f"assign m_axi4_write[{channel}].in.bid     = m{channel:02d}_axi_bid    ; // Write response channel ID")
-        output_lines.append(f"assign m_axi4_write[{channel}].in.bresp   = m{channel:02d}_axi_bresp  ; // Write channel response")
-        output_lines.append(f"assign m_axi4_write[{channel}].in.bvalid  = m{channel:02d}_axi_bvalid ; // Write response channel valid")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.awready = m{channel_dist:02d}_axi_awready; // Address write channel ready")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.wready  = m{channel_dist:02d}_axi_wready ; // Write channel ready")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bid     = m{channel_dist:02d}_axi_bid    ; // Write response channel ID")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bresp   = m{channel_dist:02d}_axi_bresp  ; // Write channel response")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bvalid  = m{channel_dist:02d}_axi_bvalid ; // Write response channel valid")
         output_lines.append("")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel} WRITE AXI4 SIGNALS OUTPUT")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"assign m{channel:02d}_axi_awvalid = m_axi4_write[{channel}].out.awvalid; // Address write channel valid")
-        output_lines.append(f"assign m{channel:02d}_axi_awid    = m_axi4_write[{channel}].out.awid   ; // Address write channel ID")
-        output_lines.append(f"assign m{channel:02d}_axi_awaddr  = m_axi4_write[{channel}].out.awaddr ; // Address write channel address")
-        output_lines.append(f"assign m{channel:02d}_axi_awlen   = m_axi4_write[{channel}].out.awlen  ; // Address write channel burst length")
-        output_lines.append(f"assign m{channel:02d}_axi_awsize  = m_axi4_write[{channel}].out.awsize ; // Address write channel burst size")
-        output_lines.append(f"assign m{channel:02d}_axi_awburst = m_axi4_write[{channel}].out.awburst; // Address write channel burst type")
-        output_lines.append(f"assign m{channel:02d}_axi_awlock  = m_axi4_write[{channel}].out.awlock ; // Address write channel lock type")
-        output_lines.append(f"assign m{channel:02d}_axi_awcache = m_axi4_write[{channel}].out.awcache; // Address write channel memory type")
-        output_lines.append(f"assign m{channel:02d}_axi_awprot  = m_axi4_write[{channel}].out.awprot ; // Address write channel protection type")
-        output_lines.append(f"assign m{channel:02d}_axi_awqos   = m_axi4_write[{channel}].out.awqos  ; // Address write channel quality of service")
-        output_lines.append(f"assign m{channel:02d}_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write[{channel}].out.wdata, endian_write_reg); // Write channel data")
-        output_lines.append(f"assign m{channel:02d}_axi_wstrb   = m_axi4_write[{channel}].out.wstrb  ; // Write channel write strobe")
-        output_lines.append(f"assign m{channel:02d}_axi_wlast   = m_axi4_write[{channel}].out.wlast  ; // Write channel last word flag")
-        output_lines.append(f"assign m{channel:02d}_axi_wvalid  = m_axi4_write[{channel}].out.wvalid ; // Write channel valid")
-        output_lines.append(f"assign m{channel:02d}_axi_bready  = m_axi4_write[{channel}].out.bready ; // Write response channel ready")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awvalid = m_axi4_write[{channel}].out.awvalid; // Address write channel valid")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awid    = m_axi4_write[{channel}].out.awid   ; // Address write channel ID")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awaddr  = m_axi4_write[{channel}].out.awaddr ; // Address write channel address")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awlen   = m_axi4_write[{channel}].out.awlen  ; // Address write channel burst length")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awsize  = m_axi4_write[{channel}].out.awsize ; // Address write channel burst size")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awburst = m_axi4_write[{channel}].out.awburst; // Address write channel burst type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awlock  = m_axi4_write[{channel}].out.awlock ; // Address write channel lock type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awcache = m_axi4_write[{channel}].out.awcache; // Address write channel memory type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awprot  = m_axi4_write[{channel}].out.awprot ; // Address write channel protection type")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_awqos   = m_axi4_write[{channel}].out.awqos  ; // Address write channel quality of service")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write[{channel}].out.wdata, endian_write_reg); // Write channel data")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_wstrb   = m_axi4_write[{channel}].out.wstrb  ; // Write channel write strobe")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_wlast   = m_axi4_write[{channel}].out.wlast  ; // Write channel last word flag")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_wvalid  = m_axi4_write[{channel}].out.wvalid ; // Write channel valid")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_bready  = m_axi4_write[{channel}].out.bready ; // Write response channel ready")
         output_lines.append("")
 
     # Writing to the VHDL file
@@ -1494,7 +1495,7 @@ output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
 output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
-    for channel in range(int(NUM_CHANNELS_TOP)):
+    for channel in DISTINCT_CHANNELS:
         output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))
@@ -1543,7 +1544,7 @@ output wire [                           3-1:0] m{0:02d}_axi_arprot       , // Ad
 output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Address read channel quality of service
     """
 
-    for channel in range(int(NUM_CHANNELS_TOP)):
+    for channel in DISTINCT_CHANNELS:
         output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))
@@ -1592,7 +1593,7 @@ with open(output_file_afu_portmap, 'w') as file:
 .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
     """
 
-    for channel in range(int(NUM_CHANNELS_TOP)):
+    for channel in DISTINCT_CHANNELS:
         output_lines.append(connection_template.format(channel))
 
     file.write('\n'.join(output_lines))
@@ -1620,14 +1621,13 @@ def generate_tcl_script_from_json(output_file_name):
             current_address += size_in_hex  # Increment the address based on the size
 
 def generate_ipx_associate_commands(output_file_name):
-    # Find the highest channel number
-    highest_channel_number = max(int(properties[0]) for properties in channels.values())
 
     # Open output file for appending
     with open(output_file_name, "a") as file:
-        for channel_num in range(highest_channel_number + 1):
+        for channel_num in DISTINCT_CHANNELS:
             file.write(f'ipx::associate_bus_interfaces -busif "m0{channel_num}_axi" -clock "ap_clk" $core >> $log_file\n')
 
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands(output_file_generate_ports_tcl)
 generate_tcl_script_from_json(output_file_buffer_channels_tcl)
+
