@@ -41,7 +41,7 @@ module engine_forward_data #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  MemoryPacketResponse   response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     input  ControlPacket          response_control_in                                              ,
@@ -50,7 +50,7 @@ module engine_forward_data #(parameter
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacket           request_memory_out                                               ,
+    output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output ControlPacket          request_control_out                                              ,
@@ -72,15 +72,10 @@ assign request_memory_out                   = 0;
 logic areset_forward_data_engine;
 logic areset_generator          ;
 
-KernelDescriptor descriptor_in_reg;
-
-EnginePacket response_engine_in_reg;
-MemoryPacket response_memory_in_reg;
-
-EnginePacket request_engine_out_int;
-EnginePacket response_engine_in_int;
-MemoryPacket response_memory_in_int;
-
+KernelDescriptor descriptor_in_reg     ;
+EnginePacket     response_engine_in_reg;
+EnginePacket     request_engine_out_int;
+EnginePacket     response_engine_in_int;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
@@ -188,11 +183,6 @@ end
 // FIFO INPUT Engine Response EnginePacket
 // --------------------------------------------------------------------------------------
 assign response_engine_in_int = response_engine_in_reg;
-
-// --------------------------------------------------------------------------------------
-// FIFO INPUT Memory Response EnginePacket
-// --------------------------------------------------------------------------------------
-assign response_memory_in_int = response_memory_in_reg;
 
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT Engine requests EnginePacket
