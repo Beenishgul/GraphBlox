@@ -36,12 +36,14 @@ if not os.path.exists(output_folder_path_parameters):
 if not os.path.exists(output_folder_path_portmaps):
     os.makedirs(output_folder_path_portmaps)
 
+output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
 output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
 output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
+output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
@@ -620,18 +622,34 @@ CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE = sum(CU_BUNDLES_CONFIG_BUNDLE
 CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP)
 
 check_and_clean_file(output_file_path_global)
+check_and_clean_file(output_file_top_parameters)
 check_and_clean_file(output_file_path_shared)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
 check_and_clean_file(output_file_channel_top)
 check_and_clean_file(output_file_afu_ports)
+check_and_clean_file(output_file_top_ports)
 check_and_clean_file(output_file_afu_portmap)
-
 check_and_clean_file(output_file_cu_arbitration)
 check_and_clean_file(output_file_bundle_arbitration)
 check_and_clean_file(output_file_lane_arbitration)
 
+# Write to VHDL file
+with open(output_file_top_parameters, "w") as file:
+    output_lines = []
 
+    ports_template = """
+parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = 64 ,
+parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = 512,
+parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1,
+"""
+    for channel in range(int(NUM_CHANNELS)):
+        output_lines.append(ports_template.format(channel))
+    
+    output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
+    output_lines.append(f"parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32")
+
+    file.write('\n'.join(output_lines))
 
 # Write to VHDL file
 with open(output_file_path_global, "w") as file:
@@ -1424,45 +1442,45 @@ with open(output_file_afu_ports, 'w') as file:
     output_lines = []
 
     ports_template = """
-    output logic                         m{0:02d}_axi_awvalid,
-    input  logic                         m{0:02d}_axi_awready,
-    output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
-    output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_awlen  ,
-    output logic                         m{0:02d}_axi_wvalid ,
-    input  logic                         m{0:02d}_axi_wready ,
-    output logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_wdata  ,
-    output logic [ M_AXI4_BE_STRB_W-1:0] m{0:02d}_axi_wstrb  ,
-    output logic                         m{0:02d}_axi_wlast  ,
-    input  logic                         m{0:02d}_axi_bvalid ,
-    output logic                         m{0:02d}_axi_bready ,
-    output logic                         m{0:02d}_axi_arvalid,
-    input  logic                         m{0:02d}_axi_arready,
-    output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_araddr ,
-    output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_arlen  ,
-    input  logic                         m{0:02d}_axi_rvalid ,
-    output logic                         m{0:02d}_axi_rready ,
-    input  logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
-    input  logic                         m{0:02d}_axi_rlast  ,
-    // Control Signals
-    // AXI4 master interface m{0:02d}_axi missing ports
-    input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
-    input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_rid    ,
-    input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_rresp  ,
-    input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_bresp  ,
-    output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_awid   ,
-    output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_awsize ,
-    output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_awburst,
-    output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_awlock ,
-    output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_awcache,
-    output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_awprot ,
-    output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_awqos  ,
-    output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_arid   ,
-    output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_arsize ,
-    output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_arburst,
-    output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_arlock ,
-    output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_arcache,
-    output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
-    output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
+output logic                         m{0:02d}_axi_awvalid,
+input  logic                         m{0:02d}_axi_awready,
+output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
+output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_awlen  ,
+output logic                         m{0:02d}_axi_wvalid ,
+input  logic                         m{0:02d}_axi_wready ,
+output logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_wdata  ,
+output logic [ M_AXI4_BE_STRB_W-1:0] m{0:02d}_axi_wstrb  ,
+output logic                         m{0:02d}_axi_wlast  ,
+input  logic                         m{0:02d}_axi_bvalid ,
+output logic                         m{0:02d}_axi_bready ,
+output logic                         m{0:02d}_axi_arvalid,
+input  logic                         m{0:02d}_axi_arready,
+output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_araddr ,
+output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_arlen  ,
+input  logic                         m{0:02d}_axi_rvalid ,
+output logic                         m{0:02d}_axi_rready ,
+input  logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
+input  logic                         m{0:02d}_axi_rlast  ,
+// Control Signals
+// AXI4 master interface m{0:02d}_axi missing ports
+input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
+input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_rid    ,
+input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_rresp  ,
+input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_bresp  ,
+output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_awid   ,
+output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_awsize ,
+output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_awburst,
+output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_awlock ,
+output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_awcache,
+output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_awprot ,
+output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_awqos  ,
+output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_arid   ,
+output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_arsize ,
+output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_arburst,
+output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_arlock ,
+output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_arcache,
+output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
+output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
     for channel in range(int(NUM_CHANNELS)):
@@ -1470,47 +1488,97 @@ with open(output_file_afu_ports, 'w') as file:
 
     file.write('\n'.join(output_lines))
 
+with open(output_file_top_ports, 'w') as file:
+    output_lines = []
+
+    ports_template = """
+input  wire                                    m{0:02d}_axi_awready      , // Address write channel ready
+input  wire                                    m{0:02d}_axi_wready       , // Write channel ready
+output wire                                    m{0:02d}_axi_awvalid      , // Address write channel valid
+output wire                                    m{0:02d}_axi_wlast        , // Write channel last word flag
+output wire                                    m{0:02d}_axi_wvalid       , // Write channel valid
+output wire [                           8-1:0] m{0:02d}_axi_awlen        , // Address write channel burst length
+output wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_awaddr       , // Address write channel address
+output wire [        C_M{0:02d}_AXI_DATA_WIDTH-1:0] m{0:02d}_axi_wdata        , // Write channel data
+output wire [      C_M{0:02d}_AXI_DATA_WIDTH/8-1:0] m{0:02d}_axi_wstrb        , // Write channel write strobe
+input  wire                                    m{0:02d}_axi_bvalid       , // Write response channel valid
+output wire                                    m{0:02d}_axi_bready       , // Write response channel ready
+input  wire                                    m{0:02d}_axi_arready      , // Address read channel ready
+input  wire                                    m{0:02d}_axi_rlast        , // Read channel last word
+input  wire                                    m{0:02d}_axi_rvalid       , // Read channel valid
+input  wire [        C_M{0:02d}_AXI_DATA_WIDTH-1:0] m{0:02d}_axi_rdata        , // Read channel data
+output wire                                    m{0:02d}_axi_arvalid      , // Address read channel valid
+output wire                                    m{0:02d}_axi_rready       , // Read channel ready
+output wire [                           8-1:0] m{0:02d}_axi_arlen        , // Address write channel burst length
+output wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_araddr       , // Address read channel address
+// AXI4 master interface m{0:02d}_axi missing ports
+input  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_bid          , // Write response channel ID
+input  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_rid          , // Read channel ID
+input  wire [                           2-1:0] m{0:02d}_axi_rresp        , // Read channel response
+input  wire [                           2-1:0] m{0:02d}_axi_bresp        , // Write channel response
+output wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_awid         , // Address write channel ID
+output wire [                           3-1:0] m{0:02d}_axi_awsize       , // Address write channel burst size
+output wire [                           2-1:0] m{0:02d}_axi_awburst      , // Address write channel burst type
+output wire [                           1-1:0] m{0:02d}_axi_awlock       , // Address write channel lock type
+output wire [                           4-1:0] m{0:02d}_axi_awcache      , // Address write channel memory type
+output wire [                           3-1:0] m{0:02d}_axi_awprot       , // Address write channel protection type
+output wire [                           4-1:0] m{0:02d}_axi_awqos        , // Address write channel quality of service
+output wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_arid         , // Address read channel ID
+output wire [                           3-1:0] m{0:02d}_axi_arsize       , // Address read channel burst size
+output wire [                           2-1:0] m{0:02d}_axi_arburst      , // Address read channel burst type
+output wire [                           1-1:0] m{0:02d}_axi_arlock       , // Address read channel lock type
+output wire [                           4-1:0] m{0:02d}_axi_arcache      , // Address read channel memory type
+output wire [                           3-1:0] m{0:02d}_axi_arprot       , // Address read channel protection type
+output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Address read channel quality of service
+    """
+
+    for channel in range(int(NUM_CHANNELS)):
+        output_lines.append(ports_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
+
 with open(output_file_afu_portmap, 'w') as file:
     output_lines = []
 
     connection_template = """
-    .m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
-    .m{0:02d}_axi_awready(m{0:02d}_axi_awready),
-    .m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
-    .m{0:02d}_axi_awlen  (m{0:02d}_axi_awlen  ),
-    .m{0:02d}_axi_wvalid (m{0:02d}_axi_wvalid ),
-    .m{0:02d}_axi_wready (m{0:02d}_axi_wready ),
-    .m{0:02d}_axi_wdata  (m{0:02d}_axi_wdata  ),
-    .m{0:02d}_axi_wstrb  (m{0:02d}_axi_wstrb  ),
-    .m{0:02d}_axi_wlast  (m{0:02d}_axi_wlast  ),
-    .m{0:02d}_axi_bvalid (m{0:02d}_axi_bvalid ),
-    .m{0:02d}_axi_bready (m{0:02d}_axi_bready ),
-    .m{0:02d}_axi_arvalid(m{0:02d}_axi_arvalid),
-    .m{0:02d}_axi_arready(m{0:02d}_axi_arready),
-    .m{0:02d}_axi_araddr (m{0:02d}_axi_araddr ),
-    .m{0:02d}_axi_arlen  (m{0:02d}_axi_arlen  ),
-    .m{0:02d}_axi_rvalid (m{0:02d}_axi_rvalid ),
-    .m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
-    .m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
-    .m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
-    .m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
-    .m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
-    .m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
-    .m{0:02d}_axi_bresp  (m{0:02d}_axi_bresp  ),
-    .m{0:02d}_axi_awid   (m{0:02d}_axi_awid   ),
-    .m{0:02d}_axi_awsize (m{0:02d}_axi_awsize ),
-    .m{0:02d}_axi_awburst(m{0:02d}_axi_awburst),
-    .m{0:02d}_axi_awlock (m{0:02d}_axi_awlock ),
-    .m{0:02d}_axi_awcache(m{0:02d}_axi_awcache),
-    .m{0:02d}_axi_awprot (m{0:02d}_axi_awprot ),
-    .m{0:02d}_axi_awqos  (m{0:02d}_axi_awqos  ),
-    .m{0:02d}_axi_arid   (m{0:02d}_axi_arid   ),
-    .m{0:02d}_axi_arsize (m{0:02d}_axi_arsize ),
-    .m{0:02d}_axi_arburst(m{0:02d}_axi_arburst),
-    .m{0:02d}_axi_arlock (m{0:02d}_axi_arlock ),
-    .m{0:02d}_axi_arcache(m{0:02d}_axi_arcache),
-    .m{0:02d}_axi_arprot (m{0:02d}_axi_arprot ),
-    .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
+.m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
+.m{0:02d}_axi_awready(m{0:02d}_axi_awready),
+.m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
+.m{0:02d}_axi_awlen  (m{0:02d}_axi_awlen  ),
+.m{0:02d}_axi_wvalid (m{0:02d}_axi_wvalid ),
+.m{0:02d}_axi_wready (m{0:02d}_axi_wready ),
+.m{0:02d}_axi_wdata  (m{0:02d}_axi_wdata  ),
+.m{0:02d}_axi_wstrb  (m{0:02d}_axi_wstrb  ),
+.m{0:02d}_axi_wlast  (m{0:02d}_axi_wlast  ),
+.m{0:02d}_axi_bvalid (m{0:02d}_axi_bvalid ),
+.m{0:02d}_axi_bready (m{0:02d}_axi_bready ),
+.m{0:02d}_axi_arvalid(m{0:02d}_axi_arvalid),
+.m{0:02d}_axi_arready(m{0:02d}_axi_arready),
+.m{0:02d}_axi_araddr (m{0:02d}_axi_araddr ),
+.m{0:02d}_axi_arlen  (m{0:02d}_axi_arlen  ),
+.m{0:02d}_axi_rvalid (m{0:02d}_axi_rvalid ),
+.m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
+.m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
+.m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
+.m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
+.m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
+.m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
+.m{0:02d}_axi_bresp  (m{0:02d}_axi_bresp  ),
+.m{0:02d}_axi_awid   (m{0:02d}_axi_awid   ),
+.m{0:02d}_axi_awsize (m{0:02d}_axi_awsize ),
+.m{0:02d}_axi_awburst(m{0:02d}_axi_awburst),
+.m{0:02d}_axi_awlock (m{0:02d}_axi_awlock ),
+.m{0:02d}_axi_awcache(m{0:02d}_axi_awcache),
+.m{0:02d}_axi_awprot (m{0:02d}_axi_awprot ),
+.m{0:02d}_axi_awqos  (m{0:02d}_axi_awqos  ),
+.m{0:02d}_axi_arid   (m{0:02d}_axi_arid   ),
+.m{0:02d}_axi_arsize (m{0:02d}_axi_arsize ),
+.m{0:02d}_axi_arburst(m{0:02d}_axi_arburst),
+.m{0:02d}_axi_arlock (m{0:02d}_axi_arlock ),
+.m{0:02d}_axi_arcache(m{0:02d}_axi_arcache),
+.m{0:02d}_axi_arprot (m{0:02d}_axi_arprot ),
+.m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
     """
 
     for channel in range(int(NUM_CHANNELS)):
