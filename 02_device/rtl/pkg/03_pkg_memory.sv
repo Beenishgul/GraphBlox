@@ -151,24 +151,8 @@ typedef struct packed{
 } MemoryPacketRouteAttributes;
 
 typedef struct packed{
-  MemoryPacketRouteAttributes route   ;
-  PacketDataAddress           address ;
-  MemoryPacketType            subclass;
-} MemoryPacketMeta;
-
-typedef struct packed{
   logic [M_AXI4_FE_DATA_W-1:0] field;
 } MemoryPacketData;
-
-typedef struct packed{
-  MemoryPacketMeta meta;
-  MemoryPacketData data;
-} MemoryPacketPayload;
-
-typedef struct packed{
-  logic               valid  ;
-  MemoryPacketPayload payload;
-} MemoryPacket;
 
 // --------------------------------------------------------------------------------------
 // Request Memory Packet
@@ -439,9 +423,9 @@ function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (
   // output_packet.meta.address.offset       = input_packet_req.meta.address.offset;
   // output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
   if(input_packet_req.meta.address.shift.direction) begin
-      output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
+    output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
   end else begin
-      output_packet.meta.address.offset       = input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount;
+    output_packet.meta.address.offset       = input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount;
   end
   output_packet.data.field                = input_packet_resp.iob.rdata;
 

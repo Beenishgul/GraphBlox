@@ -148,7 +148,7 @@ logic                  areset_arbiter_1_to_N_memory                             
 MemoryPacketResponse   arbiter_1_to_N_memory_response_in                               ;
 FIFOStateSignalsInput  arbiter_1_to_N_memory_fifo_response_signals_in [NUM_MODULES-1:0];
 FIFOStateSignalsOutput arbiter_1_to_N_memory_fifo_response_signals_out                 ;
-MemoryPacket           arbiter_1_to_N_memory_response_out             [NUM_MODULES-1:0];
+MemoryPacketResponse   arbiter_1_to_N_memory_response_out             [NUM_MODULES-1:0];
 logic                  arbiter_1_to_N_memory_fifo_setup_signal                         ;
 
 MemoryPacketResponse   modules_response_memory_in                 [NUM_MODULES-1:0];
