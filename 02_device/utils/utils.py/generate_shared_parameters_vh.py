@@ -8,12 +8,12 @@ import json
 
 
 # Validate the number of arguments
-if len(sys.argv) != 8:
-    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <INCLUDE_DIR>")
+if len(sys.argv) != 9:
+    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
 
 # Construct the full path for the file
 config_filename = f"topology.json"
@@ -36,6 +36,7 @@ output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_par
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
+output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
@@ -629,7 +630,7 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES   = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES = 3;\n")
-
+    file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS};\n")
     file.write(f"parameter NUM_CUS_WIDTH_BITS     = {NUM_CUS};\n")
     file.write(f"parameter NUM_BUNDLES_WIDTH_BITS = {NUM_BUNDLES};\n")
     file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
@@ -651,6 +652,8 @@ with open(output_file_path_shared, "w") as file:
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// CU CONFIGURATIONS SETTINGS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
+
+    file.write(f"parameter NUM_CHANNELS    = {NUM_CHANNELS},\n")
 
     file.write(f"parameter NUM_CUS_MAX     = {NUM_CUS_MAX},\n")
     file.write(f"parameter NUM_BUNDLES_MAX = {NUM_BUNDLES_MAX},\n")
@@ -1339,3 +1342,57 @@ with open(output_file_cu_arbitration, "w") as file:
         file.write(f"          end\n") 
         file.write(f"endgenerate\n")
         file.write(f"\n\n") 
+
+
+with open(output_file_channel_top, 'w') as file:
+    output_lines = []
+
+    for channel in range(int(NUM_CHANNELS)):
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {channel}")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rvalid  = m{channel:02d}_axi_rvalid ; // Read channel valid")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.arready = m{channel:02d}_axi_arready; // Address read channel ready")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rlast   = m{channel:02d}_axi_rlast  ; // Read channel last word")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rdata   = swap_endianness_cacheline_axi_be(m{channel:02d}_axi_rdata, endian_read_reg)  ; // Read channel data")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rid     = m{channel:02d}_axi_rid    ; // Read channel ID")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rresp   = m{channel:02d}_axi_rresp  ; // Read channel response")
+        output_lines.append("")
+        output_lines.append(f"assign m{channel:02d}_axi_arvalid = m_axi4_read[{channel}].out.arvalid; // Address read channel valid")
+        output_lines.append(f"assign m{channel:02d}_axi_araddr  = m_axi4_read[{channel}].out.araddr ; // Address read channel address")
+        output_lines.append(f"assign m{channel:02d}_axi_arlen   = m_axi4_read[{channel}].out.arlen  ; // Address write channel burst length")
+        output_lines.append(f"assign m{channel:02d}_axi_rready  = m_axi4_read[{channel}].out.rready ; // Read channel ready")
+        output_lines.append(f"assign m{channel:02d}_axi_arid    = m_axi4_read[{channel}].out.arid   ; // Address read channel ID")
+        output_lines.append(f"assign m{channel:02d}_axi_arsize  = m_axi4_read[{channel}].out.arsize ; // Address read channel burst size")
+        output_lines.append(f"assign m{channel:02d}_axi_arburst = m_axi4_read[{channel}].out.arburst; // Address read channel burst type")
+        output_lines.append(f"assign m{channel:02d}_axi_arlock  = m_axi4_read[{channel}].out.arlock ; // Address read channel lock type")
+        output_lines.append(f"assign m{channel:02d}_axi_arcache = m_axi4_read[{channel}].out.arcache; // Address read channel memory type")
+        output_lines.append(f"assign m{channel:02d}_axi_arprot  = m_axi4_read[{channel}].out.arprot ; // Address write channel protection type")
+        output_lines.append(f"assign m{channel:02d}_axi_arqos   = m_axi4_read[{channel}].out.arqos  ; // Address write channel quality of service")
+        output_lines.append("")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.awready = m{channel:02d}_axi_awready; // Address write channel ready")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.wready  = m{channel:02d}_axi_wready ; // Write channel ready")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bid     = m{channel:02d}_axi_bid    ; // Write response channel ID")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bresp   = m{channel:02d}_axi_bresp  ; // Write channel response")
+        output_lines.append(f"assign m_axi4_write[{channel}].in.bvalid  = m{channel:02d}_axi_bvalid ; // Write response channel valid")
+        output_lines.append("")
+        output_lines.append(f"assign m{channel:02d}_axi_awvalid = m_axi4_write[{channel}].out.awvalid; // Address write channel valid")
+        output_lines.append(f"assign m{channel:02d}_axi_awid    = m_axi4_write[{channel}].out.awid   ; // Address write channel ID")
+        output_lines.append(f"assign m{channel:02d}_axi_awaddr  = m_axi4_write[{channel}].out.awaddr ; // Address write channel address")
+        output_lines.append(f"assign m{channel:02d}_axi_awlen   = m_axi4_write[{channel}].out.awlen  ; // Address write channel burst length")
+        output_lines.append(f"assign m{channel:02d}_axi_awsize  = m_axi4_write[{channel}].out.awsize ; // Address write channel burst size")
+        output_lines.append(f"assign m{channel:02d}_axi_awburst = m_axi4_write[{channel}].out.awburst; // Address write channel burst type")
+        output_lines.append(f"assign m{channel:02d}_axi_awlock  = m_axi4_write[{channel}].out.awlock ; // Address write channel lock type")
+        output_lines.append(f"assign m{channel:02d}_axi_awcache = m_axi4_write[{channel}].out.awcache; // Address write channel memory type")
+        output_lines.append(f"assign m{channel:02d}_axi_awprot  = m_axi4_write[{channel}].out.awprot ; // Address write channel protection type")
+        output_lines.append(f"assign m{channel:02d}_axi_awqos   = m_axi4_write[{channel}].out.awqos  ; // Address write channel quality of service")
+        output_lines.append(f"assign m{channel:02d}_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write[{channel}].out.wdata, endian_write_reg); // Write channel data")
+        output_lines.append(f"assign m{channel:02d}_axi_wstrb   = m_axi4_write[{channel}].out.wstrb  ; // Write channel write strobe")
+        output_lines.append(f"assign m{channel:02d}_axi_wlast   = m_axi4_write[{channel}].out.wlast  ; // Write channel last word flag")
+        output_lines.append(f"assign m{channel:02d}_axi_wvalid  = m_axi4_write[{channel}].out.wvalid ; // Write channel valid")
+        output_lines.append(f"assign m{channel:02d}_axi_bready  = m_axi4_write[{channel}].out.bready ; // Write response channel ready")
+        output_lines.append("")
+
+    # Writing to the VHDL file
+
+    file.write('\n'.join(output_lines))

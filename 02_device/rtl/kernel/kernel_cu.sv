@@ -337,7 +337,7 @@ endgenerate
 // CU Stream -> AXI-CH 1
 // --------------------------------------------------------------------------------------
 generate
-  if(GLOBAL_NUM_CHANNELS > 1) begin
+  if(NUM_CHANNELS > 1) begin
     if(GLOBAL_CU_STREAM_IP == 1) begin
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI Kernel Cache
@@ -429,7 +429,9 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+cu_bundles #(
+  `include"set_cu_parameters.vh"
+  ) inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
