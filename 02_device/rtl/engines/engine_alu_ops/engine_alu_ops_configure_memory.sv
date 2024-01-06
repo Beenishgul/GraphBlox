@@ -29,7 +29,7 @@ module engine_alu_ops_configure_memory #(parameter
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
-    input  MemoryPacket           response_memory_in                 ,
+    input  MemoryPacketResponse   response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output ALUOpsConfiguration    configure_memory_out               ,
@@ -44,7 +44,7 @@ module engine_alu_ops_configure_memory #(parameter
 logic areset_alu_ops_generator;
 logic areset_fifo             ;
 
-MemoryPacket                 response_memory_in_reg                          ;
+MemoryPacketResponse         response_memory_in_reg                          ;
 ALUOpsConfigurationMeta      configure_memory_meta_int                       ;
 ALUOpsConfiguration          configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
@@ -55,8 +55,8 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacket          fifo_response_memory_in_dout_int      ;
-MemoryPacket          fifo_response_memory_in_dout_reg      ;
+MemoryPacketResponse  fifo_response_memory_in_dout_int      ;
+MemoryPacketResponse  fifo_response_memory_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 logic                 fifo_response_memory_in_push_filter   ;
 
@@ -121,8 +121,8 @@ end
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
-assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
-assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
+assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset);
+assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset);
 
 assign configure_memory_meta_int.route.packet_destination.id_cu     = 0;
 assign configure_memory_meta_int.route.packet_destination.id_bundle = 0;
@@ -215,7 +215,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// memory response out fifo MemoryPacket
+// memory response out fifo MemoryPacketResponse
 // --------------------------------------------------------------------------------------
 // Push
 assign fifo_response_memory_in_push_filter      = (response_memory_in_reg_offset_sequence < (ENGINE_SEQ_MAX)) & (response_memory_in_reg_offset_sequence >= ENGINE_SEQ_MIN);
@@ -223,7 +223,7 @@ assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid &
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
 // --------------------------------------------------------------------------------------
-// FIFO memory configure_memory out fifo MemoryPacket
+// FIFO memory configure_memory out fifo MemoryPacketResponse
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy  | fifo_configure_memory_signals_out_int.rd_rst_busy;
@@ -242,7 +242,7 @@ xpm_fifo_sync_wrapper #(
     .WRITE_DATA_WIDTH($bits(ALUOpsConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(ALUOpsConfigurationPayload)),
     .PROG_THRESH     (PROG_THRESH                      )
-) inst_fifo_MemoryPacketResponseConigurationInput (
+) inst_fifo_MemoryPacketResponseResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
     .din        (fifo_configure_memory_din                        ),
