@@ -28,8 +28,8 @@ import PKG_CACHE::*;
 // --------------------------------------------------------------------------------------
 //   Generic Memory request type
 // --------------------------------------------------------------------------------------
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_offset;
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_offset;
 
 parameter TYPE_MEMORY_CMD_BITS = 5;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
@@ -135,7 +135,7 @@ typedef struct packed{
 
 typedef struct packed{
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
-  type_memory_request_address            offset   ; // SIZE = clog2(4GB) bits
+  type_memory_request_offset             offset   ; // SIZE = clog2(4GB) bits
   PacketDataAddressShift                 shift    ; // SIZE = clog2(offset) bits + 1
 } PacketRequestDataAddress;
 
@@ -177,7 +177,7 @@ typedef struct packed{
 // Response Memory Packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  type_memory_response_address offset; // SIZE = clog2(4GB) bits
+  type_memory_response_offset offset; // SIZE = clog2(4GB) bits
 } PacketResponseDataAddress;
 
 typedef struct packed{

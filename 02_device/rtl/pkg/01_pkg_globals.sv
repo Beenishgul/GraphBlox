@@ -49,6 +49,8 @@ package PKG_GLOBALS;
 	parameter CU_ENGINE_COUNT_MAX_WIDTH_BITS = 8;
 	parameter CU_MODULE_COUNT_MAX_WIDTH_BITS = 8;
 	parameter CU_BUFFER_COUNT_WIDTH_BITS     = 8;
+	parameter GLOBAL_OVERLAY_SIZE_WIDTH_BITS = 12; // 4*2^10 entries max or 4KB 
+	parameter GLOBAL_BUFFER_SIZE_WIDTH_BITS  = 32; // 4*2^30 Buffers max or 4GB 
 
 // --------------------------------------------------------------------------------------
 //  KERNEL COMMON GLOBALS
