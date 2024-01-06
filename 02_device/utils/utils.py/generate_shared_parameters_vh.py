@@ -19,6 +19,11 @@ _, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABI
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
+output_folder_path_topology = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
+
+if not os.path.exists(output_folder_path_topology):
+    os.makedirs(output_folder_path_topology)
+
 output_file_path_shared = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters" ,"shared_parameters.vh")
 output_file_path_global = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global" ,"config_parameters.vh")
 output_file_bundle_top = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology" , "bundle_topology.vh")
