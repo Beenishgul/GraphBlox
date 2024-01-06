@@ -128,11 +128,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic             read_write_response_engine_in_valid_reg    ;
-    logic             read_write_response_engine_in_valid_flag   ;
-    logic             read_write_response_engine_in_valid_flag_S2;
-    EnginePacketData  result_int                                 ;
-    PacketDataAddress address_int                                ;
+    logic                    read_write_response_engine_in_valid_reg    ;
+    logic                    read_write_response_engine_in_valid_flag   ;
+    logic                    read_write_response_engine_in_valid_flag_S2;
+    EnginePacketData         result_int                                 ;
+    PacketRequestDataAddress address_int                                ;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket

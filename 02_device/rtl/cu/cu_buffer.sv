@@ -182,7 +182,7 @@ assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signa
 always_ff @(posedge ap_clk) begin
   fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
   fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
-  response_out.payload      <= map_CacheResponse_to_MemoryResponsePacket(response_in_int.payload);
+  response_out.payload      <= map_CacheResponse_to_MemoryResponsePacket(engine_m_axi_request_mem_reg, response_in_int.payload);
 end
 
 // --------------------------------------------------------------------------------------

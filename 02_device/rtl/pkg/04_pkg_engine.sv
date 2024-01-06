@@ -75,7 +75,7 @@ typedef struct packed{
 typedef struct packed{
     CSRIndexConfigurationRouteAttributes route   ;
     CSRIndexConfigurationType            subclass;
-    PacketDataAddress                    address ;
+    PacketRequestDataAddress             address ;
 } CSRIndexConfigurationMeta;
 
 typedef struct packed{
@@ -321,7 +321,7 @@ typedef struct packed{
 typedef struct packed{
     ReadWriteConfigurationRouteAttributes route   ;
     ReadWriteConfigurationType            subclass;
-    PacketDataAddress                     address ;
+    PacketRequestDataAddress              address ;
 } ReadWriteConfigurationMeta;
 
 typedef struct packed{
@@ -374,7 +374,7 @@ typedef struct packed{
 
 typedef struct packed{
     CUSetupEngineConfigurationParameters param;
-    MemoryPacketMeta                     meta ;
+    MemoryPacketRequestMeta              meta ;
 } CUSetupEngineConfigurationPayload;
 
 
