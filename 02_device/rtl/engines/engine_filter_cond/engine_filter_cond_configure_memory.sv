@@ -29,7 +29,7 @@ module engine_filter_cond_configure_memory #(parameter
 ) (
     input  logic                   ap_clk                             ,
     input  logic                   areset                             ,
-    input  MemoryPacket            response_memory_in                 ,
+    input  MemoryPacketResponse    response_memory_in                 ,
     input  FIFOStateSignalsInput   fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput  fifo_response_memory_in_signals_out,
     output FilterCondConfiguration configure_memory_out               ,
@@ -44,7 +44,7 @@ module engine_filter_cond_configure_memory #(parameter
 logic areset_filter_cond_generator;
 logic areset_fifo                 ;
 
-MemoryPacket                 response_memory_in_reg                          ;
+MemoryPacketResponse         response_memory_in_reg                          ;
 FilterCondConfiguration      configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
@@ -54,8 +54,8 @@ logic [M_AXI4_FE_ADDR_W-1:0] fifo_response_memory_in_dout_int_offset_sequence;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacket          fifo_response_memory_in_dout_int      ;
-MemoryPacket          fifo_response_memory_in_dout_reg      ;
+MemoryPacketResponse  fifo_response_memory_in_dout_int      ;
+MemoryPacketResponse  fifo_response_memory_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg;
 logic                 fifo_response_memory_in_push_filter   ;
 
@@ -120,8 +120,8 @@ end
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
-assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset >> response_memory_in_reg.payload.meta.address.shift.amount);
-assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset >> fifo_response_memory_in_dout_int.payload.meta.address.shift.amount);
+assign response_memory_in_reg_offset_sequence           = (response_memory_in_reg.payload.meta.address.offset);
+assign fifo_response_memory_in_dout_int_offset_sequence = (fifo_response_memory_in_dout_int.payload.meta.address.offset);
 
 always_ff @(posedge ap_clk) begin
     if(areset_filter_cond_generator) begin

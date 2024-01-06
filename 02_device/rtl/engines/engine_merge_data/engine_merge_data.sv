@@ -41,7 +41,7 @@ module engine_merge_data #(parameter
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]   ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0]  ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  MemoryPacketResponse   response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     input  ControlPacket          response_control_in                                              ,
@@ -50,7 +50,7 @@ module engine_merge_data #(parameter
     output EnginePacket           request_engine_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacket           request_memory_out                                               ,
+    output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output ControlPacket          request_control_out                                              ,
@@ -76,12 +76,12 @@ logic areset_generator        ;
 
 KernelDescriptor descriptor_in_reg;
 
-EnginePacket response_engine_in_reg[(1+ENGINE_MERGE_WIDTH)-1:0];
-MemoryPacket response_memory_in_reg                            ;
+EnginePacket         response_engine_in_reg[(1+ENGINE_MERGE_WIDTH)-1:0];
+MemoryPacketResponse response_memory_in_reg                            ;
 
-EnginePacket request_engine_out_int                            ;
-EnginePacket response_engine_in_int[(1+ENGINE_MERGE_WIDTH)-1:0];
-MemoryPacket response_memory_in_int                            ;
+EnginePacket         request_engine_out_int                            ;
+EnginePacket         response_engine_in_int[(1+ENGINE_MERGE_WIDTH)-1:0];
+MemoryPacketResponse response_memory_in_int                            ;
 
 logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 logic configure_fifo_setup_signal;
 
-MemoryPacket           configure_memory_response_memory_in                 ;
+MemoryPacketResponse   configure_memory_response_memory_in                 ;
 FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
 FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
 MergeDataConfiguration configure_memory_out                                ;
