@@ -41,7 +41,8 @@ output_file_path_global = os.path.join(output_folder_path_global,"config_paramet
 output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
 output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
-output_file_afu_port = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
+output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
+output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
@@ -623,7 +624,8 @@ check_and_clean_file(output_file_path_shared)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
 check_and_clean_file(output_file_channel_top)
-check_and_clean_file(output_file_afu_port)
+check_and_clean_file(output_file_afu_ports)
+check_and_clean_file(output_file_afu_portmap)
 
 check_and_clean_file(output_file_cu_arbitration)
 check_and_clean_file(output_file_bundle_arbitration)
@@ -1418,7 +1420,7 @@ with open(output_file_channel_top, 'w') as file:
     file.write('\n'.join(output_lines))
 
 
-with open(output_file_afu_port, 'w') as file:
+with open(output_file_afu_ports, 'w') as file:
     output_lines = []
 
     ports_template = """
@@ -1465,5 +1467,53 @@ with open(output_file_afu_port, 'w') as file:
 
     for channel in range(int(NUM_CHANNELS)):
         output_lines.append(ports_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
+with open(output_file_afu_portmap, 'w') as file:
+    output_lines = []
+
+    connection_template = """
+    .m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
+    .m{0:02d}_axi_awready(m{0:02d}_axi_awready),
+    .m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
+    .m{0:02d}_axi_awlen  (m{0:02d}_axi_awlen  ),
+    .m{0:02d}_axi_wvalid (m{0:02d}_axi_wvalid ),
+    .m{0:02d}_axi_wready (m{0:02d}_axi_wready ),
+    .m{0:02d}_axi_wdata  (m{0:02d}_axi_wdata  ),
+    .m{0:02d}_axi_wstrb  (m{0:02d}_axi_wstrb  ),
+    .m{0:02d}_axi_wlast  (m{0:02d}_axi_wlast  ),
+    .m{0:02d}_axi_bvalid (m{0:02d}_axi_bvalid ),
+    .m{0:02d}_axi_bready (m{0:02d}_axi_bready ),
+    .m{0:02d}_axi_arvalid(m{0:02d}_axi_arvalid),
+    .m{0:02d}_axi_arready(m{0:02d}_axi_arready),
+    .m{0:02d}_axi_araddr (m{0:02d}_axi_araddr ),
+    .m{0:02d}_axi_arlen  (m{0:02d}_axi_arlen  ),
+    .m{0:02d}_axi_rvalid (m{0:02d}_axi_rvalid ),
+    .m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
+    .m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
+    .m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
+    .m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
+    .m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
+    .m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
+    .m{0:02d}_axi_bresp  (m{0:02d}_axi_bresp  ),
+    .m{0:02d}_axi_awid   (m{0:02d}_axi_awid   ),
+    .m{0:02d}_axi_awsize (m{0:02d}_axi_awsize ),
+    .m{0:02d}_axi_awburst(m{0:02d}_axi_awburst),
+    .m{0:02d}_axi_awlock (m{0:02d}_axi_awlock ),
+    .m{0:02d}_axi_awcache(m{0:02d}_axi_awcache),
+    .m{0:02d}_axi_awprot (m{0:02d}_axi_awprot ),
+    .m{0:02d}_axi_awqos  (m{0:02d}_axi_awqos  ),
+    .m{0:02d}_axi_arid   (m{0:02d}_axi_arid   ),
+    .m{0:02d}_axi_arsize (m{0:02d}_axi_arsize ),
+    .m{0:02d}_axi_arburst(m{0:02d}_axi_arburst),
+    .m{0:02d}_axi_arlock (m{0:02d}_axi_arlock ),
+    .m{0:02d}_axi_arcache(m{0:02d}_axi_arcache),
+    .m{0:02d}_axi_arprot (m{0:02d}_axi_arprot ),
+    .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
+    """
+
+    for channel in range(int(NUM_CHANNELS)):
+        output_lines.append(connection_template.format(channel))
 
     file.write('\n'.join(output_lines))
