@@ -16,7 +16,7 @@
 
 module engine_template #(
     `include "engine_parameters.vh"
-) (
+    ) (
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
@@ -25,7 +25,7 @@ module engine_template #(
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]   ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0]  ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                               ,
+    input  MemoryPacketResponse   response_memory_in                                               ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
     input  ControlPacket          response_control_in                                              ,
@@ -34,7 +34,7 @@ module engine_template #(
     output EnginePacket           request_engine_out[(1+ENGINE_CAST_WIDTH)-1:0]                    ,
     input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in[(1+ENGINE_CAST_WIDTH)-1:0]    ,
     output FIFOStateSignalsOutput fifo_request_engine_out_signals_out[(1+ENGINE_CAST_WIDTH)-1:0]   ,
-    output MemoryPacket           request_memory_out                                               ,
+    output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
     output ControlPacket          request_control_out                                              ,
@@ -53,15 +53,15 @@ logic areset_engine         ;
 
 KernelDescriptor descriptor_in_reg;
 
-ControlPacket request_control_out_int;
-EnginePacket  request_engine_out_int ;
-MemoryPacket  request_memory_out_int ;
-ControlPacket response_control_in_int;
-ControlPacket response_control_in_reg;
-EnginePacket  response_engine_in_int ;
-EnginePacket  response_engine_in_reg ;
-MemoryPacket  response_memory_in_int ;
-MemoryPacket  response_memory_in_reg ;
+ControlPacket        request_control_out_int;
+EnginePacket         request_engine_out_int ;
+MemoryPacketRequest  request_memory_out_int ;
+ControlPacket        response_control_in_int;
+ControlPacket        response_control_in_reg;
+EnginePacket         response_engine_in_int ;
+EnginePacket         response_engine_in_reg ;
+MemoryPacketResponse response_memory_in_int ;
+MemoryPacketResponse response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -130,12 +130,12 @@ logic            areset_template           ;
 logic            template_done_out         ;
 logic            template_fifo_setup_signal;
 
-ControlPacket template_request_control_out                            ;
-EnginePacket  template_request_engine_out                             ;
-MemoryPacket  template_request_memory_out                             ;
-ControlPacket template_response_control_in                            ;
-EnginePacket  template_response_engine_in [(1+ENGINE_MERGE_WIDTH)-1:0];
-MemoryPacket  template_response_memory_in                             ;
+ControlPacket        template_request_control_out                            ;
+EnginePacket         template_request_engine_out                             ;
+MemoryPacketRequest  template_request_memory_out                             ;
+ControlPacket        template_response_control_in                            ;
+EnginePacket         template_response_engine_in [(1+ENGINE_MERGE_WIDTH)-1:0];
+MemoryPacketResponse template_response_memory_in                             ;
 
 // --------------------------------------------------------------------------------------
 // Register reset signal
@@ -299,7 +299,7 @@ generate
         assign engine_cast_arbiter_1_to_N_fifo_response_signals_out = 2'b10;
         assign engine_cast_arbiter_1_to_N_fifo_setup_signal         = 1'b0;
     end
-    endgenerate
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Drive MERGE input signals
