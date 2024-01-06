@@ -257,7 +257,7 @@ xpm_fifo_sync_wrapper #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_942x16_MemoryPacketRequest
 // --------------------------------------------------------------------------------------
-always_ff begin
+always_ff @(posedge ap_clk) begin
   for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
     arbiter_bus_in[i]    <= request_arbiter_in_int[i];
     arbiter_bus_valid[i] <= request_arbiter_in_int[i].valid;
