@@ -86,16 +86,15 @@ FIFOStateSignalsOutInternal fifo_response_signals_out_int;
 // --------------------------------------------------------------------------------------
 // Serial Read Engine Signals
 // --------------------------------------------------------------------------------------
-CUSetupEngineConfiguration engine_cu_setup_configuration_in        ;
-CUSetupEngineConfiguration configuration_comb_program              ;
-CUSetupEngineConfiguration configuration_comb_flush                ;
-MemoryPacketRequest        engine_cu_setup_request_out             ;
-FIFOStateSignalsOutput     engine_cu_setup_fifo_request_signals_out;
-FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_in ;
-FIFOStateSignalsInput      engine_cu_setup_fifo_request_signals_reg;
-logic                      engine_cu_setup_start_in                ;
-logic                      engine_cu_setup_ready_out               ;
-logic                      engine_cu_setup_done_out                ;
+CUSetupEngineConfiguration        engine_cu_setup_configuration_in        ;
+CUSetupEngineConfigurationPayload configuration_comb_program              ;
+CUSetupEngineConfigurationPayload configuration_comb_flush                ;
+MemoryPacketRequest               engine_cu_setup_request_out             ;
+FIFOStateSignalsOutput            engine_cu_setup_fifo_request_signals_out;
+FIFOStateSignalsInput             engine_cu_setup_fifo_request_signals_in ;
+logic                             engine_cu_setup_start_in                ;
+logic                             engine_cu_setup_ready_out               ;
+logic                             engine_cu_setup_done_out                ;
 
 logic engine_cu_setup_fifo_setup_signal;
 
@@ -226,9 +225,9 @@ always_comb begin
                 next_state = CU_SETUP_REQ_PAUSE;
         end
         CU_SETUP_REQ_DONE : begin
-            if (~configuration_comb_program.payload.param.flush_enable)
+            if (~configuration_comb_program.param.flush_enable)
                 next_state = CU_SETUP_FLUSH_DONE;
-            else if (cu_flush_reg & configuration_comb_program.payload.param.flush_enable)
+            else if (cu_flush_reg & configuration_comb_program.param.flush_enable)
                 next_state = CU_SETUP_FLUSH_START;
             else
                 next_state = CU_SETUP_REQ_DONE;
@@ -290,7 +289,7 @@ always_ff @(posedge ap_clk) begin
             engine_cu_setup_configuration_in.valid <= 1'b1;
             counter_clear                          <= 1'b0;
             counter_load                           <= 1'b1;
-            response_memory_counter_load_value     <= configuration_comb_program.payload.param.array_size;
+            response_memory_counter_load_value     <= configuration_comb_program.param.array_size;
         end
         CU_SETUP_REQ_BUSY : begin
             done_int_reg                           <= engine_cu_setup_done_out & response_memory_counter_is_zero;
@@ -325,7 +324,7 @@ always_ff @(posedge ap_clk) begin
             engine_cu_setup_configuration_in.valid <= 1'b1;
             counter_clear                          <= 1'b0;
             counter_load                           <= 1'b1;
-            response_memory_counter_load_value     <= configuration_comb_flush.payload.param.array_size;
+            response_memory_counter_load_value     <= configuration_comb_flush.param.array_size;
         end
         CU_SETUP_FLUSH_BUSY : begin
             done_int_reg                           <= engine_cu_setup_done_out & response_memory_counter_is_zero;
@@ -359,55 +358,55 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet Program
 // --------------------------------------------------------------------------------------
-assign configuration_comb_program.payload.param.increment                    = 1'b1;
-assign configuration_comb_program.payload.param.decrement                    = 1'b0;
-assign configuration_comb_program.payload.param.flush_mode                   = 1'b0;
-assign configuration_comb_program.payload.param.flush_enable                 = descriptor_in_reg.payload.buffer_9[2];
-assign configuration_comb_program.payload.param.id_buffer                    = 0;
-assign configuration_comb_program.payload.param.array_size                   = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.start_read                   = 0;
-assign configuration_comb_program.payload.param.end_read                     = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
-assign configuration_comb_program.payload.param.stride                       = 1;
-assign configuration_comb_program.payload.param.granularity                  = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.route.packet_source.id_cu     = ID_CU;
-assign configuration_comb_program.payload.meta.route.packet_source.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
-assign configuration_comb_program.payload.meta.route.packet_source.id_module = 1;
-assign configuration_comb_program.payload.meta.address.id_buffer             = 0;
-assign configuration_comb_program.payload.meta.address.offset                = 0;
-assign configuration_comb_program.payload.meta.address.shift.amount          = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_program.payload.meta.address.shift.direction       = 1'b1;
-assign configuration_comb_program.payload.meta.subclass.cmd                  = CMD_MEM_READ;
+assign configuration_comb_program.param.increment                    = 1'b1;
+assign configuration_comb_program.param.decrement                    = 1'b0;
+assign configuration_comb_program.param.flush_mode                   = 1'b0;
+assign configuration_comb_program.param.flush_enable                 = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_program.param.id_buffer                    = 0;
+assign configuration_comb_program.param.array_size                   = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.param.start_read                   = 0;
+assign configuration_comb_program.param.end_read                     = {1'b0,descriptor_in_reg.payload.buffer_9[(M_AXI4_BE_ADDR_W/2)-1:3]};
+assign configuration_comb_program.param.stride                       = 1;
+assign configuration_comb_program.param.granularity                  = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.meta.route.packet_source.id_cu     = ID_CU;
+assign configuration_comb_program.meta.route.packet_source.id_bundle = {NUM_BUNDLES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.meta.route.packet_source.id_lane   = {NUM_LANES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.meta.route.packet_source.id_engine = {NUM_ENGINES_WIDTH_BITS{1'b1}};
+assign configuration_comb_program.meta.route.packet_source.id_module = 1;
+assign configuration_comb_program.meta.address.id_buffer             = 0;
+assign configuration_comb_program.meta.address.offset                = 0;
+assign configuration_comb_program.meta.address.shift.amount          = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_program.meta.address.shift.direction       = 1'b1;
+assign configuration_comb_program.meta.subclass.cmd                  = CMD_MEM_READ;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet FLUSH
 // --------------------------------------------------------------------------------------
-assign configuration_comb_flush.payload.param.increment              = 1'b1;
-assign configuration_comb_flush.payload.param.decrement              = 1'b0;
-assign configuration_comb_flush.payload.param.flush_mode             = 1'b1;
-assign configuration_comb_flush.payload.param.flush_enable           = descriptor_in_reg.payload.buffer_9[2];
-assign configuration_comb_flush.payload.param.id_buffer              = 0;
-assign configuration_comb_flush.payload.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
-assign configuration_comb_flush.payload.param.start_read             = 0;
-assign configuration_comb_flush.payload.param.end_read               = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
-assign configuration_comb_flush.payload.param.stride                 = 1;
-assign configuration_comb_flush.payload.param.granularity            = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_flush.payload.meta.route                   = 0;
-assign configuration_comb_flush.payload.meta.address.id_buffer       = 0;
-assign configuration_comb_flush.payload.meta.address.offset          = 0;
-assign configuration_comb_flush.payload.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
-assign configuration_comb_flush.payload.meta.address.shift.direction = 1'b1;
-assign configuration_comb_flush.payload.meta.subclass.cmd            = CMD_MEM_READ;
+assign configuration_comb_flush.param.increment              = 1'b1;
+assign configuration_comb_flush.param.decrement              = 1'b0;
+assign configuration_comb_flush.param.flush_mode             = 1'b1;
+assign configuration_comb_flush.param.flush_enable           = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_flush.param.id_buffer              = 0;
+assign configuration_comb_flush.param.array_size             = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
+assign configuration_comb_flush.param.start_read             = 0;
+assign configuration_comb_flush.param.end_read               = descriptor_in_reg.payload.buffer_9[M_AXI4_BE_ADDR_W-1:(M_AXI4_BE_ADDR_W/2)];
+assign configuration_comb_flush.param.stride                 = 1;
+assign configuration_comb_flush.param.granularity            = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_flush.meta.route                   = 0;
+assign configuration_comb_flush.meta.address.id_buffer       = 0;
+assign configuration_comb_flush.meta.address.offset          = 0;
+assign configuration_comb_flush.meta.address.shift.amount    = $clog2(M_AXI4_FE_DATA_W/8);
+assign configuration_comb_flush.meta.address.shift.direction = 1'b1;
+assign configuration_comb_flush.meta.subclass.cmd            = CMD_MEM_READ;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if(cu_flush_mode)
-        engine_cu_setup_configuration_in.payload <= configuration_comb_flush.payload;
+        engine_cu_setup_configuration_in.payload <= configuration_comb_flush;
     else
-        engine_cu_setup_configuration_in.payload <= configuration_comb_program.payload;
+        engine_cu_setup_configuration_in.payload <= configuration_comb_program;
 end
 
 // --------------------------------------------------------------------------------------
