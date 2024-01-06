@@ -21,10 +21,11 @@ module cu_cache #(
   // System Signals
   input  logic                             ap_clk                   ,
   input  logic                             areset                   ,
-  input  CacheRequest                      request_in               ,
+  input  KernelDescriptor                  descriptor_in            ,
+  input  MemoryPacketRequest               request_in               ,
   output FIFOStateSignalsOutput            fifo_request_signals_out ,
   input  FIFOStateSignalsInput             fifo_request_signals_in  ,
-  output CacheResponse                     response_out             ,
+  output MemoryPacketResponse              response_out             ,
   output FIFOStateSignalsOutput            fifo_response_signals_out,
   input  FIFOStateSignalsInput             fifo_response_signals_in ,
   output logic                             fifo_setup_signal        ,
@@ -38,12 +39,14 @@ module cu_cache #(
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_fifo   ;
-logic areset_cache  ;
-logic areset_control;
+logic            areset_fifo      ;
+logic            areset_cache     ;
+logic            areset_control   ;
+KernelDescriptor descriptor_in_reg;
 
-CacheRequest  request_in_reg ;
-CacheResponse response_in_int;
+MemoryPacketRequest request_in_reg      ;
+CacheRequest        cache_request_in_reg;
+CacheResponse       response_in_int     ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -75,10 +78,10 @@ logic                         fifo_request_setup_signal_int     ;
 logic                         fifo_request_signals_out_valid_int;
 
 // --------------------------------------------------------------------------------------
-// Cache response FIFO
+// Memory response FIFO
 // --------------------------------------------------------------------------------------
-CacheResponsePayload          fifo_response_din             ;
-CacheResponsePayload          fifo_response_dout            ;
+MemoryPacketResponsePayload   fifo_response_din             ;
+MemoryPacketResponsePayload   fifo_response_dout            ;
 FIFOStateSignalsOutInternal   fifo_response_signals_out_int ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
@@ -106,24 +109,43 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
+// READ Descriptor Control and Drive signals to other modules
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+  if (areset_control) begin
+    descriptor_in_reg.valid <= 0;
+  end
+  else begin
+    if(descriptor_in.valid)begin
+      descriptor_in_reg.valid   <= descriptor_in.valid;
+      descriptor_in_reg.payload <= descriptor_in.payload;
+    end
+  end
+end
+
+// --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     request_in_reg.valid         <= 1'b0;
+    cache_request_in_reg.valid   <= 1'b0;
     fifo_response_signals_in_reg <= 0;
     fifo_request_signals_in_reg  <= 0;
   end
   else begin
     request_in_reg.valid         <= request_in.valid;
+    cache_request_in_reg.valid   <= request_in_reg.valid;
     fifo_response_signals_in_reg <= fifo_response_signals_in;
     fifo_request_signals_in_reg  <= fifo_request_signals_in;
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  request_in_reg.payload <= request_in.payload;
+  request_in_reg.payload       <= request_in.payload;
+  cache_request_in_reg.payload <= map_MemoryRequestPacket_to_CacheRequest(request_in_reg.payload, descriptor_in_reg.payload, request_in_reg.valid);
 end
+
 // --------------------------------------------------------------------------------------
 // Drive output
 // --------------------------------------------------------------------------------------
@@ -220,10 +242,10 @@ iob_cache_axi #(
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
-assign fifo_request_din.iob              = request_in_reg.payload.iob;
-assign fifo_request_din.meta             = request_in_reg.payload.meta;
-assign fifo_request_din.data             = request_in_reg.payload.data;
+assign fifo_request_signals_in_int.wr_en = cache_request_in_reg.valid;
+assign fifo_request_din.iob              = cache_request_in_reg.payload.iob;
+assign fifo_request_din.meta             = cache_request_in_reg.payload.meta;
+assign fifo_request_din.data             = cache_request_in_reg.payload.data;
 
 // Pop
 // assign fifo_request_signals_in_int.rd_en = cache_request_pop_int;
@@ -262,10 +284,7 @@ xpm_fifo_sync_wrapper #(
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-// assign fifo_response_signals_in_int.wr_en = cache_response_push_int;
-assign fifo_response_din.iob  = cache_response_mem.iob;
-assign fifo_response_din.meta = cache_request_mem.meta;
-assign fifo_response_din.data = cache_request_mem.data;
+always_comb fifo_response_din = map_CacheResponse_to_MemoryResponsePacket(cache_request_mem,cache_response_mem);
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
@@ -273,10 +292,10 @@ assign response_in_int.valid              = fifo_response_signals_out_int.valid;
 assign response_in_int.payload            = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH           ),
-  .WRITE_DATA_WIDTH($bits(CacheResponsePayload)),
-  .READ_DATA_WIDTH ($bits(CacheResponsePayload)),
-  .PROG_THRESH     (PROG_THRESH                )
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
+  .PROG_THRESH     (PROG_THRESH                       )
 ) inst_fifo_CacheResponse (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
@@ -402,7 +421,7 @@ always_ff @(posedge ap_clk) begin
   endcase
 end// always_ff @(posedge ap_clk)
 
-assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
 
 always_ff @(posedge ap_clk) begin
   cache_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
@@ -434,8 +453,3 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
 
 endmodule : cu_cache
 
-
-
-
-
-// Remaining logic remains as is...

@@ -27,10 +27,10 @@ module arbiter_1_to_N_response_memory #(
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
-  input  MemoryPacket           response_in                                       ,
+  input  MemoryPacketResponse   response_in                                       ,
   input  FIFOStateSignalsInput  fifo_response_signals_in [NUM_MEMORY_RECEIVER-1:0],
   output FIFOStateSignalsOutput fifo_response_signals_out                         ,
-  output MemoryPacket           response_out [NUM_MEMORY_RECEIVER-1:0]            ,
+  output MemoryPacketResponse   response_out [NUM_MEMORY_RECEIVER-1:0]            ,
   output logic                  fifo_setup_signal
 );
 
@@ -40,16 +40,16 @@ module arbiter_1_to_N_response_memory #(
 logic areset_control;
 logic areset_fifo   ;
 
-MemoryPacket                    response_in_reg;
+MemoryPacketResponse            response_in_reg;
 logic [NUM_MEMORY_RECEIVER-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacketPayload             fifo_response_din                    ;
-MemoryPacket                    fifo_response_dout_int               ;
-MemoryPacket                    fifo_response_dout_reg               ;
-MemoryPacketPayload             fifo_response_dout                   ;
+MemoryPacketResponsePayload     fifo_response_din                    ;
+MemoryPacketResponse            fifo_response_dout_int               ;
+MemoryPacketResponse            fifo_response_dout_reg               ;
+MemoryPacketResponsePayload     fifo_response_dout                   ;
 logic [NUM_MEMORY_RECEIVER-1:0] fifo_response_signals_in_reg_rd_en   ;
 logic [NUM_MEMORY_RECEIVER-1:0] fifo_response_signals_in_reg_mask_int;
 logic [NUM_MEMORY_RECEIVER-1:0] fifo_response_signals_in_reg_mask_reg;
@@ -312,7 +312,7 @@ end
 
 
 // --------------------------------------------------------------------------------------
-// FIFO memory response out fifo MemoryPacket
+// FIFO memory response out fifo MemoryPacketResponse
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
@@ -331,19 +331,18 @@ endgenerate
 
 assign fifo_response_din = response_in_reg.payload;
 
-
 // Pop
 assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_int_rd_en;
 assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & fifo_response_signals_in_int_rd_en;
 assign fifo_response_dout_int.payload     = fifo_response_dout;
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-  .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-  .PROG_THRESH     (PROG_THRESH               ),
-  .READ_MODE       ("fwft"                    )
-) inst_fifo_MemoryPacket (
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
+  .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
+  .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
+  .PROG_THRESH     (PROG_THRESH                       ),
+  .READ_MODE       ("fwft"                            )
+) inst_fifo_MemoryPacketResponse (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
   .din        (fifo_response_din                        ),

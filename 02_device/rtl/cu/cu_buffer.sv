@@ -22,10 +22,11 @@ module cu_buffer #(
   // System Signals
   input  logic                             ap_clk                   ,
   input  logic                             areset                   ,
-  input  CacheRequest                      request_in               ,
+  input  KernelDescriptor                  descriptor_in            ,
+  input  MemoryPacketRequest               request_in               ,
   output FIFOStateSignalsOutput            fifo_request_signals_out ,
   input  FIFOStateSignalsInput             fifo_request_signals_in  ,
-  output CacheResponse                     response_out             ,
+  output MemoryPacketResponse              response_out             ,
   output FIFOStateSignalsOutput            fifo_response_signals_out,
   input  FIFOStateSignalsInput             fifo_response_signals_in ,
   output logic                             fifo_setup_signal        ,
@@ -41,13 +42,14 @@ module cu_buffer #(
 // --------------------------------------------------------------------------------------
 logic areset_m_axi       ;
 logic areset_fifo        ;
-logic areset_arbiter     ;
-logic areset_setup       ;
 logic areset_engine_m_axi;
 logic areset_control     ;
 
-CacheRequest  request_in_reg ;
-CacheResponse response_in_int;
+KernelDescriptor descriptor_in_reg;
+
+MemoryPacketRequest request_in_reg      ;
+CacheRequest        cache_request_in_reg;
+CacheResponse       response_in_int     ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -115,10 +117,23 @@ logic                         write_transaction_tready_out  ;
 always_ff @(posedge ap_clk) begin
   areset_m_axi        <= areset;
   areset_fifo         <= areset;
-  areset_arbiter      <= areset;
-  areset_setup        <= areset;
   areset_control      <= areset;
   areset_engine_m_axi <= areset;
+end
+
+// --------------------------------------------------------------------------------------
+// READ Descriptor Control and Drive signals to other modules
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+  if (areset_control) begin
+    descriptor_in_reg.valid <= 0;
+  end
+  else begin
+    if(descriptor_in.valid)begin
+      descriptor_in_reg.valid   <= descriptor_in.valid;
+      descriptor_in_reg.payload <= descriptor_in.payload;
+    end
+  end
 end
 
 // --------------------------------------------------------------------------------------
@@ -127,19 +142,23 @@ end
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     request_in_reg.valid         <= 1'b0;
+    cache_request_in_reg.valid   <= 1'b0;
     fifo_response_signals_in_reg <= 0;
     fifo_request_signals_in_reg  <= 0;
   end
   else begin
     request_in_reg.valid         <= request_in.valid;
+    cache_request_in_reg.valid   <= request_in_reg.valid;
     fifo_response_signals_in_reg <= fifo_response_signals_in;
     fifo_request_signals_in_reg  <= fifo_request_signals_in;
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  request_in_reg.payload <= request_in.payload;
+  request_in_reg.payload       <= request_in.payload;
+  cache_request_in_reg.payload <= map_MemoryRequestPacket_to_CacheRequest(request_in_reg.payload, descriptor_in_reg.payload, request_in_reg.valid);
 end
+
 // --------------------------------------------------------------------------------------
 // Drive output
 // --------------------------------------------------------------------------------------
@@ -163,7 +182,7 @@ assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signa
 always_ff @(posedge ap_clk) begin
   fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
   fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
-  response_out.payload      <= response_in_int.payload;
+  response_out.payload      <= map_CacheResponse_to_MemoryResponsePacket(response_in_int.payload);
 end
 
 // --------------------------------------------------------------------------------------
@@ -223,10 +242,10 @@ end
 assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_signals_in_int.wr_en = request_in_reg.valid;
-assign fifo_request_din.iob              = request_in_reg.payload.iob;
-assign fifo_request_din.meta             = request_in_reg.payload.meta;
-assign fifo_request_din.data             = request_in_reg.payload.data;
+assign fifo_request_signals_in_int.wr_en = cache_request_in_reg.valid;
+assign fifo_request_din.iob              = cache_request_in_reg.payload.iob;
+assign fifo_request_din.meta             = cache_request_in_reg.payload.meta;
+assign fifo_request_din.data             = cache_request_in_reg.payload.data;
 
 // Pop
 // assign fifo_request_signals_in_int.rd_en = engine_m_axi_request_pop_int;
@@ -383,7 +402,7 @@ always_ff @(posedge ap_clk) begin
   endcase
 end// always_ff @(posedge ap_clk)
 
-assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full;
+assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
 
 always_ff @(posedge ap_clk) begin
   engine_m_axi_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
@@ -400,7 +419,7 @@ assign engine_m_axi_response_mem.iob.ready = write_transaction_tready_out & (fif
 assign engine_m_axi_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
 assign engine_m_axi_response_mem.iob.rdata = read_transaction_tdata_out;
 assign read_transaction_length_in          = 1;
-assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & (fifo_response_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign read_transaction_start_in           = engine_m_axi_request_mem_reg.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
 assign read_transaction_offset_in          = engine_m_axi_request_mem_reg.iob.addr;
 assign read_transaction_tready_in          = fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
