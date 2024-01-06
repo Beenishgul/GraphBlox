@@ -670,7 +670,7 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES   = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES = 3;\n")
-    file.write(f"parameter NUM_CHANNELS_TOP           = {NUM_CHANNELS_TOP};\n")
+    file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS_TOP};\n")
     file.write(f"parameter NUM_CUS_WIDTH_BITS     = {NUM_CUS};\n")
     file.write(f"parameter NUM_BUNDLES_WIDTH_BITS = {NUM_BUNDLES};\n")
     file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
@@ -693,7 +693,7 @@ with open(output_file_path_shared, "w") as file:
     file.write("// CU CONFIGURATIONS SETTINGS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
 
-    file.write(f"parameter NUM_CHANNELS_TOP    = {NUM_CHANNELS_TOP},\n")
+    file.write(f"parameter NUM_CHANNELS    = {NUM_CHANNELS_TOP},\n")
 
     file.write(f"parameter NUM_CUS_MAX     = {NUM_CUS_MAX},\n")
     file.write(f"parameter NUM_BUNDLES_MAX = {NUM_BUNDLES_MAX},\n")
