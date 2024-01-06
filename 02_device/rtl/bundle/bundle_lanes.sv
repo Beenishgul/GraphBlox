@@ -16,7 +16,7 @@
 
 module bundle_lanes #(
     `include "bundle_parameters.vh"
-) (
+    ) (
     // System Signals
     input  logic                  ap_clk                                                            ,
     input  logic                  areset                                                            ,
@@ -26,7 +26,7 @@ module bundle_lanes #(
     output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out                                ,
     output FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out[NUM_LANES-1:0]          ,
     input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in [NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacket           response_memory_in                                                ,
+    input  MemoryPacketResponse   response_memory_in                                                ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                                ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                               ,
     input  ControlPacket          response_control_in                                               ,
@@ -35,7 +35,7 @@ module bundle_lanes #(
     output EnginePacket           request_lanes_out                                                 ,
     input  FIFOStateSignalsInput  fifo_request_lanes_out_signals_in                                 ,
     output FIFOStateSignalsOutput fifo_request_lanes_out_signals_out                                ,
-    output MemoryPacket           request_memory_out                                                ,
+    output MemoryPacketRequest    request_memory_out                                                ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                               ,
     output ControlPacket          request_control_out                                               ,
@@ -54,15 +54,15 @@ logic areset_lanes;
 
 KernelDescriptor descriptor_in_reg;
 
-ControlPacket request_control_out_int;
-EnginePacket  request_engine_out_int ;
-MemoryPacket  request_memory_out_int ;
-ControlPacket response_control_in_int;
-ControlPacket response_control_in_reg;
-EnginePacket  response_engine_in_int ;
-EnginePacket  response_engine_in_reg ;
-MemoryPacket  response_memory_in_int ;
-MemoryPacket  response_memory_in_reg ;
+ControlPacket        request_control_out_int;
+EnginePacket         request_engine_out_int ;
+MemoryPacketRequest  request_memory_out_int ;
+ControlPacket        response_control_in_int;
+ControlPacket        response_control_in_reg;
+EnginePacket         response_engine_in_int ;
+EnginePacket         response_engine_in_reg ;
+MemoryPacketResponse response_memory_in_int ;
+MemoryPacketResponse response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -133,8 +133,8 @@ FIFOStateSignalsOutput lane_arbiter_N_to_1_memory_fifo_request_signals_out      
 logic                  areset_lane_arbiter_N_to_1_memory                                 ;
 logic                  lane_arbiter_N_to_1_memory_fifo_setup_signal                      ;
 logic [NUM_LANES-1:0]  lane_arbiter_N_to_1_memory_lane_arbiter_grant_out                 ;
-MemoryPacket           lane_arbiter_N_to_1_memory_request_in              [NUM_LANES-1:0];
-MemoryPacket           lane_arbiter_N_to_1_memory_request_out                            ;
+MemoryPacketRequest    lane_arbiter_N_to_1_memory_request_in              [NUM_LANES-1:0];
+MemoryPacketRequest    lane_arbiter_N_to_1_memory_request_out                            ;
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Request Generator
@@ -154,8 +154,8 @@ FIFOStateSignalsInput  lane_arbiter_1_to_N_memory_fifo_response_signals_in [NUM_
 FIFOStateSignalsOutput lane_arbiter_1_to_N_memory_fifo_response_signals_out               ;
 logic                  areset_lane_arbiter_1_to_N_memory                                  ;
 logic                  lane_arbiter_1_to_N_memory_fifo_setup_signal                       ;
-MemoryPacket           lane_arbiter_1_to_N_memory_response_in                             ;
-MemoryPacket           lane_arbiter_1_to_N_memory_response_out             [NUM_LANES-1:0];
+MemoryPacketResponse   lane_arbiter_1_to_N_memory_response_in                             ;
+MemoryPacketResponse   lane_arbiter_1_to_N_memory_response_out             [NUM_LANES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: CONTROL Response Generator
@@ -188,10 +188,10 @@ logic                  lanes_done_out                            [NUM_LANES-1:0]
 logic                  lanes_fifo_setup_signal                   [NUM_LANES-1:0];
 ControlPacket          lanes_request_control_out                 [NUM_LANES-1:0];
 EnginePacket           lanes_request_lane_out                    [NUM_LANES-1:0];
-MemoryPacket           lanes_request_memory_out                  [NUM_LANES-1:0];
+MemoryPacketRequest    lanes_request_memory_out                  [NUM_LANES-1:0];
 ControlPacket          lanes_response_control_in                 [NUM_LANES-1:0];
 EnginePacket           lanes_response_engine_in                  [NUM_LANES-1:0];
-MemoryPacket           lanes_response_memory_in                  [NUM_LANES-1:0];
+MemoryPacketResponse   lanes_response_memory_in                  [NUM_LANES-1:0];
 
 logic [NUM_LANES-1:0] lanes_done_out_reg         ;
 logic [NUM_LANES-1:0] lanes_fifo_setup_signal_reg;
@@ -518,10 +518,10 @@ endgenerate
 
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_engine #(
-    .NUM_ENGINE_RECEIVER (NUM_LANES                                   ),
-    .ID_LEVEL            (2                                           ),
-    .ID_BUNDLE           (ID_BUNDLE                                   ),
-    .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
+    .NUM_ENGINE_RECEIVER(NUM_LANES                                   ),
+    .ID_LEVEL           (2                                           ),
+    .ID_BUNDLE          (ID_BUNDLE                                   ),
+    .FIFO_ARBITER_DEPTH (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
 ) inst_lane_arbiter_1_to_N_engine_response_in (
     .ap_clk                   (ap_clk                                             ),
     .areset                   (areset_lane_arbiter_1_to_N_lanes                   ),

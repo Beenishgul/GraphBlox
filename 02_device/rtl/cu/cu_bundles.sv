@@ -21,10 +21,10 @@ module cu_bundles #(
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
     input  KernelDescriptor       descriptor_in                      ,
-    input  MemoryPacket           response_memory_in                 ,
+    input  MemoryPacketResponse   response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_memory_out                 ,
+    output MemoryPacketRequest    request_memory_out                 ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out,
     output logic                  fifo_setup_signal                  ,
@@ -40,12 +40,12 @@ logic areset_cu_bundles;
 
 KernelDescriptor descriptor_in_reg;
 
-ControlPacket request_control_out_int;
-MemoryPacket  request_memory_out_int ;
-ControlPacket response_control_in_int;
-ControlPacket response_control_in_reg;
-MemoryPacket  response_memory_in_int ;
-MemoryPacket  response_memory_in_reg ;
+ControlPacket        request_control_out_int;
+MemoryPacketRequest  request_memory_out_int ;
+ControlPacket        response_control_in_int;
+ControlPacket        response_control_in_reg;
+MemoryPacketResponse response_memory_in_int ;
+MemoryPacketResponse response_memory_in_reg ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -96,10 +96,10 @@ logic                  bundle_done_out                            [NUM_BUNDLES-1
 logic                  bundle_fifo_setup_signal                   [NUM_BUNDLES-1:0];
 ControlPacket          bundle_request_control_out                 [NUM_BUNDLES-1:0];
 EnginePacket           bundle_request_lanes_out                   [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_request_memory_out                  [NUM_BUNDLES-1:0];
+MemoryPacketRequest    bundle_request_memory_out                  [NUM_BUNDLES-1:0];
 ControlPacket          bundle_response_control_in                 [NUM_BUNDLES-1:0];
 EnginePacket           bundle_response_lanes_in                   [NUM_BUNDLES-1:0];
-MemoryPacket           bundle_response_memory_in                  [NUM_BUNDLES-1:0];
+MemoryPacketResponse   bundle_response_memory_in                  [NUM_BUNDLES-1:0];
 
 logic [NUM_BUNDLES-1:0] bundle_fifo_setup_signal_reg;
 logic [NUM_BUNDLES-1:0] bundle_done_out_reg         ;
@@ -116,8 +116,8 @@ FIFOStateSignalsOutput  bundle_arbiter_memory_N_to_1_fifo_request_signals_out   
 logic                   areset_arbiter_memory_N_to_1                                          ;
 logic                   bundle_arbiter_memory_N_to_1_fifo_setup_signal                        ;
 logic [NUM_BUNDLES-1:0] bundle_arbiter_memory_N_to_1_arbiter_grant_out                        ;
-MemoryPacket            bundle_arbiter_memory_N_to_1_request_in              [NUM_BUNDLES-1:0];
-MemoryPacket            bundle_arbiter_memory_N_to_1_request_out                              ;
+MemoryPacketRequest     bundle_arbiter_memory_N_to_1_request_in              [NUM_BUNDLES-1:0];
+MemoryPacketRequest     bundle_arbiter_memory_N_to_1_request_out                              ;
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
@@ -141,8 +141,8 @@ FIFOStateSignalsInput  bundle_arbiter_memory_1_to_N_fifo_response_signals_in [NU
 FIFOStateSignalsOutput bundle_arbiter_memory_1_to_N_fifo_response_signals_out                 ;
 logic                  areset_arbiter_memory_1_to_N                                           ;
 logic                  bundle_arbiter_memory_1_to_N_fifo_setup_signal                         ;
-MemoryPacket           bundle_arbiter_memory_1_to_N_response_in                               ;
-MemoryPacket           bundle_arbiter_memory_1_to_N_response_out             [NUM_BUNDLES-1:0];
+MemoryPacketResponse   bundle_arbiter_memory_1_to_N_response_in                               ;
+MemoryPacketResponse   bundle_arbiter_memory_1_to_N_response_out             [NUM_BUNDLES-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Signals
