@@ -28,8 +28,8 @@ import PKG_CACHE::*;
 // --------------------------------------------------------------------------------------
 //   Generic Memory request type
 // --------------------------------------------------------------------------------------
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_offset;
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_offset;
+typedef logic [GLOBAL_BUFFER_SIZE_WIDTH_BITS-1:0]    type_memory_request_offset;
+typedef logic [GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0]   type_memory_response_offset;
 
 parameter TYPE_MEMORY_CMD_BITS = 5;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
@@ -404,9 +404,9 @@ function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (
   // output_packet.meta.address.offset       = input_packet_req.meta.address.offset;
   // output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
   if(input_packet_req.meta.address.shift.direction) begin
-    output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
+    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount)[GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0];
   end else begin
-    output_packet.meta.address.offset       = input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount;
+    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount)[GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0];
   end
   output_packet.data.field                = input_packet_resp.iob.rdata;
 
