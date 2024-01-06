@@ -51,6 +51,7 @@ package PKG_GLOBALS;
 	parameter CU_BUFFER_COUNT_WIDTH_BITS     = 8;
 	parameter GLOBAL_OVERLAY_SIZE_WIDTH_BITS = 12; // 4*2^10 entries max or 4KB 
 	parameter GLOBAL_BUFFER_SIZE_WIDTH_BITS  = 32; // 4*2^30 Buffers max or 4GB 
+	parameter GLOBAL_NUM_CHANNELS            = 2;  // number of channels per CU -> 32bank = 32 channels 
 
 // --------------------------------------------------------------------------------------
 //  KERNEL COMMON GLOBALS
@@ -59,6 +60,15 @@ package PKG_GLOBALS;
 // --------------------------------------------------------------------------------------
 	parameter GLOBAL_SYSTEM_CACHE_IP = 1;
 	parameter GLOBAL_CU_CACHE_IP     = 1;
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+//  KERNEL COMMON GLOBALS
+// --------------------------------------------------------------------------------------
+//  CU -> Cache Changing these values would change the cache front end
+// --------------------------------------------------------------------------------------
+	parameter GLOBAL_SYSTEM_STREAM_IP = 0;
+	parameter GLOBAL_CU_STREAM_IP     = 1;
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
