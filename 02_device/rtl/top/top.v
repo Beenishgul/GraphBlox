@@ -156,7 +156,7 @@ module top #(
     .ap_clk     (ap_clk     ),
     .ap_rst_n   (ap_rst_n   ),
     // AXI4 master interface m00_axi
-    `include "m_axi_portmaps_afu.vh"
+    `include "m_axi_portmap_afu.vh"
     // Control Signals
     .ap_start   (ap_start   ),
     .ap_idle    (ap_idle    ),
