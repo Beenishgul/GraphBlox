@@ -41,6 +41,7 @@ alg_*
 02_device/rtl/utils/include/global/config_parameters.vh
 02_device/rtl/utils/include/parameters/shared_parameters.vh
 02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
+02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
 02_device/rtl/utils/include/topology/bundle_arbitration.vh
 02_device/rtl/utils/include/topology/bundle_topology.vh
 02_device/rtl/utils/include/topology/channel_topology.vh
