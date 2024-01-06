@@ -401,12 +401,10 @@ function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (
   MemoryPacketResponsePayload output_packet;
 
   output_packet.meta.route.packet_source  = input_packet_req.meta.route.packet_source ;
-  // output_packet.meta.address.offset       = input_packet_req.meta.address.offset;
-  // output_packet.meta.address.offset       = input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount;
   if(input_packet_req.meta.address.shift.direction) begin
-    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount)[GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0];
+    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount);
   end else begin
-    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount)[GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0];
+    output_packet.meta.address.offset       = (input_packet_req.meta.address.offset << input_packet_req.meta.address.shift.amount);
   end
   output_packet.data.field                = input_packet_resp.iob.rdata;
 
