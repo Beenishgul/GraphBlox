@@ -139,6 +139,9 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Generic Memory Packet
 // --------------------------------------------------------------------------------------
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
+
 typedef struct packed{
   type_memory_cmd cmd; // SIZE = 5 bits
 } MemoryPacketType;
@@ -170,8 +173,6 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Request Memory Packet
 // --------------------------------------------------------------------------------------
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
-
 typedef struct packed{
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
   type_memory_request_address            offset   ; // SIZE = clog2(4GB) bits
@@ -197,7 +198,6 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Response Memory Packet
 // --------------------------------------------------------------------------------------
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
 
 typedef struct packed{
   type_memory_response_address offset; // SIZE = clog2(4GB) bits
