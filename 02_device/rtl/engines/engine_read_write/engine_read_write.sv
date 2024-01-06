@@ -110,13 +110,13 @@ logic configure_fifo_setup_signal;
 ReadWriteConfiguration configure_engine_out                              ;
 FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out;
 
-MemoryPacketResponse   configure_memory_response_memory_in                 ;
-FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
-FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
-ReadWriteConfiguration configure_memory_out                                ;
 FIFOStateSignalsInput  configure_memory_fifo_configure_memory_signals_in   ;
+FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
 FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
+FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
 logic                  configure_memory_fifo_setup_signal                  ;
+MemoryPacketResponse   configure_memory_response_memory_in                 ;
+ReadWriteConfiguration configure_memory_out                                ;
 
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
