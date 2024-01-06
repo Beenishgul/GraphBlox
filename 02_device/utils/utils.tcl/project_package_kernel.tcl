@@ -252,6 +252,10 @@ puts "[color 4 "                        Associate AXI/AXIS interface with clock"
 ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core >> $log_file
 ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core >> $log_file
 
+set argv [list ${PARAMS_TCL_DIR} $core]
+set argc 2
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_m_axi_ports.tcl 
+
 # =========================================================
 # associate reset signal with clock
 # =========================================================
@@ -268,7 +272,7 @@ puts "[color 3 "                        including CTRL and user kernel arguments
 # =========================================================
 # Add RTL kernel registers
 # =========================================================
-puts "[color 4 "                        Add RTL kernel registers"]" 
+puts "[color 4 "                        Add RTL kernel registers s_axi_control"]" 
 ipx::add_register CTRL [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects $core]]
 
 set mem_map    [ipx::add_memory_map -quiet "s_axi_control" $core]
@@ -375,6 +379,10 @@ puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"
 # =========================================================
 
 puts "[color 4 "                        Set RTL kernel (${KERNEL_NAME}) registers property"]" 
+
+set argv [list ${PARAMS_TCL_DIR} $addr_block]
+set argc 2
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_map_buffers_m_axi_ports.tcl 
 
 puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
   set reg      [ipx::add_register -quiet "buffer_0" $addr_block]

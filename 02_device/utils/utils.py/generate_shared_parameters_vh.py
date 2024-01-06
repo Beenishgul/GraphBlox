@@ -8,17 +8,18 @@ import json
 
 
 # Validate the number of arguments
-if len(sys.argv) != 9:
-    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
+if len(sys.argv) != 10:
+    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
+_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
 
 # Construct the full path for the file
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
+# output_folder_path_tcl  = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL)
 output_folder_path_topology   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
 output_folder_path_global     = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
 output_folder_path_parameters = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
@@ -36,6 +37,11 @@ if not os.path.exists(output_folder_path_parameters):
 if not os.path.exists(output_folder_path_portmaps):
     os.makedirs(output_folder_path_portmaps)
 
+if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
+    os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
+
+output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
+output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
 output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
 output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
@@ -53,6 +59,7 @@ output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_ar
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
 
+channels = config_data["channels"]
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
 fifo_control_response = config_data["fifo_control_response"]
@@ -60,6 +67,8 @@ fifo_control_request  = config_data["fifo_control_request"]
 fifo_memory   = config_data["fifo_memory"]
 fifo_engine   = config_data["fifo_engine"]
 
+
+NUM_CHANNELS_TOP = max(int(properties[0]) for properties in channels.values())
 
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
@@ -621,6 +630,8 @@ CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE  = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_
 CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE_TEMP)
 CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP)
 
+check_and_clean_file(output_file_generate_ports_tcl)
+check_and_clean_file(output_file_buffer_channels_tcl)
 check_and_clean_file(output_file_path_global)
 check_and_clean_file(output_file_top_parameters)
 check_and_clean_file(output_file_path_shared)
@@ -643,7 +654,7 @@ parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = 64 ,
 parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = 512,
 parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1,
 """
-    for channel in range(int(NUM_CHANNELS)):
+    for channel in range(int(NUM_CHANNELS_TOP)):
         output_lines.append(ports_template.format(channel))
     
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
@@ -659,7 +670,7 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES   = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES = 3;\n")
-    file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS};\n")
+    file.write(f"parameter NUM_CHANNELS_TOP           = {NUM_CHANNELS_TOP};\n")
     file.write(f"parameter NUM_CUS_WIDTH_BITS     = {NUM_CUS};\n")
     file.write(f"parameter NUM_BUNDLES_WIDTH_BITS = {NUM_BUNDLES};\n")
     file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
@@ -682,7 +693,7 @@ with open(output_file_path_shared, "w") as file:
     file.write("// CU CONFIGURATIONS SETTINGS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
 
-    file.write(f"parameter NUM_CHANNELS    = {NUM_CHANNELS},\n")
+    file.write(f"parameter NUM_CHANNELS_TOP    = {NUM_CHANNELS_TOP},\n")
 
     file.write(f"parameter NUM_CUS_MAX     = {NUM_CUS_MAX},\n")
     file.write(f"parameter NUM_BUNDLES_MAX = {NUM_BUNDLES_MAX},\n")
@@ -1376,7 +1387,7 @@ with open(output_file_cu_arbitration, "w") as file:
 with open(output_file_channel_top, 'w') as file:
     output_lines = []
 
-    for channel in range(int(NUM_CHANNELS)):
+    for channel in range(int(NUM_CHANNELS_TOP)):
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel}")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
@@ -1483,7 +1494,7 @@ output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
 output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
-    for channel in range(int(NUM_CHANNELS)):
+    for channel in range(int(NUM_CHANNELS_TOP)):
         output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))
@@ -1532,7 +1543,7 @@ output wire [                           3-1:0] m{0:02d}_axi_arprot       , // Ad
 output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Address read channel quality of service
     """
 
-    for channel in range(int(NUM_CHANNELS)):
+    for channel in range(int(NUM_CHANNELS_TOP)):
         output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))
@@ -1581,7 +1592,42 @@ with open(output_file_afu_portmap, 'w') as file:
 .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
     """
 
-    for channel in range(int(NUM_CHANNELS)):
+    for channel in range(int(NUM_CHANNELS_TOP)):
         output_lines.append(connection_template.format(channel))
 
     file.write('\n'.join(output_lines))
+
+
+def generate_tcl_script_from_json(output_file_name):
+  
+    # Open output file for writing
+    with open(output_file_name, "w") as file:
+        current_address = 0x010  # Starting base address
+
+        for buffer_name, properties in channels.items():
+            axi_interface = f"m0{properties[0]}_axi"
+            size = int(properties[1])  # Size as specified in JSON
+            size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+
+            # Writing the TCL commands
+            file.write(f'''puts_reg_info "{buffer_name}" "graph overlay program" "0x{current_address:03X}" [expr {{{size}}}]
+  set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
+  set_property address_offset 0x{current_address:03X} $reg
+  set_property size           [expr {{{size}}}]   $reg
+  set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
+  set_property value {axi_interface} $regparam \n\n''')
+
+            current_address += size_in_hex  # Increment the address based on the size
+
+def generate_ipx_associate_commands(output_file_name):
+    # Find the highest channel number
+    highest_channel_number = max(int(properties[0]) for properties in channels.values())
+
+    # Open output file for appending
+    with open(output_file_name, "a") as file:
+        for channel_num in range(highest_channel_number + 1):
+            file.write(f'ipx::associate_bus_interfaces -busif "m0{channel_num}_axi" -clock "ap_clk" $core >> $log_file\n')
+
+# Generate the ipx::associate_bus_interfaces commands
+generate_ipx_associate_commands(output_file_generate_ports_tcl)
+generate_tcl_script_from_json(output_file_buffer_channels_tcl)
