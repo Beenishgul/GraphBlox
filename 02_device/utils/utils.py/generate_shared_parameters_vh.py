@@ -22,6 +22,7 @@ config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILIT
 output_folder_path_topology   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
 output_folder_path_global     = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
 output_folder_path_parameters = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
+output_folder_path_portmaps = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
 
 if not os.path.exists(output_folder_path_topology):
     os.makedirs(output_folder_path_topology)
@@ -32,11 +33,15 @@ if not os.path.exists(output_folder_path_global):
 if not os.path.exists(output_folder_path_parameters):
     os.makedirs(output_folder_path_parameters)
 
+if not os.path.exists(output_folder_path_portmaps):
+    os.makedirs(output_folder_path_portmaps)
+
 output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
 output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
+output_file_afu_port = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
@@ -617,10 +622,14 @@ check_and_clean_file(output_file_path_global)
 check_and_clean_file(output_file_path_shared)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
+check_and_clean_file(output_file_channel_top)
+check_and_clean_file(output_file_afu_port)
 
 check_and_clean_file(output_file_cu_arbitration)
 check_and_clean_file(output_file_bundle_arbitration)
 check_and_clean_file(output_file_lane_arbitration)
+
+
 
 # Write to VHDL file
 with open(output_file_path_global, "w") as file:
@@ -1351,6 +1360,8 @@ with open(output_file_channel_top, 'w') as file:
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {channel}")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {channel} READ AXI4 SIGNALS INPUT")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rvalid  = m{channel:02d}_axi_rvalid ; // Read channel valid")
         output_lines.append(f"assign m_axi4_read[{channel}].in.arready = m{channel:02d}_axi_arready; // Address read channel ready")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rlast   = m{channel:02d}_axi_rlast  ; // Read channel last word")
@@ -1358,6 +1369,9 @@ with open(output_file_channel_top, 'w') as file:
         output_lines.append(f"assign m_axi4_read[{channel}].in.rid     = m{channel:02d}_axi_rid    ; // Read channel ID")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rresp   = m{channel:02d}_axi_rresp  ; // Read channel response")
         output_lines.append("")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {channel} READ AXI4 SIGNALS OUTPUT")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"assign m{channel:02d}_axi_arvalid = m_axi4_read[{channel}].out.arvalid; // Address read channel valid")
         output_lines.append(f"assign m{channel:02d}_axi_araddr  = m_axi4_read[{channel}].out.araddr ; // Address read channel address")
         output_lines.append(f"assign m{channel:02d}_axi_arlen   = m_axi4_read[{channel}].out.arlen  ; // Address write channel burst length")
@@ -1370,12 +1384,18 @@ with open(output_file_channel_top, 'w') as file:
         output_lines.append(f"assign m{channel:02d}_axi_arprot  = m_axi4_read[{channel}].out.arprot ; // Address write channel protection type")
         output_lines.append(f"assign m{channel:02d}_axi_arqos   = m_axi4_read[{channel}].out.arqos  ; // Address write channel quality of service")
         output_lines.append("")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {channel} WRITE AXI4 SIGNALS INPUT")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"assign m_axi4_write[{channel}].in.awready = m{channel:02d}_axi_awready; // Address write channel ready")
         output_lines.append(f"assign m_axi4_write[{channel}].in.wready  = m{channel:02d}_axi_wready ; // Write channel ready")
         output_lines.append(f"assign m_axi4_write[{channel}].in.bid     = m{channel:02d}_axi_bid    ; // Write response channel ID")
         output_lines.append(f"assign m_axi4_write[{channel}].in.bresp   = m{channel:02d}_axi_bresp  ; // Write channel response")
         output_lines.append(f"assign m_axi4_write[{channel}].in.bvalid  = m{channel:02d}_axi_bvalid ; // Write response channel valid")
         output_lines.append("")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {channel} WRITE AXI4 SIGNALS OUTPUT")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"assign m{channel:02d}_axi_awvalid = m_axi4_write[{channel}].out.awvalid; // Address write channel valid")
         output_lines.append(f"assign m{channel:02d}_axi_awid    = m_axi4_write[{channel}].out.awid   ; // Address write channel ID")
         output_lines.append(f"assign m{channel:02d}_axi_awaddr  = m_axi4_write[{channel}].out.awaddr ; // Address write channel address")
@@ -1394,5 +1414,56 @@ with open(output_file_channel_top, 'w') as file:
         output_lines.append("")
 
     # Writing to the VHDL file
+
+    file.write('\n'.join(output_lines))
+
+
+with open(output_file_afu_port, 'w') as file:
+    output_lines = []
+
+    ports_template = """
+    output logic                         m{0:02d}_axi_awvalid,
+    input  logic                         m{0:02d}_axi_awready,
+    output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
+    output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_awlen  ,
+    output logic                         m{0:02d}_axi_wvalid ,
+    input  logic                         m{0:02d}_axi_wready ,
+    output logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_wdata  ,
+    output logic [ M_AXI4_BE_STRB_W-1:0] m{0:02d}_axi_wstrb  ,
+    output logic                         m{0:02d}_axi_wlast  ,
+    input  logic                         m{0:02d}_axi_bvalid ,
+    output logic                         m{0:02d}_axi_bready ,
+    output logic                         m{0:02d}_axi_arvalid,
+    input  logic                         m{0:02d}_axi_arready,
+    output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_araddr ,
+    output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_arlen  ,
+    input  logic                         m{0:02d}_axi_rvalid ,
+    output logic                         m{0:02d}_axi_rready ,
+    input  logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
+    input  logic                         m{0:02d}_axi_rlast  ,
+    // Control Signals
+    // AXI4 master interface m{0:02d}_axi missing ports
+    input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
+    input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_rid    ,
+    input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_rresp  ,
+    input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_bresp  ,
+    output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_awid   ,
+    output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_awsize ,
+    output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_awburst,
+    output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_awlock ,
+    output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_awcache,
+    output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_awprot ,
+    output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_awqos  ,
+    output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_arid   ,
+    output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_arsize ,
+    output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_arburst,
+    output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_arlock ,
+    output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_arcache,
+    output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
+    output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
+    """
+
+    for channel in range(int(NUM_CHANNELS)):
+        output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))

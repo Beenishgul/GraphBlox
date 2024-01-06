@@ -1,6 +1,8 @@
 // --------------------------------------------------------------------------------------
 // Channel 0
 // --------------------------------------------------------------------------------------
+// Channel 0 READ AXI4 SIGNALS INPUT
+// --------------------------------------------------------------------------------------
 assign m_axi4_read[0].in.rvalid  = m00_axi_rvalid ; // Read channel valid
 assign m_axi4_read[0].in.arready = m00_axi_arready; // Address read channel ready
 assign m_axi4_read[0].in.rlast   = m00_axi_rlast  ; // Read channel last word
@@ -8,6 +10,9 @@ assign m_axi4_read[0].in.rdata   = swap_endianness_cacheline_axi_be(m00_axi_rdat
 assign m_axi4_read[0].in.rid     = m00_axi_rid    ; // Read channel ID
 assign m_axi4_read[0].in.rresp   = m00_axi_rresp  ; // Read channel response
 
+// --------------------------------------------------------------------------------------
+// Channel 0 READ AXI4 SIGNALS OUTPUT
+// --------------------------------------------------------------------------------------
 assign m00_axi_arvalid = m_axi4_read[0].out.arvalid; // Address read channel valid
 assign m00_axi_araddr  = m_axi4_read[0].out.araddr ; // Address read channel address
 assign m00_axi_arlen   = m_axi4_read[0].out.arlen  ; // Address write channel burst length
@@ -20,12 +25,18 @@ assign m00_axi_arcache = m_axi4_read[0].out.arcache; // Address read channel mem
 assign m00_axi_arprot  = m_axi4_read[0].out.arprot ; // Address write channel protection type
 assign m00_axi_arqos   = m_axi4_read[0].out.arqos  ; // Address write channel quality of service
 
+// --------------------------------------------------------------------------------------
+// Channel 0 WRITE AXI4 SIGNALS INPUT
+// --------------------------------------------------------------------------------------
 assign m_axi4_write[0].in.awready = m00_axi_awready; // Address write channel ready
 assign m_axi4_write[0].in.wready  = m00_axi_wready ; // Write channel ready
 assign m_axi4_write[0].in.bid     = m00_axi_bid    ; // Write response channel ID
 assign m_axi4_write[0].in.bresp   = m00_axi_bresp  ; // Write channel response
 assign m_axi4_write[0].in.bvalid  = m00_axi_bvalid ; // Write response channel valid
 
+// --------------------------------------------------------------------------------------
+// Channel 0 WRITE AXI4 SIGNALS OUTPUT
+// --------------------------------------------------------------------------------------
 assign m00_axi_awvalid = m_axi4_write[0].out.awvalid; // Address write channel valid
 assign m00_axi_awid    = m_axi4_write[0].out.awid   ; // Address write channel ID
 assign m00_axi_awaddr  = m_axi4_write[0].out.awaddr ; // Address write channel address
@@ -45,6 +56,8 @@ assign m00_axi_bready  = m_axi4_write[0].out.bready ; // Write response channel 
 // --------------------------------------------------------------------------------------
 // Channel 1
 // --------------------------------------------------------------------------------------
+// Channel 1 READ AXI4 SIGNALS INPUT
+// --------------------------------------------------------------------------------------
 assign m_axi4_read[1].in.rvalid  = m01_axi_rvalid ; // Read channel valid
 assign m_axi4_read[1].in.arready = m01_axi_arready; // Address read channel ready
 assign m_axi4_read[1].in.rlast   = m01_axi_rlast  ; // Read channel last word
@@ -52,6 +65,9 @@ assign m_axi4_read[1].in.rdata   = swap_endianness_cacheline_axi_be(m01_axi_rdat
 assign m_axi4_read[1].in.rid     = m01_axi_rid    ; // Read channel ID
 assign m_axi4_read[1].in.rresp   = m01_axi_rresp  ; // Read channel response
 
+// --------------------------------------------------------------------------------------
+// Channel 1 READ AXI4 SIGNALS OUTPUT
+// --------------------------------------------------------------------------------------
 assign m01_axi_arvalid = m_axi4_read[1].out.arvalid; // Address read channel valid
 assign m01_axi_araddr  = m_axi4_read[1].out.araddr ; // Address read channel address
 assign m01_axi_arlen   = m_axi4_read[1].out.arlen  ; // Address write channel burst length
@@ -64,12 +80,18 @@ assign m01_axi_arcache = m_axi4_read[1].out.arcache; // Address read channel mem
 assign m01_axi_arprot  = m_axi4_read[1].out.arprot ; // Address write channel protection type
 assign m01_axi_arqos   = m_axi4_read[1].out.arqos  ; // Address write channel quality of service
 
+// --------------------------------------------------------------------------------------
+// Channel 1 WRITE AXI4 SIGNALS INPUT
+// --------------------------------------------------------------------------------------
 assign m_axi4_write[1].in.awready = m01_axi_awready; // Address write channel ready
 assign m_axi4_write[1].in.wready  = m01_axi_wready ; // Write channel ready
 assign m_axi4_write[1].in.bid     = m01_axi_bid    ; // Write response channel ID
 assign m_axi4_write[1].in.bresp   = m01_axi_bresp  ; // Write channel response
 assign m_axi4_write[1].in.bvalid  = m01_axi_bvalid ; // Write response channel valid
 
+// --------------------------------------------------------------------------------------
+// Channel 1 WRITE AXI4 SIGNALS OUTPUT
+// --------------------------------------------------------------------------------------
 assign m01_axi_awvalid = m_axi4_write[1].out.awvalid; // Address write channel valid
 assign m01_axi_awid    = m_axi4_write[1].out.awid   ; // Address write channel ID
 assign m01_axi_awaddr  = m_axi4_write[1].out.awaddr ; // Address write channel address
