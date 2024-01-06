@@ -26,34 +26,11 @@ import PKG_DESCRIPTOR::*;
 import PKG_CACHE::*;
 
 // --------------------------------------------------------------------------------------
-// FIFO Signals
-// --------------------------------------------------------------------------------------
-typedef struct packed {
-  logic empty    ;
-  logic prog_full;
-} FIFOStateSignalsOutput;
-
-typedef struct packed {
-  logic full       ;
-  logic empty      ;
-  logic valid      ;
-  logic prog_full  ;
-  logic wr_rst_busy;
-  logic rd_rst_busy;
-} FIFOStateSignalsOutInternal;
-
-typedef struct packed {
-  logic rd_en;
-} FIFOStateSignalsInput;
-
-typedef struct packed {
-  logic rd_en;
-  logic wr_en;
-} FIFOStateSignalsInputInternal;
-
-// --------------------------------------------------------------------------------------
 //   Generic Memory request type
 // --------------------------------------------------------------------------------------
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
+typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
+
 parameter TYPE_MEMORY_CMD_BITS = 5;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_MEM_INVALID  = 1 << 0,
@@ -115,6 +92,32 @@ typedef enum logic[TYPE_SEQUENCE_STATE_BITS-1:0] {
 } type_sequence_state;
 
 // --------------------------------------------------------------------------------------
+// FIFO Signals
+// --------------------------------------------------------------------------------------
+typedef struct packed {
+  logic empty    ;
+  logic prog_full;
+} FIFOStateSignalsOutput;
+
+typedef struct packed {
+  logic full       ;
+  logic empty      ;
+  logic valid      ;
+  logic prog_full  ;
+  logic wr_rst_busy;
+  logic rd_rst_busy;
+} FIFOStateSignalsOutInternal;
+
+typedef struct packed {
+  logic rd_en;
+} FIFOStateSignalsInput;
+
+typedef struct packed {
+  logic rd_en;
+  logic wr_en;
+} FIFOStateSignalsInputInternal;
+
+// --------------------------------------------------------------------------------------
 // Generic sequence_state
 // --------------------------------------------------------------------------------------
 typedef struct packed{
@@ -132,16 +135,13 @@ typedef struct packed{
 
 typedef struct packed{
   logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
-  logic [          M_AXI4_FE_DATA_W-1:0] offset   ; // SIZE = clog2(4GB) bits
+  type_memory_request_address            offset   ; // SIZE = clog2(4GB) bits
   PacketDataAddressShift                 shift    ; // SIZE = clog2(offset) bits + 1
-} PacketDataAddress;
+} PacketRequestDataAddress;
 
 // --------------------------------------------------------------------------------------
 // Generic Memory Packet
 // --------------------------------------------------------------------------------------
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_request_address;
-typedef logic [M_AXI4_FE_ADDR_W-1:0]   type_memory_response_address;
-
 typedef struct packed{
   type_memory_cmd cmd; // SIZE = 5 bits
 } MemoryPacketType;
@@ -157,12 +157,6 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Request Memory Packet
 // --------------------------------------------------------------------------------------
-typedef struct packed{
-  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
-  type_memory_request_address            offset   ; // SIZE = clog2(4GB) bits
-  PacketDataAddressShift                 shift    ; // SIZE = clog2(offset) bits + 1
-} PacketRequestDataAddress;
-
 typedef struct packed{
   MemoryPacketRouteAttributes route   ;
   PacketRequestDataAddress    address ;
@@ -182,7 +176,6 @@ typedef struct packed{
 // --------------------------------------------------------------------------------------
 // Response Memory Packet
 // --------------------------------------------------------------------------------------
-
 typedef struct packed{
   type_memory_response_address offset; // SIZE = clog2(4GB) bits
 } PacketResponseDataAddress;
@@ -223,7 +216,7 @@ typedef struct packed{
 
 typedef struct packed{
   EnginePacketRouteAttributes route   ;
-  MemoryPacketRequestMeta     address ;
+  PacketRequestDataAddress    address ;
   MemoryPacketType            subclass;
 } EnginePacketMetaFull;
 
@@ -403,18 +396,6 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
   return output_packet;
 endfunction : map_MemoryRequestPacket_to_CacheRequest
 // --------------------------------------------------------------------------------------
-function CacheResponsePayload map_CacheResponse_to_CacheResponse (input CacheRequestPayload input_packet);
-
-  CacheResponsePayload output_packet;
-
-  output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
-  output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
-  output_packet.meta.address.offset       = input_packet.meta.address.offset;
-  output_packet.data.field                = input_packet.iob.rdata;
-
-  return output_packet;
-endfunction : map_CacheResponse_to_CacheResponse
-// --------------------------------------------------------------------------------------
 function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (input CacheRequestPayload input_packet_req, input CacheResponsePayload input_packet_resp);
 
   MemoryPacketResponsePayload output_packet;
@@ -470,7 +451,7 @@ function EnginePacketPayload  map_EnginePacketFull_to_EnginePacket (input Engine
 endfunction : map_EnginePacketFull_to_EnginePacket
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketResponseData input_packet, input EnginePacketData pending_packet);
+function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (input MemoryPacketData input_packet, input EnginePacketData pending_packet);
 
   EnginePacketData output_packet;
 

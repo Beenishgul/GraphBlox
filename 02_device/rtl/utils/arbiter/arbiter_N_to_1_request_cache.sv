@@ -45,9 +45,9 @@ MemoryPacketRequest request_out_int                          ;
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
 // --------------------------------------------------------------------------------------
-MemoryPacketRequesttPayload   fifo_request_din             ;
+MemoryPacketRequestPayload    fifo_request_din             ;
 MemoryPacketRequest           fifo_request_din_reg         ;
-MemoryPacketRequesttPayload   fifo_request_dout            ;
+MemoryPacketRequestPayload    fifo_request_dout            ;
 FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
 FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -69,8 +69,8 @@ logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_bus_valid;
 MemoryPacketRequest request_arbiter_in_int[(NUM_MEMORY_REQUESTOR)-1:0];
 MemoryPacketRequest request_arbiter_in_reg[(NUM_MEMORY_REQUESTOR)-1:0];
 
-MemoryPacketRequesttPayload        fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
-MemoryPacketRequesttPayload        fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequestPayload         fifo_request_arbiter_in_din             [(NUM_MEMORY_REQUESTOR)-1:0];
+MemoryPacketRequestPayload         fifo_request_arbiter_in_dout            [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsInputInternal      fifo_request_arbiter_in_signals_in_int  [(NUM_MEMORY_REQUESTOR)-1:0];
 FIFOStateSignalsOutInternal        fifo_request_arbiter_in_signals_out_int [(NUM_MEMORY_REQUESTOR)-1:0];
 logic [(NUM_MEMORY_REQUESTOR)-1:0] fifo_request_arbiter_in_setup_signal_int                            ;
