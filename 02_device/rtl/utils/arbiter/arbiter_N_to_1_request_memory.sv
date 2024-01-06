@@ -41,6 +41,7 @@ logic areset_arbiter;
 
 MemoryPacketRequest request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
 MemoryPacketRequest request_out_int                          ;
+MemoryPacketRequest request_out_reg                          ;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
@@ -127,12 +128,13 @@ always_ff @(posedge ap_clk) begin
   else begin
     fifo_setup_signal        <= fifo_request_setup_signal_int | (|fifo_request_arbiter_in_setup_signal_int);
     fifo_request_signals_out <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
-    request_out.valid        <= request_out_int.valid;
+    request_out.valid        <= request_out_reg.valid;
   end
 end
 
 always_ff @(posedge ap_clk) begin
-  request_out.payload <= request_out_int.payload ;
+  request_out.payload <= request_out_reg.payload ;
+  request_out_reg     <= request_out_int;
 end
 
 always_ff @(posedge ap_clk) begin
@@ -255,16 +257,16 @@ xpm_fifo_sync_wrapper #(
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_942x16_MemoryPacketRequest
 // --------------------------------------------------------------------------------------
-always_comb begin
+always_ff begin
   for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin : generate_arbiter_bus_in
-    arbiter_bus_in[i]    = request_arbiter_in_int[i];
-    arbiter_bus_valid[i] = request_arbiter_in_int[i].valid;
-    arbiter_request[i]   = ~fifo_request_arbiter_in_signals_out_int[i].empty;
+    arbiter_bus_in[i]    <= request_arbiter_in_int[i];
+    arbiter_bus_valid[i] <= request_arbiter_in_int[i].valid;
+    arbiter_request[i]   <= ~fifo_request_arbiter_in_signals_out_int[i].empty;
   end
   for (int i=NUM_MEMORY_REQUESTOR; i<NUM_ARBITER_REQUESTOR; i++) begin : generate_arbiter_bus_invalid
-    arbiter_bus_in[i]    = 0;
-    arbiter_bus_valid[i] = 0;
-    arbiter_request[i]   = 0;
+    arbiter_bus_in[i]    <= 0;
+    arbiter_bus_valid[i] <= 1'b0;
+    arbiter_request[i]   <= 1'b0;
   end
 end
 

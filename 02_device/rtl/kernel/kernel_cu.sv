@@ -217,7 +217,7 @@ always_ff @(posedge ap_clk) begin
   descriptor_in_reg.payload     <= descriptor_in.payload;
   cu_setup_descriptor.payload   <= descriptor_in_reg.payload;
   cu_bundles_descriptor.payload <= descriptor_in_reg.payload;
-  cu_cache_descriptor.valid     <= descriptor_in_reg.payload;
+  cu_cache_descriptor.payload     <= descriptor_in_reg.payload;
 end
 
 // --------------------------------------------------------------------------------------
