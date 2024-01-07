@@ -27,10 +27,6 @@
                 "id_module": {
                     "bits": "8",
                     "value": "0x00"
-                },
-                 "id_channel": {
-                    "bits": "8",
-                    "value": "0x00"
                 }
             },
             "entry_2": {
@@ -244,7 +240,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -381,7 +377,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -502,7 +498,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -623,7 +619,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -726,7 +722,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
