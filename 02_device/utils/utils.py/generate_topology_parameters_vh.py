@@ -689,11 +689,13 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES = 3;\n")
     file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS_TOP};\n")
-    file.write(f"parameter NUM_CUS_WIDTH_BITS     = {NUM_CUS};\n")
-    file.write(f"parameter NUM_BUNDLES_WIDTH_BITS = {NUM_BUNDLES};\n")
-    file.write(f"parameter NUM_LANES_WIDTH_BITS   = {NUM_LANES};\n")
-    file.write(f"parameter NUM_ENGINES_WIDTH_BITS = {NUM_ENGINES};\n")
-    file.write(f"parameter NUM_MODULES_WIDTH_BITS = 3;\n")
+    
+    file.write(f"parameter NUM_CHANNELS_WIDTH_BITS = {NUM_CHANNELS_TOP};\n")
+    file.write(f"parameter NUM_CUS_WIDTH_BITS      = {NUM_CUS};\n")
+    file.write(f"parameter NUM_BUNDLES_WIDTH_BITS  = {NUM_BUNDLES};\n")
+    file.write(f"parameter NUM_LANES_WIDTH_BITS    = {NUM_LANES};\n")
+    file.write(f"parameter NUM_ENGINES_WIDTH_BITS  = {NUM_ENGINES};\n")
+    file.write(f"parameter NUM_MODULES_WIDTH_BITS  = 3;\n")
     file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n")
     
 
