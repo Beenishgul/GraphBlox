@@ -105,9 +105,7 @@ module __KERNEL___testbench ();
         parameter integer LP_MAX_TRANSFER_LENGTH     = 16384 / 4               ;
         parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = S_AXI_BE_ADDR_WIDTH_BITS;
         parameter integer C_S_AXI_CONTROL_DATA_WIDTH = S_AXI_BE_DATA_WIDTH     ;
-        parameter integer C_M00_AXI_ADDR_WIDTH       = M_AXI4_BE_ADDR_W        ;
-        parameter integer C_M00_AXI_DATA_WIDTH       = M_AXI4_BE_DATA_W        ;
-        parameter integer C_M00_AXI_ID_WIDTH         = M_AXI4_BE_ID_W          ;
+        `include "testbench_parameters.vh"
 
 // Control Register
         parameter KRNL_CTRL_REG_ADDR     = 32'h00000000;
@@ -160,45 +158,7 @@ module __KERNEL___testbench ();
         end
 
 //AXI4 master interface m00_axi
-        wire [                     1-1:0] m00_axi_awvalid;
-        wire [                     1-1:0] m00_axi_awready;
-        wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr ;
-        wire [                     8-1:0] m00_axi_awlen  ;
-        wire [                     1-1:0] m00_axi_wvalid ;
-        wire [                     1-1:0] m00_axi_wready ;
-        wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata  ;
-        wire [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb  ;
-        wire [                     1-1:0] m00_axi_wlast  ;
-        wire [                     1-1:0] m00_axi_bvalid ;
-        wire [                     1-1:0] m00_axi_bready ;
-        wire [                     1-1:0] m00_axi_arvalid;
-        wire [                     1-1:0] m00_axi_arready;
-        wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr ;
-        wire [                     8-1:0] m00_axi_arlen  ;
-        wire [                     1-1:0] m00_axi_rvalid ;
-        wire [                     1-1:0] m00_axi_rready ;
-        wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata  ;
-        wire [                     1-1:0] m00_axi_rlast  ;
-
-        // AXI4 master interface m00_axi missing ports
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_bid    ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_rid    ;
-        wire [                 2-1:0] m00_axi_rresp  ;
-        wire [                 2-1:0] m00_axi_bresp  ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_awid   ;
-        wire [                 3-1:0] m00_axi_awsize ;
-        wire [                 2-1:0] m00_axi_awburst;
-        wire [                 1-1:0] m00_axi_awlock ;
-        wire [                 4-1:0] m00_axi_awcache;
-        wire [                 3-1:0] m00_axi_awprot ;
-        wire [                 4-1:0] m00_axi_awqos  ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_arid   ;
-        wire [                 3-1:0] m00_axi_arsize ;
-        wire [                 2-1:0] m00_axi_arburst;
-        wire [                 1-1:0] m00_axi_arlock ;
-        wire [                 4-1:0] m00_axi_arcache;
-        wire [                 3-1:0] m00_axi_arprot ;
-        wire [                 4-1:0] m00_axi_arqos  ;
+        `include "m_axi_wires_top.vh"
 
 //AXI4LITE control signals
         wire [                           1-1:0] s_axi_control_awvalid;
@@ -222,10 +182,9 @@ module __KERNEL___testbench ();
 
 // DUT instantiation
     top #(
+        `include "set_top_parameters.vh"
         .C_S_AXI_CONTROL_ADDR_WIDTH(C_S_AXI_CONTROL_ADDR_WIDTH),
-        .C_S_AXI_CONTROL_DATA_WIDTH(C_S_AXI_CONTROL_DATA_WIDTH),
-        .C_M00_AXI_ADDR_WIDTH      (C_M00_AXI_ADDR_WIDTH      ),
-        .C_M00_AXI_DATA_WIDTH      (C_M00_AXI_DATA_WIDTH      )
+        .C_S_AXI_CONTROL_DATA_WIDTH(C_S_AXI_CONTROL_DATA_WIDTH)
     ) inst_dut (
         .ap_clk               (ap_clk               ),
         .ap_rst_n             (ap_rst_n             ),
