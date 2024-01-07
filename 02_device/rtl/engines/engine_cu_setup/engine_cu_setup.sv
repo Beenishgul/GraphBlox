@@ -326,6 +326,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // --------------------------------------------------------------------------------------
 
     assign fifo_request_comb.payload.meta.route             = configuration_reg.payload.meta.route;
+    assign fifo_request_comb.payload.meta.address.id_channel= configuration_reg.payload.meta.address.id_channel;
     assign fifo_request_comb.payload.meta.address.id_buffer = configuration_reg.payload.meta.address.id_buffer;
     assign fifo_request_comb.payload.meta.address.shift     = configuration_reg.payload.meta.address.shift;
     assign fifo_request_comb.payload.meta.subclass          = configuration_reg.payload.meta.subclass;

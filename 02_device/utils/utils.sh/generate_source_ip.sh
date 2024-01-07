@@ -178,6 +178,12 @@ then
         sed -i "s/$search/$replace/g" $newtext
     fi
 
+    search="_NUM_TRIALS_"
+    replace=${NUM_TRIALS}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtext
+    fi
+    
     search="_ROOT_"
     replace=${ROOT}
     if [[ $search != "" && $replace != "" ]]; then

@@ -643,6 +643,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.route.sequence_source    = engine_csr_index_route.sequence_source;
     assign fifo_request_comb.payload.meta.route.sequence_state     = engine_csr_index_route.sequence_state;
     assign fifo_request_comb.payload.meta.route.sequence_id        = sequence_id_counter;
+    assign fifo_request_comb.payload.meta.address.id_channel       = configure_engine_int.payload.meta.address.id_channel;
     assign fifo_request_comb.payload.meta.address.id_buffer        = configure_engine_int.payload.meta.address.id_buffer;
     assign fifo_request_comb.payload.meta.address.shift            = configure_engine_int.payload.meta.address.shift;
     assign fifo_request_comb.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;

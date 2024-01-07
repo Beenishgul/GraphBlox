@@ -1295,7 +1295,7 @@ module __KERNEL___testbench ();
             // enable_interrupts();
             disable_interrupts();
             #1000
-                multiple_iteration__ALGORITHM_NAME_(5, error_found, graph);
+                multiple_iteration__ALGORITHM_NAME_(_NUM_TRIALS_, error_found, graph);
 
             if (error_found == 1) begin
                 $display( "ERROR: Test Failed!");

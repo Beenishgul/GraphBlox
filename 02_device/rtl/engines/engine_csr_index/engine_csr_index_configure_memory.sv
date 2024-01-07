@@ -49,8 +49,8 @@ CSRIndexConfigurationMeta    configure_memory_meta_int                       ;
 CSRIndexConfiguration        configure_memory_reg                            ;
 logic [ENGINE_SEQ_WIDTH-1:0] configure_memory_valid_reg                      ;
 logic                        configure_memory_valid_int                      ;
-type_memory_response_offset response_memory_in_reg_offset_sequence          ;
-type_memory_response_offset fifo_response_memory_in_dout_int_offset_sequence;
+type_memory_response_offset  response_memory_in_reg_offset_sequence          ;
+type_memory_response_offset  fifo_response_memory_in_dout_int_offset_sequence;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -130,6 +130,7 @@ assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
 assign configure_memory_meta_int.route.packet_destination.id_engine = 0;
 assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 
+assign configure_memory_meta_int.address.id_channel      = 0;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = 0;
 assign configure_memory_meta_int.address.shift.amount    = 0;
@@ -200,6 +201,8 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.meta.subclass.cmd                       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
                 configure_memory_reg.payload.meta.route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS)];
                 configure_memory_reg.payload.meta.route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
+                configure_memory_reg.payload.meta.address.id_channel                 <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
+                configure_memory_reg.payload.param.id_channel                        <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
             end
             (1 << 6) : begin
                 configure_memory_reg.payload.meta.route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];

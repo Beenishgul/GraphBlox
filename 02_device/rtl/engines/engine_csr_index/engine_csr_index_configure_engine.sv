@@ -142,6 +142,7 @@ always_ff @(posedge ap_clk) begin
     configure_engine_reg.payload.param.stride                  <= 0;
     configure_engine_reg.payload.param.granularity             <= 0;
     configure_engine_reg.payload.param.direction               <= 0;
+    configure_engine_reg.payload.param.id_channel              <= 0;
     configure_engine_reg.payload.param.id_buffer               <= 0;
     configure_engine_reg.payload.param.array_size              <= fifo_response_engine_in_dout_reg.payload.data.field[1];
 end
