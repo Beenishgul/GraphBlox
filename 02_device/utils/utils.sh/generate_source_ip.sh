@@ -43,6 +43,7 @@ cu="cu"
 lane="lane"
 
 utils="utils"
+utils_include="include"
 
 iob_include="iob_include"
 portmaps="portmaps"
@@ -103,10 +104,18 @@ sed -i "/SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/s/^/\/\/ /; /SYSTEM_CACHE_SIZE\s*=\s*[0
 if [[ "$TESTBENCH_MODULE" == "integration" ]]
 then
     newtext="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv"
+    newtextvh="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/${testbench}/module_slv_m_axi_vip_func.vh"
+    
     search="__KERNEL__"
     replace=${KERNEL_NAME}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s/$search/$replace/g" $newtext
+    fi
+
+    search="__KERNEL__"
+    replace=${KERNEL_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtextvh
     fi
 
     search="_GRAPH_DIR_"

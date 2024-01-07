@@ -1787,14 +1787,6 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
                 m{0:02d}_axi.mem_model.backdoor_memory_write_4byte(ptr + (slot * 4), slot);
             end
         endfunction
-
-        task automatic system_reset_sequence(input integer unsigned width = 20);
-            $display("%t : Starting System Reset Sequence", $time);
-            fork
-                ap_rst_n_sequence(25);
-            join
-
-        endtask
         """
 
     start_vips_pre = """
@@ -1958,6 +1950,8 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 
     output_lines.append(backdoor_buffer_fill_memories_pre)
     for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+        if index == 9:
+            continue  # Skip the iteration if the index is 9
         output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2))
     output_lines.append(backdoor_buffer_fill_memories_end)
     
