@@ -121,11 +121,12 @@ typedef struct packed {
 // Generic sequence_state
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  logic [    NUM_CUS_WIDTH_BITS-1:0] id_cu    ; // SIZE = 8 bits  - up to 8 vertex cu - pending
-  logic [NUM_BUNDLES_WIDTH_BITS-1:0] id_bundle; // SIZE = 8 bits  - up to 8 bundles
-  logic [  NUM_LANES_WIDTH_BITS-1:0] id_lane  ; // SIZE = 8 bits  - up to 8 lanes per bundle
-  logic [NUM_ENGINES_WIDTH_BITS-1:0] id_engine; // SIZE = 8 bits  - up to 8 engines per bundle
-  logic [NUM_MODULES_WIDTH_BITS-1:0] id_module; // SIZE = 8 bits  - up to 8 modules per engine
+  logic [NUM_CHANNELS_WIDTH_BITS-1:0] id_channel; // SIZE = 8 bits  - up to 8 8 channels per cu
+  logic [     NUM_CUS_WIDTH_BITS-1:0] id_cu     ; // SIZE = 8 bits  - up to 8 vertex cu - pending
+  logic [ NUM_BUNDLES_WIDTH_BITS-1:0] id_bundle ; // SIZE = 8 bits  - up to 8 bundles
+  logic [   NUM_LANES_WIDTH_BITS-1:0] id_lane   ; // SIZE = 8 bits  - up to 8 lanes per bundle
+  logic [ NUM_ENGINES_WIDTH_BITS-1:0] id_engine ; // SIZE = 8 bits  - up to 8 engines per bundle
+  logic [ NUM_MODULES_WIDTH_BITS-1:0] id_module ; // SIZE = 8 bits  - up to 8 modules per engine
 } PacketRouteAddress;
 
 typedef struct packed{

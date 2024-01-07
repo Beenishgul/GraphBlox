@@ -33,7 +33,7 @@
 02_device/rtl/utils/include/global/config_parameters.vh
 02_device/rtl/utils/include/parameters/set_top_parameters.vh
 02_device/rtl/utils/include/parameters/testbench_parameters.vh
-02_device/rtl/utils/include/parameters/shared_parameters.vh
+02_device/rtl/utils/include/parameters/topology_parameters.vh
 02_device/rtl/utils/include/parameters/top_parameters.vh
 02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
 02_device/rtl/utils/include/portmaps/m_axi_portmap_top.vh

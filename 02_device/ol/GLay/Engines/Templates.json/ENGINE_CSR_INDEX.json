@@ -69,6 +69,10 @@
             "id_engine": {
                 "bits": "8",
                 "value": "0x00"
+            },
+             "id_channel": {
+                "bits": "8",
+                "value": "0x00"
             }
         },
         "entry_6": {
