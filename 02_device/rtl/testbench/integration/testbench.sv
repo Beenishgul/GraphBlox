@@ -324,41 +324,6 @@ module __KERNEL___testbench ();
 // Pointer for interface : m00_axi
         bit [63:0] buffer_9_ptr = 64'h0;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the input buffer AXI vip memory model with 32-bit words
-        function void  m00_axi_buffer_fill_memory(
-                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-                input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
-                input bit [M_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
-                input integer offset,                 // start index of data source
-                input integer words                   // number of words to fill
-            );
-            int index;
-            // bit [(32/8)-1:0] wr_strb = 4'hf;
-            bit [M_AXI4_BE_DATA_W-1:0] temp;
-            int i;
-            for (index = 0; index < words; index++) begin
-                // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
-                for (i = 0; i < (M_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    temp[i*8+7-:8] = words_data[offset+index][((M_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
-                    // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
-                end
-                // $display("After: %0d ->%0d ->%0h",index, i, temp);
-                mem.mem_model.backdoor_memory_write(ptr + index * (M_AXI4_BE_DATA_W/8), temp);
-            end
-        endfunction
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the m00_axi memory.
-        function void m00_axi_fill_memory(
-                input bit [63:0] ptr,
-                input integer    length
-            );
-            for (longint unsigned slot = 0; slot < length; slot++) begin
-                m00_axi.mem_model.backdoor_memory_write_4byte(ptr + (slot * 4), slot);
-            end
-        endfunction
-
         task automatic system_reset_sequence(input integer unsigned width = 20);
             $display("%t : Starting System Reset Sequence", $time);
             fork
@@ -366,7 +331,6 @@ module __KERNEL___testbench ();
             join
 
         endtask
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
         function bit [31:0] get_random_4bytes();
@@ -391,7 +355,6 @@ module __KERNEL___testbench ();
             ptr_random_failed : assert(std::randomize(rptr));
             return(rptr);
         endfunction
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Control interface non-blocking write
@@ -496,73 +459,6 @@ module __KERNEL___testbench ();
             $display("MSG: Interrupt Status Register: 0x%0x", rd_value);
             blocking_write_register(KRNL_ISR_REG_ADDR, rd_value);
             $display("Finished Servicing interrupts");
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Start the control VIP, SLAVE memory models and AXI4-Stream.
-        task automatic start_vips();
-
-            $display("///////////////////////////////////////////////////////////////////////////");
-            $display("MSG: Control Master: ctrl");
-            ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
-            ctrl.start_master();
-
-            $display("///////////////////////////////////////////////////////////////////////////");
-            $display("Starting Memory slave: m00_axi");
-            m00_axi = new("m00_axi", __KERNEL___testbench.inst_slv_m00_axi_vip.inst.IF);
-            m00_axi.start_slave();
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, set the Slave to not de-assert WREADY at any time.
-// This will show the fastest outbound bandwidth from the WRITE channel.
-        task automatic slv_no_backpressure_wready();
-            axi_ready_gen     rgen;
-            $display("%t - Applying slv_no_backpressure_wready", $time);
-
-            rgen = new("m00_axi_no_backpressure_wready");
-            rgen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-            m00_axi.wr_driver.set_wready_gen(rgen);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, apply a WREADY policy to introduce backpressure.
-// Based on the simulation seed the order/shape of the WREADY per-channel will be different.
-        task automatic slv_random_backpressure_wready();
-            axi_ready_gen     rgen;
-            $display("%t - Applying slv_random_backpressure_wready", $time);
-
-            rgen = new("m00_axi_random_backpressure_wready");
-            rgen.set_ready_policy(XIL_AXI_READY_GEN_RANDOM);
-            rgen.set_low_time_range(0,12);
-            rgen.set_high_time_range(1,12);
-            rgen.set_event_count_range(3,5);
-            m00_axi.wr_driver.set_wready_gen(rgen);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, force the memory model to not insert any inter-beat
-// gaps on the READ channel.
-        task automatic slv_no_delay_rvalid();
-            $display("%t - Applying slv_no_delay_rvalid", $time);
-
-            m00_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_FIXED);
-            m00_axi.mem_model.set_inter_beat_gap(0);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, Allow the memory model to insert any inter-beat
-// gaps on the READ channel.
-        task automatic slv_random_delay_rvalid();
-            $display("%t - Applying slv_random_delay_rvalid", $time);
-
-            m00_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
-            m00_axi.mem_model.set_inter_beat_gap_range(0,10);
-
         endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -810,304 +706,240 @@ module __KERNEL___testbench ();
 
         endtask
 
-        task automatic backdoor_fill_memories();
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            m00_axi_fill_memory(buffer_0_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_1_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_2_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_3_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_4_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_5_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_6_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_7_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_8_ptr, LP_MAX_LENGTH);
-            
-
-            m00_axi_fill_memory(buffer_9_ptr, LP_MAX_LENGTH);
-
-        endtask
-
-        task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.in_degree, 0, graph.mem512_in_degree);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.out_degree, 0, graph.mem512_out_degree);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx, 0, graph.mem512_edges_idx);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_src, 0, graph.mem512_edges_array_src);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_dest, 0, graph.mem512_edges_array_dest);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edges_array_weight);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1, 0, graph.mem512_auxiliary_1);
-            
-
-            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2, 0, graph.mem512_auxiliary_2);
-            
-        endtask
+        `include "module_slv_m_axi_vip_func.vh"
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
 
-            int cache_line_size = 64; // Cache line size in bytes
-            int bytes_per_read = M_AXI4_FE_DATA_W / 8; // Number of bytes read in each iteration
-            int words_per_read = M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W; // Number of bytes read in each iteration
+        int cache_line_size = 64                               ; // Cache line size in bytes
+        int bytes_per_read  = M_AXI4_FE_DATA_W / 8             ; // Number of bytes read in each iteration
+        int words_per_read  = M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W; // Number of bytes read in each iteration
 
 
-            // Backdoor fill the memory with the content.
-            int o,l;
-            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+        // Backdoor fill the memory with the content.
+        int                        o,l;
+        bit [M_AXI4_FE_DATA_W-1:0] ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
 
-            l=0;
-            o= words_per_read;
+        l=0;
+        o= words_per_read;
+        o--;
+
+        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
+            // $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+            graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            if (o == 0) begin
+                l++;
+                o= words_per_read;
+            end
             o--;
-
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-                // $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                if (o == 0) begin
-                    l++;
-                    o= words_per_read;
-                end
-                o--;
+        end
+        for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
+            // $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+            graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            if (o == 0) begin
+                l++;
+                o= words_per_read;
             end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
-                // $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                if (o == 0) begin
-                    l++;
-                    o= words_per_read;
-                end
-                o--;
-            end
-
-            l=0;
-            o= words_per_read;
             o--;
+        end
 
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
-                if (o == 0) begin
-                    l++;
-                    o= words_per_read;
-                end
-                o--;
+        l=0;
+        o= words_per_read;
+        o--;
+
+        for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+            ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
+            graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            if (o == 0) begin
+                l++;
+                o= words_per_read;
             end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                if (o == 0) begin
-                    l++;
-                    o= words_per_read;
-                end
-                o--;
+            o--;
+        end
+        for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+            graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+            if (o == 0) begin
+                l++;
+                o= words_per_read;
             end
+            o--;
+        end
         endtask
 
-        function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            int o,l;
-            o=0;
-            l=0;
+            function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                int o,l;
+                o=0;
+                l=0;
 
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
-                if(i == graph.bfs_source)begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = graph.bfs_source;
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                    if(i == graph.bfs_source)begin
+                        graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = graph.bfs_source;
+                    end
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
                 end
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
 
-                if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+                    if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+                        graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
+                    end
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+
+                o=0;
+                l=0;
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+            endfunction
+
+            function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                int o,l;
+                o=0;
+                l=0;
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
                     graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
                 end
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
 
-            o=0;
-            l=0;
+                o=0;
+                l=0;
 
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
                 end
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
                 end
-            end
-        endfunction
+            endfunction
 
-        function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
+            function automatic bit check_BFS_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+                bit error_found = 0;
+                integer error_counter;
+                integer frontier_counter;
+                error_counter = 0;
+                frontier_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                    frontier_counter += ret_rd_value;
+                end
+                $display("MSG: Frontier_counter: %0d \n", frontier_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_PR_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                int o,l;
+                bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+                // bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},1'b1};
+                bit error_found = 0;
+                integer error_counter;
+                integer mismatch_counter;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                o=0;
+                l=0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                    if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]) begin
+                        $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                        mismatch_counter += 1;
+                    end
+
+                    o++;
+                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        l++;
+                        o=0;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check___KERNEL___result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found = 0;
+
+                error_found |= check__ALGORITHM_NAME__result(graph)   ;
+
+                return(error_found);
+            endfunction
+
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            int o,l;
-            o=0;
-            l=0;
-
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            o=0;
-            l=0;
-
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-        endfunction
-
-        function automatic bit check_BFS_result(ref GraphCSR graph);
+            // Global read the files then send to backdoor memory with the content.
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            bit error_found = 0;
-            integer error_counter;
-            integer frontier_counter;
-            error_counter = 0;
-            frontier_counter = 0;
 
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                frontier_counter += ret_rd_value;
-            end
-            $display("MSG: Frontier_counter: %0d \n", frontier_counter);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            error_counter = 0;
-            return(error_found);
-        endfunction
-
-        function automatic bit check_PR_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            int o,l;
-            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            // bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},1'b1};
-            bit error_found = 0;
-            integer error_counter;
-            integer mismatch_counter;
-            error_counter = 0;
-            mismatch_counter = 0;
-
-            o=0;
-            l=0;
-
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]) begin
-                    $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                    mismatch_counter += 1;
-                end
-
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            error_counter = 0;
-
-            return(error_found);
-        endfunction
-
-        function automatic bit check___KERNEL___result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found = 0;
-
-            error_found |= check__ALGORITHM_NAME__result(graph)   ;
-
-            return(error_found);
-        endfunction
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        // Global read the files then send to backdoor memory with the content.
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-        bit         choose_pressure_type      = 0;
+            bit choose_pressure_type = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
 
