@@ -20,10 +20,11 @@ config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
 # output_folder_path_tcl  = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL)
-output_folder_path_topology   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
-output_folder_path_global     = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
-output_folder_path_parameters = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
-output_folder_path_portmaps = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
+output_folder_path_testbench   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "testbench")
+output_folder_path_topology    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
+output_folder_path_global      = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
+output_folder_path_parameters  = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
+output_folder_path_portmaps    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
 
 if not os.path.exists(output_folder_path_topology):
     os.makedirs(output_folder_path_topology)
@@ -40,17 +41,23 @@ if not os.path.exists(output_folder_path_portmaps):
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
 
-output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
-output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
-output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
-output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
-output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
-output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
-output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
-output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
-output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
-output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
+if not os.path.exists(output_folder_path_testbench):
+    os.makedirs(output_folder_path_testbench)
+
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
+output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
+output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
+output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
+output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
+output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
+output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
+output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
+output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_parameters.vh")
+output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
+output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
+output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
+output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
+output_file_top_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_top.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
@@ -59,6 +66,7 @@ output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_ar
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
 
+buffers = config_data["buffers"]
 channels = config_data["channels"]
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
@@ -642,9 +650,12 @@ check_and_clean_file(output_file_channel_top)
 check_and_clean_file(output_file_afu_ports)
 check_and_clean_file(output_file_top_ports)
 check_and_clean_file(output_file_afu_portmap)
+check_and_clean_file(output_file_top_portmap)
 check_and_clean_file(output_file_cu_arbitration)
 check_and_clean_file(output_file_bundle_arbitration)
 check_and_clean_file(output_file_lane_arbitration)
+check_and_clean_file(output_file_slv_m_axi_vip_inst)
+check_and_clean_file(output_file_slv_m_axi_vip_func)
 
 # Write to VHDL file
 with open(output_file_top_parameters, "w") as file:
@@ -1550,6 +1561,54 @@ output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Ad
     file.write('\n'.join(output_lines))
 
 
+with open(output_file_top_portmap, 'w') as file:
+    output_lines = []
+
+    connection_template = """
+.m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
+.m{0:02d}_axi_awready(m{0:02d}_axi_awready),
+.m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
+.m{0:02d}_axi_awlen  (m{0:02d}_axi_awlen  ),
+.m{0:02d}_axi_wvalid (m{0:02d}_axi_wvalid ),
+.m{0:02d}_axi_wready (m{0:02d}_axi_wready ),
+.m{0:02d}_axi_wdata  (m{0:02d}_axi_wdata  ),
+.m{0:02d}_axi_wstrb  (m{0:02d}_axi_wstrb  ),
+.m{0:02d}_axi_wlast  (m{0:02d}_axi_wlast  ),
+.m{0:02d}_axi_bvalid (m{0:02d}_axi_bvalid ),
+.m{0:02d}_axi_bready (m{0:02d}_axi_bready ),
+.m{0:02d}_axi_arvalid(m{0:02d}_axi_arvalid),
+.m{0:02d}_axi_arready(m{0:02d}_axi_arready),
+.m{0:02d}_axi_araddr (m{0:02d}_axi_araddr ),
+.m{0:02d}_axi_arlen  (m{0:02d}_axi_arlen  ),
+.m{0:02d}_axi_rvalid (m{0:02d}_axi_rvalid ),
+.m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
+.m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
+.m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
+.m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
+.m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
+.m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
+.m{0:02d}_axi_bresp  (m{0:02d}_axi_bresp  ),
+.m{0:02d}_axi_awid   (m{0:02d}_axi_awid   ),
+.m{0:02d}_axi_awsize (m{0:02d}_axi_awsize ),
+.m{0:02d}_axi_awburst(m{0:02d}_axi_awburst),
+.m{0:02d}_axi_awlock (m{0:02d}_axi_awlock ),
+.m{0:02d}_axi_awcache(m{0:02d}_axi_awcache),
+.m{0:02d}_axi_awprot (m{0:02d}_axi_awprot ),
+.m{0:02d}_axi_awqos  (m{0:02d}_axi_awqos  ),
+.m{0:02d}_axi_arid   (m{0:02d}_axi_arid   ),
+.m{0:02d}_axi_arsize (m{0:02d}_axi_arsize ),
+.m{0:02d}_axi_arburst(m{0:02d}_axi_arburst),
+.m{0:02d}_axi_arlock (m{0:02d}_axi_arlock ),
+.m{0:02d}_axi_arcache(m{0:02d}_axi_arcache),
+.m{0:02d}_axi_arprot (m{0:02d}_axi_arprot ),
+.m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
+    """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(connection_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
 with open(output_file_afu_portmap, 'w') as file:
     output_lines = []
 
@@ -1598,6 +1657,62 @@ with open(output_file_afu_portmap, 'w') as file:
 
     file.write('\n'.join(output_lines))
 
+with open(output_file_slv_m_axi_vip_inst, 'w') as file:
+    output_lines = []
+
+    module_template = """
+    // Slave MM VIP instantiation
+    slv_m00_axi_vip inst_slv_m{0:02d}_axi_vip (
+        .aclk         (ap_clk         ),
+        .aresetn      (ap_rst_n       ),
+        .s_axi_awvalid(m{0:02d}_axi_awvalid),
+        .s_axi_awready(m{0:02d}_axi_awready),
+        .s_axi_awaddr (m{0:02d}_axi_awaddr ),
+        .s_axi_awlen  (m{0:02d}_axi_awlen  ),
+        .s_axi_wvalid (m{0:02d}_axi_wvalid ),
+        .s_axi_wready (m{0:02d}_axi_wready ),
+        .s_axi_wdata  (m{0:02d}_axi_wdata  ),
+        .s_axi_wstrb  (m{0:02d}_axi_wstrb  ),
+        .s_axi_wlast  (m{0:02d}_axi_wlast  ),
+        .s_axi_bvalid (m{0:02d}_axi_bvalid ),
+        .s_axi_bready (m{0:02d}_axi_bready ),
+        .s_axi_arvalid(m{0:02d}_axi_arvalid),
+        .s_axi_arready(m{0:02d}_axi_arready),
+        .s_axi_araddr (m{0:02d}_axi_araddr ),
+        .s_axi_arlen  (m{0:02d}_axi_arlen  ),
+        .s_axi_rvalid (m{0:02d}_axi_rvalid ),
+        .s_axi_rready (m{0:02d}_axi_rready ),
+        .s_axi_rdata  (m{0:02d}_axi_rdata  ),
+        .s_axi_rlast  (m{0:02d}_axi_rlast  ),
+        
+        .s_axi_bid    (m{0:02d}_axi_bid    ),
+        .s_axi_rid    (m{0:02d}_axi_rid    ),
+        .s_axi_rresp  (m{0:02d}_axi_rresp  ),
+        .s_axi_bresp  (m{0:02d}_axi_bresp  ),
+        .s_axi_awid   (m{0:02d}_axi_awid   ),
+        .s_axi_awsize (m{0:02d}_axi_awsize ),
+        .s_axi_awburst(m{0:02d}_axi_awburst),
+        .s_axi_awlock (m{0:02d}_axi_awlock ),
+        .s_axi_awcache(m{0:02d}_axi_awcache),
+        .s_axi_awprot (m{0:02d}_axi_awprot ),
+        .s_axi_awqos  (m{0:02d}_axi_awqos  ),
+        .s_axi_arid   (m{0:02d}_axi_arid   ),
+        .s_axi_arsize (m{0:02d}_axi_arsize ),
+        .s_axi_arburst(m{0:02d}_axi_arburst),
+        .s_axi_arlock (m{0:02d}_axi_arlock ),
+        .s_axi_arcache(m{0:02d}_axi_arcache),
+        .s_axi_arprot (m{0:02d}_axi_arprot ),
+        .s_axi_arqos  (m{0:02d}_axi_arqos  )
+    );
+
+        slv_m00_axi_vip_slv_mem_t m{0:02d}_axi    ;
+        slv_m00_axi_vip_slv_t     m{0:02d}_axi_slv;
+        """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(module_template.format(channel))
+
+    file.write('\n'.join(output_lines))
 
 def generate_tcl_script_from_json(output_file_name):
   
@@ -1611,7 +1726,7 @@ def generate_tcl_script_from_json(output_file_name):
             size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
 
             # Writing the TCL commands
-            file.write(f'''puts_reg_info "{buffer_name}" "graph overlay program" "0x{current_address:03X}" [expr {{{size}}}]
+            file.write(f'''puts_reg_info "{buffer_name}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
   set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
   set_property address_offset 0x{current_address:03X} $reg
   set_property size           [expr {{{size}}}]   $reg
@@ -1630,4 +1745,222 @@ def generate_ipx_associate_commands(output_file_name):
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands(output_file_generate_ports_tcl)
 generate_tcl_script_from_json(output_file_buffer_channels_tcl)
+
+
+
+# Write to VHDL file
+with open(output_file_slv_m_axi_vip_func, "w") as file:
+    output_lines = []
+
+    fill_memory_template = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Backdoor fill the input buffer AXI vip memory model with 32-bit words
+        function void  m{0:02d}_axi_buffer_fill_memory(
+                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
+                input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
+                input bit [M_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
+                input integer offset,                 // start index of data source
+                input integer words                   // number of words to fill
+            );
+            int index;
+            // bit [(32/8)-1:0] wr_strb = 4'hf;
+            bit [M_AXI4_BE_DATA_W-1:0] temp;
+            int i;
+            for (index = 0; index < words; index++) begin
+                // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
+                for (i = 0; i < (M_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+                    temp[i*8+7-:8] = words_data[offset+index][((M_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
+                    // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
+                end
+                // $display("After: %0d ->%0d ->%0h",index, i, temp);
+                mem.mem_model.backdoor_memory_write(ptr + index * (M_AXI4_BE_DATA_W/8), temp);
+            end
+        endfunction
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Backdoor fill the m00_axi memory.
+        function void m{0:02d}_axi_fill_memory(
+                input bit [63:0] ptr,
+                input integer    length
+            );
+            for (longint unsigned slot = 0; slot < length; slot++) begin
+                m{0:02d}_axi.mem_model.backdoor_memory_write_4byte(ptr + (slot * 4), slot);
+            end
+        endfunction
+
+        task automatic system_reset_sequence(input integer unsigned width = 20);
+            $display("%t : Starting System Reset Sequence", $time);
+            fork
+                ap_rst_n_sequence(25);
+            join
+
+        endtask
+        """
+
+    start_vips_pre = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Start the control VIP, SLAVE memory models and AXI4-Stream.
+        task automatic start_vips();
+
+            $display("///////////////////////////////////////////////////////////////////////////");
+            $display("MSG: Control Master: ctrl");
+            ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
+            ctrl.start_master();
+            """
+
+    start_vips_mid = """
+            $display("///////////////////////////////////////////////////////////////////////////");
+            $display("Starting Memory slave: m{0:02d}_axi");
+            m{0:02d}_axi = new("m{0:02d}_axi", __KERNEL___testbench.inst_slv_m{0:02d}_axi_vip.inst.IF);
+            m{0:02d}_axi.start_slave();
+            """
+
+    start_vips_end = """
+        endtask
+            """
+
+    slv_no_backpressure_wready_pre = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// For each of the connected slave interfaces, set the Slave to not de-assert WREADY at any time.
+// This will show the fastest outbound bandwidth from the WRITE channel.
+        task automatic slv_no_backpressure_wready();
+            axi_ready_gen     rgen;
+            $display("%t - Applying slv_no_backpressure_wready", $time);
+            """
+
+    slv_no_backpressure_wready_mid = """
+            rgen = new("m{0:02d}_axi_no_backpressure_wready");
+            rgen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
+            m{0:02d}_axi.wr_driver.set_wready_gen(rgen);
+            """
+
+    slv_no_backpressure_wready_end = """
+        endtask
+            """
+
+    slv_random_backpressure_wready_pre = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// For each of the connected slave interfaces, apply a WREADY policy to introduce backpressure.
+// Based on the simulation seed the order/shape of the WREADY per-channel will be different.
+        task automatic slv_random_backpressure_wready();
+            axi_ready_gen     rgen;
+            $display("%t - Applying slv_random_backpressure_wready", $time);
+            """
+
+    slv_random_backpressure_wready_mid = """
+            rgen = new("m{0:02d}_axi_random_backpressure_wready");
+            rgen.set_ready_policy(XIL_AXI_READY_GEN_RANDOM);
+            rgen.set_low_time_range(0,12);
+            rgen.set_high_time_range(1,12);
+            rgen.set_event_count_range(3,5);
+            m{0:02d}_axi.wr_driver.set_wready_gen(rgen);
+            """
+
+    slv_random_backpressure_wready_end = """
+        endtask
+            """
+
+    slv_no_delay_rvalid_pre = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// For each of the connected slave interfaces, force the memory model to not insert any inter-beat
+// gaps on the READ channel.
+        task automatic slv_no_delay_rvalid();
+            $display("%t - Applying slv_no_delay_rvalid", $time);
+            """
+
+    slv_no_delay_rvalid_mid = """
+            m{0:02d}_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_FIXED);
+            m{0:02d}_axi.mem_model.set_inter_beat_gap(0);
+            """
+
+    slv_no_delay_rvalid_end = """
+        endtask
+            """
+
+    slv_random_delay_rvalid_pre = """
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// For each of the connected slave interfaces, Allow the memory model to insert any inter-beat
+// gaps on the READ channel.
+        task automatic slv_random_delay_rvalid();
+            $display("%t - Applying slv_random_delay_rvalid", $time);
+            """
+
+    slv_random_delay_rvalid_mid = """
+            m{0:02d}_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
+            m{0:02d}_axi.mem_model.set_inter_beat_gap_range(0,10);
+            """
+
+    slv_random_delay_rvalid_end = """
+        endtask
+            """
+
+
+    backdoor_fill_memories_pre = """
+        task automatic backdoor_fill_memories();
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor fill the memory with the content.
+            """
+
+    backdoor_fill_memories_mid = """
+            m{0:02d}_axi_fill_memory({1}_ptr, LP_MAX_LENGTH);
+            """
+
+    backdoor_fill_memories_end = """
+        endtask
+            """
+
+    backdoor_buffer_fill_memories_pre = """
+        task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor fill the memory with the content.
+            """
+
+    backdoor_buffer_fill_memories_mid = """
+            m{0:02d}_axi_buffer_fill_memory(m{0:02d}_axi, {1}_ptr, graph.{2}, 0, graph.mem512_{2});
+            """
+
+    backdoor_buffer_fill_memories_end = """
+        endtask
+            """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(fill_memory_template.format(channel))
+
+    output_lines.append(start_vips_pre)
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(start_vips_mid.format(channel))
+    output_lines.append(start_vips_end)
+
+    output_lines.append(slv_no_backpressure_wready_pre)
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(slv_no_backpressure_wready_mid.format(channel))
+    output_lines.append(slv_no_backpressure_wready_end)
+
+    output_lines.append(slv_random_backpressure_wready_pre)
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(slv_random_backpressure_wready_mid.format(channel))
+    output_lines.append(slv_random_backpressure_wready_end)
+
+    output_lines.append(slv_no_delay_rvalid_pre)
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(slv_no_delay_rvalid_mid.format(channel))
+    output_lines.append(slv_no_delay_rvalid_end)
+
+    output_lines.append(slv_random_delay_rvalid_pre)
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(slv_random_delay_rvalid_mid.format(channel))
+    output_lines.append(slv_random_delay_rvalid_end)
+
+    output_lines.append(backdoor_fill_memories_pre)
+    for index, (buffer_name, properties) in enumerate(channels.items()):
+        output_lines.append(backdoor_fill_memories_mid.format(int(properties[0]), buffer_name, index))
+    output_lines.append(backdoor_fill_memories_end)
+
+    output_lines.append(backdoor_buffer_fill_memories_pre)
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+        output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2))
+    output_lines.append(backdoor_buffer_fill_memories_end)
+    
+    file.write('\n'.join(output_lines))
+
 
