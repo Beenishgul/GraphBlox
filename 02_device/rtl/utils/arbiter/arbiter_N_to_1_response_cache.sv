@@ -21,12 +21,12 @@ module arbiter_N_to_1_response_cache #(
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
   parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3
 ) (
-  input  logic                           ap_clk                              ,
-  input  logic                           areset                              ,
+  input  logic                           ap_clk                               ,
+  input  logic                           areset                               ,
   input  MemoryPacketResponse            response_in [NUM_MEMORY_RECEIVER-1:0],
   input  FIFOStateSignalsInput           fifo_response_signals_in             ,
   output FIFOStateSignalsOutput          fifo_response_signals_out            ,
-  output logic [NUM_MEMORY_RECEIVER-1:0] arbiter_grant_out                   ,
+  output logic [NUM_MEMORY_RECEIVER-1:0] arbiter_grant_out                    ,
   output MemoryPacketResponse            response_out                         ,
   output logic                           fifo_setup_signal
 );
@@ -220,7 +220,7 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
-// FIFO cache Ready
+// FIFO memory Ready
 // --------------------------------------------------------------------------------------
 // FIFO is reseting
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
