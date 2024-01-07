@@ -340,6 +340,13 @@
         "buffer_8": ["0","64"],
         "buffer_9": ["0","64"]
     },
+    "ch_properties": {
+        "channel_0": ["0","0"],
+        "channel_1": ["0","0"],
+        "channel_2": ["0","0"],
+        "channel_3": ["0","0"],
+        "channel_4": ["0","0"],
+    },
     "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,
         "ENGINE_CSR_INDEX": 8,
