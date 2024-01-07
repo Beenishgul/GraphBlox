@@ -21,7 +21,7 @@ package PKG_GLOBALS;
 // ********************************************************************************************
 
 // --------------------------------------------------------------------------------------
-//  COMPUTE UNITS GLOBALS 
+//  COMPUTE UNITS GLOBALS
 // --------------------------------------------------------------------------------------
 //  Topology config-- include is auto generated
 // --------------------------------------------------------------------------------------
@@ -44,43 +44,44 @@ package PKG_GLOBALS;
 // Maximum supported engines/lanes/bundles/buffers
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-	parameter CU_KERNEL_COUNT_MAX_WIDTH_BITS = 8;
-	parameter CU_BUNDLE_COUNT_MAX_WIDTH_BITS = 8;
-	parameter CU_LANE_COUNT_MAX_WIDTH_BITS   = 8;
-	parameter CU_ENGINE_COUNT_MAX_WIDTH_BITS = 8;
-	parameter CU_MODULE_COUNT_MAX_WIDTH_BITS = 8;
-	parameter CU_BUFFER_COUNT_WIDTH_BITS     = 8;
+parameter CU_KERNEL_COUNT_MAX_WIDTH_BITS   = 8;
+parameter CU_BUNDLE_COUNT_MAX_WIDTH_BITS   = 8;
+parameter CU_LANE_COUNT_MAX_WIDTH_BITS     = 8;
+parameter CU_ENGINE_COUNT_MAX_WIDTH_BITS   = 8;
+parameter CU_MODULE_COUNT_MAX_WIDTH_BITS   = 8;
+parameter CU_CHANNELS_COUNT_MAX_WIDTH_BITS = 8;
+parameter CU_BUFFER_COUNT_WIDTH_BITS       = 8;
 
-	parameter GLOBAL_OVERLAY_SIZE_WIDTH_BITS = 12; // 4*2^10 entries max or 4KB 
-	parameter GLOBAL_BUFFER_SIZE_WIDTH_BITS  = 32; // 4*2^30 Buffers max or 4GB 
-
-// --------------------------------------------------------------------------------------
-//  KERNEL COMMON GLOBALS
-// --------------------------------------------------------------------------------------
-//  CU -> Cache Changing these values would change the cache front end
-// --------------------------------------------------------------------------------------
-	parameter GLOBAL_SYSTEM_CACHE_IP = 1;
-	parameter GLOBAL_CU_CACHE_IP     = 1;
-// --------------------------------------------------------------------------------------
+parameter GLOBAL_OVERLAY_SIZE_WIDTH_BITS = 12; // 4*2^10 entries max or 4KB
+parameter GLOBAL_BUFFER_SIZE_WIDTH_BITS  = 32; // 4*2^30 Buffers max or 4GB
 
 // --------------------------------------------------------------------------------------
 //  KERNEL COMMON GLOBALS
 // --------------------------------------------------------------------------------------
 //  CU -> Cache Changing these values would change the cache front end
 // --------------------------------------------------------------------------------------
-	parameter GLOBAL_SYSTEM_STREAM_IP = 0;
-	parameter GLOBAL_CU_STREAM_IP     = 1;
+parameter GLOBAL_SYSTEM_CACHE_IP = 1;
+parameter GLOBAL_CU_CACHE_IP     = 1;
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+//  KERNEL COMMON GLOBALS
+// --------------------------------------------------------------------------------------
+//  CU -> Cache Changing these values would change the cache front end
+// --------------------------------------------------------------------------------------
+parameter GLOBAL_SYSTEM_STREAM_IP = 0;
+parameter GLOBAL_CU_STREAM_IP     = 1;
 // --------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------
 //   State Machine input sync
 // --------------------------------------------------------------------------------------
-	typedef enum logic[4:0] {
-		CU_ENGINE_M_AXI_RESET     = 1 << 0,
-		CU_ENGINE_M_AXI_READY     = 1 << 1,
-		CU_ENGINE_M_AXI_CMD_TRANS = 1 << 2,
-		CU_ENGINE_M_AXI_PEND      = 1 << 3,
-		CU_ENGINE_M_AXI_DONE      = 1 << 4
-	} cu_engine_m_axi_state;
+typedef enum logic[4:0] {
+	CU_ENGINE_M_AXI_RESET     = 1 << 0,
+	CU_ENGINE_M_AXI_READY     = 1 << 1,
+	CU_ENGINE_M_AXI_CMD_TRANS = 1 << 2,
+	CU_ENGINE_M_AXI_PEND      = 1 << 3,
+	CU_ENGINE_M_AXI_DONE      = 1 << 4
+} cu_engine_m_axi_state;
 
 endpackage

@@ -55,6 +55,7 @@ typedef struct packed{
     logic                                  mode_sequence;
     logic                                  mode_buffer  ;
     logic                                  mode_break   ;
+    logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel   ;
     logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer    ;
     logic [          M_AXI4_FE_DATA_W-1:0] array_size   ;
     logic [          M_AXI4_FE_DATA_W-1:0] index_start  ;
@@ -132,16 +133,16 @@ typedef struct packed{
 // Keeps the original meta data for that lane
 
 typedef enum logic[9:0] {
-    ENGINE_FORWARD_DATA_GEN_RESET              = 1 << 0,
-    ENGINE_FORWARD_DATA_GEN_IDLE               = 1 << 1,
-    ENGINE_FORWARD_DATA_GEN_START_TRANS        = 1 << 2,
-    ENGINE_FORWARD_DATA_GEN_START              = 1 << 3,
-    ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS        = 1 << 4,
-    ENGINE_FORWARD_DATA_GEN_BUSY               = 1 << 5,
-    ENGINE_FORWARD_DATA_GEN_BUSY_TRANS         = 1 << 6,
-    ENGINE_FORWARD_DATA_GEN_PAUSE              = 1 << 7,
-    ENGINE_FORWARD_DATA_GEN_DONE_TRANS         = 1 << 8,
-    ENGINE_FORWARD_DATA_GEN_DONE               = 1 << 9
+    ENGINE_FORWARD_DATA_GEN_RESET       = 1 << 0,
+    ENGINE_FORWARD_DATA_GEN_IDLE        = 1 << 1,
+    ENGINE_FORWARD_DATA_GEN_START_TRANS = 1 << 2,
+    ENGINE_FORWARD_DATA_GEN_START       = 1 << 3,
+    ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS = 1 << 4,
+    ENGINE_FORWARD_DATA_GEN_BUSY        = 1 << 5,
+    ENGINE_FORWARD_DATA_GEN_BUSY_TRANS  = 1 << 6,
+    ENGINE_FORWARD_DATA_GEN_PAUSE       = 1 << 7,
+    ENGINE_FORWARD_DATA_GEN_DONE_TRANS  = 1 << 8,
+    ENGINE_FORWARD_DATA_GEN_DONE        = 1 << 9
 } engine_forward_data_generator_state;
 
 typedef struct packed{
@@ -298,6 +299,7 @@ typedef struct packed{
     logic                                                                        mode_sequence;
     logic                                                                        mode_buffer  ;
     logic                                                                        mode_counter ;
+    logic [      NUM_CHANNELS_WIDTH_BITS-1:0]                                    id_channel   ;
     logic [   CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                    id_buffer    ;
     logic [             M_AXI4_FE_DATA_W-1:0]                                    array_size   ;
     logic [             M_AXI4_FE_DATA_W-1:0]                                    index_start  ;
@@ -364,6 +366,7 @@ typedef struct packed{
     logic                                  decrement   ;
     logic                                  flush_mode  ;
     logic                                  flush_enable;
+    logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel  ;
     logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer   ;
     logic [          M_AXI4_FE_DATA_W-1:0] array_size  ;
     logic [          M_AXI4_FE_DATA_W-1:0] start_read  ;
