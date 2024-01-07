@@ -14,12 +14,14 @@
 
 `include "global_package.vh"
 
-module kernel_afu (
+module kernel_afu  #(
+  `include "afu_parameters.vh"
+)(
   // System Signals
   input  logic                         ap_clk         ,
   input  logic                         ap_rst_n       ,
   // AXI4 master interface m00_axi
- `include "m_axi_ports_afu.vh"
+  `include "m_axi_ports_afu.vh"
   // Control Signals
   input  logic                         ap_start       ,
   output logic                         ap_idle        ,
@@ -173,61 +175,36 @@ always_ff @(posedge ap_clk) begin
   kernel_control_descriptor_in.buffer_9 <= buffer_9  ;
 end
 
-
-generate
-  if(GLOBAL_SYSTEM_CACHE_IP == 1) begin
 // --------------------------------------------------------------------------------------
 // System Cache CH 0-> AXI
 // --------------------------------------------------------------------------------------
-    kernel_cache inst_kernel_cache_ch0 (
-      .ap_clk            (ap_clk                      ),
-      .areset            (areset_cache[0]             ),
-      .s_axi_read_out    (kernel_s_axi_read_out[0]    ),
-      .s_axi_read_in     (kernel_s_axi_read_in[0]     ),
-      .s_axi_write_out   (kernel_s_axi_write_out[0]   ),
-      .s_axi_write_in    (kernel_s_axi_write_in[0]    ),
-      .m_axi_read_in     (kernel_m_axi4_read_in[0]    ),
-      .m_axi_read_out    (kernel_m_axi4_read_out[0]   ),
-      .m_axi_write_in    (kernel_m_axi4_write_in[0]   ),
-      .m_axi_write_out   (kernel_m_axi4_write_out[0]  ),
-      .cache_setup_signal(kernel_cache_setup_signal[0])
-    );
-  end else begin
-    assign kernel_cache_setup_signal[0] = 0;
-    assign kernel_s_axi_read_out[0]     = kernel_m_axi4_read_in[0];
-    assign kernel_m_axi4_read_out[0]    = kernel_s_axi_read_in[0];
-    assign kernel_s_axi_write_out[0]    = kernel_m_axi4_write_in[0];
-    assign kernel_m_axi4_write_out[0]   = kernel_s_axi_write_in[0];
-  end
-endgenerate
-
 generate
-  if(NUM_CHANNELS > 1) begin
-    if(GLOBAL_SYSTEM_STREAM_IP == 1) begin
+  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_kernel_cache_l2
 // --------------------------------------------------------------------------------------
-// System Cache CH 1 -> AXI
+    if(CHANNEL_CONFIG_L2_CACHE[i] == 0) begin
 // --------------------------------------------------------------------------------------
-      kernel_cache inst_kernel_cache_ch1 (
+      kernel_cache inst_kernel_cache_l2 (
         .ap_clk            (ap_clk                      ),
-        .areset            (areset_cache[1]             ),
-        .s_axi_read_out    (kernel_s_axi_read_out[1]    ),
-        .s_axi_read_in     (kernel_s_axi_read_in[1]     ),
-        .s_axi_write_out   (kernel_s_axi_write_out[1]   ),
-        .s_axi_write_in    (kernel_s_axi_write_in[1]    ),
-        .m_axi_read_in     (kernel_m_axi4_read_in[1]    ),
-        .m_axi_read_out    (kernel_m_axi4_read_out[1]   ),
-        .m_axi_write_in    (kernel_m_axi4_write_in[1]   ),
-        .m_axi_write_out   (kernel_m_axi4_write_out[1]  ),
-        .cache_setup_signal(kernel_cache_setup_signal[1])
+        .areset            (areset_cache[i]             ),
+        .s_axi_read_out    (kernel_s_axi_read_out[i]    ),
+        .s_axi_read_in     (kernel_s_axi_read_in[i]     ),
+        .s_axi_write_out   (kernel_s_axi_write_out[i]   ),
+        .s_axi_write_in    (kernel_s_axi_write_in[i]    ),
+        .m_axi_read_in     (kernel_m_axi4_read_in[i]    ),
+        .m_axi_read_out    (kernel_m_axi4_read_out[i]   ),
+        .m_axi_write_in    (kernel_m_axi4_write_in[i]   ),
+        .m_axi_write_out   (kernel_m_axi4_write_out[i]  ),
+        .cache_setup_signal(kernel_cache_setup_signal[i])
       );
     end else begin
-      assign kernel_cache_setup_signal[1] = 0;
-      assign kernel_s_axi_read_out[1]     = kernel_m_axi4_read_in[1];
-      assign kernel_m_axi4_read_out[1]    = kernel_s_axi_read_in[1];
-      assign kernel_s_axi_write_out[1]    = kernel_m_axi4_write_in[1];
-      assign kernel_m_axi4_write_out[1]   = kernel_s_axi_write_in[1];
+      assign kernel_cache_setup_signal[i] = 0;
+      assign kernel_s_axi_read_out[i]     = kernel_m_axi4_read_in[i];
+      assign kernel_m_axi4_read_out[i]    = kernel_s_axi_read_in[i];
+      assign kernel_s_axi_write_out[i]    = kernel_m_axi4_write_in[i];
+      assign kernel_m_axi4_write_out[i]   = kernel_s_axi_write_in[i];
     end
   end
+// --------------------------------------------------------------------------------------
 endgenerate
 
 // --------------------------------------------------------------------------------------
@@ -250,6 +227,7 @@ generate
       .m_axi_write_out(m_axi4_write[i].out       )
     );
   end
+// --------------------------------------------------------------------------------------
 endgenerate
 
 // --------------------------------------------------------------------------------------
