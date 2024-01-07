@@ -15,17 +15,17 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_cache #(
-  parameter NUM_MEMORY_REQUESTOR = 2                                ,
-  parameter FIFO_ARBITER_DEPTH   = 16                               ,
-  parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9)  ,
-  parameter PROG_THRESH          = (FIFO_WRITE_DEPTH/2) + 3
+  parameter NUM_MEMORY_RECEIVER = 2                              ,
+  parameter FIFO_ARBITER_DEPTH  = 16                             ,
+  parameter FIFO_WRITE_DEPTH    = 2**$clog2(FIFO_ARBITER_DEPTH+9),
+  parameter PROG_THRESH         = (FIFO_WRITE_DEPTH/2) + 3
 ) (
-  input  logic                  ap_clk                                 ,
-  input  logic                  areset                                 ,
-  input  MemoryPacketResponse   response_in                            ,
-  input  FIFOStateSignalsInput  fifo_response_signals_in               ,
-  output FIFOStateSignalsOutput fifo_response_signals_out              ,
-  output MemoryPacketResponse   response_out [NUM_MEMORY_REQUESTOR-1:0],
+  input  logic                  ap_clk                                ,
+  input  logic                  areset                                ,
+  input  MemoryPacketResponse   response_in                           ,
+  input  FIFOStateSignalsInput  fifo_response_signals_in              ,
+  output FIFOStateSignalsOutput fifo_response_signals_out             ,
+  output MemoryPacketResponse   response_out [NUM_MEMORY_RECEIVER-1:0],
   output logic                  fifo_setup_signal
 );
 
@@ -37,8 +37,8 @@ logic areset_fifo           ;
 logic cu_setup_push_filter  ;
 logic cu_bundles_push_filter;
 
-MemoryPacketResponse response_out_reg[NUM_MEMORY_REQUESTOR-1:0];
-MemoryPacketResponse response_in_reg                           ;
+MemoryPacketResponse response_out_reg[NUM_MEMORY_RECEIVER-1:0];
+MemoryPacketResponse response_in_reg                          ;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO

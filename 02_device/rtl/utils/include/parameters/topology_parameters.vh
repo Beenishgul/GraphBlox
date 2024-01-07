@@ -7,7 +7,7 @@ parameter PROG_THRESH      = 24,
 // --------------------------------------------------------------------------------------
 // CU CONFIGURATIONS SETTINGS
 // --------------------------------------------------------------------------------------
-parameter NUM_CHANNELS    = 4,
+parameter NUM_CHANNELS    = 2,
 parameter NUM_CUS_MAX     = 1,
 parameter NUM_BUNDLES_MAX = 4,
 parameter NUM_LANES_MAX   = 4,

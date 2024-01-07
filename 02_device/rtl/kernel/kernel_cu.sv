@@ -290,7 +290,7 @@ end
 // Cache response generator
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_cache #(
-  .NUM_MEMORY_REQUESTOR(NUM_MEMORY_REQUESTOR                      ),
+  .NUM_MEMORY_RECEIVER (NUM_MEMORY_REQUESTOR                      ),
   .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_response (
   .ap_clk                   (ap_clk                                    ),
@@ -307,7 +307,7 @@ arbiter_1_to_N_response_cache #(
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_response_cache #(
   .NUM_MEMORY_RECEIVER  (NUM_CHANNELS                              ),
-  .NUM_ARBITER_REQUESTOR(BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+  .FIFO_ARBITER_DEPTH   (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_ch_arbiter_N_to_1_response_cache_in (
   .ap_clk                   (ap_clk                                           ),
   .areset                   (areset_ch_arbiter_N_to_1_cache                   ),

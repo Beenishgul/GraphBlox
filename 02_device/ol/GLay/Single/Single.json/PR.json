@@ -619,7 +619,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_6": {
