@@ -39,6 +39,7 @@ logic areset_setup    ;
 logic areset_bundles  ;
 logic areset_cache    ;
 logic areset_stream   ;
+logic areset_cu_channel_N_to_1_response_cache ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
@@ -103,7 +104,6 @@ logic                  cu_setup_done_assert  ;
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI-CH 0
 // --------------------------------------------------------------------------------------
-KernelDescriptor       cu_cache_descriptor              ;
 MemoryPacketRequest    cu_cache_request_in              ;
 FIFOStateSignalsOutput cu_cache_fifo_request_signals_out;
 FIFOStateSignalsInput  cu_cache_fifo_request_signals_in ;
@@ -117,7 +117,6 @@ logic                  cu_cache_done_out                 ;
 // --------------------------------------------------------------------------------------
 // CU Stream -> AXI-CH 1
 // --------------------------------------------------------------------------------------
-KernelDescriptor       cu_stream_descriptor              ;
 MemoryPacketRequest    cu_stream_request_in              ;
 FIFOStateSignalsOutput cu_stream_fifo_request_signals_out;
 FIFOStateSignalsInput  cu_stream_fifo_request_signals_in ;
@@ -128,6 +127,20 @@ FIFOStateSignalsInput  cu_stream_fifo_response_signals_in ;
 logic                  cu_stream_fifo_setup_signal        ;
 logic                  cu_stream_done_out                 ;
 
+// --------------------------------------------------------------------------------------
+// CU Stream -> AXI-Multi CH
+// --------------------------------------------------------------------------------------
+logic                  areset_cu_channel                  [NUM_CHANNELS-1:0];
+KernelDescriptor       cu_channel_descriptor              [NUM_CHANNELS-1:0];
+MemoryPacketRequest    cu_channel_request_in              [NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput cu_channel_fifo_request_signals_out[NUM_CHANNELS-1:0];
+FIFOStateSignalsInput  cu_channel_fifo_request_signals_in [NUM_CHANNELS-1:0];
+
+MemoryPacketResponse     cu_channel_response_out             [NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput   cu_channel_fifo_response_signals_out[NUM_CHANNELS-1:0];
+FIFOStateSignalsInput    cu_channel_fifo_response_signals_in [NUM_CHANNELS-1:0];
+logic [NUM_CHANNELS-1:0] cu_channel_fifo_setup_signal                          ;
+logic [NUM_CHANNELS-1:0] cu_channel_done_out                                   ;
 
 // --------------------------------------------------------------------------------------
 logic                             areset_axi_slice  [NUM_CHANNELS-1:0];
@@ -143,11 +156,11 @@ always_ff @(posedge ap_clk) begin
   areset_control   <= areset;
   areset_setup     <= areset;
   areset_generator <= areset;
+  areset_cu_channel_N_to_1_response_cache   <= areset;
   areset_bundles   <= areset;
-  areset_cache     <= areset;
-  areset_stream    <= areset;
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     areset_axi_slice[i] <= areset;
+    areset_cu_channel[i] <= areset;
   end
 end
 
@@ -202,15 +215,17 @@ always_ff @(posedge ap_clk) begin
     descriptor_in_reg.valid     <= 1'b0;
     cu_setup_descriptor.valid   <= 1'b0;
     cu_bundles_descriptor.valid <= 1'b0;
-    cu_cache_descriptor.valid   <= 1'b0;
-    cu_stream_descriptor.valid  <= 1'b0;
+    for (int i = 0; i < NUM_CHANNELS; i++) begin
+      cu_channel_descriptor[i].valid  <= 1'b0;
+    end
   end
   else begin
     descriptor_in_reg.valid     <= descriptor_in.valid;
     cu_setup_descriptor.valid   <= descriptor_in_reg.valid;
     cu_bundles_descriptor.valid <= descriptor_in_reg.valid;
-    cu_cache_descriptor.valid   <= descriptor_in_reg.valid;
-    cu_stream_descriptor.valid  <= descriptor_in_reg.valid;
+    for (int i = 0; i < NUM_CHANNELS; i++) begin
+      cu_channel_descriptor[i].valid  <= descriptor_in_reg.valid;
+    end
   end
 end
 
@@ -218,9 +233,9 @@ always_ff @(posedge ap_clk) begin
   descriptor_in_reg.payload     <= descriptor_in.payload;
   cu_setup_descriptor.payload   <= descriptor_in_reg.payload;
   cu_bundles_descriptor.payload <= descriptor_in_reg.payload;
-  cu_cache_descriptor.payload   <= descriptor_in_reg.payload;
-  cu_stream_descriptor.payload  <= descriptor_in_reg.payload;
-
+  for (int i = 0; i < NUM_CHANNELS; i++) begin
+    cu_channel_descriptor[i].payload  <= descriptor_in_reg.payload;
+  end
 end
 
 // --------------------------------------------------------------------------------------
@@ -278,7 +293,39 @@ arbiter_1_to_N_response_cache #(
   .response_out             (cache_generator_response_out              ),
   .fifo_setup_signal        (cache_generator_fifo_response_setup_signal)
 );
+// --------------------------------------------------------------------------------------
+// Generate Channel - Arbiter Signals: Channel Respnse Generator
+// --------------------------------------------------------------------------------------
+FIFOStateSignalsInput  lane_arbiter_N_to_1_memory_fifo_request_signals_in                ;
+FIFOStateSignalsOutput lane_arbiter_N_to_1_memory_fifo_request_signals_out               ;
+logic                  areset_lane_arbiter_N_to_1_memory                                 ;
+logic                  lane_arbiter_N_to_1_memory_fifo_setup_signal                      ;
+logic [NUM_CHANNELS-1:0]  lane_arbiter_N_to_1_memory_lane_arbiter_grant_out                 ;
+MemoryPacketRequest    lane_arbiter_N_to_1_memory_request_in              [NUM_CHANNELS-1:0];
+MemoryPacketRequest    lane_arbiter_N_to_1_memory_request_out                            ;
 
+  arbiter_N_to_1_response_cache #(
+  .NUM_MEMORY_RECEIVER  (NUM_CHANNELS                              ),
+  .NUM_ARBITER_REQUESTOR(BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+    ) inst_ch_arbiter_N_to_1_response_cache_in (
+      .ap_clk                    (ap_clk),
+      .areset                    (areset_cu_channel_N_to_1_response_cache),
+      .response_in               (cu_channel_response_out),
+      .fifo_response_signals_in  (fifo_response_signals_in),
+      .fifo_response_signals_out (fifo_response_signals_out),
+      .arbiter_grant_out         (arbiter_grant_out),
+      .response_out              (response_out),
+      .fifo_setup_signal         (fifo_setup_signal)
+    );
+
+// --------------------------------------------------------------------------------------
+//   Register Channel signal
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+  for (int i = 0; i < NUM_CHANNELS; i++) begin
+    cu_channel_fifo_response_signals_in[i].rd_en = ~fifo_response_signals_out[i].prog_full & arbiter_grant_out[i];
+  end
+end
 // --------------------------------------------------------------------------------------
 // Assign Kernel Cache <-> CU Signals
 // --------------------------------------------------------------------------------------
@@ -294,12 +341,12 @@ generate
 // CU Cache -> AXI Kernel Cache
     cu_cache inst_cu_cache (
       .ap_clk                   (ap_clk                            ),
-      .areset                   (areset_cache                      ),
-      .descriptor_in            (cu_cache_descriptor               ),
+      .areset                   (areset_cu_channel[0]                      ),
+      .descriptor_in            (cu_channel_descriptor[0]                  ),
       .request_in               (cu_cache_request_in               ),
       .fifo_request_signals_out (cu_cache_fifo_request_signals_out ),
       .fifo_request_signals_in  (cu_cache_fifo_request_signals_in  ),
-      .response_out             (cu_cache_response_out             ),
+      .response_out             (cu_channel_response_out[0]                ),
       .fifo_response_signals_out(cu_cache_fifo_response_signals_out),
       .fifo_response_signals_in (cu_cache_fifo_response_signals_in ),
       .fifo_setup_signal        (cu_cache_fifo_setup_signal        ),
@@ -313,8 +360,8 @@ generate
 // CU BUFFER -> AXI Kernel Cache
     cu_buffer inst_cu_buffer_ch0 (
       .ap_clk                   (ap_clk                            ),
-      .areset                   (areset_cache                      ),
-      .descriptor_in            (cu_cache_descriptor               ),
+      .areset                   (areset_cu_channel[0]                      ),
+      .descriptor_in            (cu_channel_descriptor[0]                  ),
       .request_in               (cu_cache_request_in               ),
       .fifo_request_signals_out (cu_cache_fifo_request_signals_out ),
       .fifo_request_signals_in  (cu_cache_fifo_request_signals_in  ),
@@ -343,12 +390,12 @@ generate
 // CU Cache -> AXI Kernel Cache
       cu_stream inst_cu_stream (
         .ap_clk                   (ap_clk                             ),
-        .areset                   (areset_stream                      ),
-        .descriptor_in            (cu_stream_descriptor               ),
+        .areset                   (areset_cu_channel[1]                       ),
+        .descriptor_in            (cu_channel_descriptor[1]                   ),
         .request_in               (cu_stream_request_in               ),
         .fifo_request_signals_out (cu_stream_fifo_request_signals_out ),
         .fifo_request_signals_in  (cu_stream_fifo_request_signals_in  ),
-        .response_out             (cu_stream_response_out             ),
+        .response_out             (cu_channel_response_out[0]                 ),
         .fifo_response_signals_out(cu_stream_fifo_response_signals_out),
         .fifo_response_signals_in (cu_stream_fifo_response_signals_in ),
         .fifo_setup_signal        (cu_stream_fifo_setup_signal        ),
@@ -362,8 +409,8 @@ generate
 // CU BUFFER -> AXI Kernel Cache
       cu_buffer inst_cu_buffer_ch1 (
         .ap_clk                   (ap_clk                             ),
-        .areset                   (areset_stream                      ),
-        .descriptor_in            (cu_stream_descriptor               ),
+        .areset                   (areset_cu_channel[1]                       ),
+        .descriptor_in            (cu_channel_descriptor[1]                   ),
         .request_in               (cu_stream_request_in               ),
         .fifo_request_signals_out (cu_stream_fifo_request_signals_out ),
         .fifo_request_signals_in  (cu_stream_fifo_request_signals_in  ),
@@ -429,9 +476,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
