@@ -337,7 +337,7 @@ always_ff @(posedge ap_clk) begin
 
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     ch_arbiter_N_to_1_cache_response_in[i] <= cu_channel_response_out[i];
-    cu_channel_fifo_response_signals_in[i].rd_en <= ~ch_arbiter_N_to_1_cache_fifo_response_signals_out[i].prog_full & ch_arbiter_N_to_1_cache_ch_arbiter_grant_out[i];
+    cu_channel_fifo_response_signals_in[i].rd_en <= ~ch_arbiter_N_to_1_cache_fifo_response_signals_out.prog_full & ch_arbiter_N_to_1_cache_ch_arbiter_grant_out[i];
   end
 end
 
@@ -406,90 +406,91 @@ generate
         .done_out                 (cu_channel_done_out[i]                 )
       );
     end
+  end
 // --------------------------------------------------------------------------------------
-    endgenerate
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH 1:0 (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-    generate
-      for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_ch
+generate
+  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_ch
 // --------------------------------------------------------------------------------------
-        axi_register_slice_mid_end inst_axi_register_slice_mid_ch (
-          .ap_clk         (ap_clk               ),
-          .areset         (areset_axi_slice[i]  ),
-          .s_axi_read_out (cu_m_axi_read_in[i]  ),
-          .s_axi_read_in  (cu_m_axi_read_out[i] ),
-          .s_axi_write_out(cu_m_axi_write_in[i] ),
-          .s_axi_write_in (cu_m_axi_write_out[i]),
-          .m_axi_read_in  (m_axi_read_in[i]     ),
-          .m_axi_read_out (m_axi_read_out[i]    ),
-          .m_axi_write_in (m_axi_write_in[i]    ),
-          .m_axi_write_out(m_axi_write_out[i]   )
-        );
-      end
-    endgenerate
+    axi_register_slice_mid_end inst_axi_register_slice_mid_ch (
+      .ap_clk         (ap_clk               ),
+      .areset         (areset_axi_slice[i]  ),
+      .s_axi_read_out (cu_m_axi_read_in[i]  ),
+      .s_axi_read_in  (cu_m_axi_read_out[i] ),
+      .s_axi_write_out(cu_m_axi_write_in[i] ),
+      .s_axi_write_in (cu_m_axi_write_out[i]),
+      .m_axi_read_in  (m_axi_read_in[i]     ),
+      .m_axi_read_out (m_axi_read_out[i]    ),
+      .m_axi_write_in (m_axi_write_in[i]    ),
+      .m_axi_write_out(m_axi_write_out[i]   )
+    );
+  end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
-    cu_setup #(
-      .ID_CU    ({NUM_CUS_WIDTH_BITS{1'b1}}    ),
-      .ID_BUNDLE({NUM_BUNDLES_WIDTH_BITS{1'b1}}),
-      .ID_LANE  ({NUM_LANES_WIDTH_BITS{1'b1}}  )
-    ) inst_cu_setup (
-      .ap_clk                   (ap_clk                            ),
-      .areset                   (areset_setup                      ),
-      .cu_flush                 (cu_setup_cu_flush                 ),
-      .descriptor_in            (cu_setup_descriptor               ),
-      .response_in              (cu_setup_response_in              ),
-      .fifo_response_signals_in (cu_setup_fifo_response_signals_in ),
-      .fifo_response_signals_out(cu_setup_fifo_response_signals_out),
-      .request_out              (cu_setup_request_out              ),
-      .fifo_request_signals_in  (cu_setup_fifo_request_signals_in  ),
-      .fifo_request_signals_out (cu_setup_fifo_request_signals_out ),
-      .fifo_setup_signal        (cu_setup_fifo_setup_signal        ),
-      .done_out                 (cu_setup_done_out                 )
-    );
+cu_setup #(
+  .ID_CU    ({NUM_CUS_WIDTH_BITS{1'b1}}    ),
+  .ID_BUNDLE({NUM_BUNDLES_WIDTH_BITS{1'b1}}),
+  .ID_LANE  ({NUM_LANES_WIDTH_BITS{1'b1}}  )
+) inst_cu_setup (
+  .ap_clk                   (ap_clk                            ),
+  .areset                   (areset_setup                      ),
+  .cu_flush                 (cu_setup_cu_flush                 ),
+  .descriptor_in            (cu_setup_descriptor               ),
+  .response_in              (cu_setup_response_in              ),
+  .fifo_response_signals_in (cu_setup_fifo_response_signals_in ),
+  .fifo_response_signals_out(cu_setup_fifo_response_signals_out),
+  .request_out              (cu_setup_request_out              ),
+  .fifo_request_signals_in  (cu_setup_fifo_request_signals_in  ),
+  .fifo_request_signals_out (cu_setup_fifo_request_signals_out ),
+  .fifo_setup_signal        (cu_setup_fifo_setup_signal        ),
+  .done_out                 (cu_setup_done_out                 )
+);
 
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-    cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
-      .ap_clk                             (ap_clk                              ),
-      .areset                             (areset_bundles                      ),
-      .descriptor_in                      (cu_bundles_descriptor               ),
-      .response_memory_in                 (cu_bundles_response_in              ),
-      .fifo_response_memory_in_signals_in (cu_bundles_fifo_response_signals_in ),
-      .fifo_response_memory_in_signals_out(cu_bundles_fifo_response_signals_out),
-      .request_memory_out                 (cu_bundles_request_out              ),
-      .fifo_request_memory_out_signals_in (cu_bundles_fifo_request_signals_in  ),
-      .fifo_request_memory_out_signals_out(cu_bundles_fifo_request_signals_out ),
-      .fifo_setup_signal                  (cu_bundles_fifo_setup_signal        ),
-      .done_out                           (cu_bundles_done_out                 )
-    );
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+  .ap_clk                             (ap_clk                              ),
+  .areset                             (areset_bundles                      ),
+  .descriptor_in                      (cu_bundles_descriptor               ),
+  .response_memory_in                 (cu_bundles_response_in              ),
+  .fifo_response_memory_in_signals_in (cu_bundles_fifo_response_signals_in ),
+  .fifo_response_memory_in_signals_out(cu_bundles_fifo_response_signals_out),
+  .request_memory_out                 (cu_bundles_request_out              ),
+  .fifo_request_memory_out_signals_in (cu_bundles_fifo_request_signals_in  ),
+  .fifo_request_memory_out_signals_out(cu_bundles_fifo_request_signals_out ),
+  .fifo_setup_signal                  (cu_bundles_fifo_setup_signal        ),
+  .done_out                           (cu_bundles_done_out                 )
+);
 
 // --------------------------------------------------------------------------------------
 // Make sure done signal is asserted for N cycles
 // --------------------------------------------------------------------------------------
-    assign cu_bundles_done_assert = &cu_bundles_done_hold;
+assign cu_bundles_done_assert = &cu_bundles_done_hold;
 
-    always_ff @(posedge ap_clk) begin
-      if (areset_bundles) begin
-        cu_bundles_done_hold <= 0;
-      end else begin
-        cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],(cu_bundles_done_out & (&cu_channel_done_out) & fifo_empty_reg)};
-      end
-    end
+always_ff @(posedge ap_clk) begin
+  if (areset_bundles) begin
+    cu_bundles_done_hold <= 0;
+  end else begin
+    cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],(cu_bundles_done_out & (&cu_channel_done_out) & fifo_empty_reg)};
+  end
+end
 
-    assign cu_setup_done_assert = &cu_setup_done_hold;
+assign cu_setup_done_assert = &cu_setup_done_hold;
 
-    always_ff @(posedge ap_clk) begin
-      if (areset_bundles) begin
-        cu_setup_done_hold <= 0;
-      end else begin
-        cu_setup_done_hold <= {cu_setup_done_hold[PULSE_HOLD-2:0],(cu_setup_done_out & (&cu_channel_done_out) & fifo_empty_reg)};
-      end
-    end
+always_ff @(posedge ap_clk) begin
+  if (areset_bundles) begin
+    cu_setup_done_hold <= 0;
+  end else begin
+    cu_setup_done_hold <= {cu_setup_done_hold[PULSE_HOLD-2:0],(cu_setup_done_out & (&cu_channel_done_out) & fifo_empty_reg)};
+  end
+end
 
-    endmodule : kernel_cu
+endmodule : kernel_cu

@@ -29,9 +29,9 @@ parameter NUM_ENGINES_INDEX = 2,
 // TOPOLOGY CONFIGURATIONS CHANNEL
 // --------------------------------------------------------------------------------------
 parameter NUM_CHANNELS_MAX = {5},
-parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            ='{0, 0, 3, 2, 1}
+parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0}
 ,
-parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            ='{0, 0, 1, 2, 3}
+parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0}
 ,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS DEFAULTS
