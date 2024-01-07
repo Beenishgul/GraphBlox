@@ -52,7 +52,7 @@ output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topo
 output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
 output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
-output_file_path_shared = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
+output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
 output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
 output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
 output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
@@ -71,6 +71,7 @@ with open(config_file_path, "r") as file:
 
 buffers = config_data["buffers"]
 channels = config_data["channels"]
+ch_properties = config_data["ch_properties"]
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
 fifo_control_response = config_data["fifo_control_response"]
@@ -440,6 +441,27 @@ def check_and_clean_file(file_path):
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
 
+def generate_topology_parameters(ch_properties):
+
+    # Grouping values for each channel
+    channel_config_l1 = []
+    channel_config_l2 = []
+    for channel, values in ch_properties.items():
+        channel_config_l1.append(int(values[0]))
+        channel_config_l2.append(int(values[1]))
+
+
+    NUM_CHANNELS_MAX = {len(channel_config_l1)}
+
+
+    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2
+
+CHANNEL_CONFIG_L1 = []
+CHANNEL_CONFIG_L2 = []
+NUM_CHANNELS_MAX  = 1
+
+NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2= generate_topology_parameters(ch_properties)
+
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
     pad_lane([pad_data([get_memory_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
@@ -648,7 +670,7 @@ check_and_clean_file(output_file_path_global)
 check_and_clean_file(output_file_top_parameters)
 check_and_clean_file(output_file_set_top_parameters)
 check_and_clean_file(output_file_testbench_parameters)
-check_and_clean_file(output_file_path_shared)
+check_and_clean_file(output_file_path_topology)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
 check_and_clean_file(output_file_channel_top)
@@ -698,16 +720,15 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_MODULES_WIDTH_BITS  = 3;\n")
     file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n")
     
-
 # Write to VHDL file
-with open(output_file_path_shared, "w") as file:
+with open(output_file_path_topology, "w") as file:
 
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// FIFO SETTINGS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
 
     file.write("parameter FIFO_WRITE_DEPTH = 32,\n")
-    file.write("parameter PROG_THRESH      = 20,\n\n")
+    file.write("parameter PROG_THRESH      = 24,\n\n")
 
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// CU CONFIGURATIONS SETTINGS\n")
@@ -731,8 +752,15 @@ with open(output_file_path_shared, "w") as file:
     file.write(f"parameter NUM_BUNDLES_INDEX = {NUM_BUNDLES},\n")
     file.write(f"parameter NUM_LANES_INDEX   = {NUM_LANES},\n")
     file.write(f"parameter NUM_ENGINES_INDEX = {NUM_ENGINES},\n\n")
+
     # ... [The previous writing for the arrays here] ...
 
+    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write("// TOPOLOGY CONFIGURATIONS CHANNEL\n")
+    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(f"parameter NUM_CHANNELS_MAX = {NUM_CHANNELS_MAX},\n")
+    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L1) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L2) + ",\n")
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// TOPOLOGY CONFIGURATIONS DEFAULTS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
