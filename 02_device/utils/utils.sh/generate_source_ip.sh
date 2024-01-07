@@ -63,8 +63,8 @@ mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${lane}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}
 
 eval $(python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include")
-python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_IP_DIR_UTILS_TCL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} ${NUM_CHANNELS} "include"
-# python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_IP_DIR_UTILS_TCL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} ${NUM_CHANNELS} "include"
+# python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
 rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
 rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv
