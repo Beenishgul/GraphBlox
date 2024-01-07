@@ -7,7 +7,7 @@ parameter PROG_THRESH      = 24,
 // --------------------------------------------------------------------------------------
 // CU CONFIGURATIONS SETTINGS
 // --------------------------------------------------------------------------------------
-parameter NUM_CHANNELS    = 2,
+parameter NUM_CHANNELS    = 1,
 parameter NUM_CUS_MAX     = 1,
 parameter NUM_BUNDLES_MAX = 4,
 parameter NUM_LANES_MAX   = 4,
@@ -28,10 +28,10 @@ parameter NUM_ENGINES_INDEX = 2,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS CHANNEL
 // --------------------------------------------------------------------------------------
-parameter NUM_CHANNELS_MAX = {5},
-parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0}
+parameter NUM_CHANNELS_MAX = 8,
+parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0, 0, 0, 0}
 ,
-parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0}
+parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            ='{0, 1, 0, 0, 0, 0, 0, 0}
 ,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS DEFAULTS
