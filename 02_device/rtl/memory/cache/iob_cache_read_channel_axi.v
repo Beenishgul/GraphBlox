@@ -58,7 +58,7 @@ module iob_cache_read_channel_axi #(
       if (LINE2BE_W > 0) begin : g_line2be_w
          // Constant AXI signals
          assign axi_arid_o = AXI_ID;
-         assign axi_arlock_o = 1'b0;
+         assign axi_arlock_o = 2'b0;
          assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_arprot_o = 3'd0;
          assign axi_arqos_o = 4'd0;
@@ -144,7 +144,7 @@ module iob_cache_read_channel_axi #(
 
          // assign read_addr_o  = 0;
          assign axi_arid_o = AXI_ID;
-         assign axi_arlock_o = 1'b0;
+         assign axi_arlock_o = 2'b0;
          assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_arprot_o = 3'd0;
          assign axi_arqos_o = 4'd0;

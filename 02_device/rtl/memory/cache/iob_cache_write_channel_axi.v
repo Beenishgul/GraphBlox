@@ -71,7 +71,7 @@ module iob_cache_write_channel_axi #(
 
          assign axi_awsize_o = BE_NBYTES_W;  // verify - Writes data of the size of BE_DATA_W
          assign axi_awburst_o = 2'd0;
-         assign axi_awlock_o = 1'b0;  // 00 - Normal Access
+         assign axi_awlock_o = 2'b0;  // 00 - Normal Access
          assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_awprot_o = 3'd0;
          assign axi_awqos_o = 4'd0;
@@ -144,7 +144,7 @@ module iob_cache_write_channel_axi #(
          if (LINE2BE_W > 0) begin : g_line2be_w
             // Constant AXI signals
             assign axi_awid_o = AXI_ID;
-            assign axi_awlock_o = 1'b0;
+            assign axi_awlock_o = 2'b0;
             assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
             assign axi_awprot_o = 3'd0;
             assign axi_awqos_o = 4'd0;
