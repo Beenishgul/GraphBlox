@@ -11,19 +11,26 @@ import control___KERNEL___vip_pkg::*;
 
 class GraphCSR;
 
-string  graph_name                    ;
-integer num_vertices                  ;
-integer num_edges                     ;
-integer num_auxiliary_1               ;
-integer num_auxiliary_2               ;
-integer mem512_num_vertices           ;
-integer mem512_auxiliary_1            ;
-integer mem512_auxiliary_2            ;
-integer mem512_num_edges              ;
-integer mem512_overlay_program_entries;
-integer debug_counter_1               ;
-integer debug_counter_2               ;
-integer bfs_source                    ;
+string  graph_name     ;
+integer num_vertices   ;
+integer num_edges      ;
+integer num_auxiliary_1;
+integer num_auxiliary_2;
+integer debug_counter_1;
+integer debug_counter_2;
+integer bfs_source     ;
+
+integer mem512_num_vertices      ;
+integer mem512_auxiliary_1       ;
+integer mem512_auxiliary_2       ;
+integer mem512_num_edges         ;
+integer mem512_overlay_program   ;
+integer mem512_edges_idx         ;
+integer mem512_in_degree         ;
+integer mem512_out_degree        ;
+integer mem512_edges_array_src   ;
+integer mem512_edges_array_dest  ;
+integer mem512_edges_array_weight;
 
 integer file_error               ;
 integer file_ptr_overlay_program ;
@@ -62,7 +69,13 @@ function new ();
     this.mem512_auxiliary_2        = 0;
     this.debug_counter_1           = 0;
     this.debug_counter_2           = 0;
-    this.mem512_overlay_program_entries = 4;
+    this.mem512_overlay_program    = 4;
+    this.mem512_edges_idx          = 0;
+    this.mem512_in_degree          = 0;
+    this.mem512_out_degree         = 0;
+    this.mem512_edges_array_src    = 0;
+    this.mem512_edges_array_dest   = 0;
+    this.mem512_edges_array_weight = 0;
 endfunction
 
 
@@ -217,7 +230,7 @@ module __KERNEL___testbench ();
         .ap_clk               (ap_clk               ),
         .ap_rst_n             (ap_rst_n             ),
         // AXI4 master interface m00_axi
-        `include "m_axi_portmap_afu.vh"
+        `include "m_axi_portmap_top.vh"
         // Control Signals
         .s_axi_control_awvalid(s_axi_control_awvalid),
         .s_axi_control_awready(s_axi_control_awready),
@@ -264,52 +277,7 @@ module __KERNEL___testbench ();
 
         control___KERNEL___vip_mst_t ctrl;
 
-// Slave MM VIP instantiation
-    slv_m00_axi_vip inst_slv_m00_axi_vip (
-        .aclk         (ap_clk         ),
-        .aresetn      (ap_rst_n       ),
-        .s_axi_awvalid(m00_axi_awvalid),
-        .s_axi_awready(m00_axi_awready),
-        .s_axi_awaddr (m00_axi_awaddr ),
-        .s_axi_awlen  (m00_axi_awlen  ),
-        .s_axi_wvalid (m00_axi_wvalid ),
-        .s_axi_wready (m00_axi_wready ),
-        .s_axi_wdata  (m00_axi_wdata  ),
-        .s_axi_wstrb  (m00_axi_wstrb  ),
-        .s_axi_wlast  (m00_axi_wlast  ),
-        .s_axi_bvalid (m00_axi_bvalid ),
-        .s_axi_bready (m00_axi_bready ),
-        .s_axi_arvalid(m00_axi_arvalid),
-        .s_axi_arready(m00_axi_arready),
-        .s_axi_araddr (m00_axi_araddr ),
-        .s_axi_arlen  (m00_axi_arlen  ),
-        .s_axi_rvalid (m00_axi_rvalid ),
-        .s_axi_rready (m00_axi_rready ),
-        .s_axi_rdata  (m00_axi_rdata  ),
-        .s_axi_rlast  (m00_axi_rlast  ),
-        
-        .s_axi_bid    (m00_axi_bid    ),
-        .s_axi_rid    (m00_axi_rid    ),
-        .s_axi_rresp  (m00_axi_rresp  ),
-        .s_axi_bresp  (m00_axi_bresp  ),
-        .s_axi_awid   (m00_axi_awid   ),
-        .s_axi_awsize (m00_axi_awsize ),
-        .s_axi_awburst(m00_axi_awburst),
-        .s_axi_awlock (m00_axi_awlock ),
-        .s_axi_awcache(m00_axi_awcache),
-        .s_axi_awprot (m00_axi_awprot ),
-        .s_axi_awqos  (m00_axi_awqos  ),
-        .s_axi_arid   (m00_axi_arid   ),
-        .s_axi_arsize (m00_axi_arsize ),
-        .s_axi_arburst(m00_axi_arburst),
-        .s_axi_arlock (m00_axi_arlock ),
-        .s_axi_arcache(m00_axi_arcache),
-        .s_axi_arprot (m00_axi_arprot ),
-        .s_axi_arqos  (m00_axi_arqos  )
-    );
-
-        slv_m00_axi_vip_slv_mem_t m00_axi    ;
-        slv_m00_axi_vip_slv_t     m00_axi_slv;
+        `include "module_slv_m_axi_vip_inst.vh"
 
         parameter NUM_AXIS_MST   = 0;
         parameter NUM_AXIS_SLV   = 0;
@@ -847,29 +815,65 @@ module __KERNEL___testbench ();
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor fill the memory with the content.
             m00_axi_fill_memory(buffer_0_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_1_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_2_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_3_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_4_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_5_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_6_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_7_ptr, LP_MAX_LENGTH);
+            
+
             m00_axi_fill_memory(buffer_8_ptr, LP_MAX_LENGTH);
+            
+
+            m00_axi_fill_memory(buffer_9_ptr, LP_MAX_LENGTH);
 
         endtask
 
         task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor fill the memory with the content.
-            m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_entries);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.in_degree, 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.out_degree , 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
+            m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.in_degree, 0, graph.mem512_in_degree);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.out_degree, 0, graph.mem512_out_degree);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx, 0, graph.mem512_edges_idx);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_src, 0, graph.mem512_edges_array_src);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_dest, 0, graph.mem512_edges_array_dest);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_edges_array_weight);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1, 0, graph.mem512_auxiliary_1);
+            
+
+            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2, 0, graph.mem512_auxiliary_2);
+            
         endtask
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
@@ -1142,7 +1146,7 @@ module __KERNEL___testbench ();
             realcount = 0;
             setup_temp = 0;
 
-            for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
+            for (int i = 0; i < graph.mem512_overlay_program; i++) begin
                 for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
                     graph.overlay_program[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = realcount;
                     realcount++;
@@ -1266,10 +1270,18 @@ module __KERNEL___testbench ();
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
 
-            graph.mem512_overlay_program_entries = int'(buffer_9_ptr[M_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
+            graph.mem512_overlay_program = int'(buffer_9_ptr[M_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
 
             graph.mem512_num_vertices = ((graph.num_vertices*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
             graph.mem512_num_edges = ((graph.num_edges*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
+
+            graph.mem512_edges_idx       = graph.mem512_num_vertices ;
+            graph.mem512_in_degree       = graph.mem512_num_vertices ;
+            graph.mem512_out_degree      = graph.mem512_num_vertices ;
+
+            graph.mem512_edges_array_src = graph.mem512_num_edges ;
+            graph.mem512_edges_array_dest= graph.mem512_num_edges ;
+            graph.mem512_edges_array_weight= graph.mem512_num_edges ;
 
             graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
             graph.mem512_auxiliary_2 = ((graph.num_auxiliary_2*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
@@ -1281,7 +1293,7 @@ module __KERNEL___testbench ();
             graph.auxiliary_2  = new [graph.mem512_auxiliary_2];
             graph.edges_array_src = new [graph.mem512_num_edges];
             graph.edges_array_dest= new [graph.mem512_num_edges];
-            graph.overlay_program = new [graph.mem512_overlay_program_entries];
+            graph.overlay_program = new [graph.mem512_overlay_program];
 
             read_files_graphCSR(graph);
 
