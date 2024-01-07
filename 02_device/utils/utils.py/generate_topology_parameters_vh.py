@@ -451,7 +451,7 @@ def generate_topology_parameters(ch_properties):
         channel_config_l2.append(int(values[1]))
 
 
-    NUM_CHANNELS_MAX = {len(channel_config_l1)}
+    NUM_CHANNELS_MAX = len(channel_config_l1)
 
 
     return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2

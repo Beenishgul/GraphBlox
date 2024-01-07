@@ -333,9 +333,9 @@
         "buffer_1": ["0","64"],
         "buffer_2": ["0","64"],
         "buffer_3": ["0","64"],
-        "buffer_4": ["1","64"],
-        "buffer_5": ["1","64"],
-        "buffer_6": ["1","64"],
+        "buffer_4": ["0","64"],
+        "buffer_5": ["0","64"],
+        "buffer_6": ["0","64"],
         "buffer_7": ["0","64"],
         "buffer_8": ["0","64"],
         "buffer_9": ["0","64"]
@@ -345,7 +345,10 @@
         "channel_1": ["1","1"],
         "channel_2": ["0","0"],
         "channel_3": ["0","0"],
-        "channel_4": ["0","0"]
+        "channel_4": ["0","0"],
+        "channel_5": ["0","0"],
+        "channel_6": ["0","0"],
+        "channel_7": ["0","0"]
     },
     "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,
