@@ -343,9 +343,9 @@
     "ch_properties": {
         "channel_0": ["0","0"],
         "channel_1": ["0","0"],
-        "channel_2": ["0","0"],
-        "channel_3": ["0","0"],
-        "channel_4": ["0","0"],
+        "channel_2": ["3","1"],
+        "channel_3": ["2","2"],
+        "channel_4": ["1","3"]
     },
     "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,

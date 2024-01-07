@@ -2,7 +2,7 @@
 // FIFO SETTINGS
 // --------------------------------------------------------------------------------------
 parameter FIFO_WRITE_DEPTH = 32,
-parameter PROG_THRESH      = 20,
+parameter PROG_THRESH      = 24,
 
 // --------------------------------------------------------------------------------------
 // CU CONFIGURATIONS SETTINGS
@@ -25,6 +25,14 @@ parameter NUM_BUNDLES_INDEX = 4,
 parameter NUM_LANES_INDEX   = 4,
 parameter NUM_ENGINES_INDEX = 2,
 
+// --------------------------------------------------------------------------------------
+// TOPOLOGY CONFIGURATIONS CHANNEL
+// --------------------------------------------------------------------------------------
+parameter NUM_CHANNELS_MAX = {5},
+parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            ='{0, 0, 3, 2, 1}
+,
+parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            ='{0, 0, 1, 2, 3}
+,
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS DEFAULTS
 // --------------------------------------------------------------------------------------
