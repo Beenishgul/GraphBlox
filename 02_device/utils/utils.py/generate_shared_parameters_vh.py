@@ -56,8 +56,11 @@ output_file_path_shared = os.path.join(output_folder_path_parameters,"shared_par
 output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
 output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
 output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
-output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
+output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
+output_file_testbench_parameters = os.path.join(output_folder_path_parameters,"testbench_parameters.vh")
 output_file_top_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_top.vh")
+output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
+output_file_top_wires = os.path.join(output_folder_path_portmaps,"m_axi_wires_top.vh")
 
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
@@ -643,12 +646,15 @@ check_and_clean_file(output_file_generate_ports_tcl)
 check_and_clean_file(output_file_buffer_channels_tcl)
 check_and_clean_file(output_file_path_global)
 check_and_clean_file(output_file_top_parameters)
+check_and_clean_file(output_file_set_top_parameters)
+check_and_clean_file(output_file_testbench_parameters)
 check_and_clean_file(output_file_path_shared)
 check_and_clean_file(output_file_bundle_top)
 check_and_clean_file(output_file_lane_top)
 check_and_clean_file(output_file_channel_top)
 check_and_clean_file(output_file_afu_ports)
 check_and_clean_file(output_file_top_ports)
+check_and_clean_file(output_file_top_wires)
 check_and_clean_file(output_file_afu_portmap)
 check_and_clean_file(output_file_top_portmap)
 check_and_clean_file(output_file_cu_arbitration)
@@ -1511,6 +1517,55 @@ output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
 
     file.write('\n'.join(output_lines))
 
+with open(output_file_top_wires, 'w') as file:
+    output_lines = []
+
+    wires_template = """
+  wire                                    m{0:02d}_axi_awready      ; // Address write channel ready
+  wire                                    m{0:02d}_axi_wready       ; // Write channel ready
+  wire                                    m{0:02d}_axi_awvalid      ; // Address write channel valid
+  wire                                    m{0:02d}_axi_wlast        ; // Write channel last word flag
+  wire                                    m{0:02d}_axi_wvalid       ; // Write channel valid
+  wire [                           8-1:0] m{0:02d}_axi_awlen        ; // Address write channel burst length
+  wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_awaddr  ; // Address write channel address
+  wire [        C_M{0:02d}_AXI_DATA_WIDTH-1:0] m{0:02d}_axi_wdata   ; // Write channel data
+  wire [      C_M{0:02d}_AXI_DATA_WIDTH/8-1:0] m{0:02d}_axi_wstrb   ; // Write channel write strobe
+  wire                                    m{0:02d}_axi_bvalid       ; // Write response channel valid
+  wire                                    m{0:02d}_axi_bready       ; // Write response channel ready
+  wire                                    m{0:02d}_axi_arready      ; // Address read channel ready
+  wire                                    m{0:02d}_axi_rlast        ; // Read channel last word
+  wire                                    m{0:02d}_axi_rvalid       ; // Read channel valid
+  wire [        C_M{0:02d}_AXI_DATA_WIDTH-1:0] m{0:02d}_axi_rdata   ; // Read channel data
+  wire                                    m{0:02d}_axi_arvalid      ; // Address read channel valid
+  wire                                    m{0:02d}_axi_rready       ; // Read channel ready
+  wire [                           8-1:0] m{0:02d}_axi_arlen        ; // Address write channel burst length
+  wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_araddr  ; // Address read channel address
+// AXI4 master interface m{0:02d}_axi missing ports
+  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_bid     ; // Write response channel ID
+  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_rid     ; // Read channel ID
+  wire [                           2-1:0] m{0:02d}_axi_rresp        ; // Read channel response
+  wire [                           2-1:0] m{0:02d}_axi_bresp        ; // Write channel response
+  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_awid    ; // Address write channel ID
+  wire [                           3-1:0] m{0:02d}_axi_awsize       ; // Address write channel burst size
+  wire [                           2-1:0] m{0:02d}_axi_awburst      ; // Address write channel burst type
+  wire [                           1-1:0] m{0:02d}_axi_awlock       ; // Address write channel lock type
+  wire [                           4-1:0] m{0:02d}_axi_awcache      ; // Address write channel memory type
+  wire [                           3-1:0] m{0:02d}_axi_awprot       ; // Address write channel protection type
+  wire [                           4-1:0] m{0:02d}_axi_awqos        ; // Address write channel quality of service
+  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_arid    ; // Address read channel ID
+  wire [                           3-1:0] m{0:02d}_axi_arsize       ; // Address read channel burst size
+  wire [                           2-1:0] m{0:02d}_axi_arburst      ; // Address read channel burst type
+  wire [                           1-1:0] m{0:02d}_axi_arlock       ; // Address read channel lock type
+  wire [                           4-1:0] m{0:02d}_axi_arcache      ; // Address read channel memory type
+  wire [                           3-1:0] m{0:02d}_axi_arprot       ; // Address read channel protection type
+  wire [                           4-1:0] m{0:02d}_axi_arqos        ; // Address read channel quality of service
+    """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(wires_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
 with open(output_file_top_ports, 'w') as file:
     output_lines = []
 
@@ -1958,3 +2013,32 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
     file.write('\n'.join(output_lines))
 
 
+# Write to VHDL file
+with open(output_file_set_top_parameters, "w") as file:
+    output_lines = []
+
+    ports_template = """
+        .C_M{0:02d}_AXI_ADDR_WIDTH      (C_M{0:02d}_AXI_ADDR_WIDTH      ),
+        .C_M{0:02d}_AXI_DATA_WIDTH      (C_M{0:02d}_AXI_DATA_WIDTH      ),
+        """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(ports_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
+
+# Write to VHDL file
+with open(output_file_testbench_parameters, "w") as file:
+    output_lines = []
+
+    ports_template = """
+        parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = M_AXI4_BE_ADDR_W        ;
+        parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = M_AXI4_BE_DATA_W        ;
+        parameter integer C_M{0:02d}_AXI_ID_WIDTH         = M_AXI4_BE_ID_W          ;
+        """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(ports_template.format(channel))
+
+    file.write('\n'.join(output_lines))

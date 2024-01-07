@@ -1,17 +1,9 @@
+*.err
+*.log
 .vscode
 .Xil
-*.log
-*.err
-glay.sublime-project
-glay.sublime-workspace
-nohup.out
-vivado.jou  
-vivado.log 
-vivado_pid*.str
-xilinx_* 
-alg_*
-00_make/params.tcl
 00_make/params.sh
+00_make/params.tcl
 01_host/*.err
 01_host/*.log
 01_host/.vscode
@@ -38,14 +30,17 @@ alg_*
 02_device/nohup.out
 02_device/ol/*/template.*.json
 02_device/ol/*/template.*.ol
-02_device/rtl/utils/include/testbench
 02_device/rtl/utils/include/global/config_parameters.vh
+02_device/rtl/utils/include/parameters/set_top_parameters.vh
+02_device/rtl/utils/include/parameters/testbench_parameters.vh
 02_device/rtl/utils/include/parameters/shared_parameters.vh
 02_device/rtl/utils/include/parameters/top_parameters.vh
-02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
 02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
 02_device/rtl/utils/include/portmaps/m_axi_portmap_top.vh
+02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
 02_device/rtl/utils/include/portmaps/m_axi_ports_top.vh
+02_device/rtl/utils/include/portmaps/m_axi_wires_top.vh
+02_device/rtl/utils/include/testbench
 02_device/rtl/utils/include/topology/bundle_arbitration.vh
 02_device/rtl/utils/include/topology/bundle_topology.vh
 02_device/rtl/utils/include/topology/channel_topology.vh
@@ -56,5 +51,13 @@ alg_*
 02_device/vivado.log 
 02_device/vivado_pid*.str   
 02_device/xilinx_*
+alg_*
+glay.sublime-project
+glay.sublime-workspace
+nohup.out
+vivado.jou  
+vivado.log 
+vivado_pid*.str
+xilinx_* 
 
 
