@@ -695,12 +695,12 @@ with open(output_file_top_parameters, "w") as file:
     output_lines = []
 
     ports_template = """
-parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = 64 ,
-parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = 512,
-parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1,
+parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = {2} ,
+parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1} ,
+parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1   ,
 """
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template.format(channel))
+   for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH[index],CHANNEL_CONFIG_ADDRESS_WIDTH[index]))
     
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32")
@@ -1833,6 +1833,8 @@ def generate_ipx_associate_commands(output_file_name):
             file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
             file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
             file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH[index]} $bifparam\n')
+            file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+            file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH[index]} $bifparam\n')
           
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands(output_file_generate_ports_tcl)
@@ -2068,12 +2070,12 @@ with open(output_file_testbench_parameters, "w") as file:
     output_lines = []
 
     ports_template = """
-        parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = M_AXI4_BE_ADDR_W        ;
-        parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = M_AXI4_BE_DATA_W        ;
+        parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = {2}           ;
+        parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1}        ;
         parameter integer C_M{0:02d}_AXI_ID_WIDTH         = M_AXI4_BE_ID_W          ;
         """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH[index],CHANNEL_CONFIG_ADDRESS_WIDTH[index]))
 
     file.write('\n'.join(output_lines))
