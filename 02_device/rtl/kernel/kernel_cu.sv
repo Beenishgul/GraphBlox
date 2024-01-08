@@ -290,8 +290,8 @@ end
 // Cache response generator
 // --------------------------------------------------------------------------------------
 arbiter_1_to_N_response_cache #(
-  .NUM_MEMORY_RECEIVER (NUM_MEMORY_REQUESTOR                      ),
-  .FIFO_ARBITER_DEPTH  (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+  .NUM_MEMORY_RECEIVER(NUM_MEMORY_REQUESTOR                      ),
+  .FIFO_ARBITER_DEPTH (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_cache_generator_response (
   .ap_clk                   (ap_clk                                    ),
   .areset                   (areset_generator                          ),
@@ -306,8 +306,8 @@ arbiter_1_to_N_response_cache #(
 // Generate Channel - Arbiter Signals: Channel Response Generator
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_response_cache #(
-  .NUM_MEMORY_RECEIVER  (NUM_CHANNELS                              ),
-  .FIFO_ARBITER_DEPTH   (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
+  .NUM_MEMORY_RECEIVER(NUM_CHANNELS                              ),
+  .FIFO_ARBITER_DEPTH (BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY)
 ) inst_ch_arbiter_N_to_1_response_cache_in (
   .ap_clk                   (ap_clk                                           ),
   .areset                   (areset_ch_arbiter_N_to_1_cache                   ),
@@ -407,16 +407,13 @@ generate
       );
     end
   end
-// --------------------------------------------------------------------------------------
-endgenerate
 
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH 1:0 (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-generate
-  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_ch
+  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_end_ch
 // --------------------------------------------------------------------------------------
-    axi_register_slice_mid_end inst_axi_register_slice_mid_ch (
+    axi_register_slice_mid_end inst_axi_register_slice_mid_end_ch (
       .ap_clk         (ap_clk               ),
       .areset         (areset_axi_slice[i]  ),
       .s_axi_read_out (cu_m_axi_read_in[i]  ),
