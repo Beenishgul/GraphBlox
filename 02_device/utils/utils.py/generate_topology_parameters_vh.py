@@ -699,7 +699,7 @@ parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = {2} ,
 parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1} ,
 parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1   ,
 """
-   for index, channel in enumerate(DISTINCT_CHANNELS):
+    for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH[index],CHANNEL_CONFIG_ADDRESS_WIDTH[index]))
     
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
@@ -766,6 +766,8 @@ with open(output_file_path_topology, "w") as file:
     file.write(f"parameter NUM_CHANNELS_MAX = {NUM_CHANNELS_MAX},\n")
     file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L1) + ",\n")
     file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L2) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH) + ",\n")
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// TOPOLOGY CONFIGURATIONS DEFAULTS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
