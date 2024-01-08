@@ -113,8 +113,8 @@ parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM
 // --------------------------------------------------------------------------------------
 parameter STREAM_FRONTEND_ADDR_W = M_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
 parameter STREAM_FRONTEND_DATA_W = M_AXI4_FE_DATA_W; //Data width - word size used for the cache
-parameter STREAM_N_WAYS          = 8               ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-parameter STREAM_LINE_OFF_W      = 5               ; //Line-Offset Width - 2**NLINE_W total cache lines
+parameter STREAM_N_WAYS          = 4               ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+parameter STREAM_LINE_OFF_W      = 4               ; //Line-Offset Width - 2**NLINE_W total cache lines
 parameter STREAM_WTBUF_DEPTH_W   = $clog2(32)      ; //Depth Width of Write-Through Buffer
 //Replacement policy (STREAM_N_WAYS > 1)
 parameter STREAM_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
