@@ -46,25 +46,24 @@ if not os.path.exists(output_folder_path_testbench):
 
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
+output_file_afu_topology = os.path.join(output_folder_path_topology,"afu_topology.vh")
 output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
-output_file_bundle_top = os.path.join(output_folder_path_topology , "bundle_topology.vh")
-output_file_channel_top = os.path.join(output_folder_path_topology,"channel_topology.vh")
+output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
+output_file_bundle_topology = os.path.join(output_folder_path_topology , "bundle_topology.vh")
+output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
 output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
-output_file_lane_top = os.path.join(output_folder_path_topology,"lane_topology.vh")
+output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
+output_file_lane_topology = os.path.join(output_folder_path_topology,"lane_topology.vh")
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
+output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
 output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
 output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
-output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
-output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
 output_file_testbench_parameters = os.path.join(output_folder_path_parameters,"testbench_parameters.vh")
+output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
 output_file_top_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_top.vh")
 output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
 output_file_top_wires = os.path.join(output_folder_path_portmaps,"m_axi_wires_top.vh")
-
-output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
-output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
-output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
@@ -671,9 +670,9 @@ check_and_clean_file(output_file_top_parameters)
 check_and_clean_file(output_file_set_top_parameters)
 check_and_clean_file(output_file_testbench_parameters)
 check_and_clean_file(output_file_path_topology)
-check_and_clean_file(output_file_bundle_top)
-check_and_clean_file(output_file_lane_top)
-check_and_clean_file(output_file_channel_top)
+check_and_clean_file(output_file_bundle_topology)
+check_and_clean_file(output_file_lane_topology)
+check_and_clean_file(output_file_afu_topology)
 check_and_clean_file(output_file_afu_ports)
 check_and_clean_file(output_file_top_ports)
 check_and_clean_file(output_file_top_wires)
@@ -965,7 +964,7 @@ with open(output_file_path_topology, "w") as file:
 
 
 # Write to VHDL file
-with open(output_file_bundle_top, "w") as file:
+with open(output_file_bundle_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
     for j in range(NUM_BUNDLES):
@@ -1034,7 +1033,7 @@ with open(output_file_bundle_top, "w") as file:
 
 
 # Write to VHDL file
-with open(output_file_lane_top, "w") as file:
+with open(output_file_lane_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
     for j in range(NUM_BUNDLES):
@@ -1432,7 +1431,7 @@ with open(output_file_cu_arbitration, "w") as file:
         file.write(f"\n\n") 
 
 
-with open(output_file_channel_top, 'w') as file:
+with open(output_file_afu_topology, 'w') as file:
     output_lines = []
 
     for channel, channel_dist in zip(range(int(NUM_CHANNELS_TOP)), DISTINCT_CHANNELS):
