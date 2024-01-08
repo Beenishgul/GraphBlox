@@ -325,109 +325,15 @@ cu_cache_command_generator_state next_state   ;
 
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
 assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & cache_ctrl_out.wtb_empty);
+assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
 
-always_ff @(posedge ap_clk) begin
-  if(areset_control)
-    current_state <= CU_CACHE_CMD_RESET;
-  else begin
-    current_state <= next_state;
-  end
-end// always_ff @(posedge ap_clk)
-
-always_comb begin
-  next_state = current_state;
-  case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_READY : begin
-      if(cmd_read_condition)
-        next_state = CU_CACHE_CMD_READ_TRANS;
-      else if(cmd_write_condition)
-        next_state = CU_CACHE_CMD_WRITE_TRANS;
-      else
-        next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_READ_TRANS : begin
-      next_state = CU_CACHE_CMD_READ;
-    end
-    CU_CACHE_CMD_READ : begin
-      if(cache_response_mem.iob.valid)
-        next_state = CU_CACHE_CMD_POP_TRANS;
-      else
-        next_state = CU_CACHE_CMD_READ;
-    end
-    CU_CACHE_CMD_WRITE_TRANS : begin
-      next_state = CU_CACHE_CMD_WRITE;
-    end
-    CU_CACHE_CMD_WRITE : begin
-      next_state = CU_CACHE_CMD_POP_TRANS;
-    end
-    CU_CACHE_CMD_POP_TRANS : begin
-      next_state = CU_CACHE_CMD_POP;
-    end
-    CU_CACHE_CMD_POP : begin
-      next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_DONE : begin
-      next_state = CU_CACHE_CMD_DONE;
-    end
-  endcase
-end// always_comb
-// State Transition Logic
-
-always_ff @(posedge ap_clk) begin
-  case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      counter_load                       <= 1'b1;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_READY : begin
-      counter_load                       <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_READ_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b1;
-    end
-    CU_CACHE_CMD_READ : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_WRITE_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b1;
-    end
-    CU_CACHE_CMD_WRITE : begin
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-    end
-    CU_CACHE_CMD_POP_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b1;
-      fifo_response_signals_in_int.wr_en <= 1'b1;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_POP : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-    CU_CACHE_CMD_DONE : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b0;
-      fifo_response_signals_in_int.wr_en <= 1'b0;
-      cache_request_mem_reg.iob.valid    <= 1'b0;
-    end
-  endcase
-end// always_ff @(posedge ap_clk)
+// always_ff @(posedge ap_clk) begin
+//   if(areset_control)
+//     current_state <= CU_CACHE_CMD_RESET;
+//   else begin
+//     current_state <= next_state;
+//   end
+// end// always_ff @(posedge ap_clk)
 
 // always_comb begin
 //   next_state = current_state;
@@ -437,20 +343,32 @@ end// always_ff @(posedge ap_clk)
 //     end
 //     CU_CACHE_CMD_READY : begin
 //       if(cmd_read_condition)
-//         next_state = CU_CACHE_CMD_READ;
+//         next_state = CU_CACHE_CMD_READ_TRANS;
 //       else if(cmd_write_condition)
-//         next_state = CU_CACHE_CMD_WRITE;
+//         next_state = CU_CACHE_CMD_WRITE_TRANS;
 //       else
 //         next_state = CU_CACHE_CMD_READY;
+//     end
+//     CU_CACHE_CMD_READ_TRANS : begin
+//       next_state = CU_CACHE_CMD_READ;
 //     end
 //     CU_CACHE_CMD_READ : begin
 //       if(cache_response_mem.iob.valid)
-//         next_state = CU_CACHE_CMD_READY;
+//         next_state = CU_CACHE_CMD_POP_TRANS;
 //       else
 //         next_state = CU_CACHE_CMD_READ;
 //     end
+//     CU_CACHE_CMD_WRITE_TRANS : begin
+//       next_state = CU_CACHE_CMD_WRITE;
+//     end
 //     CU_CACHE_CMD_WRITE : begin
-//         next_state = CU_CACHE_CMD_READY;
+//       next_state = CU_CACHE_CMD_POP_TRANS;
+//     end
+//     CU_CACHE_CMD_POP_TRANS : begin
+//       next_state = CU_CACHE_CMD_POP;
+//     end
+//     CU_CACHE_CMD_POP : begin
+//       next_state = CU_CACHE_CMD_READY;
 //     end
 //     CU_CACHE_CMD_DONE : begin
 //       next_state = CU_CACHE_CMD_DONE;
@@ -459,55 +377,149 @@ end// always_ff @(posedge ap_clk)
 // end// always_comb
 // // State Transition Logic
 
-// always_comb begin
-//   counter_load                       = 1'b0;
-//   fifo_request_signals_in_int.rd_en  = 1'b0;
-//   fifo_response_signals_in_int.wr_en = 1'b0;
-//   cache_request_mem_reg.iob.valid    = 1'b0;
+// always_ff @(posedge ap_clk) begin
 //   case (current_state)
 //     CU_CACHE_CMD_RESET : begin
-//       counter_load                       = 1'b1;
-//       fifo_request_signals_in_int.rd_en  = 1'b0;
-//       fifo_response_signals_in_int.wr_en = 1'b0;
-//       cache_request_mem_reg.iob.valid    = 1'b0;
+//       counter_load                       <= 1'b1;
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
 //     end
 //     CU_CACHE_CMD_READY : begin
-//       counter_load                       = 1'b0;
-//       fifo_request_signals_in_int.rd_en  = 1'b0;
-//       fifo_response_signals_in_int.wr_en = 1'b0;
-//       cache_request_mem_reg.iob.valid    = 1'b0;
+//       counter_load                       <= 1'b0;
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
+//     end
+//     CU_CACHE_CMD_READ_TRANS : begin
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b1;
 //     end
 //     CU_CACHE_CMD_READ : begin
-//       if(~cache_response_mem.iob.valid) begin
-//         cache_request_mem_reg.iob.valid    = 1'b1;
-//         fifo_request_signals_in_int.rd_en  = 1'b0;
-//         fifo_response_signals_in_int.wr_en = 1'b0;
-//       end else begin
-//         fifo_request_signals_in_int.rd_en  = 1'b1;
-//         fifo_response_signals_in_int.wr_en = 1'b1;
-//         cache_request_mem_reg.iob.valid    = 1'b0;
-//       end 
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
+//     end
+//     CU_CACHE_CMD_WRITE_TRANS : begin
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b1;
 //     end
 //     CU_CACHE_CMD_WRITE : begin
-//         cache_request_mem_reg.iob.valid    = 1'b1;
-//         fifo_request_signals_in_int.rd_en  = 1'b1;
-//         fifo_response_signals_in_int.wr_en = 1'b1;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//     end
+//     CU_CACHE_CMD_POP_TRANS : begin
+//       fifo_request_signals_in_int.rd_en  <= 1'b1;
+//       fifo_response_signals_in_int.wr_en <= 1'b1;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
+//     end
+//     CU_CACHE_CMD_POP : begin
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
 //     end
 //     CU_CACHE_CMD_DONE : begin
-//       fifo_request_signals_in_int.rd_en  = 1'b0;
-//       fifo_response_signals_in_int.wr_en = 1'b0;
-//       cache_request_mem_reg.iob.valid    = 1'b0;
+//       fifo_request_signals_in_int.rd_en  <= 1'b0;
+//       fifo_response_signals_in_int.wr_en <= 1'b0;
+//       cache_request_mem_reg.iob.valid    <= 1'b0;
 //     end
 //   endcase
-// end// always_comb
+// end// always_ff @(posedge ap_clk)
 
-// always_comb begin
-//   cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
-//   cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
-//   cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
-//   cache_request_mem_reg.meta      = fifo_request_dout.meta;
-//   cache_request_mem_reg.data      = fifo_request_dout.data;
+// always_ff @(posedge ap_clk) begin
+//   cache_request_mem_reg.iob.wstrb <= fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+//   cache_request_mem_reg.iob.addr  <= fifo_request_dout.iob.addr;
+//   cache_request_mem_reg.iob.wdata <= fifo_request_dout.iob.wdata;
+//   cache_request_mem_reg.meta      <= fifo_request_dout.meta;
+//   cache_request_mem_reg.data      <= fifo_request_dout.data;
+
+//   if(cache_request_mem_reg.iob.valid  && (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) )
+//             $display("%t - Cache %0s B:%0d L:%0d-[%0d]", $time,cache_request_mem_reg.meta.subclass.cmd.name(),$clog2(cache_request_mem_reg.meta.route.packet_source.id_bundle) , $clog2(cache_request_mem_reg.meta.route.packet_source.id_lane) , cache_request_mem_reg.data.field);
+
 // end
+
+always_comb begin
+  next_state = current_state;
+  case (current_state)
+    CU_CACHE_CMD_RESET : begin
+      next_state = CU_CACHE_CMD_READY;
+    end
+    CU_CACHE_CMD_READY : begin
+      if(cmd_read_condition)
+        next_state = CU_CACHE_CMD_READ;
+      else if(cmd_write_condition)
+        next_state = CU_CACHE_CMD_WRITE;
+      else
+        next_state = CU_CACHE_CMD_READY;
+    end
+    CU_CACHE_CMD_READ : begin
+      if(cache_response_mem.iob.valid)
+        next_state = CU_CACHE_CMD_READY;
+      else
+        next_state = CU_CACHE_CMD_READ;
+    end
+    CU_CACHE_CMD_WRITE : begin
+        next_state = CU_CACHE_CMD_READY;
+    end
+    CU_CACHE_CMD_DONE : begin
+      next_state = CU_CACHE_CMD_DONE;
+    end
+  endcase
+end// always_comb
+// State Transition Logic
+
+always_comb begin
+  counter_load                       = 1'b0;
+  fifo_request_signals_in_int.rd_en  = 1'b0;
+  fifo_response_signals_in_int.wr_en = 1'b0;
+  cache_request_mem_reg.iob.valid    = 1'b0;
+  case (current_state)
+    CU_CACHE_CMD_RESET : begin
+      counter_load                       = 1'b1;
+      fifo_request_signals_in_int.rd_en  = 1'b0;
+      fifo_response_signals_in_int.wr_en = 1'b0;
+      cache_request_mem_reg.iob.valid    = 1'b0;
+    end
+    CU_CACHE_CMD_READY : begin
+      counter_load                       = 1'b0;
+      fifo_request_signals_in_int.rd_en  = 1'b0;
+      fifo_response_signals_in_int.wr_en = 1'b0;
+      cache_request_mem_reg.iob.valid    = 1'b0;
+    end
+    CU_CACHE_CMD_READ : begin
+      if(~cache_response_mem.iob.valid) begin
+        cache_request_mem_reg.iob.valid    = 1'b1;
+        fifo_request_signals_in_int.rd_en  = 1'b0;
+        fifo_response_signals_in_int.wr_en = 1'b0;
+      end else begin
+        fifo_request_signals_in_int.rd_en  = 1'b1;
+        fifo_response_signals_in_int.wr_en = 1'b1;
+        cache_request_mem_reg.iob.valid    = 1'b0;
+      end 
+    end
+    CU_CACHE_CMD_WRITE : begin
+        cache_request_mem_reg.iob.valid    = 1'b1;
+        fifo_request_signals_in_int.rd_en  = 1'b1;
+        fifo_response_signals_in_int.wr_en = 1'b1;
+    end
+    CU_CACHE_CMD_DONE : begin
+      fifo_request_signals_in_int.rd_en  = 1'b0;
+      fifo_response_signals_in_int.wr_en = 1'b0;
+      cache_request_mem_reg.iob.valid    = 1'b0;
+    end
+  endcase
+end// always_comb
+
+always_comb begin
+  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
+  cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
+  cache_request_mem_reg.meta      = fifo_request_dout.meta;
+  cache_request_mem_reg.data      = fifo_request_dout.data;
+end
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
