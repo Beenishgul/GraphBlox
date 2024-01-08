@@ -87,7 +87,7 @@ axi_register_slice_mid inst_register_slice_mid_512x64 (
   .s_axi_arcache (s_axi_read.in.arcache    ), // input read address read channel memory type. transactions set with normal non-cacheable modifiable and bufferable (0011).
   .s_axi_arid    (s_axi_read.in.arid       ), // input read address read channel id
   .s_axi_arlen   (s_axi_read.in.arlen      ), // input read address channel burst length
-  .s_axi_arlock  (s_axi_read.in.arlock[0]  ), // input read address read channel lock type
+  .s_axi_arlock  (s_axi_read.in.arlock     ), // input read address read channel lock type
   .s_axi_arprot  (s_axi_read.in.arprot     ), // input read address channel protection type. transactions set with normal, secure, and data attributes (000).
   .s_axi_arqos   (s_axi_read.in.arqos      ), // input read address channel quality of service
   .s_axi_arready (s_axi_read.out.arready   ), // output read address read channel ready
@@ -99,7 +99,7 @@ axi_register_slice_mid inst_register_slice_mid_512x64 (
   .s_axi_awcache (s_axi_write.in.awcache   ), // input write address write channel memory type. transactions set with normal non-cacheable modifiable and bufferable (0011).
   .s_axi_awid    (s_axi_write.in.awid      ), // input write address write channel id
   .s_axi_awlen   (s_axi_write.in.awlen     ), // input write address write channel burst length
-  .s_axi_awlock  (s_axi_write.in.awlock[0] ), // input write address write channel lock type
+  .s_axi_awlock  (s_axi_write.in.awlock    ), // input write address write channel lock type
   .s_axi_awprot  (s_axi_write.in.awprot    ), // input write address write channel protection type. transactions set with normal, secure, and data attributes (000).
   .s_axi_awqos   (s_axi_write.in.awqos     ), // input write address write channel quality of service
   .s_axi_awready (s_axi_write.out.awready  ), // output write address write channel ready
@@ -127,7 +127,7 @@ axi_register_slice_mid inst_register_slice_mid_512x64 (
   .m_axi_arcache (m_axi_read.out.arcache   ), // output read address read channel memory type. transactions set with normal non-cacheable modifiable and bufferable (0011).
   .m_axi_arid    (m_axi_read.out.arid      ), // output read address read channel id
   .m_axi_arlen   (m_axi_read.out.arlen     ), // output read address channel burst length
-  .m_axi_arlock  (m_axi_read.out.arlock[0] ), // output read address read channel lock type
+  .m_axi_arlock  (m_axi_read.out.arlock    ), // output read address read channel lock type
   .m_axi_arprot  (m_axi_read.out.arprot    ), // output read address channel protection type. transactions set with normal, secure, and data attributes (000).
   .m_axi_arqos   (m_axi_read.out.arqos     ), // output read address channel quality of service
   .m_axi_arready (m_axi_read.in.arready    ), // input read address read channel ready
@@ -139,7 +139,7 @@ axi_register_slice_mid inst_register_slice_mid_512x64 (
   .m_axi_awcache (m_axi_write.out.awcache  ), // output write address write channel memory type. transactions set with normal non-cacheable modifiable and bufferable (0011).
   .m_axi_awid    (m_axi_write.out.awid     ), // output write address write channel id
   .m_axi_awlen   (m_axi_write.out.awlen    ), // output write address write channel burst length
-  .m_axi_awlock  (m_axi_write.out.awlock[0]), // output write address write channel lock type
+  .m_axi_awlock  (m_axi_write.out.awlock   ), // output write address write channel lock type
   .m_axi_awprot  (m_axi_write.out.awprot   ), // output write address write channel protection type. transactions set with normal, secure, and data attributes (000).
   .m_axi_awqos   (m_axi_write.out.awqos    ), // output write address write channel quality of service
   .m_axi_awready (m_axi_write.in.awready   ), // input write address write channel ready
