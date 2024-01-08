@@ -43,7 +43,7 @@
 02_device/rtl/utils/include/testbench
 02_device/rtl/utils/include/topology/bundle_arbitration.vh
 02_device/rtl/utils/include/topology/bundle_topology.vh
-02_device/rtl/utils/include/topology/channel_topology.vh
+02_device/rtl/utils/include/topology/afu_topology.vh
 02_device/rtl/utils/include/topology/cu_arbitration.vh
 02_device/rtl/utils/include/topology/lane_arbitration.vh
 02_device/rtl/utils/include/topology/lane_topology.vh
