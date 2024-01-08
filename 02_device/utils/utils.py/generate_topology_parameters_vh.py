@@ -445,21 +445,27 @@ def generate_topology_parameters(ch_properties):
     # Grouping values for each channel
     channel_config_l1 = []
     channel_config_l2 = []
+    channel_config_data_width = []
+    channel_config_address_width = []
     for channel, values in ch_properties.items():
         channel_config_l1.append(int(values[0]))
         channel_config_l2.append(int(values[1]))
+        channel_config_address_width.append(int(values[2]))
+        channel_config_data_width.append(int(values[3]))
 
 
     NUM_CHANNELS_MAX = len(channel_config_l1)
 
 
-    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2
+    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2, channel_config_address_width, channel_config_data_width
 
 CHANNEL_CONFIG_L1 = []
 CHANNEL_CONFIG_L2 = []
+CHANNEL_CONFIG_ADDRESS_WIDTH=[]
+CHANNEL_CONFIG_DATA_WIDTH=[]
 NUM_CHANNELS_MAX  = 1
 
-NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2= generate_topology_parameters(ch_properties)
+NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH, CHANNEL_CONFIG_DATA_WIDTH= generate_topology_parameters(ch_properties)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
@@ -1823,10 +1829,10 @@ def generate_ipx_associate_commands(output_file_name):
 
     # Open output file for appending
     with open(output_file_name, "a") as file:
-        for channel_num in DISTINCT_CHANNELS:
+        for index, channel_num in enumerate(DISTINCT_CHANNELS):
             file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
             file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-            file.write(f'set_property value 512 $bifparam\n')
+            file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH[index]} $bifparam\n')
           
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands(output_file_generate_ports_tcl)
