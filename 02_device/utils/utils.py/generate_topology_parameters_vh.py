@@ -1824,13 +1824,13 @@ def generate_ipx_associate_commands(output_file_name):
     # Open output file for appending
     with open(output_file_name, "a") as file:
         for channel_num in DISTINCT_CHANNELS:
-            file.write(f'ipx::associate_bus_interfaces -busif "m0{channel_num}_axi" -clock "ap_clk" $core >> $log_file\n')
-
+            file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
+            file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+            file.write(f'set_property value 512 $bifparam\n')
+          
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands(output_file_generate_ports_tcl)
 generate_tcl_script_from_json(output_file_buffer_channels_tcl)
-
-
 
 # Write to VHDL file
 with open(output_file_slv_m_axi_vip_func, "w") as file:

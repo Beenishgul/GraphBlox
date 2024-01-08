@@ -318,7 +318,7 @@ typedef struct packed {
 
 typedef struct packed {
   CacheResponseIOB         iob ;
-  MemoryPacketResponseMeta meta;
+  MemoryPacketRequestMeta  meta;
   MemoryPacketData         data;
 } CacheResponsePayload;
 

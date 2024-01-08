@@ -44,8 +44,10 @@ genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
+logic areset_m_axi  ;
 logic areset_cu     ;
 logic areset_control;
+
 
 logic endian_read_reg ;
 logic endian_write_reg;
@@ -97,6 +99,7 @@ parameter PULSE_HOLD    = 100;
 logic     areset_system      ;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
+  areset_m_axi   <= areset_system;
   areset_cu      <= areset_system;
   areset_control <= areset_system;
 
@@ -193,28 +196,36 @@ generate
         .m_axi_write_out   (kernel_m_axi4_write_out[i]  ),
         .cache_setup_signal(kernel_cache_setup_signal[i])
       );
-// Kernel CACHE (M->S) Register Slice
-// --------------------------------------------------------------------------------------
-      axi_register_slice_back_end inst_axi_register_slice_back_end (
-        .ap_clk         (ap_clk                    ),
-        .areset         (areset_axi_slice[i]       ),
-        .s_axi_read_out (kernel_m_axi4_read_in[i]  ),
-        .s_axi_read_in  (kernel_m_axi4_read_out[i] ),
-        .s_axi_write_out(kernel_m_axi4_write_in[i] ),
-        .s_axi_write_in (kernel_m_axi4_write_out[i]),
-        .m_axi_read_in  (m_axi4_read[i].in         ),
-        .m_axi_read_out (m_axi4_read[i].out        ),
-        .m_axi_write_in (m_axi4_write[i].in        ),
-        .m_axi_write_out(m_axi4_write[i].out       )
-      );
-
     end else begin
       assign kernel_cache_setup_signal[i] = 0;
-      assign m_axi4_read[i].in     = kernel_m_axi4_read_in[i];
-      assign m_axi4_read[i].out    = kernel_s_axi_read_in[i];
-      assign m_axi4_write[i].in    = kernel_m_axi4_write_in[i];
-      assign m_axi4_write[i].out   = kernel_s_axi_write_in[i];
+      assign kernel_s_axi_read_out[i]     = kernel_m_axi4_read_in[i];
+      assign kernel_m_axi4_read_out[i]    = kernel_s_axi_read_in[i];
+      assign kernel_s_axi_write_out[i]    = kernel_m_axi4_write_in[i];
+      assign kernel_m_axi4_write_out[i]   = kernel_s_axi_write_in[i];
     end
+  end
+// --------------------------------------------------------------------------------------
+endgenerate
+
+// --------------------------------------------------------------------------------------
+// Kernel CACHE (M->S) Register Slice
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+generate
+  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_back_end_ch
+// --------------------------------------------------------------------------------------
+    axi_register_slice_back_end inst_axi_register_slice_back_end (
+      .ap_clk         (ap_clk                    ),
+      .areset         (areset_axi_slice[i]       ),
+      .s_axi_read_out (kernel_m_axi4_read_in[i]  ),
+      .s_axi_read_in  (kernel_m_axi4_read_out[i] ),
+      .s_axi_write_out(kernel_m_axi4_write_in[i] ),
+      .s_axi_write_in (kernel_m_axi4_write_out[i]),
+      .m_axi_read_in  (m_axi4_read[i].in         ),
+      .m_axi_read_out (m_axi4_read[i].out        ),
+      .m_axi_write_in (m_axi4_write[i].in        ),
+      .m_axi_write_out(m_axi4_write[i].out       )
+    );
   end
 // --------------------------------------------------------------------------------------
 endgenerate
@@ -253,7 +264,7 @@ kernel_control inst_kernel_control (
 );
 
 // --------------------------------------------------------------------------------------
-// Generate afu MULTI channels generated
+// Generate bundle MULTI channels generated
 // --------------------------------------------------------------------------------------
 `include "afu_topology.vh"
 
