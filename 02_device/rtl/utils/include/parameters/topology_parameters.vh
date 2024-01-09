@@ -25,6 +25,9 @@ parameter NUM_BUNDLES_INDEX = 4,
 parameter NUM_LANES_INDEX   = 4,
 parameter NUM_ENGINES_INDEX = 3,
 
+parameter CACHE_CONFIG_MAX_NUM_WAYS   = 4,
+parameter CACHE_CONFIG_MAX_SIZE = 32768,
+
 // --------------------------------------------------------------------------------------
 // TOPOLOGY CONFIGURATIONS CHANNEL
 // --------------------------------------------------------------------------------------

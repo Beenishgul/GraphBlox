@@ -75,7 +75,7 @@ assign m00_axi_bready  = m00_axi4_write.out.bready ; // Write response channel r
 // --------------------------------------------------------------------------------------
 generate
 // --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L2_CACHE[0] == 1) begin
+    if(CHANNEL_CONFIG_L2_CACHE[0] == 0) begin
 // --------------------------------------------------------------------------------------
       kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper inst_kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),
@@ -188,11 +188,11 @@ assign m01_axi_bready  = m01_axi4_write.out.bready ; // Write response channel r
     
 
 // --------------------------------------------------------------------------------------
-// System Cache CH 0-> AXI
+// System Cache CH 1-> AXI
 // --------------------------------------------------------------------------------------
 generate
 // --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L2_CACHE[1] == 1) begin
+    if(CHANNEL_CONFIG_L2_CACHE[1] == 0) begin
 // --------------------------------------------------------------------------------------
       kernel_m01_axi_system_cache_be512x64_mid512x64_wrapper inst_kernel_m01_axi_system_cache_be512x64_mid512x64_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),

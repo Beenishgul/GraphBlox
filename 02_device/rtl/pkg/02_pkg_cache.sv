@@ -72,71 +72,21 @@ parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (
 parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
 parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
-/*---------------------------------------------------*/
-//AXI specific parameters
-parameter CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W;
-parameter CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W;
-parameter CACHE_AXI_ID_W    = M00_AXI4_MID_ID_W   ; //AXI ID (identification) width
-parameter CACHE_AXI_LEN_W   = M00_AXI4_MID_LEN_W  ; //AXI ID burst length (log2)
-parameter CACHE_AXI_LOCK_W  = M00_AXI4_MID_LOCK_W ;
-parameter CACHE_AXI_CACHE_W = M00_AXI4_MID_CACHE_W;
-parameter CACHE_AXI_PROT_W  = M00_AXI4_MID_PROT_W ;
-parameter CACHE_AXI_QOS_W   = M00_AXI4_MID_QOS_W  ;
-parameter CACHE_AXI_BURST_W = M00_AXI4_MID_BURST_W;
-parameter CACHE_AXI_RESP_W  = M00_AXI4_MID_RESP_W ;
-parameter CACHE_AXI_SIZE_W  = M00_AXI4_MID_SIZE_W ;
-
-parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID = 0; //AXI ID value
-
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // CACHE FLUSH GENERAL
 // --------------------------------------------------------------------------------------
-parameter SYSTEM_CACHE_NUM_WAYS      = 4                              ;
-parameter SYSTEM_CACHE_ADDR_WIDTH    = 63                             ;
-parameter SYSTEM_CACHE_DATA_WIDTH    = CACHE_BACKEND_NBYTES           ;
-parameter SYSTEM_CACHE_LINE_SIZE_LOG = $clog2(SYSTEM_CACHE_DATA_WIDTH);
-parameter SYSTEM_CACHE_SIZE           = 65536
-// parameter SYSTEM_CACHE_SIZE           = __SYSTEM_CACHE_SIZE_B__                                                                           ; // Define the total size of the cache
-	parameter SYSTEM_CACHE_NUM_SETS = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
-parameter SYSTEM_CACHE_SIZE_ITERAIONS = SYSTEM_CACHE_NUM_WAYS * SYSTEM_CACHE_NUM_SETS;
-parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM_WAYS;
+parameter SYSTEM_CACHE_NUM_WAYS       = CACHE_CONFIG_MAX_NUM_WAYS                                                          ;
+parameter SYSTEM_CACHE_DATA_WIDTH     = CACHE_BACKEND_NBYTES                                                               ;
+parameter SYSTEM_CACHE_LINE_SIZE_LOG  = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ;
+parameter SYSTEM_CACHE_SIZE           = CACHE_CONFIG_MAX_SIZE                                                              ;
+parameter SYSTEM_CACHE_NUM_SETS       = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
+parameter SYSTEM_CACHE_SIZE_ITERAIONS = SYSTEM_CACHE_NUM_WAYS * SYSTEM_CACHE_NUM_SETS                                      ;
+parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM_WAYS                                      ;
 
 // Optimized address calculation using shift operations
 // read char *addr = base_address + (((counter >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | (counter & (SYSTEM_CACHE_NUM_WAYS-1) << SYSTEM_CACHE_LINE_SIZE_LOG));
 // --------------------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// STREAM CACHE PARAMETERS
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-parameter STREAM_FRONTEND_ADDR_W = M00_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-parameter STREAM_FRONTEND_DATA_W = M00_AXI4_FE_DATA_W; //Data width - word size used for the cache
-parameter STREAM_N_WAYS          = 4                 ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-parameter STREAM_LINE_OFF_W      = 2                 ; //Line-Offset Width - 2**NLINE_W total cache lines
-parameter STREAM_WTBUF_DEPTH_W   = $clog2(32)        ; //Depth Width of Write-Through Buffer
-//Replacement policy (STREAM_N_WAYS > 1)
-parameter STREAM_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
-//Do NOT change - memory cache's parameters - dependency
-parameter STREAM_NWAY_W          = $clog2(STREAM_N_WAYS)         ; //Cache Ways Width
-parameter STREAM_FRONTEND_NBYTES = STREAM_FRONTEND_DATA_W/8      ; //Number of Bytes per Word
-parameter STREAM_FRONTEND_BYTE_W = $clog2(STREAM_FRONTEND_NBYTES); //Byte Offset
-/*---------------------------------------------------*/
-//Higher hierarchy memory (slave) interface parameters
-parameter STREAM_BACKEND_ADDR_W = M00_AXI4_MID_ADDR_W          ; //Address width of the higher hierarchy memory
-parameter STREAM_BACKEND_DATA_W = M00_AXI4_MID_DATA_W          ; //Data width of the memory
-parameter STREAM_BACKEND_NBYTES = STREAM_BACKEND_DATA_W/8      ; //Number of bytes
-parameter STREAM_BACKEND_BYTE_W = $clog2(STREAM_BACKEND_NBYTES); //Offset of Number of Bytes
-//Cache-Memory base Offset
-parameter STREAM_WORD_OFF_W = $clog2(STREAM_BACKEND_DATA_W/STREAM_FRONTEND_DATA_W); //Word-Offset Width - 2**OFFSET_W total STREAM_FRONTEND_DATA_W words per line - WARNING about LINE2MEM_DATA_RATIO_W (can cause word_counter [-1:0]
-/*---------------------------------------------------*/
-//Write Policy
-// parameter STREAM_WRITE_POL = CACHE_WRITE_BACK; //write policy: write-through (0), write-back (1)
-parameter STREAM_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (0), write-back (1)
-//Controller's options
-parameter STREAM_CTRL_STREAM = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
-parameter STREAM_CTRL_CNT    = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
 // --------------------------------------------------------------------------------------
 //   State Machine input sync
