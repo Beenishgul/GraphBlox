@@ -1,3 +1,4 @@
+
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -6,7 +7,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : cu_cache.sv
+// File   : m01_axi_cu_cache_mid512x64_fe512x64_wrapper.sv
 // Create : 2023-06-13 23:21:43
 // Revise : 2023-08-28 18:21:31
 // Editor : sublime text4, tab size (2)
@@ -14,7 +15,7 @@
 
 `include "global_package.vh"
 
-module cu_cache #(
+module m01_axi_cu_cache_mid512x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -29,10 +30,10 @@ module cu_cache #(
   output FIFOStateSignalsOutput                  fifo_response_signals_out,
   input  FIFOStateSignalsInput                   fifo_response_signals_in ,
   output logic                                   fifo_setup_signal        ,
-  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in            ,
-  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
-  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
-  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M01_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in            ,
+  output M01_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
+  input  M01_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
+  output M01_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
   output logic                                   done_out
 );
 
@@ -54,8 +55,8 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-M00_AXI4_MID_MasterReadInterface  m_axi_read ;
-M00_AXI4_MID_MasterWriteInterface m_axi_write;
+M01_AXI4_MID_MasterReadInterface  m_axi_read ;
+M01_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -199,27 +200,27 @@ assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
 iob_cache_axi #(
-  .FE_ADDR_W           (M00_AXI4_FE_ADDR_W                                 ),
-  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                              ),
-  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                               ),
-  .BE_DATA_W           (CACHE_BACKEND_DATA_W                               ),
+  .FE_ADDR_W           (M01_AXI4_FE_ADDR_W                            ),
+  .FE_DATA_W           (M01_AXI4_FE_DATA_W                            ),
+  .BE_ADDR_W           (M01_AXI4_MID_ADDR_W                           ),
+  .BE_DATA_W           (M01_AXI4_MID_DATA_W                           ),
   .NWAYS_W             (CACHE_N_WAYS                                       ),
   .NLINES_W            (CACHE_LINE_OFF_W                                   ),
-  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                                   ),
+  .WORD_OFFSET_W       ($clog2(M01_AXI4_MID_DATA_W/M01_AXI4_FE_DATA_W)     ),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
   .USE_CTRL            (CACHE_CTRL_CACHE                                   ),
   .USE_CTRL_CNT        (CACHE_CTRL_CACHE                                   ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                                     ),
-  .AXI_ID              (CACHE_AXI_ID                                       ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                                    ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                                   ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                                   ),
-  .CACHE_AXI_CACHE_MODE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  .AXI_ID_W            (M00_AXI4_MID_ID_W                                  ),
+  .AXI_ID              (0                                                  ),
+  .AXI_LEN_W           (M00_AXI4_MID_LEN_W                                 ),
+  .AXI_ADDR_W          (M01_AXI4_MID_ADDR_W                           ),
+  .AXI_DATA_W          (M01_AXI4_MID_DATA_W                           ),
+  .CACHE_AXI_CACHE_MODE(M01_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
   .iob_avalid_i(cache_request_mem.iob.valid                                                           ),
-  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
+  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M01_AXI4_FE_ADDR_W-1:$clog2(M01_AXI4_FE_DATA_W/8)]),
   .iob_wdata_i (cache_request_mem.iob.wdata                                                           ),
   .iob_wstrb_i (cache_request_mem.iob.wstrb                                                           ),
   .iob_rdata_o (cache_response_mem.iob.rdata                                                          ),
@@ -428,5 +429,5 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : cu_cache
-
+endmodule : m01_axi_cu_cache_mid512x64_fe32x64_wrapper
+  

@@ -30,23 +30,23 @@
 02_device/nohup.out
 02_device/ol/*/template.*.json
 02_device/ol/*/template.*.ol
-02_device/rtl/utils/include/global/config_parameters.vh
-02_device/rtl/utils/include/parameters/set_top_parameters.vh
-02_device/rtl/utils/include/parameters/testbench_parameters.vh
-02_device/rtl/utils/include/parameters/topology_parameters.vh
-02_device/rtl/utils/include/parameters/top_parameters.vh
-02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
-02_device/rtl/utils/include/portmaps/m_axi_portmap_top.vh
-02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
-02_device/rtl/utils/include/portmaps/m_axi_ports_top.vh
-02_device/rtl/utils/include/portmaps/m_axi_wires_top.vh
-02_device/rtl/utils/include/testbench
-02_device/rtl/utils/include/topology/bundle_arbitration.vh
-02_device/rtl/utils/include/topology/bundle_topology.vh
-02_device/rtl/utils/include/topology/afu_topology.vh
-02_device/rtl/utils/include/topology/cu_arbitration.vh
-02_device/rtl/utils/include/topology/lane_arbitration.vh
-02_device/rtl/utils/include/topology/lane_topology.vh
+# 02_device/rtl/utils/include/global/config_parameters.vh
+# 02_device/rtl/utils/include/parameters/set_top_parameters.vh
+# 02_device/rtl/utils/include/parameters/testbench_parameters.vh
+# 02_device/rtl/utils/include/parameters/topology_parameters.vh
+# 02_device/rtl/utils/include/parameters/top_parameters.vh
+# 02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
+# 02_device/rtl/utils/include/portmaps/m_axi_portmap_top.vh
+# 02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
+# 02_device/rtl/utils/include/portmaps/m_axi_ports_top.vh
+# 02_device/rtl/utils/include/portmaps/m_axi_wires_top.vh
+# 02_device/rtl/utils/include/testbench
+# 02_device/rtl/utils/include/topology/bundle_arbitration.vh
+# 02_device/rtl/utils/include/topology/bundle_topology.vh
+# 02_device/rtl/utils/include/topology/afu_topology.vh
+# 02_device/rtl/utils/include/topology/cu_arbitration.vh
+# 02_device/rtl/utils/include/topology/lane_arbitration.vh
+# 02_device/rtl/utils/include/topology/lane_topology.vh
 02_device/vivado.jou  
 02_device/vivado.log 
 02_device/vivado_pid*.str   

@@ -72,25 +72,9 @@ KernelDescriptor kernel_cu_descriptor_in;
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI Mutli channels support
 // --------------------------------------------------------------------------------------
-logic areset_axi_slice[NUM_CHANNELS-1:0];
-logic areset_cache    [NUM_CHANNELS-1:0];
-// --------------------------------------------------------------------------------------
-// AXI
-// --------------------------------------------------------------------------------------
-M00_AXI4_BE_MasterReadInterface  m_axi4_read [NUM_CHANNELS-1:0];
-M00_AXI4_BE_MasterWriteInterface m_axi4_write[NUM_CHANNELS-1:0];
-
-M00_AXI4_MID_SlaveReadInterfaceOutput  kernel_s_axi_read_out [NUM_CHANNELS-1:0];
-M00_AXI4_MID_SlaveReadInterfaceInput   kernel_s_axi_read_in  [NUM_CHANNELS-1:0];
-M00_AXI4_MID_SlaveWriteInterfaceOutput kernel_s_axi_write_out[NUM_CHANNELS-1:0];
-M00_AXI4_MID_SlaveWriteInterfaceInput  kernel_s_axi_write_in [NUM_CHANNELS-1:0];
-
-M00_AXI4_BE_MasterReadInterfaceInput   kernel_m_axi4_read_in  [NUM_CHANNELS-1:0];
-M00_AXI4_BE_MasterReadInterfaceOutput  kernel_m_axi4_read_out [NUM_CHANNELS-1:0];
-M00_AXI4_BE_MasterWriteInterfaceInput  kernel_m_axi4_write_in [NUM_CHANNELS-1:0];
-M00_AXI4_BE_MasterWriteInterfaceOutput kernel_m_axi4_write_out[NUM_CHANNELS-1:0];
-
-logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal;
+logic                    areset_axi_slice         [NUM_CHANNELS-1:0];
+logic                    areset_cache             [NUM_CHANNELS-1:0];
+logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal                  ;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
@@ -178,50 +162,7 @@ end
 // --------------------------------------------------------------------------------------
 // System Cache CH 0-> AXI
 // --------------------------------------------------------------------------------------
-generate
-  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_kernel_cache_l2
-// --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L2_CACHE[i] == 1) begin
-// --------------------------------------------------------------------------------------
-      kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper inst_kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper_cache_l2 (
-        .ap_clk            (ap_clk                      ),
-        .areset            (areset_cache[i]             ),
-        .s_axi_read_out    (kernel_s_axi_read_out[i]    ),
-        .s_axi_read_in     (kernel_s_axi_read_in[i]     ),
-        .s_axi_write_out   (kernel_s_axi_write_out[i]   ),
-        .s_axi_write_in    (kernel_s_axi_write_in[i]    ),
-        .m_axi_read_in     (kernel_m_axi4_read_in[i]    ),
-        .m_axi_read_out    (kernel_m_axi4_read_out[i]   ),
-        .m_axi_write_in    (kernel_m_axi4_write_in[i]   ),
-        .m_axi_write_out   (kernel_m_axi4_write_out[i]  ),
-        .cache_setup_signal(kernel_cache_setup_signal[i])
-      );
-// Kernel CACHE (M->S) Register Slice
-// --------------------------------------------------------------------------------------
-      m00_axi_register_slice_be_512x64_wrapper inst_m00_axi_register_slice_be_512x64_wrapper (
-        .ap_clk         (ap_clk                    ),
-        .areset         (areset_axi_slice[i]       ),
-        .s_axi_read_out (kernel_m_axi4_read_in[i]  ),
-        .s_axi_read_in  (kernel_m_axi4_read_out[i] ),
-        .s_axi_write_out(kernel_m_axi4_write_in[i] ),
-        .s_axi_write_in (kernel_m_axi4_write_out[i]),
-        .m_axi_read_in  (m_axi4_read[i].in         ),
-        .m_axi_read_out (m_axi4_read[i].out        ),
-        .m_axi_write_in (m_axi4_write[i].in        ),
-        .m_axi_write_out(m_axi4_write[i].out       )
-      );
-
-    end else begin
-      assign kernel_cache_setup_signal[i] = 0;
-      assign kernel_s_axi_read_out[i]     = m_axi4_read[i].in       ;
-      assign m_axi4_read[i].out           = kernel_s_axi_read_in[i] ;
-      assign kernel_s_axi_write_out[i]    = m_axi4_write[i].in      ;
-      assign m_axi4_write[i].out          = kernel_s_axi_write_in[i];
-    end
-  end
-// --------------------------------------------------------------------------------------
-endgenerate
-
+`include "afu_topology.vh"
 
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
@@ -236,10 +177,7 @@ kernel_cu #(
   .ap_clk           (ap_clk                     ),
   .areset           (areset_cu                  ),
   .descriptor_in    (kernel_cu_descriptor_in    ),
-  .m_axi_read_in    (kernel_s_axi_read_out      ),
-  .m_axi_read_out   (kernel_s_axi_read_in       ),
-  .m_axi_write_in   (kernel_s_axi_write_out     ),
-  .m_axi_write_out  (kernel_s_axi_write_in      ),
+  `include "m_axi_portmap_kernel_cu.vh"
   .fifo_setup_signal(kernel_cu_fifo_setup_signal),
   .done_out         (kernel_cu_done_out         )
 );
@@ -255,11 +193,6 @@ kernel_control inst_kernel_control (
   .descriptor_in (kernel_control_descriptor_in ),
   .descriptor_out(kernel_control_descriptor_out)
 );
-
-// --------------------------------------------------------------------------------------
-// Generate bundle MULTI channels generated
-// --------------------------------------------------------------------------------------
-`include "afu_topology.vh"
 
 endmodule : kernel_afu
 
