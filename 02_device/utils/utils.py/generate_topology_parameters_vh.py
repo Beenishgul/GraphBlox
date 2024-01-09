@@ -9,11 +9,11 @@ import json
 
 # Validate the number of arguments
 if len(sys.argv) != 14:
-    print("Usage: <script> <XILINX_VIVADO> <FULL_SRC_IP_DIR_GEN_VIP> <KERNEL_NAME> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
+    print("Usage: <script> <XILINX_VIVADO> <FULL_SRC_IP_DIR_GEN_VIP> <KERNEL_NAME> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <PAUSE_FILE_GENERATION> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
+_, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, PAUSE_FILE_GENERATION, INCLUDE_DIR = sys.argv
 
 
 # Construct the full path for the file
@@ -3998,6 +3998,9 @@ with open(output_file_kernel_cu_portmap, 'w') as file:
 
     file.write('\n'.join(output_lines))
 
+if int(PAUSE_FILE_GENERATION):
+    print("MSG: Pause cu cache/buffer module generation.")
+    sys.exit()  # Exits the script
 
 fill_cu_mxx_axi_cu_cache_wrapper="""
 // -----------------------------------------------------------------------------
