@@ -7,7 +7,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kenrel_m00_axi_system_cache_be512x64_mid512x64_wrapper.sv
+// File   : kenrel_m01_axi_system_cache_be512x64_mid512x64_wrapper.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-06-19 00:51:45
 // Editor : sublime text4, tab size (2)
@@ -15,18 +15,18 @@
 
 `include "global_package.vh"
 
-module kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper (
+module kernel_m01_axi_system_cache_be512x64_mid512x64_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
-  output M00_AXI4_MID_SlaveReadInterfaceOutput  s_axi_read_out    ,
-  input  M00_AXI4_MID_SlaveReadInterfaceInput   s_axi_read_in     ,
-  output M00_AXI4_MID_SlaveWriteInterfaceOutput s_axi_write_out   ,
-  input  M00_AXI4_MID_SlaveWriteInterfaceInput  s_axi_write_in    ,
-  input  M00_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
-  output M00_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
-  input  M00_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
-  output M00_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
+  output M01_AXI4_MID_SlaveReadInterfaceOutput  s_axi_read_out    ,
+  input  M01_AXI4_MID_SlaveReadInterfaceInput   s_axi_read_in     ,
+  output M01_AXI4_MID_SlaveWriteInterfaceOutput s_axi_write_out   ,
+  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s_axi_write_in    ,
+  input  M01_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
+  output M01_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
+  input  M01_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
+  output M01_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
   output logic                                  cache_setup_signal
 );
 
@@ -41,10 +41,10 @@ logic cache_setup_signal_int;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-M00_AXI4_BE_MasterReadInterface  m_axi_read ;
-M00_AXI4_BE_MasterWriteInterface m_axi_write;
-M00_AXI4_MID_SlaveReadInterface  s_axi_read ;
-M00_AXI4_MID_SlaveWriteInterface s_axi_write;
+M01_AXI4_BE_MasterReadInterface  m_axi_read ;
+M01_AXI4_BE_MasterWriteInterface m_axi_write;
+M01_AXI4_MID_SlaveReadInterface  s_axi_read ;
+M01_AXI4_MID_SlaveWriteInterface s_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -186,7 +186,7 @@ m00_axi_system_cache_be512x64_mid512x64 inst_m00_axi_system_cache_be512x64_mid51
   .M0_AXI_BREADY     (m_axi_write.out.bready      )  // Output Write response channel ready
 );
 
-endmodule : kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper
+endmodule : kernel_m01_axi_system_cache_be512x64_mid512x64_wrapper
 
 
   
