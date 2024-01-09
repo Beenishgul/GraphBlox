@@ -70,6 +70,7 @@ with open(config_file_path, "r") as file:
 mapping = config_data["mapping"]
 cycles  = config_data["cycles"]
 buffers = config_data["buffers"]
+channels = config_data["channels"]
 
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
@@ -445,6 +446,99 @@ def process_file_json(template_file_path, engine_template_filename, engine_name)
 
     engine_index_json += 1
 
+def get_buffer_index(buffers, value):
+    # Find the index of the value in the buffers dictionary
+    for key, val in buffers.items():
+        if val == value:
+            # Return the index as an integer (assuming the key format is "buffer_x")
+            return int(key.split('_')[1])
+    # Return None if the value is not found
+    return 1
+
+# Function to parse and construct the entries with compact comments
+def process_entries_json_v2(output_program_path_ol, source_program_path_json, channels, buffers):
+
+    CACHE_LINE_SIZE = 64
+    ENTRY_SIZE = 4  # Assuming 4 bytes per entry
+    entries_per_cache_line = CACHE_LINE_SIZE // ENTRY_SIZE
+    total_number_entries = 0
+
+    with open(source_program_path_json, 'r') as file:
+        # Load the JSON data from the file
+        parsed_data = json.load(file)
+
+    for engine_name, engine_data in parsed_data.items():
+
+        entries = engine_data["entries"]
+        # Print engine name and number of entries
+            
+        append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+        append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
+        append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+        lookup_tables = {**engine_data.get('type_memory_cmd', {}), **engine_data.get('type_ALU_operation', {}), **engine_data.get('type_filter_operation', {})}
+
+        for key in entries:
+            cache_line, offset = calculate_cache_info(total_number_entries, entries_per_cache_line)
+            total_number_entries += 1
+            entry = entries[key]
+            entry_value = 0
+            
+            bits_prev = 0
+            comment_details = []  # List to store details for the comment
+            
+            # Start from LSB to MSB
+            for param in entry:
+                bits = int(entry[param]["bits"])
+                value = entry[param]["value"]
+                original_value = value
+                original_flag = 0
+
+                # Replace symbolic values with their corresponding numeric values
+                if isinstance(value, str):
+                    original_flag = 1
+                    if param == "id_buffer":
+                        buffer_index = get_buffer_index(buffers, value)
+                        if buffer_index is not None:
+                            # Calculate the shift amount based on the buffer index
+                            value = 1 << (buffer_index-1)
+                    elif param == "id_channel" and value in channels:
+                        channel_index = int(channels[value][0])
+                        value = 1 << channel_index
+                    else:
+                        value = lookup_tables.get(value, value)
+                
+                # Convert to integer
+                if isinstance(value, str) and value.startswith("0x"):
+                    value = int(value, 16)
+                else:
+                    value = int(value)
+
+                # Shift and OR the value
+                value <<= bits_prev
+                entry_value |= value
+
+                # Calculate the bit range and format the value for the current parameter
+                bit_range = f"{bits_prev}:{bits_prev + bits - 1}"
+                if original_flag:
+                    formatted_value = original_value
+                else:
+                    formatted_value = f"0x{value >> bits_prev:0{bits//4}X}"  # Short hex value
+
+                if bits == 1 and isinstance(formatted_value, int):
+                    formatted_value = "True" if formatted_value == 1 else "False"
+
+                comment_details.append(f"{param}[{bit_range}]={formatted_value}")
+                bits_prev += bits
+
+            # Convert to hexadecimal format
+            entry_hex = f"0x{entry_value:08X}"
+            # Create the compact comment
+            comment = f" // {key:10} cacheline[{cache_line:3}][{offset:2}] <{bits_prev:2}b>: " + " || ".join(comment_details)
+            append_to_file(output_program_path_ol, f"{entry_hex}{comment}")
+    append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
+    append_to_file(output_program_path_ol, f"// -->  Load.{topology}  <-- ")
+    append_to_file(output_program_path_ol, f"// Number of entries {total_number_entries}")
+
 
 # Function to parse and construct the entries with compact comments
 def process_entries_json(output_program_path_ol, source_program_path_json):
@@ -463,7 +557,7 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
 
         entries = engine_data["entries"]
         # Print engine name and number of entries
-        
+            
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
         append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
@@ -474,10 +568,10 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
             total_number_entries += 1
             entry = entries[key]
             entry_value = 0
-
+            
             bits_prev = 0
             comment_details = []  # List to store details for the comment
-
+            
             # Start from LSB to MSB
             for param in entry:
                 bits = int(entry[param]["bits"])
@@ -551,5 +645,9 @@ with open(output_file_path_json, 'w') as f:
     json.dump(combined_engine_template_json, f, indent=4)
 
 process_entries_json(output_program_path_ol, source_program_path_json)
+# process_entries_json_v2(output_program_path_ol, source_program_path_json,channels, buffers)
 
 print(f"export NUM_ENTRIES={entry_index_vh}")
+
+
+
