@@ -1,3 +1,4 @@
+
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -6,7 +7,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   cu_buffer.sv
+// File   : m00_axi_cu_buffer_mid512x64_fe512x64_wrapper.sv
 // Create : 2023-06-13 23:21:43
 // Revise : 2023-08-28 18:21:31
 // Editor : sublime text4, tab size (2)
@@ -14,10 +15,10 @@
 
 `include "global_package.vh"
 
-module cu_buffer #(
-  parameter NUM_CHANNELS_READ = 1 ,
-  parameter FIFO_WRITE_DEPTH  = 32,
-  parameter PROG_THRESH       = 16
+module m00_axi_cu_buffer_mid512x64_fe32x64_wrapper #(
+  parameter NUM_CHANNELS_READ = 1,
+  parameter FIFO_WRITE_DEPTH  = 64,
+  parameter PROG_THRESH       = 32
 ) (
   // System Signals
   input  logic                                   ap_clk                   ,
@@ -432,8 +433,20 @@ assign write_transaction_offset_in = engine_m_axi_request_mem_reg.iob.addr;
 assign write_transaction_tdata_in  = engine_m_axi_request_mem_reg.iob.wdata;
 
 engine_m_axi #(
-  .C_NUM_CHANNELS(NUM_CHANNELS_READ                                  ),
-  .C_AXI_RW_CACHE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+    .C_NUM_CHANNELS(NUM_CHANNELS_READ                                  ),
+    .M_AXI4_MID_ADDR_W(M00_AXI4_MID_ADDR_W),
+    .M_AXI4_MID_BURST_W(M00_AXI4_MID_BURST_W),
+    .M_AXI4_MID_CACHE_W(M00_AXI4_MID_CACHE_W),
+    .M_AXI4_MID_DATA_W(M00_AXI4_MID_DATA_W),
+    .M_AXI4_MID_ID_W(M00_AXI4_MID_ID_W),
+    .M_AXI4_MID_LEN_W(M00_AXI4_MID_LEN_W),
+    .M_AXI4_MID_LOCK_W(M00_AXI4_MID_LOCK_W),
+    .M_AXI4_MID_PROT_W(M00_AXI4_MID_PROT_W),
+    .M_AXI4_MID_QOS_W(M00_AXI4_MID_QOS_W),
+    .M_AXI4_MID_REGION_W(M00_AXI4_MID_REGION_W),
+    .M_AXI4_MID_RESP_W(M00_AXI4_MID_RESP_W),
+    .M_AXI4_MID_SIZE_W(M00_AXI4_MID_SIZE_W),
+    .C_AXI_RW_CACHE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_engine_m_axi (
   .read_transaction_done_out   (read_transaction_done_out   ),
   .read_transaction_length_in  (read_transaction_length_in  ),
@@ -455,4 +468,6 @@ engine_m_axi #(
   .areset                      (areset_engine_m_axi         )
 );
 
-endmodule : cu_buffer
+
+endmodule : m00_axi_cu_buffer_mid512x64_fe32x64_wrapper
+  
