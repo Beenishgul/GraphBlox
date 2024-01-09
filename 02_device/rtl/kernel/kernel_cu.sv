@@ -111,7 +111,7 @@ logic [NUM_CHANNELS-1:0] cu_channel_fifo_setup_signal                          ;
 logic [NUM_CHANNELS-1:0] cu_channel_done_out                                   ;
 
 // --------------------------------------------------------------------------------------
-logic                                   areset_axi_slice    [NUM_CHANNELS-1:0];
+logic areset_axi_slice[NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Channel - Arbiter Signals: Channel Respnse Generator
@@ -368,7 +368,9 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+cu_bundles #(
+  `include"set_cu_parameters.vh"
+  ) inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
