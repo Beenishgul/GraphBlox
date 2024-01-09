@@ -4205,8 +4205,8 @@ iob_cache_axi #(
   .FE_DATA_W           (M{0:02d}_AXI4_FE_DATA_W                            ),
   .BE_ADDR_W           (M{0:02d}_AXI4_MID_ADDR_W                           ),
   .BE_DATA_W           (M{0:02d}_AXI4_MID_DATA_W                           ),
-  .NWAYS_W             (CACHE_N_WAYS                                       ),
-  .NLINES_W            (CACHE_LINE_OFF_W                                   ),
+  .NWAYS_W             ({6}                                       ),
+  .NLINES_W            ($clog2({5})                                   ),
   .WORD_OFFSET_W       ($clog2(M{0:02d}_AXI4_MID_DATA_W/M{0:02d}_AXI4_FE_DATA_W)     ),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
@@ -4438,6 +4438,6 @@ for index, channel in enumerate(DISTINCT_CHANNELS):
   output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
   check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
   with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
-    formatted_string = fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index])
+    formatted_string = fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index])
     file.write(formatted_string)
 

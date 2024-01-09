@@ -101,8 +101,6 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CF
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME} "sv"
-
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
