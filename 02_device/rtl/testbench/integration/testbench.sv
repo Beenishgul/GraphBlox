@@ -4,7 +4,7 @@
 `default_nettype none
 `timescale 1 ps / 1 ps
 import axi_vip_pkg::*;
-import slv_m00_axi_vip_pkg::*;
+`include "module_slv_m_axi_vip_import.vh"
 import control___KERNEL___vip_pkg::*;
 
 `include "global_package.vh"

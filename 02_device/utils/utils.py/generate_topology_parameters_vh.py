@@ -8,12 +8,12 @@ import json
 
 
 # Validate the number of arguments
-if len(sys.argv) != 10:
-    print("Usage: <script> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
+if len(sys.argv) != 14:
+    print("Usage: <script> <XILINX_VIVADO> <FULL_SRC_IP_DIR_GEN_VIP> <KERNEL_NAME> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <NUM_CHANNELS> <INCLUDE_DIR>")
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
+_, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
 
 # Construct the full path for the file
 config_filename = f"topology.json"
@@ -25,6 +25,7 @@ output_folder_path_topology    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, IN
 output_folder_path_global      = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
 output_folder_path_parameters  = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
 output_folder_path_portmaps    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
+output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
 
 if not os.path.exists(output_folder_path_topology):
     os.makedirs(output_folder_path_topology)
@@ -38,11 +39,19 @@ if not os.path.exists(output_folder_path_parameters):
 if not os.path.exists(output_folder_path_portmaps):
     os.makedirs(output_folder_path_portmaps)
 
+if not os.path.exists(FULL_SRC_IP_DIR_UTILS):
+    os.makedirs(FULL_SRC_IP_DIR_UTILS)
+
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
 
 if not os.path.exists(output_folder_path_testbench):
     os.makedirs(output_folder_path_testbench)
+
+
+output_file_filelist_xsim_ip_vhdl_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.vhdl.f")
+output_file_filelist_xsim_ip_sv_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.sv.f")
+output_file_filelist_xsim_ip_v_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.v.f")
 
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
@@ -60,6 +69,7 @@ output_file_path_topology = os.path.join(output_folder_path_parameters,"topology
 output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
 output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
 output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
+output_file_slv_m_axi_vip_import = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_import.vh")
 output_file_testbench_parameters = os.path.join(output_folder_path_parameters,"testbench_parameters.vh")
 output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
 output_file_top_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_top.vh")
@@ -726,7 +736,11 @@ check_and_clean_file(output_file_cu_arbitration)
 check_and_clean_file(output_file_bundle_arbitration)
 check_and_clean_file(output_file_lane_arbitration)
 check_and_clean_file(output_file_slv_m_axi_vip_inst)
+check_and_clean_file(output_file_slv_m_axi_vip_import)
 check_and_clean_file(output_file_slv_m_axi_vip_func)
+check_and_clean_file(output_file_filelist_xsim_ip_vhdl_f)
+check_and_clean_file(output_file_filelist_xsim_ip_sv_f)
+check_and_clean_file(output_file_filelist_xsim_ip_v_f)
 
 # Write to VHDL file
 with open(output_file_top_parameters, "w") as file:
@@ -1852,6 +1866,20 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
 
     file.write('\n'.join(output_lines))
 
+with open(output_file_slv_m_axi_vip_import, 'w') as file:
+    output_lines = []
+
+    module_template = """
+    // Slave MM VIP instantiation
+    import slv_m{0:02d}_axi_vip_pkg::*;
+        """
+
+    for channel in DISTINCT_CHANNELS:
+        output_lines.append(module_template.format(channel))
+
+    file.write('\n'.join(output_lines))
+
+
 def generate_output_file_buffer_channels_tcl(output_file_name):
   
     # Open output file for writing
@@ -1900,9 +1928,17 @@ with open(output_file_generate_m_axi_vip_tcl, "w") as file:
 
     fill_m_axi_vip_tcl_template="""
 # ----------------------------------------------------------------------------
+set BE_ADDR_WIDTH_M{0:02d}         {2}
+set BE_CACHE_DATA_WIDTH_M{0:02d}   {1}
+set LINE_CACHE_DATA_WIDTH_M{0:02d} {1} 
+set MID_ADDR_WIDTH_M{0:02d}        {4} 
+set MID_CACHE_DATA_WIDTH_M{0:02d}  {3} 
+set SYSTEM_CACHE_NUM_WAYS_M{0:02d} {6} 
+set SYSTEM_CACHE_SIZE_B_M{0:02d}   {5} 
+# ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI VIP Slave"]" 
+puts "[color 2 "                        Generate AXI_M{0:02d} VIP Slave"]" 
 
 set module_name slv_m{0:02d}_axi_vip
 create_ip -name axi_vip                 \\
@@ -1912,20 +1948,20 @@ create_ip -name axi_vip                 \\
           -module_name ${{module_name}}   >> $log_file
           
 set_property -dict [list \\
-                    CONFIG.INTERFACE_MODE {{SLAVE}}               \\
-                    CONFIG.PROTOCOL {{AXI4}}                      \\
-                    CONFIG.ADDR_WIDTH {{{1}}}                     \\
-                    CONFIG.DATA_WIDTH {{{2}}}                     \\
-                    CONFIG.SUPPORTS_NARROW {{0}}                  \\
-                    CONFIG.HAS_LOCK {{1}}                         \\
-                    CONFIG.HAS_CACHE {{1}}                        \\
-                    CONFIG.HAS_REGION {{0}}                       \\
-                    CONFIG.HAS_BURST {{1}}                        \\
-                    CONFIG.HAS_QOS {{1}}                          \\
-                    CONFIG.HAS_PROT {{1}}                         \\
-                    CONFIG.HAS_WSTRB {{1}}                        \\
-                    CONFIG.HAS_SIZE {{1}}                         \\
-                    CONFIG.ID_WIDTH   {{1}}                       \\
+                    CONFIG.INTERFACE_MODE {{SLAVE}}                     \\
+                    CONFIG.PROTOCOL {{AXI4}}                            \\
+                    CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}       \\
+                    CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}} \\
+                    CONFIG.SUPPORTS_NARROW {{0}}                        \\
+                    CONFIG.HAS_LOCK {{1}}                               \\
+                    CONFIG.HAS_CACHE {{1}}                              \\
+                    CONFIG.HAS_REGION {{0}}                             \\
+                    CONFIG.HAS_BURST {{1}}                              \\
+                    CONFIG.HAS_QOS {{1}}                                \\
+                    CONFIG.HAS_PROT {{1}}                               \\
+                    CONFIG.HAS_WSTRB {{1}}                              \\
+                    CONFIG.HAS_SIZE {{1}}                               \\
+                    CONFIG.ID_WIDTH   {{1}}                             \\
                     ] [get_ips ${{module_name}}]
 
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
@@ -1941,22 +1977,14 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE AXI_M{0:02d}
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
-# ----------------------------------------------------------------------------
-set BE_ADDR_WIDTH_M{0:02d}         {2}
-set BE_CACHE_DATA_WIDTH_M{0:02d}   {1}
-set LINE_CACHE_DATA_WIDTH_M{0:02d} {1} 
-set MID_ADDR_WIDTH_M{0:02d}        {4} 
-set MID_CACHE_DATA_WIDTH_M{0:02d}  {3} 
-set SYSTEM_CACHE_NUM_WAYS_M{0:02d} {6} 
-set SYSTEM_CACHE_SIZE_B_M{0:02d}   {5} 
 
 set SYSTEM_CACHE_SIZE_KB_M{0:02d} [expr {{${{SYSTEM_CACHE_SIZE_B}} / 1024}}]
-puts "[color 2 "                        Generate Kernel Cache: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
+puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
 puts "[color 2 "                                    Front-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
 puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
 
 
-set module_name m{0:02d}_axi_rsystem_cache_{1}x{2}_{3}x{4}
+set module_name m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}
 create_ip -name system_cache            \\
           -vendor xilinx.com            \\
           -library ip                   \\
@@ -2011,8 +2039,8 @@ create_ip -name axi_register_slice      \\
           -module_name ${{module_name}}   >> $log_file
           
 set_property -dict [list                                                      \\
-                      CONFIG.ADDR_WIDTH {{MID_ADDR_WIDTH_M{0:02d}}}           \\
-                      CONFIG.DATA_WIDTH {{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                      CONFIG.ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
+                      CONFIG.DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
                       CONFIG.ID_WIDTH {{1}}                   \\
                       CONFIG.READ_WRITE_MODE {{READ_WRITE}}   \\
                       CONFIG.REG_AR {{15}}                    \\
@@ -2045,8 +2073,8 @@ create_ip -name axi_register_slice      \\
           -module_name ${{module_name}}   >> $log_file
           
 set_property -dict [list                                                          \\
-                      CONFIG.ADDR_WIDTH {{BE_ADDR_WIDTH_M{0:02d}}}                \\
-                      CONFIG.DATA_WIDTH {{BE_CACHE_DATA_WIDTH_M{0:02d}}}          \\
+                      CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}                \\
+                      CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}          \\
                       CONFIG.ID_WIDTH {{1}}                                       \\
                       CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
                       CONFIG.REG_AR {{15}}                    \\
@@ -2072,8 +2100,69 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 
     file.write('\n'.join(output_lines))
 
+
+
+
+check_and_clean_file(output_file_filelist_xsim_ip_vhdl_f)
+check_and_clean_file(output_file_filelist_xsim_ip_sv_f)
+check_and_clean_file(output_file_filelist_xsim_ip_v_f)
+
 # ----------------------------------------------------------------------------
-# generate axi slave vip
+# generate axi vip project files
+# ----------------------------------------------------------------------------
+with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
+    output_lines = []
+
+    fill_filelist_xsim_ip_vhdl_template="""
+{5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/hdl/system_cache_v5_0_vh_rfs.vhd
+{5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}.vhd
+  """
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+
+    file.write('\n'.join(output_lines))
+
+
+with open(output_file_filelist_xsim_ip_sv_f, "w") as file:
+    output_lines = []
+
+    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip_pkg.sv")
+    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip.sv")
+    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv")
+
+    fill_file_filelist_xsim_ip_sv_template="""
+{5}/slv_m{0:02d}_axi_vip/sim/slv_m{0:02d}_axi_vip_pkg.sv
+{5}/slv_m{0:02d}_axi_vip/sim/slv_m{0:02d}_axi_vip.sv
+  """
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_file_filelist_xsim_ip_sv_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+
+    file.write('\n'.join(output_lines))
+
+
+with open(output_file_filelist_xsim_ip_v_f, "w") as file:
+    output_lines = []
+
+    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v")
+
+    fill_file_filelist_xsim_ip_v_template="""
+{5}/m{0:02d}_axi_register_slice_be_{1}x{2}/hdl/axi_register_slice_v2_1_vl_rfs.v
+{5}/m{0:02d}_axi_register_slice_be_{1}x{2}/sim/m{0:02d}_axi_register_slice_be_{1}x{2}.v
+{5}/m{0:02d}_axi_register_slice_mid_{3}x{4}/sim/m{0:02d}_axi_register_slice_mid_{3}x{4}.v
+   """
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+
+    output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
+    
+    file.write('\n'.join(output_lines))
+
+
+# ----------------------------------------------------------------------------
+# generate axi slave vip functions
 # ----------------------------------------------------------------------------
 # Write to VHDL file
 with open(output_file_slv_m_axi_vip_func, "w") as file:
@@ -2083,7 +2172,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Backdoor fill the input buffer AXI vip memory model with 32-bit words
         function void  m{0:02d}_axi_buffer_fill_memory(
-                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
+                input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
                 input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
                 input bit [M_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
                 input integer offset,                 // start index of data source
@@ -2105,7 +2194,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         endfunction
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the m00_axi memory.
+// Backdoor fill the m{0:02d}_axi memory.
         function void m{0:02d}_axi_fill_memory(
                 input bit [63:0] ptr,
                 input integer    length
