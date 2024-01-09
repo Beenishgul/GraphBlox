@@ -44,27 +44,39 @@
 `include "global_package.vh"
 
 module engine_m_axi #(
-  parameter C_NUM_CHANNELS = 1                                               ,
-  parameter C_AXI_RW_CACHE = M00_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES
+  parameter C_NUM_CHANNELS      = 1                                                 ,
+  parameter M_AXI4_MID_ADDR_W   = M00_AXI4_MID_ADDR_W                               ,
+  parameter M_AXI4_MID_BURST_W  = M00_AXI4_MID_BURST_W                              ,
+  parameter M_AXI4_MID_CACHE_W  = M00_AXI4_MID_CACHE_W                              ,
+  parameter M_AXI4_MID_DATA_W   = M00_AXI4_MID_DATA_W                               ,
+  parameter M_AXI4_MID_ID_W     = M00_AXI4_MID_ID_W                                 ,
+  parameter M_AXI4_MID_LEN_W    = M00_AXI4_MID_LEN_W                                ,
+  parameter M_AXI4_MID_LOCK_W   = M00_AXI4_MID_LOCK_W                               ,
+  parameter M_AXI4_MID_PROT_W   = M00_AXI4_MID_PROT_W                               ,
+  parameter M_AXI4_MID_QOS_W    = M00_AXI4_MID_QOS_W                                ,
+  parameter M_AXI4_MID_REGION_W = M00_AXI4_MID_REGION_W                             ,
+  parameter M_AXI4_MID_RESP_W   = M00_AXI4_MID_RESP_W                               ,
+  parameter M_AXI4_MID_SIZE_W   = M00_AXI4_MID_SIZE_W                               ,
+  parameter C_AXI_RW_CACHE      = M00_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES
 ) (
   // System signals
   input  logic                                                  ap_clk                      ,
   input  logic                                                  areset                      ,
   // Transactions READ
   input  logic                                                  read_transaction_start_in   ,
-  input  logic [  M00_AXI4_MID_DATA_W-1:0]                        read_transaction_length_in  ,
-  input  logic [     C_NUM_CHANNELS-1:0][M00_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in  ,
+  input  logic [  M_AXI4_MID_DATA_W-1:0]                        read_transaction_length_in  ,
+  input  logic [     C_NUM_CHANNELS-1:0][M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in  ,
   output logic                                                  read_transaction_done_out   ,
   input  logic [     C_NUM_CHANNELS-1:0]                        read_transaction_tready_in  ,
   output logic [     C_NUM_CHANNELS-1:0]                        read_transaction_tvalid_out ,
-  output logic [     C_NUM_CHANNELS-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out  ,
+  output logic [     C_NUM_CHANNELS-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out  ,
   output logic [     C_NUM_CHANNELS-1:0]                        read_transaction_prog_full  ,
   // Transactions WRITE
   input  logic                                                  write_transaction_start_in  ,
   input  logic                                                  write_transaction_tvalid_in ,
-  input  logic [  M00_AXI4_MID_DATA_W-1:0]                        write_transaction_length_in ,
-  input  logic [  M00_AXI4_MID_ADDR_W-1:0]                        write_transaction_offset_in ,
-  input  logic [  M00_AXI4_MID_DATA_W-1:0]                        write_transaction_tdata_in  ,
+  input  logic [  M_AXI4_MID_DATA_W-1:0]                        write_transaction_length_in ,
+  input  logic [  M_AXI4_MID_ADDR_W-1:0]                        write_transaction_offset_in ,
+  input  logic [  M_AXI4_MID_DATA_W-1:0]                        write_transaction_tdata_in  ,
   output logic                                                  write_transaction_done_out  ,
   output logic                                                  write_transaction_tready_out,
   // AXI4 master interface WRITE
@@ -73,47 +85,47 @@ module engine_m_axi #(
   output logic                                                  axi_awvalid                 ,
   output logic                                                  axi_wlast                   ,
   output logic                                                  axi_wvalid                  ,
-  output logic [    M00_AXI4_MID_ID_W-1:0]                        axi_awid                    ,
-  output logic [   M00_AXI4_MID_LEN_W-1:0]                        axi_awlen                   ,
-  output logic [   M00_AXI4_MID_QOS_W-1:0]                        axi_awqos                   ,
-  output logic [  M00_AXI4_MID_ADDR_W-1:0]                        axi_awaddr                  ,
-  output logic [  M00_AXI4_MID_DATA_W-1:0]                        axi_wdata                   ,
-  output logic [  M00_AXI4_MID_LOCK_W-1:0]                        axi_awlock                  ,
-  output logic [  M00_AXI4_MID_PROT_W-1:0]                        axi_awprot                  ,
-  output logic [  M00_AXI4_MID_SIZE_W-1:0]                        axi_awsize                  ,
-  output logic [ M00_AXI4_MID_BURST_W-1:0]                        axi_awburst                 ,
-  output logic [ M00_AXI4_MID_CACHE_W-1:0]                        axi_awcache                 ,
-  output logic [M00_AXI4_MID_DATA_W/8-1:0]                        axi_wstrb                   ,
-  output logic [M00_AXI4_MID_REGION_W-1:0]                        axi_awregion                ,
+  output logic [    M_AXI4_MID_ID_W-1:0]                        axi_awid                    ,
+  output logic [   M_AXI4_MID_LEN_W-1:0]                        axi_awlen                   ,
+  output logic [   M_AXI4_MID_QOS_W-1:0]                        axi_awqos                   ,
+  output logic [  M_AXI4_MID_ADDR_W-1:0]                        axi_awaddr                  ,
+  output logic [  M_AXI4_MID_DATA_W-1:0]                        axi_wdata                   ,
+  output logic [  M_AXI4_MID_LOCK_W-1:0]                        axi_awlock                  ,
+  output logic [  M_AXI4_MID_PROT_W-1:0]                        axi_awprot                  ,
+  output logic [  M_AXI4_MID_SIZE_W-1:0]                        axi_awsize                  ,
+  output logic [ M_AXI4_MID_BURST_W-1:0]                        axi_awburst                 ,
+  output logic [ M_AXI4_MID_CACHE_W-1:0]                        axi_awcache                 ,
+  output logic [M_AXI4_MID_DATA_W/8-1:0]                        axi_wstrb                   ,
+  output logic [M_AXI4_MID_REGION_W-1:0]                        axi_awregion                ,
   // AXI4 master interface READ
   input  logic                                                  axi_arready                 ,
   input  logic                                                  axi_rlast                   ,
   input  logic                                                  axi_rvalid                  ,
-  input  logic [    M00_AXI4_MID_ID_W-1:0]                        axi_rid                     ,
-  input  logic [  M00_AXI4_MID_DATA_W-1:0]                        axi_rdata                   ,
-  input  logic [  M00_AXI4_MID_RESP_W-1:0]                        axi_rresp                   ,
+  input  logic [    M_AXI4_MID_ID_W-1:0]                        axi_rid                     ,
+  input  logic [  M_AXI4_MID_DATA_W-1:0]                        axi_rdata                   ,
+  input  logic [  M_AXI4_MID_RESP_W-1:0]                        axi_rresp                   ,
   output logic                                                  axi_arvalid                 ,
   output logic                                                  axi_rready                  ,
-  output logic [    M00_AXI4_MID_ID_W-1:0]                        axi_arid                    ,
-  output logic [   M00_AXI4_MID_LEN_W-1:0]                        axi_arlen                   ,
-  output logic [   M00_AXI4_MID_QOS_W-1:0]                        axi_arqos                   ,
-  output logic [  M00_AXI4_MID_ADDR_W-1:0]                        axi_araddr                  ,
-  output logic [  M00_AXI4_MID_LOCK_W-1:0]                        axi_arlock                  ,
-  output logic [  M00_AXI4_MID_PROT_W-1:0]                        axi_arprot                  ,
-  output logic [  M00_AXI4_MID_SIZE_W-1:0]                        axi_arsize                  ,
-  output logic [ M00_AXI4_MID_BURST_W-1:0]                        axi_arburst                 ,
-  output logic [ M00_AXI4_MID_CACHE_W-1:0]                        axi_arcache                 ,
-  output logic [M00_AXI4_MID_REGION_W-1:0]                        axi_arregion                ,
+  output logic [    M_AXI4_MID_ID_W-1:0]                        axi_arid                    ,
+  output logic [   M_AXI4_MID_LEN_W-1:0]                        axi_arlen                   ,
+  output logic [   M_AXI4_MID_QOS_W-1:0]                        axi_arqos                   ,
+  output logic [  M_AXI4_MID_ADDR_W-1:0]                        axi_araddr                  ,
+  output logic [  M_AXI4_MID_LOCK_W-1:0]                        axi_arlock                  ,
+  output logic [  M_AXI4_MID_PROT_W-1:0]                        axi_arprot                  ,
+  output logic [  M_AXI4_MID_SIZE_W-1:0]                        axi_arsize                  ,
+  output logic [ M_AXI4_MID_BURST_W-1:0]                        axi_arburst                 ,
+  output logic [ M_AXI4_MID_CACHE_W-1:0]                        axi_arcache                 ,
+  output logic [M_AXI4_MID_REGION_W-1:0]                        axi_arregion                ,
   input  logic                                                  axi_bvalid                  ,
   output logic                                                  axi_bready                  ,
-  input  logic [  M00_AXI4_MID_RESP_W-1:0]                        axi_bresp                   ,
-  input  logic [    M00_AXI4_MID_ID_W-1:0]                        axi_bid
+  input  logic [  M_AXI4_MID_RESP_W-1:0]                        axi_bresp                   ,
+  input  logic [    M_AXI4_MID_ID_W-1:0]                        axi_bid
 );
 // --------------------------------------------------------------------------------------//
 // Local Parameters (constants)
 // --------------------------------------------------------------------------------------//
 localparam integer LP_NUM_READ_CHANNELS = 1                  ;
-localparam integer LP_DW_BYTES          = M00_AXI4_MID_DATA_W/8;
+localparam integer LP_DW_BYTES          = M_AXI4_MID_DATA_W/8;
 // localparam integer LP_AXI_BURST_LEN      = 4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
 localparam integer LP_AXI_BURST_LEN      = 16                      ;
 localparam integer LP_LOG_BURST_LEN      = $clog2(LP_AXI_BURST_LEN);
@@ -136,7 +148,7 @@ assign axi_arqos    = 4'b0000;
 assign axi_arregion = 4'b0000;
 assign axi_awburst  = 2'b00;
 assign axi_awcache  = C_AXI_RW_CACHE;
-assign axi_awid     = {M00_AXI4_MID_ID_W{1'b0}};
+assign axi_awid     = {M_AXI4_MID_ID_W{1'b0}};
 assign axi_awlock   = 2'b00;
 assign axi_awprot   = 3'b000;
 assign axi_awqos    = 4'b0000;
@@ -149,11 +161,11 @@ end
 
 // AXI4 Read Master
 engine_m_axi_read #(
-  .C_ADDR_WIDTH       (M00_AXI4_MID_ADDR_W    ),
-  .C_DATA_WIDTH       (M00_AXI4_MID_DATA_W    ),
-  .C_ID_WIDTH         (M00_AXI4_MID_ID_W      ),
+  .C_ADDR_WIDTH       (M_AXI4_MID_ADDR_W    ),
+  .C_DATA_WIDTH       (M_AXI4_MID_DATA_W    ),
+  .C_ID_WIDTH         (M_AXI4_MID_ID_W      ),
   .C_NUM_CHANNELS     (C_NUM_CHANNELS       ),
-  .C_LENGTH_WIDTH     (M00_AXI4_MID_DATA_W    ),
+  .C_LENGTH_WIDTH     (M_AXI4_MID_DATA_W    ),
   .C_BURST_LEN        (LP_AXI_BURST_LEN     ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN     ),
   .C_MAX_OUTSTANDING  (LP_RD_MAX_OUTSTANDING),
@@ -187,9 +199,9 @@ engine_m_axi_read #(
 
 // AXI4 Write Master
 engine_m_axi_write #(
-  .C_ADDR_WIDTH       (M00_AXI4_MID_ADDR_W),
-  .C_DATA_WIDTH       (M00_AXI4_MID_DATA_W),
-  .C_MAX_LENGTH_WIDTH (M00_AXI4_MID_DATA_W),
+  .C_ADDR_WIDTH       (M_AXI4_MID_ADDR_W),
+  .C_DATA_WIDTH       (M_AXI4_MID_DATA_W),
+  .C_MAX_LENGTH_WIDTH (M_AXI4_MID_DATA_W),
   .C_BURST_LEN        (LP_AXI_BURST_LEN ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN ),
   .C_INCLUDE_DATA_FIFO(1                )

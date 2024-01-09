@@ -52,7 +52,7 @@ generate
       );
     end else begin
 // CU BUFFER -> AXI Kernel Cache
-      m00_axi_cu_cache_mid512x64_fe32x64_wrapper inst_cu_buffer_l1 (
+      m00_axi_cu_buffer_mid512x64_fe32x64_wrapper inst_cu_buffer_l1 (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[0]                   ),
         .descriptor_in            (cu_channel_descriptor[0]               ),
@@ -142,7 +142,7 @@ generate
       );
     end else begin
 // CU BUFFER -> AXI Kernel Cache
-      m01_axi_cu_cache_mid512x64_fe32x64_wrapper inst_cu_buffer_l1 (
+      m01_axi_cu_buffer_mid512x64_fe32x64_wrapper inst_cu_buffer_l1 (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[1]                   ),
         .descriptor_in            (cu_channel_descriptor[1]               ),
