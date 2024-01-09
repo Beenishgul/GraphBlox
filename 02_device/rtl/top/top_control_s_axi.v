@@ -5,7 +5,7 @@
 // Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 //
 // ==============================================================
-`timescale 1ns/1ps
+`include "global_timescale.vh"
 module top_control_s_axi #(parameter
     C_S_AXI_ADDR_WIDTH = 8 ,
     C_S_AXI_DATA_WIDTH = 32

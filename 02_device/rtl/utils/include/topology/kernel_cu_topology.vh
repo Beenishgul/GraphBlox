@@ -72,7 +72,7 @@ generate
     end
 endgenerate
 // --------------------------------------------------------------------------------------
-// Generate CU CACHE CH 1:0 (M->S) Register Slice
+// Generate CU CACHE CH 0 (M->S) Register Slice
 // --------------------------------------------------------------------------------------
     m00_axi_register_slice_mid_512x64_wrapper inst_m00_axi_register_slice_mid_512x64_wrapper_ch (
       .ap_clk         (ap_clk                 ),
@@ -90,7 +90,7 @@ endgenerate
     
 
 // --------------------------------------------------------------------------------------
-// CU Cache -> AXI-CH 0
+// CU Cache -> AXI-CH 1
 // --------------------------------------------------------------------------------------
 
 
@@ -162,7 +162,7 @@ generate
     end
 endgenerate
 // --------------------------------------------------------------------------------------
-// Generate CU CACHE CH 1:0 (M->S) Register Slice
+// Generate CU CACHE CH 1 (M->S) Register Slice
 // --------------------------------------------------------------------------------------
     m01_axi_register_slice_mid_512x64_wrapper inst_m01_axi_register_slice_mid_512x64_wrapper_ch (
       .ap_clk         (ap_clk                 ),

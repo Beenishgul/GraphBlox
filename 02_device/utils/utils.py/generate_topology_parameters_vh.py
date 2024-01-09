@@ -539,6 +539,20 @@ CACHE_CONFIG_L2_SIZE = []
 
 CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS = generate_caches_properties_parameters(cache_properties)
 
+def find_max_value(list1, list2):
+    # Combine both lists while filtering out empty lists
+    combined_list = [x for x in list1 + list2 if x is not None]
+
+    # Check if the combined list is empty
+    if not combined_list:
+        return 0  # or return None, or raise an error, depending on your requirements
+
+    # Return the maximum value
+    return max(combined_list)
+
+CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS)
+CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE)
+
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
     pad_lane([pad_data([get_memory_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
@@ -800,6 +814,9 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_MODULES = 3;\n")
     file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS_TOP};\n")
     
+    file.write(f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS};\n")
+    file.write(f"parameter CACHE_CONFIG_MAX_SIZE = {CACHE_CONFIG_MAX_SIZE};\n\n")
+
     file.write(f"parameter NUM_CHANNELS_WIDTH_BITS = {NUM_CHANNELS_TOP};\n")
     file.write(f"parameter NUM_CUS_WIDTH_BITS      = {NUM_CUS};\n")
     file.write(f"parameter NUM_BUNDLES_WIDTH_BITS  = {NUM_BUNDLES};\n")
@@ -844,6 +861,9 @@ with open(output_file_path_topology, "w") as file:
     file.write(f"parameter NUM_BUNDLES_INDEX = {NUM_BUNDLES},\n")
     file.write(f"parameter NUM_LANES_INDEX   = {NUM_LANES},\n")
     file.write(f"parameter NUM_ENGINES_INDEX = {NUM_ENGINES},\n\n")
+
+    file.write(f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS},\n")
+    file.write(f"parameter CACHE_CONFIG_MAX_SIZE = {CACHE_CONFIG_MAX_SIZE},\n\n")
 
     # ... [The previous writing for the arrays here] ...
     file.write("// --------------------------------------------------------------------------------------\n")
@@ -1609,11 +1629,11 @@ assign m{0:02d}_axi_bready  = m{0:02d}_axi4_write.out.bready ; // Write response
 
     module_template = """
 // --------------------------------------------------------------------------------------
-// System Cache CH 0-> AXI
+// System Cache CH {5}-> AXI
 // --------------------------------------------------------------------------------------
 generate
 // --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L2_CACHE[{5}] == 1) begin
+    if(CHANNEL_CONFIG_L2_CACHE[{5}] == 0) begin
 // --------------------------------------------------------------------------------------
       kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper inst_kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),
@@ -3817,7 +3837,7 @@ m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mi
   .M0_AXI_RID        (m_axi_read.in.rid           ), // Input Read channel ID
   .M0_AXI_RRESP      (m_axi_read.in.rresp         ), // Input Read channel response
   .M0_AXI_ARVALID    (m_axi_read.out.arvalid      ), // Output Read Address read channel valid
-  .M0_AXI_ARADDR     (m_axi_read.out.araddr[62:0] ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     ({{1'b0, m_axi_read.out.araddr[62:0]}} ), // Output Read Address read channel address
   .M0_AXI_ARLEN      (m_axi_read.out.arlen        ), // Output Read Address channel burst length
   .M0_AXI_RREADY     (m_axi_read.out.rready       ), // Output Read Read channel ready
   .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
@@ -3834,7 +3854,7 @@ m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mi
   .M0_AXI_BVALID     (m_axi_write.in.bvalid       ), // Input Write response channel valid
   .M0_AXI_AWVALID    (m_axi_write.out.awvalid     ), // Output Write Address write channel valid
   .M0_AXI_AWID       (m_axi_write.out.awid        ), // Output Write Address write channel ID
-  .M0_AXI_AWADDR     (m_axi_write.out.awaddr[62:0]), // Output Write Address write channel address
+  .M0_AXI_AWADDR     ({{1'b0, m_axi_write.out.awaddr[62:0]}}), // Output Write Address write channel address
   .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
   .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
   .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
@@ -3873,7 +3893,7 @@ with open(output_file_kernel_cu_topology, 'w') as file:
 
     output_file_kernel_cu_topology_template = """
 // --------------------------------------------------------------------------------------
-// CU Cache -> AXI-CH 0
+// CU Cache -> AXI-CH {1}
 // --------------------------------------------------------------------------------------
 
 
@@ -3945,7 +3965,7 @@ generate
     end
 endgenerate
 // --------------------------------------------------------------------------------------
-// Generate CU CACHE CH 1:0 (M->S) Register Slice
+// Generate CU CACHE CH {1} (M->S) Register Slice
 // --------------------------------------------------------------------------------------
     m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper inst_m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper_ch (
       .ap_clk         (ap_clk                 ),
@@ -3999,7 +4019,7 @@ with open(output_file_kernel_cu_portmap, 'w') as file:
     file.write('\n'.join(output_lines))
 
 if int(PAUSE_FILE_GENERATION):
-    print("MSG: Pause cu cache/buffer module generation.")
+    print("MSG: Pause CU cache/buffer module generation.")
     sys.exit()  # Exits the script
 
 fill_cu_mxx_axi_cu_cache_wrapper="""

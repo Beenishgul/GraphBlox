@@ -97,10 +97,10 @@ else
     cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
 
-# The file to be modified
-FILE_PKG_CACHE_NAME="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv"
-# Use sed to comment out the specific line and then add the new line below it
-sed -i "/SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/s/^/\/\/ /; /SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/a parameter SYSTEM_CACHE_SIZE           = ${SYSTEM_CACHE_SIZE_B} ;" ${FILE_PKG_CACHE_NAME}
+# # The file to be modified
+# FILE_PKG_CACHE_NAME="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv"
+# # Use sed to comment out the specific line and then add the new line below it
+# sed -i "/SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/s/^/\/\/ /; /SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/a parameter SYSTEM_CACHE_SIZE           = ${SYSTEM_CACHE_SIZE_B} ;" ${FILE_PKG_CACHE_NAME}
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
 if [[ "$TESTBENCH_MODULE" == "integration" ]]

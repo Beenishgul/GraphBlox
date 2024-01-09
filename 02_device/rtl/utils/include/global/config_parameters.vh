@@ -4,6 +4,9 @@ parameter NUM_LANES   = 4;
 parameter NUM_ENGINES = 3;
 parameter NUM_MODULES = 3;
 parameter NUM_CHANNELS           = 2;
+parameter CACHE_CONFIG_MAX_NUM_WAYS   = 4;
+parameter CACHE_CONFIG_MAX_SIZE = 32768;
+
 parameter NUM_CHANNELS_WIDTH_BITS = 2;
 parameter NUM_CUS_WIDTH_BITS      = 1;
 parameter NUM_BUNDLES_WIDTH_BITS  = 4;
