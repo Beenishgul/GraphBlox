@@ -15,6 +15,8 @@ if len(sys.argv) != 14:
 # Assuming the script name is the first argument, and the directories follow after.
 _, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, NUM_CHANNELS, INCLUDE_DIR = sys.argv
 
+
+PKG_DIR = f"pkg"
 # Construct the full path for the file
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
@@ -25,6 +27,7 @@ output_folder_path_topology    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, IN
 output_folder_path_global      = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
 output_folder_path_parameters  = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
 output_folder_path_portmaps    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
+output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, PKG_DIR)
 output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
 
 if not os.path.exists(output_folder_path_topology):
@@ -39,6 +42,9 @@ if not os.path.exists(output_folder_path_parameters):
 if not os.path.exists(output_folder_path_portmaps):
     os.makedirs(output_folder_path_portmaps)
 
+if not os.path.exists(output_folder_path_pkgs):
+    os.makedirs(output_folder_path_pkgs)
+
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS):
     os.makedirs(FULL_SRC_IP_DIR_UTILS)
 
@@ -52,6 +58,10 @@ if not os.path.exists(output_folder_path_testbench):
 output_file_filelist_xsim_ip_vhdl_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.vhdl.f")
 output_file_filelist_xsim_ip_sv_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.sv.f")
 output_file_filelist_xsim_ip_v_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.v.f")
+
+output_file_pkg_mxx_axi4_fe  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_fe.sv")
+output_file_pkg_mxx_axi4_mid = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_mid.sv")
+output_file_pkg_mxx_axi4_be  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_be.sv")
 
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
@@ -741,6 +751,9 @@ check_and_clean_file(output_file_slv_m_axi_vip_func)
 check_and_clean_file(output_file_filelist_xsim_ip_vhdl_f)
 check_and_clean_file(output_file_filelist_xsim_ip_sv_f)
 check_and_clean_file(output_file_filelist_xsim_ip_v_f)
+check_and_clean_file(output_file_pkg_mxx_axi4_fe)
+check_and_clean_file(output_file_pkg_mxx_axi4_mid)
+check_and_clean_file(output_file_pkg_mxx_axi4_be)
 
 # Write to VHDL file
 with open(output_file_top_parameters, "w") as file:
@@ -776,6 +789,10 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_ENGINES_WIDTH_BITS  = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES_WIDTH_BITS  = 3;\n")
     file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n")
+
+    for buffer_name, properties in channels.items():
+        uppercase_buffer_name = buffer_name.upper()
+        file.write(f"parameter {uppercase_buffer_name}_WIDTH_BITS = {properties[1]};\n")
     
 # Write to VHDL file
 with open(output_file_path_topology, "w") as file:
@@ -1511,7 +1528,7 @@ with open(output_file_afu_topology, 'w') as file:
         output_lines.append(f"assign m_axi4_read[{channel}].in.rvalid  = m{channel_dist:02d}_axi_rvalid ; // Read channel valid")
         output_lines.append(f"assign m_axi4_read[{channel}].in.arready = m{channel_dist:02d}_axi_arready; // Address read channel ready")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rlast   = m{channel_dist:02d}_axi_rlast  ; // Read channel last word")
-        output_lines.append(f"assign m_axi4_read[{channel}].in.rdata   = swap_endianness_cacheline_axi_be(m{channel_dist:02d}_axi_rdata, endian_read_reg)  ; // Read channel data")
+        output_lines.append(f"assign m_axi4_read[{channel}].in.rdata   = swap_endianness_cacheline_m{channel_dist:02d}_axi_be(m{channel_dist:02d}_axi_rdata, endian_read_reg)  ; // Read channel data")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rid     = m{channel_dist:02d}_axi_rid    ; // Read channel ID")
         output_lines.append(f"assign m_axi4_read[{channel}].in.rresp   = m{channel_dist:02d}_axi_rresp  ; // Read channel response")
         output_lines.append("")
@@ -1552,7 +1569,7 @@ with open(output_file_afu_topology, 'w') as file:
         output_lines.append(f"assign m{channel_dist:02d}_axi_awcache = m_axi4_write[{channel}].out.awcache; // Address write channel memory type")
         output_lines.append(f"assign m{channel_dist:02d}_axi_awprot  = m_axi4_write[{channel}].out.awprot ; // Address write channel protection type")
         output_lines.append(f"assign m{channel_dist:02d}_axi_awqos   = m_axi4_write[{channel}].out.awqos  ; // Address write channel quality of service")
-        output_lines.append(f"assign m{channel_dist:02d}_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write[{channel}].out.wdata, endian_write_reg); // Write channel data")
+        output_lines.append(f"assign m{channel_dist:02d}_axi_wdata   = swap_endianness_cacheline_m{channel_dist:02d}_axi_be(m_axi4_write[{channel}].out.wdata, endian_write_reg); // Write channel data")
         output_lines.append(f"assign m{channel_dist:02d}_axi_wstrb   = m_axi4_write[{channel}].out.wstrb  ; // Write channel write strobe")
         output_lines.append(f"assign m{channel_dist:02d}_axi_wlast   = m_axi4_write[{channel}].out.wlast  ; // Write channel last word flag")
         output_lines.append(f"assign m{channel_dist:02d}_axi_wvalid  = m_axi4_write[{channel}].out.wvalid ; // Write channel valid")
@@ -1570,43 +1587,43 @@ with open(output_file_afu_ports, 'w') as file:
     ports_template = """
 output logic                         m{0:02d}_axi_awvalid,
 input  logic                         m{0:02d}_axi_awready,
-output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
-output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_awlen  ,
+output logic [ M{0:02d}_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
+output logic [  M{0:02d}_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_awlen  ,
 output logic                         m{0:02d}_axi_wvalid ,
 input  logic                         m{0:02d}_axi_wready ,
-output logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_wdata  ,
-output logic [ M_AXI4_BE_STRB_W-1:0] m{0:02d}_axi_wstrb  ,
+output logic [ M{0:02d}_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_wdata  ,
+output logic [ M{0:02d}_AXI4_BE_STRB_W-1:0] m{0:02d}_axi_wstrb  ,
 output logic                         m{0:02d}_axi_wlast  ,
 input  logic                         m{0:02d}_axi_bvalid ,
 output logic                         m{0:02d}_axi_bready ,
 output logic                         m{0:02d}_axi_arvalid,
 input  logic                         m{0:02d}_axi_arready,
-output logic [ M_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_araddr ,
-output logic [  M_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_arlen  ,
+output logic [ M{0:02d}_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_araddr ,
+output logic [  M{0:02d}_AXI4_BE_LEN_W-1:0] m{0:02d}_axi_arlen  ,
 input  logic                         m{0:02d}_axi_rvalid ,
 output logic                         m{0:02d}_axi_rready ,
-input  logic [ M_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
+input  logic [ M{0:02d}_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
 input  logic                         m{0:02d}_axi_rlast  ,
 // Control Signals
 // AXI4 master interface m{0:02d}_axi missing ports
-input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
-input  logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_rid    ,
-input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_rresp  ,
-input  logic [ M_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_bresp  ,
-output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_awid   ,
-output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_awsize ,
-output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_awburst,
-output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_awlock ,
-output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_awcache,
-output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_awprot ,
-output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_awqos  ,
-output logic [   M_AXI4_BE_ID_W-1:0] m{0:02d}_axi_arid   ,
-output logic [ M_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_arsize ,
-output logic [M_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_arburst,
-output logic [ M_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_arlock ,
-output logic [M_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_arcache,
-output logic [ M_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
-output logic [  M_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
+input  logic [   M{0:02d}_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
+input  logic [   M{0:02d}_AXI4_BE_ID_W-1:0] m{0:02d}_axi_rid    ,
+input  logic [ M{0:02d}_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_rresp  ,
+input  logic [ M{0:02d}_AXI4_BE_RESP_W-1:0] m{0:02d}_axi_bresp  ,
+output logic [   M{0:02d}_AXI4_BE_ID_W-1:0] m{0:02d}_axi_awid   ,
+output logic [ M{0:02d}_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_awsize ,
+output logic [M{0:02d}_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_awburst,
+output logic [ M{0:02d}_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_awlock ,
+output logic [M{0:02d}_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_awcache,
+output logic [ M{0:02d}_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_awprot ,
+output logic [  M{0:02d}_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_awqos  ,
+output logic [   M{0:02d}_AXI4_BE_ID_W-1:0] m{0:02d}_axi_arid   ,
+output logic [ M{0:02d}_AXI4_BE_SIZE_W-1:0] m{0:02d}_axi_arsize ,
+output logic [M{0:02d}_AXI4_BE_BURST_W-1:0] m{0:02d}_axi_arburst,
+output logic [ M{0:02d}_AXI4_BE_LOCK_W-1:0] m{0:02d}_axi_arlock ,
+output logic [M{0:02d}_AXI4_BE_CACHE_W-1:0] m{0:02d}_axi_arcache,
+output logic [ M{0:02d}_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
+output logic [  M{0:02d}_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
     for channel in DISTINCT_CHANNELS:
@@ -2100,13 +2117,6 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 
     file.write('\n'.join(output_lines))
 
-
-
-
-check_and_clean_file(output_file_filelist_xsim_ip_vhdl_f)
-check_and_clean_file(output_file_filelist_xsim_ip_sv_f)
-check_and_clean_file(output_file_filelist_xsim_ip_v_f)
-
 # ----------------------------------------------------------------------------
 # generate axi vip project files
 # ----------------------------------------------------------------------------
@@ -2183,22 +2193,22 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         function void  m{0:02d}_axi_buffer_fill_memory(
                 input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
                 input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
-                input bit [M_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
+                input bit [M{0:02d}_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
                 input integer offset,                 // start index of data source
                 input integer words                   // number of words to fill
             );
             int index;
             // bit [(32/8)-1:0] wr_strb = 4'hf;
-            bit [M_AXI4_BE_DATA_W-1:0] temp;
+            bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
             int i;
             for (index = 0; index < words; index++) begin
                 // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
-                for (i = 0; i < (M_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    temp[i*8+7-:8] = words_data[offset+index][((M_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
+                for (i = 0; i < (M{0:02d}_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+                    temp[i*8+7-:8] = words_data[offset+index][((M{0:02d}_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
                     // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
                 end
                 // $display("After: %0d ->%0d ->%0h",index, i, temp);
-                mem.mem_model.backdoor_memory_write(ptr + index * (M_AXI4_BE_DATA_W/8), temp);
+                mem.mem_model.backdoor_memory_write(ptr + index * (M{0:02d}_AXI4_BE_DATA_W/8), temp);
             end
         endfunction
 
@@ -2405,10 +2415,800 @@ with open(output_file_testbench_parameters, "w") as file:
     ports_template = """
         parameter integer C_M{0:02d}_AXI_ADDR_WIDTH       = {2}           ;
         parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1}        ;
-        parameter integer C_M{0:02d}_AXI_ID_WIDTH         = M_AXI4_BE_ID_W          ;
+        parameter integer C_M{0:02d}_AXI_ID_WIDTH         = M{0:02d}_AXI4_BE_ID_W          ;
         """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
+
+    file.write('\n'.join(output_lines))
+
+
+
+
+
+check_and_clean_file(output_file_pkg_mxx_axi4_fe)
+check_and_clean_file(output_file_pkg_mxx_axi4_mid)
+check_and_clean_file(output_file_pkg_mxx_axi4_be)
+
+# ----------------------------------------------------------------------------
+# generate axi pkg axi project files
+# ----------------------------------------------------------------------------
+with open(output_file_pkg_mxx_axi4_be, "w") as file:
+    output_lines = []
+
+    fill_file_pkg_mxx_axi4_be_pre="""
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : PKG_MXX_AXI4_BE.sv
+// Create : 2022-11-28 16:08:34
+// Revise : 2022-11-28 16:08:34
+// Editor : sublime text4, tab size (2)
+// -----------------------------------------------------------------------------
+
+`include "global_timescale.vh"
+package PKG_MXX_AXI4_BE;
+
+parameter S_AXI_BE_ADDR_WIDTH_BITS = 12;
+parameter S_AXI_BE_DATA_WIDTH      = 32;
+
+  """
+
+    fill_file_pkg_mxx_axi4_be_mid="""
+parameter M{0:02d}_AXI4_BE_ADDR_W   = {2}                 ;
+parameter M{0:02d}_AXI4_BE_DATA_W   = {1}                 ;
+parameter M{0:02d}_AXI4_BE_STRB_W   = M{0:02d}_AXI4_BE_DATA_W / 8;
+parameter M{0:02d}_AXI4_BE_BURST_W  = 2                   ;
+parameter M{0:02d}_AXI4_BE_CACHE_W  = 4                   ;
+parameter M{0:02d}_AXI4_BE_PROT_W   = 3                   ;
+parameter M{0:02d}_AXI4_BE_REGION_W = 4                   ;
+parameter M{0:02d}_AXI4_BE_USER_W   = 4                   ;
+parameter M{0:02d}_AXI4_BE_LOCK_W   = 1                   ;
+parameter M{0:02d}_AXI4_BE_QOS_W    = 4                   ;
+parameter M{0:02d}_AXI4_BE_LEN_W    = 8                   ;
+parameter M{0:02d}_AXI4_BE_SIZE_W   = 3                   ;
+parameter M{0:02d}_AXI4_BE_RESP_W   = 2                   ;
+parameter M{0:02d}_AXI4_BE_ID_W     = 1                   ;
+
+typedef logic                          type_m{0:02d}_axi4_be_valid;
+typedef logic                          type_m{0:02d}_axi4_be_ready;
+typedef logic                          type_m{0:02d}_axi4_be_last;
+typedef logic [M{0:02d}_AXI4_BE_ADDR_W-1:0]   type_m{0:02d}_axi4_be_addr;
+typedef logic [M{0:02d}_AXI4_BE_DATA_W-1:0]   type_m{0:02d}_axi4_be_data;
+typedef logic [M{0:02d}_AXI4_BE_STRB_W-1:0]   type_m{0:02d}_axi4_be_strb;
+typedef logic [M{0:02d}_AXI4_BE_LEN_W-1:0]    type_m{0:02d}_axi4_be_len;
+typedef logic [M{0:02d}_AXI4_BE_LOCK_W-1:0]   type_m{0:02d}_axi4_be_lock;
+typedef logic [M{0:02d}_AXI4_BE_PROT_W-1:0]   type_m{0:02d}_axi4_be_prot;
+typedef logic [M{0:02d}_AXI4_BE_REGION_W-1:0] type_m{0:02d}_axi4_be_region;
+typedef logic [M{0:02d}_AXI4_BE_QOS_W-1:0]    type_m{0:02d}_axi4_be_qos;
+typedef logic [M{0:02d}_AXI4_BE_ID_W-1:0]     type_m{0:02d}_axi4_be_id;
+
+parameter M{0:02d}_AXI4_BE_BURST_FIXED = 2'b00;
+parameter M{0:02d}_AXI4_BE_BURST_INCR  = 2'b01;
+parameter M{0:02d}_AXI4_BE_BURST_WRAP  = 2'b10;
+parameter M{0:02d}_AXI4_BE_BURST_RSVD  = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_BE_BURST_W-1:0] type_m{0:02d}_axi4_be_burst;
+
+parameter M{0:02d}_AXI4_BE_RESP_OKAY   = 2'b00;
+parameter M{0:02d}_AXI4_BE_RESP_EXOKAY = 2'b01;
+parameter M{0:02d}_AXI4_BE_RESP_SLVERR = 2'b10;
+parameter M{0:02d}_AXI4_BE_RESP_DECERR = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_BE_RESP_W-1:0] type_m{0:02d}_axi4_be_resp;
+
+parameter M{0:02d}_AXI4_BE_SIZE_1B   = 3'b000;
+parameter M{0:02d}_AXI4_BE_SIZE_2B   = 3'b001;
+parameter M{0:02d}_AXI4_BE_SIZE_4B   = 3'b010;
+parameter M{0:02d}_AXI4_BE_SIZE_8B   = 3'b011;
+parameter M{0:02d}_AXI4_BE_SIZE_16B  = 3'b100;
+parameter M{0:02d}_AXI4_BE_SIZE_32B  = 3'b101;
+parameter M{0:02d}_AXI4_BE_SIZE_64B  = 3'b110;
+parameter M{0:02d}_AXI4_BE_SIZE_128B = 3'b111;
+
+typedef logic [M{0:02d}_AXI4_BE_SIZE_W-1:0] type_m{0:02d}_axi4_be_size;
+
+parameter M{0:02d}_AXI4_BE_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000;
+parameter M{0:02d}_AXI4_BE_CACHE_BUFFERABLE_ONLY                        = 4'B0001;
+parameter M{0:02d}_AXI4_BE_CACHE_NO_ALLOCATE                            = 4'B0010;
+parameter M{0:02d}_AXI4_BE_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_1                             = 4'B0100;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_2                             = 4'B0101;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_3                             = 4'B1000;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_4                             = 4'B1001;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_5                             = 4'B1100;
+parameter M{0:02d}_AXI4_BE_CACHE_RESERVED_6                             = 4'B1101;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110;
+parameter M{0:02d}_AXI4_BE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111;
+
+typedef logic [M{0:02d}_AXI4_BE_CACHE_W-1:0] type_m{0:02d}_axi4_be_cache;
+
+// --------------------------------------------------------------------------------------
+// AXI4 MASTER
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_be_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_be_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_be_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_be_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_be_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_BE_MasterReadInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_be_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_be_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_be_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_be_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_be_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_be_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_be_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_be_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_be_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_be_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_be_region arregion;
+}} M{0:02d}_AXI4_BE_MasterReadInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_BE_MasterReadInterfaceInput  in ;
+  M{0:02d}_AXI4_BE_MasterReadInterfaceOutput out;
+}} M{0:02d}_AXI4_BE_MasterReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_be_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_be_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_be_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_be_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_BE_MasterWriteInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_be_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_be_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_be_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_be_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_be_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_be_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_be_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_be_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_be_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_be_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_be_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_be_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_be_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_be_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_be_region awregion;
+}} M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_BE_MasterWriteInterface;
+
+// --------------------------------------------------------------------------------------
+// AXI4 Slave
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_be_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_be_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_be_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_be_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_be_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_BE_SlaveReadInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_be_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_be_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_be_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_be_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_be_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_be_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_be_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_be_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_be_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_be_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_be_region arregion;
+}} M{0:02d}_AXI4_BE_SlaveReadInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_BE_SlaveReadInterfaceInput  in ;
+  M{0:02d}_AXI4_BE_SlaveReadInterfaceOutput out;
+}} M{0:02d}_AXI4_BE_SlaveReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_be_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_be_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_be_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_be_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_BE_SlaveWriteInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_be_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_be_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_be_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_be_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_be_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_be_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_be_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_be_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_be_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_be_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_be_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_be_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_be_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_be_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_be_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_be_region awregion;
+}} M{0:02d}_AXI4_BE_SlaveWriteInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_BE_SlaveWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_BE_SlaveWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_BE_SlaveWriteInterface;
+
+
+function logic [M{0:02d}_AXI4_BE_DATA_W-1:0] swap_endianness_cacheline_m{0:02d}_axi_be (logic [M{0:02d}_AXI4_BE_DATA_W-1:0] in, logic mode);
+
+  logic [M{0:02d}_AXI4_BE_DATA_W-1:0] out;
+
+  integer i;
+
+  if(mode == 1) begin
+    for ( i = 0; i < M{0:02d}_AXI4_BE_STRB_W; i++) begin
+      out[i*8 +: 8] = in[((M{0:02d}_AXI4_BE_DATA_W-1)-(i*8)) -:8];
+    end
+  end else begin
+    out = in;
+  end
+
+  return out;
+endfunction : swap_endianness_cacheline_m{0:02d}_axi_be
+
+  """
+
+    fill_file_pkg_mxx_axi4_be_end="""
+endpackage
+  """
+
+    output_lines.append(fill_file_pkg_mxx_axi4_be_pre)
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_file_pkg_mxx_axi4_be_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
+    output_lines.append(fill_file_pkg_mxx_axi4_be_end)
+
+    file.write('\n'.join(output_lines))
+
+
+with open(output_file_pkg_mxx_axi4_mid, "w") as file:
+    output_lines = []
+
+    fill_file_pkg_mxx_axi4_mid_pre="""
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : PKG_MXX_AXI4_MID.sv
+// Create : 2022-11-28 16:08:34
+// Revise : 2022-11-28 16:08:34
+// Editor : sublime text4, tab size (2)
+// -----------------------------------------------------------------------------
+
+`include "global_timescale.vh"
+package PKG_MXX_AXI4_MID;
+
+parameter S_AXI_MID_ADDR_WIDTH_BITS = 12;
+parameter S_AXI_MID_DATA_WIDTH      = 32;
+
+  """
+
+    fill_file_pkg_mxx_axi4_mid_mid="""
+parameter M{0:02d}_AXI4_MID_ADDR_W   = {2}                 ;
+parameter M{0:02d}_AXI4_MID_DATA_W   = {1}                 ;
+parameter M{0:02d}_AXI4_MID_STRB_W   = M{0:02d}_AXI4_MID_DATA_W / 8;
+parameter M{0:02d}_AXI4_MID_BURST_W  = 2                   ;
+parameter M{0:02d}_AXI4_MID_CACHE_W  = 4                   ;
+parameter M{0:02d}_AXI4_MID_PROT_W   = 3                   ;
+parameter M{0:02d}_AXI4_MID_REGION_W = 4                   ;
+parameter M{0:02d}_AXI4_MID_USER_W   = 4                   ;
+parameter M{0:02d}_AXI4_MID_LOCK_W   = 1                   ;
+parameter M{0:02d}_AXI4_MID_QOS_W    = 4                   ;
+parameter M{0:02d}_AXI4_MID_LEN_W    = 8                   ;
+parameter M{0:02d}_AXI4_MID_SIZE_W   = 3                   ;
+parameter M{0:02d}_AXI4_MID_RESP_W   = 2                   ;
+parameter M{0:02d}_AXI4_MID_ID_W     = 1                   ;
+
+typedef logic                          type_m{0:02d}_axi4_mid_valid;
+typedef logic                          type_m{0:02d}_axi4_mid_ready;
+typedef logic                          type_m{0:02d}_axi4_mid_last;
+typedef logic [M{0:02d}_AXI4_MID_ADDR_W-1:0]   type_m{0:02d}_axi4_mid_addr;
+typedef logic [M{0:02d}_AXI4_MID_DATA_W-1:0]   type_m{0:02d}_axi4_mid_data;
+typedef logic [M{0:02d}_AXI4_MID_STRB_W-1:0]   type_m{0:02d}_axi4_mid_strb;
+typedef logic [M{0:02d}_AXI4_MID_LEN_W-1:0]    type_m{0:02d}_axi4_mid_len;
+typedef logic [M{0:02d}_AXI4_MID_LOCK_W-1:0]   type_m{0:02d}_axi4_mid_lock;
+typedef logic [M{0:02d}_AXI4_MID_PROT_W-1:0]   type_m{0:02d}_axi4_mid_prot;
+typedef logic [M{0:02d}_AXI4_MID_REGION_W-1:0] type_m{0:02d}_axi4_mid_region;
+typedef logic [M{0:02d}_AXI4_MID_QOS_W-1:0]    type_m{0:02d}_axi4_mid_qos;
+typedef logic [M{0:02d}_AXI4_MID_ID_W-1:0]     type_m{0:02d}_axi4_mid_id;
+
+parameter M{0:02d}_AXI4_MID_BURST_FIXED = 2'b00;
+parameter M{0:02d}_AXI4_MID_BURST_INCR  = 2'b01;
+parameter M{0:02d}_AXI4_MID_BURST_WRAP  = 2'b10;
+parameter M{0:02d}_AXI4_MID_BURST_RSVD  = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_MID_BURST_W-1:0] type_m{0:02d}_axi4_mid_burst;
+
+parameter M{0:02d}_AXI4_MID_RESP_OKAY   = 2'b00;
+parameter M{0:02d}_AXI4_MID_RESP_EXOKAY = 2'b01;
+parameter M{0:02d}_AXI4_MID_RESP_SLVERR = 2'b10;
+parameter M{0:02d}_AXI4_MID_RESP_DECERR = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_MID_RESP_W-1:0] type_m{0:02d}_axi4_mid_resp;
+
+parameter M{0:02d}_AXI4_MID_SIZE_1B   = 3'b000;
+parameter M{0:02d}_AXI4_MID_SIZE_2B   = 3'b001;
+parameter M{0:02d}_AXI4_MID_SIZE_4B   = 3'b010;
+parameter M{0:02d}_AXI4_MID_SIZE_8B   = 3'b011;
+parameter M{0:02d}_AXI4_MID_SIZE_16B  = 3'b100;
+parameter M{0:02d}_AXI4_MID_SIZE_32B  = 3'b101;
+parameter M{0:02d}_AXI4_MID_SIZE_64B  = 3'b110;
+parameter M{0:02d}_AXI4_MID_SIZE_128B = 3'b111;
+
+typedef logic [M{0:02d}_AXI4_MID_SIZE_W-1:0] type_m{0:02d}_axi4_mid_size;
+
+parameter M{0:02d}_AXI4_MID_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000;
+parameter M{0:02d}_AXI4_MID_CACHE_BUFFERABLE_ONLY                        = 4'B0001;
+parameter M{0:02d}_AXI4_MID_CACHE_NO_ALLOCATE                            = 4'B0010;
+parameter M{0:02d}_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_1                             = 4'B0100;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_2                             = 4'B0101;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_3                             = 4'B1000;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_4                             = 4'B1001;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_5                             = 4'B1100;
+parameter M{0:02d}_AXI4_MID_CACHE_RESERVED_6                             = 4'B1101;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110;
+parameter M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111;
+
+typedef logic [M{0:02d}_AXI4_MID_CACHE_W-1:0] type_m{0:02d}_axi4_mid_cache;
+
+// --------------------------------------------------------------------------------------
+// AXI4 MASTER
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_mid_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_mid_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_mid_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_mid_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_mid_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_MID_MasterReadInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_mid_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_mid_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_mid_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_mid_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_mid_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_mid_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_mid_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_mid_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_mid_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_mid_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_mid_region arregion;
+}} M{0:02d}_AXI4_MID_MasterReadInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_MID_MasterReadInterfaceInput  in ;
+  M{0:02d}_AXI4_MID_MasterReadInterfaceOutput out;
+}} M{0:02d}_AXI4_MID_MasterReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_mid_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_mid_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_mid_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_mid_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_MID_MasterWriteInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_mid_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_mid_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_mid_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_mid_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_mid_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_mid_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_mid_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_mid_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_mid_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_mid_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_mid_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_mid_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_mid_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_mid_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_mid_region awregion;
+}} M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_MID_MasterWriteInterface;
+
+// --------------------------------------------------------------------------------------
+// AXI4 Slave
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_mid_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_mid_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_mid_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_mid_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_mid_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_mid_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_mid_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_mid_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_mid_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_mid_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_mid_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_mid_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_mid_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_mid_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_mid_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_mid_region arregion;
+}} M{0:02d}_AXI4_MID_SlaveReadInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_MID_SlaveReadInterfaceInput  in ;
+  M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput out;
+}} M{0:02d}_AXI4_MID_SlaveReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_mid_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_mid_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_mid_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_mid_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_mid_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_mid_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_mid_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_mid_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_mid_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_mid_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_mid_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_mid_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_mid_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_mid_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_mid_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_mid_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_mid_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_mid_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_mid_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_mid_region awregion;
+}} M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_MID_SlaveWriteInterface;
+
+
+function logic [M{0:02d}_AXI4_MID_DATA_W-1:0] swap_endianness_cacheline_m{0:02d}_axi_mid (logic [M{0:02d}_AXI4_MID_DATA_W-1:0] in, logic mode);
+
+  logic [M{0:02d}_AXI4_MID_DATA_W-1:0] out;
+
+  integer i;
+
+  if(mode == 1) begin
+    for ( i = 0; i < M{0:02d}_AXI4_MID_STRB_W; i++) begin
+      out[i*8 +: 8] = in[((M{0:02d}_AXI4_MID_DATA_W-1)-(i*8)) -:8];
+    end
+  end else begin
+    out = in;
+  end
+
+  return out;
+endfunction : swap_endianness_cacheline_m{0:02d}_axi_mid
+
+  """
+
+    fill_file_pkg_mxx_axi4_mid_end="""
+endpackage
+  """
+
+    output_lines.append(fill_file_pkg_mxx_axi4_mid_pre)
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_file_pkg_mxx_axi4_mid_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
+    output_lines.append(fill_file_pkg_mxx_axi4_mid_end)
+
+    file.write('\n'.join(output_lines))
+
+
+with open(output_file_pkg_mxx_axi4_fe, "w") as file:
+    output_lines = []
+
+    fill_file_pkg_mxx_axi4_fe_pre="""
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2022 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : PKG_MXX_AXI4_FE.sv
+// Create : 2022-11-28 16:08:34
+// Revise : 2022-11-28 16:08:34
+// Editor : sublime text4, tab size (2)
+// -----------------------------------------------------------------------------
+
+`include "global_timescale.vh"
+package PKG_MXX_AXI4_FE;
+
+parameter S_AXI_FE_ADDR_WIDTH_BITS = 12;
+parameter S_AXI_FE_DATA_WIDTH      = 32;
+
+  """
+
+    fill_file_pkg_mxx_axi4_fe_mid="""
+parameter M{0:02d}_AXI4_FE_ADDR_W   = {2}                 ;
+parameter M{0:02d}_AXI4_FE_DATA_W   = {1}                 ;
+parameter M{0:02d}_AXI4_FE_STRB_W   = M{0:02d}_AXI4_FE_DATA_W / 8;
+parameter M{0:02d}_AXI4_FE_BURST_W  = 2                   ;
+parameter M{0:02d}_AXI4_FE_CACHE_W  = 4                   ;
+parameter M{0:02d}_AXI4_FE_PROT_W   = 3                   ;
+parameter M{0:02d}_AXI4_FE_REGION_W = 4                   ;
+parameter M{0:02d}_AXI4_FE_USER_W   = 4                   ;
+parameter M{0:02d}_AXI4_FE_LOCK_W   = 1                   ;
+parameter M{0:02d}_AXI4_FE_QOS_W    = 4                   ;
+parameter M{0:02d}_AXI4_FE_LEN_W    = 8                   ;
+parameter M{0:02d}_AXI4_FE_SIZE_W   = 3                   ;
+parameter M{0:02d}_AXI4_FE_RESP_W   = 2                   ;
+parameter M{0:02d}_AXI4_FE_ID_W     = 1                   ;
+
+typedef logic                          type_m{0:02d}_axi4_fe_valid;
+typedef logic                          type_m{0:02d}_axi4_fe_ready;
+typedef logic                          type_m{0:02d}_axi4_fe_last;
+typedef logic [M{0:02d}_AXI4_FE_ADDR_W-1:0]   type_m{0:02d}_axi4_fe_addr;
+typedef logic [M{0:02d}_AXI4_FE_DATA_W-1:0]   type_m{0:02d}_axi4_fe_data;
+typedef logic [M{0:02d}_AXI4_FE_STRB_W-1:0]   type_m{0:02d}_axi4_fe_strb;
+typedef logic [M{0:02d}_AXI4_FE_LEN_W-1:0]    type_m{0:02d}_axi4_fe_len;
+typedef logic [M{0:02d}_AXI4_FE_LOCK_W-1:0]   type_m{0:02d}_axi4_fe_lock;
+typedef logic [M{0:02d}_AXI4_FE_PROT_W-1:0]   type_m{0:02d}_axi4_fe_prot;
+typedef logic [M{0:02d}_AXI4_FE_REGION_W-1:0] type_m{0:02d}_axi4_fe_region;
+typedef logic [M{0:02d}_AXI4_FE_QOS_W-1:0]    type_m{0:02d}_axi4_fe_qos;
+typedef logic [M{0:02d}_AXI4_FE_ID_W-1:0]     type_m{0:02d}_axi4_fe_id;
+
+parameter M{0:02d}_AXI4_FE_BURST_FIXED = 2'b00;
+parameter M{0:02d}_AXI4_FE_BURST_INCR  = 2'b01;
+parameter M{0:02d}_AXI4_FE_BURST_WRAP  = 2'b10;
+parameter M{0:02d}_AXI4_FE_BURST_RSVD  = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_FE_BURST_W-1:0] type_m{0:02d}_axi4_fe_burst;
+
+parameter M{0:02d}_AXI4_FE_RESP_OKAY   = 2'b00;
+parameter M{0:02d}_AXI4_FE_RESP_EXOKAY = 2'b01;
+parameter M{0:02d}_AXI4_FE_RESP_SLVERR = 2'b10;
+parameter M{0:02d}_AXI4_FE_RESP_DECERR = 2'b11;
+
+typedef logic [M{0:02d}_AXI4_FE_RESP_W-1:0] type_m{0:02d}_axi4_fe_resp;
+
+parameter M{0:02d}_AXI4_FE_SIZE_1B   = 3'b000;
+parameter M{0:02d}_AXI4_FE_SIZE_2B   = 3'b001;
+parameter M{0:02d}_AXI4_FE_SIZE_4B   = 3'b010;
+parameter M{0:02d}_AXI4_FE_SIZE_8B   = 3'b011;
+parameter M{0:02d}_AXI4_FE_SIZE_16B  = 3'b100;
+parameter M{0:02d}_AXI4_FE_SIZE_32B  = 3'b101;
+parameter M{0:02d}_AXI4_FE_SIZE_64B  = 3'b110;
+parameter M{0:02d}_AXI4_FE_SIZE_128B = 3'b111;
+
+typedef logic [M{0:02d}_AXI4_FE_SIZE_W-1:0] type_m{0:02d}_axi4_fe_size;
+
+parameter M{0:02d}_AXI4_FE_CACHE_NONCACHEABLE_NONBUFFERABLE             = 4'B0000;
+parameter M{0:02d}_AXI4_FE_CACHE_BUFFERABLE_ONLY                        = 4'B0001;
+parameter M{0:02d}_AXI4_FE_CACHE_NO_ALLOCATE                            = 4'B0010;
+parameter M{0:02d}_AXI4_FE_CACHE_BUFFERABLE_NO_ALLOCATE                 = 4'B0011;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_1                             = 4'B0100;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_2                             = 4'B0101;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS        = 4'B0110;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_BACK_ALLOCATE_ON_READS           = 4'B0111;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_3                             = 4'B1000;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_4                             = 4'B1001;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_WRITES       = 4'B1010;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_BACK_ALLOCATE_ON_WRITES          = 4'B1011;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_5                             = 4'B1100;
+parameter M{0:02d}_AXI4_FE_CACHE_RESERVED_6                             = 4'B1101;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS_WRITES = 4'B1110;
+parameter M{0:02d}_AXI4_FE_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES       = 4'B1111;
+
+typedef logic [M{0:02d}_AXI4_FE_CACHE_W-1:0] type_m{0:02d}_axi4_fe_cache;
+
+// --------------------------------------------------------------------------------------
+// AXI4 MASTER
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_fe_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_fe_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_fe_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_fe_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_fe_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_FE_MasterReadInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_fe_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_fe_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_fe_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_fe_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_fe_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_fe_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_fe_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_fe_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_fe_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_fe_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_fe_region arregion;
+}} M{0:02d}_AXI4_FE_MasterReadInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_FE_MasterReadInterfaceInput  in ;
+  M{0:02d}_AXI4_FE_MasterReadInterfaceOutput out;
+}} M{0:02d}_AXI4_FE_MasterReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_fe_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_fe_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_fe_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_fe_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_FE_MasterWriteInterfaceInput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_fe_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_fe_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_fe_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_fe_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_fe_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_fe_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_fe_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_fe_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_fe_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_fe_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_fe_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_fe_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_fe_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_fe_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_fe_region awregion;
+}} M{0:02d}_AXI4_FE_MasterWriteInterfaceOutput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_FE_MasterWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_FE_MasterWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_FE_MasterWriteInterface;
+
+// --------------------------------------------------------------------------------------
+// AXI4 Slave
+// --------------------------------------------------------------------------------------
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid rvalid ; // Input Read channel valid
+  type_m{0:02d}_axi4_fe_last  arready; // Input Read Address read channel ready
+  type_m{0:02d}_axi4_fe_last  rlast  ; // Input Read channel last word
+  type_m{0:02d}_axi4_fe_data  rdata  ; // Input Read channel data
+  type_m{0:02d}_axi4_fe_id    rid    ; // Input Read channel ID
+  type_m{0:02d}_axi4_fe_resp  rresp  ; // Input Read channel response
+}} M{0:02d}_AXI4_FE_SlaveReadInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid  arvalid ; // Output Read Address read channel valid
+  type_m{0:02d}_axi4_fe_addr   araddr  ; // Output Read Address read channel address
+  type_m{0:02d}_axi4_fe_len    arlen   ; // Output Read Address channel burst length
+  type_m{0:02d}_axi4_fe_ready  rready  ; // Output Read Read channel ready
+  type_m{0:02d}_axi4_fe_id     arid    ; // Output Read Address read channel ID
+  type_m{0:02d}_axi4_fe_size   arsize  ; // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_fe_burst  arburst ; // Output Read Address read channel burst type
+  type_m{0:02d}_axi4_fe_lock   arlock  ; // Output Read Address read channel lock type
+  type_m{0:02d}_axi4_fe_cache  arcache ; // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_fe_prot   arprot  ; // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_fe_qos    arqos   ; // Output Read Address channel quality of service
+  type_m{0:02d}_axi4_fe_region arregion;
+}} M{0:02d}_AXI4_FE_SlaveReadInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_FE_SlaveReadInterfaceInput  in ;
+  M{0:02d}_AXI4_FE_SlaveReadInterfaceOutput out;
+}} M{0:02d}_AXI4_FE_SlaveReadInterface;
+
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_ready awready; // Input Write Address write channel ready
+  type_m{0:02d}_axi4_fe_ready wready ; // Input Write channel ready
+  type_m{0:02d}_axi4_fe_id    bid    ; // Input Write response channel ID
+  type_m{0:02d}_axi4_fe_resp  bresp  ; // Input Write channel response
+  type_m{0:02d}_axi4_fe_valid bvalid ; // Input Write response channel valid
+}} M{0:02d}_AXI4_FE_SlaveWriteInterfaceOutput;
+
+typedef struct packed {{
+  type_m{0:02d}_axi4_fe_valid  awvalid ; // Output Write Address write channel valid
+  type_m{0:02d}_axi4_fe_id     awid    ; // Output Write Address write channel ID
+  type_m{0:02d}_axi4_fe_addr   awaddr  ; // Output Write Address write channel address
+  type_m{0:02d}_axi4_fe_len    awlen   ; // Output Write Address write channel burst length
+  type_m{0:02d}_axi4_fe_size   awsize  ; // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  type_m{0:02d}_axi4_fe_burst  awburst ; // Output Write Address write channel burst type
+  type_m{0:02d}_axi4_fe_lock   awlock  ; // Output Write Address write channel lock type
+  type_m{0:02d}_axi4_fe_cache  awcache ; // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  type_m{0:02d}_axi4_fe_prot   awprot  ; // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  type_m{0:02d}_axi4_fe_qos    awqos   ; // Output Write Address write channel quality of service
+  type_m{0:02d}_axi4_fe_data   wdata   ; // Output Write channel data
+  type_m{0:02d}_axi4_fe_strb   wstrb   ; // Output Write channel write strobe
+  type_m{0:02d}_axi4_fe_last   wlast   ; // Output Write channel last word flag
+  type_m{0:02d}_axi4_fe_valid  wvalid  ; // Output Write channel valid
+  type_m{0:02d}_axi4_fe_ready  bready  ; // Output Write response channel ready
+  type_m{0:02d}_axi4_fe_region awregion;
+}} M{0:02d}_AXI4_FE_SlaveWriteInterfaceInput;
+
+typedef struct packed {{
+  M{0:02d}_AXI4_FE_SlaveWriteInterfaceInput  in ;
+  M{0:02d}_AXI4_FE_SlaveWriteInterfaceOutput out;
+}} M{0:02d}_AXI4_FE_SlaveWriteInterface;
+
+
+function logic [M{0:02d}_AXI4_FE_DATA_W-1:0] swap_endianness_cacheline_m{0:02d}_axi_fe (logic [M{0:02d}_AXI4_FE_DATA_W-1:0] in, logic mode);
+
+  logic [M{0:02d}_AXI4_FE_DATA_W-1:0] out;
+
+  integer i;
+
+  if(mode == 1) begin
+    for ( i = 0; i < M{0:02d}_AXI4_FE_STRB_W; i++) begin
+      out[i*8 +: 8] = in[((M{0:02d}_AXI4_FE_DATA_W-1)-(i*8)) -:8];
+    end
+  end else begin
+    out = in;
+  end
+
+  return out;
+endfunction : swap_endianness_cacheline_m{0:02d}_axi_fe
+
+  """
+
+    fill_file_pkg_mxx_axi4_fe_end="""
+endpackage
+  """
+
+    output_lines.append(fill_file_pkg_mxx_axi4_fe_pre)
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_file_pkg_mxx_axi4_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+    output_lines.append(fill_file_pkg_mxx_axi4_fe_end)
 
     file.write('\n'.join(output_lines))

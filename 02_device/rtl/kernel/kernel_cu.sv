@@ -20,10 +20,10 @@ module kernel_cu #(
   input  logic                             ap_clk                            ,
   input  logic                             areset                            ,
   input  KernelDescriptor                  descriptor_in                     ,
-  input  AXI4MIDMasterReadInterfaceInput   m_axi_read_in[NUM_CHANNELS-1: 0]  ,
-  output AXI4MIDMasterReadInterfaceOutput  m_axi_read_out[NUM_CHANNELS-1: 0] ,
-  input  AXI4MIDMasterWriteInterfaceInput  m_axi_write_in[NUM_CHANNELS-1: 0] ,
-  output AXI4MIDMasterWriteInterfaceOutput m_axi_write_out[NUM_CHANNELS-1: 0],
+  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in[NUM_CHANNELS-1: 0]  ,
+  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out[NUM_CHANNELS-1: 0] ,
+  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in[NUM_CHANNELS-1: 0] ,
+  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out[NUM_CHANNELS-1: 0],
   output logic                             fifo_setup_signal                 ,
   output logic                             done_out
 );
@@ -114,11 +114,11 @@ logic [NUM_CHANNELS-1:0] cu_channel_fifo_setup_signal                          ;
 logic [NUM_CHANNELS-1:0] cu_channel_done_out                                   ;
 
 // --------------------------------------------------------------------------------------
-logic                             areset_axi_slice  [NUM_CHANNELS-1:0];
-AXI4MIDMasterReadInterfaceInput   cu_m_axi_read_in  [NUM_CHANNELS-1:0];
-AXI4MIDMasterReadInterfaceOutput  cu_m_axi_read_out [NUM_CHANNELS-1:0];
-AXI4MIDMasterWriteInterfaceInput  cu_m_axi_write_in [NUM_CHANNELS-1:0];
-AXI4MIDMasterWriteInterfaceOutput cu_m_axi_write_out[NUM_CHANNELS-1:0];
+logic                                   areset_axi_slice  [NUM_CHANNELS-1:0];
+M00_AXI4_MID_MasterReadInterfaceInput   cu_m_axi_read_in  [NUM_CHANNELS-1:0];
+M00_AXI4_MID_MasterReadInterfaceOutput  cu_m_axi_read_out [NUM_CHANNELS-1:0];
+M00_AXI4_MID_MasterWriteInterfaceInput  cu_m_axi_write_in [NUM_CHANNELS-1:0];
+M00_AXI4_MID_MasterWriteInterfaceOutput cu_m_axi_write_out[NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Channel - Arbiter Signals: Channel Respnse Generator
@@ -453,9 +453,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),

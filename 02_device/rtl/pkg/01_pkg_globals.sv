@@ -39,6 +39,16 @@ package PKG_GLOBALS;
 // parameter NUM_MODULES_WIDTH_BITS = 3;
 // parameter NUM_CHANNELS           = 1;
 // parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2((CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE*NUM_BUNDLES)+(16*NUM_BUNDLES));
+// parameter BUFFER_0_WIDTH_BITS = 64;
+// parameter BUFFER_1_WIDTH_BITS = 64;
+// parameter BUFFER_2_WIDTH_BITS = 64;
+// parameter BUFFER_3_WIDTH_BITS = 64;
+// parameter BUFFER_4_WIDTH_BITS = 64;
+// parameter BUFFER_5_WIDTH_BITS = 64;
+// parameter BUFFER_6_WIDTH_BITS = 64;
+// parameter BUFFER_7_WIDTH_BITS = 64;
+// parameter BUFFER_8_WIDTH_BITS = 64;
+// parameter BUFFER_9_WIDTH_BITS = 64;
 // -- include is auto generated --
 // --------------------------------------------------------------------------------------
 // Maximum supported engines/lanes/bundles/buffers

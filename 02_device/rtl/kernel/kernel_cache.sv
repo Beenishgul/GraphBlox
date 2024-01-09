@@ -16,17 +16,17 @@
 
 module kernel_cache (
   // System Signals
-  input  logic                            ap_clk            ,
-  input  logic                            areset            ,
-  output AXI4MIDSlaveReadInterfaceOutput  s_axi_read_out    ,
-  input  AXI4MIDSlaveReadInterfaceInput   s_axi_read_in     ,
-  output AXI4MIDSlaveWriteInterfaceOutput s_axi_write_out   ,
-  input  AXI4MIDSlaveWriteInterfaceInput  s_axi_write_in    ,
-  input  AXI4BEMasterReadInterfaceInput   m_axi_read_in     ,
-  output AXI4BEMasterReadInterfaceOutput  m_axi_read_out    ,
-  input  AXI4BEMasterWriteInterfaceInput  m_axi_write_in    ,
-  output AXI4BEMasterWriteInterfaceOutput m_axi_write_out   ,
-  output logic                            cache_setup_signal
+  input  logic                                  ap_clk            ,
+  input  logic                                  areset            ,
+  output M00_AXI4_MID_SlaveReadInterfaceOutput  s_axi_read_out    ,
+  input  M00_AXI4_MID_SlaveReadInterfaceInput   s_axi_read_in     ,
+  output M00_AXI4_MID_SlaveWriteInterfaceOutput s_axi_write_out   ,
+  input  M00_AXI4_MID_SlaveWriteInterfaceInput  s_axi_write_in    ,
+  input  M00_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
+  output M00_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
+  input  M00_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
+  output M00_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
+  output logic                                  cache_setup_signal
 );
 
 // --------------------------------------------------------------------------------------
@@ -40,10 +40,10 @@ logic cache_setup_signal_int;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-AXI4BEMasterReadInterface  m_axi_read ;
-AXI4BEMasterWriteInterface m_axi_write;
-AXI4MIDSlaveReadInterface  s_axi_read ;
-AXI4MIDSlaveWriteInterface s_axi_write;
+M00_AXI4_BE_MasterReadInterface  m_axi_read ;
+M00_AXI4_BE_MasterWriteInterface m_axi_write;
+M00_AXI4_MID_SlaveReadInterface  s_axi_read ;
+M00_AXI4_MID_SlaveWriteInterface s_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal

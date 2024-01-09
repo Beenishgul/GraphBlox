@@ -19,21 +19,21 @@ module cu_cache #(
   parameter PROG_THRESH      = 32
 ) (
   // System Signals
-  input  logic                             ap_clk                   ,
-  input  logic                             areset                   ,
-  input  KernelDescriptor                  descriptor_in            ,
-  input  MemoryPacketRequest               request_in               ,
-  output FIFOStateSignalsOutput            fifo_request_signals_out ,
-  input  FIFOStateSignalsInput             fifo_request_signals_in  ,
-  output MemoryPacketResponse              response_out             ,
-  output FIFOStateSignalsOutput            fifo_response_signals_out,
-  input  FIFOStateSignalsInput             fifo_response_signals_in ,
-  output logic                             fifo_setup_signal        ,
-  input  AXI4MIDMasterReadInterfaceInput   m_axi_read_in            ,
-  output AXI4MIDMasterReadInterfaceOutput  m_axi_read_out           ,
-  input  AXI4MIDMasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MIDMasterWriteInterfaceOutput m_axi_write_out          ,
-  output logic                             done_out
+  input  logic                                   ap_clk                   ,
+  input  logic                                   areset                   ,
+  input  KernelDescriptor                        descriptor_in            ,
+  input  MemoryPacketRequest                     request_in               ,
+  output FIFOStateSignalsOutput                  fifo_request_signals_out ,
+  input  FIFOStateSignalsInput                   fifo_request_signals_in  ,
+  output MemoryPacketResponse                    response_out             ,
+  output FIFOStateSignalsOutput                  fifo_response_signals_out,
+  input  FIFOStateSignalsInput                   fifo_response_signals_in ,
+  output logic                                   fifo_setup_signal        ,
+  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in            ,
+  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
+  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
+  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  output logic                                   done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -54,8 +54,8 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-AXI4MIDMasterReadInterface  m_axi_read ;
-AXI4MIDMasterWriteInterface m_axi_write;
+M00_AXI4_MID_MasterReadInterface  m_axi_read ;
+M00_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -199,40 +199,40 @@ assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
 iob_cache_axi #(
-  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                                 ),
-  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                            ),
-  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                             ),
-  .BE_DATA_W           (CACHE_BACKEND_DATA_W                             ),
-  .NWAYS_W             (CACHE_N_WAYS                                     ),
-  .NLINES_W            (CACHE_LINE_OFF_W                                 ),
-  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                                 ),
-  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                              ),
-  .REP_POLICY          (CACHE_REP_POLICY                                 ),
-  .WRITE_POL           (CACHE_WRITE_POL                                  ),
-  .USE_CTRL            (CACHE_CTRL_CACHE                                 ),
-  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                                 ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                                   ),
-  .AXI_ID              (CACHE_AXI_ID                                     ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                                  ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                                 ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                                 ),
-  .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  .FE_ADDR_W           (M00_AXI4_FE_ADDR_W                                 ),
+  .FE_DATA_W           (CACHE_FRONTEND_DATA_W                              ),
+  .BE_ADDR_W           (CACHE_BACKEND_ADDR_W                               ),
+  .BE_DATA_W           (CACHE_BACKEND_DATA_W                               ),
+  .NWAYS_W             (CACHE_N_WAYS                                       ),
+  .NLINES_W            (CACHE_LINE_OFF_W                                   ),
+  .WORD_OFFSET_W       (CACHE_WORD_OFF_W                                   ),
+  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
+  .REP_POLICY          (CACHE_REP_POLICY                                   ),
+  .WRITE_POL           (CACHE_WRITE_POL                                    ),
+  .USE_CTRL            (CACHE_CTRL_CACHE                                   ),
+  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                                   ),
+  .AXI_ID_W            (CACHE_AXI_ID_W                                     ),
+  .AXI_ID              (CACHE_AXI_ID                                       ),
+  .AXI_LEN_W           (CACHE_AXI_LEN_W                                    ),
+  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                                   ),
+  .AXI_DATA_W          (CACHE_AXI_DATA_W                                   ),
+  .CACHE_AXI_CACHE_MODE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
-  .iob_avalid_i(cache_request_mem.iob.valid                                                         ),
-  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M_AXI4_FE_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
-  .iob_wdata_i (cache_request_mem.iob.wdata                                                         ),
-  .iob_wstrb_i (cache_request_mem.iob.wstrb                                                         ),
-  .iob_rdata_o (cache_response_mem.iob.rdata                                                        ),
-  .iob_rvalid_o(cache_response_mem.iob.valid                                                        ),
-  .iob_ready_o (cache_response_mem.iob.ready                                                        ),
-  .invalidate_i(cache_ctrl_in.force_inv                                                             ),
-  .invalidate_o(cache_ctrl_out.force_inv                                                            ),
-  .wtb_empty_i (cache_ctrl_in.wtb_empty                                                             ),
-  .wtb_empty_o (cache_ctrl_out.wtb_empty                                                            ),
+  .iob_avalid_i(cache_request_mem.iob.valid                                                           ),
+  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:CACHE_FRONTEND_BYTE_W]),
+  .iob_wdata_i (cache_request_mem.iob.wdata                                                           ),
+  .iob_wstrb_i (cache_request_mem.iob.wstrb                                                           ),
+  .iob_rdata_o (cache_response_mem.iob.rdata                                                          ),
+  .iob_rvalid_o(cache_response_mem.iob.valid                                                          ),
+  .iob_ready_o (cache_response_mem.iob.ready                                                          ),
+  .invalidate_i(cache_ctrl_in.force_inv                                                               ),
+  .invalidate_o(cache_ctrl_out.force_inv                                                              ),
+  .wtb_empty_i (cache_ctrl_in.wtb_empty                                                               ),
+  .wtb_empty_o (cache_ctrl_out.wtb_empty                                                              ),
   `include "m_axi_portmap_cache.vh"
-  .clk_i       (ap_clk                                                                              ),
-  .cke_i       (1'b1                                                                                ),
-  .arst_i      (areset_cache                                                                        )
+  .clk_i       (ap_clk                                                                                ),
+  .cke_i       (1'b1                                                                                  ),
+  .arst_i      (areset_cache                                                                          )
 );
 
 // --------------------------------------------------------------------------------------
@@ -353,7 +353,7 @@ always_comb begin
         next_state = CU_CACHE_CMD_READ;
     end
     CU_CACHE_CMD_WRITE : begin
-        next_state = CU_CACHE_CMD_READY;
+      next_state = CU_CACHE_CMD_READY;
     end
     CU_CACHE_CMD_DONE : begin
       next_state = CU_CACHE_CMD_DONE;
@@ -389,12 +389,12 @@ always_comb begin
         fifo_request_signals_in_int.rd_en  = 1'b1;
         fifo_response_signals_in_int.wr_en = 1'b1;
         cache_request_mem_reg.iob.valid    = 1'b0;
-      end 
+      end
     end
     CU_CACHE_CMD_WRITE : begin
-        cache_request_mem_reg.iob.valid    = 1'b1;
-        fifo_request_signals_in_int.rd_en  = 1'b1;
-        fifo_response_signals_in_int.wr_en = 1'b1;
+      cache_request_mem_reg.iob.valid    = 1'b1;
+      fifo_request_signals_in_int.rd_en  = 1'b1;
+      fifo_response_signals_in_int.wr_en = 1'b1;
     end
     CU_CACHE_CMD_DONE : begin
       fifo_request_signals_in_int.rd_en  = 1'b0;

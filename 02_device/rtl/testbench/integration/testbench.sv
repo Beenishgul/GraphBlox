@@ -40,16 +40,16 @@ integer file_ptr_out_degree      ;
 integer file_ptr_edges_array_src ;
 integer file_ptr_edges_array_dest;
 
-bit [M_AXI4_BE_DATA_W-1:0] overlay_program[];
+bit [M00_AXI4_BE_DATA_W-1:0] overlay_program[];
 
-bit [M_AXI4_BE_DATA_W-1:0] auxiliary_1[];
-bit [M_AXI4_BE_DATA_W-1:0] auxiliary_2[];
-bit [M_AXI4_BE_DATA_W-1:0] in_degree[];
-bit [M_AXI4_BE_DATA_W-1:0] out_degree[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_idx[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_src[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_dest[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_weight[];
+bit [M00_AXI4_BE_DATA_W-1:0] auxiliary_1[];
+bit [M00_AXI4_BE_DATA_W-1:0] auxiliary_2[];
+bit [M00_AXI4_BE_DATA_W-1:0] in_degree[];
+bit [M00_AXI4_BE_DATA_W-1:0] out_degree[];
+bit [M00_AXI4_BE_DATA_W-1:0] edges_idx[];
+bit [M00_AXI4_BE_DATA_W-1:0] edges_array_src[];
+bit [M00_AXI4_BE_DATA_W-1:0] edges_array_dest[];
+bit [M00_AXI4_BE_DATA_W-1:0] edges_array_weight[];
 
 function new ();
     this.file_error                = 0;
@@ -671,13 +671,13 @@ module __KERNEL___testbench ();
         /////////////////////////////////////////////////////////////////////////////////////////////////
 
         int cache_line_size = 64                               ; // Cache line size in bytes
-        int bytes_per_read  = M_AXI4_FE_DATA_W / 8             ; // Number of bytes read in each iteration
-        int words_per_read  = M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W; // Number of bytes read in each iteration
+        int bytes_per_read  = M00_AXI4_FE_DATA_W / 8             ; // Number of bytes read in each iteration
+        int words_per_read  = M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W; // Number of bytes read in each iteration
 
 
         // Backdoor fill the memory with the content.
         int                        o,l;
-        bit [M_AXI4_FE_DATA_W-1:0] ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+        bit [M00_AXI4_FE_DATA_W-1:0] ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
 
         l=0;
         o= words_per_read;
@@ -686,7 +686,7 @@ module __KERNEL___testbench ();
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
             // $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
-            graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
             if (o == 0) begin
                 l++;
                 o= words_per_read;
@@ -696,7 +696,7 @@ module __KERNEL___testbench ();
         for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
             // $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
-            graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
             if (o == 0) begin
                 l++;
                 o= words_per_read;
@@ -710,7 +710,7 @@ module __KERNEL___testbench ();
 
         for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-            graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = ret_rd_value;
+            graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
             if (o == 0) begin
                 l++;
                 o= words_per_read;
@@ -718,7 +718,7 @@ module __KERNEL___testbench ();
             o--;
         end
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-            graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+            graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
             if (o == 0) begin
                 l++;
                 o= words_per_read;
@@ -735,24 +735,24 @@ module __KERNEL___testbench ();
                 l=0;
 
                 for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                    graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = {M00_AXI4_FE_DATA_W{1'b1}};
                     if(i == graph.bfs_source)begin
-                        graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = graph.bfs_source;
+                        graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = graph.bfs_source;
                     end
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
                 end
                 for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
 
                     if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
-                        graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
+                        graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 1;
                     end
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
@@ -762,17 +762,17 @@ module __KERNEL___testbench ();
                 l=0;
 
                 for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = {M_AXI4_FE_DATA_W{1'b1}};
+                    graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = {M00_AXI4_FE_DATA_W{1'b1}};
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
                 end
                 for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
@@ -787,17 +787,17 @@ module __KERNEL___testbench ();
                 l=0;
 
                 for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
                 end
                 for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                    graph.auxiliary_1[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 1;
+                    graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 1;
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
@@ -807,17 +807,17 @@ module __KERNEL___testbench ();
                 l=0;
 
                 for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
                 end
                 for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                    graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = 0;
+                    graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
@@ -827,7 +827,7 @@ module __KERNEL___testbench ();
             function automatic bit check_BFS_result(ref GraphCSR graph);
                 /////////////////////////////////////////////////////////////////////////////////////////////////
                 // Backdoor read the memory with the content.
-                bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
+                bit [M00_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
                 bit error_found = 0;
                 integer error_counter;
                 integer frontier_counter;
@@ -836,7 +836,7 @@ module __KERNEL___testbench ();
 
                 $display("MSG: // ------------------------------------------------- \n");
                 for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
+                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M00_AXI4_FE_DATA_W/8));
                     frontier_counter += ret_rd_value;
                 end
                 $display("MSG: Frontier_counter: %0d \n", frontier_counter);
@@ -850,8 +850,8 @@ module __KERNEL___testbench ();
                 /////////////////////////////////////////////////////////////////////////////////////////////////
                 // Backdoor read the memory with the content.
                 int o,l;
-                bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-                // bit [M_AXI4_FE_DATA_W-1:0]        set_value    = {(M_AXI4_FE_DATA_W-1){1'b0},1'b1};
+                bit [M00_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
+                // bit [M00_AXI4_FE_DATA_W-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
                 bit error_found = 0;
                 integer error_counter;
                 integer mismatch_counter;
@@ -863,14 +863,14 @@ module __KERNEL___testbench ();
 
                 $display("MSG: // ------------------------------------------------- \n");
                 for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                    if(ret_rd_value != graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]) begin
-                        $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                    ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M00_AXI4_FE_DATA_W/8));
+                    if(ret_rd_value != graph.out_degree[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W]) begin
+                        $display("MSG: Starting num_auxiliary_2: %0d==%0d\n", ret_rd_value, graph.out_degree[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W]);
                         mismatch_counter += 1;
                     end
 
                     o++;
-                    if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                    if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                         l++;
                         o=0;
                     end
@@ -925,21 +925,21 @@ module __KERNEL___testbench ();
             int          realcount                 = 0;
             int          vertexcount               = 0;
             int o,l;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_overlay_program         ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_out_degree              ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_in_degree               ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_idx               ;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_overlay_program         ;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_out_degree              ;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_in_degree               ;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_idx               ;
 
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_array_src ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_array_dest;
-            bit [M_AXI4_FE_DATA_W-1:0] setup_temp;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_array_src ;
+            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_array_dest;
+            bit [M00_AXI4_FE_DATA_W-1:0] setup_temp;
 
             realcount = 0;
             setup_temp = 0;
 
             for (int i = 0; i < graph.mem512_overlay_program; i++) begin
-                for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
-                    graph.overlay_program[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = realcount;
+                for (int j = 0; j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
+                    graph.overlay_program[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = realcount;
                     realcount++;
                 end
             end
@@ -974,10 +974,10 @@ module __KERNEL___testbench ();
                     if(num_read == 1) begin
                         // $display("MSG: %d %d Hex number: 32'h%0h",l,o, temp_overlay_program);
                         setup_temp = temp_overlay_program;
-                        graph.overlay_program[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = setup_temp;
-                        // $display("MSG: %d %d Hex number: 32'h%0h",l,o, graph.overlay_program[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
+                        graph.overlay_program[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = setup_temp;
+                        // $display("MSG: %d %d Hex number: 32'h%0h",l,o, graph.overlay_program[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W]);
                         o++;
-                        if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
+                        if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                             l++;
                             o=0;
                         end
@@ -988,20 +988,20 @@ module __KERNEL___testbench ();
             `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
             for (int i = 0; i < graph.mem512_num_vertices; i++) begin
-                for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
+                for (int j = 0; j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
                     graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
                     setup_temp = temp_out_degree;
-                    graph.out_degree[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
-                    // $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:M_AXI4_FE_DATA_W]);
+                    graph.out_degree[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
+                    // $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:M00_AXI4_FE_DATA_W]);
 
                     graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
                     setup_temp = temp_in_degree;
-                    graph.in_degree[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
+                    graph.in_degree[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
 
                     // $display("MSG: Starting temp_in_degree: %0d\n", temp_in_degree);
                     graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
                     setup_temp = temp_edges_idx;
-                    graph.edges_idx[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
+                    graph.edges_idx[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
                     // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
                 end
             end
@@ -1009,14 +1009,14 @@ module __KERNEL___testbench ();
             // `include"initialize_testbench._ALGORITHM_NAME_.vh"
 
             for (int i = 0; i < graph.mem512_num_edges; i++) begin
-                for (int j = 0;j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
+                for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
                     graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
                     setup_temp = temp_edges_array_src;
-                    graph.edges_array_src[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
+                    graph.edges_array_src[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
 
                     graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
                     setup_temp = temp_edges_array_dest;
-                    graph.edges_array_dest[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
+                    graph.edges_array_dest[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
                     // $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
                 end
             end
@@ -1061,10 +1061,10 @@ module __KERNEL___testbench ();
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
 
-            graph.mem512_overlay_program = int'(buffer_9_ptr[M_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
+            graph.mem512_overlay_program = int'(buffer_9_ptr[M00_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
 
-            graph.mem512_num_vertices = ((graph.num_vertices*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
-            graph.mem512_num_edges = ((graph.num_edges*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
+            graph.mem512_num_vertices = ((graph.num_vertices*M00_AXI4_FE_DATA_W) + (M00_AXI4_BE_DATA_W-1) )/ (M00_AXI4_BE_DATA_W);
+            graph.mem512_num_edges = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_BE_DATA_W-1) )/ (M00_AXI4_BE_DATA_W);
 
             graph.mem512_edges_idx       = graph.mem512_num_vertices ;
             graph.mem512_in_degree       = graph.mem512_num_vertices ;
@@ -1074,8 +1074,8 @@ module __KERNEL___testbench ();
             graph.mem512_edges_array_dest= graph.mem512_num_edges ;
             graph.mem512_edges_array_weight= graph.mem512_num_edges ;
 
-            graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
-            graph.mem512_auxiliary_2 = ((graph.num_auxiliary_2*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
+            graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_BE_DATA_W-1) )/ (M00_AXI4_BE_DATA_W);
+            graph.mem512_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_BE_DATA_W-1) )/ (M00_AXI4_BE_DATA_W);
 
             graph.out_degree   = new [graph.mem512_num_vertices];
             graph.in_degree    = new [graph.mem512_num_vertices];

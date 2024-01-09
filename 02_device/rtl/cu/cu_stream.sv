@@ -19,21 +19,21 @@ module cu_stream #(
   parameter PROG_THRESH      = 32
 ) (
   // System Signals
-  input  logic                             ap_clk                   ,
-  input  logic                             areset                   ,
-  input  KernelDescriptor                  descriptor_in            ,
-  input  MemoryPacketRequest               request_in               ,
-  output FIFOStateSignalsOutput            fifo_request_signals_out ,
-  input  FIFOStateSignalsInput             fifo_request_signals_in  ,
-  output MemoryPacketResponse              response_out             ,
-  output FIFOStateSignalsOutput            fifo_response_signals_out,
-  input  FIFOStateSignalsInput             fifo_response_signals_in ,
-  output logic                             fifo_setup_signal        ,
-  input  AXI4MIDMasterReadInterfaceInput   m_axi_read_in            ,
-  output AXI4MIDMasterReadInterfaceOutput  m_axi_read_out           ,
-  input  AXI4MIDMasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MIDMasterWriteInterfaceOutput m_axi_write_out          ,
-  output logic                             done_out
+  input  logic                                   ap_clk                   ,
+  input  logic                                   areset                   ,
+  input  KernelDescriptor                        descriptor_in            ,
+  input  MemoryPacketRequest                     request_in               ,
+  output FIFOStateSignalsOutput                  fifo_request_signals_out ,
+  input  FIFOStateSignalsInput                   fifo_request_signals_in  ,
+  output MemoryPacketResponse                    response_out             ,
+  output FIFOStateSignalsOutput                  fifo_response_signals_out,
+  input  FIFOStateSignalsInput                   fifo_response_signals_in ,
+  output logic                                   fifo_setup_signal        ,
+  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in            ,
+  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
+  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
+  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  output logic                                   done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -54,8 +54,8 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-AXI4MIDMasterReadInterface  m_axi_read ;
-AXI4MIDMasterWriteInterface m_axi_write;
+M00_AXI4_MID_MasterReadInterface  m_axi_read ;
+M00_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -199,40 +199,40 @@ assign stream_ctrl_in.force_inv = 1'b0;
 assign stream_ctrl_in.wtb_empty = 1'b1;
 
 iob_cache_axi #(
-  .FE_ADDR_W           (M_AXI4_FE_ADDR_W                       ),
-  .FE_DATA_W           (STREAM_FRONTEND_DATA_W                 ),
-  .BE_ADDR_W           (STREAM_BACKEND_ADDR_W                  ),
-  .BE_DATA_W           (STREAM_BACKEND_DATA_W                  ),
-  .NWAYS_W             (STREAM_N_WAYS                          ),
-  .NLINES_W            (STREAM_LINE_OFF_W                      ),
-  .WORD_OFFSET_W       (STREAM_WORD_OFF_W                      ),
-  .WTBUF_DEPTH_W       (STREAM_WTBUF_DEPTH_W                   ),
-  .REP_POLICY          (STREAM_REP_POLICY                      ),
-  .WRITE_POL           (STREAM_WRITE_POL                       ),
-  .USE_CTRL            (STREAM_CTRL_STREAM                     ),
-  .USE_CTRL_CNT        (STREAM_CTRL_STREAM                     ),
-  .AXI_ID_W            (CACHE_AXI_ID_W                         ),
-  .AXI_ID              (CACHE_AXI_ID                           ),
-  .AXI_LEN_W           (CACHE_AXI_LEN_W                        ),
-  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                       ),
-  .AXI_DATA_W          (CACHE_AXI_DATA_W                       ),
-  .CACHE_AXI_CACHE_MODE(M_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE)
+  .FE_ADDR_W           (M00_AXI4_FE_ADDR_W                       ),
+  .FE_DATA_W           (STREAM_FRONTEND_DATA_W                   ),
+  .BE_ADDR_W           (STREAM_BACKEND_ADDR_W                    ),
+  .BE_DATA_W           (STREAM_BACKEND_DATA_W                    ),
+  .NWAYS_W             (STREAM_N_WAYS                            ),
+  .NLINES_W            (STREAM_LINE_OFF_W                        ),
+  .WORD_OFFSET_W       (STREAM_WORD_OFF_W                        ),
+  .WTBUF_DEPTH_W       (STREAM_WTBUF_DEPTH_W                     ),
+  .REP_POLICY          (STREAM_REP_POLICY                        ),
+  .WRITE_POL           (STREAM_WRITE_POL                         ),
+  .USE_CTRL            (STREAM_CTRL_STREAM                       ),
+  .USE_CTRL_CNT        (STREAM_CTRL_STREAM                       ),
+  .AXI_ID_W            (CACHE_AXI_ID_W                           ),
+  .AXI_ID              (CACHE_AXI_ID                             ),
+  .AXI_LEN_W           (CACHE_AXI_LEN_W                          ),
+  .AXI_ADDR_W          (CACHE_AXI_ADDR_W                         ),
+  .AXI_DATA_W          (CACHE_AXI_DATA_W                         ),
+  .CACHE_AXI_CACHE_MODE(M00_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE)
 ) inst_iob_stream_axi (
-  .iob_avalid_i(stream_request_mem.iob.valid                                                           ),
-  .iob_addr_i  (stream_request_mem.iob.addr [STREAM_CTRL_CNT+M_AXI4_FE_ADDR_W-1:STREAM_FRONTEND_BYTE_W]),
-  .iob_wdata_i (stream_request_mem.iob.wdata                                                           ),
-  .iob_wstrb_i (stream_request_mem.iob.wstrb                                                           ),
-  .iob_rdata_o (stream_response_mem.iob.rdata                                                          ),
-  .iob_rvalid_o(stream_response_mem.iob.valid                                                          ),
-  .iob_ready_o (stream_response_mem.iob.ready                                                          ),
-  .invalidate_i(stream_ctrl_in.force_inv                                                               ),
-  .invalidate_o(stream_ctrl_out.force_inv                                                              ),
-  .wtb_empty_i (stream_ctrl_in.wtb_empty                                                               ),
-  .wtb_empty_o (stream_ctrl_out.wtb_empty                                                              ),
+  .iob_avalid_i(stream_request_mem.iob.valid                                                             ),
+  .iob_addr_i  (stream_request_mem.iob.addr [STREAM_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:STREAM_FRONTEND_BYTE_W]),
+  .iob_wdata_i (stream_request_mem.iob.wdata                                                             ),
+  .iob_wstrb_i (stream_request_mem.iob.wstrb                                                             ),
+  .iob_rdata_o (stream_response_mem.iob.rdata                                                            ),
+  .iob_rvalid_o(stream_response_mem.iob.valid                                                            ),
+  .iob_ready_o (stream_response_mem.iob.ready                                                            ),
+  .invalidate_i(stream_ctrl_in.force_inv                                                                 ),
+  .invalidate_o(stream_ctrl_out.force_inv                                                                ),
+  .wtb_empty_i (stream_ctrl_in.wtb_empty                                                                 ),
+  .wtb_empty_o (stream_ctrl_out.wtb_empty                                                                ),
   `include "m_axi_portmap_cache.vh"
-  .clk_i       (ap_clk                                                                                 ),
-  .cke_i       (1'b1                                                                                   ),
-  .arst_i      (areset_stream                                                                          )
+  .clk_i       (ap_clk                                                                                   ),
+  .cke_i       (1'b1                                                                                     ),
+  .arst_i      (areset_stream                                                                            )
 );
 
 // --------------------------------------------------------------------------------------

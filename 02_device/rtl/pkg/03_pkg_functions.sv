@@ -32,9 +32,9 @@
 `include "global_timescale.vh"
 package PKG_FUNCTIONS;
 
-import PKG_AXI4_FE::*;
-import PKG_AXI4_MID::*;
-import PKG_AXI4_BE::*;
+import PKG_MXX_AXI4_FE::*;
+import PKG_MXX_AXI4_MID::*;
+import PKG_MXX_AXI4_BE::*;
 
 function integer min (
 		input integer a, b
@@ -114,38 +114,38 @@ function integer mux_sum (
 	end
 endfunction
 
-function logic [M_AXI4_BE_DATA_W-1:0] swap_endianness_cacheline_backend (logic [M_AXI4_BE_DATA_W-1:0] in);
+function logic [M00_AXI4_BE_DATA_W-1:0] swap_endianness_cacheline_backend (logic [M00_AXI4_BE_DATA_W-1:0] in);
 
-	logic [M_AXI4_BE_DATA_W-1:0] out;
+	logic [M00_AXI4_BE_DATA_W-1:0] out;
 
 	integer i;
-	for ( i = 0; i < M_AXI4_BE_STRB_W; i++) begin
-		out[i*8 +: 8] = in[((M_AXI4_BE_DATA_W-1)-(i*8)) -:8];
+	for ( i = 0; i < M00_AXI4_BE_STRB_W; i++) begin
+		out[i*8 +: 8] = in[((M00_AXI4_BE_DATA_W-1)-(i*8)) -:8];
 	end
 
 	return out;
 endfunction : swap_endianness_cacheline_backend
 
-function logic [M_AXI4_MID_DATA_W-1:0] swap_endianness_cacheline_midend (logic [M_AXI4_MID_DATA_W-1:0] in);
+function logic [M00_AXI4_MID_DATA_W-1:0] swap_endianness_cacheline_midend (logic [M00_AXI4_MID_DATA_W-1:0] in);
 
-	logic [M_AXI4_MID_DATA_W-1:0] out;
+	logic [M00_AXI4_MID_DATA_W-1:0] out;
 
 	integer i;
-	for ( i = 0; i < M_AXI4_MID_STRB_W; i++) begin
-		out[i*8 +: 8] = in[((M_AXI4_MID_DATA_W-1)-(i*8)) -:8];
+	for ( i = 0; i < M00_AXI4_MID_STRB_W; i++) begin
+		out[i*8 +: 8] = in[((M00_AXI4_MID_DATA_W-1)-(i*8)) -:8];
 	end
 
 	return out;
 endfunction : swap_endianness_cacheline_midend
 
 
-function logic [M_AXI4_FE_DATA_W-1:0] swap_endianness_cacheline_frontend (logic [M_AXI4_FE_DATA_W-1:0] in);
+function logic [M00_AXI4_FE_DATA_W-1:0] swap_endianness_cacheline_frontend (logic [M00_AXI4_FE_DATA_W-1:0] in);
 
-	logic [M_AXI4_FE_DATA_W-1:0] out;
+	logic [M00_AXI4_FE_DATA_W-1:0] out;
 
 	integer i;
-	for ( i = 0; i < M_AXI4_FE_STRB_W; i++) begin
-		out[i*8 +: 8] = in[((M_AXI4_FE_DATA_W-1)-(i*8)) -:8];
+	for ( i = 0; i < M00_AXI4_FE_STRB_W; i++) begin
+		out[i*8 +: 8] = in[((M00_AXI4_FE_DATA_W-1)-(i*8)) -:8];
 	end
 
 	return out;
