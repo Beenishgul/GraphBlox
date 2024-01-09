@@ -16,7 +16,7 @@
 
 module kernel_afu #(
   `include "afu_parameters.vh"
-  ) (
+) (
   // System Signals
   input  logic                           ap_clk     ,
   input  logic                           ap_rst_n   ,
@@ -183,7 +183,7 @@ generate
 // --------------------------------------------------------------------------------------
     if(CHANNEL_CONFIG_L2_CACHE[i] == 1) begin
 // --------------------------------------------------------------------------------------
-      kernel_cache inst_kernel_cache_l2 (
+      kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper inst_kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper_cache_l2 (
         .ap_clk            (ap_clk                      ),
         .areset            (areset_cache[i]             ),
         .s_axi_read_out    (kernel_s_axi_read_out[i]    ),
@@ -198,7 +198,7 @@ generate
       );
 // Kernel CACHE (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-      axi_register_slice_back_end inst_axi_register_slice_back_end (
+      m00_axi_register_slice_be_512x64_wrapper inst_m00_axi_register_slice_be_512x64_wrapper (
         .ap_clk         (ap_clk                    ),
         .areset         (areset_axi_slice[i]       ),
         .s_axi_read_out (kernel_m_axi4_read_in[i]  ),

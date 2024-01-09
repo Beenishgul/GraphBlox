@@ -413,7 +413,7 @@ generate
 // --------------------------------------------------------------------------------------
   for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_end_ch
 // --------------------------------------------------------------------------------------
-    axi_register_slice_mid_end inst_axi_register_slice_mid_end_ch (
+    m00_axi_register_slice_mid_512x64_wrapper inst_m00_axi_register_slice_mid_512x64_wrapper_ch (
       .ap_clk         (ap_clk               ),
       .areset         (areset_axi_slice[i]  ),
       .s_axi_read_out (cu_m_axi_read_in[i]  ),
@@ -453,7 +453,9 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+cu_bundles #(
+  `include"set_cu_parameters.vh"
+  ) inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
