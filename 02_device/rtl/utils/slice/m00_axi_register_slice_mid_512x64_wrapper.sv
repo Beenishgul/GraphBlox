@@ -1,3 +1,4 @@
+
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -6,7 +7,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : axi_register_slice_mid.sv
+// File   : m00_axi_register_slice_mid_512x64_wrapper.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-06-19 00:51:45
 // Editor : sublime text4, tab size (2)
@@ -14,10 +15,10 @@
 
 `include "global_package.vh"
 
-module axi_register_slice_mid_end (
+module m00_axi_register_slice_mid_512x64_wrapper (
   // System Signals
-  input  logic                                   ap_clk         ,
-  input  logic                                   areset         ,
+  input  logic                                  ap_clk         ,
+  input  logic                                  areset         ,
   output M00_AXI4_MID_SlaveReadInterfaceOutput   s_axi_read_out ,
   input  M00_AXI4_MID_SlaveReadInterfaceInput    s_axi_read_in  ,
   output M00_AXI4_MID_SlaveWriteInterfaceOutput  s_axi_write_out,
@@ -163,4 +164,6 @@ m00_axi_register_slice_mid_512x64 inst_m00_axi_register_slice_mid_512x64 (
   .m_axi_wvalid  (m_axi_write.out.wvalid  )  // output write channel valid
 );
 
-endmodule : axi_register_slice_mid_end
+endmodule : m00_axi_register_slice_mid_512x64_wrapper
+
+  

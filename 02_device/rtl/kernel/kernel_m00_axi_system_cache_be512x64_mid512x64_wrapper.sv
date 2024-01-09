@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_cache.sv
+// File   : kenrel_m00_axi_system_cache_be512x64_mid512x64_wrapper.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-06-19 00:51:45
 // Editor : sublime text4, tab size (2)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module kernel_cache (
+module kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -185,4 +185,4 @@ m00_axi_system_cache_be512x64_mid512x64 inst_m00_axi_system_cache_be512x64_mid51
   .M0_AXI_BREADY     (m_axi_write.out.bready      )  // Output Write response channel ready
 );
 
-endmodule : kernel_cache
+endmodule : kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper

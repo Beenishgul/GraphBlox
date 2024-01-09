@@ -129,7 +129,7 @@ typedef struct packed{
 } PacketRouteAddress;
 
 typedef struct packed{
-  logic                                direction; // 0 - right, 1 left  1 bits
+  logic                                  direction; // 0 - right, 1 left  1 bits
   logic [$clog2(M00_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = clog2(offset) bits
 } PacketDataAddressShift;
 
@@ -290,7 +290,7 @@ typedef struct packed {
 // Cache requests in CacheRequest
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-  logic                        valid;
+  logic                          valid;
   logic [M00_AXI4_FE_ADDR_W-1:0] addr ;
   logic [M00_AXI4_FE_DATA_W-1:0] wdata;
   logic [M00_AXI4_FE_STRB_W-1:0] wstrb;
@@ -311,15 +311,15 @@ typedef struct packed {
 // Cache response out CacheResponse
 // --------------------------------------------------------------------------------------
 typedef struct packed {
-  logic                        valid;
-  logic                        ready;
+  logic                          valid;
+  logic                          ready;
   logic [M00_AXI4_FE_DATA_W-1:0] rdata;
 } CacheResponseIOB;
 
 typedef struct packed {
-  CacheResponseIOB         iob ;
-  MemoryPacketRequestMeta  meta;
-  MemoryPacketData         data;
+  CacheResponseIOB        iob ;
+  MemoryPacketRequestMeta meta;
+  MemoryPacketData        data;
 } CacheResponsePayload;
 
 typedef struct packed {
