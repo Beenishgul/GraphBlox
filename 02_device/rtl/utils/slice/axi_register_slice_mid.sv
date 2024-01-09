@@ -79,7 +79,7 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-axi_register_slice_mid inst_register_slice_mid_512x64 (
+m00_axi_register_slice_mid_512x64 inst_m00_axi_register_slice_mid_512x64 (
   .aclk          (ap_clk                   ),
   .aresetn       (areset_register_slice    ),
   .s_axi_araddr  (s_axi_read.in.araddr     ), // input read address read channel address

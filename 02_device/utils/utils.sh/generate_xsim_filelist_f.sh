@@ -119,9 +119,9 @@ echo $newtext > ${CFG_FILE_NAME_SV}
 echo $newtext > ${CFG_FILE_NAME_VHDL}
 echo $newtext > ${CFG_FILE_NAME_VH}
 
-echo $newtext > ${CFG_FILE_NAME_IP_SV}
-echo $newtext > ${CFG_FILE_NAME_IP_VHDL}
-echo $newtext > ${CFG_FILE_NAME_IP_V}
+# echo $newtext > ${CFG_FILE_NAME_IP_SV}
+# echo $newtext > ${CFG_FILE_NAME_IP_VHDL}
+# echo $newtext > ${CFG_FILE_NAME_IP_V}
 
 echo $newtext > ${CFG_FILE_NAME_V}
 
@@ -167,55 +167,55 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/ ${CFG
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${top}/ ${CFG_FILE_NAME_V} "v"
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.vhd"
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.vhd"
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/sim/system_cache_512x64.vhd"
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/sim/system_cache_512x64.vhd"
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/hdl/axi_register_slice_v2_1_vl_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/hdl/axi_register_slice_v2_1_vl_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/sim/axi_register_slice_be.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/sim/axi_register_slice_be.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 # newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/hdl/axi_register_slice_v2_1_vl_rfs.v"
 # echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/sim/axi_register_slice_mid.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/sim/axi_register_slice_mid.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/ ${CFG_FILE_NAME_SV} "sv"
 
-newtext="${XILINX_VIVADO}/data/verilog/src/glbl.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${XILINX_VIVADO}/data/verilog/src/glbl.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME_SV}
 echo $newtext >> ${CFG_FILE_NAME_VHDL}
 echo $newtext >> ${CFG_FILE_NAME_V}
 
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 echo $newtext >> ${CFG_FILE_NAME_VH}
 
@@ -223,8 +223,8 @@ rm_xsim_filelist_f ${CFG_FILE_NAME_SV}
 rm_xsim_filelist_f ${CFG_FILE_NAME_VHDL}
 rm_xsim_filelist_f ${CFG_FILE_NAME_V}
 
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_SV}
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_VHDL}
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_V}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_SV}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_VHDL}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_V}
 
 rm_xsim_filelist_f ${CFG_FILE_NAME_VH}
