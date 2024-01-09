@@ -17,15 +17,12 @@
 module kernel_cu #(
   `include "kernel_parameters.vh"
 ) (
-  input  logic                             ap_clk                            ,
-  input  logic                             areset                            ,
-  input  KernelDescriptor                  descriptor_in                     ,
-  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in[NUM_CHANNELS-1: 0]  ,
-  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out[NUM_CHANNELS-1: 0] ,
-  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in[NUM_CHANNELS-1: 0] ,
-  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out[NUM_CHANNELS-1: 0],
-  output logic                             fifo_setup_signal                 ,
-  output logic                             done_out
+  input  logic                                   ap_clk                              ,
+  input  logic                                   areset                              ,
+  input  KernelDescriptor                        descriptor_in                       ,
+  `include "m_axi_ports_kernel_cu.vh"
+  output logic                                   fifo_setup_signal                   ,
+  output logic                                   done_out
 );
 
 genvar i;
@@ -114,11 +111,7 @@ logic [NUM_CHANNELS-1:0] cu_channel_fifo_setup_signal                          ;
 logic [NUM_CHANNELS-1:0] cu_channel_done_out                                   ;
 
 // --------------------------------------------------------------------------------------
-logic                                   areset_axi_slice  [NUM_CHANNELS-1:0];
-M00_AXI4_MID_MasterReadInterfaceInput   cu_m_axi_read_in  [NUM_CHANNELS-1:0];
-M00_AXI4_MID_MasterReadInterfaceOutput  cu_m_axi_read_out [NUM_CHANNELS-1:0];
-M00_AXI4_MID_MasterWriteInterfaceInput  cu_m_axi_write_in [NUM_CHANNELS-1:0];
-M00_AXI4_MID_MasterWriteInterfaceOutput cu_m_axi_write_out[NUM_CHANNELS-1:0];
+logic                                   areset_axi_slice    [NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Channel - Arbiter Signals: Channel Respnse Generator
@@ -344,89 +337,11 @@ end
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI-CH 0
 // --------------------------------------------------------------------------------------
-generate
-  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_channel_cache_l1
-// --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L1_CACHE[i] == 0) begin
-// --------------------------------------------------------------------------------------
-// CU Cache -> AXI Kernel Cache
-      cu_cache inst_cu_cache_l1 (
-        .ap_clk                   (ap_clk                                 ),
-        .areset                   (areset_cu_channel[i]                   ),
-        .descriptor_in            (cu_channel_descriptor[i]               ),
-        .request_in               (cu_channel_request_in[i]               ),
-        .fifo_request_signals_out (cu_channel_fifo_request_signals_out[i] ),
-        .fifo_request_signals_in  (cu_channel_fifo_request_signals_in[i]  ),
-        .response_out             (cu_channel_response_out[i]             ),
-        .fifo_response_signals_out(cu_channel_fifo_response_signals_out[i]),
-        .fifo_response_signals_in (cu_channel_fifo_response_signals_in[i] ),
-        .fifo_setup_signal        (cu_channel_fifo_setup_signal[i]        ),
-        .m_axi_read_in            (cu_m_axi_read_in[i]                    ),
-        .m_axi_read_out           (cu_m_axi_read_out[i]                   ),
-        .m_axi_write_in           (cu_m_axi_write_in[i]                   ),
-        .m_axi_write_out          (cu_m_axi_write_out[i]                  ),
-        .done_out                 (cu_channel_done_out[i]                 )
-      );
-    end else if(CHANNEL_CONFIG_L1_CACHE[i] == 1) begin
-// CU BUFFER -> AXI Kernel Cache
-      cu_stream inst_cu_stream_l1 (
-        .ap_clk                   (ap_clk                                 ),
-        .areset                   (areset_cu_channel[i]                   ),
-        .descriptor_in            (cu_channel_descriptor[i]               ),
-        .request_in               (cu_channel_request_in[i]               ),
-        .fifo_request_signals_out (cu_channel_fifo_request_signals_out[i] ),
-        .fifo_request_signals_in  (cu_channel_fifo_request_signals_in[i]  ),
-        .response_out             (cu_channel_response_out[i]             ),
-        .fifo_response_signals_out(cu_channel_fifo_response_signals_out[i]),
-        .fifo_response_signals_in (cu_channel_fifo_response_signals_in[i] ),
-        .fifo_setup_signal        (cu_channel_fifo_setup_signal[i]        ),
-        .m_axi_read_in            (cu_m_axi_read_in[i]                    ),
-        .m_axi_read_out           (cu_m_axi_read_out[i]                   ),
-        .m_axi_write_in           (cu_m_axi_write_in[i]                   ),
-        .m_axi_write_out          (cu_m_axi_write_out[i]                  ),
-        .done_out                 (cu_channel_done_out[i]                 )
-      );
-    end else begin
-// CU BUFFER -> AXI Kernel Cache
-      cu_buffer inst_cu_buffer_l1 (
-        .ap_clk                   (ap_clk                                 ),
-        .areset                   (areset_cu_channel[i]                   ),
-        .descriptor_in            (cu_channel_descriptor[i]               ),
-        .request_in               (cu_channel_request_in[i]               ),
-        .fifo_request_signals_out (cu_channel_fifo_request_signals_out[i] ),
-        .fifo_request_signals_in  (cu_channel_fifo_request_signals_in[i]  ),
-        .response_out             (cu_channel_response_out[i]             ),
-        .fifo_response_signals_out(cu_channel_fifo_response_signals_out[i]),
-        .fifo_response_signals_in (cu_channel_fifo_response_signals_in[i] ),
-        .fifo_setup_signal        (cu_channel_fifo_setup_signal[i]        ),
-        .m_axi_read_in            (cu_m_axi_read_in[i]                    ),
-        .m_axi_read_out           (cu_m_axi_read_out[i]                   ),
-        .m_axi_write_in           (cu_m_axi_write_in[i]                   ),
-        .m_axi_write_out          (cu_m_axi_write_out[i]                  ),
-        .done_out                 (cu_channel_done_out[i]                 )
-      );
-    end
-  end
-
+`include "kernel_cu_topology.vh"
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH 1:0 (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-  for (i=0; i<(NUM_CHANNELS); i++) begin : generate_axi_register_slice_mid_end_ch
-// --------------------------------------------------------------------------------------
-    m00_axi_register_slice_mid_512x64_wrapper inst_m00_axi_register_slice_mid_512x64_wrapper_ch (
-      .ap_clk         (ap_clk               ),
-      .areset         (areset_axi_slice[i]  ),
-      .s_axi_read_out (cu_m_axi_read_in[i]  ),
-      .s_axi_read_in  (cu_m_axi_read_out[i] ),
-      .s_axi_write_out(cu_m_axi_write_in[i] ),
-      .s_axi_write_in (cu_m_axi_write_out[i]),
-      .m_axi_read_in  (m_axi_read_in[i]     ),
-      .m_axi_read_out (m_axi_read_out[i]    ),
-      .m_axi_write_in (m_axi_write_in[i]    ),
-      .m_axi_write_out(m_axi_write_out[i]   )
-    );
-  end
-endgenerate
+
 
 // --------------------------------------------------------------------------------------
 // Initial setup and configuration reading
@@ -453,9 +368,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),
