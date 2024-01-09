@@ -926,7 +926,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "buffer_5"
                 }
             },
             "entry_6": {
@@ -944,7 +944,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x10"
+                    "value": "buffer_5"
                 }
             },
             "entry_7": {

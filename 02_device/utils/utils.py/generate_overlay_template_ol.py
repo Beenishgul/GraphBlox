@@ -446,14 +446,24 @@ def process_file_json(template_file_path, engine_template_filename, engine_name)
 
     engine_index_json += 1
 
-def get_buffer_index(buffers, value):
-    # Find the index of the value in the buffers dictionary
-    for key, val in buffers.items():
-        if val == value:
-            # Return the index as an integer (assuming the key format is "buffer_x")
-            return int(key.split('_')[1])
-    # Return None if the value is not found
-    return 1
+def get_buffer_index(buffers, input_value):
+    # Iterate through the dictionary with an index counter
+    for index, (key, value) in enumerate(buffers.items()):
+        if key == input_value or value == input_value:
+            return index  # This is an integer
+
+    # Return None if no match is found
+    return None
+
+def get_channels_index(channels, input_value):
+    # Iterate through the dictionary with an index counter
+    for index, (key, value) in enumerate(channels.items()):
+        if key == input_value or value[0] == input_value:
+            return int(value[0])  # This is an integer
+
+    # Return None if no match is found
+    return None
+
 
 # Function to parse and construct the entries with compact comments
 def process_entries_json_v2(output_program_path_ol, source_program_path_json, channels, buffers):
@@ -494,24 +504,31 @@ def process_entries_json_v2(output_program_path_ol, source_program_path_json, ch
                 original_flag = 0
 
                 # Replace symbolic values with their corresponding numeric values
-                if isinstance(value, str):
+                if isinstance(value, str) and not value.startswith("0x"):
                     original_flag = 1
                     if param == "id_buffer":
                         buffer_index = get_buffer_index(buffers, value)
                         if buffer_index is not None:
-                            # Calculate the shift amount based on the buffer index
-                            value = 1 << (buffer_index-1)
+                            if buffer_index == 0:
+                                value = 0
+                            else:
+                                value = 1 << (buffer_index-1)
+                            # print(f"echo id_buffer {0} {1}", value, bits_prev)
+                        else:
+                            value = 0
                     elif param == "id_channel" and value in channels:
-                        channel_index = int(channels[value][0])
-                        value = 1 << channel_index
+                        channel_index = get_channels_index(channels,value)
+                        if channel_index is not None:
+                            value = 1 << channel_index
                     else:
                         value = lookup_tables.get(value, value)
                 
-                # Convert to integer
+                # Convert to hex integer
                 if isinstance(value, str) and value.startswith("0x"):
                     value = int(value, 16)
                 else:
                     value = int(value)
+
 
                 # Shift and OR the value
                 value <<= bits_prev
@@ -644,8 +661,8 @@ append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
 with open(output_file_path_json, 'w') as f:
     json.dump(combined_engine_template_json, f, indent=4)
 
-process_entries_json(output_program_path_ol, source_program_path_json)
-# process_entries_json_v2(output_program_path_ol, source_program_path_json,channels, buffers)
+# process_entries_json(output_program_path_ol, source_program_path_json)
+process_entries_json_v2(output_program_path_ol, source_program_path_json,channels, buffers)
 
 print(f"export NUM_ENTRIES={entry_index_vh}")
 

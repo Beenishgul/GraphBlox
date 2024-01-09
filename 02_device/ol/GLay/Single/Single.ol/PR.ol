@@ -24,8 +24,8 @@
 0x00000000 // entry_0    cacheline[  0][14] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry_1    cacheline[  0][15] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  1][ 0] <32b>: index_end[0:31]=0x00000000
-0x00000001 // entry_3    cacheline[  1][ 1] <32b>: stride[0:31]=0x1
-0x80000002 // entry_4    cacheline[  1][ 2] <32b>: shift.amount[0:30]=0x2 || shift.direction[31:31]=0x1
+0x00000001 // entry_3    cacheline[  1][ 1] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  1][ 2] <32b>: shift.amount[0:30]=0x0000002 || shift.direction[31:31]=0x1
 0x00200022 // entry_5    cacheline[  1][ 3] <29b>: cmd[0:4]=CMD_MEM_READ || id_module[5:12]=0x01 || id_engine[13:20]=0x00 || id_channel[21:28]=0x01
 0x04010401 // entry_6    cacheline[  1][ 4] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x04
 0x00000000 // entry_7    cacheline[  1][ 5] <32b>: array_size[0:31]=0x00000000
@@ -58,7 +58,7 @@
 0x00000000 // entry_1    cacheline[  2][ 7] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  2][ 8] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  2][ 9] <32b>: stride[0:31]=0x00000001
-0x80000002 // entry_4    cacheline[  2][10] <32b>: shift.amount[0:30]=0x2 || shift.direction[31:31]=1
+0x80000002 // entry_4    cacheline[  2][10] <32b>: shift.amount[0:30]=0x0000002 || shift.direction[31:31]=1
 0x00200004 // entry_5    cacheline[  2][11] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x01
 0x80000000 // entry_6    cacheline[  2][12] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x80
 0x00000000 // entry_7    cacheline[  2][13] <32b>: array_size[0:31]=0x00000000
@@ -73,8 +73,8 @@
 0x00000000 // entry_2    cacheline[  3][ 3] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  3][ 4] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  3][ 5] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
-0x00400002 // entry_5    cacheline[  3][ 6] <29b>: cmd[0:4]=CMD_MEM_READ || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x02
-0x10010801 // entry_6    cacheline[  3][ 7] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=0x10
+0x00400002 // entry_5    cacheline[  3][ 6] <29b>: cmd[0:4]=CMD_MEM_READ || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=buffer_5
+0x10010801 // entry_6    cacheline[  3][ 7] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  3][ 8] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_READ_WRITE_10, Number of entries: 11
