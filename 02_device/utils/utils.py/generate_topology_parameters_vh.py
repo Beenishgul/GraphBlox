@@ -48,6 +48,7 @@ output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portma
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
 output_file_afu_topology = os.path.join(output_folder_path_topology,"afu_topology.vh")
 output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
+output_file_generate_m_axi_vip_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_vip.tcl")
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
 output_file_bundle_topology = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
@@ -71,6 +72,7 @@ with open(config_file_path, "r") as file:
 buffers = config_data["buffers"]
 channels = config_data["channels"]
 ch_properties = config_data["ch_properties"]
+cache_properties = config_data["cache_properties"]
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
 fifo_control_response = config_data["fifo_control_response"]
@@ -440,32 +442,67 @@ def check_and_clean_file(file_path):
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
 
-def generate_topology_parameters(ch_properties):
+def generate_channels_properties_parameters(ch_properties):
 
     # Grouping values for each channel
     channel_config_l1 = []
     channel_config_l2 = []
-    channel_config_data_width = []
-    channel_config_address_width = []
+    channel_config_data_width_be = []
+    channel_config_address_width_be = []
+    channel_config_data_width_mid = []
+    channel_config_address_width_mid = []
+    channel_config_data_width_fe = []
+    channel_config_address_width_fe = []
     for channel, values in ch_properties.items():
+        channel_config_address_width_be.append(int(values[2]))
+        channel_config_address_width_fe.append(int(values[6]))
+        channel_config_address_width_mid.append(int(values[4]))
+        channel_config_data_width_be.append(int(values[3]))
+        channel_config_data_width_fe.append(int(values[7]))
+        channel_config_data_width_mid.append(int(values[5]))
         channel_config_l1.append(int(values[0]))
         channel_config_l2.append(int(values[1]))
-        channel_config_address_width.append(int(values[2]))
-        channel_config_data_width.append(int(values[3]))
 
 
     NUM_CHANNELS_MAX = len(channel_config_l1)
 
 
-    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2, channel_config_address_width, channel_config_data_width
+    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2, channel_config_address_width_be, channel_config_data_width_be, channel_config_address_width_mid, channel_config_data_width_mid, channel_config_address_width_fe, channel_config_data_width_fe
+
+def generate_caches_properties_parameters(cache_properties):
+
+    # Grouping values for each cache
+    cache_config_l1_num_ways = []
+    cache_config_l1_size = []
+    cache_config_l2_num_ways = []
+    cache_config_l2_size = []
+    for cache, values in cache_properties.items():
+        cache_config_l1_num_ways.append(int(values[3]))
+        cache_config_l1_size.append(int(values[2]))
+        cache_config_l2_num_ways.append(int(values[1]))
+        cache_config_l2_size.append(int(values[0]))
+
+
+    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways
 
 CHANNEL_CONFIG_L1 = []
 CHANNEL_CONFIG_L2 = []
-CHANNEL_CONFIG_ADDRESS_WIDTH=[]
-CHANNEL_CONFIG_DATA_WIDTH=[]
+CHANNEL_CONFIG_ADDRESS_WIDTH_BE=[]
+CHANNEL_CONFIG_DATA_WIDTH_BE=[]
+CHANNEL_CONFIG_ADDRESS_WIDTH_MID=[]
+CHANNEL_CONFIG_DATA_WIDTH_MID=[]
+CHANNEL_CONFIG_ADDRESS_WIDTH_FE=[]
+CHANNEL_CONFIG_DATA_WIDTH_FE=[]
 NUM_CHANNELS_MAX  = 1
 
-NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH, CHANNEL_CONFIG_DATA_WIDTH= generate_topology_parameters(ch_properties)
+NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
+
+CACHE_CONFIG_L1_NUM_WAYS = []
+CACHE_CONFIG_L1_SIZE = []
+CACHE_CONFIG_L2_NUM_WAYS = []
+CACHE_CONFIG_L2_SIZE = []
+
+CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS = generate_caches_properties_parameters(cache_properties)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
@@ -671,6 +708,7 @@ CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_
 
 check_and_clean_file(output_file_generate_ports_tcl)
 check_and_clean_file(output_file_buffer_channels_tcl)
+check_and_clean_file(output_file_generate_m_axi_vip_tcl)
 check_and_clean_file(output_file_path_global)
 check_and_clean_file(output_file_top_parameters)
 check_and_clean_file(output_file_set_top_parameters)
@@ -700,7 +738,7 @@ parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1} ,
 parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1   ,
 """
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH[index],CHANNEL_CONFIG_ADDRESS_WIDTH[index]))
+        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
     
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32")
@@ -759,15 +797,23 @@ with open(output_file_path_topology, "w") as file:
     file.write(f"parameter NUM_ENGINES_INDEX = {NUM_ENGINES},\n\n")
 
     # ... [The previous writing for the arrays here] ...
-
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// TOPOLOGY CONFIGURATIONS CHANNEL\n")
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write(f"parameter NUM_CHANNELS_MAX = {NUM_CHANNELS_MAX},\n")
-    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L1) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]            =" + vhdl_format(CHANNEL_CONFIG_L2) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L1) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L2) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_BE[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_BE) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_BE[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_BE) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_MID[NUM_CHANNELS_MAX]         =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_MID) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_MID[NUM_CHANNELS_MAX]      =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_MID) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_FE[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_FE) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_FE[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_FE) + ",\n")
+
+    file.write("parameter int CACHE_CONFIG_L2_SIZE[NUM_CHANNELS_MAX]         =" + vhdl_format(CACHE_CONFIG_L2_SIZE) + ",\n")
+    file.write("parameter int CACHE_CONFIG_L2_NUM_WAYS[NUM_CHANNELS_MAX]      =" + vhdl_format(CACHE_CONFIG_L2_NUM_WAYS) + ",\n")
+    file.write("parameter int CACHE_CONFIG_L1_SIZE[NUM_CHANNELS_MAX]          =" + vhdl_format(CACHE_CONFIG_L1_SIZE) + ",\n")
+    file.write("parameter int CACHE_CONFIG_L1_NUM_WAYS[NUM_CHANNELS_MAX]       =" + vhdl_format(CACHE_CONFIG_L1_NUM_WAYS) + ",\n")
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// TOPOLOGY CONFIGURATIONS DEFAULTS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
@@ -1754,7 +1800,7 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
 
     module_template = """
     // Slave MM VIP instantiation
-    slv_m00_axi_vip inst_slv_m{0:02d}_axi_vip (
+    slv_m{0:02d}_axi_vip inst_slv_m{0:02d}_axi_vip (
         .aclk         (ap_clk         ),
         .aresetn      (ap_rst_n       ),
         .s_axi_awvalid(m{0:02d}_axi_awvalid),
@@ -1797,8 +1843,8 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         .s_axi_arqos  (m{0:02d}_axi_arqos  )
     );
 
-        slv_m00_axi_vip_slv_mem_t m{0:02d}_axi    ;
-        slv_m00_axi_vip_slv_t     m{0:02d}_axi_slv;
+        slv_m{0:02d}_axi_vip_slv_mem_t m{0:02d}_axi    ;
+        slv_m{0:02d}_axi_vip_slv_t     m{0:02d}_axi_slv;
         """
 
     for channel in DISTINCT_CHANNELS:
@@ -1806,7 +1852,7 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
 
     file.write('\n'.join(output_lines))
 
-def generate_tcl_script_from_json(output_file_name):
+def generate_output_file_buffer_channels_tcl(output_file_name):
   
     # Open output file for writing
     with open(output_file_name, "w") as file:
@@ -1827,21 +1873,208 @@ def generate_tcl_script_from_json(output_file_name):
 
             current_address += size_in_hex  # Increment the address based on the size
 
-def generate_ipx_associate_commands(output_file_name):
+generate_output_file_buffer_channels_tcl(output_file_buffer_channels_tcl)
+
+def generate_ipx_associate_commands_tcl(output_file_name):
 
     # Open output file for appending
     with open(output_file_name, "a") as file:
         for index, channel_num in enumerate(DISTINCT_CHANNELS):
             file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
             file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-            file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH[index]} $bifparam\n')
+            file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[index]} $bifparam\n')
             file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-            file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH[index]} $bifparam\n')
+            file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]} $bifparam\n')
           
-# Generate the ipx::associate_bus_interfaces commands
-generate_ipx_associate_commands(output_file_generate_ports_tcl)
-generate_tcl_script_from_json(output_file_buffer_channels_tcl)
 
+# Generate the ipx::associate_bus_interfaces commands
+generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
+
+
+# ----------------------------------------------------------------------------
+# generate axi vip
+# ----------------------------------------------------------------------------
+
+with open(output_file_generate_m_axi_vip_tcl, "w") as file:
+    output_lines = []
+
+    fill_m_axi_vip_tcl_template="""
+# ----------------------------------------------------------------------------
+# generate axi slave vip
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate AXI VIP Slave"]" 
+
+set module_name slv_m{0:02d}_axi_vip
+create_ip -name axi_vip                 \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 1.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list \\
+                    CONFIG.INTERFACE_MODE {{SLAVE}}               \\
+                    CONFIG.PROTOCOL {{AXI4}}                      \\
+                    CONFIG.ADDR_WIDTH {{{1}}}                     \\
+                    CONFIG.DATA_WIDTH {{{2}}}                     \\
+                    CONFIG.SUPPORTS_NARROW {{0}}                  \\
+                    CONFIG.HAS_LOCK {{1}}                         \\
+                    CONFIG.HAS_CACHE {{1}}                        \\
+                    CONFIG.HAS_REGION {{0}}                       \\
+                    CONFIG.HAS_BURST {{1}}                        \\
+                    CONFIG.HAS_QOS {{1}}                          \\
+                    CONFIG.HAS_PROT {{1}}                         \\
+                    CONFIG.HAS_WSTRB {{1}}                        \\
+                    CONFIG.HAS_SIZE {{1}}                         \\
+                    CONFIG.ID_WIDTH   {{1}}                       \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# generate SYSTEM CACHE AXI_M{0:02d}
+# C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
+# ----------------------------------------------------------------------------
+set BE_ADDR_WIDTH_M{0:02d}         {2}
+set BE_CACHE_DATA_WIDTH_M{0:02d}   {1}
+set LINE_CACHE_DATA_WIDTH_M{0:02d} {1} 
+set MID_ADDR_WIDTH_M{0:02d}        {4} 
+set MID_CACHE_DATA_WIDTH_M{0:02d}  {3} 
+set SYSTEM_CACHE_NUM_WAYS_M{0:02d} {6} 
+set SYSTEM_CACHE_SIZE_B_M{0:02d}   {5} 
+
+set SYSTEM_CACHE_SIZE_KB_M{0:02d} [expr {{${{SYSTEM_CACHE_SIZE_B}} / 1024}}]
+puts "[color 2 "                        Generate Kernel Cache: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
+puts "[color 2 "                                    Front-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
+puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
+
+
+set module_name m{0:02d}_axi_rsystem_cache_{1}x{2}_{3}x{4}
+create_ip -name system_cache            \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 5.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+
+set_property -dict [list                                                  \\
+                    CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}    \\
+                    CONFIG.C_CACHE_SIZE  ${{SYSTEM_CACHE_SIZE_B_M{0:02d}}}           \\
+                    CONFIG.C_M0_AXI_ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}           \\
+                    CONFIG.C_M0_AXI_DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                    CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
+                    CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
+                    CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
+                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\
+                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
+                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}\\
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}      \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
+                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{URAM}}                \\
+                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# Generate AXI_M{0:02d} Register Slice
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Mid-end {3}x{4}"]" 
+
+set module_name m{0:02d}_axi_register_slice_mid_{3}x{4}
+create_ip -name axi_register_slice      \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 2.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list                                                      \\
+                      CONFIG.ADDR_WIDTH {{MID_ADDR_WIDTH_M{0:02d}}}           \\
+                      CONFIG.DATA_WIDTH {{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                      CONFIG.ID_WIDTH {{1}}                   \\
+                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}   \\
+                      CONFIG.REG_AR {{15}}                    \\
+                      CONFIG.REG_AW {{15}}                    \\
+                      CONFIG.REG_B {{15}}                     \\
+                      CONFIG.REG_R {{15}}                     \\
+                      CONFIG.REG_W {{15}}                     \\
+                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+# ----------------------------------------------------------------------------
+# Generate AXI_M{0:02d} Register Slice
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Back-end"]" 
+
+set module_name m{0:02d}_axi_register_slice_be_{1}x{2}
+create_ip -name axi_register_slice      \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 2.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list                                                          \\
+                      CONFIG.ADDR_WIDTH {{BE_ADDR_WIDTH_M{0:02d}}}                \\
+                      CONFIG.DATA_WIDTH {{BE_CACHE_DATA_WIDTH_M{0:02d}}}          \\
+                      CONFIG.ID_WIDTH {{1}}                                       \\
+                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
+                      CONFIG.REG_AR {{15}}                    \\
+                      CONFIG.REG_AW {{15}}                    \\
+                      CONFIG.REG_B {{15}}                     \\
+                      CONFIG.REG_R {{15}}                     \\
+                      CONFIG.REG_W {{15}}                     \\
+                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    """
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index]))
+
+    file.write('\n'.join(output_lines))
+
+# ----------------------------------------------------------------------------
+# generate axi slave vip
+# ----------------------------------------------------------------------------
 # Write to VHDL file
 with open(output_file_slv_m_axi_vip_func, "w") as file:
     output_lines = []
@@ -2078,6 +2311,6 @@ with open(output_file_testbench_parameters, "w") as file:
         """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH[index],CHANNEL_CONFIG_ADDRESS_WIDTH[index]))
+        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
 
     file.write('\n'.join(output_lines))

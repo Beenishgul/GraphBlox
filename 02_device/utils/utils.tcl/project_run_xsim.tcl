@@ -54,7 +54,7 @@ update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_N
 puts "[color 4 "                        INFO: Update compile order: sim_1"]"
 update_compile_order -fileset sim_1 >> $log_file
 
-launch_simulation -simset sim_1 -mode post-implementation -type functional
+launch_simulation -simset sim_1 -mode post-synthesis -type functional
 # launch_simulation -simset sim_1 -mode behavioral
 
 log_wave -r *
