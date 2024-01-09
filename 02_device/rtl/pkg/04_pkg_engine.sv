@@ -17,7 +17,7 @@ package PKG_ENGINE;
 
 import PKG_GLOBALS::*;
 import PKG_MEMORY::*;
-import PKG_AXI4_FE::*;
+import PKG_MXX_AXI4_FE::*;
 
 // --------------------------------------------------------------------------------------
 // CSR\_Index\_Generator
@@ -57,11 +57,11 @@ typedef struct packed{
     logic                                  mode_break   ;
     logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel   ;
     logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer    ;
-    logic [          M_AXI4_FE_DATA_W-1:0] array_size   ;
-    logic [          M_AXI4_FE_DATA_W-1:0] index_start  ;
-    logic [          M_AXI4_FE_DATA_W-1:0] index_end    ;
-    logic [          M_AXI4_FE_DATA_W-1:0] stride       ;
-    logic [  $clog2(M_AXI4_FE_ADDR_W)-1:0] granularity  ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] array_size   ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] index_start  ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] index_end    ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] stride       ;
+    logic [$clog2(M00_AXI4_FE_ADDR_W)-1:0] granularity  ;
     logic                                  direction    ;
 } CSRIndexConfigurationParameters;
 
@@ -184,7 +184,7 @@ typedef struct packed{
     type_ALU_operation                                                           alu_operation;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    alu_mask     ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value  ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value  ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask     ;
 } ALUOpsConfigurationParameters;
 
@@ -239,7 +239,7 @@ typedef struct packed{
     type_filter_operation                                                        filter_operation;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    filter_mask     ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask      ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value     ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value     ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask        ;
     logic                                                                        break_flag      ;
     logic                                                                        break_pass      ;
@@ -301,14 +301,14 @@ typedef struct packed{
     logic                                                                        mode_counter ;
     logic [      NUM_CHANNELS_WIDTH_BITS-1:0]                                    id_channel   ;
     logic [   CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                    id_buffer    ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    array_size   ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    index_start  ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    index_end    ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    stride       ;
-    logic [     $clog2(M_AXI4_FE_ADDR_W)-1:0]                                    granularity  ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    array_size   ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    index_start  ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    index_end    ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    stride       ;
+    logic [   $clog2(M00_AXI4_FE_ADDR_W)-1:0]                                    granularity  ;
     logic                                                                        direction    ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;
-    logic [             M_AXI4_FE_DATA_W-1:0]                                    const_value  ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value  ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask     ;
 } ReadWriteConfigurationParameters;
 
@@ -368,11 +368,11 @@ typedef struct packed{
     logic                                  flush_enable;
     logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel  ;
     logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer   ;
-    logic [          M_AXI4_FE_DATA_W-1:0] array_size  ;
-    logic [          M_AXI4_FE_DATA_W-1:0] start_read  ;
-    logic [          M_AXI4_FE_DATA_W-1:0] end_read    ;
-    logic [          M_AXI4_FE_DATA_W-1:0] stride      ;
-    logic [  $clog2(M_AXI4_FE_ADDR_W)-1:0] granularity ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] array_size  ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] start_read  ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] end_read    ;
+    logic [        M00_AXI4_FE_DATA_W-1:0] stride      ;
+    logic [$clog2(M00_AXI4_FE_ADDR_W)-1:0] granularity ;
 } CUSetupEngineConfigurationParameters;
 
 typedef struct packed{

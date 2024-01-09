@@ -15,9 +15,9 @@
 package PKG_CACHE;
 
 import PKG_GLOBALS::*;
-import PKG_AXI4_FE::*;
-import PKG_AXI4_MID::*;
-import PKG_AXI4_BE::*;
+import PKG_MXX_AXI4_FE::*;
+import PKG_MXX_AXI4_MID::*;
+import PKG_MXX_AXI4_BE::*;
 
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
@@ -45,8 +45,8 @@ parameter CACHE_WRITE_BACK    = 1; //write-back allocate: implemented a dirty-me
 // CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-parameter CACHE_FRONTEND_ADDR_W = M_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-parameter CACHE_FRONTEND_DATA_W = M_AXI4_FE_DATA_W; //Data width - word size used for the cache
+parameter CACHE_FRONTEND_ADDR_W = M00_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+parameter CACHE_FRONTEND_DATA_W = M00_AXI4_FE_DATA_W; //Data width - word size used for the cache
 parameter CACHE_N_WAYS          = 1               ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
 parameter CACHE_LINE_OFF_W      = 6               ; //Line-Offset Width - 2**NLINE_W total cache lines
 parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)      ; //Depth Width of Write-Through Buffer
@@ -58,8 +58,8 @@ parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8      ; //Number of Byt
 parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES); //Byte Offset
 /*---------------------------------------------------*/
 //Higher hierarchy memory (slave) interface parameters
-parameter CACHE_BACKEND_ADDR_W = M_AXI4_MID_ADDR_W           ; //Address width of the higher hierarchy memory
-parameter CACHE_BACKEND_DATA_W = M_AXI4_MID_DATA_W           ; //Data width of the memory
+parameter CACHE_BACKEND_ADDR_W = M00_AXI4_MID_ADDR_W           ; //Address width of the higher hierarchy memory
+parameter CACHE_BACKEND_DATA_W = M00_AXI4_MID_DATA_W           ; //Data width of the memory
 parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8      ; //Number of bytes
 parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
@@ -76,15 +76,15 @@ parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling
 //AXI specific parameters
 parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W;
 parameter                      CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W;
-parameter                      CACHE_AXI_ID_W    = M_AXI4_MID_ID_W     ; //AXI ID (identification) width
-parameter                      CACHE_AXI_LEN_W   = M_AXI4_MID_LEN_W    ; //AXI ID burst length (log2)
-parameter                      CACHE_AXI_LOCK_W  = M_AXI4_MID_LOCK_W   ;
-parameter                      CACHE_AXI_CACHE_W = M_AXI4_MID_CACHE_W  ;
-parameter                      CACHE_AXI_PROT_W  = M_AXI4_MID_PROT_W   ;
-parameter                      CACHE_AXI_QOS_W   = M_AXI4_MID_QOS_W    ;
-parameter                      CACHE_AXI_BURST_W = M_AXI4_MID_BURST_W  ;
-parameter                      CACHE_AXI_RESP_W  = M_AXI4_MID_RESP_W   ;
-parameter                      CACHE_AXI_SIZE_W  = M_AXI4_MID_SIZE_W   ;
+parameter                      CACHE_AXI_ID_W    = M00_AXI4_MID_ID_W     ; //AXI ID (identification) width
+parameter                      CACHE_AXI_LEN_W   = M00_AXI4_MID_LEN_W    ; //AXI ID burst length (log2)
+parameter                      CACHE_AXI_LOCK_W  = M00_AXI4_MID_LOCK_W   ;
+parameter                      CACHE_AXI_CACHE_W = M00_AXI4_MID_CACHE_W  ;
+parameter                      CACHE_AXI_PROT_W  = M00_AXI4_MID_PROT_W   ;
+parameter                      CACHE_AXI_QOS_W   = M00_AXI4_MID_QOS_W    ;
+parameter                      CACHE_AXI_BURST_W = M00_AXI4_MID_BURST_W  ;
+parameter                      CACHE_AXI_RESP_W  = M00_AXI4_MID_RESP_W   ;
+parameter                      CACHE_AXI_SIZE_W  = M00_AXI4_MID_SIZE_W   ;
 
 parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID      = 0                   ; //AXI ID value
 
@@ -111,8 +111,8 @@ parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM
 // STREAM CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-parameter STREAM_FRONTEND_ADDR_W = M_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-parameter STREAM_FRONTEND_DATA_W = M_AXI4_FE_DATA_W; //Data width - word size used for the cache
+parameter STREAM_FRONTEND_ADDR_W = M00_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+parameter STREAM_FRONTEND_DATA_W = M00_AXI4_FE_DATA_W; //Data width - word size used for the cache
 parameter STREAM_N_WAYS          = 4               ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
 parameter STREAM_LINE_OFF_W      = 2               ; //Line-Offset Width - 2**NLINE_W total cache lines
 parameter STREAM_WTBUF_DEPTH_W   = $clog2(32)      ; //Depth Width of Write-Through Buffer
@@ -124,8 +124,8 @@ parameter STREAM_FRONTEND_NBYTES = STREAM_FRONTEND_DATA_W/8      ; //Number of B
 parameter STREAM_FRONTEND_BYTE_W = $clog2(STREAM_FRONTEND_NBYTES); //Byte Offset
 /*---------------------------------------------------*/
 //Higher hierarchy memory (slave) interface parameters
-parameter STREAM_BACKEND_ADDR_W = M_AXI4_MID_ADDR_W           ; //Address width of the higher hierarchy memory
-parameter STREAM_BACKEND_DATA_W = M_AXI4_MID_DATA_W           ; //Data width of the memory
+parameter STREAM_BACKEND_ADDR_W = M00_AXI4_MID_ADDR_W           ; //Address width of the higher hierarchy memory
+parameter STREAM_BACKEND_DATA_W = M00_AXI4_MID_DATA_W           ; //Data width of the memory
 parameter STREAM_BACKEND_NBYTES = STREAM_BACKEND_DATA_W/8      ; //Number of bytes
 parameter STREAM_BACKEND_BYTE_W = $clog2(STREAM_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset

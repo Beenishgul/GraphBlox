@@ -14,30 +14,30 @@
 
 `include "global_package.vh"
 
-module kernel_afu  #(
+module kernel_afu #(
   `include "afu_parameters.vh"
-)(
+  ) (
   // System Signals
-  input  logic                         ap_clk         ,
-  input  logic                         ap_rst_n       ,
+  input  logic                           ap_clk     ,
+  input  logic                           ap_rst_n   ,
   // AXI4 master interface m00_axi
   `include "m_axi_ports_afu.vh"
   // Control Signals
-  input  logic                         ap_start       ,
-  output logic                         ap_idle        ,
-  output logic                         ap_done        ,
-  output logic                         ap_ready       ,
-  input  logic                         ap_continue    ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_0       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_1       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_2       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_3       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_4       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_5       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_6       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_7       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_8       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_9
+  input  logic                           ap_start   ,
+  output logic                           ap_idle    ,
+  output logic                           ap_done    ,
+  output logic                           ap_ready   ,
+  input  logic                           ap_continue,
+  input  logic [BUFFER_0_WIDTH_BITS-1:0] buffer_0   ,
+  input  logic [BUFFER_1_WIDTH_BITS-1:0] buffer_1   ,
+  input  logic [BUFFER_2_WIDTH_BITS-1:0] buffer_2   ,
+  input  logic [BUFFER_3_WIDTH_BITS-1:0] buffer_3   ,
+  input  logic [BUFFER_4_WIDTH_BITS-1:0] buffer_4   ,
+  input  logic [BUFFER_5_WIDTH_BITS-1:0] buffer_5   ,
+  input  logic [BUFFER_6_WIDTH_BITS-1:0] buffer_6   ,
+  input  logic [BUFFER_7_WIDTH_BITS-1:0] buffer_7   ,
+  input  logic [BUFFER_8_WIDTH_BITS-1:0] buffer_8   ,
+  input  logic [BUFFER_9_WIDTH_BITS-1:0] buffer_9
 );
 
 genvar i;
@@ -77,18 +77,18 @@ logic areset_cache    [NUM_CHANNELS-1:0];
 // --------------------------------------------------------------------------------------
 // AXI
 // --------------------------------------------------------------------------------------
-AXI4BEMasterReadInterface  m_axi4_read [NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterface m_axi4_write[NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterReadInterface  m_axi4_read [NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterWriteInterface m_axi4_write[NUM_CHANNELS-1:0];
 
-AXI4MIDSlaveReadInterfaceOutput  kernel_s_axi_read_out [NUM_CHANNELS-1:0];
-AXI4MIDSlaveReadInterfaceInput   kernel_s_axi_read_in  [NUM_CHANNELS-1:0];
-AXI4MIDSlaveWriteInterfaceOutput kernel_s_axi_write_out[NUM_CHANNELS-1:0];
-AXI4MIDSlaveWriteInterfaceInput  kernel_s_axi_write_in [NUM_CHANNELS-1:0];
+M00_AXI4_MID_SlaveReadInterfaceOutput  kernel_s_axi_read_out [NUM_CHANNELS-1:0];
+M00_AXI4_MID_SlaveReadInterfaceInput   kernel_s_axi_read_in  [NUM_CHANNELS-1:0];
+M00_AXI4_MID_SlaveWriteInterfaceOutput kernel_s_axi_write_out[NUM_CHANNELS-1:0];
+M00_AXI4_MID_SlaveWriteInterfaceInput  kernel_s_axi_write_in [NUM_CHANNELS-1:0];
 
-AXI4BEMasterReadInterfaceInput   kernel_m_axi4_read_in  [NUM_CHANNELS-1:0];
-AXI4BEMasterReadInterfaceOutput  kernel_m_axi4_read_out [NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterfaceInput  kernel_m_axi4_write_in [NUM_CHANNELS-1:0];
-AXI4BEMasterWriteInterfaceOutput kernel_m_axi4_write_out[NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterReadInterfaceInput   kernel_m_axi4_read_in  [NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterReadInterfaceOutput  kernel_m_axi4_read_out [NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterWriteInterfaceInput  kernel_m_axi4_write_in [NUM_CHANNELS-1:0];
+M00_AXI4_BE_MasterWriteInterfaceOutput kernel_m_axi4_write_out[NUM_CHANNELS-1:0];
 
 logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal;
 

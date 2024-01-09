@@ -26,7 +26,7 @@ module engine_forward_data_generator #(parameter
     FIFO_WRITE_DEPTH    = 16              ,
     PROG_THRESH         = 8               ,
     PIPELINE_STAGES     = 2               ,
-    COUNTER_WIDTH       = M_AXI4_FE_ADDR_W,
+    COUNTER_WIDTH       = M00_AXI4_FE_ADDR_W,
     NUM_BACKTRACK_LANES = 4               ,
     NUM_BUNDLES         = 4
 ) (

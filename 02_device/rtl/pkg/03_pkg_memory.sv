@@ -21,7 +21,7 @@
 package PKG_MEMORY;
 
 import PKG_GLOBALS::*;
-import PKG_AXI4_FE::*;
+import PKG_MXX_AXI4_FE::*;
 import PKG_DESCRIPTOR::*;
 import PKG_CACHE::*;
 
@@ -130,7 +130,7 @@ typedef struct packed{
 
 typedef struct packed{
   logic                                direction; // 0 - right, 1 left  1 bits
-  logic [$clog2(M_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = clog2(offset) bits
+  logic [$clog2(M00_AXI4_FE_ADDR_W)-1:0] amount   ; // SIZE = clog2(offset) bits
 } PacketDataAddressShift;
 
 typedef struct packed{
@@ -152,7 +152,7 @@ typedef struct packed{
 } MemoryPacketRouteAttributes;
 
 typedef struct packed{
-  logic [M_AXI4_FE_DATA_W-1:0] field;
+  logic [M00_AXI4_FE_DATA_W-1:0] field;
 } MemoryPacketData;
 
 // --------------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ typedef struct packed{
 
 parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
 typedef struct packed{
-  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M_AXI4_FE_DATA_W-1:0] field;
+  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M00_AXI4_FE_DATA_W-1:0] field;
 } EnginePacketData;
 
 typedef struct packed{
@@ -291,9 +291,9 @@ typedef struct packed {
 // --------------------------------------------------------------------------------------
 typedef struct packed {
   logic                        valid;
-  logic [M_AXI4_FE_ADDR_W-1:0] addr ;
-  logic [M_AXI4_FE_DATA_W-1:0] wdata;
-  logic [M_AXI4_FE_STRB_W-1:0] wstrb;
+  logic [M00_AXI4_FE_ADDR_W-1:0] addr ;
+  logic [M00_AXI4_FE_DATA_W-1:0] wdata;
+  logic [M00_AXI4_FE_STRB_W-1:0] wstrb;
 } CacheRequestIOB;
 
 typedef struct packed {
@@ -313,7 +313,7 @@ typedef struct packed {
 typedef struct packed {
   logic                        valid;
   logic                        ready;
-  logic [M_AXI4_FE_DATA_W-1:0] rdata;
+  logic [M00_AXI4_FE_DATA_W-1:0] rdata;
 } CacheResponseIOB;
 
 typedef struct packed {
@@ -346,7 +346,7 @@ endfunction : map_internal_fifo_signals_to_output
 function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketRequestPayload input_packet, input KernelDescriptorPayload  descriptor, input input_packet_valid);
 
   CacheRequestPayload output_packet;
-  logic [M_AXI4_FE_ADDR_W-1:0] address_base;
+  logic [M00_AXI4_FE_ADDR_W-1:0] address_base;
 
   case (input_packet.meta.address.id_buffer)
     (1 << 0) : begin

@@ -20,21 +20,21 @@ module cu_buffer #(
   parameter PROG_THRESH       = 16
 ) (
   // System Signals
-  input  logic                             ap_clk                   ,
-  input  logic                             areset                   ,
-  input  KernelDescriptor                  descriptor_in            ,
-  input  MemoryPacketRequest               request_in               ,
-  output FIFOStateSignalsOutput            fifo_request_signals_out ,
-  input  FIFOStateSignalsInput             fifo_request_signals_in  ,
-  output MemoryPacketResponse              response_out             ,
-  output FIFOStateSignalsOutput            fifo_response_signals_out,
-  input  FIFOStateSignalsInput             fifo_response_signals_in ,
-  output logic                             fifo_setup_signal        ,
-  input  AXI4MIDMasterReadInterfaceInput   m_axi_read_in            ,
-  output AXI4MIDMasterReadInterfaceOutput  m_axi_read_out           ,
-  input  AXI4MIDMasterWriteInterfaceInput  m_axi_write_in           ,
-  output AXI4MIDMasterWriteInterfaceOutput m_axi_write_out          ,
-  output logic                             done_out
+  input  logic                                   ap_clk                   ,
+  input  logic                                   areset                   ,
+  input  KernelDescriptor                        descriptor_in            ,
+  input  MemoryPacketRequest                     request_in               ,
+  output FIFOStateSignalsOutput                  fifo_request_signals_out ,
+  input  FIFOStateSignalsInput                   fifo_request_signals_in  ,
+  output MemoryPacketResponse                    response_out             ,
+  output FIFOStateSignalsOutput                  fifo_response_signals_out,
+  input  FIFOStateSignalsInput                   fifo_response_signals_in ,
+  output logic                                   fifo_setup_signal        ,
+  input  M00_AXI4_MID_MasterReadInterfaceInput   m_axi_read_in            ,
+  output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
+  input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
+  output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  output logic                                   done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
-AXI4MIDMasterReadInterface  m_axi_read ;
-AXI4MIDMasterWriteInterface m_axi_write;
+M00_AXI4_MID_MasterReadInterface  m_axi_read ;
+M00_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -91,24 +91,24 @@ logic                         fifo_response_setup_signal_int;
 // --------------------------------------------------------------------------------------
 // READ/WRITE ENGINE
 // --------------------------------------------------------------------------------------
-logic                                                read_transaction_done_out     ;
-logic                                                read_transaction_start_in     ;
-logic [NUM_CHANNELS_READ-1:0]                        read_transaction_prog_full    ;
-logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tready_in    ;
-logic [NUM_CHANNELS_READ-1:0]                        read_transaction_tvalid_out   ;
-logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
-logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
-logic [NUM_CHANNELS_READ-1:0][M_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
-logic [M_AXI4_MID_DATA_W-1:0]                        read_transaction_length_in    ;
+logic                                                    read_transaction_done_out     ;
+logic                                                    read_transaction_start_in     ;
+logic [  NUM_CHANNELS_READ-1:0]                          read_transaction_prog_full    ;
+logic [  NUM_CHANNELS_READ-1:0]                          read_transaction_tready_in    ;
+logic [  NUM_CHANNELS_READ-1:0]                          read_transaction_tvalid_out   ;
+logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
+logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
+logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
+logic [M00_AXI4_MID_DATA_W-1:0]                          read_transaction_length_in    ;
 
-logic                         write_transaction_start_in    ;
-logic                         write_transaction_tvalid_in   ;
-logic [M_AXI4_MID_DATA_W-1:0] write_transaction_length_in   ;
-logic [M_AXI4_MID_ADDR_W-1:0] write_transaction_offset_in   ;
-logic [M_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in    ;
-logic [M_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in_reg;
-logic                         write_transaction_done_out    ;
-logic                         write_transaction_tready_out  ;
+logic                           write_transaction_start_in    ;
+logic                           write_transaction_tvalid_in   ;
+logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_length_in   ;
+logic [M00_AXI4_MID_ADDR_W-1:0] write_transaction_offset_in   ;
+logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in    ;
+logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in_reg;
+logic                           write_transaction_done_out    ;
+logic                           write_transaction_tready_out  ;
 
 
 // --------------------------------------------------------------------------------------
@@ -432,8 +432,8 @@ assign write_transaction_offset_in = engine_m_axi_request_mem_reg.iob.addr;
 assign write_transaction_tdata_in  = engine_m_axi_request_mem_reg.iob.wdata;
 
 engine_m_axi #(
-  .C_NUM_CHANNELS(NUM_CHANNELS_READ                                ),
-  .C_AXI_RW_CACHE(M_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  .C_NUM_CHANNELS(NUM_CHANNELS_READ                                  ),
+  .C_AXI_RW_CACHE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_engine_m_axi (
   .read_transaction_done_out   (read_transaction_done_out   ),
   .read_transaction_length_in  (read_transaction_length_in  ),
