@@ -2113,12 +2113,16 @@ check_and_clean_file(output_file_filelist_xsim_ip_v_f)
 with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
     output_lines = []
 
-    fill_filelist_xsim_ip_vhdl_template="""
+    fill_filelist_xsim_ip_vhdl_template_once="""
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/hdl/system_cache_v5_0_vh_rfs.vhd
+  """
+    fill_filelist_xsim_ip_vhdl_template="""
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}.vhd
   """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
+        if(index==0):
+            output_lines.append(fill_filelist_xsim_ip_vhdl_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
 
     file.write('\n'.join(output_lines))
@@ -2147,13 +2151,18 @@ with open(output_file_filelist_xsim_ip_v_f, "w") as file:
 
     output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v")
 
-    fill_file_filelist_xsim_ip_v_template="""
+    fill_file_filelist_xsim_ip_v_template_once="""
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/hdl/axi_register_slice_v2_1_vl_rfs.v
+   """
+
+    fill_file_filelist_xsim_ip_v_template="""
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/sim/m{0:02d}_axi_register_slice_be_{1}x{2}.v
 {5}/m{0:02d}_axi_register_slice_mid_{3}x{4}/sim/m{0:02d}_axi_register_slice_mid_{3}x{4}.v
    """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
+        if(index==0):
+            output_lines.append(fill_file_filelist_xsim_ip_v_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
 
     output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
