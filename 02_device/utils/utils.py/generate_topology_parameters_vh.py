@@ -509,16 +509,19 @@ def generate_caches_properties_parameters(cache_properties):
     # Grouping values for each cache
     cache_config_l1_num_ways = []
     cache_config_l1_size = []
+    cache_config_l1_prefetch = []
     cache_config_l2_num_ways = []
     cache_config_l2_size = []
     for cache, values in cache_properties.items():
+        cache_config_l1_prefetch.append(int(values[4]))
         cache_config_l1_num_ways.append(int(values[3]))
         cache_config_l1_size.append(int(values[2]))
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
 
 
-    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways
+    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch
+
 
 CHANNEL_CONFIG_L1 = []
 CHANNEL_CONFIG_L2 = []
@@ -532,12 +535,13 @@ NUM_CHANNELS_MAX  = 1
 
 NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
 
+CACHE_CONFIG_L1_PREFETCH = []
 CACHE_CONFIG_L1_NUM_WAYS = []
 CACHE_CONFIG_L1_SIZE = []
 CACHE_CONFIG_L2_NUM_WAYS = []
 CACHE_CONFIG_L2_SIZE = []
 
-CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS = generate_caches_properties_parameters(cache_properties)
+CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH = generate_caches_properties_parameters(cache_properties)
 
 
 def find_max_value(list1, list2, list1_c, list2_c, max_size):
@@ -893,6 +897,9 @@ with open(output_file_path_topology, "w") as file:
     file.write("parameter int CACHE_CONFIG_L2_NUM_WAYS[NUM_CHANNELS_MAX]      =" + vhdl_format(CACHE_CONFIG_L2_NUM_WAYS) + ",\n")
     file.write("parameter int CACHE_CONFIG_L1_SIZE[NUM_CHANNELS_MAX]          =" + vhdl_format(CACHE_CONFIG_L1_SIZE) + ",\n")
     file.write("parameter int CACHE_CONFIG_L1_NUM_WAYS[NUM_CHANNELS_MAX]       =" + vhdl_format(CACHE_CONFIG_L1_NUM_WAYS) + ",\n")
+    file.write("parameter int CACHE_CONFIG_L1_PREFETCH[NUM_CHANNELS_MAX]       =" + vhdl_format(CACHE_CONFIG_L1_PREFETCH) + ",\n")
+
+    
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write("// TOPOLOGY CONFIGURATIONS DEFAULTS\n")
     file.write("// --------------------------------------------------------------------------------------\n")
@@ -2115,7 +2122,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 
 set SYSTEM_CACHE_SIZE_KB_M{0:02d} [expr {{${{SYSTEM_CACHE_SIZE_B}} / 1024}}]
 puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
-puts "[color 2 "                                    Front-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
+puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
 puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
 
 
@@ -3505,11 +3512,12 @@ endmodule : m{0:02d}_axi_register_slice_be_{1}x{2}_wrapper
 
 
 for index, channel in enumerate(DISTINCT_CHANNELS):
-  output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_be_{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_wrapper.sv")
-  check_and_clean_file(output_file_mxx_axi_register_slice_be_wrapper)
-  with open(output_file_mxx_axi_register_slice_be_wrapper, "w") as file:
-    formatted_string = fill_mxx_axi_register_slice_be_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index])
-    file.write(formatted_string)
+    output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_be_wrapper.sv")
+    # output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_be_{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_wrapper.sv")
+    check_and_clean_file(output_file_mxx_axi_register_slice_be_wrapper)
+    with open(output_file_mxx_axi_register_slice_be_wrapper, "w") as file:
+        formatted_string = fill_mxx_axi_register_slice_be_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index])
+        file.write(formatted_string)
 
 
 fill_mxx_axi_register_slice_mid_wrapper="""
@@ -3684,11 +3692,12 @@ endmodule : m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper
 
 
 for index, channel in enumerate(DISTINCT_CHANNELS):
-  output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_mid_{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
-  check_and_clean_file(output_file_mxx_axi_register_slice_mid_wrapper)
-  with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
-    formatted_string = fill_mxx_axi_register_slice_mid_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
-    file.write(formatted_string)
+    # output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_mid_{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
+    output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_mid_wrapper.sv")
+    check_and_clean_file(output_file_mxx_axi_register_slice_mid_wrapper)
+    with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
+        formatted_string = fill_mxx_axi_register_slice_mid_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
+        file.write(formatted_string)
 
 
 fill_kernel_mxx_axi_system_cache_wrapper="""
@@ -3700,7 +3709,7 @@ fill_kernel_mxx_axi_system_cache_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kenrel_m{0:02d}_axi_system_cache_be512x64_mid512x64_wrapper.sv
+// File   : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-06-19 00:51:45
 // Editor : sublime text4, tab size (2)
@@ -3708,7 +3717,7 @@ fill_kernel_mxx_axi_system_cache_wrapper="""
 
 `include "global_package.vh"
 
-module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{1}x{2}_wrapper (
+module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -3886,11 +3895,12 @@ endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
 
 for index, channel in enumerate(DISTINCT_CHANNELS):
-  output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_m{channel:02d}_axi_system_cache_be{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
-  check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
-  with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
-    formatted_string = fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
-    file.write(formatted_string)
+    output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_m{channel:02d}_axi_system_cache_wrapper.sv")
+    # output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_m{channel:02d}_axi_system_cache_be{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
+    check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
+    with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
+        formatted_string = fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
+        file.write(formatted_string)
 
 
 
@@ -4234,13 +4244,13 @@ assign cache_ctrl_in.force_inv = 1'b0;
 assign cache_ctrl_in.wtb_empty = 1'b1;
 
 iob_cache_axi #(
-  .FE_ADDR_W           (M{0:02d}_AXI4_FE_ADDR_W                            ),
-  .FE_DATA_W           (M{0:02d}_AXI4_FE_DATA_W                            ),
-  .BE_ADDR_W           (M{0:02d}_AXI4_MID_ADDR_W                           ),
-  .BE_DATA_W           (M{0:02d}_AXI4_MID_DATA_W                           ),
-  .NWAYS_W             ({6}                                       ),
-  .NLINES_W            ($clog2({5})                                   ),
-  .WORD_OFFSET_W       ($clog2(M{0:02d}_AXI4_MID_DATA_W/M{0:02d}_AXI4_FE_DATA_W)     ),
+  .FE_ADDR_W           (M{0:02d}_AXI4_FE_ADDR_W                                 ),
+  .FE_DATA_W           (M{0:02d}_AXI4_FE_DATA_W                                 ),
+  .BE_ADDR_W           (M{0:02d}_AXI4_MID_ADDR_W                                ),
+  .BE_DATA_W           (M{0:02d}_AXI4_MID_DATA_W                                ),
+  .NWAYS_W             ({6}                                                     ),
+  .NLINES_W            ($clog2({5})                                             ),
+  .WORD_OFFSET_W       ($clog2(M{0:02d}_AXI4_MID_DATA_W*{7}/M{0:02d}_AXI4_FE_DATA_W)),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
@@ -4445,11 +4455,12 @@ endmodule : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper
 
 
 for index, channel in enumerate(DISTINCT_CHANNELS):
-  output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
-  check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
-  with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
-    formatted_string = fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index])
-    file.write(formatted_string)
+    output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_wrapper.sv")
+    # output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
+    check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
+    with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
+        formatted_string = fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index])
+        file.write(formatted_string)
 
 
 
@@ -4929,8 +4940,9 @@ endmodule : m{0:02d}_axi_cu_buffer_mid{1}x{2}_fe{3}x{4}_wrapper
 
 
 for index, channel in enumerate(DISTINCT_CHANNELS):
-  output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_buffer_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
-  check_and_clean_file(output_file_cu_mxx_axi_cu_buffer_wrapper)
-  with open(output_file_cu_mxx_axi_cu_buffer_wrapper, "w") as file:
-    formatted_string = fill_cu_mxx_axi_cu_buffer_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index])
-    file.write(formatted_string)
+    output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_buffer_wrapper.sv")
+    # output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_buffer_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
+    check_and_clean_file(output_file_cu_mxx_axi_cu_buffer_wrapper)
+    with open(output_file_cu_mxx_axi_cu_buffer_wrapper, "w") as file:
+        formatted_string = fill_cu_mxx_axi_cu_buffer_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index])
+        file.write(formatted_string)

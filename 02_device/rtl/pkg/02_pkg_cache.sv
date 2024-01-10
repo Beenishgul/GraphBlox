@@ -49,7 +49,7 @@ parameter CACHE_FRONTEND_ADDR_W = M00_AXI4_FE_ADDR_W; //Address width - width of
 parameter CACHE_FRONTEND_DATA_W = M00_AXI4_FE_DATA_W; //Data width - word size used for the cache
 parameter CACHE_N_WAYS          = 1                 ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
 parameter CACHE_LINE_OFF_W      = 6                 ; //Line-Offset Width - 2**NLINE_W total cache lines
-parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)        ; //Depth Width of Write-Through Buffer
+parameter CACHE_WTBUF_DEPTH_W   = $clog2(64)        ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
