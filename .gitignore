@@ -53,8 +53,12 @@
 !02_device/rtl/cu/cu_m00_axi_cu_*.sv
 02_device/rtl/cu/cu_m*_axi_cu_*.sv
 !02_device/rtl/cu/cu_m00_axi_cu_*.sv
+!02_device/rtl/kernel/kernel_m00_axi_system_cache_*.sv
 02_device/rtl/kernel/kernel_m*_axi_system_cache_*.sv
+!02_device/rtl/kernel/kernel_m00_axi_system_cache_*.sv
+!02_device/rtl/utils/slice/m00_axi_register_slice_*.sv
 02_device/rtl/utils/slice/m*_axi_register_slice_*.sv
+!02_device/rtl/utils/slice/m00_axi_register_slice_*.sv
 02_device/vivado.jou  
 02_device/vivado.log 
 02_device/vivado_pid*.str   
