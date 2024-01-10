@@ -4364,24 +4364,7 @@ always_comb begin
       next_state = CU_CACHE_CMD_READY;
     end
     CU_CACHE_CMD_READY : begin
-      if(cmd_read_condition)
-        next_state = CU_CACHE_CMD_READ;
-      else if(cmd_write_condition)
-        next_state = CU_CACHE_CMD_WRITE;
-      else
         next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_READ : begin
-      if(cache_response_mem.iob.valid)
-        next_state = CU_CACHE_CMD_READY;
-      else
-        next_state = CU_CACHE_CMD_READ;
-    end
-    CU_CACHE_CMD_WRITE : begin
-      next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_DONE : begin
-      next_state = CU_CACHE_CMD_DONE;
     end
   endcase
 end// always_comb
@@ -4404,9 +4387,8 @@ always_comb begin
       fifo_request_signals_in_int.rd_en  = 1'b0;
       fifo_response_signals_in_int.wr_en = 1'b0;
       cache_request_mem_reg.iob.valid    = 1'b0;
-    end
-    CU_CACHE_CMD_READ : begin
-      if(~cache_response_mem.iob.valid) begin
+      if(cmd_read_condition) begin
+        if(~cache_response_mem.iob.valid) begin
         cache_request_mem_reg.iob.valid    = 1'b1;
         fifo_request_signals_in_int.rd_en  = 1'b0;
         fifo_response_signals_in_int.wr_en = 1'b0;
@@ -4415,22 +4397,17 @@ always_comb begin
         fifo_response_signals_in_int.wr_en = 1'b1;
         cache_request_mem_reg.iob.valid    = 1'b0;
       end
-    end
-    CU_CACHE_CMD_WRITE : begin
-      cache_request_mem_reg.iob.valid    = 1'b1;
-      fifo_request_signals_in_int.rd_en  = 1'b1;
-      fifo_response_signals_in_int.wr_en = 1'b1;
-    end
-    CU_CACHE_CMD_DONE : begin
-      fifo_request_signals_in_int.rd_en  = 1'b0;
-      fifo_response_signals_in_int.wr_en = 1'b0;
-      cache_request_mem_reg.iob.valid    = 1'b0;
+      end else if(cmd_write_condition) begin
+        cache_request_mem_reg.iob.valid    = 1'b1;
+        fifo_request_signals_in_int.rd_en  = 1'b1;
+        fifo_response_signals_in_int.wr_en = 1'b1;
+      end
     end
   endcase
 end// always_comb
 
 always_comb begin
-  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {{32{{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}}}};
+  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
   cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
   cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
   cache_request_mem_reg.meta      = fifo_request_dout.meta;
