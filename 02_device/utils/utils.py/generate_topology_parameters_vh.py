@@ -4407,7 +4407,7 @@ always_comb begin
 end// always_comb
 
 always_comb begin
-  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {{32{{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}}}};
   cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
   cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
   cache_request_mem_reg.meta      = fifo_request_dout.meta;
