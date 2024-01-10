@@ -723,36 +723,14 @@ clean: session-info
 # 	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).json
 
 .PHONY: clean-all
-clean-all: session-info 
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/.Xil
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)_*
-	$(RMDIR) *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
-	$(RMDIR) *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
-	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) ;\
-	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
-	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
-	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
-	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
-	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/testbench                     
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/cu/cu_m*_axi_cu_*.sv
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/kernel/kernel_m*_axi_system_cache_*.sv
-	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/global/config_parameters.vh       \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/set_top_parameters.vh   \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/testbench_parameters.vh \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/topology_parameters.vh  \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/top_parameters.vh   \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_portmap_afu.vh  \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_portmap_top.vh  \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_ports_afu.vh    \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_ports_top.vh    \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_wires_top.vh    \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/bundle_arbitration.vh \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/bundle_topology.vh    \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/afu_topology.vh       \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/cu_arbitration.vh     \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/lane_arbitration.vh   \
-			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/lane_topology.vh     
+clean-all: session-info
+	find $(ROOT_DIR)/$(APP_DIR) -type f \( \
+	    \( -path '*/02_device/rtl/cu/cu_m[0-9][0-9]*_axi_cu_*.sv' \
+	    -o -path '*/02_device/rtl/kernel/kernel_m[0-9][0-9]*_axi_system_cache_*.sv' \) \
+	    ! -path '*/02_device/rtl/cu/cu_m00*_axi_cu_*.sv' \
+	    ! -path '*/02_device/rtl/kernel/kernel_m00*_axi_system_cache_*.sv' \) \
+	    -exec echo Deleting file: {} \; -exec rm -f {} \; || true
+
 # 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
 # 	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
 # 	rm -rf $(ARCHITECTURE)/*/Templates/*.json
