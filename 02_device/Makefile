@@ -82,7 +82,7 @@ ifeq ($(HOST_NAME), default)
 	VIVADO_VER ?= 2022
 	DESIGN_FREQ_HZ ?= 300000000  
 	XILINX_JOBS_STRATEGY ?= 1
-    XILINX_MAX_THREADS   ?= 1
+	XILINX_MAX_THREADS   ?= 1
 else ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
@@ -91,7 +91,7 @@ else ifeq ($(HOST_NAME), panther)
 	VIVADO_VER ?= 2022
 	DESIGN_FREQ_HZ ?= 300000000  
 	XILINX_JOBS_STRATEGY ?= 4
-    XILINX_MAX_THREADS   ?= 8
+	XILINX_MAX_THREADS   ?= 8
 else ifeq ($(HOST_NAME), jaguar)
 # 	ALVEO?=  U250
 # 	PART ?=  xcu250-figd2104-2L-e
@@ -104,7 +104,7 @@ else ifeq ($(HOST_NAME), jaguar)
 	VIVADO_VER ?= 2023
 	DESIGN_FREQ_HZ ?= 250000000  
 	XILINX_JOBS_STRATEGY ?= 8
-    XILINX_MAX_THREADS   ?= 16
+	XILINX_MAX_THREADS   ?= 16
 else 
 	ALVEO?=  U250
 	PART ?=  xcu250-figd2104-2L-e
@@ -129,7 +129,7 @@ else
 	VIVADO_VER ?=2023
 	DESIGN_FREQ_HZ ?= 250000000  
 	XILINX_JOBS_STRATEGY ?= 4
-    XILINX_MAX_THREADS   ?= 8
+	XILINX_MAX_THREADS   ?= 8
 endif
 
 # TARGET: set the build target, can be hw or hw_emu
@@ -724,13 +724,4 @@ clean: session-info
 
 .PHONY: clean-all
 clean-all: session-info
-	find $(ROOT_DIR)/$(APP_DIR) -type f \( \
-	    \( -path '*/02_device/rtl/cu/cu_m[0-9][0-9]*_axi_cu_*.sv' \
-	    -o -path '*/02_device/rtl/kernel/kernel_m[0-9][0-9]*_axi_system_cache_*.sv' \) \
-	    ! -path '*/02_device/rtl/cu/cu_m00*_axi_cu_*.sv' \
-	    ! -path '*/02_device/rtl/kernel/kernel_m00*_axi_system_cache_*.sv' \) \
-	    -exec echo Deleting file: {} \; -exec rm -f {} \; || true
-
-# 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
-# 	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
-# 	rm -rf $(ARCHITECTURE)/*/Templates/*.json
+	python3 $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/make_clean_all.py $(ROOT_DIR)/$(APP_DIR) $(ROOT_DIR)/$(APP_DIR)/.gitignore
