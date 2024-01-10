@@ -42,7 +42,7 @@
 02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
 02_device/rtl/utils/include/portmaps/m_axi_ports_top.vh
 02_device/rtl/utils/include/portmaps/m_axi_wires_top.vh
-02_device/rtl/utils/include/testbench
+02_device/rtl/utils/include/testbench/*
 02_device/rtl/utils/include/topology/bundle_arbitration.vh
 02_device/rtl/utils/include/topology/bundle_topology.vh
 02_device/rtl/utils/include/topology/afu_topology.vh
@@ -50,11 +50,9 @@
 02_device/rtl/utils/include/topology/cu_arbitration.vh
 02_device/rtl/utils/include/topology/lane_arbitration.vh
 02_device/rtl/utils/include/topology/lane_topology.vh
-# Ignore specific patterns but keep certain files
-02_device/rtl/cu/cu_m*_axi_cu_*.sv
 !02_device/rtl/cu/cu_m00*_axi_cu_*.sv
+02_device/rtl/cu/cu_m*_axi_cu_*.sv
 02_device/rtl/kernel/kernel_m*_axi_system_cache_*.sv
-# !02_device/rtl/kernel/kernel_m00*_axi_system_cache_*.sv
 02_device/rtl/utils/slice/m*_axi_register_slice_*.sv
 02_device/vivado.jou  
 02_device/vivado.log 
