@@ -73,7 +73,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_8"
                 }
             },
             "entry_6": {
@@ -91,7 +91,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x80"
+                    "value": "buffer_8"
                 }
             },
             "entry_7": {
@@ -194,7 +194,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_7"
                 }
             },
             "entry_6": {
@@ -212,7 +212,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x40"
+                    "value": "buffer_7"
                 }
             },
             "entry_7": {
@@ -418,7 +418,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_3"
                 }
             },
             "entry_6": {
@@ -436,7 +436,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "buffer_3"
                 }
             },
             "entry_7": {
@@ -684,7 +684,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_2"
                 }
             },
             "entry_6": {
@@ -702,7 +702,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "buffer_2"
                 }
             },
             "entry_7": {
@@ -805,7 +805,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_7"
                 }
             },
             "entry_6": {
@@ -823,7 +823,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x40"
+                    "value": "buffer_7"
                 }
             },
             "entry_7": {
@@ -1029,7 +1029,7 @@
                 },
                  "id_channel": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "buffer_7"
                 }
             },
             "entry_6": {
@@ -1047,7 +1047,7 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x40"
+                    "value": "buffer_7"
                 }
             },
             "entry_7": {
