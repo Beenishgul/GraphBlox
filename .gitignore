@@ -54,7 +54,8 @@
 02_device/rtl/cu/cu_m*_axi_cu_*.sv
 !02_device/rtl/cu/cu_m00*_axi_cu_*.sv
 02_device/rtl/kernel/kernel_m*_axi_system_cache_*.sv
-!02_device/rtl/kernel/kernel_m00*_axi_system_cache_*.sv
+# !02_device/rtl/kernel/kernel_m00*_axi_system_cache_*.sv
+02_device/rtl/utils/slice/m*_axi_register_slice_*.sv
 02_device/vivado.jou  
 02_device/vivado.log 
 02_device/vivado_pid*.str   
@@ -66,4 +67,4 @@ nohup.out
 vivado.jou  
 vivado.log 
 vivado_pid*.str
-xilinx_* 
+xilinx_*
