@@ -182,7 +182,8 @@ module iob_cache_memory #(
          // back-end write channel
          assign write_wstrb_o  = {FE_NBYTES{1'bx}};
          // write_req_o, write_addr_o and write_wdata_o assigns are generated bellow (dependencies)
-
+         assign wtbuf_full_o   = 1'b0;
+         assign wtbuf_empty_o  = 1'b0;
          // back-end read channel
          assign replace_req_o  = (~|way_hit) & (write_ack_i) & req_reg_i & ~replace_i;
          assign replace_addr_o = addr_i[FE_ADDR_W-1:BE_NBYTES_W+LINE2BE_W];
