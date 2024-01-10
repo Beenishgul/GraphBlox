@@ -539,9 +539,19 @@ CACHE_CONFIG_L2_SIZE = []
 
 CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS = generate_caches_properties_parameters(cache_properties)
 
-def find_max_value(list1, list2):
+
+def find_max_value(list1, list2, list1_c, list2_c, max_size):
     # Combine both lists while filtering out empty lists
-    combined_list = [x for x in list1 + list2 if x is not None]
+    list1_temp = []
+    list2_temp = []
+
+    for index in range(max_size):
+        if(list1_c[index] != 0):
+            list1_temp.append(list1[index])
+        if(list2_c[index] != 0):
+            list2_temp.append(list2[index])
+
+    combined_list = [x for x in list1_temp + list2_temp if x is not None]
 
     # Check if the combined list is empty
     if not combined_list:
@@ -550,8 +560,8 @@ def find_max_value(list1, list2):
     # Return the maximum value
     return max(combined_list)
 
-CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS)
-CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE)
+CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS, CHANNEL_CONFIG_L1, CHANNEL_CONFIG_L2, NUM_CHANNELS_TOP)
+CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE, CHANNEL_CONFIG_L1, CHANNEL_CONFIG_L2, NUM_CHANNELS_TOP)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
@@ -1633,7 +1643,7 @@ assign m{0:02d}_axi_bready  = m{0:02d}_axi4_write.out.bready ; // Write response
 // --------------------------------------------------------------------------------------
 generate
 // --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L2_CACHE[{5}] == 0) begin
+    if(CHANNEL_CONFIG_L2_CACHE[{5}] == 1) begin
 // --------------------------------------------------------------------------------------
       kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper inst_kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),
@@ -3904,7 +3914,7 @@ M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput cu_m{0:02d}_axi_write_out;
 
 generate
 // --------------------------------------------------------------------------------------
-    if(CHANNEL_CONFIG_L1_CACHE[{1}] == 0) begin
+    if(CHANNEL_CONFIG_L1_CACHE[{1}] == 1) begin
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI Kernel Cache
       m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1 (
@@ -3924,7 +3934,7 @@ generate
         .m_axi_write_out          (cu_m{0:02d}_axi_write_out                ),
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
-    end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 1) begin
+    end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 2) begin
 // CU BUFFER -> AXI Kernel Cache
       m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_stream_l1 (
         .ap_clk                   (ap_clk                                 ),
