@@ -19,10 +19,10 @@ def delete_files(root_dir, gitignore_path):
                     for file_to_delete in glob.glob(pattern, recursive=True):
                         try:
                             if os.path.isfile(file_to_delete) and not any(fnmatch.fnmatch(file_to_delete, exclusion_pattern) for exclusion_pattern in exclusion_patterns):
-                                print(f"Deleting file: {file_to_delete}")
+                                # print(f"Deleting file: {file_to_delete}")
                                 os.remove(file_to_delete)
                             elif os.path.isdir(file_to_delete):
-                                print(f"Deleting directory and its contents: {file_to_delete}")
+                                # print(f"Deleting directory and its contents: {file_to_delete}")
                                 shutil.rmtree(file_to_delete)
                         except Exception as e:
                             print(f"Error deleting {file_to_delete}: {str(e)}")

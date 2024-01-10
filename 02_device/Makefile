@@ -82,7 +82,7 @@ ifeq ($(HOST_NAME), default)
 	VIVADO_VER ?= 2022
 	DESIGN_FREQ_HZ ?= 300000000  
 	XILINX_JOBS_STRATEGY ?= 1
-	XILINX_MAX_THREADS   ?= 1
+    XILINX_MAX_THREADS   ?= 1
 else ifeq ($(HOST_NAME), panther)
 	ALVEO?=  U280
 	PART ?=  xcu280-fsvh2892-2L-e
@@ -91,7 +91,7 @@ else ifeq ($(HOST_NAME), panther)
 	VIVADO_VER ?= 2022
 	DESIGN_FREQ_HZ ?= 300000000  
 	XILINX_JOBS_STRATEGY ?= 4
-	XILINX_MAX_THREADS   ?= 8
+    XILINX_MAX_THREADS   ?= 8
 else ifeq ($(HOST_NAME), jaguar)
 # 	ALVEO?=  U250
 # 	PART ?=  xcu250-figd2104-2L-e
@@ -104,7 +104,7 @@ else ifeq ($(HOST_NAME), jaguar)
 	VIVADO_VER ?= 2023
 	DESIGN_FREQ_HZ ?= 250000000  
 	XILINX_JOBS_STRATEGY ?= 8
-	XILINX_MAX_THREADS   ?= 16
+    XILINX_MAX_THREADS   ?= 16
 else 
 	ALVEO?=  U250
 	PART ?=  xcu250-figd2104-2L-e
@@ -129,7 +129,7 @@ else
 	VIVADO_VER ?=2023
 	DESIGN_FREQ_HZ ?= 250000000  
 	XILINX_JOBS_STRATEGY ?= 4
-	XILINX_MAX_THREADS   ?= 8
+    XILINX_MAX_THREADS   ?= 8
 endif
 
 # TARGET: set the build target, can be hw or hw_emu
@@ -723,5 +723,37 @@ clean: session-info
 # 	rm -rf $(ARCHITECTURE)/$(CAPABILITY)/Templates/$(ALGORITHM_NAME).json
 
 .PHONY: clean-all
-clean-all: session-info
-	python3 $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/make_clean_all.py $(ROOT_DIR)/$(APP_DIR) $(ROOT_DIR)/$(APP_DIR)/.gitignore
+clean-all: session-info 
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/.Xil
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR)_*
+	$(RMDIR) *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x
+	$(RMDIR) *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
+	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR) ;\
+	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
+	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
+	$(CD) $(ROOT_DIR)/$(APP_DIR) ;\
+	rm -rf *.xo *.xclbin *.xclbin.info *.xclbin.link_summary *.jou *.log *.xo.compile_summary _x ;\
+	rm -rf *.dat *.pb xsim.dir *.xml *.ltx *.csv *.json *.protoinst *.wdb *.wcfg *.str
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/testbench                     
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/cu/cu_m*_axi_cu_*.sv
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/slice/m*_axi_register_slice_*.sv
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/kernel/kernel_m*_axi_system_cache_*.sv
+	$(RMDIR) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/global/config_parameters.vh       \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/set_top_parameters.vh   \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/testbench_parameters.vh \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/topology_parameters.vh  \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/parameters/top_parameters.vh   \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_portmap_afu.vh  \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_portmap_top.vh  \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_ports_afu.vh    \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_ports_top.vh    \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/portmaps/m_axi_wires_top.vh    \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/bundle_arbitration.vh \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/bundle_topology.vh    \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/afu_topology.vh       \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/cu_arbitration.vh     \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/lane_arbitration.vh   \
+			$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/rtl/utils/include/topology/lane_topology.vh     
+# 	$(CD) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(IP_DIR_OVERLAY) ;\
+# 	rm -rf $(ARCHITECTURE)/*/Templates/*.ol ;\
+# 	rm -rf $(ARCHITECTURE)/*/Templates/*.json
