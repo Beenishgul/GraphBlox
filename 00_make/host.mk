@@ -35,8 +35,9 @@ all:
 	
 .PHONY: clean-all
 clean-all:
-	-@$(MAKE) clean-all $(MAKE_DEVICE)
-	-@$(MAKE) clean-all $(MAKE_HOST)
+# 	-@$(MAKE) clean-all $(MAKE_DEVICE)
+# 	-@$(MAKE) clean-all $(MAKE_HOST)
+	$(PYTHON) $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/make_clean_all.py $(ROOT_DIR)/$(APP_DIR) $(ROOT_DIR)/$(APP_DIR)/.gitignore
 	
 .PHONY: clean
 clean:
