@@ -1,4 +1,5 @@
 
+
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -9,7 +10,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_cache_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 02:41:36
+// Revise : 2024-01-11 13:17:46
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -17,7 +18,7 @@
 
 
 
-module m00_axi_cu_cache_mid32x64_fe32x64_wrapper #(
+module m00_axi_cu_cache_mid512x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -47,12 +48,15 @@ logic            areset_cache     ;
 logic            areset_control   ;
 KernelDescriptor descriptor_in_reg;
 
-MemoryPacketRequest request_in_reg      ;
-CacheRequest        cache_request_in_reg;
-CacheResponse       response_in_int     ;
+MemoryPacketRequest  request_in_reg      ;
+CacheRequest         cache_request_in_reg;
+MemoryPacketResponse response_in_int     ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
+
+logic cmd_read_condition ;
+logic cmd_write_condition;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -63,11 +67,12 @@ M00_AXI4_MID_MasterWriteInterface m_axi_write;
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-CacheRequestPayload   cache_request_mem    ;
-CacheRequestPayload   cache_request_mem_reg;
-CacheResponsePayload  cache_response_mem   ;
-CacheControlIOBOutput cache_ctrl_in        ;
-CacheControlIOBOutput cache_ctrl_out       ;
+CacheRequestPayload   cache_request_mem     ;
+CacheRequestPayload   cache_request_mem_int ;
+CacheResponsePayload  cache_response_mem    ;
+CacheResponsePayload  cache_response_mem_reg;
+CacheControlIOBOutput cache_ctrl_in         ;
+CacheControlIOBOutput cache_ctrl_out        ;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -83,8 +88,8 @@ logic                         fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
 // Memory response FIFO
 // --------------------------------------------------------------------------------------
-MemoryPacketResponsePayload   fifo_response_din             ;
-MemoryPacketResponsePayload   fifo_response_dout            ;
+CacheRequestPayload           fifo_response_din             ;
+CacheRequestPayload           fifo_response_dout            ;
 FIFOStateSignalsOutInternal   fifo_response_signals_out_int ;
 FIFOStateSignalsInput         fifo_response_signals_in_reg  ;
 FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
@@ -206,9 +211,9 @@ iob_cache_axi #(
   .FE_DATA_W           (M00_AXI4_FE_DATA_W                                 ),
   .BE_ADDR_W           (M00_AXI4_MID_ADDR_W                                ),
   .BE_DATA_W           (M00_AXI4_MID_DATA_W                                ),
-  .NWAYS_W             (1                                                     ),
-  .NLINES_W            ($clog2(512)                                             ),
-  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*3/M00_AXI4_FE_DATA_W)),
+  .NWAYS_W             (1                                                  ),
+  .NLINES_W            ($clog2(512)                                        ),
+  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W/M00_AXI4_FE_DATA_W)     ),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
@@ -217,25 +222,25 @@ iob_cache_axi #(
   .AXI_ID_W            (M00_AXI4_MID_ID_W                                  ),
   .AXI_ID              (0                                                  ),
   .AXI_LEN_W           (M00_AXI4_MID_LEN_W                                 ),
-  .AXI_ADDR_W          (M00_AXI4_MID_ADDR_W                           ),
-  .AXI_DATA_W          (M00_AXI4_MID_DATA_W                           ),
+  .AXI_ADDR_W          (M00_AXI4_MID_ADDR_W                                ),
+  .AXI_DATA_W          (M00_AXI4_MID_DATA_W                                ),
   .CACHE_AXI_CACHE_MODE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
-  .iob_avalid_i(cache_request_mem.iob.valid                                                           ),
+  .iob_avalid_i(cache_request_mem.iob.valid                                                                  ),
   .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:$clog2(M00_AXI4_FE_DATA_W/8)]),
-  .iob_wdata_i (cache_request_mem.iob.wdata                                                           ),
-  .iob_wstrb_i (cache_request_mem.iob.wstrb                                                           ),
-  .iob_rdata_o (cache_response_mem.iob.rdata                                                          ),
-  .iob_rvalid_o(cache_response_mem.iob.valid                                                          ),
-  .iob_ready_o (cache_response_mem.iob.ready                                                          ),
-  .invalidate_i(cache_ctrl_in.force_inv                                                               ),
-  .invalidate_o(cache_ctrl_out.force_inv                                                              ),
-  .wtb_empty_i (cache_ctrl_in.wtb_empty                                                               ),
-  .wtb_empty_o (cache_ctrl_out.wtb_empty                                                              ),
+  .iob_wdata_i (cache_request_mem.iob.wdata                                                                  ),
+  .iob_wstrb_i (cache_request_mem.iob.wstrb                                                                  ),
+  .iob_rdata_o (cache_response_mem.iob.rdata                                                                 ),
+  .iob_rvalid_o(cache_response_mem.iob.valid                                                                 ),
+  .iob_ready_o (cache_response_mem.iob.ready                                                                 ),
+  .invalidate_i(cache_ctrl_in.force_inv                                                                      ),
+  .invalidate_o(cache_ctrl_out.force_inv                                                                     ),
+  .wtb_empty_i (cache_ctrl_in.wtb_empty                                                                      ),
+  .wtb_empty_o (cache_ctrl_out.wtb_empty                                                                     ),
   `include "m_axi_portmap_cache.vh"
-  .clk_i       (ap_clk                                                                                ),
-  .cke_i       (1'b1                                                                                  ),
-  .arst_i      (areset_cache                                                                          )
+  .clk_i       (ap_clk                                                                                       ),
+  .cke_i       (1'b1                                                                                         ),
+  .arst_i      (areset_cache                                                                                 )
 );
 
 // --------------------------------------------------------------------------------------
@@ -252,12 +257,12 @@ assign fifo_request_din.data             = cache_request_in_reg.payload.data;
 
 // Pop
 // assign fifo_request_signals_in_int.rd_en = cache_request_pop_int;
-assign cache_request_mem.iob.valid = cache_request_mem_reg.iob.valid;
-assign cache_request_mem.iob.addr  = cache_request_mem_reg.iob.addr;
-assign cache_request_mem.iob.wdata = cache_request_mem_reg.iob.wdata;
-assign cache_request_mem.iob.wstrb = cache_request_mem_reg.iob.wstrb;
-assign cache_request_mem.meta      = cache_request_mem_reg.meta;
-assign cache_request_mem.data      = cache_request_mem_reg.data;
+assign cache_request_mem.iob.valid = cache_request_mem_int.iob.valid;
+assign cache_request_mem.iob.addr  = cache_request_mem_int.iob.addr;
+assign cache_request_mem.iob.wdata = cache_request_mem_int.iob.wdata;
+assign cache_request_mem.iob.wstrb = cache_request_mem_int.iob.wstrb;
+assign cache_request_mem.meta      = cache_request_mem_int.meta;
+assign cache_request_mem.data      = cache_request_mem_int.data;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -287,18 +292,18 @@ xpm_fifo_sync_wrapper #(
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-always_comb fifo_response_din = map_CacheResponse_to_MemoryResponsePacket(cache_request_mem, cache_response_mem);
+always_comb fifo_response_din = cache_request_mem;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_reg.rd_en;
+assign fifo_response_signals_in_int.rd_en = cache_response_mem.iob.valid | ((cache_request_mem.meta.subclass.cmd == CMD_MEM_WRITE) & fifo_response_signals_in_int.wr_en);
 assign response_in_int.valid              = fifo_response_signals_out_int.valid;
-assign response_in_int.payload            = fifo_response_dout;
+always_comb response_in_int.payload       = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, cache_response_mem_reg);
 
 xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
-  .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
-  .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
-  .PROG_THRESH     (PROG_THRESH                       )
+  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+  .WRITE_DATA_WIDTH($bits(CacheRequestPayload)),
+  .READ_DATA_WIDTH ($bits(CacheRequestPayload)),
+  .PROG_THRESH     (PROG_THRESH               )
 ) inst_fifo_CacheResponse (
   .clk        (ap_clk                                   ),
   .srst       (areset_fifo                              ),
@@ -314,99 +319,26 @@ xpm_fifo_sync_wrapper #(
   .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
 );
 
-// --------------------------------------------------------------------------------------
-// Cache Commands State Machine
-// --------------------------------------------------------------------------------------
-logic cmd_read_condition ;
-logic cmd_write_condition;
-
-cu_cache_command_generator_state current_state;
-cu_cache_command_generator_state next_state   ;
-// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-  if(areset_control)
-    current_state <= CU_CACHE_CMD_RESET;
-  else begin
-    current_state <= next_state;
-  end
-end// always_ff @(posedge ap_clk)
-// --------------------------------------------------------------------------------------
-assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
-assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
-// --------------------------------------------------------------------------------------
-always_comb begin
-  next_state = current_state;
-  case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      next_state = CU_CACHE_CMD_READY;
-    end
-    CU_CACHE_CMD_READY : begin
-        next_state = CU_CACHE_CMD_READY;
-    end
-  endcase
-end// always_comb
-// State Transition Logic
-
-always_comb begin
-  counter_load                       = 1'b0;
-  fifo_request_signals_in_int.rd_en  = 1'b0;
-  fifo_response_signals_in_int.wr_en = 1'b0;
-  cache_request_mem_reg.iob.valid    = 1'b0;
-  case (current_state)
-    CU_CACHE_CMD_RESET : begin
-      counter_load                       = 1'b1;
-      fifo_request_signals_in_int.rd_en  = 1'b0;
-      fifo_response_signals_in_int.wr_en = 1'b0;
-      cache_request_mem_reg.iob.valid    = 1'b0;
-    end
-    CU_CACHE_CMD_READY : begin
-      counter_load                       = 1'b0;
-      fifo_request_signals_in_int.rd_en  = 1'b0;
-      fifo_response_signals_in_int.wr_en = 1'b0;
-      cache_request_mem_reg.iob.valid    = 1'b0;
-      if(cmd_read_condition) begin
-        if(~cache_response_mem.iob.valid) begin
-        cache_request_mem_reg.iob.valid    = 1'b1;
-        fifo_request_signals_in_int.rd_en  = 1'b0;
-        fifo_response_signals_in_int.wr_en = 1'b0;
-      end else begin
-        fifo_request_signals_in_int.rd_en  = 1'b1;
-        fifo_response_signals_in_int.wr_en = 1'b1;
-        cache_request_mem_reg.iob.valid    = 1'b0;
-      end
-      end else if(cmd_write_condition) begin
-        cache_request_mem_reg.iob.valid    = 1'b1;
-        fifo_request_signals_in_int.rd_en  = 1'b1;
-        fifo_response_signals_in_int.wr_en = 1'b1;
-      end
-    end
-  endcase
-end// always_comb
-
-always_comb begin
-  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
-  cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
-  cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
-  cache_request_mem_reg.meta      = fifo_request_dout.meta;
-  cache_request_mem_reg.data      = fifo_request_dout.data;
+  cache_response_mem_reg <= cache_response_mem;
 end
 
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
+// Cache Commands State Machine
 // --------------------------------------------------------------------------------------
-counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
-  .ap_clk      (ap_clk                                                                                       ),
-  .ap_clken    (1'b1                                                                                         ),
-  .areset      (areset_counter                                                                               ),
-  .load        (counter_load                                                                                 ),
-  .incr        (fifo_response_signals_in_int.wr_en  & (cache_request_mem.meta.subclass.cmd == CMD_MEM_WRITE) ),
-  .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
-  .load_value  (write_command_counter_load_value                                                             ),
-  .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
-  .count       (write_command_counter_                                                                       ),
-  .is_zero     (write_command_counter_is_zero                                                                )
-);
+assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
+assign cache_request_mem_int.iob.valid    = fifo_request_signals_out_valid_int & cache_response_mem.iob.ready;
+assign fifo_request_signals_in_int.rd_en  = fifo_request_signals_out_valid_int & cache_response_mem.iob.ready;
+assign fifo_response_signals_in_int.wr_en = fifo_request_signals_out_valid_int & cache_response_mem.iob.ready;
+assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
 
-endmodule : m00_axi_cu_cache_mid32x64_fe32x64_wrapper
-  
+always_comb begin
+  cache_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  cache_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
+  cache_request_mem_int.iob.wdata = fifo_request_dout.iob.wdata;
+  cache_request_mem_int.meta      = fifo_request_dout.meta;
+  cache_request_mem_int.data      = fifo_request_dout.data;
+end
+
+endmodule : m00_axi_cu_cache_mid512x64_fe32x64_wrapper
