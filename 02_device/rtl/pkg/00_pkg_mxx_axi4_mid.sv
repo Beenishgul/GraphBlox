@@ -19,7 +19,7 @@ parameter S_AXI_MID_DATA_WIDTH      = 32;
   
 
 parameter M00_AXI4_MID_ADDR_W   = 64                 ;
-parameter M00_AXI4_MID_DATA_W   = 32                 ;
+parameter M00_AXI4_MID_DATA_W   = 512                 ;
 parameter M00_AXI4_MID_STRB_W   = M00_AXI4_MID_DATA_W / 8;
 parameter M00_AXI4_MID_BURST_W  = 2                   ;
 parameter M00_AXI4_MID_CACHE_W  = 4                   ;

@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_sram_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 02:41:36
+// Revise : 2024-01-11 13:17:46
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -17,7 +17,8 @@
 `include "typedef.svh"
 
 
-module m00_axi_cu_sram_mid32x64_fe32x64_wrapper #(
+
+module m00_axi_cu_sram_mid512x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -231,7 +232,7 @@ axi_from_mem #(
   .MemAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .AxiAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .DataWidth   (M00_AXI4_FE_DATA_W    ),
-  .MaxRequests (2**CACHE_WTBUF_DEPTH_W),
+  .MaxRequests (2**3),
   .axi_req_t   (axi_req_t             ),
   .axi_rsp_t   (axi_resp_t            )
 ) inst_axi_from_mem (
@@ -350,4 +351,5 @@ always_comb begin
   sram_request_mem_int.data      = fifo_request_dout.data;
 end
 
-endmodule : m00_axi_cu_sram_mid32x64_fe32x64_wrapper
+endmodule : m00_axi_cu_sram_mid512x64_fe32x64_wrapper
+  
