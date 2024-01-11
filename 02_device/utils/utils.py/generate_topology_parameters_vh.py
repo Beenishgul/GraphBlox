@@ -5,7 +5,7 @@ import sys
 import os
 import ast
 import json
-
+from datetime import datetime
 
 # Validate the number of arguments
 if len(sys.argv) != 14:
@@ -14,6 +14,13 @@ if len(sys.argv) != 14:
 
 # Assuming the script name is the first argument, and the directories follow after.
 _, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, PAUSE_FILE_GENERATION, INCLUDE_DIR = sys.argv
+
+
+# Getting the current date and time
+current_datetime = datetime.now()
+
+# Formatting the date and time in the specified format
+formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # Construct the full path for the file
@@ -3090,7 +3097,7 @@ with open(output_file_pkg_mxx_axi4_fe, "w") as file:
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : PKG_MXX_AXI4_FE.sv
 // Create : 2022-11-28 16:08:34
-// Revise : 2022-11-28 16:08:34
+// Revise : {3}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -3333,14 +3340,15 @@ endpackage
 
     output_lines.append(fill_file_pkg_mxx_axi4_fe_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_file_pkg_mxx_axi4_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+        output_lines.append(fill_file_pkg_mxx_axi4_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index], formatted_datetime))
     output_lines.append(fill_file_pkg_mxx_axi4_fe_end)
 
     file.write('\n'.join(output_lines))
 
 
+fill_mxx_axi_register_slice_be_wrapper_module = []
 
-fill_mxx_axi_register_slice_be_wrapper="""
+fill_mxx_axi_register_slice_be_wrapper_pre="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -3349,13 +3357,16 @@ fill_mxx_axi_register_slice_be_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper.sv
+// File   : mxx_axi_register_slice_be_wrapper.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:51:45
+// Revise : {3}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+"""
+
+fill_mxx_axi_register_slice_be_wrapper="""
 
 module m{0:02d}_axi_register_slice_be_{1}x{2}_wrapper (
   // System Signals
@@ -3511,16 +3522,20 @@ endmodule : m{0:02d}_axi_register_slice_be_{1}x{2}_wrapper
   """
 
 
-for index, channel in enumerate(DISTINCT_CHANNELS):
-    output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_be_wrapper.sv")
-    # output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_be_{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_wrapper.sv")
-    check_and_clean_file(output_file_mxx_axi_register_slice_be_wrapper)
-    with open(output_file_mxx_axi_register_slice_be_wrapper, "w") as file:
-        formatted_string = fill_mxx_axi_register_slice_be_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index])
-        file.write(formatted_string)
+output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_register_slice_be_wrapper.sv")
+check_and_clean_file(output_file_mxx_axi_register_slice_be_wrapper)
+
+with open(output_file_mxx_axi_register_slice_be_wrapper, "w") as file:
+    fill_mxx_axi_register_slice_be_wrapper_module.append(fill_mxx_axi_register_slice_be_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index], formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        fill_mxx_axi_register_slice_be_wrapper_module.append(fill_mxx_axi_register_slice_be_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index], formatted_datetime))
+    
+    file.write('\n'.join(fill_mxx_axi_register_slice_be_wrapper_module))
 
 
-fill_mxx_axi_register_slice_mid_wrapper="""
+fill_mxx_axi_register_slice_mid_wrapper_module=[]
+
+fill_mxx_axi_register_slice_mid_wrapper_pre="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -3529,13 +3544,16 @@ fill_mxx_axi_register_slice_mid_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper.sv
+// File   : mxx_axi_register_slice_mid_wrapper.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:51:45
+// Revise : {3}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+  """
+
+fill_mxx_axi_register_slice_mid_wrapper="""
 
 module m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper (
   // System Signals
@@ -3690,17 +3708,20 @@ endmodule : m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper
 
   """
 
+output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_register_slice_mid_wrapper.sv")
+check_and_clean_file(output_file_mxx_axi_register_slice_mid_wrapper)
 
-for index, channel in enumerate(DISTINCT_CHANNELS):
-    # output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_mid_{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
-    output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"m{channel:02d}_axi_register_slice_mid_wrapper.sv")
-    check_and_clean_file(output_file_mxx_axi_register_slice_mid_wrapper)
-    with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
-        formatted_string = fill_mxx_axi_register_slice_mid_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
-        file.write(formatted_string)
+with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
+    fill_mxx_axi_register_slice_mid_wrapper_module.append(fill_mxx_axi_register_slice_mid_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index], formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        fill_mxx_axi_register_slice_mid_wrapper_module.append(fill_mxx_axi_register_slice_mid_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index], formatted_datetime))
+    
+    file.write('\n'.join(fill_mxx_axi_register_slice_mid_wrapper_module))
 
 
-fill_kernel_mxx_axi_system_cache_wrapper="""
+fill_kernel_mxx_axi_system_cache_wrapper_module = []
+
+fill_kernel_mxx_axi_system_cache_wrapper_pre="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -3709,13 +3730,16 @@ fill_kernel_mxx_axi_system_cache_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper.sv
+// File   : kernel_mxx_axi_system_cache_wrapper.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:51:45
+// Revise : {5}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+"""
+
+fill_kernel_mxx_axi_system_cache_wrapper="""
 
 module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   // System Signals
@@ -3893,20 +3917,17 @@ endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
   """
 
+output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_mxx_axi_system_cache_wrapper.sv")
+check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
 
-for index, channel in enumerate(DISTINCT_CHANNELS):
-    output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_m{channel:02d}_axi_system_cache_wrapper.sv")
-    # output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_m{channel:02d}_axi_system_cache_be{CHANNEL_CONFIG_DATA_WIDTH_BE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]}_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_wrapper.sv")
-    check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
-    with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
-        formatted_string = fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index])
-        file.write(formatted_string)
+with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
+    fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+    
+    file.write('\n'.join(fill_kernel_mxx_axi_system_cache_wrapper_module))
 
 
-
-# check_and_clean_file(output_file_kernel_cu_topology)
-# check_and_clean_file(output_file_kernel_cu_portmap)
-# check_and_clean_file(output_file_kernel_cu_ports)
 
 with open(output_file_kernel_cu_topology, 'w') as file:
     output_lines = []
@@ -4042,7 +4063,10 @@ if int(PAUSE_FILE_GENERATION):
     print("MSG: Pause CU cache/buffer module generation.")
     sys.exit()  # Exits the script
 
-fill_cu_mxx_axi_cu_cache_wrapper="""
+
+fill_cu_mxx_axi_cu_cache_wrapper_module = []
+
+fill_cu_mxx_axi_cu_cache_wrapper_pre="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -4051,13 +4075,16 @@ fill_cu_mxx_axi_cu_cache_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{1}x{2}_wrapper.sv
+// File   : m{0:02d}_axi_cu_cache_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-08-28 18:21:31
+// Revise : {8}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+"""
+
+fill_cu_mxx_axi_cu_cache_wrapper="""
 
 module m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
@@ -4454,17 +4481,21 @@ endmodule : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
 
-for index, channel in enumerate(DISTINCT_CHANNELS):
-    output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_wrapper.sv")
-    # output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_cache_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
-    check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
-    with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
-        formatted_string = fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index])
-        file.write(formatted_string)
+output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_cache_wrapper.sv")
+check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
+
+with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
+    fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+    
+    file.write('\n'.join(fill_cu_mxx_axi_cu_cache_wrapper_module))
 
 
 
-fill_cu_mxx_axi_cu_buffer_wrapper="""
+fill_cu_mxx_axi_cu_buffer_wrapper_module=[]
+
+fill_cu_mxx_axi_cu_buffer_wrapper_pre="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -4473,13 +4504,16 @@ fill_cu_mxx_axi_cu_buffer_wrapper="""
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m{0:02d}_axi_cu_buffer_mid{1}x{2}_fe{1}x{2}_wrapper.sv
+// File   : m{0:02d}_axi_cu_buffer_mid_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-08-28 18:21:31
+// Revise : {5}
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+"""
+
+fill_cu_mxx_axi_cu_buffer_wrapper="""
 
 module m{0:02d}_axi_cu_buffer_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter NUM_CHANNELS_READ = 1,
@@ -4938,11 +4972,12 @@ engine_m_axi #(
 endmodule : m{0:02d}_axi_cu_buffer_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
+output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_buffer_wrapper.sv")
+check_and_clean_file(output_file_cu_mxx_axi_cu_buffer_wrapper)
 
-for index, channel in enumerate(DISTINCT_CHANNELS):
-    output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_buffer_wrapper.sv")
-    # output_file_cu_mxx_axi_cu_buffer_wrapper = os.path.join(output_folder_path_cu,f"cu_m{channel:02d}_axi_cu_buffer_mid{CHANNEL_CONFIG_DATA_WIDTH_MID[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]}_fe{CHANNEL_CONFIG_DATA_WIDTH_FE[index]}x{CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]}_wrapper.sv")
-    check_and_clean_file(output_file_cu_mxx_axi_cu_buffer_wrapper)
-    with open(output_file_cu_mxx_axi_cu_buffer_wrapper, "w") as file:
-        formatted_string = fill_cu_mxx_axi_cu_buffer_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index])
-        file.write(formatted_string)
+with open(output_file_cu_mxx_axi_cu_buffer_wrapper, "w") as file:
+    fill_cu_mxx_axi_cu_buffer_wrapper_module.append(fill_cu_mxx_axi_cu_buffer_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        fill_cu_mxx_axi_cu_buffer_wrapper_module.append(fill_cu_mxx_axi_cu_buffer_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],formatted_datetime))
+    
+    file.write('\n'.join(fill_cu_mxx_axi_cu_buffer_wrapper_module))

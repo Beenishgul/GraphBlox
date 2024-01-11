@@ -1070,8 +1070,8 @@ module __KERNEL___testbench ();
             graph.mem512_in_degree       = graph.mem512_num_vertices ;
             graph.mem512_out_degree      = graph.mem512_num_vertices ;
 
-            graph.mem512_edges_array_src = graph.mem512_num_edges ;
-            graph.mem512_edges_array_dest= graph.mem512_num_edges ;
+            graph.mem512_edges_array_src   = graph.mem512_num_edges ;
+            graph.mem512_edges_array_dest  = graph.mem512_num_edges ;
             graph.mem512_edges_array_weight= graph.mem512_num_edges ;
 
             graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_BE_DATA_W-1) )/ (M00_AXI4_BE_DATA_W);

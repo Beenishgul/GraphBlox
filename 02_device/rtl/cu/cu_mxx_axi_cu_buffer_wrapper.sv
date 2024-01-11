@@ -7,15 +7,17 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m00_axi_cu_buffer_mid32x64_fe32x64_wrapper.sv
+// File   : m00_axi_cu_buffer_mid_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-08-28 18:21:31
+// Revise : 2024-01-11 01:36:58
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
 
-module m00_axi_cu_buffer_mid32x64_fe32x64_wrapper #(
+
+
+module m00_axi_cu_buffer_mid512x64_fe32x64_wrapper #(
   parameter NUM_CHANNELS_READ = 1,
   parameter FIFO_WRITE_DEPTH  = 64,
   parameter PROG_THRESH       = 32
@@ -469,5 +471,5 @@ engine_m_axi #(
 );
 
 
-endmodule : m00_axi_cu_buffer_mid32x64_fe32x64_wrapper
+endmodule : m00_axi_cu_buffer_mid512x64_fe32x64_wrapper
   

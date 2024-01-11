@@ -104,7 +104,7 @@
 0x00000000 // entry_2    cacheline[  4][12] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  4][13] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  4][14] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
-0x00400002 // entry_5    cacheline[  4][15] <29b>: cmd[0:4]=CMD_MEM_READ || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=buffer_5
+0x00200002 // entry_5    cacheline[  4][15] <29b>: cmd[0:4]=CMD_MEM_READ || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=buffer_5
 0x10010801 // entry_6    cacheline[  5][ 0] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  5][ 1] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------

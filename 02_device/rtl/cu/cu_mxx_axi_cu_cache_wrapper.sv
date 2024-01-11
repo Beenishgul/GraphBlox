@@ -7,15 +7,17 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m00_axi_cu_cache_mid32x64_fe32x64_wrapper.sv
+// File   : m00_axi_cu_cache_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2023-08-28 18:21:31
+// Revise : 2024-01-11 01:36:58
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
 
-module m00_axi_cu_cache_mid32x64_fe32x64_wrapper #(
+
+
+module m00_axi_cu_cache_mid512x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -206,7 +208,7 @@ iob_cache_axi #(
   .BE_DATA_W           (M00_AXI4_MID_DATA_W                                ),
   .NWAYS_W             (1                                                     ),
   .NLINES_W            ($clog2(512)                                             ),
-  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*2/M00_AXI4_FE_DATA_W)),
+  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*1/M00_AXI4_FE_DATA_W)),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
@@ -406,5 +408,5 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : m00_axi_cu_cache_mid32x64_fe32x64_wrapper
+endmodule : m00_axi_cu_cache_mid512x64_fe32x64_wrapper
   
