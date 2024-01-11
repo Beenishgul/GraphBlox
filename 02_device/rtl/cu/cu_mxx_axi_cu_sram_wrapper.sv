@@ -152,21 +152,12 @@ FIFOStateSignalsInputInternal fifo_response_signals_in_int  ;
 logic                         fifo_response_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
-// Cache/Memory response counter
-// --------------------------------------------------------------------------------------
-logic                           areset_counter                  ;
-logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
-
-assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
-
-// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   areset_fifo    <= areset;
   areset_control <= areset;
   areset_sram    <= ~areset;
-  areset_counter <= areset;
 end
 
 // --------------------------------------------------------------------------------------
