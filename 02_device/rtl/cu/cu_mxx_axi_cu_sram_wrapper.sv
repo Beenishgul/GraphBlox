@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_sram_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 01:59:03
+// Revise : 2024-01-11 02:05:10
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -96,10 +96,10 @@ logic                         fifo_response_setup_signal_int;
 logic                           areset_counter                  ;
 logic                           counter_load                    ;
 logic                           write_command_counter_is_zero   ;
-logic [SRAM_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
-logic [SRAM_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
+logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_          ;
+logic [CACHE_WTBUF_DEPTH_W-1:0] write_command_counter_load_value;
 
-assign write_command_counter_load_value = ((SRAM_WTBUF_DEPTH_W**2)-1);
+assign write_command_counter_load_value = ((CACHE_WTBUF_DEPTH_W**2)-1);
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -209,20 +209,20 @@ iob_cache_axi #(
   .NWAYS_W             (1                                                     ),
   .NLINES_W            ($clog2(512)                                             ),
   .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*1/M00_AXI4_FE_DATA_W)),
-  .WTBUF_DEPTH_W       (SRAM_WTBUF_DEPTH_W                                ),
-  .REP_POLICY          (SRAM_REP_POLICY                                   ),
-  .WRITE_POL           (SRAM_WRITE_POL                                    ),
-  .USE_CTRL            (SRAM_CTRL_SRAM                                   ),
-  .USE_CTRL_CNT        (SRAM_CTRL_SRAM                                   ),
+  .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
+  .REP_POLICY          (CACHE_REP_POLICY                                   ),
+  .WRITE_POL           (CACHE_WRITE_POL                                    ),
+  .USE_CTRL            (CACHE_CTRL_CACHE                                   ),
+  .USE_CTRL_CNT        (CACHE_CTRL_CACHE                                   ),
   .AXI_ID_W            (M00_AXI4_MID_ID_W                                  ),
   .AXI_ID              (0                                                  ),
   .AXI_LEN_W           (M00_AXI4_MID_LEN_W                                 ),
   .AXI_ADDR_W          (M00_AXI4_MID_ADDR_W                           ),
   .AXI_DATA_W          (M00_AXI4_MID_DATA_W                           ),
-  .SRAM_AXI_SRAM_MODE(M00_AXI4_MID_SRAM_WRITE_BACK_ALLOCATE_READS_WRITES)
+  .CACHE_AXI_CACHE_MODE(M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
 ) inst_iob_cache_axi (
   .iob_avalid_i(cache_request_mem.iob.valid                                                           ),
-  .iob_addr_i  (cache_request_mem.iob.addr [SRAM_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:$clog2(M00_AXI4_FE_DATA_W/8)]),
+  .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M00_AXI4_FE_ADDR_W-1:$clog2(M00_AXI4_FE_DATA_W/8)]),
   .iob_wdata_i (cache_request_mem.iob.wdata                                                           ),
   .iob_wstrb_i (cache_request_mem.iob.wstrb                                                           ),
   .iob_rdata_o (cache_response_mem.iob.rdata                                                          ),
@@ -395,7 +395,7 @@ end
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
-counter #(.C_WIDTH(SRAM_WTBUF_DEPTH_W)) inst_write_command_counter (
+counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .ap_clk      (ap_clk                                                                                       ),
   .ap_clken    (1'b1                                                                                         ),
   .areset      (areset_counter                                                                               ),
@@ -403,7 +403,7 @@ counter #(.C_WIDTH(SRAM_WTBUF_DEPTH_W)) inst_write_command_counter (
   .incr        (fifo_response_signals_in_int.wr_en  & (cache_request_mem.meta.subclass.cmd == CMD_MEM_WRITE) ),
   .decr        (cache_request_mem_reg.iob.valid  & (cache_request_mem_reg.meta.subclass.cmd == CMD_MEM_WRITE)),
   .load_value  (write_command_counter_load_value                                                             ),
-  .stride_value({{(SRAM_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
+  .stride_value({{(CACHE_WTBUF_DEPTH_W-1){1'b0}},{1'b1}}                                                     ),
   .count       (write_command_counter_                                                                       ),
   .is_zero     (write_command_counter_is_zero                                                                )
 );
