@@ -13,7 +13,7 @@
 // - Fabian Schuiki <fschuiki@iis.ee.ethz.ch>
 // - Wolfgang Roenninger <wroennin@iis.ee.ethz.ch>
 // - Andreas Kurth <akurth@iis.ee.ethz.ch>
-
+`include "global_package.vh"
 /// An AXI4-Lite to AXI4 adapter.
 module axi_lite_to_axi #(
   parameter int  unsigned AxiDataWidth = 32'd0,

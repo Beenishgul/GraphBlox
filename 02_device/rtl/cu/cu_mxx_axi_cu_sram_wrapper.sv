@@ -112,13 +112,17 @@ logic            areset_sram      ;
 logic            areset_control   ;
 KernelDescriptor descriptor_in_reg;
 
-MemoryPacketRequest request_in_reg     ;
-CacheRequest        sram_request_in_reg;
-CacheResponse       response_in_int    ;
+MemoryPacketRequest  request_in_reg     ;
+CacheRequest         sram_request_in_reg;
+MemoryPacketResponse response_in_int    ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
 
+logic cmd_read_condition ;
+logic cmd_write_condition;
+logic mem_rsp_error_o    ;
+logic cmd_trans_pending  ;
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
@@ -126,7 +130,6 @@ CacheRequestPayload  sram_request_mem     ;
 CacheRequestPayload  sram_request_mem_reg ;
 CacheResponsePayload sram_response_mem    ;
 CacheResponsePayload sram_response_mem_reg;
-
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -237,10 +240,6 @@ end
 // --------------------------------------------------------------------------------------
 // AXI port sram
 // --------------------------------------------------------------------------------------
-
-logic mem_gnt_o      ;
-logic mem_rsp_error_o;
-
 axi_from_mem #(
   .MemAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .AxiAddrWidth(M00_AXI4_FE_ADDR_W    ),
@@ -256,7 +255,7 @@ axi_from_mem #(
   .mem_we_i       (cmd_write_condition                      ),
   .mem_wdata_i    (sram_request_mem.iob.wdata               ),
   .mem_be_i       (sram_request_mem.iob.wstrb               ),
-  .mem_gnt_o      (mem_gnt_o                                ),
+  .mem_gnt_o      (sram_response_mem.iob.ready              ),
   .mem_rsp_valid_o(sram_response_mem.iob.valid              ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata              ),
   .mem_rsp_error_o(mem_rsp_error_o                          ),
@@ -322,7 +321,7 @@ always_comb fifo_response_din = sram_request_mem;
 
 assign fifo_response_signals_in_int.rd_en = sram_response_mem.iob.valid ;
 assign response_in_int.valid              = fifo_response_signals_out_int.valid;
-assign response_in_int.payload            = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, sram_response_mem_reg);
+always_comb response_in_int.payload       = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, sram_response_mem_reg);
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -351,66 +350,92 @@ end
 // --------------------------------------------------------------------------------------
 // Cache Commands State Machine
 // --------------------------------------------------------------------------------------
-logic cmd_read_condition ;
-logic cmd_write_condition;
+// cu_sram_command_generator_state current_state;
+// cu_sram_command_generator_state next_state   ;
+// // --------------------------------------------------------------------------------------
+// always_comb begin
+//   fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
 
-cu_sram_command_generator_state current_state;
-cu_sram_command_generator_state next_state   ;
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if(areset_control)
-    current_state <= CU_SRAM_CMD_RESET;
-  else begin
-    current_state <= next_state;
-  end
-end// always_ff @(posedge ap_clk)
-// --------------------------------------------------------------------------------------
+// end
+// // --------------------------------------------------------------------------------------
+// always_ff @(posedge ap_clk) begin
+//   if(areset_control) begin
+//     current_state <= CU_SRAM_CMD_RESET;
+//   end
+//   else begin
+//     current_state <= next_state;
+//   end
+// end// always_ff @(posedge ap_clk)
+// // --------------------------------------------------------------------------------------
+// always_comb begin
+//   next_state = current_state;
+//   case (current_state)
+//     CU_SRAM_CMD_RESET : begin
+//       next_state = CU_SRAM_CMD_READY;
+//     end
+//     CU_SRAM_CMD_READY : begin
+//       next_state = CU_SRAM_CMD_READY;
+//     end
+//     default : begin
+//       next_state = CU_SRAM_CMD_RESET;
+//     end
+//   endcase
+// end// always_comb
+// // State Transition Logic
+
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
-assign cmd_read_condition                 = fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) & ~(write_command_counter_is_zero);
-assign cmd_write_condition                = fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero);
-// --------------------------------------------------------------------------------------
-always_comb begin
-  next_state = current_state;
-  case (current_state)
-    CU_SRAM_CMD_RESET : begin
-      next_state = CU_SRAM_CMD_READY;
-    end
-    CU_SRAM_CMD_READY : begin
-      next_state = CU_SRAM_CMD_READY;
-    end
-  endcase
-end// always_comb
-// State Transition Logic
+assign sram_request_mem_reg.iob.valid     = fifo_request_signals_out_valid_int;
+assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
+assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
+assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
 
-always_comb begin
-  counter_load                       = 1'b0;
-  fifo_request_signals_in_int.rd_en  = 1'b0;
-  fifo_response_signals_in_int.wr_en = 1'b0;
-  sram_request_mem_reg.iob.valid     = 1'b0;
-  case (current_state)
-    CU_SRAM_CMD_RESET : begin
-      counter_load                       = 1'b1;
-      fifo_request_signals_in_int.rd_en  = 1'b0;
-      fifo_response_signals_in_int.wr_en = 1'b0;
-      sram_request_mem_reg.iob.valid     = 1'b0;
-    end
-    CU_SRAM_CMD_READY : begin
-      counter_load                       = 1'b0;
-      fifo_request_signals_in_int.rd_en  = 1'b0;
-      fifo_response_signals_in_int.wr_en = 1'b0;
-      sram_request_mem_reg.iob.valid     = 1'b0;
-      if(cmd_read_condition) begin
-        sram_request_mem_reg.iob.valid     = 1'b1;
-        fifo_request_signals_in_int.rd_en  = 1'b1;
-        fifo_response_signals_in_int.wr_en = 1'b1;
-      end else if(cmd_write_condition) begin
-        sram_request_mem_reg.iob.valid     = 1'b1;
-        fifo_request_signals_in_int.rd_en  = 1'b1;
-        fifo_response_signals_in_int.wr_en = 1'b1;
-      end
-    end
-  endcase
-end// always_comb
+// always_comb begin
+//   counter_load                       = 1'b0;
+//   fifo_request_signals_in_int.rd_en  = 1'b0;
+//   fifo_response_signals_in_int.wr_en = 1'b0;
+//   sram_request_mem_reg.iob.valid     = 1'b0;
+//   case (current_state)
+//     CU_SRAM_CMD_RESET : begin
+//       counter_load                       = 1'b1;
+//       fifo_request_signals_in_int.rd_en  = 1'b0;
+//       fifo_response_signals_in_int.wr_en = 1'b0;
+//       sram_request_mem_reg.iob.valid     = 1'b0;
+//     end
+//     CU_SRAM_CMD_READY : begin
+//       counter_load                       = 1'b0;
+//       fifo_request_signals_in_int.rd_en  = 1'b0;
+//       fifo_response_signals_in_int.wr_en = 1'b0;
+//       sram_request_mem_reg.iob.valid     = 1'b0;
+//       if(cmd_read_condition) begin
+//         sram_request_mem_reg.iob.valid     = 1'b1;
+//         fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
+//         fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
+//       end else if(cmd_write_condition) begin
+//         sram_request_mem_reg.iob.valid     = 1'b1;
+//         fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
+//         fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
+//       end
+//     end
+//     default : begin
+//       counter_load                       = 1'b0;
+//       fifo_request_signals_in_int.rd_en  = 1'b0;
+//       fifo_response_signals_in_int.wr_en = 1'b0;
+//       sram_request_mem_reg.iob.valid     = 1'b0;
+//     end
+//   endcase
+// end// always_comb
+
+always_ff @(posedge ap_clk) begin
+  if(areset_control) begin
+    cmd_trans_pending <= 1'b0;
+  end else begin
+    if(sram_request_mem_reg.iob.valid)
+      cmd_trans_pending <= 1'b1;
+    else if(sram_response_mem.iob.valid)
+      cmd_trans_pending <= 1'b0;
+  end
+end
 
 always_comb begin
   sram_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};

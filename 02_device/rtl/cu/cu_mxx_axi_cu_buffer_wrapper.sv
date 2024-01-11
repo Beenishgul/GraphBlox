@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_cu_buffer_mid512x64_fe32x64_wrapper #(
+module m00_axi_cu_buffer_mid32x64_fe32x64_wrapper #(
   parameter NUM_CHANNELS_READ = 1,
   parameter FIFO_WRITE_DEPTH  = 64,
   parameter PROG_THRESH       = 32
@@ -471,5 +471,5 @@ engine_m_axi #(
 );
 
 
-endmodule : m00_axi_cu_buffer_mid512x64_fe32x64_wrapper
+endmodule : m00_axi_cu_buffer_mid32x64_fe32x64_wrapper
   

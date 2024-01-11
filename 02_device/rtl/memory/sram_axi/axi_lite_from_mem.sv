@@ -11,7 +11,7 @@
 // Authors:
 // - Wolfgang Roenninger <wroennin@iis.ee.ethz.ch>
 // - Nicole Narr <narrn@ethz.ch>
-
+`include "global_package.vh"
 /// Protocol adapter which translates memory requests to the AXI4-Lite protocol.
 ///
 /// This module acts like an SRAM and makes AXI4-Lite requests downstream.
