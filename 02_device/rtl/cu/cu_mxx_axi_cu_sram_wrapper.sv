@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_sram_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 13:17:46
+// Revise : 2024-01-11 16:40:05
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -232,7 +232,7 @@ axi_from_mem #(
   .MemAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .AxiAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .DataWidth   (M00_AXI4_FE_DATA_W    ),
-  .MaxRequests (2**3),
+  .MaxRequests (2**1),
   .axi_req_t   (axi_req_t             ),
   .axi_rsp_t   (axi_resp_t            )
 ) inst_axi_from_mem (
