@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_sram_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 02:05:10
+// Revise : 2024-01-11 02:41:36
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -208,7 +208,7 @@ iob_cache_axi #(
   .BE_DATA_W           (M00_AXI4_MID_DATA_W                                ),
   .NWAYS_W             (1                                                     ),
   .NLINES_W            ($clog2(512)                                             ),
-  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*1/M00_AXI4_FE_DATA_W)),
+  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*3/M00_AXI4_FE_DATA_W)),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
