@@ -7,15 +7,17 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper.sv
+// File   : kernel_mxx_axi_system_cache_wrapper.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:51:45
+// Revise : 2024-01-11 01:36:58
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
 
-module kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper (
+
+
+module kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -102,7 +104,7 @@ assign m_axi_write.out.awaddr[63] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x64 (
+m00_axi_system_cache_be512x64_mid512x64 inst_m00_axi_system_cache_be512x64_mid512x64 (
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),
   .Initializing      (cache_setup_signal_int      ),
@@ -186,7 +188,7 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .M0_AXI_BREADY     (m_axi_write.out.bready      )  // Output Write response channel ready
 );
 
-endmodule : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper
+endmodule : kernel_m00_axi_system_cache_be512x64_mid512x64_wrapper
 
 
   

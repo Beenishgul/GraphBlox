@@ -7,15 +7,17 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : m00_axi_register_slice_mid_32x64_wrapper.sv
+// File   : mxx_axi_register_slice_mid_wrapper.sv
 // Create : 2023-01-23 16:17:05
-// Revise : 2023-06-19 00:51:45
+// Revise : 2024-01-11 01:36:58
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
+  
 
-module m00_axi_register_slice_mid_32x64_wrapper (
+
+module m00_axi_register_slice_mid_512x64_wrapper (
   // System Signals
   input  logic                                  ap_clk         ,
   input  logic                                  areset         ,
@@ -80,7 +82,7 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-m00_axi_register_slice_mid_32x64 inst_m00_axi_register_slice_mid_32x64 (
+m00_axi_register_slice_mid_512x64 inst_m00_axi_register_slice_mid_512x64 (
   .aclk          (ap_clk                  ),
   .aresetn       (areset_register_slice   ),
   .s_axi_araddr  (s_axi_read.in.araddr    ), // input read address read channel address
@@ -164,6 +166,6 @@ m00_axi_register_slice_mid_32x64 inst_m00_axi_register_slice_mid_32x64 (
   .m_axi_wvalid  (m_axi_write.out.wvalid  )  // output write channel valid
 );
 
-endmodule : m00_axi_register_slice_mid_32x64_wrapper
+endmodule : m00_axi_register_slice_mid_512x64_wrapper
 
   
