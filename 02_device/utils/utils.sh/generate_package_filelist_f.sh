@@ -51,7 +51,8 @@ top="top"
 
 memory="memory"
 memory_cache="cache"
-memory_ram="ram"
+memory_sram="sram_axi"
+memory_sram_include="include"
 
 control="control"
 bundle="bundle"
@@ -102,6 +103,10 @@ generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CF
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v"
+
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/${memory_sram_include}/ ${CFG_FILE_NAME_VH} "svh"
+
+generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
 
