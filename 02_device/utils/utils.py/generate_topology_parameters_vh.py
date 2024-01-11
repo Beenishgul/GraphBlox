@@ -2617,6 +2617,7 @@ typedef logic [M{0:02d}_AXI4_BE_PROT_W-1:0]   type_m{0:02d}_axi4_be_prot;
 typedef logic [M{0:02d}_AXI4_BE_REGION_W-1:0] type_m{0:02d}_axi4_be_region;
 typedef logic [M{0:02d}_AXI4_BE_QOS_W-1:0]    type_m{0:02d}_axi4_be_qos;
 typedef logic [M{0:02d}_AXI4_BE_ID_W-1:0]     type_m{0:02d}_axi4_be_id;
+typedef logic [M{0:02d}_AXI4_BE_USER_W-1:0]   type_m{0:02d}_axi4_be_user;
 
 parameter M{0:02d}_AXI4_BE_BURST_FIXED = 2'b00;
 parameter M{0:02d}_AXI4_BE_BURST_INCR  = 2'b01;
@@ -2877,6 +2878,7 @@ typedef logic [M{0:02d}_AXI4_MID_PROT_W-1:0]   type_m{0:02d}_axi4_mid_prot;
 typedef logic [M{0:02d}_AXI4_MID_REGION_W-1:0] type_m{0:02d}_axi4_mid_region;
 typedef logic [M{0:02d}_AXI4_MID_QOS_W-1:0]    type_m{0:02d}_axi4_mid_qos;
 typedef logic [M{0:02d}_AXI4_MID_ID_W-1:0]     type_m{0:02d}_axi4_mid_id;
+typedef logic [M{0:02d}_AXI4_MID_USER_W-1:0]   type_m{0:02d}_axi4_mid_user;
 
 parameter M{0:02d}_AXI4_MID_BURST_FIXED = 2'b00;
 parameter M{0:02d}_AXI4_MID_BURST_INCR  = 2'b01;
@@ -3137,6 +3139,7 @@ typedef logic [M{0:02d}_AXI4_FE_PROT_W-1:0]   type_m{0:02d}_axi4_fe_prot;
 typedef logic [M{0:02d}_AXI4_FE_REGION_W-1:0] type_m{0:02d}_axi4_fe_region;
 typedef logic [M{0:02d}_AXI4_FE_QOS_W-1:0]    type_m{0:02d}_axi4_fe_qos;
 typedef logic [M{0:02d}_AXI4_FE_ID_W-1:0]     type_m{0:02d}_axi4_fe_id;
+typedef logic [M{0:02d}_AXI4_FE_USER_W-1:0]   type_m{0:02d}_axi4_fe_user;
 
 parameter M{0:02d}_AXI4_FE_BURST_FIXED = 2'b00;
 parameter M{0:02d}_AXI4_FE_BURST_INCR  = 2'b01;

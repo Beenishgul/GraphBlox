@@ -45,6 +45,7 @@ typedef logic [M00_AXI4_BE_PROT_W-1:0]   type_m00_axi4_be_prot;
 typedef logic [M00_AXI4_BE_REGION_W-1:0] type_m00_axi4_be_region;
 typedef logic [M00_AXI4_BE_QOS_W-1:0]    type_m00_axi4_be_qos;
 typedef logic [M00_AXI4_BE_ID_W-1:0]     type_m00_axi4_be_id;
+typedef logic [M00_AXI4_BE_USER_W-1:0]   type_m00_axi4_be_user;
 
 parameter M00_AXI4_BE_BURST_FIXED = 2'b00;
 parameter M00_AXI4_BE_BURST_INCR  = 2'b01;
