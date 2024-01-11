@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_cu_cache_mid512x64_fe32x64_wrapper #(
+module m00_axi_cu_cache_mid32x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -408,5 +408,5 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : m00_axi_cu_cache_mid512x64_fe32x64_wrapper
+endmodule : m00_axi_cu_cache_mid32x64_fe32x64_wrapper
   

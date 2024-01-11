@@ -7,7 +7,7 @@
 // this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-
+`include "global_package.vh"
 // Author: Florian Zaruba <zarubaf@iis.ee.ethz.ch>
 
 module fifo_v3 #(

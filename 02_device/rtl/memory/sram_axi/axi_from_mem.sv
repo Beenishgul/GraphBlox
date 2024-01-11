@@ -11,7 +11,7 @@
 // Authors:
 // - Christopher Reinwardt <creinwar@ethz.ch>
 // - Nicole Narr <narrn@ethz.ch>
-
+`include "global_package.vh"
 `include "typedef.svh"
 
 /// Protocol adapter which translates memory requests to the AXI4 protocol.
