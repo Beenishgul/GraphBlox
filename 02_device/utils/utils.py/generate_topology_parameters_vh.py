@@ -3974,7 +3974,7 @@ generate
         .m_axi_write_out          (cu_m{0:02d}_axi_write_out                ),
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
-    end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 3) begin
+    end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 2) begin
 // CU SRAN -> AXI Kernel Cache
       m{0:02d}_axi_cu_sram_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_sram_l1 (
         .ap_clk                   (ap_clk                                 ),
@@ -4972,7 +4972,7 @@ engine_m_axi #(
   .M_AXI4_MID_REGION_W(M{0:02d}_AXI4_MID_REGION_W                              ),
   .M_AXI4_MID_RESP_W  (M{0:02d}_AXI4_MID_RESP_W                                ),
   .M_AXI4_MID_SIZE_W  (M{0:02d}_AXI4_MID_SIZE_W                                ),
-  .C_AXI_RW_CACHE     (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES)
+  .C_AXI_RW_CACHE     (M{0:02d}_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE          )
 ) inst_engine_m_axi (
   .read_transaction_done_out   (read_transaction_done_out   ),
   .read_transaction_length_in  (read_transaction_length_in  ),
@@ -5261,8 +5261,8 @@ axi_from_mem #(
   .mem_rsp_valid_o(sram_response_mem.iob.valid              ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata              ),
   .mem_rsp_error_o(mem_rsp_error_o                          ),
-  .slv_aw_cache_i (M{0:02d}_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE),
-  .slv_ar_cache_i (M{0:02d}_AXI4_MID_CACHE_BUFFERABLE_NO_ALLOCATE),
+  .slv_aw_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
+  .slv_ar_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );

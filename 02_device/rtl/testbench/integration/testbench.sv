@@ -47,7 +47,7 @@ bit [M00_AXI4_BE_DATA_W-1:0] auxiliary_2[];
 bit [M00_AXI4_BE_DATA_W-1:0] in_degree[];
 bit [M00_AXI4_BE_DATA_W-1:0] out_degree[];
 bit [M00_AXI4_BE_DATA_W-1:0] edges_idx[];
-bit [M00_AXI4_BE_DATA_W-1:0] edges_array_src[];
+bit [M01_AXI4_BE_DATA_W-1:0] edges_array_src[];
 bit [M00_AXI4_BE_DATA_W-1:0] edges_array_dest[];
 bit [M00_AXI4_BE_DATA_W-1:0] edges_array_weight[];
 
@@ -670,13 +670,13 @@ module __KERNEL___testbench ();
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
         /////////////////////////////////////////////////////////////////////////////////////////////////
 
-        int cache_line_size = 64                               ; // Cache line size in bytes
-        int bytes_per_read  = M00_AXI4_FE_DATA_W / 8             ; // Number of bytes read in each iteration
+        int cache_line_size = 64                                   ; // Cache line size in bytes
+        int bytes_per_read  = M00_AXI4_FE_DATA_W / 8               ; // Number of bytes read in each iteration
         int words_per_read  = M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W; // Number of bytes read in each iteration
 
 
         // Backdoor fill the memory with the content.
-        int                        o,l;
+        int                          o,l;
         bit [M00_AXI4_FE_DATA_W-1:0] ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
 
         l=0;
@@ -1008,12 +1008,16 @@ module __KERNEL___testbench ();
 
             // `include"initialize_testbench._ALGORITHM_NAME_.vh"
 
-            for (int i = 0; i < graph.mem512_num_edges; i++) begin
-                for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
+            for (int i = 0; i < graph.mem512_edges_array_src; i++) begin
+                // for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
                     graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
                     setup_temp = temp_edges_array_src;
-                    graph.edges_array_src[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
+                    graph.edges_array_src[i]= setup_temp;
+                // end
+            end
 
+            for (int i = 0; i < graph.mem512_num_edges; i++) begin
+                for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
                     graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
                     setup_temp = temp_edges_array_dest;
                     graph.edges_array_dest[i][(M00_AXI4_FE_DATA_W*j)+:M00_AXI4_FE_DATA_W] = setup_temp;
@@ -1070,7 +1074,7 @@ module __KERNEL___testbench ();
             graph.mem512_in_degree       = graph.mem512_num_vertices ;
             graph.mem512_out_degree      = graph.mem512_num_vertices ;
 
-            graph.mem512_edges_array_src   = graph.mem512_num_edges ;
+            graph.mem512_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_BE_DATA_W-1) )/ (M01_AXI4_BE_DATA_W);
             graph.mem512_edges_array_dest  = graph.mem512_num_edges ;
             graph.mem512_edges_array_weight= graph.mem512_num_edges ;
 
