@@ -114,6 +114,7 @@ with open(config_file_path, "r") as file:
 buffers = config_data["buffers"]
 channels = config_data["channels"]
 ch_properties = config_data["ch_properties"]
+cu_properties = config_data["cu_properties"]
 cache_properties = config_data["cache_properties"]
 mapping = config_data["mapping"]
 luts    = config_data["luts"]
@@ -519,15 +520,17 @@ def generate_caches_properties_parameters(cache_properties):
     cache_config_l1_prefetch = []
     cache_config_l2_num_ways = []
     cache_config_l2_size = []
+    cache_config_l2_ram = []
     for cache, values in cache_properties.items():
         cache_config_l1_prefetch.append(int(values[4]))
         cache_config_l1_num_ways.append(int(values[3]))
         cache_config_l1_size.append(int(values[2]))
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
+        cache_config_l2_ram.append(int(values[5]))
 
 
-    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch
+    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram
 
 
 CHANNEL_CONFIG_L1 = []
@@ -547,8 +550,9 @@ CACHE_CONFIG_L1_NUM_WAYS = []
 CACHE_CONFIG_L1_SIZE = []
 CACHE_CONFIG_L2_NUM_WAYS = []
 CACHE_CONFIG_L2_SIZE = []
+CACHE_CONFIG_L2_RAM = []
 
-CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH = generate_caches_properties_parameters(cache_properties)
+CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L2_RAM = generate_caches_properties_parameters(cache_properties)
 
 
 def find_max_value(list1, list2, list1_c, list2_c, max_size):
@@ -2161,7 +2165,7 @@ set_property -dict [list                                                  \\
                     CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
                     CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{URAM}}                \\
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
                     ] [get_ips ${{module_name}}]
 
@@ -2251,7 +2255,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index]))
 
     file.write('\n'.join(output_lines))
 
