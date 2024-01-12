@@ -275,7 +275,7 @@ always_ff @(posedge ap_clk) begin
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     cu_channel_request_in[i]              <= ch_arbiter_1_to_N_chs_cache_request_out[i];
     ch_arbiter_1_to_N_chs_cache_fifo_request_signals_in[i].rd_en = ~cu_channel_fifo_request_signals_out[i].prog_full ;
-    cu_channel_fifo_request_signals_in[i] <= 1'b1;
+    cu_channel_fifo_request_signals_in[i].rd_en <= 1'b1;
   end
 end
 

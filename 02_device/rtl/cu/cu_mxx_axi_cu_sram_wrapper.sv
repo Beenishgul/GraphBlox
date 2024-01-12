@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_sram_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 16:40:05
+// Revise : 2024-01-11 16:49:17
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 
 
-module m00_axi_cu_sram_mid512x64_fe32x64_wrapper #(
+module m00_axi_cu_sram_mid32x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -302,7 +302,7 @@ xpm_fifo_sync_wrapper #(
 assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy | fifo_response_signals_out_int.rd_rst_busy;
 
 // Push
-always_comb fifo_response_din = sram_request_mem;
+assign fifo_response_din = sram_request_mem;
 
 // Pop
 assign fifo_response_signals_in_int.rd_en = sram_response_mem.iob.valid ;
@@ -334,9 +334,9 @@ always_ff @(posedge ap_clk) begin
   sram_response_mem_reg <= sram_response_mem;
 end
 // --------------------------------------------------------------------------------------
-// Cache Commands State Machine
+// SRAM Commands State Machine
 // --------------------------------------------------------------------------------------
-assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
+assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
 assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int;
 assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
 assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
@@ -351,5 +351,5 @@ always_comb begin
   sram_request_mem_int.data      = fifo_request_dout.data;
 end
 
-endmodule : m00_axi_cu_sram_mid512x64_fe32x64_wrapper
+endmodule : m00_axi_cu_sram_mid32x64_fe32x64_wrapper
   

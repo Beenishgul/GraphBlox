@@ -9,7 +9,7 @@
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
 // File   : m00_axi_cu_cache_wrapper.sv
 // Create : 2023-06-13 23:21:43
-// Revise : 2024-01-11 16:40:05
+// Revise : 2024-01-11 16:49:17
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_cu_cache_mid512x64_fe32x64_wrapper #(
+module m00_axi_cu_cache_mid32x64_fe32x64_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -331,7 +331,7 @@ always_ff @(posedge ap_clk) begin
   end
 end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
-assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
+assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
 assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
 assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
 // --------------------------------------------------------------------------------------
@@ -408,5 +408,5 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : m00_axi_cu_cache_mid512x64_fe32x64_wrapper
+endmodule : m00_axi_cu_cache_mid32x64_fe32x64_wrapper
   
