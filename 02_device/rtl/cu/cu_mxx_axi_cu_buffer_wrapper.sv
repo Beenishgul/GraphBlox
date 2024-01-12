@@ -323,15 +323,104 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// Cache Commands State Machine
+// Cache Commands Read State Machine
+// --------------------------------------------------------------------------------------
+cu_stream_command_generator_state current_state;
+cu_stream_command_generator_state next_state   ;
+
+logic cmd_read_pending ;
+logic cmd_write_pending;
+// --------------------------------------------------------------------------------------
+//   State Machine AP_USER_MANAGED sync
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+  if(areset_control)
+    current_state <= CU_STREAM_CMD_RESET;
+  else begin
+    current_state <= next_state;
+  end
+end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
-assign stream_request_mem_int.iob.valid   = fifo_request_signals_out_valid_int;
-assign fifo_request_signals_in_int.rd_en  = stream_response_mem.iob.ready;
-assign fifo_response_signals_in_int.wr_en = stream_response_mem.iob.ready;
-assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)  & fifo_request_signals_out_valid_int;
+assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)  & fifo_request_signals_out_valid_int & ~read_transaction_prog_full;
 assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & write_transaction_tready_out & fifo_request_signals_out_valid_int;
+// --------------------------------------------------------------------------------------
+always_comb begin
+  next_state = current_state;
+  case (current_state)
+    CU_STREAM_CMD_RESET : begin
+      next_state = CU_STREAM_CMD_READY;
+    end
+    CU_STREAM_CMD_READY : begin
+      if(cmd_read_condition)
+        next_state = CU_STREAM_CMD_READ_TRANS;
+      else if(cmd_write_condition)
+        next_state = CU_STREAM_CMD_WRITE_TRANS;
+      else
+        next_state = CU_STREAM_CMD_READY;
+    end
+    CU_STREAM_CMD_READ_TRANS : begin
+      next_state = CU_STREAM_CMD_PENDING;
+    end
+    CU_STREAM_CMD_WRITE_TRANS : begin
+      next_state = CU_STREAM_CMD_PENDING;
+    end
+    CU_STREAM_CMD_PENDING : begin
+      if(stream_response_mem.iob.valid)
+        next_state = CU_STREAM_CMD_READY;
+      else
+        next_state = CU_STREAM_CMD_PENDING;
+    end
+    CU_STREAM_CMD_DONE : begin
+      next_state = CU_STREAM_CMD_DONE;
+    end
+  endcase
+end// always_comb
+// State Transition Logic
 
+always_ff @(posedge ap_clk) begin
+  case (current_state)
+    CU_STREAM_CMD_RESET : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b0;
+      fifo_response_signals_in_int.wr_en <= 1'b0;
+      stream_request_mem_int.iob.valid   <= 1'b0;
+      cmd_read_pending                   <= 1'b0;
+      cmd_write_pending                  <= 1'b0;
+    end
+    CU_STREAM_CMD_READY : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b0;
+      fifo_response_signals_in_int.wr_en <= 1'b0;
+      stream_request_mem_int.iob.valid   <= 1'b0;
+      cmd_read_pending                   <= 1'b0;
+      cmd_write_pending                  <= 1'b0;
+    end
+    CU_STREAM_CMD_READ_TRANS : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b1;
+      fifo_response_signals_in_int.wr_en <= 1'b1;
+      stream_request_mem_int.iob.valid   <= 1'b1;
+      cmd_read_pending                   <= 1'b1;
+    end
+    CU_STREAM_CMD_WRITE_TRANS : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b1;
+      fifo_response_signals_in_int.wr_en <= 1'b1;
+      stream_request_mem_int.iob.valid   <= 1'b1;
+      cmd_read_pending                   <= 1'b0;
+      cmd_write_pending                  <= 1'b1;
+    end
+    CU_STREAM_CMD_PENDING : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b0;
+      fifo_response_signals_in_int.wr_en <= 1'b0;
+      stream_request_mem_int.iob.valid   <= 1'b0;
+    end
+    CU_STREAM_CMD_DONE : begin
+      fifo_request_signals_in_int.rd_en  <= 1'b0;
+      fifo_response_signals_in_int.wr_en <= 1'b0;
+      stream_request_mem_int.iob.valid   <= 1'b0;
+    end
+  endcase
+end// always_ff @(posedge ap_clk)
+
+// --------------------------------------------------------------------------------------
 always_comb begin
   stream_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
   stream_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
@@ -343,22 +432,22 @@ end
 // --------------------------------------------------------------------------------------
 // READ Stream
 // --------------------------------------------------------------------------------------
-assign read_transaction_length_in          = 1;
-assign read_transaction_start_in           = cmd_read_condition;
-assign read_transaction_offset_in          = stream_request_mem_int.iob.addr;
-assign read_transaction_tready_in          = cmd_read_condition;
+assign read_transaction_length_in = 1;
+assign read_transaction_start_in  = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
+assign read_transaction_offset_in = stream_request_mem_int.iob.addr;
+assign read_transaction_tready_in = cmd_read_pending;
 // --------------------------------------------------------------------------------------
 // WRITE Stream
 // --------------------------------------------------------------------------------------
 assign write_transaction_start_in  = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
-assign write_transaction_tvalid_in = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign write_transaction_tvalid_in = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & cmd_write_pending;
 assign write_transaction_length_in = 1;
 assign write_transaction_offset_in = stream_request_mem_int.iob.addr;
 assign write_transaction_tdata_in  = stream_request_mem_int.iob.wdata;
 // --------------------------------------------------------------------------------------
 // output Stream
 // --------------------------------------------------------------------------------------
-assign stream_response_mem.iob.ready = cmd_read_condition | cmd_write_condition;
+assign stream_response_mem.iob.ready = write_transaction_tready_out | ~read_transaction_prog_full;
 assign stream_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
 assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
 
