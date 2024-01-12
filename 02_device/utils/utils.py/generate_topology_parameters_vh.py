@@ -2192,6 +2192,9 @@ set_property -dict [list                                                      \\
                       CONFIG.DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
                       CONFIG.ID_WIDTH {{1}}                   \\
                       CONFIG.READ_WRITE_MODE {{READ_WRITE}}   \\
+                      CONFIG.MAX_BURST_LENGTH {{32}}            \\
+                      CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
+                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
                       CONFIG.REG_AR {{15}}                    \\
                       CONFIG.REG_AW {{15}}                    \\
                       CONFIG.REG_B {{15}}                     \\
@@ -2212,7 +2215,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # ----------------------------------------------------------------------------
 # Generate AXI_M{0:02d} Register Slice
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Back-end"]" 
+puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Back-end {1}x{2}"]" 
 
 set module_name m{0:02d}_axi_register_slice_be_{1}x{2}
 create_ip -name axi_register_slice      \\
@@ -2222,10 +2225,13 @@ create_ip -name axi_register_slice      \\
           -module_name ${{module_name}}   >> $log_file
           
 set_property -dict [list                                                          \\
-                      CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}                \\
-                      CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}          \\
+                      CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}               \\
+                      CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}         \\
                       CONFIG.ID_WIDTH {{1}}                                       \\
                       CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
+                      CONFIG.MAX_BURST_LENGTH {{32}}            \\
+                      CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
+                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
                       CONFIG.REG_AR {{15}}                    \\
                       CONFIG.REG_AW {{15}}                    \\
                       CONFIG.REG_B {{15}}                     \\
