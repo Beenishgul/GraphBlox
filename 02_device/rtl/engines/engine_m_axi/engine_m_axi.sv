@@ -140,7 +140,7 @@ logic areset_m_axi_kernel;
 // RTL Logic
 // --------------------------------------------------------------------------------------//
 // Tie-off unused AXI protocol features
-assign axi_arburst  = 2'b00;
+assign axi_arburst  = 2'b01;
 assign axi_arcache  = C_AXI_RW_CACHE;
 assign axi_arlock   = 2'b00;
 assign axi_arprot   = 3'b000;
