@@ -244,7 +244,7 @@ endfunction : swap_endianness_cacheline_m00_axi_be
   
 
 parameter M01_AXI4_BE_ADDR_W   = 64                 ;
-parameter M01_AXI4_BE_DATA_W   = 32                 ;
+parameter M01_AXI4_BE_DATA_W   = 512                 ;
 parameter M01_AXI4_BE_STRB_W   = M01_AXI4_BE_DATA_W / 8;
 parameter M01_AXI4_BE_BURST_W  = 2                   ;
 parameter M01_AXI4_BE_CACHE_W  = 4                   ;
