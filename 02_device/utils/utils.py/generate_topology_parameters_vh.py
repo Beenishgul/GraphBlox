@@ -527,7 +527,7 @@ def generate_caches_properties_parameters(cache_properties):
         cache_config_l1_size.append(int(values[2]))
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
-        cache_config_l2_ram.append(int(values[5]))
+        cache_config_l2_ram.append(values[5])
 
 
     return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram
@@ -2132,7 +2132,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
 
 set SYSTEM_CACHE_SIZE_KB_M{0:02d} [expr {{${{SYSTEM_CACHE_SIZE_B_M{0:02d}}} / 1024}}]
-puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
+puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache \\[{7}\\]: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
 puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
 puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
 
