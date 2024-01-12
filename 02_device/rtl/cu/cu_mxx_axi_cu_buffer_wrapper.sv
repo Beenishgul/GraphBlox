@@ -255,10 +255,13 @@ assign fifo_request_din.meta             = cache_request_in_reg.payload.meta;
 assign fifo_request_din.data             = cache_request_in_reg.payload.data;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en = stream_response_mem.iob.valid ;
-assign response_in_int.valid              = fifo_response_signals_out_int.valid;
-always_comb response_in_int.payload       = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, stream_response_mem_reg);
-
+// assign fifo_request_signals_in_int.rd_en = stream_request_pop_int;
+assign stream_request_mem.iob.valid = stream_request_mem_int.iob.valid;
+assign stream_request_mem.iob.addr  = stream_request_mem_int.iob.addr;
+assign stream_request_mem.iob.wdata = stream_request_mem_int.iob.wdata;
+assign stream_request_mem.iob.wstrb = stream_request_mem_int.iob.wstrb;
+assign stream_request_mem.meta      = stream_request_mem_int.meta;
+assign stream_request_mem.data      = stream_request_mem_int.data;
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -355,7 +358,7 @@ assign write_transaction_tdata_in  = stream_request_mem_int.iob.wdata;
 // --------------------------------------------------------------------------------------
 // output Stream
 // --------------------------------------------------------------------------------------
-assign stream_response_mem.iob.ready = cmd_write_condition | cmd_write_condition;
+assign stream_response_mem.iob.ready = cmd_read_condition | cmd_write_condition;
 assign stream_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
 assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
 

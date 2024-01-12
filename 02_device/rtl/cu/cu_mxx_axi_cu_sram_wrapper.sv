@@ -333,6 +333,7 @@ xpm_fifo_sync_wrapper #(
 always_ff @(posedge ap_clk) begin
   sram_response_mem_reg <= sram_response_mem;
 end
+
 // --------------------------------------------------------------------------------------
 // SRAM Commands State Machine
 // --------------------------------------------------------------------------------------
