@@ -37,9 +37,12 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
   output M00_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
   input  M00_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
   output M00_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M00_AXI4_LITE_MID_RESP_T                m_axi_lite_in            ,
+  output M00_AXI4_LITE_MID_REQ_T                 m_axi_lite_out           ,
   output logic                                   done_out
 );
 
+assign m_axi_lite_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -512,9 +515,12 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
   output M01_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
   input  M01_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
   output M01_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M01_AXI4_LITE_MID_RESP_T                m_axi_lite_in            ,
+  output M01_AXI4_LITE_MID_REQ_T                 m_axi_lite_out           ,
   output logic                                   done_out
 );
 
+assign m_axi_lite_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
