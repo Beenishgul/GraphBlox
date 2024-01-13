@@ -2272,9 +2272,9 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # ----------------------------------------------------------------------------
 # Generate AXI_LITE{0:02d} Register Slice
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate AXI_LITE_M{0:02d} Register Slice Back-end {1}x{2}"]" 
+puts "[color 2 "                        Generate AXI_LITE_M{0:02d} Register Slice Back-end 64x17"]" 
 
-set module_name m{0:02d}_axi_lite_register_slice_mid_17x64
+set module_name m{0:02d}_axi_lite_register_slice_mid_64x17
 create_ip -name axi_register_slice      \\
           -vendor xilinx.com            \\
           -library ip                   \\
