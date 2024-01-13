@@ -5,7 +5,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -60,7 +61,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -126,7 +127,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -181,7 +183,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -247,7 +249,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -302,7 +305,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -353,7 +356,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -408,7 +412,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -619,7 +623,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -674,7 +679,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -740,7 +745,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -795,7 +801,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -864,7 +870,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -919,7 +926,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {
@@ -970,7 +977,8 @@
             "CMD_MEM_READ": 2,
             "CMD_MEM_WRITE": 4,
             "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16
+            "CMD_STREAM_WRITE": 16,
+            "CMD_CACHE_FLUSH": 32
         },
         "entries": {
             "entry_0": {
@@ -1025,7 +1033,7 @@
             },
             "entry_5": {
                 "cmd": {
-                    "bits": "5",
+                    "bits": "6",
                     "value": "CMD_MEM_INVALID"
                 },
                 "id_module": {

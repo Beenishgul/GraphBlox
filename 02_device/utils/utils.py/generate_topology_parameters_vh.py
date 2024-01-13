@@ -5600,7 +5600,7 @@ axi_from_mem #(
   .MemAddrWidth(M{0:02d}_AXI4_FE_ADDR_W    ),
   .AxiAddrWidth(M{0:02d}_AXI4_FE_ADDR_W    ),
   .DataWidth   (M{0:02d}_AXI4_FE_DATA_W    ),
-  .MaxRequests (2**1),
+  .MaxRequests (2**{7}                 ),
   .axi_req_t   (M{0:02d}_AXI4_FE_REQ_T     ),
   .axi_rsp_t   (M{0:02d}_AXI4_FE_RESP_T    )
 ) inst_axi_from_mem (
