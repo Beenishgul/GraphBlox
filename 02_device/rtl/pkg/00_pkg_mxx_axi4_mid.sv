@@ -264,8 +264,8 @@ typedef logic [M00_AXI4_LITE_MID_STRB_W-1:0]   type_m00_axi4_lite_mid_strb;
 `AXI_LITE_TYPEDEF_ALL(m00_axi_lite, type_m00_axi4_lite_mid_addr, type_m00_axi4_lite_mid_data, type_m00_axi4_lite_mid_strb)
 typedef m00_axi_lite_req_t  M00_AXI4_LITE_MID_REQ_T;
 typedef m00_axi_lite_resp_t M00_AXI4_LITE_MID_RESP_T;
-typedef m00_axi_lite_resp_t S00_AXI4_LITE_MID_REQ_T;
-typedef m00_axi_lite_req_t  S00_AXI4_LITE_MID_RESP_T;
+typedef m00_axi_lite_req_t  S00_AXI4_LITE_MID_REQ_T;
+typedef m00_axi_lite_resp_t S00_AXI4_LITE_MID_RESP_T;
 
   
 
@@ -514,8 +514,8 @@ typedef logic [M01_AXI4_LITE_MID_STRB_W-1:0]   type_m01_axi4_lite_mid_strb;
 `AXI_LITE_TYPEDEF_ALL(m01_axi_lite, type_m01_axi4_lite_mid_addr, type_m01_axi4_lite_mid_data, type_m01_axi4_lite_mid_strb)
 typedef m01_axi_lite_req_t  M01_AXI4_LITE_MID_REQ_T;
 typedef m01_axi_lite_resp_t M01_AXI4_LITE_MID_RESP_T;
-typedef m01_axi_lite_resp_t S01_AXI4_LITE_MID_REQ_T;
-typedef m01_axi_lite_req_t  S01_AXI4_LITE_MID_RESP_T;
+typedef m01_axi_lite_req_t  S01_AXI4_LITE_MID_REQ_T;
+typedef m01_axi_lite_resp_t S01_AXI4_LITE_MID_RESP_T;
 
   
 

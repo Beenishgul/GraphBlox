@@ -2896,8 +2896,8 @@ typedef logic [M{0:02d}_AXI4_LITE_BE_STRB_W-1:0]   type_m{0:02d}_axi4_lite_be_st
 `AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_be_addr, type_m{0:02d}_axi4_lite_be_data, type_m{0:02d}_axi4_lite_be_strb)
 typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_BE_REQ_T;
 typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_BE_RESP_T;
-typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_BE_REQ_T;
-typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_BE_RESP_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_BE_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_BE_RESP_T;
 
   """
 
@@ -3185,8 +3185,8 @@ typedef logic [M{0:02d}_AXI4_LITE_MID_STRB_W-1:0]   type_m{0:02d}_axi4_lite_mid_
 `AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_mid_addr, type_m{0:02d}_axi4_lite_mid_data, type_m{0:02d}_axi4_lite_mid_strb)
 typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_MID_REQ_T;
 typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_MID_RESP_T;
-typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_MID_REQ_T;
-typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_MID_RESP_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_MID_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_MID_RESP_T;
 
   """
 
@@ -3474,8 +3474,8 @@ typedef logic [M{0:02d}_AXI4_LITE_FE_STRB_W-1:0]   type_m{0:02d}_axi4_lite_fe_st
 `AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_fe_addr, type_m{0:02d}_axi4_lite_fe_data, type_m{0:02d}_axi4_lite_fe_strb)
 typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_FE_REQ_T;
 typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_FE_RESP_T;
-typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_FE_REQ_T;
-typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_FE_RESP_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_FE_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_FE_RESP_T;
 
   """
 
@@ -3899,6 +3899,8 @@ module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   output M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
+  input  S{0:02d}_AXI4_LITE_BE_REQ_T                 s_axi_lite_in     ,
+  output S{0:02d}_AXI4_LITE_BE_RESP_T                s_axi_lite_out    ,
   output logic                                  cache_setup_signal
 );
 
@@ -3910,6 +3912,8 @@ logic areset_control     ;
 
 logic cache_setup_signal_int;
 
+logic m_axi_read_out_araddr_63 ;
+logic m_axi_write_out_awaddr_63;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
@@ -3975,10 +3979,7 @@ assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
 m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mid{3}x{4} (
-  .ACLK              (ap_clk                      ),
-  .ARESETN           (areset_system_cache         ),
-  .Initializing      (cache_setup_signal_int      ),
-  
+
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
   .S0_AXI_GEN_RVALID (s_axi_read.out.rvalid       ), // Output Read channel valid
@@ -4018,14 +4019,7 @@ m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mi
   .S0_AXI_GEN_WLAST  (s_axi_write.in.wlast        ), // Input Write channel last word flag
   .S0_AXI_GEN_WVALID (s_axi_write.in.wvalid       ), // Input Write channel valid
   .S0_AXI_GEN_BREADY (s_axi_write.in.bready       ), // Input Write response channel ready
-  
 
-  """
-fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
-
-    """
-
-fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_RVALID     (m_axi_read.in.rvalid        ), // Input Read channel valid
   .M0_AXI_ARREADY    (m_axi_read.in.arready       ), // Input Read Address read channel ready
   .M0_AXI_RLAST      (m_axi_read.in.rlast         ), // Input Read channel last word
@@ -4033,7 +4027,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_RID        (m_axi_read.in.rid           ), // Input Read channel ID
   .M0_AXI_RRESP      (m_axi_read.in.rresp         ), // Input Read channel response
   .M0_AXI_ARVALID    (m_axi_read.out.arvalid      ), // Output Read Address read channel valid
-  .M0_AXI_ARADDR     ({{1'b0, m_axi_read.out.araddr[62:0]}} ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     ({{m_axi_read_out_araddr_63, m_axi_read.out.araddr[62:0]}} ), // Output Read Address read channel address
   .M0_AXI_ARLEN      (m_axi_read.out.arlen        ), // Output Read Address channel burst length
   .M0_AXI_RREADY     (m_axi_read.out.rready       ), // Output Read Read channel ready
   .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
@@ -4050,7 +4044,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_BVALID     (m_axi_write.in.bvalid       ), // Input Write response channel valid
   .M0_AXI_AWVALID    (m_axi_write.out.awvalid     ), // Output Write Address write channel valid
   .M0_AXI_AWID       (m_axi_write.out.awid        ), // Output Write Address write channel ID
-  .M0_AXI_AWADDR     ({{1'b0, m_axi_write.out.awaddr[62:0]}}), // Output Write Address write channel address
+  .M0_AXI_AWADDR     ({{m_axi_write_out_awaddr_63, m_axi_write.out.awaddr[62:0]}}), // Output Write Address write channel address
   .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
   .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
   .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
@@ -4062,13 +4056,52 @@ fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_WSTRB      (m_axi_write.out.wstrb       ), // Output Write channel write strobe
   .M0_AXI_WLAST      (m_axi_write.out.wlast       ), // Output Write channel last word flag
   .M0_AXI_WVALID     (m_axi_write.out.wvalid      ), // Output Write channel valid
-  .M0_AXI_BREADY     (m_axi_write.out.bready      )  // Output Write response channel ready
+  .M0_AXI_BREADY     (m_axi_write.out.bready      ),  // Output Write response channel ready
+    """
+
+fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
+  .S_AXI_CTRL_AWADDR (s_axi_lite_in.aw.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .S_AXI_CTRL_AWPROT (s_axi_lite_in.aw.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .S_AXI_CTRL_AWVALID(s_axi_lite_in.aw_valid      ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_AWREADY(s_axi_lite_out.aw_ready     ),
+  .S_AXI_CTRL_WDATA  (s_axi_lite_in.w.data        ), // : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .S_AXI_CTRL_WVALID (s_axi_lite_in.w_valid       ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_WREADY (s_axi_lite_out.w_ready      ),
+  .S_AXI_CTRL_BRESP  (s_axi_lite_out.b.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .S_AXI_CTRL_BVALID (s_axi_lite_out.b_valid      ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_BREADY (s_axi_lite_in.b_ready       ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_ARADDR (s_axi_lite_in.ar.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .S_AXI_CTRL_ARPROT (s_axi_lite_in.ar.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .S_AXI_CTRL_ARVALID(s_axi_lite_in.ar_valid      ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_ARREADY(s_axi_lite_out.ar_ready     ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_RDATA  (s_axi_lite_out.r.data       ), // : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .S_AXI_CTRL_RRESP  (s_axi_lite_out.r.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .S_AXI_CTRL_RVALID (s_axi_lite_out.r_valid      ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_RREADY (s_axi_lite_in.r_ready       ), // : IN STD_LOGIC;
+    """
+
+fill_kernel_mxx_axi_system_cache_wrapper_post_if="""
+  .ACLK              (ap_clk                      ),
+  .ARESETN           (areset_system_cache         ),
+  .Initializing      (cache_setup_signal_int      )
 );
 
 endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
+"""
 
-    """
+fill_kernel_mxx_axi_system_cache_wrapper_post_else="""
+
+  .ACLK              (ap_clk                      ),
+  .ARESETN           (areset_system_cache         ),
+  .Initializing      (cache_setup_signal_int      )    
+);
+
+assign s_axi_lite_out = 0;
+
+endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
+
+"""
 
 output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_mxx_axi_system_cache_wrapper.sv")
 check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
@@ -4079,8 +4112,10 @@ with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
         fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ctrl.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-   
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post_if.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+        else:
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post_else.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+     
     file.write('\n'.join(fill_kernel_mxx_axi_system_cache_wrapper_module))
 
 
