@@ -4368,6 +4368,7 @@ endgenerate
 // Generate CU CACHE CH {1} Lite (M->S) Register Slice
 // --------------------------------------------------------------------------------------
     assign cu_m{0:02d}_axi_lite_in = 0;
+    assign m{0:02d}_axi_lite_out = 0;
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
@@ -5409,6 +5410,7 @@ module m{0:02d}_axi_cu_sram_mid{1}x{2}_fe{3}x{4}_wrapper #(
 );
 
 
+assign m_axi_lite_out = 0;
 // --------------------------------------------------------------------------------------
 // Define SRAM axi data types
 // --------------------------------------------------------------------------------------
