@@ -29,8 +29,8 @@ module kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper (
   output M00_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M00_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M00_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S00_AXI4_LITE_BE_REQ_T                 s_axi_lite_in     ,
-  output S00_AXI4_LITE_BE_RESP_T                s_axi_lite_out    ,
+  input  S00_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
+  output S00_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
   output logic                                  cache_setup_signal
 );
 
@@ -231,8 +231,8 @@ module kernel_m01_axi_system_cache_be512x64_mid32x64_wrapper (
   output M01_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M01_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M01_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S01_AXI4_LITE_BE_REQ_T                 s_axi_lite_in     ,
-  output S01_AXI4_LITE_BE_RESP_T                s_axi_lite_out    ,
+  input  S01_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
+  output S01_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
   output logic                                  cache_setup_signal
 );
 
@@ -390,7 +390,6 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .M0_AXI_WVALID     (m_axi_write.out.wvalid      ), // Output Write channel valid
   .M0_AXI_BREADY     (m_axi_write.out.bready      ),  // Output Write response channel ready
     
-
 
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),

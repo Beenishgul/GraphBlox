@@ -111,7 +111,8 @@ logic [NUM_CHANNELS-1:0] cu_channel_fifo_setup_signal                          ;
 logic [NUM_CHANNELS-1:0] cu_channel_done_out                                   ;
 
 // --------------------------------------------------------------------------------------
-logic areset_axi_slice[NUM_CHANNELS-1:0];
+logic areset_axi_slice     [NUM_CHANNELS-1:0];
+logic areset_axi_lite_slice[NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Channel - Arbiter Signals: Channel Respnse Generator
@@ -146,8 +147,9 @@ always_ff @(posedge ap_clk) begin
   areset_ch_arbiter_1_to_N_chs_cache <= areset;
   areset_bundles                     <= areset;
   for (int i = 0; i < NUM_CHANNELS; i++) begin
-    areset_axi_slice[i]  <= areset;
-    areset_cu_channel[i] <= areset;
+    areset_axi_slice[i]      <= areset;
+    areset_cu_channel[i]     <= areset;
+    areset_axi_lite_slice[i] <= areset;
   end
 end
 
@@ -273,7 +275,7 @@ always_ff @(posedge ap_clk) begin
   ch_arbiter_1_to_N_chs_cache_request_in.payload <= cache_generator_request_out.payload;
 
   for (int i = 0; i < NUM_CHANNELS; i++) begin
-    cu_channel_request_in[i]              <= ch_arbiter_1_to_N_chs_cache_request_out[i];
+    cu_channel_request_in[i] <= ch_arbiter_1_to_N_chs_cache_request_out[i];
     ch_arbiter_1_to_N_chs_cache_fifo_request_signals_in[i].rd_en = ~cu_channel_fifo_request_signals_out[i].prog_full ;
     cu_channel_fifo_request_signals_in[i].rd_en <= 1'b1;
   end
@@ -368,9 +370,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                             (ap_clk                              ),
   .areset                             (areset_bundles                      ),
   .descriptor_in                      (cu_bundles_descriptor               ),

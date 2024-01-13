@@ -2267,7 +2267,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # ----------------------------------------------------------------------------
 puts "[color 2 "                        Generate AXI_LITE_M{0:02d} Register Slice Back-end {1}x{2}"]" 
 
-set module_name m{0:02d}_axi_lite_register_slice_be_17x64
+set module_name m{0:02d}_axi_lite_register_slice_mid_17x64
 create_ip -name axi_register_slice      \\
           -vendor xilinx.com            \\
           -library ip                   \\
@@ -3864,6 +3864,113 @@ with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
     
     file.write('\n'.join(fill_mxx_axi_register_slice_mid_wrapper_module))
 
+fill_mxx_axi_lite_register_slice_mid_wrapper_module = []
+
+fill_mxx_axi_lite_register_slice_mid_wrapper_pre="""
+// -----------------------------------------------------------------------------
+//
+//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//
+// -----------------------------------------------------------------------------
+// Copyright (c) 2021-2023 All rights reserved
+// -----------------------------------------------------------------------------
+// Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
+// File   : m{0:02d}_axi_lite_register_slice_mid_wrapper.sv
+// Create : 2024-01-12 14:41:10
+// Revise : 2024-01-12 14:41:10
+// Editor : sublime text4, tab size (2)
+// -----------------------------------------------------------------------------
+
+`include "global_package.vh"
+"""
+
+fill_mxx_axi_lite_register_slice_mid_wrapper="""
+
+module m{0:02d}_axi_lite_register_slice_mid_{1}x{2}_wrapper (
+  // System Signals
+  input  logic                   ap_clk,
+  input  logic                   areset,
+  input  M{0:02d}_AXI4_LITE_MID_RESP_T m_axi_lite_in,
+  output M{0:02d}_AXI4_LITE_MID_REQ_T  m_axi_lite_out,
+  input  S{0:02d}_AXI4_LITE_MID_REQ_T  s_axi_lite_in,
+  output S{0:02d}_AXI4_LITE_MID_RESP_T s_axi_lite_out
+);
+
+// --------------------------------------------------------------------------------------
+// Module Wires and Variables
+// --------------------------------------------------------------------------------------
+logic areset_register_slice;
+
+// --------------------------------------------------------------------------------------
+//   Register reset signal
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+  areset_register_slice <= ~areset;
+end
+
+// --------------------------------------------------------------------------------------
+// System cache
+// --------------------------------------------------------------------------------------
+m{0:02d}_axi_lite_register_slice_mid_{1}x{2} inst_m{0:02d}_axi_lite_register_slice_mid_{1}x{2} (
+  .aclk         (ap_clk                 ),
+  .aresetn      (aresetn                ),
+  .s_axi_araddr (s_axi_lite_in.ar.addr  ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .s_axi_arprot (s_axi_lite_in.ar.prot  ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .s_axi_arready(s_axi_lite_out.ar_ready), // : OUT STD_LOGIC;
+  .s_axi_arvalid(s_axi_lite_in.ar_valid ), // : IN STD_LOGIC;
+  .s_axi_awaddr (s_axi_lite_in.aw.addr  ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .s_axi_awprot (s_axi_lite_in.aw.prot  ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .s_axi_awready(s_axi_lite_out.aw_ready),
+  .s_axi_awvalid(s_axi_lite_in.aw_valid ), // : IN STD_LOGIC;
+  .s_axi_bready (s_axi_lite_in.b_ready  ), // : IN STD_LOGIC;
+  .s_axi_bresp  (s_axi_lite_out.b.resp  ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .s_axi_bvalid (s_axi_lite_out.b_valid ), // : OUT STD_LOGIC;
+  .s_axi_rdata  (s_axi_lite_out.r.data  ), // : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .s_axi_rready (s_axi_lite_in.r_ready  ), // : IN STD_LOGIC;
+  .s_axi_rresp  (s_axi_lite_out.r.resp  ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .s_axi_rvalid (s_axi_lite_out.r_valid ), // : OUT STD_LOGIC;
+  .s_axi_wdata  (s_axi_lite_in.w.data   ), // : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .s_axi_wready (s_axi_lite_out.w_ready ),
+  .s_axi_wstrb  (s_axi_lite_in.w.strb   ),
+  .s_axi_wvalid (s_axi_lite_in.w_valid  ), // : IN STD_LOGIC;
+  
+  .m_axi_araddr (m_axi_lite_out.ar.addr ), // : out STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .m_axi_arprot (m_axi_lite_out.ar.prot ), // : out STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .m_axi_arready(m_axi_lite_in.ar_ready ), // : in STD_LOGIC;
+  .m_axi_arvalid(m_axi_lite_out.ar_valid), // : out STD_LOGIC;
+  .m_axi_awaddr (m_axi_lite_out.aw.addr ), // : out STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .m_axi_awprot (m_axi_lite_out.aw.prot ), // : out STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .m_axi_awready(m_axi_lite_in.aw_ready ),
+  .m_axi_awvalid(m_axi_lite_out.aw_valid), // : out STD_LOGIC;
+  .m_axi_bready (m_axi_lite_out.b_ready ), // : out STD_LOGIC;
+  .m_axi_bresp  (m_axi_lite_in.b.resp   ), // : in STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .m_axi_bvalid (m_axi_lite_in.b_valid  ), // : in STD_LOGIC;
+  .m_axi_rdata  (m_axi_lite_in.r.data   ), // : in STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .m_axi_rready (m_axi_lite_out.r_ready ), // : out STD_LOGIC;
+  .m_axi_rresp  (m_axi_lite_in.r.resp   ), // : in STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .m_axi_rvalid (m_axi_lite_in.r_valid  ), // : in STD_LOGIC;
+  .m_axi_wdata  (m_axi_lite_out.w.data  ), // : out STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .m_axi_wready (m_axi_lite_in.w_ready  ),
+  .m_axi_wstrb  (m_axi_lite_out.w.strb  ),
+  .m_axi_wvalid (m_axi_lite_out.w_valid )  // : out STD_LOGIC;
+);
+
+endmodule : m{0:02d}_axi_lite_register_slice_mid_{1}x{2}_wrapper
+
+  """
+
+
+output_file_mxx_axi_lite_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_lite_register_slice_mid_wrapper.sv")
+check_and_clean_file(output_file_mxx_axi_lite_register_slice_mid_wrapper)
+
+with open(output_file_mxx_axi_lite_register_slice_mid_wrapper, "w") as file:
+    fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(fill_mxx_axi_lite_register_slice_mid_wrapper_pre.format(channel, 64, 17, formatted_datetime))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(fill_mxx_axi_lite_register_slice_mid_wrapper.format(channel, 64, 17, formatted_datetime))
+    
+    file.write('\n'.join(fill_mxx_axi_lite_register_slice_mid_wrapper_module))
+
 
 fill_kernel_mxx_axi_system_cache_wrapper_module = []
 
@@ -3899,8 +4006,8 @@ module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   output M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S{0:02d}_AXI4_LITE_BE_REQ_T                 s_axi_lite_in     ,
-  output S{0:02d}_AXI4_LITE_BE_RESP_T                s_axi_lite_out    ,
+  input  S{0:02d}_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
+  output S{0:02d}_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
   output logic                                  cache_setup_signal
 );
 
@@ -4091,7 +4198,6 @@ endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 """
 
 fill_kernel_mxx_axi_system_cache_wrapper_post_else="""
-
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),
   .Initializing      (cache_setup_signal_int      )    
@@ -4134,6 +4240,9 @@ M{0:02d}_AXI4_MID_MasterReadInterfaceOutput  cu_m{0:02d}_axi_read_out ;
 M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  cu_m{0:02d}_axi_write_in ;
 M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput cu_m{0:02d}_axi_write_out;
 
+M{0:02d}_AXI4_LITE_MID_RESP_T cu_m{0:02d}_axi_lite_in;
+M{0:02d}_AXI4_LITE_MID_REQ_T  cu_m{0:02d}_axi_lite_out;
+
 generate
 // --------------------------------------------------------------------------------------
     if(CHANNEL_CONFIG_L1_CACHE[{1}] == 1) begin
@@ -4154,6 +4263,8 @@ generate
         .m_axi_read_out           (cu_m{0:02d}_axi_read_out                 ),
         .m_axi_write_in           (cu_m{0:02d}_axi_write_in                 ),
         .m_axi_write_out          (cu_m{0:02d}_axi_write_out                ),
+        .m_axi_lite_in            (cu_m{0:02d}_axi_lite_in                  ),
+        .m_axi_lite_out           (cu_m{0:02d}_axi_lite_out                 ),
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
     end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 2) begin
@@ -4173,6 +4284,8 @@ generate
         .m_axi_read_out           (cu_m{0:02d}_axi_read_out                 ),
         .m_axi_write_in           (cu_m{0:02d}_axi_write_in                 ),
         .m_axi_write_out          (cu_m{0:02d}_axi_write_out                ),
+        .m_axi_lite_in            (cu_m{0:02d}_axi_lite_in                  ),
+        .m_axi_lite_out           (cu_m{0:02d}_axi_lite_out                 ),
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
     end else begin
@@ -4192,6 +4305,8 @@ generate
         .m_axi_read_out           (cu_m{0:02d}_axi_read_out                 ),
         .m_axi_write_in           (cu_m{0:02d}_axi_write_in                 ),
         .m_axi_write_out          (cu_m{0:02d}_axi_write_out                ),
+        .m_axi_lite_in            (cu_m{0:02d}_axi_lite_in                  ),
+        .m_axi_lite_out           (cu_m{0:02d}_axi_lite_out                 ),
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
     end
@@ -4211,12 +4326,38 @@ endgenerate
       .m_axi_write_in (m{0:02d}_axi_write_in    ),
       .m_axi_write_out(m{0:02d}_axi_write_out   )
     );
+    """
 
+    output_file_axi_lite_ctrl_template_if = """
+// --------------------------------------------------------------------------------------
+// Generate CU CACHE CH {1} Lite (M->S) Register Slice
+// --------------------------------------------------------------------------------------
+    m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper inst_m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper
+        (
+            .ap_clk         (ap_clk),
+            .areset         (areset_axi_lite_slice[{1}]),
+            .m_axi_lite_in  (m{0:02d}_axi_lite_in) ,
+            .m_axi_lite_out (m{0:02d}_axi_lite_out),
+            .s_axi_lite_in  (cu_m{0:02d}_axi_lite_out),
+            .s_axi_lite_out (cu_m{0:02d}_axi_lite_in )
+        );
+    """
+
+    output_file_axi_lite_ctrl_template_else = """
+// --------------------------------------------------------------------------------------
+// Generate CU CACHE CH {1} Lite (M->S) Register Slice
+// --------------------------------------------------------------------------------------
+    assign m{0:02d}_axi_lite_out   = 0;
+    assign cu_m{0:02d}_axi_lite_in = 0;
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(output_file_kernel_cu_topology_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
-
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            output_lines.append(output_file_axi_lite_ctrl_template_if.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+        else:
+            output_lines.append(output_file_axi_lite_ctrl_template_else.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+          
     file.write('\n'.join(output_lines))
 
 
@@ -4228,6 +4369,8 @@ with open(output_file_kernel_cu_ports, 'w') as file:
   output M{0:02d}_AXI4_MID_MasterReadInterfaceOutput  m{0:02d}_axi_read_out ,
   input  M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  m{0:02d}_axi_write_in ,
   output M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput m{0:02d}_axi_write_out,
+  input  M{0:02d}_AXI4_LITE_MID_RESP_T                m{0:02d}_axi_lite_in  ,
+  output M{0:02d}_AXI4_LITE_MID_REQ_T                 m{0:02d}_axi_lite_out ,
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
@@ -4240,10 +4383,13 @@ with open(output_file_kernel_cu_portmap, 'w') as file:
     output_lines = []
 
     output_file_kernel_cu_portmap_template = """
-.m{0:02d}_axi_read_in(kernel_s{0:02d}_axi_read_out),
-.m{0:02d}_axi_read_out(kernel_s{0:02d}_axi_read_in),
-.m{0:02d}_axi_write_in(kernel_s{0:02d}_axi_write_out),
-.m{0:02d}_axi_write_out(kernel_s{0:02d}_axi_write_in),
+.m{0:02d}_axi_read_in  (kernel_s{0:02d}_axi_read_out ),
+.m{0:02d}_axi_read_out (kernel_s{0:02d}_axi_read_in  ),
+.m{0:02d}_axi_write_in (kernel_s{0:02d}_axi_write_out),
+.m{0:02d}_axi_write_out(kernel_s{0:02d}_axi_write_in ),
+
+.m{0:02d}_axi_lite_in (kernel_s{0:02d}_axi_lite_out),
+.m{0:02d}_axi_lite_out(kernel_s{0:02d}_axi_lite_in ),
     """
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(output_file_kernel_cu_portmap_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
@@ -4296,9 +4442,12 @@ module m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper #(
   output M{0:02d}_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
   input  M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
   output M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M{0:02d}_AXI4_LITE_MID_RESP_T                m_axi_lite_in            ,
+  output M{0:02d}_AXI4_LITE_MID_REQ_T                 m_axi_lite_out           ,
   output logic                                   done_out
 );
 
+assign m_axi_lite_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -4726,9 +4875,12 @@ module m{0:02d}_axi_cu_stream_mid{1}x{2}_fe{3}x{4}_wrapper #(
   output M{0:02d}_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
   input  M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
   output M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M{0:02d}_AXI4_LITE_MID_RESP_T                m_axi_lite_in            ,
+  output M{0:02d}_AXI4_LITE_MID_REQ_T                 m_axi_lite_out           ,
   output logic                                   done_out
 );
 
+assign m_axi_lite_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -5232,6 +5384,8 @@ module m{0:02d}_axi_cu_sram_mid{1}x{2}_fe{3}x{4}_wrapper #(
   output M{0:02d}_AXI4_MID_MasterReadInterfaceOutput  m_axi_read_out           ,
   input  M{0:02d}_AXI4_MID_MasterWriteInterfaceInput  m_axi_write_in           ,
   output M{0:02d}_AXI4_MID_MasterWriteInterfaceOutput m_axi_write_out          ,
+  input  M{0:02d}_AXI4_LITE_MID_RESP_T                m_axi_lite_in            ,
+  output M{0:02d}_AXI4_LITE_MID_REQ_T                 m_axi_lite_out           ,
   output logic                                   done_out
 );
 
