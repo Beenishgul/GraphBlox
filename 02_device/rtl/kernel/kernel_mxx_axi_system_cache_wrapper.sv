@@ -149,6 +149,12 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .S0_AXI_GEN_WVALID (s_axi_write.in.wvalid       ), // Input Write channel valid
   .S0_AXI_GEN_BREADY (s_axi_write.in.bready       ), // Input Write response channel ready
   
+
+  
+
+
+    
+
   .M0_AXI_RVALID     (m_axi_read.in.rvalid        ), // Input Read channel valid
   .M0_AXI_ARREADY    (m_axi_read.in.arready       ), // Input Read Address read channel ready
   .M0_AXI_RLAST      (m_axi_read.in.rlast         ), // Input Read channel last word
@@ -191,7 +197,7 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
 endmodule : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper
 
 
-  
+    
 
 
 module kernel_m01_axi_system_cache_be512x64_mid32x64_wrapper (
@@ -326,6 +332,9 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .S0_AXI_GEN_WVALID (s_axi_write.in.wvalid       ), // Input Write channel valid
   .S0_AXI_GEN_BREADY (s_axi_write.in.bready       ), // Input Write response channel ready
   
+
+  
+
   .M0_AXI_RVALID     (m_axi_read.in.rvalid        ), // Input Read channel valid
   .M0_AXI_ARREADY    (m_axi_read.in.arready       ), // Input Read Address read channel ready
   .M0_AXI_RLAST      (m_axi_read.in.rlast         ), // Input Read channel last word
@@ -368,4 +377,4 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
 endmodule : kernel_m01_axi_system_cache_be512x64_mid32x64_wrapper
 
 
-  
+    
