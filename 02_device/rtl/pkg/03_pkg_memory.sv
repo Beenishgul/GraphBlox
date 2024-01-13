@@ -384,14 +384,13 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
   output_packet.iob.valid = input_packet_valid;
   // output_packet.iob.addr  = address_base + (input_packet.meta.address.offset << input_packet.meta.address.shift.amount);
   // output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
-  
+  output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
+
   case (input_packet.meta.subclass.cmd)
-    CMD_CACHE_FLUSH: begin
-      output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
-      output_packet.iob.wdata = input_packet.data.field;
+    CMD_CACHE_FLUSH : begin
+      output_packet.iob.wdata = {{47{1'b0}},cmd_flush};
     end
     default : begin
-      output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
       output_packet.iob.wdata = input_packet.data.field;
     end
   endcase

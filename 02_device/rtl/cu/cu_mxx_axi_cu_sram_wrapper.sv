@@ -127,11 +127,13 @@ logic mem_rsp_error_o    ;
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-CacheRequestPayload  sram_request_mem     ;
-CacheRequestPayload  sram_request_mem_int ;
-CacheRequestPayload  sram_request_flush_int ;
-CacheResponsePayload sram_response_mem    ;
-CacheResponsePayload sram_response_mem_reg;
+CacheRequestPayload  sram_request_mem      ;
+CacheRequestPayload  sram_request_mem_int  ;
+CacheRequestPayload  sram_request_flush    ;
+CacheRequestPayload  sram_request_flush_int;
+CacheResponsePayload sram_response_mem     ;
+CacheResponsePayload sram_response_mem_reg ;
+CacheResponsePayload sram_response_flush   ;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -259,34 +261,35 @@ axi_from_mem #(
 // Cache CTRL
 // --------------------------------------------------------------------------------------
 
-logic mem_lite_rsp_error_o;
-logic sram_request_flush_valid;
-
+logic mem_lite_rsp_error_o     ;
+logic sram_request_flush_valid ;
+logic [M01_AXI4_LITE_MID_DATA_W-1:0] sram_response_flush_rdata;
+logic [M01_AXI4_LITE_MID_STRB_W-1:0] sram_request_flush_wstrb = {M01_AXI4_LITE_MID_STRB_W{1'b1}};
 axi_lite_from_mem #(
   .MemAddrWidth(M01_AXI4_LITE_MID_ADDR_W),
   .AxiAddrWidth(M01_AXI4_LITE_MID_ADDR_W),
   .DataWidth   (M01_AXI4_LITE_MID_DATA_W),
   .MaxRequests (2**6                    ),
-  .axi_req_t   (M00_AXI4_LITE_MID_RESP_T),
-  .axi_rsp_t   (M00_AXI4_LITE_MID_REQ_T )
+  .axi_req_t   (M00_AXI4_LITE_MID_REQ_T ),
+  .axi_rsp_t   (M00_AXI4_LITE_MID_RESP_T)
 ) inst_axi_lite_from_mem (
-  .clk_i          (clk_i               ),
-  .rst_ni         (rst_ni              ),
-  .mem_req_i      (sram_request_flush.iob.valid  ),
-  .mem_addr_i     (sram_request_flush.iob.wdata[M01_AXI4_LITE_MID_ADDR_W-1:0] ),
-  .mem_we_i       (cmd_flush_condition ),
-  .mem_wdata_i    (sram_request_flush.iob.addr ),
-  .mem_be_i       (sram_request_flush.iob.wstrb[M01_AXI4_LITE_MID_STRB_W-1:0] ),
-  .mem_gnt_o      (sram_response_flush.iob.ready            ),
-  .mem_rsp_valid_o(mem_rsp_valid_o     ),
-  .mem_rsp_rdata_o(mem_rsp_rdata_o     ),
-  .mem_rsp_error_o(mem_lite_rsp_error_o),
-  .axi_req_o      (m_axi_lite_out      ),
-  .axi_rsp_i      (m_axi_lite_in       )
+  .clk_i          (ap_clk                                                    ),
+  .rst_ni         (areset_sram                                               ),
+  .mem_req_i      (sram_request_flush.iob.valid                              ),
+  .mem_addr_i     (sram_request_flush.iob.wdata[M01_AXI4_LITE_MID_ADDR_W-1:0]),
+  .mem_we_i       (cmd_flush_condition                                       ),
+  .mem_wdata_i    (sram_request_flush.iob.addr                               ),
+  .mem_be_i       (sram_request_flush_wstrb                                  ),
+  .mem_gnt_o      (sram_response_flush.iob.ready                             ),
+  .mem_rsp_valid_o(sram_response_flush.iob.valid                             ),
+  .mem_rsp_rdata_o(sram_response_flush_rdata                                 ),
+  .mem_rsp_error_o(mem_lite_rsp_error_o                                      ),
+  .axi_req_o      (m_axi_lite_out                                            ),
+  .axi_rsp_i      (m_axi_lite_in                                             )
 );
 
 assign sram_request_flush_int.iob.valid = fifo_request_signals_out_valid_int & cmd_flush_condition;
-assign cmd_flush_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH);
+assign cmd_flush_condition              = (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH);
 
 always_comb begin
   sram_request_flush_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH))}};
@@ -381,11 +384,13 @@ end
 // SRAM Commands State Machine
 // --------------------------------------------------------------------------------------
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
-assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int;
-assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
-assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
+assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int & (cmd_read_condition | cmd_write_condition);;
 assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
 assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+// --------------------------------------------------------------------------------------
+assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready | sram_response_flush.iob.ready;
+assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready | sram_response_flush.iob.ready;
+
 
 always_comb begin
   sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
@@ -721,11 +726,12 @@ module m01_axi_cu_sram_mid32x64_fe32x64_wrapper #(
 // SRAM Commands State Machine
 // --------------------------------------------------------------------------------------
     assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
-    assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int;
-    assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
-    assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
+    assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int & (cmd_read_condition | cmd_write_condition);
     assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
     assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+// --------------------------------------------------------------------------------------
+    assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
+    assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
 
     always_comb begin
       sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
