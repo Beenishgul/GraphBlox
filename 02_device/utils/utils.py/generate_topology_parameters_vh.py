@@ -2136,7 +2136,9 @@ generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}
 generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
 export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    """
 
+    fill_m_axi_vip_tcl_template_cache_pre="""
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE AXI_M{0:02d}
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
@@ -2162,12 +2164,14 @@ set_property -dict [list                                                  \\
                     CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
                     CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
                     CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
-                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\
-                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
+                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
+
+    fill_m_axi_vip_tcl_template_cache_mid="""                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
                     CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
                     CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
-                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\
-                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
+                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
+
+    fill_m_axi_vip_tcl_template_cache_post="""                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
                     CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}\\
                     CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}      \\
                     CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
@@ -2192,7 +2196,9 @@ generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}
 generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
 export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    """
 
+    fill_m_axi_vip_tcl_template_slice_post="""
 # ----------------------------------------------------------------------------
 # Generate AXI_M{0:02d} Register Slice
 # ----------------------------------------------------------------------------
@@ -2268,7 +2274,7 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    fill_m_axi_vip_tcl_template_post="""
+    fill_m_axi_vip_tcl_template_ctrl_post="""
 # ----------------------------------------------------------------------------
 # Generate AXI_LITE{0:02d} Register Slice
 # ----------------------------------------------------------------------------
@@ -2310,8 +2316,13 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_m_axi_vip_tcl_template_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+            output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template_slice_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
        
     file.write('\n'.join(output_lines))
 
