@@ -1601,6 +1601,10 @@ M{0:02d}_AXI4_BE_MasterReadInterfaceInput   kernel_m{0:02d}_axi4_read_in  ;
 M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  kernel_m{0:02d}_axi4_read_out ;
 M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  kernel_m{0:02d}_axi4_write_in ;
 M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput kernel_m{0:02d}_axi4_write_out;
+
+M{0:02d}_AXI4_LITE_MID_RESP_T               kernel_m{0:02d}_axi_lite_in ;
+M{0:02d}_AXI4_LITE_MID_REQ_T                kernel_m{0:02d}_axi_lite_out;
+
 """
 
     assign_template = """
@@ -1677,6 +1681,8 @@ generate
         .m_axi_read_out    (kernel_m{0:02d}_axi4_read_out   ),
         .m_axi_write_in    (kernel_m{0:02d}_axi4_write_in   ),
         .m_axi_write_out   (kernel_m{0:02d}_axi4_write_out  ),
+        .s_axi_lite_in     (kernel_m{0:02d}_axi_lite_out    ),
+        .s_axi_lite_out    (kernel_m{0:02d}_axi_lite_in     ),
         .cache_setup_signal(kernel_cache_setup_signal[{5}])
       );
 // Kernel CACHE (M->S) Register Slice
@@ -1695,11 +1701,12 @@ generate
       );
 
     end else begin
-      assign kernel_cache_setup_signal[{5}]   = 0;
-      assign kernel_s{0:02d}_axi_read_out     = m{0:02d}_axi4_read.in       ;
-      assign m{0:02d}_axi4_read.out           = kernel_s{0:02d}_axi_read_in ;
-      assign kernel_s{0:02d}_axi_write_out    = m{0:02d}_axi4_write.in      ;
-      assign m{0:02d}_axi4_write.out          = kernel_s{0:02d}_axi_write_in;
+        assign kernel_cache_setup_signal[{5}] = 0;
+        assign kernel_s{0:02d}_axi_read_out     = m{0:02d}_axi4_read.in       ;
+        assign m{0:02d}_axi4_read.out           = kernel_s{0:02d}_axi_read_in ;
+        assign kernel_s{0:02d}_axi_write_out    = m{0:02d}_axi4_write.in      ;
+        assign m{0:02d}_axi4_write.out          = kernel_s{0:02d}_axi_write_in;
+        assign kernel_m{0:02d}_axi_lite_in      = 0;
     end
 // --------------------------------------------------------------------------------------
 endgenerate
@@ -4388,8 +4395,8 @@ with open(output_file_kernel_cu_portmap, 'w') as file:
 .m{0:02d}_axi_write_in (kernel_s{0:02d}_axi_write_out),
 .m{0:02d}_axi_write_out(kernel_s{0:02d}_axi_write_in ),
 
-.m{0:02d}_axi_lite_in (kernel_s{0:02d}_axi_lite_out),
-.m{0:02d}_axi_lite_out(kernel_s{0:02d}_axi_lite_in ),
+.m{0:02d}_axi_lite_in (kernel_m{0:02d}_axi_lite_in),
+.m{0:02d}_axi_lite_out(kernel_m{0:02d}_axi_lite_out),
     """
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(output_file_kernel_cu_portmap_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
