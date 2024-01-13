@@ -521,6 +521,7 @@ def generate_caches_properties_parameters(cache_properties):
     cache_config_l2_num_ways = []
     cache_config_l2_size = []
     cache_config_l2_ram = []
+    cache_config_l2_ctrl = []
     for cache, values in cache_properties.items():
         cache_config_l1_prefetch.append(int(values[4]))
         cache_config_l1_num_ways.append(int(values[3]))
@@ -528,9 +529,10 @@ def generate_caches_properties_parameters(cache_properties):
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
         cache_config_l2_ram.append(values[5])
+        cache_config_l2_ctrl.append(values[6])
 
 
-    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram
+    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram, cache_config_l2_ctrl
 
 
 CHANNEL_CONFIG_L1 = []
@@ -551,8 +553,9 @@ CACHE_CONFIG_L1_SIZE = []
 CACHE_CONFIG_L2_NUM_WAYS = []
 CACHE_CONFIG_L2_SIZE = []
 CACHE_CONFIG_L2_RAM = []
+CACHE_CONFIG_L2_CTRL = []
 
-CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L2_RAM = generate_caches_properties_parameters(cache_properties)
+CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L2_RAM, CACHE_CONFIG_L2_CTRL = generate_caches_properties_parameters(cache_properties)
 
 
 def find_max_value(list1, list2, list1_c, list2_c, max_size):
@@ -2153,6 +2156,10 @@ set_property -dict [list                                                  \\
                     CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
                     CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
                     CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\
+                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
+                    CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
+                    CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
+                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\
                     CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
                     CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}\\
                     CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}      \\
@@ -2167,7 +2174,7 @@ set_property -dict [list                                                  \\
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
                     CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
-                    ] [get_ips ${{module_name}}]
+                    ] [get_ips ${{module_name}}] >> $log_file
 
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
 set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
@@ -2254,9 +2261,51 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index]))
+    fill_m_axi_vip_tcl_template_post="""
+# ----------------------------------------------------------------------------
+# Generate AXI_LITE{0:02d} Register Slice
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate AXI_LITE_M{0:02d} Register Slice Back-end {1}x{2}"]" 
 
+set module_name m{0:02d}_axi_lite_register_slice_be_17x64
+create_ip -name axi_register_slice      \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 2.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list                                                          \\
+                      CONFIG.ADDR_WIDTH {{17}}                                    \\
+                      CONFIG.DATA_WIDTH {{64}}                                    \\
+                      CONFIG.PROTOCOL  {{AXI4LITE}}                               \\
+                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
+                      CONFIG.MAX_BURST_LENGTH {{32}}                              \\
+                      CONFIG.NUM_READ_OUTSTANDING {{32}}                          \\
+                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}                         \\
+                      CONFIG.REG_AR {{15}}                    \\
+                      CONFIG.REG_AW {{15}}                    \\
+                      CONFIG.REG_B {{15}}                     \\
+                      CONFIG.REG_R {{15}}                     \\
+                      CONFIG.REG_W {{15}}                     \\
+                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+  
+ """
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            output_lines.append(fill_m_axi_vip_tcl_template_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+       
     file.write('\n'.join(output_lines))
 
 # ----------------------------------------------------------------------------
@@ -2592,6 +2641,7 @@ with open(output_file_pkg_mxx_axi4_be, "w") as file:
 // -----------------------------------------------------------------------------
 
 `include "global_timescale.vh"
+`include "typedef.svh"
 package PKG_MXX_AXI4_BE;
 
 parameter S_AXI_BE_ADDR_WIDTH_BITS = 12;
@@ -2825,6 +2875,32 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_be
 
   """
 
+    fill_file_pkg_mxx_axi4_lite_be_mid="""
+
+// --------------------------------------------------------------------------------------
+// AXI4 Lite 
+// --------------------------------------------------------------------------------------
+
+`AXI_TYPEDEF_ALL(m{0:02d}_axi, type_m{0:02d}_axi4_be_addr, type_m{0:02d}_axi4_be_id, type_m{0:02d}_axi4_be_data, type_m{0:02d}_axi4_be_strb, type_m{0:02d}_axi4_be_user)
+typedef m{0:02d}_axi_req_t M{0:02d}_AXI4_BE_REQ_T;
+typedef m{0:02d}_axi_resp_t M{0:02d}_AXI4_BE_RESP_T;
+
+parameter M{0:02d}_AXI4_LITE_BE_ADDR_W   = 17                 ;
+parameter M{0:02d}_AXI4_LITE_BE_DATA_W   = 64                 ;
+parameter M{0:02d}_AXI4_LITE_BE_STRB_W   = M{0:02d}_AXI4_LITE_BE_DATA_W / 8;
+parameter M{0:02d}_AXI4_LITE_BE_ID_W     = 1                   ;
+typedef logic [M{0:02d}_AXI4_LITE_BE_ADDR_W-1:0]   type_m{0:02d}_axi4_lite_be_addr;
+typedef logic [M{0:02d}_AXI4_LITE_BE_DATA_W-1:0]   type_m{0:02d}_axi4_lite_be_data;
+typedef logic [M{0:02d}_AXI4_LITE_BE_STRB_W-1:0]   type_m{0:02d}_axi4_lite_be_strb;
+
+`AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_be_addr, type_m{0:02d}_axi4_lite_be_data, type_m{0:02d}_axi4_lite_be_strb)
+typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_BE_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_BE_RESP_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_BE_REQ_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_BE_RESP_T;
+
+  """
+
     fill_file_pkg_mxx_axi4_be_end="""
 endpackage
   """
@@ -2832,6 +2908,7 @@ endpackage
     output_lines.append(fill_file_pkg_mxx_axi4_be_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(fill_file_pkg_mxx_axi4_be_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
+        output_lines.append(fill_file_pkg_mxx_axi4_lite_be_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
     output_lines.append(fill_file_pkg_mxx_axi4_be_end)
 
     file.write('\n'.join(output_lines))
@@ -2853,6 +2930,7 @@ with open(output_file_pkg_mxx_axi4_mid, "w") as file:
 // -----------------------------------------------------------------------------
 
 `include "global_timescale.vh"
+`include "typedef.svh"
 package PKG_MXX_AXI4_MID;
 
 parameter S_AXI_MID_ADDR_WIDTH_BITS = 12;
@@ -3086,6 +3164,32 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_mid
 
   """
 
+    fill_file_pkg_mxx_axi4_lite_mid_mid="""
+
+// --------------------------------------------------------------------------------------
+// AXI4 Lite 
+// --------------------------------------------------------------------------------------
+
+`AXI_TYPEDEF_ALL(m{0:02d}_axi, type_m{0:02d}_axi4_mid_addr, type_m{0:02d}_axi4_mid_id, type_m{0:02d}_axi4_mid_data, type_m{0:02d}_axi4_mid_strb, type_m{0:02d}_axi4_mid_user)
+typedef m{0:02d}_axi_req_t M{0:02d}_AXI4_MID_REQ_T;
+typedef m{0:02d}_axi_resp_t M{0:02d}_AXI4_MID_RESP_T;
+
+parameter M{0:02d}_AXI4_LITE_MID_ADDR_W   = 17                 ;
+parameter M{0:02d}_AXI4_LITE_MID_DATA_W   = 64                 ;
+parameter M{0:02d}_AXI4_LITE_MID_STRB_W   = M{0:02d}_AXI4_LITE_MID_DATA_W / 8;
+parameter M{0:02d}_AXI4_LITE_MID_ID_W     = 1                   ;
+typedef logic [M{0:02d}_AXI4_LITE_MID_ADDR_W-1:0]   type_m{0:02d}_axi4_lite_mid_addr;
+typedef logic [M{0:02d}_AXI4_LITE_MID_DATA_W-1:0]   type_m{0:02d}_axi4_lite_mid_data;
+typedef logic [M{0:02d}_AXI4_LITE_MID_STRB_W-1:0]   type_m{0:02d}_axi4_lite_mid_strb;
+
+`AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_mid_addr, type_m{0:02d}_axi4_lite_mid_data, type_m{0:02d}_axi4_lite_mid_strb)
+typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_MID_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_MID_RESP_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_MID_REQ_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_MID_RESP_T;
+
+  """
+
     fill_file_pkg_mxx_axi4_mid_end="""
 endpackage
   """
@@ -3093,6 +3197,7 @@ endpackage
     output_lines.append(fill_file_pkg_mxx_axi4_mid_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(fill_file_pkg_mxx_axi4_mid_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
+        output_lines.append(fill_file_pkg_mxx_axi4_lite_mid_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
     output_lines.append(fill_file_pkg_mxx_axi4_mid_end)
 
     file.write('\n'.join(output_lines))
@@ -3114,6 +3219,7 @@ with open(output_file_pkg_mxx_axi4_fe, "w") as file:
 // -----------------------------------------------------------------------------
 
 `include "global_timescale.vh"
+`include "typedef.svh"
 package PKG_MXX_AXI4_FE;
 
 parameter S_AXI_FE_ADDR_WIDTH_BITS = 12;
@@ -3347,6 +3453,32 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_fe
 
   """
 
+    fill_file_pkg_mxx_axi4_lite_fe_mid="""
+
+// --------------------------------------------------------------------------------------
+// AXI4 Lite 
+// --------------------------------------------------------------------------------------
+
+`AXI_TYPEDEF_ALL(m{0:02d}_axi, type_m{0:02d}_axi4_fe_addr, type_m{0:02d}_axi4_fe_id, type_m{0:02d}_axi4_fe_data, type_m{0:02d}_axi4_fe_strb, type_m{0:02d}_axi4_fe_user)
+typedef m{0:02d}_axi_req_t M{0:02d}_AXI4_FE_REQ_T;
+typedef m{0:02d}_axi_resp_t M{0:02d}_AXI4_FE_RESP_T;
+
+parameter M{0:02d}_AXI4_LITE_FE_ADDR_W   = 17                 ;
+parameter M{0:02d}_AXI4_LITE_FE_DATA_W   = 64                 ;
+parameter M{0:02d}_AXI4_LITE_FE_STRB_W   = M{0:02d}_AXI4_LITE_FE_DATA_W / 8;
+parameter M{0:02d}_AXI4_LITE_FE_ID_W     = 1                   ;
+typedef logic [M{0:02d}_AXI4_LITE_FE_ADDR_W-1:0]   type_m{0:02d}_axi4_lite_fe_addr;
+typedef logic [M{0:02d}_AXI4_LITE_FE_DATA_W-1:0]   type_m{0:02d}_axi4_lite_fe_data;
+typedef logic [M{0:02d}_AXI4_LITE_FE_STRB_W-1:0]   type_m{0:02d}_axi4_lite_fe_strb;
+
+`AXI_LITE_TYPEDEF_ALL(m{0:02d}_axi_lite, type_m{0:02d}_axi4_lite_fe_addr, type_m{0:02d}_axi4_lite_fe_data, type_m{0:02d}_axi4_lite_fe_strb)
+typedef m{0:02d}_axi_lite_req_t  M{0:02d}_AXI4_LITE_FE_REQ_T;
+typedef m{0:02d}_axi_lite_resp_t M{0:02d}_AXI4_LITE_FE_RESP_T;
+typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_FE_REQ_T;
+typedef m{0:02d}_axi_lite_req_t  S{0:02d}_AXI4_LITE_FE_RESP_T;
+
+  """
+
     fill_file_pkg_mxx_axi4_fe_end="""
 endpackage
   """
@@ -3354,6 +3486,7 @@ endpackage
     output_lines.append(fill_file_pkg_mxx_axi4_fe_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(fill_file_pkg_mxx_axi4_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index], formatted_datetime))
+        output_lines.append(fill_file_pkg_mxx_axi4_lite_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index], formatted_datetime))
     output_lines.append(fill_file_pkg_mxx_axi4_fe_end)
 
     file.write('\n'.join(output_lines))
@@ -3886,6 +4019,13 @@ m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mi
   .S0_AXI_GEN_WVALID (s_axi_write.in.wvalid       ), // Input Write channel valid
   .S0_AXI_GEN_BREADY (s_axi_write.in.bready       ), // Input Write response channel ready
   
+
+  """
+fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
+
+    """
+
+fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_RVALID     (m_axi_read.in.rvalid        ), // Input Read channel valid
   .M0_AXI_ARREADY    (m_axi_read.in.arready       ), // Input Read Address read channel ready
   .M0_AXI_RLAST      (m_axi_read.in.rlast         ), // Input Read channel last word
@@ -3928,7 +4068,7 @@ m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mi
 endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
 
-  """
+    """
 
 output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_mxx_axi_system_cache_wrapper.sv")
 check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
@@ -3937,7 +4077,10 @@ with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
     fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
     for index, channel in enumerate(DISTINCT_CHANNELS):
         fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-    
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ctrl.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+   
     file.write('\n'.join(fill_kernel_mxx_axi_system_cache_wrapper_module))
 
 
@@ -5031,7 +5174,6 @@ fill_cu_mxx_axi_cu_sram_wrapper_pre="""
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
-`include "typedef.svh"
 """
 
 fill_cu_mxx_axi_cu_sram_wrapper="""
@@ -5062,9 +5204,9 @@ module m{0:02d}_axi_cu_sram_mid{1}x{2}_fe{3}x{4}_wrapper #(
 // --------------------------------------------------------------------------------------
 // Define SRAM axi data types
 // --------------------------------------------------------------------------------------
-`AXI_TYPEDEF_ALL(axi, type_m{0:02d}_axi4_mid_addr, type_m{0:02d}_axi4_mid_id, type_m{0:02d}_axi4_mid_data, type_m{0:02d}_axi4_mid_strb, type_m{0:02d}_axi4_mid_user)
-axi_req_t  axi_req_o;
-axi_resp_t axi_rsp_i;
+M{0:02d}_AXI4_FE_REQ_T  axi_req_o;
+M{0:02d}_AXI4_FE_RESP_T axi_rsp_i;
+
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
@@ -5251,8 +5393,8 @@ axi_from_mem #(
   .AxiAddrWidth(M{0:02d}_AXI4_FE_ADDR_W    ),
   .DataWidth   (M{0:02d}_AXI4_FE_DATA_W    ),
   .MaxRequests (2**1),
-  .axi_req_t   (axi_req_t             ),
-  .axi_rsp_t   (axi_resp_t            )
+  .axi_req_t   (M{0:02d}_AXI4_FE_REQ_T     ),
+  .axi_rsp_t   (M{0:02d}_AXI4_FE_RESP_T    )
 ) inst_axi_from_mem (
   .clk_i          (ap_clk                                   ),
   .rst_ni         (areset_sram                              ),

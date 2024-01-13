@@ -11,6 +11,7 @@
 // -----------------------------------------------------------------------------
 
 `include "global_timescale.vh"
+`include "typedef.svh"
 package PKG_MXX_AXI4_FE;
 
 parameter S_AXI_FE_ADDR_WIDTH_BITS = 12;
@@ -243,6 +244,31 @@ endfunction : swap_endianness_cacheline_m00_axi_fe
 
   
 
+
+// --------------------------------------------------------------------------------------
+// AXI4 Lite 
+// --------------------------------------------------------------------------------------
+
+`AXI_TYPEDEF_ALL(m00_axi, type_m00_axi4_fe_addr, type_m00_axi4_fe_id, type_m00_axi4_fe_data, type_m00_axi4_fe_strb, type_m00_axi4_fe_user)
+typedef m00_axi_req_t M00_AXI4_FE_REQ_T;
+typedef m00_axi_resp_t M00_AXI4_FE_RESP_T;
+
+parameter M00_AXI4_LITE_FE_ADDR_W   = 17                 ;
+parameter M00_AXI4_LITE_FE_DATA_W   = 64                 ;
+parameter M00_AXI4_LITE_FE_STRB_W   = M00_AXI4_LITE_FE_DATA_W / 8;
+parameter M00_AXI4_LITE_FE_ID_W     = 1                   ;
+typedef logic [M00_AXI4_LITE_FE_ADDR_W-1:0]   type_m00_axi4_lite_fe_addr;
+typedef logic [M00_AXI4_LITE_FE_DATA_W-1:0]   type_m00_axi4_lite_fe_data;
+typedef logic [M00_AXI4_LITE_FE_STRB_W-1:0]   type_m00_axi4_lite_fe_strb;
+
+`AXI_LITE_TYPEDEF_ALL(m00_axi_lite, type_m00_axi4_lite_fe_addr, type_m00_axi4_lite_fe_data, type_m00_axi4_lite_fe_strb)
+typedef m00_axi_lite_req_t  M00_AXI4_LITE_FE_REQ_T;
+typedef m00_axi_lite_resp_t M00_AXI4_LITE_FE_RESP_T;
+typedef m00_axi_lite_resp_t S00_AXI4_LITE_FE_REQ_T;
+typedef m00_axi_lite_req_t  S00_AXI4_LITE_FE_RESP_T;
+
+  
+
 parameter M01_AXI4_FE_ADDR_W   = 64                 ;
 parameter M01_AXI4_FE_DATA_W   = 32                 ;
 parameter M01_AXI4_FE_STRB_W   = M01_AXI4_FE_DATA_W / 8;
@@ -465,6 +491,31 @@ function logic [M01_AXI4_FE_DATA_W-1:0] swap_endianness_cacheline_m01_axi_fe (lo
 
   return out;
 endfunction : swap_endianness_cacheline_m01_axi_fe
+
+  
+
+
+// --------------------------------------------------------------------------------------
+// AXI4 Lite 
+// --------------------------------------------------------------------------------------
+
+`AXI_TYPEDEF_ALL(m01_axi, type_m01_axi4_fe_addr, type_m01_axi4_fe_id, type_m01_axi4_fe_data, type_m01_axi4_fe_strb, type_m01_axi4_fe_user)
+typedef m01_axi_req_t M01_AXI4_FE_REQ_T;
+typedef m01_axi_resp_t M01_AXI4_FE_RESP_T;
+
+parameter M01_AXI4_LITE_FE_ADDR_W   = 17                 ;
+parameter M01_AXI4_LITE_FE_DATA_W   = 64                 ;
+parameter M01_AXI4_LITE_FE_STRB_W   = M01_AXI4_LITE_FE_DATA_W / 8;
+parameter M01_AXI4_LITE_FE_ID_W     = 1                   ;
+typedef logic [M01_AXI4_LITE_FE_ADDR_W-1:0]   type_m01_axi4_lite_fe_addr;
+typedef logic [M01_AXI4_LITE_FE_DATA_W-1:0]   type_m01_axi4_lite_fe_data;
+typedef logic [M01_AXI4_LITE_FE_STRB_W-1:0]   type_m01_axi4_lite_fe_strb;
+
+`AXI_LITE_TYPEDEF_ALL(m01_axi_lite, type_m01_axi4_lite_fe_addr, type_m01_axi4_lite_fe_data, type_m01_axi4_lite_fe_strb)
+typedef m01_axi_lite_req_t  M01_AXI4_LITE_FE_REQ_T;
+typedef m01_axi_lite_resp_t M01_AXI4_LITE_FE_RESP_T;
+typedef m01_axi_lite_resp_t S01_AXI4_LITE_FE_REQ_T;
+typedef m01_axi_lite_req_t  S01_AXI4_LITE_FE_RESP_T;
 
   
 

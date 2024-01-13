@@ -14,7 +14,6 @@
 // -----------------------------------------------------------------------------
 
 `include "global_package.vh"
-`include "typedef.svh"
 
 
 
@@ -44,9 +43,9 @@ module m00_axi_cu_sram_mid32x64_fe32x64_wrapper #(
 // --------------------------------------------------------------------------------------
 // Define SRAM axi data types
 // --------------------------------------------------------------------------------------
-`AXI_TYPEDEF_ALL(axi, type_m00_axi4_mid_addr, type_m00_axi4_mid_id, type_m00_axi4_mid_data, type_m00_axi4_mid_strb, type_m00_axi4_mid_user)
-axi_req_t  axi_req_o;
-axi_resp_t axi_rsp_i;
+M00_AXI4_FE_REQ_T  axi_req_o;
+M00_AXI4_FE_RESP_T axi_rsp_i;
+
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
@@ -233,8 +232,8 @@ axi_from_mem #(
   .AxiAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .DataWidth   (M00_AXI4_FE_DATA_W    ),
   .MaxRequests (2**1),
-  .axi_req_t   (axi_req_t             ),
-  .axi_rsp_t   (axi_resp_t            )
+  .axi_req_t   (M00_AXI4_FE_REQ_T     ),
+  .axi_rsp_t   (M00_AXI4_FE_RESP_T    )
 ) inst_axi_from_mem (
   .clk_i          (ap_clk                                   ),
   .rst_ni         (areset_sram                              ),
@@ -382,9 +381,9 @@ module m01_axi_cu_sram_mid32x64_fe32x64_wrapper #(
 // --------------------------------------------------------------------------------------
 // Define SRAM axi data types
 // --------------------------------------------------------------------------------------
-`AXI_TYPEDEF_ALL(axi, type_m01_axi4_mid_addr, type_m01_axi4_mid_id, type_m01_axi4_mid_data, type_m01_axi4_mid_strb, type_m01_axi4_mid_user)
-axi_req_t  axi_req_o;
-axi_resp_t axi_rsp_i;
+M01_AXI4_FE_REQ_T  axi_req_o;
+M01_AXI4_FE_RESP_T axi_rsp_i;
+
 // --------------------------------------------------------------------------------------
 // READ AXI4 SIGNALS INPUT
 // --------------------------------------------------------------------------------------
@@ -571,8 +570,8 @@ axi_from_mem #(
   .AxiAddrWidth(M01_AXI4_FE_ADDR_W    ),
   .DataWidth   (M01_AXI4_FE_DATA_W    ),
   .MaxRequests (2**1),
-  .axi_req_t   (axi_req_t             ),
-  .axi_rsp_t   (axi_resp_t            )
+  .axi_req_t   (M01_AXI4_FE_REQ_T     ),
+  .axi_rsp_t   (M01_AXI4_FE_RESP_T    )
 ) inst_axi_from_mem (
   .clk_i          (ap_clk                                   ),
   .rst_ni         (areset_sram                              ),
