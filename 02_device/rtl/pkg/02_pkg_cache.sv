@@ -101,17 +101,17 @@ typedef enum logic[1:0] {
 	CU_SRAM_CMD_READY       = 1 << 1
 } cu_sram_command_generator_state;
 
-typedef enum logic[9:0] {
+typedef enum logic[5:0] {
 	CU_STREAM_CMD_RESET       = 1 << 0,
 	CU_STREAM_CMD_READY       = 1 << 1,
 	CU_STREAM_CMD_READ_TRANS  = 1 << 2,
-	CU_STREAM_CMD_READ        = 1 << 3,
-	CU_STREAM_CMD_WRITE_TRANS = 1 << 4,
-	CU_STREAM_CMD_WRITE       = 1 << 5,
-	CU_STREAM_CMD_PENDING     = 1 << 6,
-	CU_STREAM_CMD_POP_TRANS   = 1 << 7,
-	CU_STREAM_CMD_POP         = 1 << 8,
-	CU_STREAM_CMD_DONE        = 1 << 9
+	CU_STREAM_CMD_WRITE_TRANS = 1 << 3,
+	CU_STREAM_CMD_PENDING     = 1 << 4,
+	CU_STREAM_CMD_DONE        = 1 << 5
 } cu_stream_command_generator_state;
+
+// --------------------------------------------------------------------------------------
+//   SYSTEM CACHE CTRL COMMANDS
+// --------------------------------------------------------------------------------------
 
 endpackage
