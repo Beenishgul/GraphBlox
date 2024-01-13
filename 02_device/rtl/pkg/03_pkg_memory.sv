@@ -31,13 +31,14 @@ import PKG_CACHE::*;
 typedef logic [GLOBAL_BUFFER_SIZE_WIDTH_BITS-1:0]    type_memory_request_offset;
 typedef logic [GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0]   type_memory_response_offset;
 
-parameter TYPE_MEMORY_CMD_BITS = 5;
+parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
   CMD_MEM_INVALID  = 1 << 0,
   CMD_MEM_READ     = 1 << 1,
   CMD_MEM_WRITE    = 1 << 2,
   CMD_STREAM_READ  = 1 << 3,
-  CMD_STREAM_WRITE = 1 << 4
+  CMD_STREAM_WRITE = 1 << 4,
+  CMD_CACHE_FLUSH  = 1 << 5
 } type_memory_cmd;
 
 // --------------------------------------------------------------------------------------
@@ -382,11 +383,21 @@ function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input Mem
   output_packet.data      = input_packet.data;
   output_packet.iob.valid = input_packet_valid;
   // output_packet.iob.addr  = address_base + (input_packet.meta.address.offset << input_packet.meta.address.shift.amount);
-  output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
-  output_packet.iob.wdata = input_packet.data.field;
+  // output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
+  
+  case (input_packet.meta.subclass.cmd)
+    CMD_CACHE_FLUSH: begin
+      output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
+      output_packet.iob.wdata = input_packet.data.field;
+    end
+    default : begin
+      output_packet.iob.addr  = address_base + input_packet.meta.address.offset;
+      output_packet.iob.wdata = input_packet.data.field;
+    end
+  endcase
 
   case (input_packet.meta.subclass.cmd)
-    CMD_MEM_WRITE : begin
+    CMD_CACHE_FLUSH, CMD_MEM_WRITE : begin
       output_packet.iob.wstrb = {CACHE_FRONTEND_NBYTES{1'b1}};
     end
     default : begin
