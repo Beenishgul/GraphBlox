@@ -260,36 +260,60 @@ axi_from_mem #(
 // --------------------------------------------------------------------------------------
 // Cache CTRL
 // --------------------------------------------------------------------------------------
+logic mem_lite_rsp_error_o;
 
-logic mem_lite_rsp_error_o     ;
-logic sram_request_flush_valid ;
-logic [M01_AXI4_LITE_MID_DATA_W-1:0] sram_response_flush_rdata;
-logic [M01_AXI4_LITE_MID_STRB_W-1:0] sram_request_flush_wstrb = {M01_AXI4_LITE_MID_STRB_W{1'b1}};
+logic [M00_AXI4_LITE_MID_DATA_W-1:0] sram_response_flush_rdata                                   ;
+logic [M00_AXI4_LITE_MID_STRB_W-1:0] sram_request_flush_wstrb  = {M00_AXI4_LITE_MID_STRB_W{1'b1}};
+
+logic [M00_AXI4_LITE_MID_DATA_W-1:0] cmd_flush_data;
+logic [M00_AXI4_LITE_MID_ADDR_W-1:0] cmd_flush_addr;
+
+logic cmd_flush_flag;
+
 axi_lite_from_mem #(
-  .MemAddrWidth(M01_AXI4_LITE_MID_ADDR_W),
-  .AxiAddrWidth(M01_AXI4_LITE_MID_ADDR_W),
-  .DataWidth   (M01_AXI4_LITE_MID_DATA_W),
+  .MemAddrWidth(M00_AXI4_LITE_MID_ADDR_W),
+  .AxiAddrWidth(M00_AXI4_LITE_MID_ADDR_W),
+  .DataWidth   (M00_AXI4_LITE_MID_DATA_W),
   .MaxRequests (2**6                    ),
   .axi_req_t   (M00_AXI4_LITE_MID_REQ_T ),
   .axi_rsp_t   (M00_AXI4_LITE_MID_RESP_T)
 ) inst_axi_lite_from_mem (
-  .clk_i          (ap_clk                                                    ),
-  .rst_ni         (areset_sram                                               ),
-  .mem_req_i      (sram_request_flush.iob.valid                              ),
-  .mem_addr_i     (sram_request_flush.iob.wdata[M01_AXI4_LITE_MID_ADDR_W-1:0]),
-  .mem_we_i       (cmd_flush_condition                                       ),
-  .mem_wdata_i    (sram_request_flush.iob.addr                               ),
-  .mem_be_i       (sram_request_flush_wstrb                                  ),
-  .mem_gnt_o      (sram_response_flush.iob.ready                             ),
-  .mem_rsp_valid_o(sram_response_flush.iob.valid                             ),
-  .mem_rsp_rdata_o(sram_response_flush_rdata                                 ),
-  .mem_rsp_error_o(mem_lite_rsp_error_o                                      ),
-  .axi_req_o      (m_axi_lite_out                                            ),
-  .axi_rsp_i      (m_axi_lite_in                                             )
+  .clk_i          (ap_clk                       ),
+  .rst_ni         (areset_sram                  ),
+  .mem_req_i      (sram_request_flush.iob.valid ),
+  .mem_addr_i     (cmd_flush_addr               ),
+  .mem_we_i       (cmd_flush_condition          ),
+  .mem_wdata_i    (cmd_flush_data               ),
+  .mem_be_i       (sram_request_flush_wstrb     ),
+  .mem_gnt_o      (sram_response_flush.iob.ready),
+  .mem_rsp_valid_o(sram_response_flush.iob.valid),
+  .mem_rsp_rdata_o(sram_response_flush_rdata    ),
+  .mem_rsp_error_o(mem_lite_rsp_error_o         ),
+  .axi_req_o      (m_axi_lite_out               ),
+  .axi_rsp_i      (m_axi_lite_in                )
 );
 
 assign sram_request_flush_int.iob.valid = fifo_request_signals_out_valid_int & cmd_flush_condition;
 assign cmd_flush_condition              = (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH);
+
+always_ff @(posedge ap_clk) begin 
+  if(areset_sram) begin
+    cmd_flush_flag <= 0;
+  end else begin
+    if(sram_request_flush.iob.valid)
+      cmd_flush_flag <= sram_request_flush_int.iob.valid & sram_response_flush.iob.ready;
+  end
+end
+
+always_comb begin
+  if(~cmd_flush_flag) begin
+    cmd_flush_data = sram_request_flush.iob.addr[31:0];
+    cmd_flush_addr = cmd_flush_lh;
+  end else begin
+    cmd_flush_data = sram_request_flush.iob.addr[63:32];
+    cmd_flush_addr = cmd_flush_rh;
+  end
+end
 
 always_comb begin
   sram_request_flush_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH))}};
@@ -298,6 +322,13 @@ always_comb begin
   sram_request_flush_int.meta      = fifo_request_dout.meta;
   sram_request_flush_int.data      = fifo_request_dout.data;
 end
+
+assign sram_request_flush.iob.valid = sram_request_flush_int.iob.valid;
+assign sram_request_flush.iob.addr  = sram_request_flush_int.iob.addr;
+assign sram_request_flush.iob.wdata = sram_request_flush_int.iob.wdata;
+assign sram_request_flush.iob.wstrb = sram_request_flush_int.iob.wstrb;
+assign sram_request_flush.meta      = sram_request_flush_int.meta;
+assign sram_request_flush.data      = sram_request_flush_int.data;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT

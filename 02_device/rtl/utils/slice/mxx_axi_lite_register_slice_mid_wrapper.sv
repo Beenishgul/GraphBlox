@@ -44,7 +44,7 @@ end
 // --------------------------------------------------------------------------------------
 m00_axi_lite_register_slice_mid_64x17 inst_m00_axi_lite_register_slice_mid_64x17 (
   .aclk         (ap_clk                 ),
-  .aresetn      (aresetn                ),
+  .aresetn      (areset_register_slice  ),
   .s_axi_araddr (s_axi_lite_in.ar.addr  ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
   .s_axi_arprot (s_axi_lite_in.ar.prot  ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
   .s_axi_arready(s_axi_lite_out.ar_ready), // : OUT STD_LOGIC;

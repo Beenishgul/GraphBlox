@@ -114,6 +114,7 @@ typedef enum logic[5:0] {
 //   SYSTEM CACHE CTRL COMMANDS
 // --------------------------------------------------------------------------------------
 
-parameter [M01_AXI4_LITE_MID_ADDR_W-1 :0] cmd_flush = 17'b1_1100_0000_0001_1000;
+parameter [M01_AXI4_LITE_MID_ADDR_W-1 :0] cmd_flush_lh = 17'b1_1100_0000_0001_1000;
+parameter [M01_AXI4_LITE_MID_ADDR_W-1 :0] cmd_flush_rh = 17'b1_1100_0000_0001_1100;
 
 endpackage
