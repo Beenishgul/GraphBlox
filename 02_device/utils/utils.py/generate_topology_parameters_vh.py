@@ -2368,9 +2368,15 @@ with open(output_file_filelist_xsim_ip_v_f, "w") as file:
 {5}/m{0:02d}_axi_register_slice_mid_{3}x{4}/sim/m{0:02d}_axi_register_slice_mid_{3}x{4}.v
    """
 
+    fill_file_filelist_xsim_ip_v_template_axi_lite="""
+{5}/m{0:02d}_axi_lite_register_slice_mid_64x17/sim/m{0:02d}_axi_lite_register_slice_mid_64x17.v
+   """
+
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(index==0):
             output_lines.append(fill_file_filelist_xsim_ip_v_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+        if(int(CACHE_CONFIG_L2_CTRL[index])):
+            output_lines.append(fill_file_filelist_xsim_ip_v_template_axi_lite.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
 
     output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
@@ -4354,7 +4360,6 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH {1} Lite (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-    assign m{0:02d}_axi_lite_out   = 0;
     assign cu_m{0:02d}_axi_lite_in = 0;
     """
 
