@@ -4098,7 +4098,7 @@ assign m_axi_write.out.awaddr[63] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m00_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m00_axi_system_cache_be{1}x{2}_mid{3}x{4} (
+m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} (
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
