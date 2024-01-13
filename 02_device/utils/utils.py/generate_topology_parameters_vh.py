@@ -2292,15 +2292,11 @@ set_property -dict [list                                                        
                       CONFIG.DATA_WIDTH {{64}}                                    \\
                       CONFIG.PROTOCOL  {{AXI4LITE}}                               \\
                       CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
-                      CONFIG.MAX_BURST_LENGTH {{32}}                              \\
-                      CONFIG.NUM_READ_OUTSTANDING {{32}}                          \\
-                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}                         \\
-                      CONFIG.REG_AR {{15}}                    \\
-                      CONFIG.REG_AW {{15}}                    \\
-                      CONFIG.REG_B {{15}}                     \\
-                      CONFIG.REG_R {{15}}                     \\
-                      CONFIG.REG_W {{15}}                     \\
-                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                      CONFIG.REG_AR {{7}}                     \\
+                      CONFIG.REG_AW {{7}}                     \\
+                      CONFIG.REG_B {{7}}                      \\
+                      CONFIG.REG_R {{7}}                      \\
+                      CONFIG.REG_W {{7}}                      \\
                     ] [get_ips ${{module_name}}]
 
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
@@ -3937,7 +3933,7 @@ end
 // --------------------------------------------------------------------------------------
 m{0:02d}_axi_lite_register_slice_mid_{1}x{2} inst_m{0:02d}_axi_lite_register_slice_mid_{1}x{2} (
   .aclk         (ap_clk                 ),
-  .aresetn      (aresetn                ),
+  .aresetn      (areset_register_slice  ),
   .s_axi_araddr (s_axi_lite_in.ar.addr  ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
   .s_axi_arprot (s_axi_lite_in.ar.prot  ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
   .s_axi_arready(s_axi_lite_out.ar_ready), // : OUT STD_LOGIC;
