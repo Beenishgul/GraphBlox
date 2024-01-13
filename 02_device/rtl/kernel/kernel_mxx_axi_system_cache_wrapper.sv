@@ -189,30 +189,12 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .M0_AXI_BREADY     (m_axi_write.out.bready      ),  // Output Write response channel ready
     
 
-  .S_AXI_CTRL_AWADDR (s_axi_lite_in.aw.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
-  .S_AXI_CTRL_AWPROT (s_axi_lite_in.aw.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-  .S_AXI_CTRL_AWVALID(s_axi_lite_in.aw_valid      ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_AWREADY(s_axi_lite_out.aw_ready     ),
-  .S_AXI_CTRL_WDATA  (s_axi_lite_in.w.data        ), // : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-  .S_AXI_CTRL_WVALID (s_axi_lite_in.w_valid       ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_WREADY (s_axi_lite_out.w_ready      ),
-  .S_AXI_CTRL_BRESP  (s_axi_lite_out.b.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-  .S_AXI_CTRL_BVALID (s_axi_lite_out.b_valid      ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_BREADY (s_axi_lite_in.b_ready       ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_ARADDR (s_axi_lite_in.ar.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
-  .S_AXI_CTRL_ARPROT (s_axi_lite_in.ar.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-  .S_AXI_CTRL_ARVALID(s_axi_lite_in.ar_valid      ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_ARREADY(s_axi_lite_out.ar_ready     ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_RDATA  (s_axi_lite_out.r.data       ), // : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-  .S_AXI_CTRL_RRESP  (s_axi_lite_out.r.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-  .S_AXI_CTRL_RVALID (s_axi_lite_out.r_valid      ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_RREADY (s_axi_lite_in.r_ready       ), // : IN STD_LOGIC;
-    
-
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),
-  .Initializing      (cache_setup_signal_int      )
+  .Initializing      (cache_setup_signal_int      )    
 );
+
+assign s_axi_lite_out = 0;
 
 endmodule : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper
 
