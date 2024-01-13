@@ -79,7 +79,7 @@ logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal                  ;
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
-parameter PULSE_HOLD    = 100;
+localparam PULSE_HOLD    = 100;
 logic     areset_system      ;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
