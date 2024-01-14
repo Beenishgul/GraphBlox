@@ -865,12 +865,12 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
         end
         CU_STREAM_CMD_PENDING : begin
           if(command_counter_is_zero)
-            next_state = CU_STREAM_CMD_READY;
+            next_state = CU_STREAM_CMD_DONE;
           else
             next_state = CU_STREAM_CMD_PENDING;
         end
         CU_STREAM_CMD_DONE : begin
-          next_state = CU_STREAM_CMD_DONE;
+          next_state = CU_STREAM_CMD_READY;
         end
       endcase
     end// always_comb
@@ -879,42 +879,46 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     always_ff @(posedge ap_clk) begin
       case (current_state)
         CU_STREAM_CMD_RESET : begin
-          fifo_request_signals_in_int.rd_en  <= 1'b0;
-          fifo_response_signals_in_int.wr_en <= 1'b0;
-          stream_request_mem_int.iob.valid   <= 1'b0;
           cmd_read_pending                   <= 1'b0;
           cmd_write_pending                  <= 1'b0;
           counter_load                       <= 1'b0;
-        end
-        CU_STREAM_CMD_READY : begin
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           fifo_response_signals_in_int.wr_en <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
+        end
+        CU_STREAM_CMD_READY : begin
           cmd_read_pending                   <= 1'b0;
           cmd_write_pending                  <= 1'b0;
           counter_load                       <= 1'b1;
+          fifo_request_signals_in_int.rd_en  <= 1'b0;
+          fifo_response_signals_in_int.wr_en <= 1'b0;
+          stream_request_mem_int.iob.valid   <= 1'b0;
         end
         CU_STREAM_CMD_READ_TRANS : begin
+          cmd_read_pending                   <= 1'b1;
           counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b1;
           fifo_response_signals_in_int.wr_en <= 1'b1;
           stream_request_mem_int.iob.valid   <= 1'b1;
-          cmd_read_pending                   <= 1'b1;
         end
         CU_STREAM_CMD_WRITE_TRANS : begin
+          cmd_read_pending                   <= 1'b0;
+          cmd_write_pending                  <= 1'b1;
           counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b1;
           fifo_response_signals_in_int.wr_en <= 1'b1;
           stream_request_mem_int.iob.valid   <= 1'b1;
-          cmd_read_pending                   <= 1'b0;
-          cmd_write_pending                  <= 1'b1;
         end
         CU_STREAM_CMD_PENDING : begin
+          counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           fifo_response_signals_in_int.wr_en <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
         end
         CU_STREAM_CMD_DONE : begin
+          cmd_read_pending                   <= 1'b0;
+          cmd_write_pending                  <= 1'b0;
+          counter_load                       <= 1'b1;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           fifo_response_signals_in_int.wr_en <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
