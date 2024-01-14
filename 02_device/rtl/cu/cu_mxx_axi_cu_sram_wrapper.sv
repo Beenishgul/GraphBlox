@@ -343,11 +343,11 @@ assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid &
 assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int;
 assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
 assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
-assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH);
+assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)| (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE);
 
 always_comb begin
-  sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
   sram_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
   sram_request_mem_int.iob.wdata = fifo_request_dout.iob.wdata;
   sram_request_mem_int.meta      = fifo_request_dout.meta;
@@ -684,11 +684,11 @@ assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid &
 assign sram_request_mem_int.iob.valid     = fifo_request_signals_out_valid_int;
 assign fifo_request_signals_in_int.rd_en  = sram_response_mem.iob.ready;
 assign fifo_response_signals_in_int.wr_en = sram_response_mem.iob.ready;
-assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE);
+assign cmd_read_condition                 = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH);
+assign cmd_write_condition                = (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)| (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE);
 
 always_comb begin
-  sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  sram_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
   sram_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
   sram_request_mem_int.iob.wdata = fifo_request_dout.iob.wdata;
   sram_request_mem_int.meta      = fifo_request_dout.meta;

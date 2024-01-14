@@ -649,6 +649,18 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
 
     always_comb begin
+        fifo_request_comb.payload.meta.address.burst_length = 0;
+        case (configure_engine_int.payload.meta.subclass.cmd)
+            CMD_STREAM_READ : begin
+                fifo_request_comb.payload.meta.address.burst_length = ((counter_count+counter_stride_value) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_count) : counter_stride_value;
+            end
+            default : begin
+                fifo_request_comb.payload.meta.address.burst_length = 1;
+            end
+        endcase
+    end
+
+    always_comb begin
         if(configure_engine_int.payload.meta.address.shift.direction) begin
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_engine_int.payload.meta.address.shift.amount;
         end else begin
