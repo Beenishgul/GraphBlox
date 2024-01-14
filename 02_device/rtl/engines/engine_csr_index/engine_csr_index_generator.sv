@@ -164,15 +164,15 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-    logic                     counter_decr         ;
-    logic                     counter_enable       ;
-    logic                     counter_incr         ;
-    logic                     counter_is_zero      ;
-    logic                     counter_load         ;
-    logic [COUNTER_WIDTH-1:0] counter_count        ;
-    logic [COUNTER_WIDTH-1:0] counter_load_value   ;
-    logic [COUNTER_WIDTH-1:0] counter_stride_value ;
-    logic [COUNTER_WIDTH-1:0] counter_burst_value  ;
+    logic                     counter_decr        ;
+    logic                     counter_enable      ;
+    logic                     counter_incr        ;
+    logic                     counter_is_zero     ;
+    logic                     counter_load        ;
+    logic [COUNTER_WIDTH-1:0] counter_count       ;
+    logic [COUNTER_WIDTH-1:0] counter_load_value  ;
+    logic [COUNTER_WIDTH-1:0] counter_stride_value;
+    logic [COUNTER_WIDTH-1:0] counter_burst_value ;
 
     logic                     response_memory_counter_is_zero   ;
     logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
@@ -371,7 +371,7 @@ module engine_csr_index_generator #(parameter
                 if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) // (1) indirect mode (get count from other engines)
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE;
                 else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) // (0) direct mode (get count from memory)
-                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;     
+                    next_state = ENGINE_CSR_INDEX_GEN_START_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY;
             end
@@ -760,11 +760,20 @@ module engine_csr_index_generator #(parameter
         fifo_request_dout_reg_S2.valid                                 <= fifo_request_dout_reg.valid;
         fifo_request_dout_reg_S2.payload.data                          <= fifo_request_dout_reg.payload.data;
         fifo_request_dout_reg_S2.payload.meta.subclass                 <= fifo_request_dout_reg.payload.meta.subclass;
-        fifo_request_dout_reg_S2.payload.meta.address                  <= fifo_request_dout_reg.payload.meta.address;
         fifo_request_dout_reg_S2.payload.meta.route.packet_destination <= fifo_request_dout_reg.payload.meta.route.packet_destination;
         fifo_request_dout_reg_S2.payload.meta.route.hops               <= fifo_request_dout_reg.payload.meta.route.hops;
         fifo_request_dout_reg_S2.payload.meta.route.sequence_source    <= fifo_request_dout_reg.payload.meta.route.sequence_source;
         fifo_request_dout_reg_S2.payload.meta.route.sequence_id        <= fifo_request_dout_reg.payload.meta.route.sequence_id;
+
+        // fifo_request_dout_reg_S2.payload.meta.address <= fifo_request_dout_reg.payload.meta.address;
+
+        fifo_request_dout_reg_S2.payload.meta.address.id_channel   <= fifo_request_dout_reg.payload.meta.address.id_channel;
+        fifo_request_dout_reg_S2.payload.meta.address.id_buffer    <= fifo_request_dout_reg.payload.meta.address.id_buffer;
+        fifo_request_dout_reg_S2.payload.meta.address.burst_length <= burst_length;
+        fifo_request_dout_reg_S2.payload.meta.address.offset       <= fifo_request_dout_reg.payload.meta.address.offset;
+        fifo_request_dout_reg_S2.payload.meta.address.shift        <= fifo_request_dout_reg.payload.meta.address.shift;
+
+        burst_flag_reg <= burst_flag;
 
         if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_DONE;
@@ -774,26 +783,43 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-    type_memory_burst_length  burst_length;
-    logic                     burst_flag;
-    assign counter_burst_value = 16;
-    logic [COUNTER_WIDTH-1:0] counter_temp_value  ;
+    localparam  BURST_LENGTH = 16;
+    type_memory_burst_length burst_length    ;
+    logic                    burst_flag      ;
+    logic                    mod_flag      ;
+    logic                    burst_flag_reg  ;
+    assign counter_burst_value = BURST_LENGTH;
+    logic [COUNTER_WIDTH-1:0] counter_temp_value;
 // --------------------------------------------------------------------------------------
     always_comb begin
-        burst_length = 0;
-        burst_flag   = 0;
+        burst_length       = 0;
+        burst_flag         = 0;
         counter_temp_value = fifo_request_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
+        mod_flag           = |((counter_temp_value-counter_load_value)%counter_burst_value);
         case (fifo_request_dout_reg.payload.meta.subclass.cmd)
             CMD_STREAM_READ : begin
-                burst_length = ((counter_temp_value+counter_burst_value) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : counter_burst_value;
-                if((counter_temp_value-counter_load_value)%counter_burst_value)
-                    burst_flag = 1;
-                else
-                    burst_flag = 0;
+                if(~mod_flag) begin
+                    burst_flag   = 1'b1;
+                    burst_length = ((counter_temp_value+counter_burst_value) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : counter_burst_value;
+                end
+                else begin
+                    burst_flag   = 1'b0;
+                    burst_length = 1;
+                end
+            end
+            CMD_STREAM_WRITE : begin
+                if(~mod_flag) begin
+                    burst_flag   = 1'b1;
+                    burst_length = ((counter_temp_value+counter_burst_value) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : counter_burst_value;
+                end
+                else begin
+                    burst_flag   = 1'b1;
+                    burst_length = 1;
+                end
             end
             default : begin
-                burst_length = 1;
-                burst_flag   = 0;
+                burst_flag   = 1;
+                burst_length = 1'b1;
             end
         endcase
     end
@@ -838,10 +864,10 @@ module engine_csr_index_generator #(parameter
     assign request_pending_out_int.payload           = fifo_request_pending_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(32                        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (17                       )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -898,7 +924,7 @@ module engine_csr_index_generator #(parameter
                 fifo_response_memory_in_signals_out_reg.empty     <= 1'b0;
                 fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
                 request_engine_out_reg.valid                      <= fifo_response_comb.valid;
-                request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid;
+                request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid & burst_flag_reg;
             end
         end
     end
