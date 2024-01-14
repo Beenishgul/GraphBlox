@@ -30,6 +30,7 @@ import PKG_CACHE::*;
 // --------------------------------------------------------------------------------------
 typedef logic [GLOBAL_BUFFER_SIZE_WIDTH_BITS-1:0]    type_memory_request_offset;
 typedef logic [GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0]   type_memory_response_offset;
+typedef type_m00_axi4_fe_len                         type_memory_burst_length;
 
 parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
@@ -135,10 +136,11 @@ typedef struct packed{
 } PacketDataAddressShift;
 
 typedef struct packed{
-  logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel; // SIZE = 8 bits  - up to 8 8 channels per cu
-  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer ; // SIZE = 8 bits  - up to 8 buffers in the descriptor
-  type_memory_request_offset             offset    ; // SIZE = clog2(4GB) bits
-  PacketDataAddressShift                 shift     ; // SIZE = clog2(offset) bits + 1
+  logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel  ; // SIZE = 8 bits  - up to 8 8 channels per cu
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer   ; // SIZE = 8 bits  - up to 8 buffers in the descriptor
+  type_memory_burst_length               burst_length;
+  type_memory_request_offset             offset      ; // SIZE = clog2(4GB) bits
+  PacketDataAddressShift                 shift       ; // SIZE = clog2(offset) bits + 1
 } PacketRequestDataAddress;
 
 // --------------------------------------------------------------------------------------

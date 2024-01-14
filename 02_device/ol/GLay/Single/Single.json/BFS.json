@@ -905,7 +905,7 @@
             "entry_3": {
                 "stride": {
                     "bits": "32",
-                    "value": "0x00000001"
+                    "value": "0x0000000F"
                 }
             },
             "entry_4": {
@@ -921,7 +921,7 @@
             "entry_5": {
                 "cmd": {
                     "bits": "6",
-                    "value": "CMD_MEM_READ"
+                    "value": "CMD_STREAM_READ"
                 },
                 "id_module": {
                     "bits": "8",

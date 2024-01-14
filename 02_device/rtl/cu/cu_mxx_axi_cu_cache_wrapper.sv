@@ -335,8 +335,8 @@ always_ff @(posedge ap_clk) begin
 end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
-assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
+assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH));
+assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)| (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
 // --------------------------------------------------------------------------------------
 always_comb begin
   next_state = current_state;
@@ -388,7 +388,7 @@ always_comb begin
 end// always_comb
 
 always_comb begin
-  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
   cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
   cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
   cache_request_mem_reg.meta      = fifo_request_dout.meta;
@@ -733,8 +733,8 @@ always_ff @(posedge ap_clk) begin
 end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
-assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ);
-assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & (fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
+assign cmd_read_condition                 = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ) | (fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH));
+assign cmd_write_condition                = cache_response_mem.iob.ready & fifo_request_signals_out_valid_int & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)| (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & ~(write_command_counter_is_zero & ~cache_ctrl_out.wtb_empty);
 // --------------------------------------------------------------------------------------
 always_comb begin
   next_state = current_state;
@@ -786,7 +786,7 @@ always_comb begin
 end// always_comb
 
 always_comb begin
-  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE))}};
+  cache_request_mem_reg.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
   cache_request_mem_reg.iob.addr  = fifo_request_dout.iob.addr;
   cache_request_mem_reg.iob.wdata = fifo_request_dout.iob.wdata;
   cache_request_mem_reg.meta      = fifo_request_dout.meta;
