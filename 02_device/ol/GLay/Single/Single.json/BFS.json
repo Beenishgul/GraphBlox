@@ -905,7 +905,7 @@
             "entry_3": {
                 "stride": {
                     "bits": "32",
-                    "value": "0x0000000F"
+                    "value": "0x00000001"
                 }
             },
             "entry_4": {
