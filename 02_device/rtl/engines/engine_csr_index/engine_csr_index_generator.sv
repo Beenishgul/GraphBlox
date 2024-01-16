@@ -354,7 +354,7 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
-    localparam BURST_LENGTH = 32;
+    localparam BURST_LENGTH = 16;
     // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
