@@ -164,7 +164,7 @@ typedef struct packed{
 // Forward the data in a lane and operate
 // Keeps the original meta data for that lane
 
-typedef enum logic[12:0] {
+typedef enum logic[10:0] {
     ENGINE_ALU_OPS_GEN_RESET              = 1 << 0,
     ENGINE_ALU_OPS_GEN_IDLE               = 1 << 1,
     ENGINE_ALU_OPS_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
@@ -175,9 +175,7 @@ typedef enum logic[12:0] {
     ENGINE_ALU_OPS_GEN_PAUSE_TRANS        = 1 << 7,
     ENGINE_ALU_OPS_GEN_BUSY               = 1 << 8,
     ENGINE_ALU_OPS_GEN_BUSY_TRANS         = 1 << 9,
-    ENGINE_ALU_OPS_GEN_PAUSE              = 1 << 10,
-    ENGINE_ALU_OPS_GEN_DONE_TRANS         = 1 << 11,
-    ENGINE_ALU_OPS_GEN_DONE               = 1 << 12
+    ENGINE_ALU_OPS_GEN_PAUSE              = 1 << 10
 } engine_alu_ops_generator_state;
 
 typedef struct packed{

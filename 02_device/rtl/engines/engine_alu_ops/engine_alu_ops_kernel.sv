@@ -72,13 +72,13 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-always_ff @(posedge ap_clk) begin
+always_comb begin
   if (areset | clear) begin
-    result_reg      <= 0;
-    result_flag_reg <= 1'b0;
+    result_reg      = 0;
+    result_flag_reg = 1'b0;
   end else begin
-    result_reg      <= result_int;
-    result_flag_reg <= result_flag_int;
+    result_reg      = result_int;
+    result_flag_reg = result_flag_int;
   end
 end
 
