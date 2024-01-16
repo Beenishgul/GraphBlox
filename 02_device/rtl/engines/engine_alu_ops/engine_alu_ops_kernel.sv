@@ -148,7 +148,7 @@ end
 
 // Output assignment logic
 always_ff @(posedge ap_clk) begin
-  if (areset || clear) begin
+  if (areset) begin
     result      <= 0;
     result_flag <= 0;
   end else begin
