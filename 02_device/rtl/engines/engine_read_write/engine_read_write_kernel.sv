@@ -80,7 +80,7 @@ always_comb begin
     address_int.shift.direction = config_params_in.direction;
     address_int.id_channel      = config_params_in.id_channel;
     address_int.id_buffer       = config_params_in.id_buffer;
-    address_int.burst_length    = config_params_in.burst_length;
+    address_int.burst_length    = 1;
     if(address_int.shift.direction) begin
       address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) << address_int.shift.amount;
     end else begin
