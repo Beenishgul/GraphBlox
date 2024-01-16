@@ -559,7 +559,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_send_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
-    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_signals_in_reg.rd_en;
     assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid;
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
@@ -654,7 +654,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_commit_din                  = request_pending_out_int.payload;
 
     // Pop
-    assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
+    assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en;
     assign request_commit_out_int.valid             = fifo_request_commit_signals_out_int.valid;
     assign request_commit_out_int.payload           = fifo_request_commit_dout;
 
