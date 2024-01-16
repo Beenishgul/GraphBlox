@@ -194,7 +194,6 @@ module engine_csr_index_generator #(parameter
     logic [COUNTER_WIDTH-1:0] counter_count       ;
     logic [COUNTER_WIDTH-1:0] counter_load_value  ;
     logic [COUNTER_WIDTH-1:0] counter_stride_value;
-    logic [COUNTER_WIDTH-1:0] counter_burst_value ;
 
     logic                     response_memory_counter_is_zero   ;
     logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
@@ -766,7 +765,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_send_din                  = fifo_request_din_reg_S2.payload;
 
     // Pop
-    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & cmd_stream_mode_pop & ~fifo_request_pending_signals_out_int.prog_full & cmd_stream_read_int;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & cmd_stream_mode_pop & cmd_stream_read_int;
     assign request_out_int.valid                  = fifo_request_send_signals_out_int.valid;
     assign request_out_int.payload                = fifo_request_send_dout;
 

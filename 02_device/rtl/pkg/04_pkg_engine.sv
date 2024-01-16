@@ -274,23 +274,18 @@ typedef struct packed{
 // related to reading CSR structure data, for example, reading the offsets
 // array. Mode parameter would decide the engine read/write mode.
 
-typedef enum logic[15:0] {
+typedef enum logic[10:0] {
     ENGINE_READ_WRITE_GEN_RESET              = 1 << 0,
     ENGINE_READ_WRITE_GEN_IDLE               = 1 << 1,
     ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
     ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS = 1 << 3,
     ENGINE_READ_WRITE_GEN_SETUP_MEMORY       = 1 << 4,
-    ENGINE_READ_WRITE_GEN_SETUP_ENGINE_IDLE  = 1 << 5,
-    ENGINE_READ_WRITE_GEN_SETUP_ENGINE_TRANS = 1 << 6,
-    ENGINE_READ_WRITE_GEN_SETUP_ENGINE       = 1 << 7,
-    ENGINE_READ_WRITE_GEN_START_TRANS        = 1 << 8,
-    ENGINE_READ_WRITE_GEN_START              = 1 << 9,
-    ENGINE_READ_WRITE_GEN_BUSY_TRANS         = 1 << 10,
-    ENGINE_READ_WRITE_GEN_BUSY               = 1 << 11,
-    ENGINE_READ_WRITE_GEN_PAUSE_TRANS        = 1 << 12,
-    ENGINE_READ_WRITE_GEN_PAUSE              = 1 << 13,
-    ENGINE_READ_WRITE_GEN_DONE_TRANS         = 1 << 14,
-    ENGINE_READ_WRITE_GEN_DONE               = 1 << 15
+    ENGINE_READ_WRITE_GEN_START_TRANS        = 1 << 5,
+    ENGINE_READ_WRITE_GEN_START              = 1 << 6,
+    ENGINE_READ_WRITE_GEN_BUSY_TRANS         = 1 << 7,
+    ENGINE_READ_WRITE_GEN_BUSY               = 1 << 8,
+    ENGINE_READ_WRITE_GEN_PAUSE_TRANS        = 1 << 9,
+    ENGINE_READ_WRITE_GEN_PAUSE              = 1 << 10
 } engine_read_write_generator_state;
 
 typedef struct packed{
