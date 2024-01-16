@@ -169,8 +169,9 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
-    configure_memory_reg.payload.data                <= 0;
+    configure_memory_reg.payload.meta.address.offset       <= configure_memory_meta_int.address.offset;
+    configure_memory_reg.payload.meta.address.burst_length <= configure_memory_meta_int.address.burst_length;
+    configure_memory_reg.payload.data                      <= 0;
 end
 
 always_ff @(posedge ap_clk) begin
