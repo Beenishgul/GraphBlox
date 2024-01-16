@@ -64,6 +64,7 @@ logic configure_memory_setup_reg;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
+logic sequence_done_flag;
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -239,7 +240,7 @@ assign fifo_response_engine_in_signals_in_int.wr_en = response_engine_in_reg.val
 assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
 // Pop
-assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~(response_engine_in_int.valid & (response_engine_in_int.payload.meta.route.sequence_state == SEQUENCE_DONE));
+assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~sequence_done_flag & ~alu_ops_done_assert;
 // assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~alu_ops_response_engine_in_valid_reg & ~generator_engine_request_engine_reg.valid & ~alu_ops_response_engine_in_valid_flag_S2 & ~response_engine_in_int.valid & configure_engine_param_valid & ~fifo_request_engine_out_signals_out_int.prog_full);
 assign response_engine_in_int.valid   = fifo_response_engine_in_signals_out_int.valid;
 assign response_engine_in_int.payload = fifo_response_engine_in_dout;
@@ -266,6 +267,8 @@ xpm_fifo_sync_wrapper #(
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
+// --------------------------------------------------------------------------------------
+assign sequence_done_flag = (configure_engine_param_int.alu_operation == ALU_ACC) & response_engine_in_int.valid & (response_engine_in_int.payload.meta.route.sequence_state == SEQUENCE_DONE);
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if(areset_generator)
@@ -384,44 +387,8 @@ EnginePacketData result_int          ;
 logic            result_flag         ;
 logic            engine_alu_ops_clear;
 
-assign alu_ops_response_engine_in_valid_flag = alu_ops_response_engine_in_valid_reg;
-
 always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        alu_ops_response_engine_in_valid_reg      <= 1'b0;
-        alu_ops_response_engine_in_valid_flag_S2  <= 1'b0;
-        generator_engine_request_engine_reg.valid <= 1'b0;
-    end
-    else begin
-        alu_ops_response_engine_in_valid_flag_S2  <= alu_ops_response_engine_in_valid_flag;
-        generator_engine_request_engine_reg.valid <= alu_ops_response_engine_in_valid_flag_S2;
-
-        if(response_engine_in_int.valid & configure_engine_param_valid) begin
-            alu_ops_response_engine_in_valid_reg <= 1'b1;
-        end else begin
-            if(alu_ops_response_engine_in_valid_flag)
-                alu_ops_response_engine_in_valid_reg <= 1'b0;
-            else
-                alu_ops_response_engine_in_valid_reg <= alu_ops_response_engine_in_valid_reg;
-        end
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    if(areset_generator) begin
-        alu_ops_response_engine_in_done_flag <= 1'b0;
-    end else begin
-
-        if((configure_engine_param_int.alu_operation == ALU_ACC) & (response_engine_in_int.payload.meta.route.sequence_state == SEQUENCE_DONE) & response_engine_in_int.valid)
-            alu_ops_response_engine_in_done_flag <= 1'b1;
-
-        if((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state == SEQUENCE_DONE) & generator_engine_request_engine_reg_S2.valid)
-            alu_ops_response_engine_in_done_flag <= 1'b0;
-
-    end
-end
-
-always_ff @(posedge ap_clk) begin
+    generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
     generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data  ;
     generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;
     generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
@@ -431,16 +398,19 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_comb begin
-    if((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE & result_flag) begin
+    if((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE) & result_flag & ~alu_ops_done_assert) begin
         generator_engine_request_engine_reg_S2.valid = 1'b1;
         engine_alu_ops_clear                         =  1'b1;
-    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state != SEQUENCE_DONE &  result_flag) begin
+    end else if((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE) & result_flag & alu_ops_done_assert) begin
         generator_engine_request_engine_reg_S2.valid =  1'b0;
         engine_alu_ops_clear                         =  1'b0;
-    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state != SEQUENCE_DONE & ~result_flag) begin
+    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg.payload.meta.route.sequence_state != SEQUENCE_DONE) &  result_flag) begin
         generator_engine_request_engine_reg_S2.valid =  1'b0;
         engine_alu_ops_clear                         =  1'b0;
-    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) && generator_engine_request_engine_reg.payload.meta.route.sequence_state == SEQUENCE_DONE & ~result_flag) begin
+    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg.payload.meta.route.sequence_state) != SEQUENCE_DONE & ~result_flag) begin
+        generator_engine_request_engine_reg_S2.valid =  1'b0;
+        engine_alu_ops_clear                         =  1'b0;
+    end else if ((configure_engine_param_int.alu_operation == ALU_ACC) & (generator_engine_request_engine_reg.payload.meta.route.sequence_state) == SEQUENCE_DONE & ~result_flag) begin
         generator_engine_request_engine_reg_S2.valid =  1'b0;
         engine_alu_ops_clear                         =  1'b0;
     end else begin
@@ -467,6 +437,22 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
     .result_flag        (result_flag                                           ),
     .result             (result_int                                            )
 );
+
+
+// --------------------------------------------------------------------------------------
+localparam PULSE_HOLD           = 2;
+logic [PULSE_HOLD-1:0] alu_ops_done_hold  ;
+logic                  alu_ops_done_assert;
+
+assign alu_ops_done_assert = |alu_ops_done_hold;
+
+always_ff @(posedge ap_clk) begin
+  if (areset_generator) begin
+    alu_ops_done_hold <= 0;
+  end else begin
+    alu_ops_done_hold <= {alu_ops_done_hold[PULSE_HOLD-2:0],sequence_done_flag};
+  end
+end
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
