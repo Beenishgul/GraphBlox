@@ -116,6 +116,7 @@ module engine_read_write_generator #(parameter
 
     EnginePacketFull generator_engine_request_engine_reg   ;
     EnginePacketFull generator_engine_request_engine_reg_S2;
+    EnginePacketFull generator_engine_request_engine_reg_S3;
     EnginePacket     request_engine_out_reg                ;
     EnginePacketFull request_memory_out_reg                ;
 
@@ -325,10 +326,10 @@ module engine_read_write_generator #(parameter
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH*2        ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (PROG_THRESH*2             )
+        .PROG_THRESH     (PROG_THRESH               )
     ) inst_fifo_EnginePacketResponseEngineInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -503,7 +504,7 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
-        generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data;
+        generator_engine_request_engine_reg.payload.data                          <= 0;
         generator_engine_request_engine_reg.payload.meta.address                  <= 0;
         generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;
         generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
@@ -515,14 +516,26 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg_S2.valid                                 <= generator_engine_request_engine_reg.valid;
-        generator_engine_request_engine_reg_S2.payload.data                          <= result_int;
-        generator_engine_request_engine_reg_S2.payload.meta.address                  <= address_int;
+        generator_engine_request_engine_reg_S2.payload.data                          <= 0;
+        generator_engine_request_engine_reg_S2.payload.meta.address                  <= 0;
         generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination <= generator_engine_request_engine_reg.payload.meta.route.packet_destination;
         generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg.payload.meta.route.sequence_source;
         generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg.payload.meta.route.sequence_state;
         generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg.payload.meta.route.sequence_id;
         generator_engine_request_engine_reg_S2.payload.meta.route.hops               <= generator_engine_request_engine_reg.payload.meta.route.hops;
         generator_engine_request_engine_reg_S2.payload.meta.subclass                 <= generator_engine_request_engine_reg.payload.meta.subclass;
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg_S3.valid                                 <= generator_engine_request_engine_reg_S2.valid;
+        generator_engine_request_engine_reg_S3.payload.data                          <= result_int;
+        generator_engine_request_engine_reg_S3.payload.meta.address                  <= address_int;
+        generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+        generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
+        generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
+        generator_engine_request_engine_reg_S3.payload.meta.route.hops               <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
+        generator_engine_request_engine_reg_S3.payload.meta.subclass                 <= generator_engine_request_engine_reg_S2.payload.meta.subclass;
     end
 
 // --------------------------------------------------------------------------------------
@@ -545,8 +558,8 @@ module engine_read_write_generator #(parameter
     assign fifo_request_send_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
-    assign fifo_request_send_din                  = generator_engine_request_engine_reg_S2.payload;
+    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_reg_S3.valid;
+    assign fifo_request_send_din                  = generator_engine_request_engine_reg_S3.payload;
 
     // Pop
     assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & fifo_request_signals_in_reg.rd_en;
