@@ -353,6 +353,7 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
+    // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
     localparam BURST_LENGTH = 32;
     // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
@@ -976,7 +977,7 @@ module engine_csr_index_generator #(parameter
                 request_engine_out_reg.valid             <= fifo_request_dout_reg_S2.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
-                fifo_request_engine_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
+                fifo_request_engine_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_pending_signals_out_int) | map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
                 fifo_request_memory_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_send_signals_out_int);
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg          <= 2'b10;
