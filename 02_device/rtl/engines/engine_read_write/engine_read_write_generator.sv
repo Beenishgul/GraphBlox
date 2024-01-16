@@ -322,7 +322,7 @@ module engine_read_write_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_send_signals_out_int.prog_full;
+    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_send_signals_out_int.prog_full & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & configure_engine_param_valid;
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -330,7 +330,7 @@ module engine_read_write_generator #(parameter
         .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH*2        ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (PROG_THRESH+4             )
+        .PROG_THRESH     (PROG_THRESH*2             )
     ) inst_fifo_EnginePacketResponseEngineInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -504,7 +504,7 @@ module engine_read_write_generator #(parameter
 // Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
-        response_engine_in_int.valid                                              <= response_engine_in_int.valid;
+        generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
         generator_engine_request_engine_reg.payload.data                          <= result_int;
         generator_engine_request_engine_reg.payload.meta.address                  <= address_int;
         generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;

@@ -29,7 +29,7 @@ module engine_read_write_configure_memory #(parameter
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
-    input  MemoryPacketResponse           response_memory_in                 ,
+    input  MemoryPacketResponse   response_memory_in                 ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out,
     output ReadWriteConfiguration configure_memory_out               ,
@@ -133,7 +133,7 @@ assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 assign configure_memory_meta_int.address.id_channel      = 0;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = 0;
-assign configure_memory_meta_int.address.burst_length    = 0;
+assign configure_memory_meta_int.address.burst_length    = 1;
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
 assign configure_memory_meta_int.subclass.cmd            = CMD_MEM_INVALID;
@@ -169,7 +169,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    configure_memory_reg.payload.meta.address.offset <= configure_memory_meta_int.address.offset;
+    configure_memory_reg.payload.meta.address.burst_length <= configure_memory_meta_int.address.burst_length;
+    configure_memory_reg.payload.meta.address.offset       <= configure_memory_meta_int.address.offset;
 end
 
 always_ff @(posedge ap_clk) begin

@@ -107,9 +107,6 @@ FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 logic configure_fifo_setup_signal;
 
-ReadWriteConfiguration configure_engine_out                              ;
-FIFOStateSignalsOutput configure_engine_fifo_configure_engine_signals_out;
-
 FIFOStateSignalsInput  configure_memory_fifo_configure_memory_signals_in   ;
 FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
 FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
@@ -121,7 +118,6 @@ ReadWriteConfiguration configure_memory_out                                ;
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput  generator_engine_fifo_configure_engine_in_signals_in;
 FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
 FIFOStateSignalsInput  generator_engine_fifo_request_engine_out_signals_in ;
 FIFOStateSignalsInput  generator_engine_fifo_request_memory_out_signals_in ;
@@ -138,7 +134,6 @@ EnginePacket           generator_engine_request_engine_out                 ;
 MemoryPacketRequest    generator_engine_request_memory_out                 ;
 EnginePacket           generator_engine_response_engine_in                 ;
 MemoryPacketResponse   generator_engine_response_memory_in                 ;
-ReadWriteConfiguration generator_engine_configure_engine_in                ;
 ReadWriteConfiguration generator_engine_configure_memory_in                ;
 
 // --------------------------------------------------------------------------------------
@@ -337,9 +332,6 @@ engine_read_write_configure_memory #(
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-assign generator_engine_configure_engine_in                       = configure_engine_out;
-assign generator_engine_fifo_configure_engine_in_signals_in.rd_en = ~configure_engine_fifo_configure_engine_signals_out.empty;
-
 assign generator_engine_configure_memory_in                       = configure_memory_out;
 assign generator_engine_fifo_configure_memory_in_signals_in.rd_en = ~configure_memory_fifo_configure_memory_signals_out.empty;
 
