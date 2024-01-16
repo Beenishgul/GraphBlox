@@ -172,8 +172,8 @@ assign arlen   = ar_final_transaction || (start & single_transaction) ? final_bu
 assign arsize  = $clog2((C_DATA_WIDTH/8));
 assign arid    = id;
 
-assign arxfer         = arvalid & arready;
-assign fifo_stall     = prog_full[id];
+assign arxfer     = arvalid & arready;
+assign fifo_stall = prog_full[id];
 
 always @(posedge ap_clk) begin
   if (areset) begin
@@ -317,8 +317,10 @@ generate
     assign m_tvalid       = tvalid;
     assign m_tdata        = tdata;
     assign rready         = &m_tready;
-    assign wr_rst_busy = 0;
-    assign rd_rst_busy = 0;
+    assign wr_rst_busy    = 0;
+    assign rd_rst_busy    = 0;
+    assign ctrl_prog_full = 0;
+    assign prog_full      = 0;
   end
 endgenerate
 
