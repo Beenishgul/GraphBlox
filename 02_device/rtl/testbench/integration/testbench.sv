@@ -1158,7 +1158,7 @@ module __KERNEL___testbench ();
         task automatic multiple_iteration_PR(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
-            $display("Starting: multiple_iteration");
+            $display("Starting: multiple_iteration PR");
             for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
 
                 $display("Starting iteration: %d / %d", iter+1, num_iterations);
@@ -1208,7 +1208,7 @@ module __KERNEL___testbench ();
         task automatic multiple_iteration_BFS(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
-            $display("Starting iteration: %d / %d", 0, num_iterations);
+            $display("Starting iteration BFS: %d / %d", 0, num_iterations);
             RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
             case(choose_pressure_type)
                 0 : slv_no_backpressure_wready();
