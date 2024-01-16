@@ -43,6 +43,7 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 );
 
 assign m_axi_lite_out = 0;
+assign m_axi_write_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -61,7 +62,6 @@ logic fifo_empty_int;
 logic fifo_empty_reg;
 
 logic cmd_read_condition ;
-logic cmd_write_condition;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -110,15 +110,6 @@ logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_ADDR_W-1:0] read_transaction_offset
 logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
 logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
 logic [M00_AXI4_MID_DATA_W-1:0]                          read_transaction_length_in    ;
-
-logic                           write_transaction_start_in    ;
-logic                           write_transaction_tvalid_in   ;
-logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_length_in   ;
-logic [M00_AXI4_MID_ADDR_W-1:0] write_transaction_offset_in   ;
-logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in    ;
-logic [M00_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in_reg;
-logic                           write_transaction_done_out    ;
-logic                           write_transaction_tready_out  ;
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
@@ -194,24 +185,12 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & write_transaction_tready_out;
+assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty;
 
 always_ff @(posedge ap_clk) begin
   fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
   fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
   response_out.payload      <= response_in_int.payload;
-end
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_write.in <= 0;
-  end
-  else begin
-    m_axi_write.in <= m_axi_write_in;
-  end
 end
 
 // --------------------------------------------------------------------------------------
@@ -223,18 +202,6 @@ always_ff @(posedge ap_clk) begin
   end
   else begin
     m_axi_read.in <= m_axi_read_in;
-  end
-end
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_m_axi) begin
-    m_axi_write_out <= 0;
-  end
-  else begin
-    m_axi_write_out <= m_axi_write.out;
   end
 end
 
@@ -339,7 +306,6 @@ cu_stream_command_generator_state current_state;
 cu_stream_command_generator_state next_state   ;
 
 logic cmd_read_pending ;
-logic cmd_write_pending;
 // --------------------------------------------------------------------------------------
 //   State Machine AP_USER_MANAGED sync
 // --------------------------------------------------------------------------------------
@@ -353,7 +319,6 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 assign fifo_request_signals_out_valid_int = fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
 assign cmd_read_condition                 = ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH))  & fifo_request_signals_out_valid_int & ~read_transaction_prog_full;
-assign cmd_write_condition                = ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & write_transaction_tready_out & fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
 
 always_comb begin
@@ -365,15 +330,10 @@ always_comb begin
     CU_STREAM_CMD_READY : begin
       if(cmd_read_condition)
         next_state = CU_STREAM_CMD_READ_TRANS;
-      else if(cmd_write_condition)
-        next_state = CU_STREAM_CMD_WRITE_TRANS;
       else
         next_state = CU_STREAM_CMD_READY;
     end
     CU_STREAM_CMD_READ_TRANS : begin
-      next_state = CU_STREAM_CMD_PENDING;
-    end
-    CU_STREAM_CMD_WRITE_TRANS : begin
       next_state = CU_STREAM_CMD_PENDING;
     end
     CU_STREAM_CMD_PENDING : begin
@@ -396,27 +356,18 @@ always_ff @(posedge ap_clk) begin
       fifo_response_signals_in_int.wr_en <= 1'b0;
       stream_request_mem_int.iob.valid   <= 1'b0;
       cmd_read_pending                   <= 1'b0;
-      cmd_write_pending                  <= 1'b0;
     end
     CU_STREAM_CMD_READY : begin
       fifo_request_signals_in_int.rd_en  <= 1'b0;
       fifo_response_signals_in_int.wr_en <= 1'b0;
       stream_request_mem_int.iob.valid   <= 1'b0;
       cmd_read_pending                   <= 1'b0;
-      cmd_write_pending                  <= 1'b0;
     end
     CU_STREAM_CMD_READ_TRANS : begin
       fifo_request_signals_in_int.rd_en  <= 1'b1;
       fifo_response_signals_in_int.wr_en <= 1'b1;
       stream_request_mem_int.iob.valid   <= 1'b1;
       cmd_read_pending                   <= 1'b1;
-    end
-    CU_STREAM_CMD_WRITE_TRANS : begin
-      fifo_request_signals_in_int.rd_en  <= 1'b1;
-      fifo_response_signals_in_int.wr_en <= 1'b1;
-      stream_request_mem_int.iob.valid   <= 1'b1;
-      cmd_read_pending                   <= 1'b0;
-      cmd_write_pending                  <= 1'b1;
     end
     CU_STREAM_CMD_PENDING : begin
       fifo_request_signals_in_int.rd_en  <= 1'b0;
@@ -433,7 +384,7 @@ end// always_ff @(posedge ap_clk)
 
 // --------------------------------------------------------------------------------------
 always_comb begin
-  stream_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
+  stream_request_mem_int.iob.wstrb = 0;
   stream_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
   stream_request_mem_int.iob.wdata = fifo_request_dout.iob.wdata;
   stream_request_mem_int.meta      = fifo_request_dout.meta;
@@ -448,18 +399,10 @@ assign read_transaction_start_in  = stream_request_mem_int.iob.valid & (fifo_req
 assign read_transaction_offset_in = stream_request_mem_int.iob.addr;
 assign read_transaction_tready_in = cmd_read_pending;
 // --------------------------------------------------------------------------------------
-// WRITE Stream
-// --------------------------------------------------------------------------------------
-assign write_transaction_start_in  = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE);
-assign write_transaction_tvalid_in = stream_request_mem_int.iob.valid & (fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE) & cmd_write_pending;
-assign write_transaction_length_in = fifo_request_dout.meta.address.burst_length;
-assign write_transaction_offset_in = stream_request_mem_int.iob.addr;
-assign write_transaction_tdata_in  = stream_request_mem_int.iob.wdata;
-// --------------------------------------------------------------------------------------
 // output Stream
 // --------------------------------------------------------------------------------------
-assign stream_response_mem.iob.ready = write_transaction_tready_out | ~read_transaction_prog_full;
-assign stream_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
+assign stream_response_mem.iob.ready = ~read_transaction_prog_full;
+assign stream_response_mem.iob.valid = read_transaction_tvalid_out;
 assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
 
 engine_m_axi #(
@@ -486,13 +429,6 @@ engine_m_axi #(
   .read_transaction_tready_in  (read_transaction_tready_in  ),
   .read_transaction_tvalid_out (read_transaction_tvalid_out ),
   .read_transaction_prog_full  (read_transaction_prog_full  ),
-  .write_transaction_start_in  (write_transaction_start_in  ),
-  .write_transaction_tvalid_in (write_transaction_tvalid_in ),
-  .write_transaction_length_in (write_transaction_length_in ),
-  .write_transaction_offset_in (write_transaction_offset_in ),
-  .write_transaction_tdata_in  (write_transaction_tdata_in  ),
-  .write_transaction_done_out  (write_transaction_done_out  ),
-  .write_transaction_tready_out(write_transaction_tready_out),
   `include "m_axi_portmap_buffer.vh"
   .ap_clk                      (ap_clk                      ),
   .areset                      (areset_engine_m_axi         )
@@ -529,6 +465,7 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 );
 
     assign m_axi_lite_out = 0;
+    assign m_axi_write_out = 0;
 // --------------------------------------------------------------------------------------
 // Module Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -548,7 +485,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 
     logic cmd_read_condition ;
     logic cmd_halt_condition ;
-    logic cmd_write_condition;
 
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
@@ -597,15 +533,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     logic [  NUM_CHANNELS_READ-1:0][M01_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
     logic [  NUM_CHANNELS_READ-1:0][M01_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
     logic [M01_AXI4_MID_DATA_W-1:0]                          read_transaction_length_in    ;
-
-    logic                           write_transaction_start_in    ;
-    logic                           write_transaction_tvalid_in   ;
-    logic [M01_AXI4_MID_DATA_W-1:0] write_transaction_length_in   ;
-    logic [M01_AXI4_MID_ADDR_W-1:0] write_transaction_offset_in   ;
-    logic [M01_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in    ;
-    logic [M01_AXI4_MID_DATA_W-1:0] write_transaction_tdata_in_reg;
-    logic                           write_transaction_done_out    ;
-    logic                           write_transaction_tready_out  ;
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
@@ -682,24 +609,12 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
       end
     end
 
-    assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty & write_transaction_tready_out;
+    assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
       fifo_request_signals_out  <= map_internal_fifo_signals_to_output(fifo_request_signals_out_int);
       fifo_response_signals_out <= map_internal_fifo_signals_to_output(fifo_response_signals_out_int);
       response_out.payload      <= response_in_int.payload;
-    end
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-      if (areset_m_axi) begin
-        m_axi_write.in <= 0;
-      end
-      else begin
-        m_axi_write.in <= m_axi_write_in;
-      end
     end
 
 // --------------------------------------------------------------------------------------
@@ -711,18 +626,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
       end
       else begin
         m_axi_read.in <= m_axi_read_in;
-      end
-    end
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-      if (areset_m_axi) begin
-        m_axi_write_out <= 0;
-      end
-      else begin
-        m_axi_write_out <= m_axi_write.out;
       end
     end
 
@@ -828,7 +731,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     cu_stream_command_generator_state next_state   ;
 
     logic cmd_read_pending ;
-    logic cmd_write_pending;
 // --------------------------------------------------------------------------------------
 //   State Machine AP_USER_MANAGED sync
 // --------------------------------------------------------------------------------------
@@ -843,7 +745,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     assign fifo_request_signals_out_valid_int = ~command_counter_is_zero & fifo_request_signals_out_int.valid & ~fifo_request_signals_out_int.empty & ~fifo_response_signals_out_int.prog_full & fifo_response_signals_in_reg.rd_en & descriptor_in_reg.valid;
     assign cmd_read_condition                 = ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH))  & fifo_request_signals_out_valid_int;
     assign cmd_halt_condition                 = ~command_counter_is_zero & ~fifo_response_signals_out_int.prog_full & descriptor_in_reg.valid;
-    assign cmd_write_condition                = ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & write_transaction_tready_out & fifo_request_signals_out_valid_int;
 // --------------------------------------------------------------------------------------
 
     always_comb begin
@@ -855,15 +756,10 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
         CU_STREAM_CMD_READY : begin
           if(cmd_read_condition)
             next_state = CU_STREAM_CMD_READ_TRANS;
-          else if(cmd_write_condition)
-            next_state = CU_STREAM_CMD_WRITE_TRANS;
           else
             next_state = CU_STREAM_CMD_READY;
         end
         CU_STREAM_CMD_READ_TRANS : begin
-          next_state = CU_STREAM_CMD_PENDING;
-        end
-        CU_STREAM_CMD_WRITE_TRANS : begin
           next_state = CU_STREAM_CMD_PENDING;
         end
         CU_STREAM_CMD_PENDING : begin
@@ -883,28 +779,18 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
       case (current_state)
         CU_STREAM_CMD_RESET : begin
           cmd_read_pending                   <= 1'b0;
-          cmd_write_pending                  <= 1'b0;
           counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
         end
         CU_STREAM_CMD_READY : begin
           cmd_read_pending                   <= 1'b0;
-          cmd_write_pending                  <= 1'b0;
           counter_load                       <= 1'b1;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
         end
         CU_STREAM_CMD_READ_TRANS : begin
           cmd_read_pending                   <= 1'b1;
-          cmd_write_pending                  <= 1'b0;
-          counter_load                       <= 1'b0;
-          fifo_request_signals_in_int.rd_en  <= 1'b0;
-          stream_request_mem_int.iob.valid   <= 1'b1;
-        end
-        CU_STREAM_CMD_WRITE_TRANS : begin
-          cmd_read_pending                   <= 1'b0;
-          cmd_write_pending                  <= 1'b1;
           counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b1;
@@ -919,7 +805,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
         end
         CU_STREAM_CMD_DONE : begin
           cmd_read_pending                   <= 1'b0;
-          cmd_write_pending                  <= 1'b0;
           counter_load                       <= 1'b0;
           fifo_request_signals_in_int.rd_en  <= 1'b0;
           stream_request_mem_int.iob.valid   <= 1'b0;
@@ -929,7 +814,7 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 
 // --------------------------------------------------------------------------------------
     always_comb begin
-      stream_request_mem_int.iob.wstrb = fifo_request_dout.iob.wstrb & {32{(cmd_write_condition)}};
+      stream_request_mem_int.iob.wstrb = 0;
       stream_request_mem_int.iob.addr  = fifo_request_dout.iob.addr;
       stream_request_mem_int.iob.wdata = fifo_request_dout.iob.wdata;
       stream_request_mem_int.meta      = fifo_request_dout.meta;
@@ -944,18 +829,10 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     assign read_transaction_offset_in = stream_request_mem_int.iob.addr;
     assign read_transaction_tready_in = cmd_read_pending & cmd_halt_condition;
 // --------------------------------------------------------------------------------------
-// WRITE Stream
-// --------------------------------------------------------------------------------------
-    assign write_transaction_start_in  = stream_request_mem_int.iob.valid & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & cmd_write_condition;
-    assign write_transaction_tvalid_in = stream_request_mem_int.iob.valid & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_WRITE)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_WRITE)) & cmd_write_pending & cmd_write_condition;
-    assign write_transaction_length_in = fifo_request_dout.meta.address.burst_length;
-    assign write_transaction_offset_in = stream_request_mem_int.iob.addr;
-    assign write_transaction_tdata_in  = stream_request_mem_int.iob.wdata;
-// --------------------------------------------------------------------------------------
 // output Stream
 // --------------------------------------------------------------------------------------
-    assign stream_response_mem.iob.ready = write_transaction_tready_out | ~read_transaction_prog_full;
-    assign stream_response_mem.iob.valid = (read_transaction_tvalid_out | write_transaction_done_out);
+    assign stream_response_mem.iob.ready = ~read_transaction_prog_full;
+    assign stream_response_mem.iob.valid = read_transaction_tvalid_out;
     assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
 
   engine_m_axi #(
@@ -982,13 +859,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     .read_transaction_tready_in  (read_transaction_tready_in  ),
     .read_transaction_tvalid_out (read_transaction_tvalid_out ),
     .read_transaction_prog_full  (read_transaction_prog_full  ),
-    .write_transaction_start_in  (write_transaction_start_in  ),
-    .write_transaction_tvalid_in (write_transaction_tvalid_in ),
-    .write_transaction_length_in (write_transaction_length_in ),
-    .write_transaction_offset_in (write_transaction_offset_in ),
-    .write_transaction_tdata_in  (write_transaction_tdata_in  ),
-    .write_transaction_done_out  (write_transaction_done_out  ),
-    .write_transaction_tready_out(write_transaction_tready_out),
     `include "m_axi_portmap_buffer.vh"
     .ap_clk                      (ap_clk                      ),
     .areset                      (areset_engine_m_axi         )
