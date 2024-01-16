@@ -327,10 +327,10 @@ module engine_read_write_generator #(parameter
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH*2        ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (PROG_THRESH               )
+        .PROG_THRESH     (PROG_THRESH+4             )
     ) inst_fifo_EnginePacketResponseEngineInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
@@ -559,7 +559,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_send_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
-    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_signals_in_reg.rd_en;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & fifo_request_signals_in_reg.rd_en;
     assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid;
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
