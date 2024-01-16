@@ -124,6 +124,10 @@ logic                  backtrack_configure_route_valid                          
 PacketRouteAddress     backtrack_configure_route_in                                               ;
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+// --------------------------------------------------------------------------------------
+localparam PULSE_HOLD           = 2;
+logic [PULSE_HOLD-1:0] alu_ops_done_hold  ;
+logic                  alu_ops_done_assert;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -438,14 +442,9 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
     .result             (result_int                                            )
 );
 
-
 // --------------------------------------------------------------------------------------
-localparam PULSE_HOLD           = 2;
-logic [PULSE_HOLD-1:0] alu_ops_done_hold  ;
-logic                  alu_ops_done_assert;
-
 assign alu_ops_done_assert = |alu_ops_done_hold;
-
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_generator) begin
     alu_ops_done_hold <= 0;
