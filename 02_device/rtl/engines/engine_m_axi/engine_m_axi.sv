@@ -169,7 +169,7 @@ engine_m_axi_read #(
   .C_BURST_LEN        (LP_AXI_BURST_LEN     ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN     ),
   .C_MAX_OUTSTANDING  (LP_RD_MAX_OUTSTANDING),
-  .C_INCLUDE_DATA_FIFO(1                    )
+  .C_INCLUDE_DATA_FIFO(0                    )
 ) inst_engine_m_axi_read (
   .ap_clk        (ap_clk                     ),
   .areset        (areset_m_axi_kernel        ),
@@ -204,7 +204,7 @@ engine_m_axi_write #(
   .C_MAX_LENGTH_WIDTH (M_AXI4_MID_DATA_W),
   .C_BURST_LEN        (LP_AXI_BURST_LEN ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN ),
-  .C_INCLUDE_DATA_FIFO(1                )
+  .C_INCLUDE_DATA_FIFO(0                )
 ) inst_engine_m_axi_write (
   .ap_clk     (ap_clk                      ),
   .areset     (areset_m_axi_kernel         ),
