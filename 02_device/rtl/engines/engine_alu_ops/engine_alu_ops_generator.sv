@@ -90,14 +90,6 @@ EnginePacket          request_engine_out_int                 ;
 FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-logic alu_ops_response_engine_in_valid_reg    ;
-logic alu_ops_response_engine_in_valid_flag_S2;
-logic alu_ops_response_engine_in_valid_flag   ;
-logic alu_ops_response_engine_in_done_flag    ;
-
-// --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 EnginePacketPayload           fifo_response_engine_in_din             ;
