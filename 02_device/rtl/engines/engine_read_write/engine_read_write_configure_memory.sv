@@ -133,6 +133,7 @@ assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 assign configure_memory_meta_int.address.id_channel      = 0;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = 0;
+assign configure_memory_meta_int.address.burst_length    = 0;
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
 assign configure_memory_meta_int.subclass.cmd            = CMD_MEM_INVALID;

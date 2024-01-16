@@ -98,13 +98,13 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    EnginePacketFullPayload       fifo_request_din                 ;
+    EnginePacketFullPayload       fifo_request_send_din            ;
     EnginePacketFullPayload       fifo_request_send_dout           ;
     EnginePacket                  fifo_response_comb               ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg      ;
     FIFOStateSignalsInputInternal fifo_request_send_signals_in_int ;
     FIFOStateSignalsOutInternal   fifo_request_send_signals_out_int;
-    logic                         fifo_request_setup_signal_int    ;
+    logic                         fifo_request_send_setup_signal_int    ;
 
     EnginePacket         response_engine_in_reg    ;
     MemoryPacketResponse response_memory_in_reg    ;
@@ -297,14 +297,14 @@ module engine_read_write_generator #(parameter
             fifo_response_engine_in_signals_out.empty     <= fifo_response_engine_in_signals_out_temp.empty;
             fifo_response_engine_in_signals_out.prog_full <= fifo_response_engine_in_signals_out_temp.prog_full | response_flag_reg;
             fifo_response_memory_in_signals_out           <= fifo_response_memory_in_signals_out_reg;
-            fifo_setup_signal                             <= fifo_request_setup_signal_int | fifo_response_engine_in_setup_signal_int;
+            fifo_setup_signal                             <= fifo_request_send_setup_signal_int | fifo_request_pending_setup_signal_int | fifo_request_commit_setup_signal_int | fifo_response_engine_in_setup_signal_int;
             request_engine_out.valid                      <= request_engine_out_reg.valid;
             request_memory_out.valid                      <= request_memory_out_reg.valid;
         end
     end
 
     assign fifo_response_engine_in_signals_out_temp = map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
-    assign fifo_empty_int                           = fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
+    assign fifo_empty_int                           = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
@@ -350,7 +350,7 @@ module engine_read_write_generator #(parameter
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
-    assign enter_gen_pause_int = fifo_request_send_signals_out_int.prog_full;
+    assign enter_gen_pause_int = fifo_request_commit_signals_out_int.prog_full | fifo_request_pending_signals_out_int.prog_full | fifo_request_send_signals_out_int.prog_full;
     assign exit_gen_pause_int  = fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty;
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -552,11 +552,11 @@ module engine_read_write_generator #(parameter
 // FIFO cache requests out fifo_814x16_EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_request_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
+    assign fifo_request_send_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
 
     // Push
     assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_reg.valid;
-    assign fifo_request_din                       = generator_engine_request_engine_reg.payload;
+    assign fifo_request_send_din                  = generator_engine_request_engine_reg.payload;
 
     // Pop
     assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full;
@@ -571,7 +571,7 @@ module engine_read_write_generator #(parameter
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
-        .din        (fifo_request_din                             ),
+        .din        (fifo_request_send_din                        ),
         .wr_en      (fifo_request_send_signals_in_int.wr_en       ),
         .rd_en      (fifo_request_send_signals_in_int.rd_en       ),
         .dout       (fifo_request_send_dout                       ),
