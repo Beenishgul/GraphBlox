@@ -103,12 +103,11 @@ module engine_csr_index_generator #(parameter
     logic cmd_done_mode_int     ;
     logic sequence_done_mode_int;
 // --------------------------------------------------------------------------------------
-    localparam                BURST_LENGTH       = 16;
-    type_memory_burst_length  burst_length           ;
-    logic                     burst_flag             ;
-    logic                     mod_flag               ;
-    logic                     burst_flag_reg         ;
-    logic [COUNTER_WIDTH-1:0] counter_temp_value     ;
+    type_memory_burst_length  burst_length      ;
+    logic                     burst_flag        ;
+    logic                     mod_flag          ;
+    logic                     burst_flag_reg    ;
+    logic [COUNTER_WIDTH-1:0] counter_temp_value;
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -354,6 +353,8 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
+    localparam BURST_LENGTH = 32;
+    // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
     assign exit_gen_pause_int  = configure_engine_int.payload.param.mode_buffer ? (fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty) : fifo_request_send_signals_out_int.empty;
@@ -770,10 +771,10 @@ module engine_csr_index_generator #(parameter
     assign request_out_int.payload                = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH*2                ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH                  ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
-        .PROG_THRESH     (BURST_LENGTH+5                )
+        .PROG_THRESH     (5                             )
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
@@ -889,10 +890,10 @@ module engine_csr_index_generator #(parameter
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH*2            ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH              ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (BURST_LENGTH              )
+        .PROG_THRESH     (5                         )
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -924,10 +925,10 @@ module engine_csr_index_generator #(parameter
     assign request_commit_out_int.payload           = fifo_request_commit_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH*2            ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH              ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (BURST_LENGTH              )
+        .PROG_THRESH     (5                         )
     ) inst_fifo_EnginePacketRequestCommit (
         .clk        (ap_clk                                         ),
         .srst       (areset_fifo                                    ),

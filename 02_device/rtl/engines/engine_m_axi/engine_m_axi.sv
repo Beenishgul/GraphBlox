@@ -89,11 +89,7 @@ module engine_m_axi #(
   output logic [  M_AXI4_MID_SIZE_W-1:0]                        axi_arsize                  ,
   output logic [ M_AXI4_MID_BURST_W-1:0]                        axi_arburst                 ,
   output logic [ M_AXI4_MID_CACHE_W-1:0]                        axi_arcache                 ,
-  output logic [M_AXI4_MID_REGION_W-1:0]                        axi_arregion                ,
-  input  logic                                                  axi_bvalid                  ,
-  output logic                                                  axi_bready                  ,
-  input  logic [  M_AXI4_MID_RESP_W-1:0]                        axi_bresp                   ,
-  input  logic [    M_AXI4_MID_ID_W-1:0]                        axi_bid
+  output logic [M_AXI4_MID_REGION_W-1:0]                        axi_arregion                
 );
 // --------------------------------------------------------------------------------------//
 // Local Parameters (constants)
