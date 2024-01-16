@@ -94,6 +94,7 @@ module engine_csr_index_generator #(parameter
     logic [CU_PACKET_SEQUENCE_ID_WIDTH_BITS-1:0] sequence_id_counter;
 
     // ----------------------------------------------------------------------------------
+    logic cmd_stream_read_int   ;
     logic cmd_stream_mode_int   ;
     logic cmd_stream_mode_pop   ;
     logic enter_stream_pause_int;
@@ -354,6 +355,7 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
+    assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
     assign exit_gen_pause_int  = configure_engine_int.payload.param.mode_buffer ? (fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty) : fifo_request_send_signals_out_int.empty;
 // --------------------------------------------------------------------------------------
@@ -764,7 +766,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_send_din                  = fifo_request_din_reg_S2.payload;
 
     // Pop
-    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & cmd_stream_mode_pop & ~fifo_request_pending_signals_out_int.prog_full;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & cmd_stream_mode_pop & ~fifo_request_pending_signals_out_int.prog_full & cmd_stream_read_int;
     assign request_out_int.valid                  = fifo_request_send_signals_out_int.valid;
     assign request_out_int.payload                = fifo_request_send_dout;
 
