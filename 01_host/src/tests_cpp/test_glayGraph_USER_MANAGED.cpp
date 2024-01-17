@@ -292,7 +292,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'Q':
         arguments->kernel_name = (char *) malloc(strlen(arg) + 1 + 20);
 
-        if (arguments->kernel_name == NULL) {
+        if (arguments->kernel_name == NULL)
+        {
             // Handle memory allocation failure
             fprintf(stderr, "Memory allocation failed for kernel_name\n");
             exit(1);
@@ -302,7 +303,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
         strcpy(arguments->kernel_name, arg);
 
         // Append "_1" to the string if ker_numThreads is greater than one
-        if (arguments->ker_numThreads > 1) {
+        if (arguments->ker_numThreads > 1)
+        {
             strcat(arguments->kernel_name, "_1");
         }
         break;
@@ -348,41 +350,42 @@ main (int argc, char **argv)
 
     uint32_t i;
 
-    graphAuxiliary->num_auxiliary_1 = graph->num_vertices*2;
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
     graphAuxiliary->auxiliary_1  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-    graphAuxiliary->num_auxiliary_2 = graph->num_vertices*2;
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
     graphAuxiliary->auxiliary_2  = (uint32_t *) my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
     // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
-    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i = 0; i < graphAuxiliary->num_auxiliary_1/2 ; i++)
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary,graph,arguments)
+    for(i = 0; i < graph->num_vertices ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
 
-        if(i == 0)
-            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+        if(i == arguments->source)
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = arguments->source;
 
     }
-    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i =  graphAuxiliary->num_auxiliary_1/2 ; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary,graph,arguments)
+    for(i =  graph->num_vertices ; i < graph->num_vertices * 2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 0;
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
 
-        if(i == graphAuxiliary->num_auxiliary_1/2)
-            static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i] = 1;
+        if(i == (graph->num_vertices + arguments->source))
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
     }
 
-    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i = 0; i < graphAuxiliary->num_auxiliary_2/2 ; i++)
+    // optimization for BFS implentaion instead of -1 we use -out degree to for hybrid approach counter
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary,graph,arguments)
+    for(i = 0; i < graph->num_vertices ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0;
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
     }
-
-    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary)
-    for(i = graphAuxiliary->num_auxiliary_2/2; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    #pragma omp parallel for default(none) private(i) shared(graphAuxiliary,graph,arguments)
+    for(i =  graph->num_vertices ; i < graph->num_vertices * 2 ; i++)
     {
-        static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+
     }
 
     Start(timer);
@@ -416,24 +419,24 @@ main (int argc, char **argv)
     printf(" -----------------------------------------------------\n");
 
 
-    for(i = 0; i < graphAuxiliary->num_auxiliary_1/2 ; i++)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_1 / 2 ; i++)
     {
-        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i]);
+        printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
     }
     printf(" -----------------------------------------------------\n");
-    for(i = graphAuxiliary->num_auxiliary_1/2; i < graphAuxiliary->num_auxiliary_1 ; i++)
+    for(i = graphAuxiliary->num_auxiliary_1 / 2; i < graphAuxiliary->num_auxiliary_1 ; i++)
     {
-        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_1)[i]);
+        printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
     }
     printf(" -----------------------------------------------------\n");
-    for(i = 0; i < graphAuxiliary->num_auxiliary_2/2 ; i++)
+    for(i = 0; i < graphAuxiliary->num_auxiliary_2 / 2 ; i++)
     {
-        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i]);
+        printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i]);
     }
     printf(" -----------------------------------------------------\n");
-    for(i = graphAuxiliary->num_auxiliary_2/2; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    for(i = graphAuxiliary->num_auxiliary_2 / 2; i < graphAuxiliary->num_auxiliary_2 ; i++)
     {
-        printf("%u \n",static_cast<uint32_t*>(graphAuxiliary->auxiliary_2)[i]);
+        printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i]);
     }
     printf(" -----------------------------------------------------\n");
     // closeGLAYUserManaged(arguments->glayHandle);
