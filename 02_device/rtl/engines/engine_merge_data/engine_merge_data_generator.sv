@@ -305,7 +305,7 @@ always_comb begin
                 next_state = ENGINE_MERGE_DATA_GEN_IDLE;
         end
         ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE : begin
-            if(fifo_configure_memory_in_signals_in.rd_en)
+            if(fifo_configure_memory_in_signals_in_reg.rd_en)
                 next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_TRANS;
             else
                 next_state = ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE;
