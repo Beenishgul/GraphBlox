@@ -398,7 +398,7 @@ generate
         end
 
         always_ff @(posedge ap_clk) begin
-            fifo_response_lanes_backtrack_signals_in_reg[i]    <= fifo_response_lanes_backtrack_signals_in;
+            fifo_response_lanes_backtrack_signals_in_reg[i] <= fifo_response_lanes_backtrack_signals_in;
         end
     end
 endgenerate
@@ -413,8 +413,8 @@ endgenerate
 generate
     for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_engine_request_in
         assign lane_arbiter_N_to_1_lane_request_in[i] = lanes_request_lane_out[i];
-        // assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
-        assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
+        assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = ~lane_arbiter_N_to_1_lane_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
+        // assign lanes_fifo_request_lane_out_signals_in[i].rd_en  = lane_arbiter_N_to_1_lane_lane_arbiter_grant_out[i];
     end
 endgenerate
 
@@ -512,8 +512,8 @@ assign lane_arbiter_1_to_N_lanes_response_in = response_engine_in_int;
 
 generate
     for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_engine_response
-        // assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full & fifo_response_lanes_in_signals_in_reg.rd_en;
-        assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = 1'b1;
+        assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_lane_in_signals_out[i].prog_full & fifo_response_lanes_in_signals_in_reg.rd_en;
+        // assign lane_arbiter_1_to_N_lanes_fifo_response_signals_in[i].rd_en = 1'b1;
         assign lanes_response_engine_in[i] = lane_arbiter_1_to_N_lanes_response_out[i];
         assign lanes_fifo_response_lane_in_signals_in[i].rd_en = 1'b1;
     end

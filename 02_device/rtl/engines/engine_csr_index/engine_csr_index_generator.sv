@@ -221,8 +221,11 @@ module engine_csr_index_generator #(parameter
     assign engine_csr_index_route.sequence_state            = SEQUENCE_INVALID;
     assign engine_csr_index_route.sequence_id               = 0;
     assign engine_csr_index_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
-
 // --------------------------------------------------------------------------------------
+    localparam             PULSE_HOLD           = 3;
+    logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
+    logic                  cmd_in_flight_assert    ;
+
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -358,7 +361,7 @@ module engine_csr_index_generator #(parameter
     // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
-    assign exit_gen_pause_int  = configure_engine_int.payload.param.mode_buffer ? (fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty) : fifo_request_send_signals_out_int.empty;
+    assign exit_gen_pause_int  = configure_engine_int.payload.param.mode_buffer ? (fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert) : fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert;
 // --------------------------------------------------------------------------------------
     assign cmd_stream_mode_int    = (configure_memory_reg.payload.meta.subclass.cmd == CMD_STREAM_READ) | (configure_engine_int.payload.meta.subclass.cmd == CMD_STREAM_WRITE);
     assign enter_stream_pause_int = ~(|((counter_count-counter_load_value)%BURST_LENGTH)) & cmd_stream_mode_int;
@@ -851,6 +854,16 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
+    assign cmd_in_flight_assert = |cmd_in_flight_hold;
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            cmd_in_flight_hold <= 0;
+        end else begin
+            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_out_int.valid|fifo_request_din_reg.valid)};
+        end
+    end
+// --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
@@ -999,9 +1012,19 @@ module engine_csr_index_generator #(parameter
             request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
 
-        // if(fifo_response_comb.valid && configure_engine_int.payload.param.mode_sequence)
-        //     $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,fifo_response_comb.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, fifo_response_comb.payload.data.field[0], fifo_response_comb.payload.data.field[1], fifo_response_comb.payload.data.field[2], fifo_response_comb.payload.data.field[3]);
+        // if(ID_BUNDLE == 2) begin
+        //     // if(response_engine_in_reg.valid)
+        //     //     $display("%t - ENGINE RES B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_engine_in_reg.payload.data.field[0], response_engine_in_reg.payload.data.field[1], response_engine_in_reg.payload.data.field[2], response_engine_in_reg.payload.data.field[3]);
 
+        //     if(request_engine_out_reg.valid)
+        //         $display("%t - ENGINE REQ B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, request_engine_out_reg.payload.data.field[0], request_engine_out_reg.payload.data.field[1], request_engine_out_reg.payload.data.field[2], request_engine_out_reg.payload.data.field[3]);
+
+        //     // if(request_memory_out_reg.valid)
+        //     //     $display("%t - MEMORY REQ %0s B:%0d L:%0d-[%0d]", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.meta.address.offset);
+
+        //     // if(response_memory_in_reg.valid)
+        //     //     $display("%t - MEMORY RES B:%0d L:%0d-[%0d]", $time,ID_BUNDLE, ID_LANE, response_memory_in_reg.payload.meta.address.offset);
+        // end
     end
 
 endmodule : engine_csr_index_generator
