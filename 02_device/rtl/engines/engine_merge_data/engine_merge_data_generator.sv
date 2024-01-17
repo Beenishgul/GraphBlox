@@ -67,7 +67,6 @@ logic configure_memory_setup_reg;
 engine_merge_data_generator_state current_state;
 engine_merge_data_generator_state next_state   ;
 
-logic done_int_reg;
 logic done_out_reg;
 
 logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_empty_int;
