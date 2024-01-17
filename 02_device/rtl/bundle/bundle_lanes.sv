@@ -16,7 +16,7 @@
 
 module bundle_lanes #(
     `include "bundle_parameters.vh"
-    ) (
+) (
     // System Signals
     input  logic                  ap_clk                                                            ,
     input  logic                  areset                                                            ,
@@ -572,18 +572,27 @@ arbiter_1_to_N_response_memory #(
 // --------------------------------------------------------------------------------------
 generate
     if(LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE>0) begin
+// --------------------------------------------------------------------------------------
+        assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;
+
+        for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_control_response
+            assign lane_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = ~lanes_fifo_response_control_in_signals_out[i].prog_full & fifo_response_control_in_signals_in_reg.rd_en;
+            assign lanes_response_control_in[i] = lane_arbiter_1_to_N_control_response_out[i];
+            assign lanes_fifo_response_control_in_signals_in[i].rd_en = 1'b1;
+        end
+// --------------------------------------------------------------------------------------
         arbiter_1_to_N_response_control #(
-            .NUM_CONTROL_RECEIVER(LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE      ),
+            .NUM_CONTROL_RECEIVER(NUM_LANES                                             ),
             .ID_LEVEL            (2                                                     ),
             .FIFO_ARBITER_DEPTH  (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
         ) inst_lane_arbiter_1_to_N_control_response_in (
-            .ap_clk                   (ap_clk                                                                                                    ),
-            .areset                   (areset_lane_arbiter_1_to_N_control                                                                        ),
-            .response_in              (lane_arbiter_1_to_N_control_response_in                                                                   ),
-            .fifo_response_signals_in (lane_arbiter_1_to_N_control_fifo_response_signals_in[LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE-1:0]),
-            .fifo_response_signals_out(lane_arbiter_1_to_N_control_fifo_response_signals_out                                                     ),
-            .response_out             (lane_arbiter_1_to_N_control_response_out[LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE-1:0]            ),
-            .fifo_setup_signal        (lane_arbiter_1_to_N_control_fifo_setup_signal                                                             )
+            .ap_clk                   (ap_clk                                               ),
+            .areset                   (areset_lane_arbiter_1_to_N_control                   ),
+            .response_in              (lane_arbiter_1_to_N_control_response_in              ),
+            .fifo_response_signals_in (lane_arbiter_1_to_N_control_fifo_response_signals_in ),
+            .fifo_response_signals_out(lane_arbiter_1_to_N_control_fifo_response_signals_out),
+            .response_out             (lane_arbiter_1_to_N_control_response_out             ),
+            .fifo_setup_signal        (lane_arbiter_1_to_N_control_fifo_setup_signal        )
         );
 // --------------------------------------------------------------------------------------
     end else begin
