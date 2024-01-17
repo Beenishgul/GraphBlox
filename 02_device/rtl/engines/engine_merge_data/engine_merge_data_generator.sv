@@ -319,9 +319,7 @@ always_comb begin
             next_state = ENGINE_MERGE_DATA_GEN_BUSY;
         end
         ENGINE_MERGE_DATA_GEN_BUSY : begin
-            if (done_int_reg)
-                next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
-            else if (fifo_request_engine_out_signals_out_int.prog_full)
+            if (fifo_request_engine_out_signals_out_int.prog_full)
                 next_state = ENGINE_MERGE_DATA_GEN_PAUSE_TRANS;
             else
                 next_state = ENGINE_MERGE_DATA_GEN_BUSY;
@@ -335,25 +333,12 @@ always_comb begin
             else
                 next_state = ENGINE_MERGE_DATA_GEN_PAUSE;
         end
-        ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
-            if (done_int_reg)
-                next_state = ENGINE_MERGE_DATA_GEN_DONE;
-            else
-                next_state = ENGINE_MERGE_DATA_GEN_DONE_TRANS;
-        end
-        ENGINE_MERGE_DATA_GEN_DONE : begin
-            if (done_int_reg)
-                next_state = ENGINE_MERGE_DATA_GEN_IDLE;
-            else
-                next_state = ENGINE_MERGE_DATA_GEN_DONE;
-        end
     endcase
 end// always_comb
 
 always_ff @(posedge ap_clk) begin
     case (current_state)
         ENGINE_MERGE_DATA_GEN_RESET : begin
-            done_int_reg                          <= 1'b1;
             done_out_reg                          <= 1'b1;
             configure_memory_setup_reg            <= 1'b0;
             configure_engine_param_valid          <= 1'b0;
@@ -361,12 +346,10 @@ always_ff @(posedge ap_clk) begin
             configure_engine_param_int.merge_type <= 0;
         end
         ENGINE_MERGE_DATA_GEN_IDLE : begin
-            done_int_reg               <= 1'b1;
             done_out_reg               <= 1'b0;
             configure_memory_setup_reg <= 1'b0;
         end
         ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE : begin
-            done_int_reg               <= 1'b1;
             done_out_reg               <= 1'b0;
             configure_memory_setup_reg <= 1'b0;
         end
@@ -380,41 +363,24 @@ always_ff @(posedge ap_clk) begin
                 configure_engine_param_int <= configure_memory_reg.payload.param;
         end
         ENGINE_MERGE_DATA_GEN_START_TRANS : begin
-            done_int_reg                 <= 1'b0;
             done_out_reg                 <= 1'b0;
             configure_engine_param_valid <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_START : begin
-            done_int_reg                 <= 1'b0;
             done_out_reg                 <= 1'b1;
             configure_engine_param_valid <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_PAUSE_TRANS : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_BUSY : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_BUSY_TRANS : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_PAUSE : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
-        end
-        ENGINE_MERGE_DATA_GEN_DONE_TRANS : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_MERGE_DATA_GEN_DONE : begin
-            done_int_reg                          <= 1'b1;
-            done_out_reg                          <= 1'b1;
-            configure_engine_param_valid          <= 1'b0;
-            configure_engine_param_int.merge_mask <= ~0;
-            configure_engine_param_int.merge_type <= 0;
         end
     endcase
 end// always_ff @(posedge ap_clk)

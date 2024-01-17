@@ -111,8 +111,8 @@ module engine_read_write_generator #(parameter
     MemoryPacketResponse response_memory_in_reg_S2 ;
     logic                configure_memory_setup_reg;
 
-    logic                            configure_engine_param_valid;
-    ReadWriteConfigurationParameters configure_engine_param_int  ;
+    ReadWriteConfigurationParameters configure_engine_param_int;
+    ReadWriteConfiguration           configure_engine_int      ;
 
     EnginePacketFull generator_engine_request_engine_reg   ;
     EnginePacketFull generator_engine_request_engine_reg_S2;
@@ -325,7 +325,7 @@ module engine_read_write_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_send_signals_out_int.prog_full & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & configure_engine_param_valid;
+    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_send_signals_out_int.prog_full & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & configure_engine_int.valid ;
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -424,8 +424,7 @@ module engine_read_write_generator #(parameter
                 done_out_reg                       <= 1'b1;
                 response_flag_reg                  <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
-                configure_engine_param_valid       <= 1'b0;
-                configure_engine_param_int         <= 0;
+                configure_engine_int.valid         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
@@ -447,22 +446,22 @@ module engine_read_write_generator #(parameter
                 configure_memory_setup_reg <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY : begin
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_int.valid <= 1'b0;
                 if(configure_memory_reg.valid)
-                    configure_engine_param_int <= configure_memory_reg.payload.param;
+                    configure_engine_int <= configure_memory_reg;
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
-                done_out_reg                 <= 1'b0;
-                response_flag_reg            <= 1'b0;
-                configure_engine_param_valid <= 1'b1;
-                counter_load                 <= 1'b1;
+                done_out_reg               <= 1'b0;
+                response_flag_reg          <= 1'b0;
+                configure_engine_int.valid <= 1'b1;
+                counter_load               <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_START : begin
-                done_out_reg                 <= 1'b0;
-                response_flag_reg            <= 1'b0;
-                configure_engine_param_valid <= 1'b1;
-                counter_load                 <= 1'b0;
+                done_out_reg               <= 1'b0;
+                response_flag_reg          <= 1'b0;
+                configure_engine_int.valid <= 1'b1;
+                counter_load               <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
                 done_out_reg      <= 1'b0;
@@ -546,9 +545,9 @@ module engine_read_write_generator #(parameter
     engine_read_write_kernel inst_engine_read_write_kernel (
         .ap_clk                (ap_clk                             ),
         .areset                (areset_kernel                      ),
-        .clear_in              (~(configure_engine_param_valid)    ),
-        .config_params_valid_in(configure_engine_param_valid       ),
-        .config_params_in      (configure_engine_param_int         ),
+        .clear_in              (~(configure_engine_int.valid)      ),
+        .config_params_valid_in(configure_engine_int.valid         ),
+        .config_params_in      (configure_engine_int.payload.param ),
         .data_valid_in         (response_engine_in_int.valid       ),
         .data_in               (response_engine_in_int.payload.data),
         .address_out           (address_int                        ),
@@ -592,20 +591,20 @@ module engine_read_write_generator #(parameter
 
 
 // --------------------------------------------------------------------------------------
-assign cmd_in_flight_assert = |cmd_in_flight_hold;
+    assign cmd_in_flight_assert = |cmd_in_flight_hold;
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_generator) begin
-    cmd_in_flight_hold <= 0;
-  end else begin
-    cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_send_out_int.valid|response_engine_in_int.valid)};
-  end
-end
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            cmd_in_flight_hold <= 0;
+        end else begin
+            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_send_out_int.valid|response_engine_in_int.valid)};
+        end
+    end
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
-    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.packet_destination;
+    assign backtrack_configure_route_valid                    = configure_engine_int.valid;
+    assign backtrack_configure_route_in                       = configure_engine_int.payload.meta.route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
@@ -734,7 +733,7 @@ end
 
             //     if(request_memory_out_reg.valid)
             //         $display("%t - MEMORY REQ %0s B:%0d L:%0d-[%0d]", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.meta.address.offset);
-                
+
             //     if(response_memory_in_reg.valid)
             //         $display("%t - MEMORY RES B:%0d L:%0d-[%0d]", $time,ID_BUNDLE, ID_LANE, response_memory_in_reg.payload.meta.address.offset);
 
