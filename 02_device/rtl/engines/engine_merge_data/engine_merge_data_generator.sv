@@ -53,7 +53,6 @@ genvar i;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_generator;
-logic areset_counter  ;
 logic areset_fifo     ;
 
 KernelDescriptor descriptor_in_reg;
@@ -87,12 +86,6 @@ EnginePacket          request_engine_out_int                 ;
 FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
 
 // --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-logic [(1+ENGINE_MERGE_WIDTH)-1:0] merge_data_response_engine_in_valid_reg ;
-logic                              merge_data_response_engine_in_valid_flag;
-
-// --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
 EnginePacketPayload                fifo_response_engine_in_din             [(1+ENGINE_MERGE_WIDTH)-1:0];
@@ -121,11 +114,14 @@ FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BA
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 
 // --------------------------------------------------------------------------------------
+logic [(1+ENGINE_MERGE_WIDTH)-1:0] merge_mask_assert_int             ;
+logic [(1+ENGINE_MERGE_WIDTH)-1:0] fifo_response_signals_in_int_rd_en;
+
+// --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     areset_generator <= areset;
-    areset_counter   <= areset;
     areset_fifo      <= areset;
     areset_backtrack <= areset;
 end
@@ -233,6 +229,7 @@ end
 // FIFO INPUT Engine Response EnginePacket
 // --------------------------------------------------------------------------------------
 generate
+// --------------------------------------------------------------------------------------
     for (i=0; i<(1+ENGINE_MERGE_WIDTH); i++) begin : generate_fifo_response_engine_in_din
         // FIFO is resetting
         assign fifo_response_engine_in_setup_signal_int[i] = fifo_response_engine_in_signals_out_int[i].wr_rst_busy | fifo_response_engine_in_signals_out_int[i].rd_rst_busy;
@@ -242,7 +239,8 @@ generate
         assign fifo_response_engine_in_din[i] = response_engine_in_reg[i].payload;
 
         // Pop
-        assign fifo_response_engine_in_signals_in_int[i].rd_en = (~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & ~merge_data_response_engine_in_valid_reg[i] & ~response_engine_in_int[i].valid & configure_engine_param_valid & ~fifo_request_engine_out_signals_out_int.prog_full) | (~configure_engine_param_int.merge_mask[i] & configure_engine_param_valid) ;
+        // assign fifo_response_engine_in_signals_in_int[i].rd_en = (~fifo_response_engine_in_signals_out_int[i].empty & fifo_response_engine_in_signals_in_reg[i].rd_en & ~merge_data_response_engine_in_valid_reg[i] & ~response_engine_in_int[i].valid & configure_engine_param_valid & ~fifo_request_engine_out_signals_out_int.prog_full) | (~configure_engine_param_int.merge_mask[i] & configure_engine_param_valid) ;
+        assign fifo_response_engine_in_signals_in_int[i].rd_en = fifo_response_signals_in_int_rd_en[i];
         assign response_engine_in_int[i].valid                 = fifo_response_engine_in_signals_out_int[i].valid;
         assign response_engine_in_int[i].payload               = fifo_response_engine_in_dout[i];
 
@@ -265,10 +263,23 @@ generate
             .wr_rst_busy(fifo_response_engine_in_signals_out_int[i].wr_rst_busy),
             .rd_rst_busy(fifo_response_engine_in_signals_out_int[i].rd_rst_busy)
         );
-
+// --------------------------------------------------------------------------------------
         assign fifo_empty_int[i] = fifo_response_engine_in_signals_out_int[i].empty;
+// --------------------------------------------------------------------------------------
     end
 endgenerate
+
+// --------------------------------------------------------------------------------------
+always_comb begin
+    for (int i=0; i<(1+ENGINE_MERGE_WIDTH); i++) begin
+        merge_mask_assert_int[i] = ~fifo_response_engine_in_signals_out_int[i].empty & configure_engine_param_int.merge_mask[i] & configure_engine_param_valid & fifo_response_engine_in_signals_in_reg[i].rd_en & ~fifo_request_engine_out_signals_out_int.prog_full;
+    end
+
+    if((merge_mask_assert_int ==  configure_engine_param_int.merge_mask[(1+ENGINE_MERGE_WIDTH)-1:0]) & configure_engine_param_valid)
+        fifo_response_signals_in_int_rd_en = configure_engine_param_int.merge_mask[(1+ENGINE_MERGE_WIDTH)-1:0];
+    else
+        fifo_response_signals_in_int_rd_en = 0;
+end
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
@@ -387,65 +398,21 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-assign merge_data_response_engine_in_valid_flag = &merge_data_response_engine_in_valid_reg;
-
 always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        merge_data_response_engine_in_valid_reg   <= 0;
-        generator_engine_request_engine_reg.valid <= 1'b0;
-    end
-    else begin
-        generator_engine_request_engine_reg.valid <= merge_data_response_engine_in_valid_flag;
-
-        if(response_engine_in_int[0].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[0]) begin
-            merge_data_response_engine_in_valid_reg[0] <= 1'b1;
-        end else begin
-            if(merge_data_response_engine_in_valid_flag)
-                merge_data_response_engine_in_valid_reg[0] <= 1'b0 | ~configure_engine_param_int.merge_mask[0];
-            else
-                merge_data_response_engine_in_valid_reg[0] <= merge_data_response_engine_in_valid_reg[0] | ~configure_engine_param_int.merge_mask[0];
-        end
-
-        for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
-            if(response_engine_in_int[j].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
-                merge_data_response_engine_in_valid_reg[j] <= 1'b1;
-            end else begin
-                if(merge_data_response_engine_in_valid_flag)
-                    merge_data_response_engine_in_valid_reg[j] <= 1'b0 | ~configure_engine_param_int.merge_mask[j];
-                else
-                    merge_data_response_engine_in_valid_reg[j] <= merge_data_response_engine_in_valid_reg[j] | ~configure_engine_param_int.merge_mask[j];
-            end
-        end
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    if(response_engine_in_int[0].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[0]) begin
-        generator_engine_request_engine_reg.payload.meta          <= response_engine_in_int[0].payload.meta;
-        generator_engine_request_engine_reg.payload.data.field[0] <= response_engine_in_int[0].payload.data.field[0];
-        // $display("%t - %0d->%0d-%0d", $time,0,response_engine_in_int[0].payload.data.field[1], response_engine_in_int[0].payload.data.field[0]);
-    end else begin
-        generator_engine_request_engine_reg.payload.meta          <= generator_engine_request_engine_reg.payload.meta ;
-        generator_engine_request_engine_reg.payload.data.field[0] <= generator_engine_request_engine_reg.payload.data.field[0];
-    end
+    generator_engine_request_engine_reg.valid                 <= response_engine_in_int[0].valid;
+    generator_engine_request_engine_reg.payload.meta          <= response_engine_in_int[0].payload.meta;
+    generator_engine_request_engine_reg.payload.data.field[0] <= response_engine_in_int[0].payload.data.field[0];
 
     for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
-        if(response_engine_in_int[j].valid & configure_engine_param_valid & configure_engine_param_int.merge_mask[j]) begin
+        if(configure_engine_param_int.merge_mask[j]) begin
             generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[0];
-            // $display("%t - %0d->%0d-%0d", $time,j,response_engine_in_int[j].payload.data.field[1], response_engine_in_int[j].payload.data.field[0]);
-        end else if (configure_engine_param_valid & ~configure_engine_param_int.merge_mask[j]) begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
         end else begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j];
+            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
         end
     end
 
     for (int j=(1+ENGINE_MERGE_WIDTH); j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        if(response_engine_in_int[0].valid & configure_engine_param_valid) begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
-        end else begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= generator_engine_request_engine_reg.payload.data.field[j] ;
-        end
+        generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
     end
 end
 
