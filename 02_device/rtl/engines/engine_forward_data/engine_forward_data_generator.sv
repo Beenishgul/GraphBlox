@@ -151,7 +151,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty;
-assign done_out_int = ~generator_engine_request_engine_reg.valid & ~response_engine_in_int.valid 
+assign done_out_int = ~generator_engine_request_engine_reg.valid & ~response_engine_in_int.valid;
 
 always_ff @(posedge ap_clk) begin
     request_engine_out.payload <= request_engine_out_int.payload;
