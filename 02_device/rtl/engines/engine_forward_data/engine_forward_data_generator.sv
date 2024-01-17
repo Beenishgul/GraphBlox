@@ -45,7 +45,6 @@ module engine_forward_data_generator #(parameter
     output logic                    done_out
 );
 
-genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -60,10 +59,6 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
-engine_forward_data_generator_state current_state;
-engine_forward_data_generator_state next_state   ;
-
-logic done_int_reg;
 logic done_out_reg;
 
 // --------------------------------------------------------------------------------------
@@ -201,7 +196,7 @@ assign fifo_response_engine_in_signals_in_int.wr_en = response_engine_in_reg.val
 assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
 // Pop
-assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~forward_data_response_engine_in_valid_reg & ~response_engine_in_int.valid );
+assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_engine_out_signals_out_int.prog_full;
 assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
 assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -225,155 +220,18 @@ xpm_fifo_sync_wrapper #(
     .rd_rst_busy(fifo_response_engine_in_signals_out_int.rd_rst_busy)
 );
 
-// --------------------------------------------------------------------------------------
-// Serial Read Engine State Machine
-// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    if(areset_generator)
-        current_state <= ENGINE_FORWARD_DATA_GEN_RESET;
-    else begin
-        current_state <= next_state;
-    end
-end// always_ff @(posedge ap_clk)
+    generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid & (|response_engine_in_int.payload.meta.route.hops);
+    generator_engine_request_engine_reg.payload.meta.route.packet_destination <= response_engine_in_int.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
+    generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data;
 
-always_comb begin
-    next_state = current_state;
-    case (current_state)
-        ENGINE_FORWARD_DATA_GEN_RESET : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_IDLE;
-        end
-        ENGINE_FORWARD_DATA_GEN_IDLE : begin
-            if(descriptor_in_reg.valid)
-                next_state = ENGINE_FORWARD_DATA_GEN_START_TRANS;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_IDLE;
-        end
-        ENGINE_FORWARD_DATA_GEN_START_TRANS : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_START;
-        end
-        ENGINE_FORWARD_DATA_GEN_START : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_BUSY;
-        end
-        ENGINE_FORWARD_DATA_GEN_BUSY_TRANS : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_BUSY;
-        end
-        ENGINE_FORWARD_DATA_GEN_BUSY : begin
-            if (done_int_reg)
-                next_state = ENGINE_FORWARD_DATA_GEN_DONE_TRANS;
-            else if (fifo_request_engine_out_signals_out_int.prog_full)
-                next_state = ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_BUSY;
-        end
-        ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS : begin
-            next_state = ENGINE_FORWARD_DATA_GEN_PAUSE;
-        end
-        ENGINE_FORWARD_DATA_GEN_PAUSE : begin
-            if (~fifo_request_engine_out_signals_out_int.prog_full)
-                next_state = ENGINE_FORWARD_DATA_GEN_BUSY_TRANS;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_PAUSE;
-        end
-        ENGINE_FORWARD_DATA_GEN_DONE_TRANS : begin
-            if (done_int_reg)
-                next_state = ENGINE_FORWARD_DATA_GEN_DONE;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_DONE_TRANS;
-        end
-        ENGINE_FORWARD_DATA_GEN_DONE : begin
-            if (done_int_reg)
-                next_state = ENGINE_FORWARD_DATA_GEN_IDLE;
-            else
-                next_state = ENGINE_FORWARD_DATA_GEN_DONE;
-        end
-    endcase
-end// always_comb
-
-always_ff @(posedge ap_clk) begin
-    case (current_state)
-        ENGINE_FORWARD_DATA_GEN_RESET : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_IDLE : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b0;
-        end
-        ENGINE_FORWARD_DATA_GEN_START_TRANS : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b0;
-        end
-        ENGINE_FORWARD_DATA_GEN_START : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_PAUSE_TRANS : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_BUSY : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_BUSY_TRANS : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_PAUSE : begin
-            done_int_reg <= 1'b0;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_DONE_TRANS : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FORWARD_DATA_GEN_DONE : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b1;
-        end
-    endcase
-end// always_ff @(posedge ap_clk)
-
-// --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-assign forward_data_response_engine_in_valid_flag = forward_data_response_engine_in_valid_reg;
-
-always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        forward_data_response_engine_in_valid_reg <= 1'b0;
-        generator_engine_request_engine_reg.valid <= 1'b0;
-    end
-    else begin
-        generator_engine_request_engine_reg.valid <= forward_data_response_engine_in_valid_flag;
-
-        if(response_engine_in_int.valid) begin
-            forward_data_response_engine_in_valid_reg <= (|response_engine_in_int.payload.meta.route.hops);
-        end else begin
-            if(forward_data_response_engine_in_valid_flag)
-                forward_data_response_engine_in_valid_reg <= 1'b0;
-            else
-                forward_data_response_engine_in_valid_reg <= forward_data_response_engine_in_valid_reg;
-        end
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    if(response_engine_in_int.valid) begin
-        generator_engine_request_engine_reg.payload.meta.route.packet_destination <= response_engine_in_int.payload.meta.route.packet_destination;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
-        generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
-        generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data;
-
-        if (response_engine_in_int.payload.meta.route.hops >= 1'b1) begin
-            generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - 1'b1;
-        end else begin
-            generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
-        end
-
+    if (response_engine_in_int.payload.meta.route.hops >= 1'b1) begin
+        generator_engine_request_engine_reg.payload.meta.route.hops <= response_engine_in_int.payload.meta.route.hops - 1'b1;
     end else begin
-        generator_engine_request_engine_reg.payload <= generator_engine_request_engine_reg.payload;
+        generator_engine_request_engine_reg.payload.meta.route.hops <= 0;
     end
 end
 
