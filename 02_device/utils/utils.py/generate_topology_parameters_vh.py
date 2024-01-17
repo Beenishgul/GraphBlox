@@ -1356,48 +1356,48 @@ with open(output_file_lane_arbitration, "w") as file:
                 file.write(f"endgenerate\n")
                 file.write(f"\n\n") 
 
-    for ID_BUNDLE in range(NUM_BUNDLES):
+    # for ID_BUNDLE in range(NUM_BUNDLES):
 
-        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
-        ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
+    #     NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
+    #     ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
 
 
-        LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
+    #     LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
+    #     LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
 
-        for ID_LANE in range(NUM_LANES):
+    #     for ID_LANE in range(NUM_LANES):
 
-            NUM_ENGINES = ENGINES_COUNT_ARRAY[ID_LANE]
-            ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
-            ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
+    #         NUM_ENGINES = ENGINES_COUNT_ARRAY[ID_LANE]
+    #         ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
+    #         ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
 
-            if ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE:
+    #         if ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE:
 
-                file.write("\n")
-                file.write(f"generate\n")
-                file.write(f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n")
-                file.write(f"          begin\n")  
+    #             file.write("\n")
+    #             file.write(f"generate\n")
+    #             file.write(f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n")
+    #             file.write(f"          begin\n")  
 
-                REAL_ID_ENGINE = 0;
-                for ID_ENGINE in range(NUM_ENGINES):
-                    MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_ENGINE]
+    #             REAL_ID_ENGINE = 0;
+    #             for ID_ENGINE in range(NUM_ENGINES):
+    #                 MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_ENGINE]
 
-                    if MAP_ENGINE:
-                        file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_ENGINE}].rd_en = ~engines_fifo_response_control_in_signals_out[{ID_ENGINE}].prog_full & fifo_response_control_in_signals_in_reg.rd_en;\n")
-                        file.write(f"               assign engines_response_control_in[{ID_ENGINE}] = engine_arbiter_1_to_N_control_response_out[{REAL_ID_ENGINE}];\n")
-                        file.write(f"               assign engines_fifo_response_control_in_signals_in[{ID_ENGINE}].rd_en = 1'b1;\n")
-                        REAL_ID_ENGINE += 1
-                    else:
-                        file.write(f"               assign engines_response_control_in[{ID_ENGINE}] = 0;\n")
-                        file.write(f"               assign engines_fifo_response_control_in_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
+    #                 if MAP_ENGINE:
+    #                     file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_ENGINE}].rd_en = ~engines_fifo_response_control_in_signals_out[{ID_ENGINE}].prog_full & fifo_response_control_in_signals_in_reg.rd_en;\n")
+    #                     file.write(f"               assign engines_response_control_in[{ID_ENGINE}] = engine_arbiter_1_to_N_control_response_out[{REAL_ID_ENGINE}];\n")
+    #                     file.write(f"               assign engines_fifo_response_control_in_signals_in[{ID_ENGINE}].rd_en = 1'b1;\n")
+    #                     REAL_ID_ENGINE += 1
+    #                 else:
+    #                     file.write(f"               assign engines_response_control_in[{ID_ENGINE}] = 0;\n")
+    #                     file.write(f"               assign engines_fifo_response_control_in_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
 
-                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
-                    file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
+    #             for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
+    #                 file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
 
-                file.write(f"               assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
-                file.write(f"          end\n") 
-                file.write(f"endgenerate\n")
-                file.write(f"\n\n") 
+    #             file.write(f"               assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
+    #             file.write(f"          end\n") 
+    #             file.write(f"endgenerate\n")
+    #             file.write(f"\n\n") 
 
 
 with open(output_file_bundle_arbitration, "w") as file:
@@ -1465,40 +1465,40 @@ with open(output_file_bundle_arbitration, "w") as file:
             file.write(f"endgenerate\n")
             file.write(f"\n\n") 
 
-    for ID_BUNDLE in range(NUM_BUNDLES):
+    # for ID_BUNDLE in range(NUM_BUNDLES):
 
-        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
-        LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
+    #     NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
+    #     LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
+    #     LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
 
-        if LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE :
+    #     if LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE :
 
-            file.write("\n")
-            file.write(f"generate\n")
-            file.write(f"     if(ID_BUNDLE == {ID_BUNDLE})\n")
-            file.write(f"          begin\n")  
+    #         file.write("\n")
+    #         file.write(f"generate\n")
+    #         file.write(f"     if(ID_BUNDLE == {ID_BUNDLE})\n")
+    #         file.write(f"          begin\n")  
 
-            REAL_ID_LANE = 0;
-            for ID_LANE in range(NUM_LANES):
-                MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
+    #         REAL_ID_LANE = 0;
+    #         for ID_LANE in range(NUM_LANES):
+    #             MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_LANE]
 
-                if MAP_LANE:
-                    file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_LANE}].rd_en = ~lanes_fifo_response_control_in_signals_out[{ID_LANE}].prog_full & fifo_response_control_in_signals_in_reg.rd_en;\n")
-                    file.write(f"               assign lanes_response_control_in[{ID_LANE}] = lane_arbiter_1_to_N_control_response_out[{REAL_ID_LANE}];\n")
-                    file.write(f"               assign lanes_fifo_response_control_in_signals_in[{ID_LANE}].rd_en = 1'b1;\n")
-                    REAL_ID_LANE += 1
-                else:
-                    file.write(f"               assign lanes_response_control_in[{ID_LANE}] = 0;\n")
-                    file.write(f"               assign lanes_fifo_response_control_in_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
+    #             if MAP_LANE:
+    #                 file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{REAL_ID_LANE}].rd_en = ~lanes_fifo_response_control_in_signals_out[{ID_LANE}].prog_full & fifo_response_control_in_signals_in_reg.rd_en;\n")
+    #                 file.write(f"               assign lanes_response_control_in[{ID_LANE}] = lane_arbiter_1_to_N_control_response_out[{REAL_ID_LANE}];\n")
+    #                 file.write(f"               assign lanes_fifo_response_control_in_signals_in[{ID_LANE}].rd_en = 1'b1;\n")
+    #                 REAL_ID_LANE += 1
+    #             else:
+    #                 file.write(f"               assign lanes_response_control_in[{ID_LANE}] = 0;\n")
+    #                 file.write(f"               assign lanes_fifo_response_control_in_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
 
-            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
-                file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
+    #         for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
+    #             file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
                    
 
-            file.write(f"               assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
-            file.write(f"          end\n") 
-            file.write(f"endgenerate\n")
-            file.write(f"\n\n") 
+    #         file.write(f"               assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
+    #         file.write(f"          end\n") 
+    #         file.write(f"endgenerate\n")
+    #         file.write(f"\n\n") 
 
 
 with open(output_file_cu_arbitration, "w") as file:
