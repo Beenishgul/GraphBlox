@@ -199,7 +199,7 @@ module engine_read_write_generator #(parameter
     assign engine_read_write_route.sequence_id               = 0;
     assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
-    localparam             PULSE_HOLD           = 3;
+    localparam             PULSE_HOLD           = 4;
     logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
     logic                  cmd_in_flight_assert    ;
 
