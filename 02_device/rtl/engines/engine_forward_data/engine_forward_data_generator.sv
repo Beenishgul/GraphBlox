@@ -51,8 +51,6 @@ module engine_forward_data_generator #(parameter
 logic areset_generator;
 logic areset_fifo     ;
 
-KernelDescriptor descriptor_in_reg;
-
 logic fifo_empty_int;
 logic fifo_empty_reg;
 
@@ -69,12 +67,6 @@ EnginePacket          response_engine_in_reg                ;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 EnginePacket          generator_engine_request_engine_reg   ;
 EnginePacket          request_engine_out_int                ;
-
-// --------------------------------------------------------------------------------------
-// Generation Logic - Merge data [0-4] -> Gen
-// --------------------------------------------------------------------------------------
-logic forward_data_response_engine_in_valid_reg ;
-logic forward_data_response_engine_in_valid_flag;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
@@ -111,22 +103,6 @@ always_ff @(posedge ap_clk) begin
     areset_generator <= areset;
     areset_fifo      <= areset;
     areset_backtrack <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------

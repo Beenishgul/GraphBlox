@@ -96,7 +96,7 @@ typedef struct packed{
 // Forward the data in a lane and merges it with other data from other lanes
 // Keeps the original meta data for that lane
 
-typedef enum logic[12:0] {
+typedef enum logic[10:0] {
     ENGINE_MERGE_DATA_GEN_RESET              = 1 << 0,
     ENGINE_MERGE_DATA_GEN_IDLE               = 1 << 1,
     ENGINE_MERGE_DATA_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
@@ -107,9 +107,7 @@ typedef enum logic[12:0] {
     ENGINE_MERGE_DATA_GEN_PAUSE_TRANS        = 1 << 7,
     ENGINE_MERGE_DATA_GEN_BUSY               = 1 << 8,
     ENGINE_MERGE_DATA_GEN_BUSY_TRANS         = 1 << 9,
-    ENGINE_MERGE_DATA_GEN_PAUSE              = 1 << 10,
-    ENGINE_MERGE_DATA_GEN_DONE_TRANS         = 1 << 11,
-    ENGINE_MERGE_DATA_GEN_DONE               = 1 << 12
+    ENGINE_MERGE_DATA_GEN_PAUSE              = 1 << 10
 } engine_merge_data_generator_state;
 
 typedef struct packed{
@@ -210,7 +208,7 @@ typedef struct packed{
 // Forward the data in a lane and operate if condition is true
 // Keeps the original meta data for that lane
 
-typedef enum logic[14:0] {
+typedef enum logic[12:0] {
     ENGINE_FILTER_COND_GEN_RESET              = 1 << 0,
     ENGINE_FILTER_COND_GEN_IDLE               = 1 << 1,
     ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
@@ -223,9 +221,7 @@ typedef enum logic[14:0] {
     ENGINE_FILTER_COND_GEN_BREAK              = 1 << 9,
     ENGINE_FILTER_COND_GEN_BUSY               = 1 << 10,
     ENGINE_FILTER_COND_GEN_BUSY_TRANS         = 1 << 11,
-    ENGINE_FILTER_COND_GEN_PAUSE              = 1 << 12,
-    ENGINE_FILTER_COND_GEN_DONE_TRANS         = 1 << 13,
-    ENGINE_FILTER_COND_GEN_DONE               = 1 << 14
+    ENGINE_FILTER_COND_GEN_PAUSE              = 1 << 12
 } engine_filter_cond_generator_state;
 
 typedef struct packed{

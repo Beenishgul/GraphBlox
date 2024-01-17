@@ -74,7 +74,6 @@ logic fifo_empty_reg;
 engine_filter_cond_generator_state current_state;
 engine_filter_cond_generator_state next_state   ;
 
-logic done_int_reg;
 logic done_out_reg;
 
 // --------------------------------------------------------------------------------------
@@ -346,9 +345,7 @@ always_comb begin
                 next_state = ENGINE_FILTER_COND_GEN_BUSY;
         end
         ENGINE_FILTER_COND_GEN_BUSY : begin
-            if (done_int_reg)
-                next_state = ENGINE_FILTER_COND_GEN_DONE_TRANS;
-            else if (fifo_request_engine_out_signals_out_int.prog_full)
+            if (fifo_request_engine_out_signals_out_int.prog_full)
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE_TRANS;
             else if (break_flow_int)
                 next_state = ENGINE_FILTER_COND_GEN_BREAK_TRANS;
@@ -376,25 +373,12 @@ always_comb begin
             else
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE;
         end
-        ENGINE_FILTER_COND_GEN_DONE_TRANS : begin
-            if (done_int_reg)
-                next_state = ENGINE_FILTER_COND_GEN_DONE;
-            else
-                next_state = ENGINE_FILTER_COND_GEN_DONE_TRANS;
-        end
-        ENGINE_FILTER_COND_GEN_DONE : begin
-            if (done_int_reg)
-                next_state = ENGINE_FILTER_COND_GEN_IDLE;
-            else
-                next_state = ENGINE_FILTER_COND_GEN_DONE;
-        end
     endcase
 end// always_comb
 
 always_ff @(posedge ap_clk) begin
     case (current_state)
         ENGINE_FILTER_COND_GEN_RESET : begin
-            done_int_reg                 <= 1'b1;
             done_out_reg                 <= 1'b1;
             configure_memory_setup_reg   <= 1'b0;
             configure_engine_int.valid   <= 1'b0;
@@ -402,12 +386,10 @@ always_ff @(posedge ap_clk) begin
             break_running_reg            <= 1'b0;
         end
         ENGINE_FILTER_COND_GEN_IDLE : begin
-            done_int_reg               <= 1'b1;
             done_out_reg               <= 1'b0;
             configure_memory_setup_reg <= 1'b0;
         end
         ENGINE_FILTER_COND_GEN_SETUP_MEMORY_IDLE : begin
-            done_int_reg               <= 1'b1;
             done_out_reg               <= 1'b0;
             configure_memory_setup_reg <= 1'b0;
         end
@@ -422,21 +404,17 @@ always_ff @(posedge ap_clk) begin
             end
         end
         ENGINE_FILTER_COND_GEN_START_TRANS : begin
-            done_int_reg               <= 1'b0;
             done_out_reg               <= 1'b0;
             configure_engine_int.valid <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_START : begin
-            done_int_reg               <= 1'b0;
             done_out_reg               <= 1'b1;
             configure_engine_int.valid <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_PAUSE_TRANS : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_BUSY : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_BREAK_TRANS : begin
@@ -446,23 +424,11 @@ always_ff @(posedge ap_clk) begin
             break_running_reg <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_BUSY_TRANS : begin
-            done_int_reg      <= 1'b0;
             done_out_reg      <= 1'b1;
             break_running_reg <= 1'b0;
         end
         ENGINE_FILTER_COND_GEN_PAUSE : begin
-            done_int_reg <= 1'b0;
             done_out_reg <= 1'b1;
-        end
-        ENGINE_FILTER_COND_GEN_DONE_TRANS : begin
-            done_int_reg <= 1'b1;
-            done_out_reg <= 1'b1;
-        end
-        ENGINE_FILTER_COND_GEN_DONE : begin
-            done_int_reg                 <= 1'b1;
-            done_out_reg                 <= 1'b1;
-            configure_engine_int.valid   <= 1'b0;
-            configure_engine_int.payload <= 0;
         end
     endcase
 end// always_ff @(posedge ap_clk)
@@ -567,12 +533,6 @@ end
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload  <= generator_engine_request_engine_reg_S3.payload;
     generator_engine_request_control_reg_S4.payload <= map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S3.payload);
-
-    // if(generator_engine_request_engine_reg_S4.valid)
-    //      $display("%t - DEST %0s B:%0d L:%0d-[%0d]-%0d-%0d-%0d", $time,generator_engine_request_engine_reg_S4.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, generator_engine_request_engine_reg_S4.payload.data.field[0], generator_engine_request_engine_reg_S4.payload.data.field[1], generator_engine_request_engine_reg_S4.payload.data.field[2], generator_engine_request_engine_reg_S4.payload.data.field[3]);
-
-    // if(generator_engine_request_control_reg_S4.valid)
-    //     $display("%t - C %0s B:%0d L:%0d-%0d-%0d", $time,generator_engine_request_control_reg_S4.payload.meta.route.sequence_state.name(),ID_BUNDLE, ID_LANE, generator_engine_request_control_reg_S4.payload.data.field[0], generator_engine_request_control_reg_S4.payload.data.field[3]);
 end
 
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (

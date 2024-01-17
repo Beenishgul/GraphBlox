@@ -866,8 +866,8 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    assign backtrack_configure_route_valid                    = configure_memory_reg.valid;
-    assign backtrack_configure_route_in                       = configure_memory_reg.payload.meta.route.packet_destination;
+    assign backtrack_configure_route_valid                    = configure_engine_int.valid;
+    assign backtrack_configure_route_in                       = configure_engine_int.payload.meta.route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
