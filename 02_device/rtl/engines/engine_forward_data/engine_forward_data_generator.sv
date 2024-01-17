@@ -57,7 +57,7 @@ logic fifo_empty_reg;
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
-logic done_out_reg;
+logic done_out_int;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
@@ -145,12 +145,13 @@ always_ff @(posedge ap_clk) begin
     else begin
         fifo_setup_signal        <= (|fifo_response_engine_in_setup_signal_int) | fifo_request_engine_out_setup_signal_int;
         request_engine_out.valid <= request_engine_out_int.valid;
-        done_out                 <= done_out_reg;
+        done_out                 <= done_out_int & fifo_empty_reg;
         fifo_empty_reg           <= fifo_empty_int;
     end
 end
 
 assign fifo_empty_int = fifo_response_engine_in_signals_out_int.empty & fifo_request_engine_out_signals_out_int.empty;
+assign done_out_int = ~generator_engine_request_engine_reg.valid & ~response_engine_in_int.valid 
 
 always_ff @(posedge ap_clk) begin
     request_engine_out.payload <= request_engine_out_int.payload;
