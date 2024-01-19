@@ -344,6 +344,16 @@ function FIFOStateSignalsOutput map_internal_fifo_signals_to_output (input FIFOS
   return output_fifo;
 endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
+function FIFOStateSignalsOutput map_internal_dual_fifo_signals_to_output (input FIFOStateSignalsOutInternal internal_fifo_1, input FIFOStateSignalsOutInternal internal_fifo_2);
+
+  FIFOStateSignalsOutput output_fifo;
+
+  output_fifo.prog_full = internal_fifo_1.prog_full | internal_fifo_2.prog_full;
+  output_fifo.empty     = internal_fifo_1.empty & internal_fifo_2.empty;
+
+  return output_fifo;
+endfunction : map_internal_dual_fifo_signals_to_output
+// --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------
 function CacheRequestPayload  map_MemoryRequestPacket_to_CacheRequest (input MemoryPacketRequestPayload input_packet, input KernelDescriptorPayload  descriptor, input input_packet_valid);

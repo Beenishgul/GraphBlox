@@ -88,8 +88,7 @@ module engine_read_write_generator #(parameter
     engine_read_write_generator_state current_state;
     engine_read_write_generator_state next_state   ;
 
-    logic done_out_reg     ;
-    logic response_flag_reg;
+    logic done_out_reg;
 
     logic cmd_stream_read_int;
     logic enter_gen_pause_int;
@@ -111,7 +110,7 @@ module engine_read_write_generator #(parameter
     MemoryPacketResponse response_memory_in_reg_S2 ;
     logic                configure_memory_setup_reg;
 
-    ReadWriteConfiguration           configure_engine_int      ;
+    ReadWriteConfiguration configure_engine_int;
 
     EnginePacketFull generator_engine_request_engine_reg   ;
     EnginePacketFull generator_engine_request_engine_reg_S2;
@@ -418,14 +417,12 @@ module engine_read_write_generator #(parameter
         case (current_state)
             ENGINE_READ_WRITE_GEN_RESET : begin
                 done_out_reg                       <= 1'b1;
-                response_flag_reg                  <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
                 configure_engine_int.valid         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
             end
             ENGINE_READ_WRITE_GEN_IDLE : begin
-                response_flag_reg                  <= 1'b0;
                 done_out_reg                       <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
                 counter_load                       <= 1'b0;
@@ -433,7 +430,6 @@ module engine_read_write_generator #(parameter
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
                 done_out_reg                       <= 1'b0;
-                response_flag_reg                  <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
@@ -449,35 +445,29 @@ module engine_read_write_generator #(parameter
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
                 done_out_reg               <= 1'b0;
-                response_flag_reg          <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
                 counter_load               <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_START : begin
                 done_out_reg               <= 1'b0;
-                response_flag_reg          <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
                 counter_load               <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
-                done_out_reg      <= 1'b0;
-                response_flag_reg <= 1'b1;
-                counter_load      <= 1'b0;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
-                done_out_reg      <= 1'b1;
-                response_flag_reg <= 1'b0;
-                counter_load      <= 1'b0;
+                done_out_reg <= 1'b1;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
-                done_out_reg      <= 1'b0;
-                response_flag_reg <= 1'b0;
-                counter_load      <= 1'b0;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
-                done_out_reg      <= 1'b0;
-                response_flag_reg <= 1'b1;
-                counter_load      <= 1'b0;
+                done_out_reg <= 1'b0;
+                counter_load <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -711,7 +701,7 @@ module engine_read_write_generator #(parameter
             request_memory_out_reg.valid            <= 1'b0;
         end
         else begin
-            fifo_request_engine_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_pending_signals_out_int) | map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
+            fifo_request_engine_out_signals_out_reg           <= map_internal_dual_fifo_signals_to_output(fifo_request_pending_signals_out_int,fifo_request_commit_signals_out_int);
             fifo_request_memory_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_send_signals_out_int);
             fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
             fifo_response_memory_in_signals_out_reg.empty     <= 1'b0;
