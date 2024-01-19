@@ -409,10 +409,9 @@ logic conditional_flow_int  ;
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass) & configure_engine_int.payload.param.conditional_flag;
 always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
-always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE) ? 1'b1 : 1'b0) : 1'b0;
+always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    engine_filter_cond_clear                                                  <= 1'b0;
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
     generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data  ;
     generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.param.filter_route._if;
@@ -443,6 +442,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
+    engine_filter_cond_clear                                                     <= 1'b0;
     generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
