@@ -111,7 +111,6 @@ module engine_read_write_generator #(parameter
     MemoryPacketResponse response_memory_in_reg_S2 ;
     logic                configure_memory_setup_reg;
 
-    ReadWriteConfigurationParameters configure_engine_param_int;
     ReadWriteConfiguration           configure_engine_int      ;
 
     EnginePacketFull generator_engine_request_engine_reg   ;
@@ -144,7 +143,6 @@ module engine_read_write_generator #(parameter
     EnginePacketPayload           fifo_response_engine_in_dout            ;
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
-    FIFOStateSignalsOutput        fifo_response_engine_in_signals_out_temp;
     logic                         fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
@@ -292,22 +290,20 @@ module engine_read_write_generator #(parameter
             request_memory_out.valid            <= 1'b0;
         end
         else begin
-            configure_memory_setup                        <= configure_memory_setup_reg;
-            done_out                                      <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
-            fifo_empty_reg                                <= fifo_empty_int;
-            fifo_request_engine_out_signals_out           <= fifo_request_engine_out_signals_out_reg;
-            fifo_request_memory_out_signals_out           <= fifo_request_memory_out_signals_out_reg;
-            fifo_response_engine_in_signals_out.empty     <= fifo_response_engine_in_signals_out_temp.empty;
-            fifo_response_engine_in_signals_out.prog_full <= fifo_response_engine_in_signals_out_temp.prog_full | response_flag_reg;
-            fifo_response_memory_in_signals_out           <= fifo_response_memory_in_signals_out_reg;
-            fifo_setup_signal                             <= fifo_request_send_setup_signal_int | fifo_request_pending_setup_signal_int | fifo_request_commit_setup_signal_int | fifo_response_engine_in_setup_signal_int;
-            request_engine_out.valid                      <= request_engine_out_reg.valid;
-            request_memory_out.valid                      <= request_memory_out_reg.valid;
+            configure_memory_setup              <= configure_memory_setup_reg;
+            done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
+            fifo_empty_reg                      <= fifo_empty_int;
+            fifo_request_engine_out_signals_out <= fifo_request_engine_out_signals_out_reg;
+            fifo_request_memory_out_signals_out <= fifo_request_memory_out_signals_out_reg;
+            fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
+            fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
+            fifo_setup_signal                   <= fifo_request_send_setup_signal_int | fifo_request_pending_setup_signal_int | fifo_request_commit_setup_signal_int | fifo_response_engine_in_setup_signal_int;
+            request_engine_out.valid            <= request_engine_out_reg.valid;
+            request_memory_out.valid            <= request_memory_out_reg.valid;
         end
     end
 
-    assign fifo_response_engine_in_signals_out_temp = map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
-    assign fifo_empty_int                           = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
+    assign fifo_empty_int = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
