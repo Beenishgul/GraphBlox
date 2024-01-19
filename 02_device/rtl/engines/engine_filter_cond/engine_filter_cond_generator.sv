@@ -86,6 +86,8 @@ FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 
 EnginePacket          generator_engine_request_engine_reg    ;
 EnginePacket          generator_engine_request_engine_reg_S2 ;
+EnginePacket          generator_engine_request_engine_reg_S3 ;
+EnginePacket          generator_engine_request_engine_reg_S4 ;
 EnginePacket          request_engine_out_int                 ;
 ControlPacket         request_control_out_int                ;
 FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
@@ -398,8 +400,20 @@ EnginePacketData result_int              ;
 logic            result_bool             ;
 logic            result_flag             ;
 logic            engine_filter_cond_clear;
+// --------------------------------------------------------------------------------------
+logic filter_flow_int       ;
+logic break_start_flow_int  ;
+logic break_done_flow_int   ;
+logic break_running_flow_int;
+logic conditional_flow_int  ;
+// --------------------------------------------------------------------------------------
+assign filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
+assign conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass) & configure_engine_int.payload.param.conditional_flag;
+assign break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
+assign break_done_flow_int  = break_running_flow_int ? ((generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE) ? 1'b1 : 1'b0) : 1'b0;
 
 always_ff @(posedge ap_clk) begin
+    engine_filter_cond_clear                                                  <= 1'b0;
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
     generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data  ;
     generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.param.filter_route._if;
@@ -409,15 +423,34 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.payload.meta.route.hops               <= response_engine_in_int.payload.meta.route.hops;
 end
 
-always_comb begin
-    generator_engine_request_engine_reg_S2.valid                                 = generator_engine_request_engine_reg.valid;
-    engine_filter_cond_clear                                                     = 1'b0;
-    generator_engine_request_engine_reg_S2.payload.data                          = result_int;
-    generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination = generator_engine_request_engine_reg.payload.meta.route.packet_destination;
-    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source    = generator_engine_request_engine_reg.payload.meta.route.sequence_source;
-    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state     = generator_engine_request_engine_reg.payload.meta.route.sequence_state;
-    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id        = generator_engine_request_engine_reg.payload.meta.route.sequence_id;
-    generator_engine_request_engine_reg_S2.payload.meta.route.hops               = generator_engine_request_engine_reg.payload.meta.route.hops;
+always_ff @(posedge ap_clk) begin
+    generator_engine_request_engine_reg_S2.valid                                 <= generator_engine_request_engine_reg.valid;
+    generator_engine_request_engine_reg_S2.payload.data                          <= generator_engine_request_engine_reg.payload.data  ;
+    generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination <= generator_engine_request_engine_reg.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg.payload.meta.route.sequence_id;
+    generator_engine_request_engine_reg_S2.payload.meta.route.hops               <= generator_engine_request_engine_reg.payload.meta.route.hops;
+end
+
+always_ff @(posedge ap_clk) begin
+    generator_engine_request_engine_reg_S3.valid                                 <= generator_engine_request_engine_reg_S2.valid;
+    generator_engine_request_engine_reg_S3.payload.data                          <= generator_engine_request_engine_reg_S2.payload.data  ;
+    generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
+    generator_engine_request_engine_reg_S3.payload.meta.route.hops               <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
+end
+
+always_ff @(posedge ap_clk) begin
+    generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int;
+    generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
+    generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
+    generator_engine_request_engine_reg_S4.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
+    generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
 
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
@@ -440,7 +473,18 @@ always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
         filter_cond_done_hold <= 0;
     end else begin
-        filter_cond_done_hold <= {filter_cond_done_hold[PULSE_HOLD-2:0],sequence_done_flag};
+        filter_cond_done_hold <= {filter_cond_done_hold[PULSE_HOLD-2:0],sequence_done_flag | break_start_flow_int};
+    end
+end
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_generator) begin
+        break_running_flow_int <= 1'b0;
+    end else begin
+        if(break_start_flow_int)
+            break_running_flow_int <= 1'b1;
+        else if (break_done_flow_int)
+            break_running_flow_int <= 1'b0;
     end
 end
 
@@ -475,8 +519,8 @@ backtrack_fifo_lanes_response_signal #(
 assign fifo_request_engine_out_setup_signal_int = fifo_request_engine_out_signals_out_int.wr_rst_busy | fifo_request_engine_out_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S2.valid;
-assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S2.payload;
+assign fifo_request_engine_out_signals_in_int.wr_en = generator_engine_request_engine_reg_S4.valid;
+assign fifo_request_engine_out_din                  = generator_engine_request_engine_reg_S4.payload;
 
 // Pop
 assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
