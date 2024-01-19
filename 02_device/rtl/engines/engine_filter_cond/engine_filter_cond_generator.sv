@@ -414,7 +414,7 @@ always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int)
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
     generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data  ;
-    generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.param.filter_route._if;
+    generator_engine_request_engine_reg.payload.meta.route.packet_destination <= response_engine_in_int.payload.meta.route.packet_destination;
     generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
     generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
     generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
@@ -445,7 +445,7 @@ always_ff @(posedge ap_clk) begin
     engine_filter_cond_clear                                                     <= 1'b0;
     generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
-    generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= configure_memory_reg.payload.param.filter_route._if;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
