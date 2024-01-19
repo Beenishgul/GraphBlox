@@ -27,11 +27,9 @@ module engine_alu_ops_kernel (
 
 // Define internal signals
 EnginePacketData ops_value_reg  ;
-EnginePacketData result_int     ;
 EnginePacketData result_reg     ;
 EnginePacketData org_value_reg  ;
 logic            data_valid_reg ;
-logic            result_flag_int;
 logic            result_flag_reg;
 
 // Process input data and mask
@@ -72,34 +70,24 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-always_comb begin
-  if (areset | clear) begin
-    result_reg      = 0;
-    result_flag_reg = 1'b0;
-  end else begin
-    result_reg      = result_int;
-    result_flag_reg = result_flag_int;
-  end
-end
-
 // ALU operations logic
 always_ff @(posedge ap_clk) begin
   if (areset | clear) begin
-    result_flag_int <= 1'b0;
-    result_int      <= 0;
+    result_flag_reg <= 1'b0;
+    result_reg      <= 0;
   end else begin
     if (config_params_valid & data_valid_reg) begin
-      result_flag_int <= 1'b1;
+      result_flag_reg <= 1'b1;
       case (config_params.alu_operation)
 
         ALU_NOP : begin
-          result_int <= ops_value_reg; // No operation
+          result_reg <= ops_value_reg; // No operation
         end
 
         ALU_ADD : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int <= ops_value_reg.field[i] + ops_value_reg.field[i+1];
+              result_reg <= ops_value_reg.field[i] + ops_value_reg.field[i+1];
             end
           end
         end
@@ -108,9 +96,9 @@ always_ff @(posedge ap_clk) begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
               if(ops_value_reg.field[i] > ops_value_reg.field[i+1])
-                result_int <= ops_value_reg.field[i] - ops_value_reg.field[i+1];
+                result_reg <= ops_value_reg.field[i] - ops_value_reg.field[i+1];
               else
-                result_int <= ops_value_reg.field[i+1] - ops_value_reg.field[i];
+                result_reg <= ops_value_reg.field[i+1] - ops_value_reg.field[i];
             end
           end
         end
@@ -118,7 +106,7 @@ always_ff @(posedge ap_clk) begin
         ALU_MUL : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int <= ops_value_reg.field[i] * ops_value_reg.field[i+1];
+              result_reg <= ops_value_reg.field[i] * ops_value_reg.field[i+1];
             end
           end
         end
@@ -126,22 +114,22 @@ always_ff @(posedge ap_clk) begin
         ALU_ACC : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
             if (config_params.alu_mask[i]) begin
-              result_int <= result_reg + ops_value_reg.field[i];
+              result_reg <= result_reg + ops_value_reg.field[i];
             end
           end
         end
 
         ALU_DIV : begin
-          result_int <= ops_value_reg; // Undefined operations reset result
+          result_reg <= ops_value_reg; // Undefined operations reset result
         end
 
         default : begin
-          result_int <= ops_value_reg; // Undefined operations reset result
+          result_reg <= ops_value_reg; // Undefined operations reset result
         end
 
       endcase
     end else begin
-      result_flag_int <= 1'b0;
+      result_flag_reg <= 1'b0;
     end
   end
 end
