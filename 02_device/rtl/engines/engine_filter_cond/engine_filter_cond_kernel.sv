@@ -14,24 +14,29 @@
 `include "global_package.vh"
 
 module engine_filter_cond_kernel (
-  input  logic                             ap_clk             ,
-  input  logic                             areset             ,
-  input  logic                             clear              ,
+  input  logic                             ap_clk,
+  input  logic                             areset,
+  input  logic                             clear,
   input  logic                             config_params_valid,
-  input  FilterCondConfigurationParameters config_params      ,
-  input  logic                             data_valid         ,
-  input  EnginePacketData                  data               ,
-  output logic                             result_flag        ,
-  output EnginePacketData                  result_data
+  input  FilterCondConfigurationParameters config_params,
+  input  logic                             data_valid,
+  input  EnginePacketData                  data,
+  output logic                             result_flag,
+  output EnginePacketData                  result,
+  output logic                             result_bool
 );
 
 // Define internal signals
 EnginePacketData ops_value_reg  ;
-EnginePacketData result_data_int;
+EnginePacketData result_int     ;
+EnginePacketData result_reg     ;
 EnginePacketData org_value_reg  ;
-EnginePacketData org_data_int   ;
-logic            result_flag_int;
 logic            data_valid_reg ;
+logic            result_flag_int;
+logic            result_flag_reg;
+logic[ENGINE_PACKET_DATA_NUM_FIELDS-1:0] result_bool_int;
+logic[ENGINE_PACKET_DATA_NUM_FIELDS-1:0] result_bool_reg;
+
 
 // Process input data and mask
 always_ff @(posedge ap_clk) begin
@@ -46,158 +51,181 @@ always_ff @(posedge ap_clk) begin
     for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       if(config_params.const_mask[i] & config_params_valid) begin
         ops_value_reg.field[i] <= config_params.const_value;
-      end else if (config_params_valid) begin
+      end else if (data_valid & config_params_valid) begin
         for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
           if(config_params.ops_mask[i][j]) begin
             ops_value_reg.field[i] <= data.field[j];
           end
         end
       end else begin
-        ops_value_reg.field[i] <= data.field[i];
+        ops_value_reg.field[i] <= 0;
       end
+    end
 
-      for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-        if (config_params_valid) begin
-          for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-            if(config_params.ops_mask[i][j]) begin
-              org_value_reg.field[i] <= data.field[j];
-            end
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+      if (config_params_valid) begin
+        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+          if(config_params.ops_mask[i][j]) begin
+            org_value_reg.field[i] <= data.field[j];
           end
-        end else begin
-          org_value_reg.field[i] <= data.field[i];
         end
+      end else begin
+        org_value_reg.field[i] <= data.field[i];
       end
     end
   end
 end
 
-// FILTER operations logic
 always_comb begin
-  // Process the FILTER operation if both config_params and data are valid
-  result_flag_int = 1'b1;
-  result_data_int = ops_value_reg;
-  org_data_int    = org_value_reg;
+  if (areset | clear) begin
+    result_reg      = 0;
+    result_flag_reg = 1'b0;
+    result_bool_reg = ~0;
+  end else begin
+    result_reg      = result_int;
+    result_flag_reg = result_flag_int;
+    result_bool_reg = result_bool_int;
+  end
+end
 
-  if (config_params_valid & data_valid_reg) begin
-    case (config_params.filter_operation)
-      FILTER_NOP : begin
-      end
-
-      FILTER_GT : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            result_flag_int = result_flag_int & (result_data_int.field[i] > ops_value_reg.field[i+1]);
-          end
+// ALU operations logic
+always_ff @(posedge ap_clk) begin
+  if (areset | clear) begin
+    result_flag_int <= 1'b0;
+    result_int      <= 0;
+    result_bool_int <= ~0;
+  end else begin
+    if (config_params_valid & data_valid_reg) begin
+      result_flag_int <= 1'b1;
+      case (config_params.filter_operation)
+// --------------------------------------------------------------------------------------
+        FILTER_NOP : begin
+          result_int      <= ops_value_reg; // No operation
+          result_bool_int <= 1'b1;
         end
-      end
-
-      FILTER_LT : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            result_flag_int = result_flag_int & (result_data_int.field[i] < ops_value_reg.field[i+1]);
-          end
-        end
-      end
-
-      FILTER_EQ : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            result_flag_int = result_flag_int & (result_data_int.field[i] == ops_value_reg.field[i+1]);
-          end
-        end
-      end
-
-      FILTER_NOT_EQ : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            result_flag_int = result_flag_int & (result_data_int.field[i] != ops_value_reg.field[i+1]);
-          end
-        end
-      end
-
-      FILTER_GT_TERN : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            if(result_data_int.field[i] > ops_value_reg.field[i+1]) begin
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-            end else begin
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[i+1] = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
+// --------------------------------------------------------------------------------------
+        FILTER_GT : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              result_int         <= ops_value_reg.field[i];
+              result_bool_int[i] <= ops_value_reg.field[i] > ops_value_reg.field[i+1];
             end
           end
         end
-        org_data_int = result_data_int;
-      end
-
-      FILTER_LT_TERN : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            if(result_data_int.field[i] < ops_value_reg.field[i+1]) begin
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-            end else begin
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[i+1] = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
+// --------------------------------------------------------------------------------------
+        FILTER_LT : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              result_int         <= ops_value_reg.field[i];
+              result_bool_int[i] <= ops_value_reg.field[i] < ops_value_reg.field[i+1];
             end
           end
         end
-        org_data_int = result_data_int;
-      end
-
-      FILTER_EQ_TERN : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            if(result_data_int.field[i] == ops_value_reg.field[i+1]) begin
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-            end else begin
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[i+1] = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
+// --------------------------------------------------------------------------------------
+        FILTER_EQ : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              result_int         <= ops_value_reg.field[i];
+              result_bool_int[i] <= ops_value_reg.field[i] == ops_value_reg.field[i+1];
             end
           end
         end
-        org_data_int = result_data_int;
-      end
-
-      FILTER_NOT_EQ_TERN : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
-          if (config_params.filter_mask[i]) begin
-            if(result_data_int.field[i] != ops_value_reg.field[i+1]) begin
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[i] = result_data_int.field[0] ^ result_data_int.field[i];
-              result_data_int.field[0] = result_data_int.field[0] ^ result_data_int.field[i];
-            end else begin
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[i+1] = result_data_int.field[0] ^ result_data_int.field[i+1];
-              result_data_int.field[0]   = result_data_int.field[0] ^ result_data_int.field[i+1];
+// --------------------------------------------------------------------------------------
+        FILTER_NOT_EQ : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              result_int         <= ops_value_reg.field[i];
+              result_bool_int[i] <= ops_value_reg.field[i] != ops_value_reg.field[i+1];
             end
           end
         end
-        org_data_int = result_data_int;
-      end
-
-      default : begin
-        result_data_int = 0; // Undefined operations reset result_data
-      end
-    endcase
+// --------------------------------------------------------------------------------------
+        FILTER_GT_TERN : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              if(ops_value_reg.field[i] > ops_value_reg.field[i+1]) begin
+                result_int.field[0]    <= ops_value_reg.field[i];
+                ops_value_reg.field[i] <= ops_value_reg.field[0];
+              end else begin
+                result_int.field[0]      <= ops_value_reg.field[i+1];
+                ops_value_reg.field[i+1] <= ops_value_reg.field[0];
+              end
+              result_bool_int <= ~0;
+            end
+          end
+        end
+// --------------------------------------------------------------------------------------
+        FILTER_LT_TERN : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              if(ops_value_reg.field[i] < ops_value_reg.field[i+1]) begin
+                result_int.field[0]    <= ops_value_reg.field[i];
+                ops_value_reg.field[i] <= ops_value_reg.field[0];
+              end else begin
+                result_int.field[0]      <= ops_value_reg.field[i+1];
+                ops_value_reg.field[i+1] <= ops_value_reg.field[0];
+              end
+              result_bool_int <= ~0;
+            end
+          end
+        end
+// --------------------------------------------------------------------------------------
+        FILTER_EQ_TERN : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              if(ops_value_reg.field[i] == ops_value_reg.field[i+1]) begin
+                result_int.field[0]    <= ops_value_reg.field[i];
+                ops_value_reg.field[i] <= ops_value_reg.field[0];
+              end else begin
+                result_int.field[0]      <= ops_value_reg.field[i+1];
+                ops_value_reg.field[i+1] <= ops_value_reg.field[0];
+              end
+              result_bool_int <= ~0;
+            end
+          end
+        end
+// --------------------------------------------------------------------------------------
+        FILTER_NOT_EQ_TERN : begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            if (config_params.filter_mask[i]) begin
+              if(ops_value_reg.field[i] != ops_value_reg.field[i+1]) begin
+                result_int.field[0]    <= ops_value_reg.field[i];
+                ops_value_reg.field[i] <= ops_value_reg.field[0];
+              end else begin
+                result_int.field[0]      <= ops_value_reg.field[i+1];
+                ops_value_reg.field[i+1] <= ops_value_reg.field[0];
+              end
+              result_bool_int <= ~0;
+            end
+          end
+        end
+// --------------------------------------------------------------------------------------
+        default : begin
+          result_int      <= ops_value_reg; // Undefined operations reset result
+          result_flag_int <= 1'b0;
+          result_bool_int <= 0;
+        end
+// --------------------------------------------------------------------------------------
+      endcase
+    end else begin
+      result_flag_int <= 1'b0;
+    end
   end
 end
 
 // Output assignment logic
 always_ff @(posedge ap_clk) begin
-  if (areset || clear) begin
-    result_data <= 0;
-    result_flag <= ~config_params.break_pass;
+  if (areset) begin
+    result      <= 0;
+    result_flag <= 1'b0;
+    result_bool <= 1'b1;
   end else begin
-    result_data <= org_data_int;
-    result_flag <= result_flag_int;
+    result.field[0] <= result_reg.field[0];
+    for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+      result.field[i] <= org_value_reg.field[i];
+    end
+    result_flag <= result_flag_reg;
+    result_bool <= &(result_bool_reg | ~config_params.filter_mask);
   end
 end
 
