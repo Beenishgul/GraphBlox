@@ -106,53 +106,53 @@ always_ff @(posedge ap_clk) begin
 // --------------------------------------------------------------------------------------
         FILTER_GT : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            result_int.field[i] <= org_value_reg.field[i];
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= org_value_reg.field[i];
-              result_bool_int[i]  <= ops_value_reg.field[i] > ops_value_reg.field[i+1];
+              result_bool_int[i] <= ops_value_reg.field[i] > ops_value_reg.field[i+1];
             end
           end
+          result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
           if (config_params.filter_mask[ENGINE_PACKET_DATA_NUM_FIELDS-1]) begin
-            result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1]  <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] > ops_value_reg.field[0];
+            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] > ops_value_reg.field[0];
           end
         end
 // --------------------------------------------------------------------------------------
         FILTER_LT : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            result_int.field[i] <= org_value_reg.field[i];
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= org_value_reg.field[i];
-              result_bool_int[i]  <= ops_value_reg.field[i] < ops_value_reg.field[i+1];
+              result_bool_int[i] <= ops_value_reg.field[i] < ops_value_reg.field[i+1];
             end
           end
+          result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
           if (config_params.filter_mask[ENGINE_PACKET_DATA_NUM_FIELDS-1]) begin
-            result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1]  <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] < ops_value_reg.field[0];
+            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] < ops_value_reg.field[0];
           end
         end
 // --------------------------------------------------------------------------------------
         FILTER_EQ : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            result_int.field[i] <= org_value_reg.field[i];
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= org_value_reg.field[i];
-              result_bool_int[i]  <= ops_value_reg.field[i] == ops_value_reg.field[i+1];
+              result_bool_int[i] <= ops_value_reg.field[i] == ops_value_reg.field[i+1];
             end
           end
+          result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
           if (config_params.filter_mask[ENGINE_PACKET_DATA_NUM_FIELDS-1]) begin
-            result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1]  <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] == ops_value_reg.field[0];
+            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] == ops_value_reg.field[0];
           end
         end
 // --------------------------------------------------------------------------------------
         FILTER_NOT_EQ : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+            result_int.field[i] <= org_value_reg.field[i];
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= org_value_reg.field[i];
-              result_bool_int[i]  <= ops_value_reg.field[i] != ops_value_reg.field[i+1];
+              result_bool_int[i] <= ops_value_reg.field[i] != ops_value_reg.field[i+1];
             end
           end
+          result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
           if (config_params.filter_mask[ENGINE_PACKET_DATA_NUM_FIELDS-1]) begin
-            result_int.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= org_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1]  <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] != ops_value_reg.field[0];
+            result_bool_int[ENGINE_PACKET_DATA_NUM_FIELDS-1] <= ops_value_reg.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] != ops_value_reg.field[0];
           end
         end
 // --------------------------------------------------------------------------------------
@@ -286,9 +286,8 @@ always_ff @(posedge ap_clk) begin
     result_flag <= 1'b0;
     result_bool <= 1'b1;
   end else begin
-    result.field[0] <= result_reg.field[0];
-    for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-      result.field[i] <= org_value_reg.field[i];
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+      result.field[i] <= result_reg.field[i];
     end
     result_flag <= result_flag_reg;
     result_bool <= &(result_bool_reg | ~config_params.filter_mask);
