@@ -254,10 +254,9 @@ assign fifo_response_engine_in_signals_in_int.wr_en = response_engine_in_reg.val
 assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
 // Pop
-assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~sequence_done_flag & ~filter_cond_done_assert;
-// assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~filter_cond_response_engine_in_valid_reg & ~generator_engine_request_engine_reg.valid & ~filter_cond_response_engine_in_valid_flag_S2 & ~response_engine_in_int.valid & configure_engine_int.valid & ~fifo_request_engine_out_signals_out_int.prog_full);
-assign response_engine_in_int.valid   = fifo_response_engine_in_signals_out_int.valid;
-assign response_engine_in_int.payload = fifo_response_engine_in_dout;
+assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~filter_cond_done_assert;
+assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
+assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
 xpm_fifo_sync_wrapper #(
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -407,11 +406,11 @@ logic break_done_flow_int   ;
 logic break_running_flow_int;
 logic conditional_flow_int  ;
 // --------------------------------------------------------------------------------------
-assign filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
-assign conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass) & configure_engine_int.payload.param.conditional_flag;
-assign break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
-assign break_done_flow_int  = break_running_flow_int ? ((generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE) ? 1'b1 : 1'b0) : 1'b0;
-
+always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
+always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass) & configure_engine_int.payload.param.conditional_flag;
+always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
+always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE) ? 1'b1 : 1'b0) : 1'b0;
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     engine_filter_cond_clear                                                  <= 1'b0;
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
@@ -452,7 +451,7 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
-
+// --------------------------------------------------------------------------------------
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
     .ap_clk             (ap_clk                                                  ),
     .areset             (areset_kernel                                           ),
@@ -467,7 +466,7 @@ engine_filter_cond_kernel inst_engine_filter_cond_kernel (
 );
 
 // --------------------------------------------------------------------------------------
-assign filter_cond_done_assert = |filter_cond_done_hold;
+assign filter_cond_done_assert = (|filter_cond_done_hold) | break_start_flow_int;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
