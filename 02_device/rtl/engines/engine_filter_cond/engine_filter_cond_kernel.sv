@@ -107,7 +107,7 @@ always_ff @(posedge ap_clk) begin
         FILTER_GT : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= ops_value_reg.field[i];
+              result_int.field[i] <= org_value_reg.field[i];
               result_bool_int[i]  <= ops_value_reg.field[i] > ops_value_reg.field[i+1];
             end
           end
@@ -116,7 +116,7 @@ always_ff @(posedge ap_clk) begin
         FILTER_LT : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= ops_value_reg.field[i];
+              result_int.field[i] <= org_value_reg.field[i];
               result_bool_int[i]  <= ops_value_reg.field[i] < ops_value_reg.field[i+1];
             end
           end
@@ -125,7 +125,7 @@ always_ff @(posedge ap_clk) begin
         FILTER_EQ : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= ops_value_reg.field[i];
+              result_int.field[i] <= org_value_reg.field[i];
               result_bool_int[i]  <= ops_value_reg.field[i] == ops_value_reg.field[i+1];
             end
           end
@@ -134,7 +134,7 @@ always_ff @(posedge ap_clk) begin
         FILTER_NOT_EQ : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.filter_mask[i]) begin
-              result_int.field[i] <= ops_value_reg.field[i];
+              result_int.field[i] <= org_value_reg.field[i];
               result_bool_int[i]  <= ops_value_reg.field[i] != ops_value_reg.field[i+1];
             end
           end
@@ -201,14 +201,14 @@ always_ff @(posedge ap_clk) begin
         end
 // --------------------------------------------------------------------------------------
         default : begin
-          result_int      <= ops_value_reg; // Undefined operations reset result
+          result_int      <= org_value_reg; // Undefined operations reset result
           result_flag_int <= 1'b0;
           result_bool_int <= ~0;;
         end
 // --------------------------------------------------------------------------------------
       endcase
     end else begin
-      result_int      <= ops_value_reg; // Undefined operations reset result
+      result_int      <= org_value_reg; // Undefined operations reset result
       result_flag_int <= 1'b0;
       result_bool_int <= ~0;;
     end
