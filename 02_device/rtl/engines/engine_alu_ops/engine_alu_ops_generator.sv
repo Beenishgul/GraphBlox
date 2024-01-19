@@ -380,7 +380,7 @@ logic            result_flag         ;
 logic            engine_alu_ops_clear;
 logic            alu_accum_done_int  ;
 // --------------------------------------------------------------------------------------
-always_comb alu_accum_done_int = (configure_engine_int.payload.param.alu_operation == ALU_ACC) ? ((generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE) ? 1'b1 : 1'b0) : 1'b0;
+always_comb alu_accum_done_int = (configure_engine_int.payload.param.alu_operation == ALU_ACC) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
@@ -413,8 +413,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    engine_alu_ops_clear                                                         <= generator_engine_request_engine_reg_S3.valid & alu_accum_done_int & result_flag;
-    generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & alu_accum_done_int & result_flag;
+    engine_alu_ops_clear                                                         <= alu_accum_done_int & result_flag;
+    generator_engine_request_engine_reg_S4.valid                                 <= alu_accum_done_int & result_flag;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int ;
     generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
