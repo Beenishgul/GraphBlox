@@ -125,6 +125,40 @@ typedef struct packed{
 } MergeDataConfiguration;
 
 // --------------------------------------------------------------------------------------
+// set operations Engine
+// --------------------------------------------------------------------------------------
+// Forward the data in a lane and union/intersect it with other data from other lanes
+// Keeps the original meta data for that lane
+
+typedef enum logic[10:0] {
+    ENGINE_SET_OPS_GEN_RESET              = 1 << 0,
+    ENGINE_SET_OPS_GEN_IDLE               = 1 << 1,
+    ENGINE_SET_OPS_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+    ENGINE_SET_OPS_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+    ENGINE_SET_OPS_GEN_SETUP_MEMORY       = 1 << 4,
+    ENGINE_SET_OPS_GEN_START_TRANS        = 1 << 5,
+    ENGINE_SET_OPS_GEN_START              = 1 << 6,
+    ENGINE_SET_OPS_GEN_PAUSE_TRANS        = 1 << 7,
+    ENGINE_SET_OPS_GEN_BUSY               = 1 << 8,
+    ENGINE_SET_OPS_GEN_BUSY_TRANS         = 1 << 9,
+    ENGINE_SET_OPS_GEN_PAUSE              = 1 << 10
+} engine_set_ops_generator_state;
+
+typedef struct packed{
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] set_mask     ;
+    type_set_operation                        set_operation;
+} SetOpsConfigurationParameters;
+
+typedef struct packed{
+    SetOpsConfigurationParameters param;
+} SetOpsConfigurationPayload;
+
+typedef struct packed{
+    logic                      valid  ;
+    SetOpsConfigurationPayload payload;
+} SetOpsConfiguration;
+
+// --------------------------------------------------------------------------------------
 // Forward\_Data\_Engine
 // --------------------------------------------------------------------------------------
 // Forward the data in a lane it with other data from other lanes
