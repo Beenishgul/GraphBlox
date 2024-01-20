@@ -461,12 +461,11 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
 
-always_comb begin
-    // generator_engine_request_control_reg_S4.valid        = generator_engine_request_engine_reg_S4.valid ;
-    // generator_engine_request_control_reg_S4.payload = map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S4);
-
-    generator_engine_request_control_reg_S4.valid   = 0;
-    generator_engine_request_control_reg_S4.payload = 0;
+always_ff @(posedge ap_clk) begin
+    generator_engine_request_control_reg_S4.valid                      <= (generator_engine_request_engine_reg_S3.valid & filter_flow_int & ~break_running_flow_reg) & configure_engine_int.payload.param.break_flag;
+    generator_engine_request_control_reg_S4.payload.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
+    generator_engine_request_control_reg_S4.payload.sequence_state     <= SEQUENCE_BREAK;
+    generator_engine_request_control_reg_S4.payload.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
 end
 
 // --------------------------------------------------------------------------------------
