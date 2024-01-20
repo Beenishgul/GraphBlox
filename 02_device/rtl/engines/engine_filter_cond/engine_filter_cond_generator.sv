@@ -132,7 +132,7 @@ PacketRouteAddress     backtrack_configure_route_in                             
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 // --------------------------------------------------------------------------------------
-localparam             PULSE_HOLD              = 2;
+localparam             PULSE_HOLD              = 1;
 logic [PULSE_HOLD-1:0] filter_cond_done_hold      ;
 logic                  filter_cond_done_assert    ;
 
@@ -452,7 +452,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int;
+    generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int & ~break_running_flow_reg;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= packet_destination_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
@@ -484,13 +484,13 @@ engine_filter_cond_kernel inst_engine_filter_cond_kernel (
 );
 
 // --------------------------------------------------------------------------------------
-assign filter_cond_done_assert = (|filter_cond_done_hold) | break_start_flow_int;
+assign filter_cond_done_assert = (|filter_cond_done_hold) | sequence_done_flag;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
         filter_cond_done_hold <= 0;
     end else begin
-        filter_cond_done_hold <= {filter_cond_done_hold[PULSE_HOLD-2:0],sequence_done_flag | break_start_flow_int};
+        filter_cond_done_hold <= {filter_cond_done_hold[PULSE_HOLD-2:0],sequence_done_flag};
     end
 end
 // --------------------------------------------------------------------------------------
