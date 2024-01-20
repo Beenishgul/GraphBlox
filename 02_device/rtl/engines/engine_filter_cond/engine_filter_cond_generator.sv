@@ -88,6 +88,7 @@ EnginePacket          generator_engine_request_engine_reg    ;
 EnginePacket          generator_engine_request_engine_reg_S2 ;
 EnginePacket          generator_engine_request_engine_reg_S3 ;
 EnginePacket          generator_engine_request_engine_reg_S4 ;
+ControlPacket         generator_engine_request_control_reg_S4;
 EnginePacket          request_engine_out_int                 ;
 ControlPacket         request_control_out_int                ;
 FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
@@ -395,23 +396,30 @@ end// always_ff @(posedge ap_clk)
 // --------------------------------------------------------------------------------------
 // Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-EnginePacketData result_int              ;
-logic            result_bool             ;
-logic            result_flag             ;
-logic            engine_filter_cond_clear;
+EnginePacketData result_int ;
+logic            result_bool;
+logic            result_flag;
 // --------------------------------------------------------------------------------------
-logic              filter_flow_int       ;
-logic              break_start_flow_int  ;
-logic              break_done_flow_int   ;
-logic              break_running_flow_int;
-logic              conditional_flow_int  ;
-PacketRouteAddress packet_destination_int;
+logic filter_flow_int       ;
+logic break_start_flow_int  ;
+logic break_done_flow_int   ;
+logic break_running_flow_int;
+logic conditional_flow_int  ;
+// --------------------------------------------------------------------------------------
+PacketRouteAddress  packet_destination_int    ;
+type_sequence_state sequence_state_engine_int ;
+type_sequence_state sequence_state_control_int;
+type_engine_cmd     cmd_int                   ;
 // --------------------------------------------------------------------------------------
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
 always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
-always_comb packet_destination_int = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+always_comb begin
+    packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+    sequence_state_engine_int  = break_start_flow_int ? SEQUENCE_DONE  : generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
+    sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK : SEQUENCE_DONE;
+end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
@@ -444,27 +452,32 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    engine_filter_cond_clear                                                     <= 1'b0;
     generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid & filter_flow_int;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= packet_destination_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
-    generator_engine_request_engine_reg_S4.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
+    generator_engine_request_engine_reg_S4.payload.meta.route.sequence_state     <= sequence_state_engine_int;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
     generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
+
+always_ff @(posedge ap_clk) begin
+    generator_engine_request_control_reg_S4.valid        <= generator_engine_request_engine_reg_S4.valid ;
+    generator_engine_request_control_reg_S4.payload.data <= map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S4);
+end
+
 // --------------------------------------------------------------------------------------
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
-    .ap_clk             (ap_clk                                                  ),
-    .areset             (areset_kernel                                           ),
-    .clear              (~(configure_engine_int.valid) | engine_filter_cond_clear),
-    .config_params_valid(configure_engine_int.valid                              ),
-    .config_params      (configure_engine_int.payload.param                      ),
-    .data_valid         (response_engine_in_int.valid                            ),
-    .data               (response_engine_in_int.payload.data                     ),
-    .result_flag        (result_flag                                             ),
-    .result             (result_int                                              ),
-    .result_bool        (result_bool                                             )
+    .ap_clk             (ap_clk                             ),
+    .areset             (areset_kernel                      ),
+    .clear              (~(configure_engine_int.valid)      ),
+    .config_params_valid(configure_engine_int.valid         ),
+    .config_params      (configure_engine_int.payload.param ),
+    .data_valid         (response_engine_in_int.valid       ),
+    .data               (response_engine_in_int.payload.data),
+    .result_flag        (result_flag                        ),
+    .result             (result_int                         ),
+    .result_bool        (result_bool                        )
 );
 
 // --------------------------------------------------------------------------------------
@@ -556,8 +569,8 @@ xpm_fifo_sync_wrapper #(
 assign fifo_request_control_out_setup_signal_int = fifo_request_control_out_signals_out_int.wr_rst_busy | fifo_request_control_out_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_control_out_signals_in_int.wr_en = 0;
-assign fifo_request_control_out_din                  = 0;
+assign fifo_request_control_out_signals_in_int.wr_en = generator_engine_request_control_reg_S4.valid;
+assign fifo_request_control_out_din                  = generator_engine_request_control_reg_S4.payload;
 
 // Pop
 assign fifo_request_control_out_signals_in_int.rd_en = ~fifo_request_control_out_signals_out_int.empty & fifo_request_control_out_signals_in_reg.rd_en;

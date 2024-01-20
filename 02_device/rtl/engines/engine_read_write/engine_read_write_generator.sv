@@ -708,23 +708,6 @@ module engine_read_write_generator #(parameter
             fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
             request_engine_out_reg.valid                      <= fifo_response_comb.valid;
             request_memory_out_reg.valid                      <= request_send_out_int.valid;
-
-
-            // if(ID_BUNDLE == 3) begin
-            //     if(response_engine_in_reg.valid)
-            //         $display("%t - ENGINE RES B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_engine_in_reg.payload.data.field[0], response_engine_in_reg.payload.data.field[1], response_engine_in_reg.payload.data.field[2], response_engine_in_reg.payload.data.field[3]);
-
-            //     if(request_engine_out_reg.valid)
-            //         $display("%t - ENGINE REQ B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, request_engine_out_reg.payload.data.field[0], request_engine_out_reg.payload.data.field[1], request_engine_out_reg.payload.data.field[2], request_engine_out_reg.payload.data.field[3]);
-
-            //     if(request_memory_out_reg.valid)
-            //         $display("%t - MEMORY REQ %0s B:%0d L:%0d-[%0d]", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.meta.address.offset);
-
-            //     if(response_memory_in_reg.valid)
-            //         $display("%t - MEMORY RES B:%0d L:%0d-[%0d]", $time,ID_BUNDLE, ID_LANE, response_memory_in_reg.payload.meta.address.offset);
-
-            // end
-
         end
     end
 

@@ -79,11 +79,11 @@ always_ff @(posedge ap_clk) begin
     if (config_params_valid & data_valid_reg) begin
       result_flag_reg <= 1'b1;
       case (config_params.alu_operation)
-
+// --------------------------------------------------------------------------------------
         ALU_NOP : begin
           result_reg <= ops_value_reg; // No operation
         end
-
+// --------------------------------------------------------------------------------------
         ALU_ADD : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
@@ -91,7 +91,7 @@ always_ff @(posedge ap_clk) begin
             end
           end
         end
-
+// --------------------------------------------------------------------------------------
         ALU_SUB : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
@@ -102,7 +102,7 @@ always_ff @(posedge ap_clk) begin
             end
           end
         end
-
+// --------------------------------------------------------------------------------------
         ALU_MUL : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
             if (config_params.alu_mask[i]) begin
@@ -110,7 +110,7 @@ always_ff @(posedge ap_clk) begin
             end
           end
         end
-
+// --------------------------------------------------------------------------------------
         ALU_ACC : begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
             if (config_params.alu_mask[i]) begin
@@ -118,15 +118,15 @@ always_ff @(posedge ap_clk) begin
             end
           end
         end
-
+// --------------------------------------------------------------------------------------
         ALU_DIV : begin
           result_reg <= ops_value_reg; // Undefined operations reset result
         end
-
+// --------------------------------------------------------------------------------------
         default : begin
           result_reg <= ops_value_reg; // Undefined operations reset result
         end
-
+// --------------------------------------------------------------------------------------
       endcase
     end else begin
       result_flag_reg <= 1'b0;
