@@ -255,7 +255,7 @@ assign fifo_response_engine_in_signals_in_int.wr_en = response_engine_in_reg.val
 assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
 // Pop
-assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~filter_cond_done_assert;
+assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en  & ~fifo_request_engine_out_signals_out_int.prog_full & ~fifo_request_control_out_signals_out_int.prog_full & ~filter_cond_done_assert;
 assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
 assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
@@ -329,7 +329,7 @@ always_comb begin
             next_state = ENGINE_FILTER_COND_GEN_BUSY;
         end
         ENGINE_FILTER_COND_GEN_BUSY : begin
-            if (fifo_request_engine_out_signals_out_int.prog_full)
+            if (fifo_request_engine_out_signals_out_int.prog_full | fifo_request_control_out_signals_out_int.prog_full )
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE_TRANS;
             else
                 next_state = ENGINE_FILTER_COND_GEN_BUSY;
@@ -338,7 +338,7 @@ always_comb begin
             next_state = ENGINE_FILTER_COND_GEN_PAUSE;
         end
         ENGINE_FILTER_COND_GEN_PAUSE : begin
-            if (~fifo_request_engine_out_signals_out_int.prog_full)
+            if (~fifo_request_engine_out_signals_out_int.prog_full & ~fifo_request_control_out_signals_out_int.prog_full )
                 next_state = ENGINE_FILTER_COND_GEN_BUSY_TRANS;
             else
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE;
@@ -462,10 +462,10 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    generator_engine_request_control_reg_S4.valid                      <= (generator_engine_request_engine_reg_S3.valid & filter_flow_int & ~break_running_flow_reg) & configure_engine_int.payload.param.break_flag;
-    generator_engine_request_control_reg_S4.payload.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
-    generator_engine_request_control_reg_S4.payload.sequence_state     <= SEQUENCE_BREAK;
-    generator_engine_request_control_reg_S4.payload.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
+    generator_engine_request_control_reg_S4.valid                                 <= (generator_engine_request_engine_reg_S3.valid & filter_flow_int & ~break_running_flow_reg) & configure_engine_int.payload.param.break_flag;
+    generator_engine_request_control_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
+    generator_engine_request_control_reg_S4.payload.meta.route.sequence_state     <= SEQUENCE_BREAK;
+    generator_engine_request_control_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
 end
 
 // --------------------------------------------------------------------------------------
