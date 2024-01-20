@@ -73,12 +73,12 @@ typedef enum logic[TYPE_FILTER_OPERATION_BITS-1:0]{
 //   Generic set ops Type
 // --------------------------------------------------------------------------------------
 parameter TYPE_SET_OPERATION_BITS = 4;
-typedef enum logic[TYPE_ALU_OPERATION_BITS-1:0] {
+typedef enum logic[TYPE_SET_OPERATION_BITS-1:0] {
   SET_NOP        = 1 << 0,
   SET_INTERSECT  = 1 << 1,
   SET_UNION      = 1 << 2,
   SET_COMPLIMENT = 1 << 3
-} type_ALU_operation;
+} type_set_operation;
 
 // --------------------------------------------------------------------------------------
 //   Generic ALU ops Type

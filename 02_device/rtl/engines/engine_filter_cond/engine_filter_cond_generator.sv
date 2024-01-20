@@ -403,6 +403,7 @@ logic            result_flag;
 logic filter_flow_int       ;
 logic break_start_flow_int  ;
 logic break_done_flow_int   ;
+logic break_running_flow_reg;
 logic break_running_flow_int;
 logic conditional_flow_int  ;
 // --------------------------------------------------------------------------------------
@@ -414,12 +415,11 @@ type_engine_cmd     cmd_int                   ;
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
-always_comb break_done_flow_int  = (break_running_flow_int|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
-always_comb begin
-    packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
-    sequence_state_engine_int  = break_start_flow_int ? SEQUENCE_DONE  : generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
-    sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK : SEQUENCE_DONE;
-end
+always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
+always_comb break_running_flow_int = (break_running_flow_reg|break_start_flow_int);
+always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+always_comb sequence_state_engine_int  = break_start_flow_int ? SEQUENCE_DONE  : generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
+always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK : SEQUENCE_DONE;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
@@ -461,9 +461,12 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
 
-always_ff @(posedge ap_clk) begin
-    generator_engine_request_control_reg_S4.valid        <= generator_engine_request_engine_reg_S4.valid ;
-    generator_engine_request_control_reg_S4.payload.data <= map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S4);
+always_comb begin
+    // generator_engine_request_control_reg_S4.valid        = generator_engine_request_engine_reg_S4.valid ;
+    // generator_engine_request_control_reg_S4.payload = map_EnginePacket_to_ControlPacket(generator_engine_request_engine_reg_S4);
+
+    generator_engine_request_control_reg_S4.valid   = 0;
+    generator_engine_request_control_reg_S4.payload = 0;
 end
 
 // --------------------------------------------------------------------------------------
@@ -493,12 +496,12 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
-        break_running_flow_int <= 1'b0;
+        break_running_flow_reg <= 1'b0;
     end else begin
         if(break_start_flow_int)
-            break_running_flow_int <= 1'b1;
+            break_running_flow_reg <= 1'b1;
         else if (break_done_flow_int)
-            break_running_flow_int <= 1'b0;
+            break_running_flow_reg <= 1'b0;
     end
 end
 
