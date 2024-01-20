@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_merge_data_configure_memory.sv
+// File   : engine_set_ops_configure_memory.sv
 // Create : 2023-07-17 15:02:02
 // Revise : 2023-08-28 15:42:14
 // Editor : sublime text4, tab size (4)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module engine_merge_data_configure_memory #(parameter
+module engine_set_ops_configure_memory #(parameter
     ID_CU            = 0                                ,
     ID_BUNDLE        = 0                                ,
     ID_LANE          = 0                                ,
@@ -242,4 +242,4 @@ xpm_fifo_sync_wrapper #(
     .rd_rst_busy(fifo_configure_memory_signals_out_int.rd_rst_busy)
 );
 
-endmodule : engine_merge_data_configure_memory
+endmodule : engine_set_ops_configure_memory
