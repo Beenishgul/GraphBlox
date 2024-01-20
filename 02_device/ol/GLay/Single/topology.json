@@ -377,6 +377,7 @@
         "ENGINE_FILTER_COND": 0,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
+        "ENGINE_SET_OPS": 0,
         "ENGINE_PIPELINE": 0,
         "ENGINE_READ_WRITE": 0
     },
@@ -386,6 +387,7 @@
         "ENGINE_FILTER_COND": 8,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
+        "ENGINE_SET_OPS": 0,
         "ENGINE_PIPELINE": 0,
         "ENGINE_READ_WRITE": 0
     },
@@ -395,6 +397,7 @@
         "ENGINE_FILTER_COND": 0,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
+        "ENGINE_SET_OPS": 0,
         "ENGINE_PIPELINE": 0,
         "ENGINE_READ_WRITE": 8
     },
@@ -404,6 +407,7 @@
         "ENGINE_FILTER_COND": 8,
         "ENGINE_FORWARD_DATA": 8,
         "ENGINE_MERGE_DATA": 8,
+        "ENGINE_SET_OPS": 8,
         "ENGINE_PIPELINE": 8,
         "ENGINE_READ_WRITE": 8
     },
@@ -413,6 +417,7 @@
         "ENGINE_FILTER_COND": 9,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 2,
+        "ENGINE_SET_OPS": 2,
         "ENGINE_PIPELINE": 0,
         "ENGINE_READ_WRITE": 11
     },
@@ -422,6 +427,7 @@
         "ENGINE_FILTER_COND": 3787,
         "ENGINE_FORWARD_DATA": 1081,
         "ENGINE_MERGE_DATA": 1380,
+        "ENGINE_SET_OPS": 1380,
         "ENGINE_PIPELINE": 1081,
         "ENGINE_READ_WRITE": 2805
     },
@@ -431,6 +437,7 @@
         "ENGINE_FILTER_COND": 3,
         "ENGINE_FORWARD_DATA": 6,
         "ENGINE_MERGE_DATA": 4,
+        "ENGINE_SET_OPS": 7,
         "ENGINE_PIPELINE": 0,
         "ENGINE_READ_WRITE": 1
     }
