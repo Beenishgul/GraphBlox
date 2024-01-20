@@ -132,7 +132,7 @@ PacketRouteAddress     backtrack_configure_route_in                             
 FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
 FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 // --------------------------------------------------------------------------------------
-localparam             PULSE_HOLD              = 1;
+localparam             PULSE_HOLD              = 2;
 logic [PULSE_HOLD-1:0] filter_cond_done_hold      ;
 logic                  filter_cond_done_assert    ;
 
