@@ -410,7 +410,6 @@ logic conditional_flow_int  ;
 PacketRouteAddress  packet_destination_int    ;
 type_sequence_state sequence_state_engine_int ;
 type_sequence_state sequence_state_control_int;
-type_engine_cmd     cmd_int                   ;
 // --------------------------------------------------------------------------------------
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
@@ -540,7 +539,7 @@ assign fifo_request_engine_out_din                  = generator_engine_request_e
 
 // Pop
 assign fifo_request_engine_out_signals_in_int.rd_en = ~fifo_request_engine_out_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
-assign request_engine_out_int.valid                 = fifo_request_engine_out_signals_out_int.valid;
+assign request_engine_out_int.valid                 = fifo_request_engine_out_signals_out_int.valid & fifo_request_engine_out_signals_in_int.rd_en;
 assign request_engine_out_int.payload               = fifo_request_engine_out_dout;
 
 xpm_fifo_sync_wrapper #(
