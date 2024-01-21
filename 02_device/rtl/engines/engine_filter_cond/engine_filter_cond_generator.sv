@@ -413,7 +413,7 @@ type_sequence_state sequence_state_control_int;
 // --------------------------------------------------------------------------------------
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
-always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag;
+always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg; 
 always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 always_comb break_running_flow_int = (break_running_flow_reg|break_start_flow_int);
 always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
@@ -496,7 +496,7 @@ always_ff @(posedge ap_clk) begin
     if (areset_generator) begin
         break_running_flow_reg <= 1'b0;
     end else begin
-        if(break_start_flow_int)
+        if(break_start_flow_int & ~break_done_flow_int)
             break_running_flow_reg <= 1'b1;
         else if (break_done_flow_int)
             break_running_flow_reg <= 1'b0;
