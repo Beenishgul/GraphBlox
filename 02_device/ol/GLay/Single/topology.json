@@ -423,13 +423,13 @@
     },
     "luts": {
         "ENGINE_ALU_OPS": 2805,
-        "ENGINE_CSR_INDEX": 3150,
-        "ENGINE_FILTER_COND": 3787,
-        "ENGINE_FORWARD_DATA": 1081,
-        "ENGINE_MERGE_DATA": 1380,
-        "ENGINE_SET_OPS": 1380,
+        "ENGINE_CSR_INDEX": 1932,
+        "ENGINE_FILTER_COND": 2070,
+        "ENGINE_FORWARD_DATA": 339,
+        "ENGINE_MERGE_DATA": 669,
+        "ENGINE_SET_OPS": 669,
         "ENGINE_PIPELINE": 1081,
-        "ENGINE_READ_WRITE": 2805
+        "ENGINE_READ_WRITE": 1419
     },
     "mapping": {
         "ENGINE_ALU_OPS": 5,
