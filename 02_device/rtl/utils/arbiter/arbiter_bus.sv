@@ -58,141 +58,110 @@ module arbiter_bus_N_in_1_out #(
     output logic [    BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-    logic                       areset_arbiter                          ;
-    logic   [ SELECT_WIDTH-1:0] select                                  ;
-    logic                       valid                                   ;
-    logic   [ARBITER_WIDTH-1:0] arbiter_grant_reg                       ;
-    logic   [ARBITER_WIDTH-1:0] arbiter_bus_valid_reg                   ;
-    logic   [    BUS_WIDTH-1:0] arbiter_bus_reg      [ARBITER_WIDTH-1:0];
-    integer                     i                                       ;
+logic                       areset_arbiter                          ;
+logic   [ARBITER_WIDTH-1:0] arbiter_grant_reg                       ;
+logic   [ARBITER_WIDTH-1:0] arbiter_bus_valid_reg                   ;
+logic   [    BUS_WIDTH-1:0] arbiter_bus_reg      [ARBITER_WIDTH-1:0];
+integer                     i                                       ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        areset_arbiter <= areset;
-    end
+always_ff @(posedge ap_clk) begin
+    areset_arbiter <= areset;
+end
 
 // --------------------------------------------------------------------------------------
 // Drive input
 // --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (areset_arbiter) begin
-            arbiter_bus_valid_reg <= 0;
-        end
-        else begin
-            arbiter_bus_valid_reg <= arbiter_bus_valid;
-        end
+always_ff @(posedge ap_clk) begin
+    if (areset_arbiter) begin
+        arbiter_bus_valid_reg <= 0;
     end
+    else begin
+        arbiter_bus_valid_reg <= arbiter_bus_valid;
+    end
+end
 
-    always_ff @(posedge ap_clk) begin
-        arbiter_bus_reg <= arbiter_bus_in;
-    end
+always_ff @(posedge ap_clk) begin
+    arbiter_bus_reg <= arbiter_bus_in;
+end
 
 // --------------------------------------------------------------------------------------
 // Drive output bus
 // --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (areset_arbiter) begin
+always_ff @(posedge ap_clk) begin
+    if (areset_arbiter) begin
+        arbiter_bus_out <= 0;
+        arbiter_grant   <= 0;
+    end else begin
+        for ( i = 0; i < ARBITER_WIDTH; i++) begin
+            if (arbiter_bus_valid_reg[i]) begin
+                arbiter_bus_out <= arbiter_bus_reg[i];
+            end
+            arbiter_grant <= arbiter_grant_reg;
+        end
+        if (~(|arbiter_bus_valid_reg)) begin
             arbiter_bus_out <= 0;
-            arbiter_grant   <= 0;
-        end else begin
-            for ( i = 0; i < ARBITER_WIDTH; i++) begin
-                if (arbiter_bus_valid_reg[i]) begin
-                    arbiter_bus_out <= arbiter_bus_reg[i];
-                end
-                arbiter_grant <= arbiter_grant_reg;
-            end
-            if (~(|arbiter_bus_valid_reg)) begin
-                arbiter_bus_out <= 0;
-            end
         end
     end
+end
 
-    generate
-        case (ARBITER_FAIRNESS)
-            0       : begin
+generate
+    case (ARBITER_FAIRNESS)
+        0       : begin
 // --------------------------------------------------------------------------------------
 // RR Arbiter instance output
 // --------------------------------------------------------------------------------------
-                if(ARBITER_WIDTH < 2) begin
-                    always_ff @ (posedge ap_clk) begin
-                        if (areset_arbiter) begin
-                            arbiter_grant_reg <= 0;
-                        end
-                        else begin
-                            arbiter_grant_reg <= arbiter_req;
-                        end
+            if(ARBITER_WIDTH < 2) begin
+                always_ff @ (posedge ap_clk) begin
+                    if (areset_arbiter) begin
+                        arbiter_grant_reg <= 0;
                     end
-                end else
-                begin
-                    arbiter_round_robin #(
-                        .WIDTH        (WIDTH        ),
-                        .ARBITER_WIDTH(ARBITER_WIDTH)
-                    ) inst_arbiter_round_robin (
-                        .areset(areset_arbiter      ),
-                        .ap_clk(ap_clk              ),
-                        .req   (arbiter_req         ),
-                        .grant (arbiter_grant_reg)
-                    );
-                end
-            end
-            1       : begin
-// --------------------------------------------------------------------------------------
-// Arbiter instance output
-// --------------------------------------------------------------------------------------
-                if(ARBITER_WIDTH < 2) begin
-                    always_ff @ (posedge ap_clk) begin
-                        if (areset_arbiter) begin
-                            arbiter_grant_reg <= 0;
-                        end
-                        else begin
-                            arbiter_grant_reg <= arbiter_req;
-                        end
+                    else begin
+                        arbiter_grant_reg <= arbiter_req;
                     end
-                end else
-                begin
-                    arbiter #(
-                        .WIDTH       (ARBITER_WIDTH),
-                        .SELECT_WIDTH(SELECT_WIDTH )
-                    ) inst_arbiter (
-                        .enable(1'b1             ),
-                        .req   (arbiter_req      ),
-                        .grant (arbiter_grant_reg),
-                        .select(select           ),
-                        .valid (valid            ),
-                        .ap_clk(ap_clk           ),
-                        .areset(areset_arbiter   )
-                    );
                 end
+            end else
+            begin
+                arbiter_round_robin #(
+                    .WIDTH        (WIDTH        ),
+                    .ARBITER_WIDTH(ARBITER_WIDTH)
+                ) inst_arbiter_round_robin (
+                    .areset(areset_arbiter      ),
+                    .ap_clk(ap_clk              ),
+                    .req   (arbiter_req         ),
+                    .grant (arbiter_grant_reg)
+                );
             end
-            default : begin
+        end
+        default : begin
 // --------------------------------------------------------------------------------------
 // RR Arbiter instance output
 // --------------------------------------------------------------------------------------
-                if(ARBITER_WIDTH < 2) begin
-                    always_ff @ (posedge ap_clk) begin
-                        if (areset_arbiter) begin
-                            arbiter_grant_reg <= 0;
-                        end
-                        else begin
-                            arbiter_grant_reg <= arbiter_req;
-                        end
+            if(ARBITER_WIDTH < 2) begin
+                always_ff @ (posedge ap_clk) begin
+                    if (areset_arbiter) begin
+                        arbiter_grant_reg <= 0;
                     end
-                end else
-                begin
-                    arbiter_round_robin #(
-                        .WIDTH        (WIDTH        ),
-                        .ARBITER_WIDTH(ARBITER_WIDTH)
-                    ) inst_arbiter_round_robin (
-                        .areset(areset_arbiter      ),
-                        .ap_clk(ap_clk              ),
-                        .req   (arbiter_req         ),
-                        .grant (arbiter_grant_reg)
-                    );
+                    else begin
+                        arbiter_grant_reg <= arbiter_req;
+                    end
                 end
+            end else
+            begin
+                arbiter_round_robin #(
+                    .WIDTH        (WIDTH        ),
+                    .ARBITER_WIDTH(ARBITER_WIDTH)
+                ) inst_arbiter_round_robin (
+                    .areset(areset_arbiter      ),
+                    .ap_clk(ap_clk              ),
+                    .req   (arbiter_req         ),
+                    .grant (arbiter_grant_reg)
+                );
             end
-        endcase
-    endgenerate
+        end
+    endcase
+endgenerate
 
 endmodule : arbiter_bus_N_in_1_out
