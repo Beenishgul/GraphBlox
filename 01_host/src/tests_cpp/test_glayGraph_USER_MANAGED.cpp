@@ -388,55 +388,66 @@ main (int argc, char **argv)
 
     }
 
-    Start(timer);
-    GLAYGraphCSRxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-    glayGraphCSRxrtBufferHandlePerKernel = setupGLAYGraphCSRUserManaged(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx, arguments->cache_size, arguments->algorithm);
-    glayGraphCSRxrtBufferHandlePerKernel->printGLAYGraphCSRxrtBufferHandlePerKernel();
-    startGLAYUserManaged(arguments->glayHandle);
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Setup Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+    uint32_t frontier = 1;
 
-    Start(timer);
-    waitGLAYUserManaged(arguments->glayHandle);
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Algorithm Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+    do{
+        Start(timer);
+        GLAYGraphCSRxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+        glayGraphCSRxrtBufferHandlePerKernel = setupGLAYGraphCSRUserManaged(arguments->glayHandle, graph, graphAuxiliary, bank_grp_idx, arguments->cache_size, arguments->algorithm);
+        glayGraphCSRxrtBufferHandlePerKernel->printGLAYGraphCSRxrtBufferHandlePerKernel();
+        startGLAYUserManaged(arguments->glayHandle);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Setup Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
 
-    Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel->readGLAYGraphCSRDeviceToHostBuffersPerKernel(arguments->glayHandle, graph, glayGraphCSRxrtBufferHandlePerKernel);
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Result Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+        Start(timer);
+        waitGLAYUserManaged(arguments->glayHandle);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Algorithm Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
+
+        Start(timer);
+        glayGraphCSRxrtBufferHandlePerKernel->readGLAYGraphCSRDeviceToHostBuffersPerKernel(arguments->glayHandle, graph, glayGraphCSRxrtBufferHandlePerKernel);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Result Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
+        for(i = 0; i < graph->num_vertices ; i++)
+        {
+            printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+            frontier += static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[graph->num_vertices+i];
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[graph->num_vertices+i] = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[graph->num_vertices+i];
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[graph->num_vertices+i] = 0;
+        }
+        printf("| %-9u | \n", frontier);
+        printf(" -----------------------------------------------------\n");
+    }while(frontier);
 
 
-    for(i = 0; i < graphAuxiliary->num_auxiliary_1 / 2 ; i++)
+    printf(" -----------------------------------------------------\n");
+    for(i = graph->num_vertices; i < graph->num_vertices * 2 ; i++)
     {
         printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
     }
     printf(" -----------------------------------------------------\n");
-    for(i = graphAuxiliary->num_auxiliary_1 / 2; i < graphAuxiliary->num_auxiliary_1 ; i++)
-    {
-        printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
-    }
-    printf(" -----------------------------------------------------\n");
-    for(i = 0; i < graphAuxiliary->num_auxiliary_2 / 2 ; i++)
+    for(i = 0; i < graph->num_vertices ; i++)
     {
         printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i]);
     }
     printf(" -----------------------------------------------------\n");
-    for(i = graphAuxiliary->num_auxiliary_2 / 2; i < graphAuxiliary->num_auxiliary_2 ; i++)
+    for(i = graph->num_vertices; i < graph->num_vertices * 2 ; i++)
     {
         printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i]);
+
+
     }
     printf(" -----------------------------------------------------\n");
     // closeGLAYUserManaged(arguments->glayHandle);

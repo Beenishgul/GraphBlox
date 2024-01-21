@@ -213,7 +213,7 @@ GLAYGraphCSRxrtBufferHandlePerKernel::GLAYGraphCSRxrtBufferHandlePerKernel(struc
     xrt_buffer_device[6] = xrt_buffer[6].address();
     xrt_buffer_device[7] = xrt_buffer[7].address();
     xrt_buffer_device[8] = xrt_buffer[8].address(); // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
-    xrt_buffer_device[9] = (uint64_t)((uint64_t)1024 << 32) | (uint64_t)(overlay_program_entries << 3) | (uint64_t)(glayHandle->flush_enable << 2) | ((uint64_t)glayHandle->endian_write << 1 )| (uint64_t)glayHandle->endian_read; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
+    xrt_buffer_device[9] = (uint64_t)((uint64_t)32768 << 32) | (uint64_t)(overlay_program_entries << 3) | (uint64_t)(glayHandle->flush_enable << 2) | ((uint64_t)glayHandle->endian_write << 1 )| (uint64_t)glayHandle->endian_read; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
 
 // ********************************************************************************************
 // ***************                  Setup Host pointers                          **************

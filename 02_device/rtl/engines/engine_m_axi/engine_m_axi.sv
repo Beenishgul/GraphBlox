@@ -96,8 +96,8 @@ module engine_m_axi #(
 // --------------------------------------------------------------------------------------//
 localparam integer LP_NUM_READ_CHANNELS = 1                  ;
 localparam integer LP_DW_BYTES          = M_AXI4_MID_DATA_W/8;
-localparam integer LP_AXI_BURST_LEN      = 4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
-// localparam integer LP_AXI_BURST_LEN      = 16                      ;
+// localparam integer LP_AXI_BURST_LEN      = 4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
+localparam integer LP_AXI_BURST_LEN      = 16                      ;
 localparam integer LP_LOG_BURST_LEN      = $clog2(LP_AXI_BURST_LEN);
 localparam integer LP_RD_MAX_OUTSTANDING = 16                      ;
 
@@ -139,7 +139,7 @@ engine_m_axi_read #(
   .C_BURST_LEN        (LP_AXI_BURST_LEN     ),
   .C_LOG_BURST_LEN    (LP_LOG_BURST_LEN     ),
   .C_MAX_OUTSTANDING  (LP_RD_MAX_OUTSTANDING),
-  .C_INCLUDE_DATA_FIFO(0                    )
+  .C_INCLUDE_DATA_FIFO(1                    )
 ) inst_engine_m_axi_read (
   .ap_clk        (ap_clk                     ),
   .areset        (areset_m_axi_kernel        ),
