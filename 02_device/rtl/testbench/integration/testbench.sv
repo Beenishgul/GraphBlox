@@ -684,7 +684,7 @@ module __KERNEL___testbench ();
 
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-            // $display("MSG: buffer_7_ptr <%0d>[%0d][%0d]: %0d\n",i, l, o,ret_rd_value);
+            $display("MSG: buffer_7_ptr <%0d>[%0d][%0d]: %0d\n",i, l, o,ret_rd_value);
             graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
             o++;
             if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
@@ -694,7 +694,7 @@ module __KERNEL___testbench ();
         end
         for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
-            // $display("MSG: buffer_8_ptr <%0d>[%0d][%0d]: %0d\n",i-graph.num_auxiliary_1, l, o,ret_rd_value);
+            $display("MSG: buffer_8_ptr <%0d>[%0d][%0d]: %0d\n",i-graph.num_auxiliary_1, l, o,ret_rd_value);
             graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
             o++;
             if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
