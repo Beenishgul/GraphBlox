@@ -600,4 +600,21 @@ xpm_fifo_sync_wrapper #(
 );
 
 
+// always_ff @(posedge ap_clk) begin
+//         if(ID_BUNDLE == 3) begin
+//             // if(response_engine_in_reg.valid)
+//             //     $display("%t - ENGINE RES B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_engine_in_reg.payload.data.field[0], response_engine_in_reg.payload.data.field[1], response_engine_in_reg.payload.data.field[2], response_engine_in_reg.payload.data.field[3]);
+
+//             // if(request_engine_out.valid)
+//             //     $display("%t - ENGINE REQ B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, request_engine_out.payload.data.field[0], request_engine_out.payload.data.field[1], request_engine_out.payload.data.field[2], request_engine_out.payload.data.field[3]);
+
+//             // if(request_memory_out_reg.valid)
+//             //     $display("%t - MEMORY REQ %0s B:%0d L:%0d-[%0d]", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.meta.address.offset);
+
+//             // if(response_memory_in_reg.valid)
+//             //     $display("%t - MEMORY RES B:%0d L:%0d-[%0d]", $time,ID_BUNDLE, ID_LANE, response_memory_in_reg.payload.meta.address.offset);
+//         end
+// end
+
+
 endmodule : engine_filter_cond_generator

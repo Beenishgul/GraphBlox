@@ -1238,6 +1238,7 @@ module __KERNEL___testbench ();
             ///////////////////////////////////////////////////////////////////////////
             error_found |= check___KERNEL___result(graph)   ;
 
+            num_iterations--;
             $display("Starting: multiple_iteration");
             for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
                 $display("Starting iteration: %d / %d", iter+1, num_iterations);
