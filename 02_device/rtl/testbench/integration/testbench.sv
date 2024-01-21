@@ -679,51 +679,49 @@ module __KERNEL___testbench ();
         int                          o,l;
         bit [M00_AXI4_FE_DATA_W-1:0] ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
 
+        o=0;
         l=0;
-        o= words_per_read;
-        o--;
 
         for (int i = 0; i < graph.num_auxiliary_1; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
-            // $display("MSG: buffer_7_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+            // $display("MSG: buffer_7_ptr <%0d>[%0d][%0d]: %0d\n",i, l, o,ret_rd_value);
             graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
-            if (o == 0) begin
+            o++;
+            if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                 l++;
-                o= words_per_read;
+                o=0;
             end
-            o--;
         end
         for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * bytes_per_read));
-            // $display("MSG: buffer_8_ptr [%0d][%0d]: %0d\n", l, o,ret_rd_value);
+            // $display("MSG: buffer_8_ptr <%0d>[%0d][%0d]: %0d\n",i-graph.num_auxiliary_1, l, o,ret_rd_value);
             graph.auxiliary_1[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
-            if (o == 0) begin
+            o++;
+            if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                 l++;
-                o= words_per_read;
+                o=0;
             end
-            o--;
         end
 
+        o=0;
         l=0;
-        o= words_per_read;
-        o--;
 
         for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
             ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * bytes_per_read));
             graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = ret_rd_value;
-            if (o == 0) begin
+            o++;
+            if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                 l++;
-                o= words_per_read;
+                o=0;
             end
-            o--;
         end
         for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
             graph.auxiliary_2[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W] = 0;
-            if (o == 0) begin
+            o++;
+            if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
                 l++;
-                o= words_per_read;
+                o=0;
             end
-            o--;
         end
         endtask
 
@@ -1010,9 +1008,9 @@ module __KERNEL___testbench ();
 
             for (int i = 0; i < graph.mem512_edges_array_src; i++) begin
                 // for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
-                    graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
-                    setup_temp = temp_edges_array_src;
-                    graph.edges_array_src[i]= setup_temp;
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
+                setup_temp = temp_edges_array_src;
+                graph.edges_array_src[i]= setup_temp;
                 // end
             end
 
