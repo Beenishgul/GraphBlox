@@ -37,8 +37,7 @@ logic areset_fifo           ;
 logic cu_setup_push_filter  ;
 logic cu_bundles_push_filter;
 
-MemoryPacketResponse response_out_reg[NUM_MEMORY_RECEIVER-1:0];
-MemoryPacketResponse response_in_reg                          ;
+MemoryPacketResponse response_in_reg;
 
 // --------------------------------------------------------------------------------------
 // Cache response FIFO
