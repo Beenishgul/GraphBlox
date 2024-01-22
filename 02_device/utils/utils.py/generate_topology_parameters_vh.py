@@ -2357,7 +2357,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
         output_lines.append(fill_m_axi_vip_tcl_template_slice_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
       
     file.write('\n'.join(output_lines))
 
