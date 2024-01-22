@@ -332,7 +332,50 @@ main (int argc, char **argv)
     struct Arguments *arguments = argumentsNew();
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
+    /* Default values. */
+    arguments->wflag = 0;
+    arguments->xflag = 0;
+    arguments->sflag = 0;
+    arguments->Sflag = 0;
+    arguments->dflag = 0;
+    arguments->binSize = 512;
+    arguments->verbosity = 0;
+    arguments->iterations = 20;
+    arguments->trials = 1;
+    arguments->epsilon = 0.0001;
+    arguments->source = 0;
+    arguments->algorithm = 0;
+    arguments->datastructure = 0;
+    arguments->pushpull = 0;
+    arguments->sort = 0;
+    arguments->mmode = 0;
+    arguments->cache_size = 32768; // 32KB for DBG reordering or GRID based structures
+
+    arguments->lmode = 0;
+    arguments->lmode_l2 = 0;
+    arguments->lmode_l3 = 0;
+
+    arguments->symmetric = 0;
+    arguments->weighted = 0;
+    arguments->delta = 1;
+    arguments->pre_numThreads  = omp_get_max_threads();
+    arguments->algo_numThreads = omp_get_max_threads();
+    arguments->ker_numThreads  = arguments->algo_numThreads;
+    arguments->fnameb = NULL;
+    arguments->fnamel = NULL;
+    arguments->fnameb_format = 1;
+    arguments->convert_format = 1;
+    initializeMersenneState (&(arguments->mt19937var), 27491095);
+    omp_set_nested(1);
+
+    struct GraphCSR *graph = NULL;
+    // void *graph = NULL;
     argp_parse (&argp, argc, argv, 0, 0, arguments);
+
+    if(arguments->dflag)
+        arguments->sort = 1;
+
+    graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
 
     int ctrlMode = 0;
     int endian = 0;
@@ -340,9 +383,9 @@ main (int argc, char **argv)
 
     int bank_grp_idx = 0;
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
-    struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
-    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, ctrlMode, endian, flush);
+    graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
 
+    arguments->glayHandle = setupGLAYDevice(arguments->glayHandle, arguments->device_index, arguments->xclbin_path, arguments->overlay_path, arguments->kernel_name, ctrlMode, endian, flush);
     if(arguments->glayHandle == NULL)
     {
         printf("ERROR:--> setupGLAYDevice\n");
@@ -460,6 +503,7 @@ main (int argc, char **argv)
 
     // releaseGLAY(arguments->glayHandle);
     free(timer);
+    freeGraphDataStructure((void *)graph, arguments->datastructure);
     argumentsFree(arguments);
     exit (0);
 }
