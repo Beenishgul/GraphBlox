@@ -6,7 +6,7 @@
 0x00000000 // entry 2    cacheline 0    offset 2    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 3    cacheline 0    offset 3    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 4    cacheline 0    offset 4    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 5    cacheline 0    offset 5    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 5    cacheline 0    offset 5    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 6    cacheline 0    offset 6    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 7    cacheline 0    offset 7    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 0x00000000 // entry 19   cacheline 1    offset 3    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 20   cacheline 1    offset 4    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 21   cacheline 1    offset 5    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 22   cacheline 1    offset 6    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 22   cacheline 1    offset 6    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 23   cacheline 1    offset 7    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 24   cacheline 1    offset 8    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@
 0x00000000 // entry 27   cacheline 1    offset 11   -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 28   cacheline 1    offset 12   -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 29   cacheline 1    offset 13   -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 30   cacheline 1    offset 14   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 30   cacheline 1    offset 14   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 31   cacheline 1    offset 15   -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 32   cacheline 2    offset 0    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 33   cacheline 2    offset 1    -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -68,7 +68,7 @@
 0x00000000 // entry 40   cacheline 2    offset 8    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 41   cacheline 2    offset 9    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 42   cacheline 2    offset 10   -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 43   cacheline 2    offset 11   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 43   cacheline 2    offset 11   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 44   cacheline 2    offset 12   -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 45   cacheline 2    offset 13   -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 46   cacheline 2    offset 14   -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -83,7 +83,7 @@
 0x00000000 // entry 51   cacheline 3    offset 3    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 52   cacheline 3    offset 4    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 53   cacheline 3    offset 5    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 54   cacheline 3    offset 6    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 54   cacheline 3    offset 6    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 55   cacheline 3    offset 7    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 56   cacheline 3    offset 8    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@
 0x00000000 // entry 89   cacheline 5    offset 9    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 90   cacheline 5    offset 10   -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 91   cacheline 5    offset 11   -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 92   cacheline 5    offset 12   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 92   cacheline 5    offset 12   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 93   cacheline 5    offset 13   -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 94   cacheline 5    offset 14   -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 95   cacheline 5    offset 15   -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -160,7 +160,7 @@
 0x00000000 // entry 100  cacheline 6    offset 4    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 101  cacheline 6    offset 5    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 102  cacheline 6    offset 6    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 103  cacheline 6    offset 7    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 103  cacheline 6    offset 7    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 104  cacheline 6    offset 8    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 105  cacheline 6    offset 9    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 // --------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@
 0x00000000 // entry 117  cacheline 7    offset 5    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 118  cacheline 7    offset 6    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 119  cacheline 7    offset 7    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 120  cacheline 7    offset 8    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 120  cacheline 7    offset 8    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 121  cacheline 7    offset 9    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 122  cacheline 7    offset 10   -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 123  cacheline 7    offset 11   -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -204,7 +204,7 @@
 0x00000000 // entry 128  cacheline 8    offset 0    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 129  cacheline 8    offset 1    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 130  cacheline 8    offset 2    -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 131  cacheline 8    offset 3    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 131  cacheline 8    offset 3    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 132  cacheline 8    offset 4    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 133  cacheline 8    offset 5    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 134  cacheline 8    offset 6    -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -225,7 +225,7 @@
 0x00000000 // entry 141  cacheline 8    offset 13   -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 142  cacheline 8    offset 14   -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 143  cacheline 8    offset 15   -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 144  cacheline 9    offset 0    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 144  cacheline 9    offset 0    -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 145  cacheline 9    offset 1    -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 146  cacheline 9    offset 2    -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 147  cacheline 9    offset 3    -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
@@ -240,7 +240,7 @@
 0x00000000 // entry 152  cacheline 9    offset 8    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 153  cacheline 9    offset 9    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
 0x00000000 // entry 154  cacheline 9    offset 10   -- // entry_4    cacheline[  0][ 4] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000000 // entry 155  cacheline 9    offset 11   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_INVALID || id_module[5:12]=0x00 || id_engine[13:20]=0x00
+0x00000000 // entry 155  cacheline 9    offset 11   -- // entry_5    cacheline[  0][ 5] <29b>: cmd[0:4]=CMD_MEM_WRITE || id_module[5:12]=0x00 || id_engine[13:20]=0x00 || id_channel[21:28]=0x00
 0x00000000 // entry 156  cacheline 9    offset 12   -- // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry 157  cacheline 9    offset 13   -- // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry 158  cacheline 9    offset 14   -- // entry_8    cacheline[  0][ 8] < 4b>: const_mask[0:3]=0x0
