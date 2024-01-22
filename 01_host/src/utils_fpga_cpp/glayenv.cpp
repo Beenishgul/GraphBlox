@@ -220,13 +220,24 @@ GLAYGraphCSRxrtBufferHandlePerKernel::GLAYGraphCSRxrtBufferHandlePerKernel(struc
 // ********************************************************************************************
     initializeGLAYOverlayConfiguration(overlay_program_entries, algorithm, graph, glayHandle->overlayPath, cacheSize);
 
+    struct Vertex *vertices = NULL;
+    struct EdgeList *sorted_edges_array = NULL;
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array;
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array;
+#endif
+
     xrt_buffer_host[0] = overlay_program;
-    xrt_buffer_host[1] = graph->vertices->in_degree;
-    xrt_buffer_host[2] = graph->vertices->out_degree;
-    xrt_buffer_host[3] = graph->vertices->edges_idx;
-    xrt_buffer_host[4] = graph->sorted_edges_array->edges_array_src;
-    xrt_buffer_host[5] = graph->sorted_edges_array->edges_array_dest;
-    xrt_buffer_host[6] = graph->sorted_edges_array->edges_array_weight;
+    xrt_buffer_host[1] = vertices->in_degree;
+    xrt_buffer_host[2] = vertices->out_degree;
+    xrt_buffer_host[3] = vertices->edges_idx;
+    xrt_buffer_host[4] = sorted_edges_array->edges_array_src;
+    xrt_buffer_host[5] = sorted_edges_array->edges_array_dest;
+    xrt_buffer_host[6] = sorted_edges_array->edges_array_weight;
     xrt_buffer_host[7] = graphAuxiliary->auxiliary_1; // endian mode 0-big endian 1-little endian
     xrt_buffer_host[8] = graphAuxiliary->auxiliary_2; // sizeof(uint32_t); // not passing an address but number of cachelines to read from graph_csr_struct
     xrt_buffer_host[9] = &xrt_buffer_device[9];
