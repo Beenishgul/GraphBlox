@@ -2470,6 +2470,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
                     temp_fe[word_count_fe-1-j] = words_data[global_index][j];
                 end
                 temp[word_count_be-1-i] = temp_fe;
+                $display("MSG: %0d 32'h%0h | %0d Hex number: 32'h%0h",global_index,words_data[global_index],(word_count_be-1-i), temp_fe);
                 global_index++;
             end
             mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be), temp);
