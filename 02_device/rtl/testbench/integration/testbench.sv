@@ -40,16 +40,16 @@ integer file_ptr_out_degree      ;
 integer file_ptr_edges_array_src ;
 integer file_ptr_edges_array_dest;
 
-bit [M00_AXI4_FE_DATA_W-1:0] overlay_program[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] overlay_program[];
 
-bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_1[];
-bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_2[];
-bit [M00_AXI4_FE_DATA_W-1:0] in_degree[];
-bit [M00_AXI4_FE_DATA_W-1:0] out_degree[];
-bit [M00_AXI4_FE_DATA_W-1:0] edges_idx[];
-bit [M00_AXI4_FE_DATA_W-1:0] edges_array_src[];
-bit [M00_AXI4_FE_DATA_W-1:0] edges_array_dest[];
-bit [M00_AXI4_FE_DATA_W-1:0] edges_array_weight[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] in_degree[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] out_degree[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_idx[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
 
 function new ();
     this.file_error                = 0;
@@ -698,7 +698,7 @@ module __KERNEL___testbench ();
         function void in_buffer_fill_memory(
                 input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
                 input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-                input bit [M00_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+                input bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]words_data[$],      // data source to fill memory
                 input integer offset,                 // start index of data source
                 input integer words                   // number of words to fill
             );
@@ -707,13 +707,14 @@ module __KERNEL___testbench ();
             int words_be;
             int word_count_fe;
             int word_count_be;
-            bit [M00_AXI4_BE_DATA_W-1:0] temp;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_fe;
             int global_index;
+            bit [M00_AXI4_BE_DATA_W/8-1:0][8-1:0]temp;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
 
-            words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
-            word_count_fe = M00_AXI4_FE_DATA_W/8;
             word_count_be = M00_AXI4_BE_DATA_W/8;
+            word_count_fe = M00_AXI4_FE_DATA_W/8;
+            words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
+
             global_index = 0;
 
             for (index = 0; index < words_be && global_index < words; index++) begin
@@ -721,9 +722,9 @@ module __KERNEL___testbench ();
                 for (i = 0; i < word_count_be; i = i + word_count_fe) begin
                     temp_fe = 0;
                     for (int j = 0; j < word_count_fe; j = j + 1) begin
-                        temp_fe[(word_count_fe-1-j)*8 +: 8] = words_data[global_index][(j)*8 +: 8];
+                        temp_fe[word_count_fe-1-j] = words_data[global_index][j];
                     end
-                    temp[i*M00_AXI4_FE_DATA_W +: M00_AXI4_FE_DATA_W] = temp_fe;
+                    temp[word_count_be-1-i] = temp_fe;
                     global_index++;
                 end
                 mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be), temp);
@@ -732,47 +733,44 @@ module __KERNEL___testbench ();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Backdoor dump data from outputt buffer AXI vip memory model with M00_AXI4_BE_DATA_W-bit words
-        function void out_buffer_dump_memory(
-                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-                input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-                inout bit [M00_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
-                input integer offset,                 // start index of data source
-                input integer words                   // number of words to fill
-            );
-            int i;
-            int index;
-            int words_be;
-            int word_count_be;
+        // function void out_buffer_dump_memory(
+        //         input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
+        //         input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
+        //         inout bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] words_data[$],      // data source to fill memory
+        //         input integer offset,                 // start index of data source
+        //         input integer words                   // number of words to fill
+        //     );
+        //     int i;
+        //     int index;
+        //     int words_be;
+        //     int word_count_be;
 
-            bit [M00_AXI4_BE_DATA_W-1:0] temp;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_fe;
-            int global_index;
+        //     bit [M00_AXI4_BE_DATA_W-1:0] temp;
+        //     int global_index;
 
-            words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
-            word_count_fe = M00_AXI4_FE_DATA_W/8;
-            word_count_be = M00_AXI4_BE_DATA_W/8;
-            global_index = 0;
+        //     words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
+        //     word_count_fe = M00_AXI4_FE_DATA_W/8;
+        //     word_count_be = M00_AXI4_BE_DATA_W/8;
+        //     global_index = 0;
             
-            for (index = 0; index < words_be && global_index < words; index++) begin
-                temp = 0;
-                temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
+        //     for (index = 0; index < words_be && global_index < words; index++) begin
+        //         temp = 0;
+        //         temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
 
-                for (i = 0; i < word_count_be; i = i + word_count_fe) begin // endian conversion to emulate general memory little endian behavior
-                    temp_fe = 0;
-                    for (int j = 0; j < word_count_fe; j = j + 1) begin
-                        temp_fe[(word_count_fe-1-j)*8 +: 8] = words_data[global_index][(j)*8 +: 8];
-                    end
-                    temp[i*M00_AXI4_FE_DATA_W +: M00_AXI4_FE_DATA_W] = temp_fe;
-                    global_index++;
-                end
-            end
-        endfunction
+        //         for (i = 0; i < word_count_be; i = i + word_count_fe) begin // endian conversion to emulate general memory little endian behavior
+        //             for (int j = 0; j < word_count_fe; j = j + 1) begin
+        //                 words_data[global_index][(j)*8 +: 8] = temp[(word_count_fe-1-j)*8 +: 8];
+        //             end
+        //             global_index++;
+        //         end
+        //     end
+        // endfunction
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
-            bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_1[];
-            bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_2[];
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
 
             auxiliary_1  = new [graph.mem_auxiliary_1];
             auxiliary_2  = new [graph.mem_auxiliary_2];
@@ -894,7 +892,7 @@ module __KERNEL___testbench ();
         function automatic bit check_BFS_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            bit [M00_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
             bit error_found = 0;
             integer error_counter;
             integer frontier_counter;
@@ -917,8 +915,8 @@ module __KERNEL___testbench ();
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
             int o,l;
-            bit [M00_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
-            // bit [M00_AXI4_FE_DATA_W-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
+            // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
             bit error_found = 0;
             integer error_counter;
             integer mismatch_counter;
@@ -992,14 +990,14 @@ module __KERNEL___testbench ();
             int          realcount                 = 0;
             int          vertexcount               = 0;
             int l;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_overlay_program         ;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_out_degree              ;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_in_degree               ;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_idx               ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_overlay_program         ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_out_degree              ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_in_degree               ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_idx               ;
 
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_array_src ;
-            bit [M00_AXI4_FE_DATA_W-1:0] temp_edges_array_dest;
-            bit [M00_AXI4_FE_DATA_W-1:0] setup_temp;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_array_src ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_array_dest;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] setup_temp;
 
             realcount = 0;
             setup_temp = 0;
