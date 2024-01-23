@@ -2439,28 +2439,73 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 
     fill_memory_template = """
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the input buffer AXI vip memory model with 32-bit words
-        function void  m{0:02d}_axi_buffer_fill_memory(
-                input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
-                input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
-                input bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
-                input integer offset,                 // start index of data source
-                input integer words                   // number of words to fill
-            );
-            int index;
-            // bit [(32/8)-1:0] wr_strb = 4'hf;
-            bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
-            int i;
-            for (index = 0; index < words; index++) begin
-                // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
-                for (i = 0; i < (M{0:02d}_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    temp[i*8+7-:8] = words_data[offset+index][((M{0:02d}_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
-                    // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
-                end
-                // $display("After: %0d ->%0d ->%0h",index, i, temp);
-                mem.mem_model.backdoor_memory_write(ptr + index * (M{0:02d}_AXI4_BE_DATA_W/8), temp);
+// Backdoor fill the input buffer AXI vip memory model with  M{0:02d}_AXI4_BE_DATA_W-bit words
+    function void m{0:02d}_axi_buffer_fill_memory(
+            input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
+            input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
+            input bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+            input integer offset,                 // start index of data source
+            input integer words                   // number of words to fill
+        );
+        int i;
+        int index;
+        int words_be;
+        int word_count_be;
+        bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
+        int global_index;
+
+        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
+        word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        global_index = 0;
+
+        for (index = 0; index < words_be; index++) begin
+
+            if(global_index >= words)
+                break;
+
+            for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+                temp[i*8+7-:8] = words_data[global_index];
+                global_index++;
             end
-        endfunction
+
+            mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be),temp);
+        end
+    endfunction
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Backdoor fill the input buffer AXI vip memory model with  M{0:02d}_AXI4_BE_DATA_W-bit words
+    function void m{0:02d}_axi_buffer_dump_memory(
+            input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
+            input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
+            inout bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+            input integer offset,                 // start index of data source
+            input integer words                   // number of words to fill
+        );
+        int i;
+        int index;
+        int words_be;
+        int word_count_be;
+        bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
+        int global_index;
+
+        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
+        word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        global_index = 0;
+
+        for (index = 0; index < words_be; index++) begin
+
+            if(global_index >= words)
+                break;
+
+            temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
+
+            for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+                words_data[global_index] = temp[(word_count_be-1-i)*8+7-:8];
+                global_index++;
+            end
+        end
+    endfunction
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Backdoor fill the m{0:02d}_axi memory.
