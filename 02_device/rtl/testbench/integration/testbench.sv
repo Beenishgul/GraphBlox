@@ -1037,7 +1037,7 @@ module __KERNEL___testbench ();
                         // $display("MSG: %d %d Hex number: 32'h%0h",l,o, temp_overlay_program);
                         setup_temp = temp_overlay_program;
                         graph.overlay_program[l] = setup_temp;
-                        // $display("MSG: %d %d Hex number: 32'h%0h",l,o, graph.overlay_program[l]);
+                        $display("MSG: %d Hex number: 32'h%0h",l, graph.overlay_program[l]);
                         l++;
                     end
                 end
