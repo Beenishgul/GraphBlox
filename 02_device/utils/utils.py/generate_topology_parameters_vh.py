@@ -2505,6 +2505,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         for (index = 0; index < words_be && global_index < words; index++) begin
             temp = 0;
             temp = mem.mem_model.backdoor_memory_read(ptr + (index * M{0:02d}_AXI4_BE_DATA_W/8));
+            // $display("MSG: %0d 512'h%0h",(index * word_count_be),temp);
 
             for (i = 0; i < word_count_be; i = i + 1) begin
                 temp_fe = 0;
@@ -2512,6 +2513,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
                     temp_fe[word_count_fe-1-j] = temp[word_count_be-1-i][j];
                 end
                 words_data[global_index] = temp_fe;
+                // $display("MSG: %0d 32'h%0h | %0d Hex number: 32'h%0h",global_index,words_data[global_index],(word_count_be-1-i), temp[word_count_be-1-i]);
                 global_index++;
             end
         end
