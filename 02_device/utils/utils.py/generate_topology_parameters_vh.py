@@ -2464,7 +2464,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
                 break;
 
             for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                temp[i*8+7-:8] = words_data[global_index];
+                temp[(word_count_be-1-i)*8+7-:8] = words_data[global_index];
                 global_index++;
             end
 
