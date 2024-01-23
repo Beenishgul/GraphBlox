@@ -846,30 +846,26 @@ module __KERNEL___testbench ();
         function automatic bit check_PR_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            int o,l;
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
             // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
             bit error_found = 0;
             integer error_counter;
             integer mismatch_counter;
             error_counter = 0;
             mismatch_counter = 0;
+            
+            auxiliary_1  = new [graph.mem_auxiliary_1];
+            auxiliary_2  = new [graph.mem_auxiliary_2];
 
-            o=0;
-            l=0;
+            m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
+            m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
 
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M00_AXI4_FE_DATA_W/8));
-                if(ret_rd_value != graph.out_degree[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W]) begin
-                    $display("MSG: Starting num_auxiliary_2[%0d]: %0d==%0d\n",i, ret_rd_value, graph.out_degree[l][(M00_AXI4_FE_DATA_W*o)+:M00_AXI4_FE_DATA_W]);
+                if(auxiliary_2[i] != graph.out_degree[i-graph.num_auxiliary_2]) begin
+                    $display("MSG: Starting num_auxiliary_2[%0d]: %0d==%0d\n",i-graph.num_auxiliary_2, auxiliary_2[i], graph.out_degree[i-graph.num_auxiliary_2]);
                     mismatch_counter += 1;
-                end
-
-                o++;
-                if (o%(M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
                 end
             end
             $display("MSG: // ------------------------------------------------- \n");
