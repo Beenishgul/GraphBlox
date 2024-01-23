@@ -2456,7 +2456,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         bit [M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W-1:0][M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp;
         bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
 
-        word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        word_count_be = M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W;
         word_count_fe = M{0:02d}_AXI4_FE_DATA_W/8;
         words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
 
@@ -2464,16 +2464,17 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 
         for (index = 0; index < words_be && global_index < words; index++) begin
             temp = 0;
-            for (i = 0; i < word_count_be; i = i + word_count_fe) begin
+            for (i = 0; i < word_count_be; i = i + 1) begin
                 temp_fe = 0;
                 for (int j = 0; j < word_count_fe; j = j + 1) begin
                     temp_fe[word_count_fe-1-j] = words_data[global_index][j];
                 end
                 temp[word_count_be-1-i] = temp_fe;
-                $display("MSG: %0d 32'h%0h | %0d Hex number: 32'h%0h",global_index,words_data[global_index],(word_count_be-1-i), temp_fe);
+                // $display("MSG: %0d 32'h%0h | %0d Hex number: 32'h%0h",global_index,words_data[global_index],(word_count_be-1-i), temp_fe);
                 global_index++;
             end
-            mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be), temp);
+            // $display("MSG: %0d 512'h%0h",(index * word_count_be),temp);
+            mem.mem_model.backdoor_memory_write(ptr + (index * M{0:02d}_AXI4_BE_DATA_W/8), temp);
         end
     endfunction
 
@@ -2495,7 +2496,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         bit [M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W-1:0][M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp;
         bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
 
-        word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        word_count_be = M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W;
         word_count_fe = M{0:02d}_AXI4_FE_DATA_W/8;
         words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
 
@@ -2503,9 +2504,9 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 
         for (index = 0; index < words_be && global_index < words; index++) begin
             temp = 0;
-            temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
+            temp = mem.mem_model.backdoor_memory_read(ptr + (index * M{0:02d}_AXI4_BE_DATA_W/8));
 
-            for (i = 0; i < word_count_be; i = i + word_count_fe) begin
+            for (i = 0; i < word_count_be; i = i + 1) begin
                 temp_fe = 0;
                 for (int j = 0; j < word_count_fe; j = j + 1) begin
                     temp_fe[word_count_fe-1-j] = temp[word_count_be-1-i][j];
