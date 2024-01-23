@@ -2443,7 +2443,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         function void  m{0:02d}_axi_buffer_fill_memory(
                 input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
                 input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
-                input bit [M{0:02d}_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
+                input bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
                 input integer offset,                 // start index of data source
                 input integer words                   // number of words to fill
             );
@@ -2593,7 +2593,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
             """
 
     backdoor_buffer_fill_memories_mid = """
-            m{0:02d}_axi_buffer_fill_memory(m{0:02d}_axi, {1}_ptr, graph.{2}, 0, graph.mem512_{2});
+            m{0:02d}_axi_buffer_fill_memory(m{0:02d}_axi, {1}_ptr, graph.{2}, 0, graph.mem_{2});
             """
 
     backdoor_buffer_fill_memories_end = """
