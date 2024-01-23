@@ -693,25 +693,39 @@ module __KERNEL___testbench ();
         `include "module_slv_m_axi_vip_func.vh"
 
 
-        // /////////////////////////////////////////////////////////////////////////////////////////////////
-        // // Backdoor fill the input buffer AXI vip memory model with 128-bit words
-        // function void in_buffer_fill_memory(
-        //         input axi_vip_slv_slv_mem_t mem,      // vip memory model handle
-        //         input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-        //         input bit [127:0] words_data[$],      // data source to fill memory
-        //         input integer offset,                 // start index of data source
-        //         input integer words                   // number of words to fill
-        //     );
-        //     int index;
-        //     bit [127:0] temp;
-        //     int i;
-        //     for (index = 0; index < words; index++) begin
-        //         for (i = 0; i < 16; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-        //             temp[i*8+7-:8] = words_data[offset+index][(15-i)*8+7-:8];
-        //         end
-        //         mem.mem_model.backdoor_memory_write(ptr + index * 16, temp);
-        //     end
-        // endfunction
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        // Backdoor fill the input buffer AXI vip memory model with 128-bit words
+        function void in_buffer_fill_memory(
+                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
+                input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
+                input bit [M00_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+                input integer offset,                 // start index of data source
+                input integer words                   // number of words to fill
+            );
+            int i;
+            int index;
+            int words_be;
+            int word_count_be;
+            bit [M00_AXI4_BE_DATA_W-1:0] temp;
+            int global_index;
+
+            words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
+            word_count_be = M00_AXI4_BE_DATA_W/8;
+            global_index = 0;
+
+            for (index = 0; index < words_be; index++) begin
+
+                if(global_index >= words)
+                    break;
+
+                for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
+                    temp[i*8+7-:8] = words_data[global_index];
+                    global_index++;
+                end
+
+                mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be),temp);
+            end
+        endfunction
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Backdoor dump data from outputt buffer AXI vip memory model with M00_AXI4_BE_DATA_W-bit words
@@ -722,18 +736,15 @@ module __KERNEL___testbench ();
                 input integer offset,                 // start index of data source
                 input integer words                   // number of words to fill
             );
+            int i;
             int index;
-            int o,l;
             int words_be;
             int word_count_be;
             bit [M00_AXI4_BE_DATA_W-1:0] temp;
-            int i;
             int global_index;
 
             words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
             word_count_be = M00_AXI4_BE_DATA_W/8;
-            o=0;
-            l=0;
             global_index = 0;
 
             for (index = 0; index < words_be; index++) begin
@@ -741,49 +752,40 @@ module __KERNEL___testbench ();
                 if(global_index >= words)
                     break;
 
-                if (o%word_count_be == 0) begin
-                    temp = mem.mem_model.backdoor_memory_read(ptr + (l * word_count_be));
-                end
+                temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
 
                 for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    words_data[offset+(index*word_count_be)+i] = temp[(word_count_be-1-i)*8+7-:8];
+                    words_data[global_index] = temp[(word_count_be-1-i)*8+7-:8];
                     global_index++;
                 end
-
-                o++;
-                if (o%word_count_be== 0) begin
-                    l++;
-                    o=0;
-                end
-
             end
         endfunction
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
-        /////////////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////
 
-        bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_1[];
-        bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_2[];
+            bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_1[];
+            bit [M00_AXI4_FE_DATA_W-1:0] auxiliary_2[];
 
-        auxiliary_1  = new [graph.mem_auxiliary_1];
-        auxiliary_2  = new [graph.mem_auxiliary_2];
+            auxiliary_1  = new [graph.mem_auxiliary_1];
+            auxiliary_2  = new [graph.mem_auxiliary_2];
 
-        out_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
-        out_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
+             m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
+             m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
 
-        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-            graph.auxiliary_1[i] = auxiliary_1[i];
-        end
-        for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-            graph.auxiliary_1[l] = auxiliary_2[i];
-        end
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                graph.auxiliary_1[i] = auxiliary_1[i];
+            end
+            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                graph.auxiliary_1[i] = auxiliary_2[i];
+            end
 
-        for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-            graph.auxiliary_2[i] = auxiliary_1[i];
-        end
-        for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-            graph.auxiliary_2[i] = 0;
-        end
+            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                graph.auxiliary_2[i] = auxiliary_1[i];
+            end
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                graph.auxiliary_2[i] = 0;
+            end
         endtask
 
         function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
