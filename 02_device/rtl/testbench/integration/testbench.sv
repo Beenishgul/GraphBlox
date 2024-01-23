@@ -718,8 +718,10 @@ module __KERNEL___testbench ();
                 if(global_index >= words)
                     break;
 
+                temp=0;
+
                 for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    temp[i*8+7-:8] = words_data[global_index];
+                    temp[(word_count_be-1-i)*8+7-:8] = words_data[global_index];
                     global_index++;
                 end
 
@@ -752,6 +754,7 @@ module __KERNEL___testbench ();
                 if(global_index >= words)
                     break;
 
+                temp=0;
                 temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
 
                 for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
