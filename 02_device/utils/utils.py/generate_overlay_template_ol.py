@@ -358,13 +358,13 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                 if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
                     if local_count == 1:
                         append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M00_AXI4_FE_DATA_W*{offset})+:M00_AXI4_FE_DATA_W]  = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_start_ops};")
                     elif local_count == 2:
                         append_to_file(output_file_path_vh, f"   // --  2  - Index_End")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M00_AXI4_FE_DATA_W*{offset})+:M00_AXI4_FE_DATA_W]  = {buffer_end_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops};")
                     elif local_count == 7:
                         append_to_file(output_file_path_vh, f"   // --  7  - Array_size")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{cache_line}][(M00_AXI4_FE_DATA_W*{offset})+:M00_AXI4_FE_DATA_W]  = {buffer_end_ops}-{buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
 
                 entry_index_vh += 1
                 local_count += 1
