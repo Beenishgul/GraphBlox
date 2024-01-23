@@ -2443,22 +2443,23 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
     function void m{0:02d}_axi_buffer_fill_memory(
             input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
             input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-            input bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+            input bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]words_data[$],      // data source to fill memory
             input integer offset,                 // start index of data source
             input integer words                   // number of words to fill
         );
         int i;
         int index;
-        int word_count_fe;
         int words_be;
+        int word_count_fe;
         int word_count_be;
-        bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
-        bit [M{0:02d}_AXI4_FE_DATA_W-1:0] temp_fe;
         int global_index;
+        bit [M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W-1:0][M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp;
+        bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
 
-        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
-        word_count_fe = M{0:02d}_AXI4_FE_DATA_W/8;
         word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        word_count_fe = M{0:02d}_AXI4_FE_DATA_W/8;
+        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
+
         global_index = 0;
 
         for (index = 0; index < words_be && global_index < words; index++) begin
@@ -2466,9 +2467,9 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
             for (i = 0; i < word_count_be; i = i + word_count_fe) begin
                 temp_fe = 0;
                 for (int j = 0; j < word_count_fe; j = j + 1) begin
-                    temp_fe[(word_count_fe-1-j)*8 +: 8] = words_data[global_index][(j)*8 +: 8];
+                    temp_fe[word_count_fe-1-j] = words_data[global_index][j];
                 end
-                temp[i*M00_AXI4_FE_DATA_W +: M00_AXI4_FE_DATA_W] = temp_fe;
+                temp[word_count_be-1-i] = temp_fe;
                 global_index++;
             end
             mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be), temp);
@@ -2480,36 +2481,39 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
     function void m{0:02d}_axi_buffer_dump_memory(
             input slv_m{0:02d}_axi_vip_slv_mem_t mem,      // vip memory model handle
             input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-            inout bit [M{0:02d}_AXI4_FE_DATA_W-1:0] words_data[$],      // data source to fill memory
+            inout bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0] words_data[$],      // data source to fill memory
             input integer offset,                 // start index of data source
             input integer words                   // number of words to fill
         );
         int i;
         int index;
         int words_be;
+        int word_count_fe;
         int word_count_be;
-        bit [M{0:02d}_AXI4_BE_DATA_W-1:0] temp;
         int global_index;
+        bit [M{0:02d}_AXI4_BE_DATA_W/M{0:02d}_AXI4_FE_DATA_W-1:0][M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp;
+        bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
 
-        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
         word_count_be = M{0:02d}_AXI4_BE_DATA_W/8;
+        word_count_fe = M{0:02d}_AXI4_FE_DATA_W/8;
+        words_be = (words*M{0:02d}_AXI4_FE_DATA_W + M{0:02d}_AXI4_BE_DATA_W - 1) / M{0:02d}_AXI4_BE_DATA_W;
+
         global_index = 0;
 
-        for (index = 0; index < words_be; index++) begin
-
-            if(global_index >= words)
-                break;
-
+        for (index = 0; index < words_be && global_index < words; index++) begin
+            temp = 0;
             temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
 
-            for (i = 0; i < word_count_be; i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                words_data[global_index] = temp[(word_count_be-1-i)*8+7-:8];
-                $display("MSG: Starting words_data[%0d]=%0d->%0d",global_index,(word_count_be-1-i),temp[(word_count_be-1-i)*8+7-:8]);
+            for (i = 0; i < word_count_be; i = i + word_count_fe) begin
+                temp_fe = 0;
+                for (int j = 0; j < word_count_fe; j = j + 1) begin
+                    temp_fe[word_count_fe-1-j] = temp[word_count_be-1-i][j];
+                end
+                words_data[global_index] = temp_fe;
                 global_index++;
             end
         end
     endfunction
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Backdoor fill the m{0:02d}_axi memory.
