@@ -692,80 +692,6 @@ module __KERNEL___testbench ();
 
         `include "module_slv_m_axi_vip_func.vh"
 
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        // Backdoor fill the input buffer AXI vip memory model with 128-bit words
-        function void in_buffer_fill_memory(
-                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-                input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-                input bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]words_data[$],      // data source to fill memory
-                input integer offset,                 // start index of data source
-                input integer words                   // number of words to fill
-            );
-            int i;
-            int index;
-            int words_be;
-            int word_count_fe;
-            int word_count_be;
-            int global_index;
-            bit [M00_AXI4_BE_DATA_W/8-1:0][8-1:0]temp;
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]temp_fe;
-
-            word_count_be = M00_AXI4_BE_DATA_W/8;
-            word_count_fe = M00_AXI4_FE_DATA_W/8;
-            words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
-
-            global_index = 0;
-
-            for (index = 0; index < words_be && global_index < words; index++) begin
-                temp = 0;
-                for (i = 0; i < word_count_be; i = i + word_count_fe) begin
-                    temp_fe = 0;
-                    for (int j = 0; j < word_count_fe; j = j + 1) begin
-                        temp_fe[word_count_fe-1-j] = words_data[global_index][j];
-                    end
-                    temp[word_count_be-1-i] = temp_fe;
-                    global_index++;
-                end
-                mem.mem_model.backdoor_memory_write(ptr + (index * word_count_be), temp);
-            end
-        endfunction
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        // Backdoor dump data from outputt buffer AXI vip memory model with M00_AXI4_BE_DATA_W-bit words
-        // function void out_buffer_dump_memory(
-        //         input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-        //         input bit [63:0] ptr,                 // start address of memory fill, should allign to 16-byte
-        //         inout bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] words_data[$],      // data source to fill memory
-        //         input integer offset,                 // start index of data source
-        //         input integer words                   // number of words to fill
-        //     );
-        //     int i;
-        //     int index;
-        //     int words_be;
-        //     int word_count_be;
-
-        //     bit [M00_AXI4_BE_DATA_W-1:0] temp;
-        //     int global_index;
-
-        //     words_be = (words*M00_AXI4_FE_DATA_W + M00_AXI4_BE_DATA_W - 1) / M00_AXI4_BE_DATA_W;
-        //     word_count_fe = M00_AXI4_FE_DATA_W/8;
-        //     word_count_be = M00_AXI4_BE_DATA_W/8;
-        //     global_index = 0;
-            
-        //     for (index = 0; index < words_be && global_index < words; index++) begin
-        //         temp = 0;
-        //         temp = mem.mem_model.backdoor_memory_read(ptr + (index * word_count_be));
-
-        //         for (i = 0; i < word_count_be; i = i + word_count_fe) begin // endian conversion to emulate general memory little endian behavior
-        //             for (int j = 0; j < word_count_fe; j = j + 1) begin
-        //                 words_data[global_index][(j)*8 +: 8] = temp[(word_count_fe-1-j)*8 +: 8];
-        //             end
-        //             global_index++;
-        //         end
-        //     end
-        // endfunction
-
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -892,17 +818,23 @@ module __KERNEL___testbench ();
         function automatic bit check_BFS_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        ret_rd_value = {M00_AXI4_FE_DATA_W{1'b0}};
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
             bit error_found = 0;
             integer error_counter;
             integer frontier_counter;
             error_counter = 0;
             frontier_counter = 0;
 
+            auxiliary_1  = new [graph.mem_auxiliary_1];
+            auxiliary_2  = new [graph.mem_auxiliary_2];
+
+            m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
+            m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
+
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M00_AXI4_FE_DATA_W/8));
-                frontier_counter += ret_rd_value;
+                frontier_counter += auxiliary_2[i];
             end
             $display("MSG: Frontier_counter: %0d \n", frontier_counter);
             $display("MSG: // ------------------------------------------------- \n");
@@ -1037,7 +969,7 @@ module __KERNEL___testbench ();
                         // $display("MSG: %d %d Hex number: 32'h%0h",l,o, temp_overlay_program);
                         setup_temp = temp_overlay_program;
                         graph.overlay_program[l] = setup_temp;
-                        $display("MSG: %d Hex number: 32'h%0h",l, graph.overlay_program[l]);
+                        // $display("MSG: %d Hex number: 32'h%0h",l, graph.overlay_program[l]);
                         l++;
                     end
                 end
@@ -1290,7 +1222,7 @@ module __KERNEL___testbench ();
             poll_done_register();
 
             ///////////////////////////////////////////////////////////////////////////
-            error_found |= check___KERNEL___result(graph)   ;
+            error_found |= check_BFS_result(graph)   ;
 
             num_iterations--;
             $display("Starting: multiple_iteration");
@@ -1324,7 +1256,7 @@ module __KERNEL___testbench ();
                 poll_done_register();
 
                 ///////////////////////////////////////////////////////////////////////////
-                error_found |= check___KERNEL___result(graph)   ;
+                error_found |= check_BFS_result(graph)   ;
 
                 $display("Finished iteration: %d / %d", iter+1, num_iterations);
             end
