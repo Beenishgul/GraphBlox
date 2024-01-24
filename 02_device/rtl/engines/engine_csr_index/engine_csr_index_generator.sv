@@ -357,7 +357,11 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
-    localparam BURST_LENGTH = 16;
+    localparam BURST_LENGTH          = 16                           ;
+    localparam PAGE_SIZE_BYTES       = 4096                         ; // 4K page size in bytes
+    localparam PAGE_SIZE_LOG2        = $clog2(PAGE_SIZE_BYTES)      ;
+    localparam CACHE_LINE_SIZE_BYTES = 64                           ;
+    localparam CACHE_LINE_SIZE_LOG2  = $clog2(CACHE_LINE_SIZE_BYTES);
     // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
@@ -833,16 +837,6 @@ module engine_csr_index_generator #(parameter
                 end
                 else begin
                     burst_flag   = 1'b0;
-                    burst_length = 1;
-                end
-            end
-            CMD_STREAM_WRITE : begin
-                if(~mod_flag) begin
-                    burst_flag   = 1'b1;
-                    burst_length = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
-                end
-                else begin
-                    burst_flag   = 1'b1;
                     burst_length = 1;
                 end
             end

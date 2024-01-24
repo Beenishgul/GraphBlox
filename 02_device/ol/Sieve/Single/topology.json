@@ -109,7 +109,7 @@
     "cu_properties": {
         "frequency"   : "200000000",
         "num_kernels" : "1",
-        "architecture": "GLay",
+        "architecture": "Sieve",
         "ctrl_mode"   : "USER_MANAGED",
         "capability"  : "Single"  
     },

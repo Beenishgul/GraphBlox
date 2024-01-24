@@ -5560,10 +5560,11 @@ logic mem_rsp_error_o    ;
 // --------------------------------------------------------------------------------------
 //   Cache signals
 // --------------------------------------------------------------------------------------
-CacheRequestPayload  sram_request_mem     ;
-CacheRequestPayload  sram_request_mem_int ;
-CacheResponsePayload sram_response_mem    ;
-CacheResponsePayload sram_response_mem_reg;
+CacheRequestPayload  sram_request_mem        ;
+CacheRequestPayload  sram_request_mem_int    ;
+CacheResponsePayload sram_response_mem       ;
+CacheResponsePayload sram_response_mem_reg   ;
+CacheResponsePayload sram_response_mem_reg_S2;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO
@@ -5739,9 +5740,9 @@ assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_bus
 assign fifo_response_din = sram_request_mem;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en = sram_response_mem.iob.valid ;
+assign fifo_response_signals_in_int.rd_en = sram_response_mem_reg.iob.valid ;
 assign response_in_int.valid              = fifo_response_signals_out_int.valid;
-always_comb response_in_int.payload       = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, sram_response_mem_reg);
+always_comb response_in_int.payload       = map_CacheResponse_to_MemoryResponsePacket(fifo_response_dout, sram_response_mem_reg_S2);
 
 xpm_fifo_sync_wrapper #(
   .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
@@ -5763,9 +5764,9 @@ xpm_fifo_sync_wrapper #(
   .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
 );
 
-
 always_ff @(posedge ap_clk) begin
-  sram_response_mem_reg <= sram_response_mem;
+  sram_response_mem_reg    <= sram_response_mem;
+  sram_response_mem_reg_S2 <= sram_response_mem_reg;
 end
 
 // --------------------------------------------------------------------------------------
