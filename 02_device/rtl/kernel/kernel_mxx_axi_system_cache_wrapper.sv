@@ -17,7 +17,7 @@
 
 
 
-module kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper (
+module kernel_m00_axi_system_cache_be32x64_mid32x64_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -108,7 +108,7 @@ assign m_axi_write.out.awaddr[63] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x64 (
+m00_axi_system_cache_be32x64_mid32x64 inst_m00_axi_system_cache_be32x64_mid32x64 (
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
@@ -196,12 +196,12 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper
+endmodule : kernel_m00_axi_system_cache_be32x64_mid32x64_wrapper
 
 
 
 
-module kernel_m01_axi_system_cache_be32x64_mid32x64_wrapper (
+module kernel_m01_axi_system_cache_be512x64_mid32x64_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -292,7 +292,7 @@ assign m_axi_write.out.awaddr[63] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64 (
+m01_axi_system_cache_be512x64_mid32x64 inst_m01_axi_system_cache_be512x64_mid32x64 (
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
@@ -380,5 +380,5 @@ m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m01_axi_system_cache_be32x64_mid32x64_wrapper
+endmodule : kernel_m01_axi_system_cache_be512x64_mid32x64_wrapper
 
