@@ -51,7 +51,7 @@
     "Single.PR": {
         "0": [
             [
-                "ENGINE_ALU_OPS"
+                "ENGINE_DIMM_SIEVE"
             ],
             [
                 "ENGINE_FORWARD_DATA"

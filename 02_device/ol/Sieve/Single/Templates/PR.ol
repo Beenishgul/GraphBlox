@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_ALU_OPS      ID 0    mapping 5    cycles 6    None-None ( 0 )-( 0 )
+// Name ENGINE_DIMM_SIEVE   ID 0    mapping 8    cycles 6    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 0    cacheline 0    offset 0    -- // entry_0    cacheline[  0][ 0] < 6b>: alu_operation[0:5]=ALU_NOP
 0x00000000 // entry 1    cacheline 0    offset 1    -- // entry_1    cacheline[  0][ 1] <20b>: alu_mask[0:3]=0x0 || id_engine[4:11]=0x00 || id_module[12:19]=0x00
