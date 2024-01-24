@@ -191,6 +191,7 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(struct Arguments *arguments, str
         nf = bottomUpStepGraphCSR(graph, sharedFrontierQueue->q_bitmap, sharedFrontierQueue->q_bitmap_next, stats);
 
         sharedFrontierQueue->q_bitmap_next->numSetBits = nf;
+        printSetBits(sharedFrontierQueue->q_bitmap);
         swapBitmaps(&sharedFrontierQueue->q_bitmap, &sharedFrontierQueue->q_bitmap_next);
         clearBitmap(sharedFrontierQueue->q_bitmap_next);
         Stop(timer_inner);

@@ -834,6 +834,8 @@ module __KERNEL___testbench ();
 
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                if(auxiliary_2[i])
+                    $display("MSG: %0d \n", i-graph.num_auxiliary_2);
                 frontier_counter += auxiliary_2[i];
             end
             $display("MSG: Frontier_counter: %0d \n", frontier_counter);

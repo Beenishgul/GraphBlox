@@ -170,8 +170,8 @@ module axi_lite_from_mem #(
     end
   end
 
-  `FFARN(aw_sent_q, aw_sent_d, 1'b0, clk_i, rst_ni)
-  `FFARN(w_sent_q, w_sent_d, 1'b0, clk_i, rst_ni)
+  `FFSRN(aw_sent_q, aw_sent_d, 1'b0, clk_i, rst_ni)
+  `FFSRN(w_sent_q, w_sent_d, 1'b0, clk_i, rst_ni)
 
   // Select which response should be forwarded. `1` write response, `0` read response.
   logic rsp_sel;
