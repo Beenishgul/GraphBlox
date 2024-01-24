@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------
-// Engine: ENGINE_ALU_OPS_0, Number of entries: 6
+// Engine: ENGINE_DIMM_SIEVE_0, Number of entries: 6
 // --------------------------------------------------------------------------------------
 0x00000001 // entry_0    cacheline[  0][ 0] < 6b>: alu_operation[0:5]=ALU_NOP
 0x00000000 // entry_1    cacheline[  0][ 1] <20b>: alu_mask[0:3]=0x0 || id_engine[4:11]=0x00 || id_module[12:19]=0x00
