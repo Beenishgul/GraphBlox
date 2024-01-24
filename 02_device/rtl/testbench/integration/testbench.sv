@@ -1218,7 +1218,7 @@ module __KERNEL___testbench ();
             poll_done_register();
 
             ///////////////////////////////////////////////////////////////////////////
-            error_found |= check_BFS_result(graph)   ;
+            error_found |= check___KERNEL___result(graph)   ;
 
             num_iterations--;
             $display("Starting: multiple_iteration");
@@ -1252,7 +1252,7 @@ module __KERNEL___testbench ();
                 poll_done_register();
 
                 ///////////////////////////////////////////////////////////////////////////
-                error_found |= check_BFS_result(graph)   ;
+                error_found |= check___KERNEL___result(graph)   ;
 
                 $display("Finished iteration: %d / %d", iter+1, num_iterations);
             end

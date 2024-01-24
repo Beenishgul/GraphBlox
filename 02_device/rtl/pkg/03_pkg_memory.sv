@@ -355,7 +355,7 @@ function FIFOStateSignalsOutput map_internal_fifo_signals_to_output (input FIFOS
   return output_fifo;
 endfunction : map_internal_fifo_signals_to_output
 // --------------------------------------------------------------------------------------
-function FIFOStateSignalsOutput map_internal_dual_fifo_signals_to_output (input FIFOStateSignalsOutInternal internal_fifo_1, input FIFOStateSignalsOutInternal internal_fifo_2);
+function FIFOStateSignalsOutput map_internal_dual_fifo_signals_to_output_internal (input FIFOStateSignalsOutInternal internal_fifo_1, input FIFOStateSignalsOutInternal internal_fifo_2);
 
   FIFOStateSignalsOutput output_fifo;
 
@@ -363,7 +363,20 @@ function FIFOStateSignalsOutput map_internal_dual_fifo_signals_to_output (input 
   output_fifo.empty     = internal_fifo_1.empty & internal_fifo_2.empty;
 
   return output_fifo;
-endfunction : map_internal_dual_fifo_signals_to_output
+endfunction : map_internal_dual_fifo_signals_to_output_internal
+
+// --------------------------------------------------------------------------------------
+
+function FIFOStateSignalsOutput map_internal_dual_fifo_signals_to_output_external (input FIFOStateSignalsOutput internal_fifo_1, input FIFOStateSignalsOutput internal_fifo_2);
+
+  FIFOStateSignalsOutput output_fifo;
+
+  output_fifo.prog_full = internal_fifo_1.prog_full | internal_fifo_2.prog_full;
+  output_fifo.empty     = internal_fifo_1.empty & internal_fifo_2.empty;
+
+  return output_fifo;
+endfunction : map_internal_dual_fifo_signals_to_output_external
+
 // --------------------------------------------------------------------------------------
 // Memory Request Packet <-> Cache
 // --------------------------------------------------------------------------------------

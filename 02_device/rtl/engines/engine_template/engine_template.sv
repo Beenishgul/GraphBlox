@@ -230,7 +230,7 @@ assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_response_signals_out.emp
 
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out   <= template_fifo_request_control_out_signals_out;
-    fifo_request_engine_out_signals_out[0] <= template_fifo_request_engine_out_signals_out & engine_cast_arbiter_1_to_N_fifo_response_signals_out;
+    fifo_request_engine_out_signals_out[0] <= map_internal_dual_fifo_signals_to_output_external(template_fifo_request_engine_out_signals_out, engine_cast_arbiter_1_to_N_fifo_response_signals_out);
     fifo_request_memory_out_signals_out    <= template_fifo_request_memory_out_signals_out;
     fifo_response_control_in_signals_out   <= template_fifo_response_control_in_signals_out;
     fifo_response_engine_in_signals_out[0] <= template_fifo_response_engine_in_signals_out[0];
