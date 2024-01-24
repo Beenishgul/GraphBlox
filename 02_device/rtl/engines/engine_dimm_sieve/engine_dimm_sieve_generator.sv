@@ -423,7 +423,7 @@ always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
 end
 // --------------------------------------------------------------------------------------
-engine_alu_ops_kernel inst_engine_alu_ops_kernel (
+engine_dimm_sieve_kernel inst_engine_dimm_sieve_kernel (
     .ap_clk             (ap_clk                                              ),
     .areset             (areset_kernel                                       ),
     .clear              (~(configure_engine_int.valid) | engine_alu_ops_clear),
