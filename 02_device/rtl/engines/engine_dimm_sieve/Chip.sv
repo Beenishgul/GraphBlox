@@ -1,0 +1,80 @@
+`timescale 1ns / 1ps
+`define Sieve
+// A memory Chip module model that bundles multiple BankGroups.
+// Notice that the Chip model interface is nothing like the real DRAM Chip
+// interface, which is much narrower, with the addressing logic performed
+// inside the Chip. Doing the addressing logic, the state and time management,
+// and the data synchronization outside the chip is more efficient in terms
+// of resource utilization and allows having the relevant control data all in
+// one place while still achieving the goal of slicing and hierarchically
+// placing the data.
+// * parameter `BGWIDTH` determines the number of Bank Groups, and
+//     `BGWIDTH=0` is equivalent to a single Bank Group
+module Chip
+    #(parameter BGWIDTH = 2,
+    parameter BAWIDTH = 2,
+    parameter COLWIDTH = 7,
+    parameter DEVICE_WIDTH = 16,
+    parameter CHWIDTH = 10,
+    
+    localparam BANKGROUPS = 2**BGWIDTH,
+    localparam BANKSPERGROUP = 2**BAWIDTH,
+    localparam COLS = 2**COLWIDTH,
+    localparam log_DEVICE_WIDTH = 4)
+    (
+    input logic clk,
+    // SystemVerilog multi-dimentional arrays allows to easily scale the bundling
+    // of inputs. For example, the data of bank 2 and bank group 3 can be read
+    // out as dqout[3][2] and setting the row and column value will give the
+    // relevant word
+    input logic  [0:0]             rd_o_wr [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    input logic  [DEVICE_WIDTH-1:0]dqin    [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    output logic [DEVICE_WIDTH-1:0]dqout   [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    input logic  [CHWIDTH-1:0]     row     [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    input logic  [COLWIDTH-1:0]    column  [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    `ifdef Sieve
+      output logic ETM [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+      input logic [COLWIDTH+log_DEVICE_WIDTH-1:0] query_col,
+      input logic [CHWIDTH-1:0] row_address,
+      input logic host_write,
+      input logic host_en,
+      input logic sieve_write,
+      input logic sieve_en,
+      input logic sieve_rsn,
+      output logic [COLWIDTH+log_DEVICE_WIDTH-1:0] match_col [BANKGROUPS-1:0][BANKSPERGROUP-1:0],
+    `endif
+    input logic rst
+    );
+    
+    // generating bank groups and assigning the corresponding inputs/outputs
+    genvar bgi;
+    generate
+        for (bgi = 0; bgi < BANKGROUPS ; bgi=bgi+1)
+        begin:BG
+            BankGroup #(.BAWIDTH(BAWIDTH),
+            .COLWIDTH(COLWIDTH),
+            .DEVICE_WIDTH(DEVICE_WIDTH),
+            .CHWIDTH(CHWIDTH)) BGi (
+            .clk(clk),
+            .rd_o_wr(rd_o_wr[bgi]),
+            .dqin(dqin[bgi]),
+            .dqout(dqout[bgi]),
+            .row(row[bgi]),
+            .column(column[bgi]),
+            `ifdef Sieve
+            .ETM(ETM[bgi]),
+            .query_col(query_col),
+            .row_address(row_address),
+            .host_write(host_write),
+            .host_en(host_en),
+            .sieve_write(sieve_write),
+            .sieve_en(sieve_en),
+            .sieve_rsn(sieve_rsn),
+            .match_col(match_col[bgi]),
+            `endif
+            .rst(rst)
+            );
+        end
+    endgenerate
+    
+endmodule
