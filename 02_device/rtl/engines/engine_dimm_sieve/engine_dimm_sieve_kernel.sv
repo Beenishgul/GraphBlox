@@ -52,108 +52,108 @@ localparam COLS          = 2**COLWIDTH                                          
 localparam CHIPSIZE      = (DEVICE_WIDTH*COLS*(ROWS/1024)*BANKSPERGROUP*BANKGROUPS)/(1024); // Mbit
 localparam DIMMSIZE      = (CHIPSIZE*CHIPS)/(1024*8)                                      ; // GB
 
-logic reset_n;
+// logic reset_n;
 
-`ifdef DDR4
-  logic ck_c;
-  logic ck_t;
-`elsif DDR3
-  logic ck_n;
-  logic ck_p;
-`endif
-logic             cke ;
-logic [RANKS-1:0] cs_n;
-`ifdef DDR4
-  //logic act_n;
-`endif
-`ifdef DDR3
-  logic ras_n;
-  logic cas_n;
-  logic we_n ;
-`endif
-//logic [ADDRWIDTH-1:0]A;
-logic [BAWIDTH-1:0] ba;
-`ifdef DDR4
-  logic [BGWIDTH-1:0] bg; // todo: explore adding one bit that is always ignored
-`endif
-logic [DQWIDTH-1:0] dq    ;
-logic [DQWIDTH-1:0] dq_reg;
-`ifdef DDR4
-  logic [CHIPS-1:0] dqs_c    ;
-  logic [CHIPS-1:0] dqs_c_reg;
-  logic [CHIPS-1:0] dqs_t    ;
-  logic [CHIPS-1:0] dqs_t_reg;
-`elsif DDR3
-  logic [CHIPS-1:0] dqs_n    ;
-  logic [CHIPS-1:0] dqs_n_reg;
-  logic [CHIPS-1:0] dqs_p    ;
-  logic [CHIPS-1:0] dqs_p_reg;
-`endif
-logic odt;
-`ifdef DDR4
-  logic parity;
-`endif
+// `ifdef DDR4
+//   logic ck_c;
+//   logic ck_t;
+// `elsif DDR3
+//   logic ck_n;
+//   logic ck_p;
+// `endif
+// logic             cke ;
+// logic [RANKS-1:0] cs_n;
+// `ifdef DDR4
+//   //logic act_n;
+// `endif
+// `ifdef DDR3
+//   logic ras_n;
+//   logic cas_n;
+//   logic we_n ;
+// `endif
+// //logic [ADDRWIDTH-1:0]A;
+// logic [BAWIDTH-1:0] ba;
+// `ifdef DDR4
+//   logic [BGWIDTH-1:0] bg; // todo: explore adding one bit that is always ignored
+// `endif
+// logic [DQWIDTH-1:0] dq    ;
+// logic [DQWIDTH-1:0] dq_reg;
+// `ifdef DDR4
+//   logic [CHIPS-1:0] dqs_c    ;
+//   logic [CHIPS-1:0] dqs_c_reg;
+//   logic [CHIPS-1:0] dqs_t    ;
+//   logic [CHIPS-1:0] dqs_t_reg;
+// `elsif DDR3
+//   logic [CHIPS-1:0] dqs_n    ;
+//   logic [CHIPS-1:0] dqs_n_reg;
+//   logic [CHIPS-1:0] dqs_p    ;
+//   logic [CHIPS-1:0] dqs_p_reg;
+// `endif
+// logic odt;
+// `ifdef DDR4
+//   logic parity;
+// `endif
 
-always_ff @(posedge ap_clk ) begin
-  reset_n <= ~areset;
-end
+// always_ff @(posedge ap_clk ) begin
+//   reset_n <= ~areset;
+// end
 
-//DIMM #(.RANKS(RANKS),
-DIMM_fsm #(
-  .RANKS       (RANKS       ),
-  .CHIPS       (CHIPS       ),
-  .BGWIDTH     (BGWIDTH     ),
-  .BAWIDTH     (BAWIDTH     ),
-  .ADDRWIDTH   (ADDRWIDTH   ),
-  .COLWIDTH    (COLWIDTH    ),
-  .DEVICE_WIDTH(DEVICE_WIDTH),
-  .BL          (BL          ),
-  .CHWIDTH     (CHWIDTH     )
-) dut (
-  .reset_n  (reset_n  ),
-  .ck2x     (ap_clk   ),
-  `ifdef DDR4
-  .ck_c     (ck_c     ),
-  .ck_t     (ck_t     ),
-  `elsif DDR3
-  .ck_n     (ck_n     ),
-  .ck_p     (ck_p     ),
-  `endif
-  .cke      (cke      ),
-  .cs_n     (cs_n     ),
-  `ifndef Sieve
-  `ifdef DDR4
-  .act_n    (act_n    ), // not needed for ifndef Sieve
-  `endif
-  `endif
-  `ifdef DDR3
-  .ras_n    (ras_n    ),
-  .cas_n    (cas_n    ),
-  .we_n     (we_n     ),
-  `endif
-  //.A(A), // A fix pattern that gives control to RLU
-  .ba       (ba       ),
-  `ifdef DDR4
-  .bg       (bg       ),
-  `endif
-  .dq       (dq       ),
-  `ifdef DDR4
-  .dqs_c    (dqs_c    ),
-  .dqs_t    (dqs_t    ),
-  `elsif DDR3
-  .dqs_n    (dqs_n    ),
-  .dqs_p    (dqs_p    ),
-  `endif
-  .odt      (odt      ),
-  `ifdef DDR4
-  .parity   (parity   ),
-  `endif
-  `ifdef Sieve
-  .match_en (match_en ),
-  .match_col(match_col), // added new
-  `endif
-  .sync     (sync     )
-);
+// //DIMM #(.RANKS(RANKS),
+// DIMM_fsm #(
+//   .RANKS       (RANKS       ),
+//   .CHIPS       (CHIPS       ),
+//   .BGWIDTH     (BGWIDTH     ),
+//   .BAWIDTH     (BAWIDTH     ),
+//   .ADDRWIDTH   (ADDRWIDTH   ),
+//   .COLWIDTH    (COLWIDTH    ),
+//   .DEVICE_WIDTH(DEVICE_WIDTH),
+//   .BL          (BL          ),
+//   .CHWIDTH     (CHWIDTH     )
+// ) dut (
+//   .reset_n  (reset_n  ),
+//   .ck2x     (ap_clk   ),
+//   `ifdef DDR4
+//   .ck_c     (ck_c     ),
+//   .ck_t     (ck_t     ),
+//   `elsif DDR3
+//   .ck_n     (ck_n     ),
+//   .ck_p     (ck_p     ),
+//   `endif
+//   .cke      (cke      ),
+//   .cs_n     (cs_n     ),
+//   `ifndef Sieve
+//   `ifdef DDR4
+//   .act_n    (act_n    ), // not needed for ifndef Sieve
+//   `endif
+//   `endif
+//   `ifdef DDR3
+//   .ras_n    (ras_n    ),
+//   .cas_n    (cas_n    ),
+//   .we_n     (we_n     ),
+//   `endif
+//   //.A(A), // A fix pattern that gives control to RLU
+//   .ba       (ba       ),
+//   `ifdef DDR4
+//   .bg       (bg       ),
+//   `endif
+//   .dq       (dq       ),
+//   `ifdef DDR4
+//   .dqs_c    (dqs_c    ),
+//   .dqs_t    (dqs_t    ),
+//   `elsif DDR3
+//   .dqs_n    (dqs_n    ),
+//   .dqs_p    (dqs_p    ),
+//   `endif
+//   .odt      (odt      ),
+//   `ifdef DDR4
+//   .parity   (parity   ),
+//   `endif
+//   `ifdef Sieve
+//   .match_en (match_en ),
+//   .match_col(match_col), // added new
+//   `endif
+//   .sync     (sync     )
+// );
 
 
 // Process input data and mask
