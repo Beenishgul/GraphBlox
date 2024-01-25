@@ -102,12 +102,6 @@ module engine_csr_index_generator #(parameter
     logic enter_gen_pause_int   ;
     logic cmd_done_mode_int     ;
     logic sequence_done_mode_int;
-// --------------------------------------------------------------------------------------
-    type_memory_burst_length  burst_length      ;
-    logic                     burst_flag        ;
-    logic                     mod_flag          ;
-    logic                     burst_flag_reg    ;
-    logic [COUNTER_WIDTH-1:0] counter_temp_value;
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -206,6 +200,31 @@ module engine_csr_index_generator #(parameter
     PacketRouteAddress     backtrack_configure_route_in                                               ;
     FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
     FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+// --------------------------------------------------------------------------------------
+    localparam                PULSE_HOLD           = 4;
+    logic [   PULSE_HOLD-1:0] cmd_in_flight_hold      ;
+    logic                     cmd_in_flight_assert    ;
+    logic [COUNTER_WIDTH-1:0] page_start              ;
+    logic [COUNTER_WIDTH-1:0] page_end                ;
+    logic [COUNTER_WIDTH-1:0] burst_length_trunk      ;
+    logic                     page_crossing_flag      ;
+// --------------------------------------------------------------------------------------
+// Burst crosses page boundary, split into two commands.
+    type_memory_burst_length first_burst_length    ;
+    type_memory_burst_length remaining_burst_length;
+// --------------------------------------------------------------------------------------
+// Delay the second burst by one cycle.
+    type_memory_burst_length next_burst_length    ;
+    type_memory_burst_length next_burst_length_reg;
+    logic                    next_burst_flag      ;
+    logic                    next_burst_flag_reg  ;
+// --------------------------------------------------------------------------------------
+    type_memory_burst_length  burst_length      ;
+    type_memory_burst_length  burst_length_reg  ;
+    logic                     burst_flag        ;
+    logic                     mod_flag          ;
+    logic                     burst_flag_reg    ;
+    logic [COUNTER_WIDTH-1:0] counter_temp_value;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
@@ -221,24 +240,6 @@ module engine_csr_index_generator #(parameter
     assign engine_csr_index_route.sequence_state            = SEQUENCE_INVALID;
     assign engine_csr_index_route.sequence_id               = 0;
     assign engine_csr_index_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
-// --------------------------------------------------------------------------------------
-    localparam                PULSE_HOLD           = 4;
-    logic [   PULSE_HOLD-1:0] cmd_in_flight_hold      ;
-    logic                     cmd_in_flight_assert    ;
-    logic [COUNTER_WIDTH-1:0] page_start              ;
-    logic [COUNTER_WIDTH-1:0] page_end                ;
-    logic [COUNTER_WIDTH-1:0] burst_length_trunk      ;
-    logic                     page_crossing_flag      ;
-
-    // Burst crosses page boundary, split into two commands.
-    type_memory_burst_length first_burst_length    ;
-    type_memory_burst_length remaining_burst_length;
-
-    // Delay the second burst by one cycle.
-    type_memory_burst_length next_burst_length    ;
-    type_memory_burst_length next_burst_length_reg;
-    logic                    next_burst_flag      ;
-    logic                    next_burst_flag_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -834,8 +835,15 @@ module engine_csr_index_generator #(parameter
 
         if (next_burst_flag_reg)
             fifo_request_dout_reg_S2.payload.meta.address.burst_length <= next_burst_length_reg;
-        else
+            if(configure_engine_int.payload.meta.address.shift.direction) begin
+                fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg_S2.payload.meta.address.offset + (fifo_request_dout_reg_S2.payload.meta.address.burst_length  << configure_engine_int.payload.meta.address.shift.amount);
+            end else begin
+                fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg_S2.payload.meta.address.offset + (fifo_request_dout_reg_S2.payload.meta.address.burst_length  >> configure_engine_int.payload.meta.address.shift.amount);
+            end
+        else begin
             fifo_request_dout_reg_S2.payload.meta.address.burst_length <= burst_length;
+            fifo_request_dout_reg_S2.payload.meta.address.offset       <= fifo_request_dout_reg.payload.meta.address.offset;
+        end
 
         if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_DONE;
@@ -872,10 +880,14 @@ module engine_csr_index_generator #(parameter
                     first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
-                    burst_length = remaining_burst_length;
                     if(page_crossing_flag) begin
                         next_burst_flag   = 1'b1;
                         next_burst_length = remaining_burst_length;
+                        burst_length      = first_burst_length;
+                    end else begin
+                        next_burst_flag   = 1'b0;
+                        next_burst_length = 0;
+                        burst_length      = remaining_burst_length;
                     end
                 end
                 else begin
