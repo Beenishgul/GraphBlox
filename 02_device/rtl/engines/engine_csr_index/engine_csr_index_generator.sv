@@ -358,7 +358,7 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
     localparam BURST_LENGTH          = 16                           ;
-    localparam PAGE_SIZE_BYTES       = 4096                         ; // 4K page size in bytes
+    localparam PAGE_SIZE_BYTES       = 1024                         ; // 4K page size in bytes
     localparam PAGE_SIZE_LOG2        = $clog2(PAGE_SIZE_BYTES)      ;
     localparam CACHE_LINE_SIZE_BYTES = 64                           ;
     localparam CACHE_LINE_SIZE_LOG2  = $clog2(CACHE_LINE_SIZE_BYTES);
@@ -811,11 +811,18 @@ module engine_csr_index_generator #(parameter
         fifo_request_dout_reg_S2.payload.meta.route.sequence_id        <= fifo_request_dout_reg.payload.meta.route.sequence_id;
         fifo_request_dout_reg_S2.payload.meta.address.id_channel       <= fifo_request_dout_reg.payload.meta.address.id_channel;
         fifo_request_dout_reg_S2.payload.meta.address.id_buffer        <= fifo_request_dout_reg.payload.meta.address.id_buffer;
-        fifo_request_dout_reg_S2.payload.meta.address.burst_length     <= burst_length;
-        fifo_request_dout_reg_S2.payload.meta.address.offset           <= fifo_request_dout_reg.payload.meta.address.offset;
-        fifo_request_dout_reg_S2.payload.meta.address.shift            <= fifo_request_dout_reg.payload.meta.address.shift;
 
-        burst_flag_reg <= burst_flag;
+        fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg.payload.meta.address.offset;
+        fifo_request_dout_reg_S2.payload.meta.address.shift  <= fifo_request_dout_reg.payload.meta.address.shift;
+
+        burst_flag_reg        <= burst_flag|next_burst_flag_reg;
+        next_burst_flag_reg   <= next_burst_flag;
+        next_burst_length_reg <= next_burst_length;
+
+        if (next_burst_flag_reg)
+            fifo_request_dout_reg_S2.payload.meta.address.burst_length <= next_burst_length_reg;
+        else
+            fifo_request_dout_reg_S2.payload.meta.address.burst_length <= burst_length;
 
         if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_DONE;
@@ -823,17 +830,55 @@ module engine_csr_index_generator #(parameter
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_RUNNING;
         end
     end
+
+    logic [COUNTER_WIDTH-1:0] page_start        ;
+    logic [COUNTER_WIDTH-1:0] page_end          ;
+    logic [COUNTER_WIDTH-1:0] burst_length_trunk;
+    logic                     page_crossing_flag;
+
+    // Burst crosses page boundary, split into two commands.
+    type_memory_burst_length first_burst_length    ;
+    type_memory_burst_length remaining_burst_length;
+
+    // Delay the second burst by one cycle.
+    type_memory_burst_length next_burst_length    ;
+    type_memory_burst_length next_burst_length_reg;
+    logic                    next_burst_flag      ;
+    logic                    next_burst_flag_reg  ;
+
 // --------------------------------------------------------------------------------------
     always_comb begin
         burst_length       = 0;
         burst_flag         = 0;
+        next_burst_flag    = 0;
+        next_burst_length  = 0;
         counter_temp_value = fifo_request_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
         mod_flag           = |((counter_temp_value-counter_load_value)%BURST_LENGTH);
+
+        // Calculate the page start and end addresses for the counter value and burst length.
+        page_start         = counter_temp_value >> PAGE_SIZE_LOG2;
+        page_end           = (counter_temp_value + BURST_LENGTH - 1) >> PAGE_SIZE_LOG2;
+        burst_length_trunk = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
+        page_crossing_flag = (page_start != page_end);
+
+        first_burst_length     = 0;
+        remaining_burst_length = 0;
+
         case (fifo_request_dout_reg.payload.meta.subclass.cmd)
             CMD_STREAM_READ : begin
                 if(~mod_flag) begin
-                    burst_flag   = 1'b1;
-                    burst_length = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
+                    burst_flag = 1'b1;
+                    // burst_length = burst_length_trunk[M00_AXI4_FE_LEN_W-1:0];
+
+                    // Burst crosses page boundary, split into two commands.
+                    first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
+                    remaining_burst_length = burst_length_trunk - first_burst_length;
+
+                    burst_length = first_burst_length;
+                    if(page_crossing_flag) begin
+                        next_burst_flag   = 1'b1;
+                        next_burst_length = remaining_burst_length;
+                    end
                 end
                 else begin
                     burst_flag   = 1'b0;
