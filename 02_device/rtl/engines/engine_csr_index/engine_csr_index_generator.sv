@@ -877,7 +877,11 @@ module engine_csr_index_generator #(parameter
                     // burst_length = burst_length_trunk[M00_AXI4_FE_LEN_W-1:0];
 
                     // Burst crosses page boundary, split into two commands.
-                    first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
+                    // first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
+
+                    first_burst_length = min(PAGE_SIZE_BYTES, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
+                    first_burst_length = min(first_burst_length, BURST_LENGTH);
+
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
                     if(page_crossing_flag) begin
