@@ -344,10 +344,25 @@ generate
     end
 endgenerate
 
-assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1][LANES_COUNT_ARRAY[0]-1:0] = bundle_fifo_response_lanes_backtrack_signals_out[0][LANES_COUNT_ARRAY[0]-1:0];
+// --------------------------------------------------------------------------------------
+// Generate Bundles - Drive Backtrack FIFO-Signals
+// --------------------------------------------------------------------------------------
 generate
+    assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1][LANES_COUNT_ARRAY[0]-1:0] = bundle_fifo_response_lanes_backtrack_signals_out[0][LANES_COUNT_ARRAY[0]-1:0];
+
+    for (j = LANES_COUNT_ARRAY[0]; j < NUM_LANES_MAX; j++) begin
+        assign bundle_fifo_response_lanes_backtrack_signals_in[NUM_BUNDLES-1][j] = 2'b10;
+        assign bundle_fifo_response_lanes_backtrack_signals_out[0][j]            = 2'b10;
+    end
+
     for (i=0; i<NUM_BUNDLES-1; i++) begin : generate_bundle_backtrack_signals
-        assign bundle_fifo_response_lanes_backtrack_signals_in[i][LANES_COUNT_ARRAY[i+1]-1:0] = bundle_fifo_response_lanes_backtrack_signals_out[i+1][LANES_COUNT_ARRAY[i+1]-1:0];
+        for (j = 0; j < LANES_COUNT_ARRAY[i+1]; j++) begin
+            assign bundle_fifo_response_lanes_backtrack_signals_in[i][j] = bundle_fifo_response_lanes_backtrack_signals_out[i+1][j];
+        end
+        for (j = LANES_COUNT_ARRAY[i+1]; j < NUM_LANES_MAX; j++) begin
+            assign bundle_fifo_response_lanes_backtrack_signals_in[i][j]    = 2'b10;
+            assign bundle_fifo_response_lanes_backtrack_signals_out[i+1][j] = 2'b10;
+        end
     end
 endgenerate
 
@@ -413,9 +428,11 @@ generate
     end else begin
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
             assign bundle_fifo_request_control_out_signals_in[i].rd_en  = 1'b0;
+            assign bundle_arbiter_control_N_to_1_arbiter_grant_out[i]   = 1'b0;
+            assign bundle_arbiter_control_N_to_1_request_in[i]          = 0;
         end
+        assign bundle_arbiter_control_N_to_1_fifo_request_signals_in  = 0;
         assign bundle_arbiter_control_N_to_1_fifo_request_signals_out = 2'b10;
-        assign bundle_arbiter_control_N_to_1_arbiter_grant_out        = 0;
         assign bundle_arbiter_control_N_to_1_request_out              = 0;
         assign bundle_arbiter_control_N_to_1_fifo_setup_signal        = 1'b0;
     end
