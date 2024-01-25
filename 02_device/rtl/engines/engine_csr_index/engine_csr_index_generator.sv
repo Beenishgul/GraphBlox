@@ -862,10 +862,10 @@ module engine_csr_index_generator #(parameter
         mod_flag           = (counter_temp_value != 0) ? |((counter_temp_value - counter_load_value) % BURST_LENGTH) : 1'b0;
 
         // Calculate the page start and end addresses for the counter value and burst length.
-        page_start         = counter_temp_value >> PAGE_SIZE_LOG2;
-        page_end           = (counter_temp_value + BURST_LENGTH - 1) >> PAGE_SIZE_LOG2;
-        burst_length_trunk = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
-        page_crossing_flag = (page_start != page_end);
+        page_start         = 0;
+        page_end           = 0;
+        burst_length_trunk = 0;
+        page_crossing_flag = 0;
 
         first_burst_length     = 0;
         remaining_burst_length = 0;
@@ -873,18 +873,18 @@ module engine_csr_index_generator #(parameter
         case (fifo_request_dout_reg.payload.meta.subclass.cmd)
             CMD_STREAM_READ : begin
                 if(~mod_flag) begin
-                    burst_flag = 1'b1;
-                    // burst_length = burst_length_trunk[M00_AXI4_FE_LEN_W-1:0];
+                    
+                    page_start         = counter_temp_value >> PAGE_SIZE_LOG2;
+                    page_end           = (counter_temp_value + BURST_LENGTH - 1) >> PAGE_SIZE_LOG2;
+                    burst_length_trunk = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
+                    page_crossing_flag = (page_start != page_end);
 
-                    // Burst crosses page boundary, split into two commands.
-                    // first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
-
-                    first_burst_length = min(burst_length_trunk, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
-
+                    burst_flag             = 1'b1;
+                    first_burst_length     = min(burst_length_trunk, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
                     if(page_crossing_flag) begin
-                        next_burst_flag   = 1'b1;
+                        next_burst_flag   = 1'b1 & (|remaining_burst_length);
                         next_burst_length = remaining_burst_length;
                         burst_length      = first_burst_length;
                     end else begin
@@ -894,13 +894,25 @@ module engine_csr_index_generator #(parameter
                     end
                 end
                 else begin
-                    burst_flag   = 1'b0;
-                    burst_length = 1;
+                    burst_flag             = 1'b0;
+                    burst_length           = 1;
+                    page_start             = 0;
+                    page_end               = 0;
+                    burst_length_trunk     = 0;
+                    page_crossing_flag     = 0;
+                    first_burst_length     = 0;
+                    remaining_burst_length = 0;
                 end
             end
             default : begin
-                burst_flag   = 1;
-                burst_length = 1'b1;
+                burst_flag             = 1'b1;
+                burst_length           = 1;
+                page_start             = 0;
+                page_end               = 0;
+                burst_length_trunk     = 0;
+                page_crossing_flag     = 0;
+                first_burst_length     = 0;
+                remaining_burst_length = 0;
             end
         endcase
     end
