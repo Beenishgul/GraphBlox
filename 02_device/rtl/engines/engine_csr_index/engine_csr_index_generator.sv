@@ -222,10 +222,23 @@ module engine_csr_index_generator #(parameter
     assign engine_csr_index_route.sequence_id               = 0;
     assign engine_csr_index_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
-    localparam             PULSE_HOLD           = 4;
-    logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
-    logic                  cmd_in_flight_assert    ;
+    localparam                PULSE_HOLD           = 4;
+    logic [   PULSE_HOLD-1:0] cmd_in_flight_hold      ;
+    logic                     cmd_in_flight_assert    ;
+    logic [COUNTER_WIDTH-1:0] page_start              ;
+    logic [COUNTER_WIDTH-1:0] page_end                ;
+    logic [COUNTER_WIDTH-1:0] burst_length_trunk      ;
+    logic                     page_crossing_flag      ;
 
+    // Burst crosses page boundary, split into two commands.
+    type_memory_burst_length first_burst_length    ;
+    type_memory_burst_length remaining_burst_length;
+
+    // Delay the second burst by one cycle.
+    type_memory_burst_length next_burst_length    ;
+    type_memory_burst_length next_burst_length_reg;
+    logic                    next_burst_flag      ;
+    logic                    next_burst_flag_reg  ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -830,21 +843,6 @@ module engine_csr_index_generator #(parameter
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_RUNNING;
         end
     end
-
-    logic [COUNTER_WIDTH-1:0] page_start        ;
-    logic [COUNTER_WIDTH-1:0] page_end          ;
-    logic [COUNTER_WIDTH-1:0] burst_length_trunk;
-    logic                     page_crossing_flag;
-
-    // Burst crosses page boundary, split into two commands.
-    type_memory_burst_length first_burst_length    ;
-    type_memory_burst_length remaining_burst_length;
-
-    // Delay the second burst by one cycle.
-    type_memory_burst_length next_burst_length    ;
-    type_memory_burst_length next_burst_length_reg;
-    logic                    next_burst_flag      ;
-    logic                    next_burst_flag_reg  ;
 
 // --------------------------------------------------------------------------------------
     always_comb begin
