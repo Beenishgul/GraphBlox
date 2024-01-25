@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_register_slice_be_32x64_wrapper (
+module m00_axi_register_slice_be_512x64_wrapper (
   // System Signals
   input  logic                                  ap_clk         ,
   input  logic                                  areset         ,
@@ -82,7 +82,7 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-m00_axi_register_slice_be_512x64 inst_m00_axi_register_slice_be_32x64 (
+m00_axi_register_slice_be_512x64 inst_m00_axi_register_slice_be_512x64 (
   .aclk          (ap_clk                  ),
   .aresetn       (areset_register_slice   ),
   .s_axi_araddr  (s_axi_read.in.araddr    ), // input read address read channel address
@@ -166,12 +166,12 @@ m00_axi_register_slice_be_512x64 inst_m00_axi_register_slice_be_32x64 (
   .m_axi_wvalid  (m_axi_write.out.wvalid  )  // output write channel valid
 );
 
-endmodule : m00_axi_register_slice_be_32x64_wrapper
+endmodule : m00_axi_register_slice_be_512x64_wrapper
 
   
 
 
-module m01_axi_register_slice_be_512x64_wrapper (
+module m01_axi_register_slice_be_32x64_wrapper (
   // System Signals
   input  logic                                  ap_clk         ,
   input  logic                                  areset         ,
@@ -236,7 +236,7 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-m01_axi_register_slice_be_512x64 inst_m01_axi_register_slice_be_512x64 (
+m01_axi_register_slice_be_512x64 inst_m01_axi_register_slice_be_32x64 (
   .aclk          (ap_clk                  ),
   .aresetn       (areset_register_slice   ),
   .s_axi_araddr  (s_axi_read.in.araddr    ), // input read address read channel address
@@ -320,6 +320,6 @@ m01_axi_register_slice_be_512x64 inst_m01_axi_register_slice_be_512x64 (
   .m_axi_wvalid  (m_axi_write.out.wvalid  )  // output write channel valid
 );
 
-endmodule : m01_axi_register_slice_be_512x64_wrapper
+endmodule : m01_axi_register_slice_be_32x64_wrapper
 
   
