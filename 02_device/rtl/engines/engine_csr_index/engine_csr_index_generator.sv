@@ -872,7 +872,7 @@ module engine_csr_index_generator #(parameter
                     first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
-                    burst_length = first_burst_length;
+                    burst_length = remaining_burst_length;
                     if(page_crossing_flag) begin
                         next_burst_flag   = 1'b1;
                         next_burst_length = remaining_burst_length;
