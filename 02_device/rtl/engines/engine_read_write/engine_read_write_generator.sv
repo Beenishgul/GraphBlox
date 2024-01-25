@@ -410,6 +410,9 @@ module engine_read_write_generator #(parameter
                 else
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE;
             end
+            default : begin
+                next_state = ENGINE_READ_WRITE_GEN_RESET;
+            end
         endcase
     end // always_comb
 

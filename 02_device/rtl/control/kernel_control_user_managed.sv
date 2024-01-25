@@ -183,6 +183,9 @@ always_comb begin
             else
                 next_state = USER_MANAGED_SYNC_DONE;
         end
+        default : begin
+            next_state = USER_MANAGED_SYNC_RESET;
+        end
     endcase
 end // always_comb
 
