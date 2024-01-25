@@ -1708,6 +1708,10 @@ generate
 
     end else begin
         assign kernel_cache_setup_signal[{5}] = 0;
+        assign kernel_m{0:02d}_axi4_read_in   = 0;
+        assign kernel_m{0:02d}_axi4_read_out  = 0;
+        assign kernel_m{0:02d}_axi4_write_in  = 0;
+        assign kernel_m{0:02d}_axi4_write_out = 0;
         assign kernel_s{0:02d}_axi_read_out     = m{0:02d}_axi4_read.in       ;
         assign m{0:02d}_axi4_read.out           = kernel_s{0:02d}_axi_read_in ;
         assign kernel_s{0:02d}_axi_write_out    = m{0:02d}_axi4_write.in      ;
