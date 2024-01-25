@@ -833,14 +833,14 @@ module engine_csr_index_generator #(parameter
         next_burst_flag_reg   <= next_burst_flag;
         next_burst_length_reg <= next_burst_length;
 
-        if (next_burst_flag_reg)
+        if (next_burst_flag_reg) begin
             fifo_request_dout_reg_S2.payload.meta.address.burst_length <= next_burst_length_reg;
             if(configure_engine_int.payload.meta.address.shift.direction) begin
                 fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg_S2.payload.meta.address.offset + (fifo_request_dout_reg_S2.payload.meta.address.burst_length  << configure_engine_int.payload.meta.address.shift.amount);
             end else begin
                 fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg_S2.payload.meta.address.offset + (fifo_request_dout_reg_S2.payload.meta.address.burst_length  >> configure_engine_int.payload.meta.address.shift.amount);
             end
-        else begin
+        end else begin
             fifo_request_dout_reg_S2.payload.meta.address.burst_length <= burst_length;
             fifo_request_dout_reg_S2.payload.meta.address.offset       <= fifo_request_dout_reg.payload.meta.address.offset;
         end
