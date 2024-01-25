@@ -859,7 +859,7 @@ module engine_csr_index_generator #(parameter
         next_burst_flag    = 0;
         next_burst_length  = 0;
         counter_temp_value = fifo_request_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-        mod_flag           = |((counter_temp_value-counter_load_value)%BURST_LENGTH);
+        mod_flag           = (counter_temp_value != 0) ? |((counter_temp_value - counter_load_value) % BURST_LENGTH) : 1'b0;
 
         // Calculate the page start and end addresses for the counter value and burst length.
         page_start         = counter_temp_value >> PAGE_SIZE_LOG2;
@@ -879,8 +879,7 @@ module engine_csr_index_generator #(parameter
                     // Burst crosses page boundary, split into two commands.
                     // first_burst_length     = PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES);
 
-                    first_burst_length = min(PAGE_SIZE_BYTES, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
-                    first_burst_length = min(first_burst_length, BURST_LENGTH);
+                    first_burst_length = min(burst_length_trunk, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
 
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
@@ -891,7 +890,7 @@ module engine_csr_index_generator #(parameter
                     end else begin
                         next_burst_flag   = 1'b0;
                         next_burst_length = 0;
-                        burst_length      = remaining_burst_length;
+                        burst_length      = first_burst_length;
                     end
                 end
                 else begin
