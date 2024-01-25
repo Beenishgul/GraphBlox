@@ -201,6 +201,9 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
                 else
                     next_state = ENGINE_CU_SETUP_IDLE;
             end
+            default : begin
+                next_state = ENGINE_CU_SETUP_RESET;
+            end
         endcase
     end // always_comb
 

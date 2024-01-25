@@ -349,6 +349,9 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
         CU_STREAM_CMD_DONE : begin
           next_state = CU_STREAM_CMD_READY;
         end
+        default : begin
+          next_state = CU_STREAM_CMD_RESET;
+        end
       endcase
     end// always_comb
 // State Transition Logic
@@ -794,6 +797,9 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
         end
         CU_STREAM_CMD_DONE : begin
           next_state = CU_STREAM_CMD_READY;
+        end
+        default : begin
+          next_state = CU_STREAM_CMD_RESET;
         end
       endcase
     end// always_comb

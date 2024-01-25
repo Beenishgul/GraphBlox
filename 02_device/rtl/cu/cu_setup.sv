@@ -256,6 +256,9 @@ always_comb begin
         CU_SETUP_FLUSH_DONE : begin
             next_state = CU_SETUP_FLUSH_DONE;
         end
+        default : begin
+          next_state = CU_SETUP_RESET;
+        end
     endcase
 end// always_comb
 

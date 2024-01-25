@@ -5303,6 +5303,9 @@ module m{0:02d}_axi_cu_stream_mid{1}x{2}_fe{3}x{4}_wrapper #(
         CU_STREAM_CMD_DONE : begin
           next_state = CU_STREAM_CMD_READY;
         end
+        default : begin
+          next_state = CU_STREAM_CMD_RESET;
+        end
       endcase
     end// always_comb
 // State Transition Logic

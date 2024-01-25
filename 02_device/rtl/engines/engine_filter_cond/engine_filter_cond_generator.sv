@@ -343,6 +343,9 @@ always_comb begin
             else
                 next_state = ENGINE_FILTER_COND_GEN_PAUSE;
         end
+        default : begin
+            next_state = ENGINE_FILTER_COND_GEN_RESET;
+        end
     endcase
 end// always_comb
 

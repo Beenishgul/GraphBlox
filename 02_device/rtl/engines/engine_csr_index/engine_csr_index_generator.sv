@@ -483,6 +483,9 @@ module engine_csr_index_generator #(parameter
                 // else
                 next_state = ENGINE_CSR_INDEX_GEN_DONE;
             end
+            default : begin
+                next_state = ENGINE_CSR_INDEX_GEN_RESET;
+            end
         endcase
     end // always_comb
 
