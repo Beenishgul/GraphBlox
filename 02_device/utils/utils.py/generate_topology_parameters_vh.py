@@ -516,6 +516,7 @@ def generate_channels_properties_parameters(ch_properties):
 def generate_caches_properties_parameters(cache_properties):
 
     # Grouping values for each cache
+    cache_config_l1_ram = []
     cache_config_l1_num_ways = []
     cache_config_l1_size = []
     cache_config_l1_prefetch = []
@@ -524,16 +525,17 @@ def generate_caches_properties_parameters(cache_properties):
     cache_config_l2_ram = []
     cache_config_l2_ctrl = []
     for cache, values in cache_properties.items():
+        cache_config_l1_ram.append(values[7])
         cache_config_l1_prefetch.append(int(values[6]))
         cache_config_l1_num_ways.append(int(values[5]))
         cache_config_l1_size.append(int(values[4]))
-        cache_config_l2_ctrl.append(values[3])
+        cache_config_l2_ctrl.append(int(values[3]))
         cache_config_l2_ram.append(values[2])
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
 
 
-    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram, cache_config_l2_ctrl
+    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l1_ram, cache_config_l2_ram, cache_config_l2_ctrl
 
 
 CHANNEL_CONFIG_L1 = []
@@ -548,6 +550,7 @@ NUM_CHANNELS_MAX  = 1
 
 NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
 
+CACHE_CONFIG_L1_RAM = []
 CACHE_CONFIG_L1_PREFETCH = []
 CACHE_CONFIG_L1_NUM_WAYS = []
 CACHE_CONFIG_L1_SIZE = []
@@ -556,7 +559,7 @@ CACHE_CONFIG_L2_SIZE = []
 CACHE_CONFIG_L2_RAM = []
 CACHE_CONFIG_L2_CTRL = []
 
-CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L2_RAM, CACHE_CONFIG_L2_CTRL = generate_caches_properties_parameters(cache_properties)
+CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L1_RAM, CACHE_CONFIG_L2_RAM, CACHE_CONFIG_L2_CTRL = generate_caches_properties_parameters(cache_properties)
 
 
 def find_max_value(list1, list2, list1_c, list2_c, max_size):
@@ -2097,6 +2100,34 @@ generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
 # generate axi vip
 # ----------------------------------------------------------------------------
 
+LEGAL_VALUES_SIZE = [32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304]
+
+def adjust_to_nearest_legal_cache_size(value):
+    nearest_legal = 32768
+    if value < 32768:
+        nearest_legal = 32768
+    elif value not in LEGAL_VALUES_SIZE:
+        # Find the nearest legal value
+        nearest_legal = min(LEGAL_VALUES_SIZE, key=lambda x: abs(x - value))
+        
+   
+        # If the value is already legal, return it unchanged
+    return nearest_legal
+
+LEGAL_VALUES_NUM_WAYS = [2, 4]
+
+def adjust_to_nearest_legal_cache_num_ways(value):
+    nearest_legal = 2
+    if value < 2:
+        nearest_legal = 2
+    elif value not in LEGAL_VALUES_NUM_WAYS:
+        # Find the nearest legal value
+        nearest_legal = min(LEGAL_VALUES_NUM_WAYS, key=lambda x: abs(x - value))
+        
+        # Return the nearest legal value
+    return nearest_legal
+
+
 with open(output_file_generate_m_axi_vip_tcl, "w") as file:
     output_lines = []
 
@@ -2109,6 +2140,12 @@ set MID_ADDR_WIDTH_M{0:02d}        {4}
 set MID_CACHE_DATA_WIDTH_M{0:02d}  {3} 
 set SYSTEM_CACHE_NUM_WAYS_M{0:02d} {6} 
 set SYSTEM_CACHE_SIZE_B_M{0:02d}   {5} 
+
+set FE_ADDR_WIDTH_M{0:02d}        {9} 
+set FE_CACHE_DATA_WIDTH_M{0:02d}  {10} 
+set CU_CACHE_NUM_WAYS_M{0:02d}    {11} 
+set CU_CACHE_SIZE_B_M{0:02d}      {12} 
+set LINE_CU_CACHE_DATA_WIDTH_M{0:02d} {3} 
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
@@ -2156,8 +2193,9 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 
 set SYSTEM_CACHE_SIZE_KB_M{0:02d} [expr {{${{SYSTEM_CACHE_SIZE_B_M{0:02d}}} / 1024}}]
 puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache \\[{7}\\]: Cache-line: ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{SYSTEM_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
-puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
 puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
+puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
+
 
 
 set module_name m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}
@@ -2195,6 +2233,67 @@ set_property -dict [list                                                  \\
                     CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
                     CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
+                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
+                    ] [get_ips ${{module_name}}] >> $log_file
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    """
+
+    fill_m_axi_vip_tcl_template_cu_cache_pre="""
+# ----------------------------------------------------------------------------
+# generate SYSTEM CACHE AXI_M{0:02d}
+# C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
+
+set CU_CACHE_SIZE_KB_M{0:02d} [expr {{${{CU_CACHE_SIZE_B_M{0:02d}}} / 1024}}]
+puts "[color 2 "                        Generate AXI_M{0:02d} CU Cache \\[{7}\\]: Cache-line: ${{LINE_CU_CACHE_DATA_WIDTH_M{0:02d}}}bits | Ways: ${{CU_CACHE_NUM_WAYS_M{0:02d}}} | Size: ${{CU_CACHE_SIZE_KB_M{0:02d}}}KB"]" 
+puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
+puts "[color 2 "                                    Front-End: Data width: ${{FE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{FE_ADDR_WIDTH_M{0:02d}}}bits"]" 
+
+
+
+set module_name m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}
+create_ip -name system_cache            \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 5.*                  \\
+          -module_name ${{module_name}}   >> $log_file
+
+set_property -dict [list                                                  \\
+                    CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CU_CACHE_DATA_WIDTH_M{0:02d}}}    \\
+                    CONFIG.C_CACHE_SIZE  ${{CU_CACHE_SIZE_B_M{0:02d}}}           \\
+                    CONFIG.C_M0_AXI_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
+                    CONFIG.C_M0_AXI_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                    CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
+                    CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
+                    CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
+                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
+
+    fill_m_axi_vip_tcl_template_cu_cache_mid="""                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
+                    CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
+                    CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
+                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
+
+    fill_m_axi_vip_tcl_template_cu_cache_post="""                    CONFIG.C_NUM_WAYS ${{CU_CACHE_NUM_WAYS_M{0:02d}}}            \\
+                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{FE_CACHE_DATA_WIDTH_M{0:02d}}}\\
+                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{FE_ADDR_WIDTH_M{0:02d}}}      \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
+                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
+                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
+                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
+                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}           \\
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
                     ] [get_ips ${{module_name}}] >> $log_file
 
@@ -2354,14 +2453,19 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
  """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index])))
+        
+        output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        output_lines.append(fill_m_axi_vip_tcl_template_slice_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+            output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        
+        output_lines.append(fill_m_axi_vip_tcl_template_cu_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), CACHE_CONFIG_L1_RAM[index]))
+        output_lines.append(fill_m_axi_vip_tcl_template_cu_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), CACHE_CONFIG_L1_RAM[index]))
+       
+        output_lines.append(fill_m_axi_vip_tcl_template_slice_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+            output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
       
     file.write('\n'.join(output_lines))
