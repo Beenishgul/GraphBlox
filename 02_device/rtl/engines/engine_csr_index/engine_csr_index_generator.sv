@@ -201,6 +201,8 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
     FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
 // --------------------------------------------------------------------------------------
+// Handle bursty transaction (READ ONLY)
+// --------------------------------------------------------------------------------------
     localparam                PULSE_HOLD           = 4;
     logic [   PULSE_HOLD-1:0] cmd_in_flight_hold      ;
     logic                     cmd_in_flight_assert    ;
@@ -210,8 +212,8 @@ module engine_csr_index_generator #(parameter
     logic                     page_crossing_flag      ;
 // --------------------------------------------------------------------------------------
 // Burst crosses page boundary, split into two commands.
-    type_memory_burst_length first_burst_length    ;
-    type_memory_burst_length remaining_burst_length;
+    logic [COUNTER_WIDTH-1:0] first_burst_length    ;
+    logic [COUNTER_WIDTH-1:0] remaining_burst_length;
 // --------------------------------------------------------------------------------------
 // Delay the second burst by one cycle.
     type_memory_burst_length next_burst_length    ;
@@ -220,7 +222,6 @@ module engine_csr_index_generator #(parameter
     logic                    next_burst_flag_reg  ;
 // --------------------------------------------------------------------------------------
     type_memory_burst_length  burst_length      ;
-    type_memory_burst_length  burst_length_reg  ;
     logic                     burst_flag        ;
     logic                     mod_flag          ;
     logic                     burst_flag_reg    ;
@@ -371,11 +372,9 @@ module engine_csr_index_generator #(parameter
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
     // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
-    localparam BURST_LENGTH          = 16                           ;
-    localparam PAGE_SIZE_BYTES       = 1024                         ; // 4K page size in bytes
-    localparam PAGE_SIZE_LOG2        = $clog2(PAGE_SIZE_BYTES)      ;
-    localparam CACHE_LINE_SIZE_BYTES = 64                           ;
-    localparam CACHE_LINE_SIZE_LOG2  = $clog2(CACHE_LINE_SIZE_BYTES);
+    localparam BURST_LENGTH    = 16                         ;
+    localparam PAGE_SIZE_WORDS = 4096/(M00_AXI4_FE_DATA_W/8); // 4K page size in words
+    localparam PAGE_SIZE_LOG2  = $clog2(PAGE_SIZE_WORDS)    ;
     // --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? 1'b1 : (fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
@@ -876,24 +875,24 @@ module engine_csr_index_generator #(parameter
         case (fifo_request_dout_reg.payload.meta.subclass.cmd)
             CMD_STREAM_READ : begin
                 if(~mod_flag) begin
-                    
+
                     page_start         = counter_temp_value >> PAGE_SIZE_LOG2;
                     page_end           = (counter_temp_value + BURST_LENGTH - 1) >> PAGE_SIZE_LOG2;
                     burst_length_trunk = ((counter_temp_value+BURST_LENGTH) > configure_engine_int.payload.param.index_end) ? (configure_engine_int.payload.param.index_end - counter_temp_value) : BURST_LENGTH;
                     page_crossing_flag = (page_start != page_end);
 
                     burst_flag             = 1'b1;
-                    first_burst_length     = min(burst_length_trunk, PAGE_SIZE_BYTES - (counter_temp_value % PAGE_SIZE_BYTES));
+                    first_burst_length     = min(burst_length_trunk, PAGE_SIZE_WORDS - (counter_temp_value % PAGE_SIZE_WORDS));
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
                     if(page_crossing_flag) begin
                         next_burst_flag   = 1'b1 & (|remaining_burst_length);
-                        next_burst_length = remaining_burst_length;
-                        burst_length      = first_burst_length;
+                        next_burst_length = remaining_burst_length[$bits(next_burst_length)-1:0];
+                        burst_length      = first_burst_length[$bits(burst_length)-1:0];
                     end else begin
                         next_burst_flag   = 1'b0;
                         next_burst_length = 0;
-                        burst_length      = first_burst_length;
+                        burst_length      = first_burst_length[$bits(burst_length)-1:0];
                     end
                 end
                 else begin
@@ -1078,20 +1077,6 @@ module engine_csr_index_generator #(parameter
             request_memory_out_reg.payload <= fifo_request_dout_reg_S2.payload;
             request_engine_out_reg.payload <= fifo_response_comb.payload;
         end
-
-        // if(ID_BUNDLE == 2) begin
-        //     // if(response_engine_in_reg.valid)
-        //     //     $display("%t - ENGINE RES B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, response_engine_in_reg.payload.data.field[0], response_engine_in_reg.payload.data.field[1], response_engine_in_reg.payload.data.field[2], response_engine_in_reg.payload.data.field[3]);
-
-        //     if(request_engine_out_reg.valid)
-        //         $display("%t - ENGINE REQ B:%0d L:%0d-%0d-%0d-%0d", $time,ID_BUNDLE, ID_LANE, request_engine_out_reg.payload.data.field[0], request_engine_out_reg.payload.data.field[1], request_engine_out_reg.payload.data.field[2], request_engine_out_reg.payload.data.field[3]);
-
-        //     // if(request_memory_out_reg.valid)
-        //     //     $display("%t - MEMORY REQ %0s B:%0d L:%0d-[%0d]", $time,request_memory_out_reg.payload.meta.subclass.cmd.name(),ID_BUNDLE, ID_LANE, request_memory_out_reg.payload.meta.address.offset);
-
-        //     // if(response_memory_in_reg.valid)
-        //     //     $display("%t - MEMORY RES B:%0d L:%0d-[%0d]", $time,ID_BUNDLE, ID_LANE, response_memory_in_reg.payload.meta.address.offset);
-        // end
     end
 
 endmodule : engine_csr_index_generator

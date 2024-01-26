@@ -165,11 +165,9 @@ logic                   engines_fifo_setup_signal                   [NUM_ENGINES
 logic [NUM_ENGINES-1:0] engines_done_out_reg                                         ;
 logic [NUM_ENGINES-1:0] engines_fifo_setup_signal_reg                                ;
 ControlPacket           engines_request_control_out                 [NUM_ENGINES-1:0];
-ControlPacket           engines_request_control_out_int                              ;
 EnginePacket            engines_request_lane_out                    [NUM_ENGINES-1:0];
 EnginePacket            engines_request_lane_out_int                                 ;
 MemoryPacketRequest     engines_request_memory_out                  [NUM_ENGINES-1:0];
-MemoryPacketRequest     engines_request_memory_out_int                               ;
 ControlPacket           engines_response_control_in                 [NUM_ENGINES-1:0];
 EnginePacket            engines_response_lane_in                    [NUM_ENGINES-1:0];
 MemoryPacketResponse    engines_response_memory_in                  [NUM_ENGINES-1:0];
@@ -520,10 +518,12 @@ generate
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_control_response
             assign engines_response_control_in[i] = 0;
             assign engines_fifo_response_control_in_signals_in[i].rd_en  = 1'b0;
+            assign engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = 1'b0;
             assign engine_arbiter_1_to_N_control_response_out[i] = 0;
         end
         assign engine_arbiter_1_to_N_control_fifo_response_signals_out = 2'b10;
         assign engine_arbiter_1_to_N_control_fifo_setup_signal         = 1'b0;
+        assign engine_arbiter_1_to_N_control_response_in               = 0;
     end
 endgenerate
 
