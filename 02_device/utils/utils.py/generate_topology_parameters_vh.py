@@ -497,14 +497,15 @@ def generate_channels_properties_parameters(ch_properties):
     channel_config_data_width_fe = []
     channel_config_address_width_fe = []
     for channel, values in ch_properties.items():
-        channel_config_address_width_be.append(int(values[2]))
-        channel_config_address_width_fe.append(int(values[6]))
-        channel_config_address_width_mid.append(int(values[4]))
-        channel_config_data_width_be.append(int(values[3]))
         channel_config_data_width_fe.append(int(values[7]))
-        channel_config_data_width_mid.append(int(values[5]))
-        channel_config_l1.append(int(values[1]))
-        channel_config_l2.append(int(values[0]))
+        channel_config_address_width_fe.append(int(values[6]))
+        channel_config_l1.append(int(values[5]))
+        channel_config_data_width_mid.append(int(values[4]))
+        channel_config_address_width_mid.append(int(values[3]))
+        channel_config_l2.append(int(values[2]))
+        channel_config_data_width_be.append(int(values[1]))
+        channel_config_address_width_be.append(int(values[0]))
+  
 
 
     NUM_CHANNELS_MAX = len(channel_config_l1)
@@ -523,13 +524,13 @@ def generate_caches_properties_parameters(cache_properties):
     cache_config_l2_ram = []
     cache_config_l2_ctrl = []
     for cache, values in cache_properties.items():
-        cache_config_l1_prefetch.append(int(values[4]))
-        cache_config_l1_num_ways.append(int(values[3]))
-        cache_config_l1_size.append(int(values[2]))
+        cache_config_l1_prefetch.append(int(values[6]))
+        cache_config_l1_num_ways.append(int(values[5]))
+        cache_config_l1_size.append(int(values[4]))
+        cache_config_l2_ctrl.append(values[3])
+        cache_config_l2_ram.append(values[2])
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
-        cache_config_l2_ram.append(values[5])
-        cache_config_l2_ctrl.append(values[6])
 
 
     return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l2_ram, cache_config_l2_ctrl

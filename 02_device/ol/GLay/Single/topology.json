@@ -328,6 +328,9 @@
         "buffer_8": "auxiliary_2",
         "buffer_9": "entries"
     },
+    "channels_comments": {
+        "comments":"channel_id, buffer_width"
+    },
     "channels": {
         "buffer_0": ["0","64"],
         "buffer_1": ["0","64"],
@@ -340,29 +343,35 @@
         "buffer_8": ["0","64"],
         "buffer_9": ["0","64"]
     },
+    "ch_properties_comments": {
+        "comments":"address_width_be, data_width_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe"
+    },
     "ch_properties": {
-        "channel_0": ["1","2","64","512","64","32", "64","32"],
-        "channel_1": ["0","3","64","32" ,"64","32" ,"64","32"],
-        "channel_2": ["0","0","64","512","64","512","64","32"],
-        "channel_3": ["0","0","64","512","64","512","64","32"],
-        "channel_4": ["0","0","64","512","64","512","64","32"],
-        "channel_5": ["0","0","64","512","64","512","64","32"],
-        "channel_6": ["0","0","64","512","64","512","64","32"],
-        "channel_7": ["0","0","64","512","64","512","64","32"],
-        "channel_8": ["0","0","64","512","64","512","64","32"],
-        "channel_9": ["0","0","64","512","64","512","64","32"]
+        "channel_0": ["64", "512", "1", "64", "32",  "2", "64", "32"],
+        "channel_1": ["64", "32",  "0", "64", "32",  "3", "64", "32"],
+        "channel_2": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_3": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_4": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_5": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_6": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_7": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_8": ["64", "512", "0", "64", "512", "0", "64", "32"],
+        "channel_9": ["64", "512", "0", "64", "512", "0", "64", "32"]
+    },
+    "cache_properties_comments": {
+        "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer"
     },
     "cache_properties": {
-        "channel_0": ["32768"  ,"4","512", "1","8","URAM"     ,"0"],
-        "channel_1": ["32768"  ,"2","512" ,"1","1","BRAM",     "0"],
-        "channel_2": ["32768"  ,"1","512" ,"1","1","URAM"     ,"0"],
-        "channel_3": ["65536"  ,"1","512" ,"1","1","BRAM"     ,"0"],
-        "channel_4": ["131072" ,"4","1024","1","1","LUTRAM"   ,"0"],
-        "channel_5": ["262144" ,"4","1024","1","1","Automatic","0"],
-        "channel_6": ["524288" ,"4","1024","1","1","URAM"     ,"0"],
-        "channel_7": ["1048576","4","1024","1","1","BRAM"     ,"0"],
-        "channel_8": ["2097152","4","1024","1","1","LUTRAM"   ,"0"],
-        "channel_9": ["4194304","4","1024","1","1","Automatic","0"]
+        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8"],
+        "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1"],
+        "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1"],
+        "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1"],
+        "channel_4": ["131072",  "4", "LUTRAM",    "0", "1024", "1", "1"],
+        "channel_5": ["262144",  "4", "Automatic", "0", "1024", "1", "1"],
+        "channel_6": ["524288",  "4", "URAM",      "0", "1024", "1", "1"],
+        "channel_7": ["1048576", "4", "BRAM",      "0", "1024", "1", "1"],
+        "channel_8": ["2097152", "4", "LUTRAM",    "0", "1024", "1", "1"],
+        "channel_9": ["4194304", "4", "Automatic", "0", "1024", "1", "1"]
     },
     "cu_properties": {
         "frequency"   : "200000000",
@@ -370,6 +379,9 @@
         "architecture": "GLay",
         "ctrl_mode"   : "USER_MANAGED",
         "capability"  : "Single"  
+    },
+    "fifo_comments": {
+        "comments":"fifo size for each port type if size zero engine doesn't have this port"
     },
     "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,
@@ -430,6 +442,9 @@
         "ENGINE_SET_OPS": 669,
         "ENGINE_PIPELINE": 1081,
         "ENGINE_READ_WRITE": 1419
+    },
+    "mapping_comments": {
+        "comments":"The engine mapping encoded in engine_template.sv file"
     },
     "mapping": {
         "ENGINE_ALU_OPS": 5,
