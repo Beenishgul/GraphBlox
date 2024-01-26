@@ -417,6 +417,7 @@ generate
             assign engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i] = 1'b0;
             assign engine_arbiter_N_to_1_memory_request_in[i]               = 0;
         end
+        assign engine_arbiter_N_to_1_memory_fifo_request_signals_in  = 1'b0;
         assign engine_arbiter_N_to_1_memory_fifo_request_signals_out = 2'b10;
         assign engine_arbiter_N_to_1_memory_request_out              = 0;
         assign engine_arbiter_N_to_1_memory_fifo_setup_signal        = 1'b0;
@@ -451,6 +452,7 @@ generate
             assign engine_arbiter_N_to_1_control_engine_arbiter_grant_out[i] = 1'b0;
             assign engine_arbiter_N_to_1_control_request_in[i]               = 0;
         end
+        assign engine_arbiter_N_to_1_control_fifo_request_signals_in  = 1'b0;
         assign engine_arbiter_N_to_1_control_fifo_request_signals_out = 2'b10;
         assign engine_arbiter_N_to_1_control_request_out              = 0;
         assign engine_arbiter_N_to_1_control_fifo_setup_signal        = 1'b0;
