@@ -211,7 +211,7 @@ iob_cache_axi #(
   .BE_DATA_W           (M00_AXI4_MID_DATA_W                                ),
   .NWAYS_W             (1                                                     ),
   .NLINES_W            ($clog2(512)                                             ),
-  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*1/M00_AXI4_FE_DATA_W)),
+  .WORD_OFFSET_W       ($clog2(M00_AXI4_MID_DATA_W*8/M00_AXI4_FE_DATA_W)),
   .WTBUF_DEPTH_W       (CACHE_WTBUF_DEPTH_W                                ),
   .REP_POLICY          (CACHE_REP_POLICY                                   ),
   .WRITE_POL           (CACHE_WRITE_POL                                    ),
