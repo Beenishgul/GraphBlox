@@ -68,7 +68,6 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
     M00_AXI4_MID_MasterReadInterface  m_axi_read ;
-    M00_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -109,7 +108,6 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     logic [  NUM_CHANNELS_READ-1:0]                          read_transaction_tvalid_out   ;
     logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
     logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
-    logic [  NUM_CHANNELS_READ-1:0][M00_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
     logic [M00_AXI4_MID_DATA_W-1:0]                          read_transaction_length_in    ;
 
 // --------------------------------------------------------------------------------------
@@ -405,7 +403,7 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 // --------------------------------------------------------------------------------------
 // READ Stream
 // --------------------------------------------------------------------------------------
-    assign read_transaction_length_in = fifo_request_dout.meta.address.burst_length;
+    assign read_transaction_length_in = { {M00_AXI4_MID_DATA_W - $bits(fifo_request_dout.meta.address.burst_length){1'b0}}, fifo_request_dout.meta.address.burst_length };
     assign read_transaction_start_in  = stream_request_mem_int.iob.valid & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH));
     assign read_transaction_offset_in = stream_request_mem_int.iob.addr;
     assign read_transaction_tready_in = cmd_read_pending & cmd_halt_condition;
@@ -415,6 +413,10 @@ module m00_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     assign stream_response_mem.iob.ready = ~read_transaction_prog_full;
     assign stream_response_mem.iob.valid = read_transaction_tvalid_out;
     assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
+
+    assign stream_response_mem.data = 0;
+    assign stream_response_mem.meta = 0;
+
 
   engine_m_axi #(
     .C_NUM_CHANNELS     (NUM_CHANNELS_READ                        ),
@@ -517,7 +519,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
     M01_AXI4_MID_MasterReadInterface  m_axi_read ;
-    M01_AXI4_MID_MasterWriteInterface m_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Cache signals
@@ -558,7 +559,6 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     logic [  NUM_CHANNELS_READ-1:0]                          read_transaction_tvalid_out   ;
     logic [  NUM_CHANNELS_READ-1:0][M01_AXI4_MID_ADDR_W-1:0] read_transaction_offset_in    ;
     logic [  NUM_CHANNELS_READ-1:0][M01_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out    ;
-    logic [  NUM_CHANNELS_READ-1:0][M01_AXI4_MID_DATA_W-1:0] read_transaction_tdata_out_reg;
     logic [M01_AXI4_MID_DATA_W-1:0]                          read_transaction_length_in    ;
 
 // --------------------------------------------------------------------------------------
@@ -854,7 +854,7 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
 // --------------------------------------------------------------------------------------
 // READ Stream
 // --------------------------------------------------------------------------------------
-    assign read_transaction_length_in = fifo_request_dout.meta.address.burst_length;
+    assign read_transaction_length_in = { {M01_AXI4_MID_DATA_W - $bits(fifo_request_dout.meta.address.burst_length){1'b0}}, fifo_request_dout.meta.address.burst_length };
     assign read_transaction_start_in  = stream_request_mem_int.iob.valid & ((fifo_request_dout.meta.subclass.cmd == CMD_MEM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_STREAM_READ)|(fifo_request_dout.meta.subclass.cmd == CMD_CACHE_FLUSH));
     assign read_transaction_offset_in = stream_request_mem_int.iob.addr;
     assign read_transaction_tready_in = cmd_read_pending & cmd_halt_condition;
@@ -864,6 +864,10 @@ module m01_axi_cu_stream_mid32x64_fe32x64_wrapper #(
     assign stream_response_mem.iob.ready = ~read_transaction_prog_full;
     assign stream_response_mem.iob.valid = read_transaction_tvalid_out;
     assign stream_response_mem.iob.rdata = read_transaction_tdata_out;
+
+    assign stream_response_mem.data = 0;
+    assign stream_response_mem.meta = 0;
+
 
   engine_m_axi #(
     .C_NUM_CHANNELS     (NUM_CHANNELS_READ                        ),

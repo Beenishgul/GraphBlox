@@ -235,7 +235,7 @@ axi_from_mem #(
   .MemAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .AxiAddrWidth(M00_AXI4_FE_ADDR_W    ),
   .DataWidth   (M00_AXI4_FE_DATA_W    ),
-  .MaxRequests (2**1                 ),
+  .MaxRequests (2**8                 ),
   .axi_req_t   (M00_AXI4_FE_REQ_T     ),
   .axi_rsp_t   (M00_AXI4_FE_RESP_T    )
 ) inst_axi_from_mem (
@@ -255,6 +255,9 @@ axi_from_mem #(
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );
+// --------------------------------------------------------------------------------------
+assign sram_response_mem.meta = 0;
+assign sram_response_mem.data = 0;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT
@@ -597,6 +600,9 @@ axi_from_mem #(
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );
+// --------------------------------------------------------------------------------------
+assign sram_response_mem.meta = 0;
+assign sram_response_mem.data = 0;
 
 // --------------------------------------------------------------------------------------
 // Cache request FIFO FWFT
