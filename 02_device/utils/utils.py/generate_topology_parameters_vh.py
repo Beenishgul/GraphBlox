@@ -4494,7 +4494,7 @@ generate
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
     end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 2) begin
-// CU SRAN -> AXI Kernel Cache
+// CU SRAM -> AXI Kernel Cache
       m{0:02d}_axi_cu_sram_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_sram_l1 (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
@@ -4536,7 +4536,7 @@ generate
         .done_out                 (cu_channel_done_out[{1}]                 )
       );
     end else begin
-// CU SRAN -> AXI Kernel Cache
+// CU CACHE -> AXI Kernel Cache
       m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1 (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
@@ -5476,7 +5476,7 @@ end
 
   endmodule : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper
   """
-  
+
 output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_cache_wrapper.sv")
 check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
 
