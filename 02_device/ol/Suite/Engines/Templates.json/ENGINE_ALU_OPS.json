@@ -1,0 +1,64 @@
+{
+    "type_ALU_operation": {
+        "ALU_NOP": 1,
+        "ALU_ADD": 2,
+        "ALU_SUB": 4,
+        "ALU_MUL": 8,
+        "ALU_ACC": 16,
+        "ALU_DIV": 32
+    },
+    "entries": {
+        "entry_0": {
+            "alu_operation": {
+                "bits": "6",
+                "value": "ALU_NOP"
+            }
+        },
+        "entry_1": {
+            "alu_mask": {
+                "bits": "4",
+                "value": "0x0"
+            },
+            "id_engine": {
+                "bits": "8",
+                "value": "0x00"
+            },
+            "id_module": {
+                "bits": "8",
+                "value": "0x00"
+            }
+        },
+        "entry_2": {
+            "const_mask": {
+                "bits": "4",
+                "value": "0x0"
+            }
+        },
+        "entry_3": {
+            "const_value": {
+                "bits": "32",
+                "value": "0x00000000"
+            }
+        },
+        "entry_4": {
+            "ops_mask": {
+                "bits": "16",
+                "value": "0x0000"
+            }
+        },
+        "entry_5": {
+            "id_cu": {
+                "bits": "8",
+                "value": "0x00"
+            },
+            "id_bundle": {
+                "bits": "8",
+                "value": "0x00"
+            },
+            "id_lane": {
+                "bits": "8",
+                "value": "0x00"
+            }
+        }
+    }
+}

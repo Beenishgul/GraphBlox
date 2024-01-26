@@ -1,0 +1,16 @@
+{
+    "entries": {
+        "entry_0": {
+            "merge_mask": {
+                "bits": "4",
+                "value": "0x0"
+            }
+        },
+        "entry_1": {
+            "merge_type": {
+                "bits": "4",
+                "value": "0x0"
+            }
+        }
+    }
+}
