@@ -5484,9 +5484,9 @@ with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
     fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(CHANNEL_CONFIG_L1[index] == 1):
-            fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
-        else:
             fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_v2.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+        else:
+            fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
     
     file.write('\n'.join(fill_cu_mxx_axi_cu_cache_wrapper_module))
 
