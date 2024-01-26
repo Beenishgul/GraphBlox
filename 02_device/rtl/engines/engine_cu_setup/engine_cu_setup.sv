@@ -62,7 +62,6 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 
     logic done_int_reg ;
     logic start_in_reg ;
-    logic pause_in_reg ;
     logic ready_out_reg;
     logic done_out_reg ;
 
@@ -72,7 +71,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     MemoryPacketRequestPayload    fifo_request_din             ;
     MemoryPacketRequest           fifo_request_din_reg         ;
     MemoryPacketRequestPayload    fifo_request_dout            ;
-    MemoryPacketRequest           fifo_request_comb            ;
+    MemoryPacketRequestPayload    fifo_request_comb            ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
     FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -328,29 +327,29 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
 
-    assign fifo_request_comb.payload.meta.route                = configuration_reg.payload.meta.route;
-    assign fifo_request_comb.payload.meta.address.id_channel   = configuration_reg.payload.meta.address.id_channel;
-    assign fifo_request_comb.payload.meta.address.id_buffer    = configuration_reg.payload.meta.address.id_buffer;
-    assign fifo_request_comb.payload.meta.address.shift        = configuration_reg.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.address.burst_length = configuration_reg.payload.meta.address.burst_length;
-    assign fifo_request_comb.payload.meta.subclass             = configuration_reg.payload.meta.subclass;
+    assign fifo_request_comb.meta.route                = configuration_reg.payload.meta.route;
+    assign fifo_request_comb.meta.address.id_channel   = configuration_reg.payload.meta.address.id_channel;
+    assign fifo_request_comb.meta.address.id_buffer    = configuration_reg.payload.meta.address.id_buffer;
+    assign fifo_request_comb.meta.address.shift        = configuration_reg.payload.meta.address.shift;
+    assign fifo_request_comb.meta.address.burst_length = configuration_reg.payload.meta.address.burst_length;
+    assign fifo_request_comb.meta.subclass             = configuration_reg.payload.meta.subclass;
 
     always_comb begin
         if(configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
         end else if(~configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_request_comb.payload.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | ((counter_count & (SYSTEM_CACHE_NUM_WAYS-1)) << SYSTEM_CACHE_LINE_SIZE_LOG));
+            fifo_request_comb.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | ((counter_count & (SYSTEM_CACHE_NUM_WAYS-1)) << SYSTEM_CACHE_LINE_SIZE_LOG));
         end
     end
 
     always_comb begin
-        fifo_request_comb.payload.data.field = counter_count;
+        fifo_request_comb.data.field = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg.payload <= fifo_request_comb.payload;
+        fifo_request_din_reg.payload <= fifo_request_comb;
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (

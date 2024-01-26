@@ -194,9 +194,9 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.param.stride <= fifo_response_memory_in_dout_reg.payload.data.field;
             end
             (1 << 4) : begin
-                configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-2:0];
+                configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
                 configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
-                configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-2:0];
+                configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
                 configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
             end
             (1 << 5) : begin

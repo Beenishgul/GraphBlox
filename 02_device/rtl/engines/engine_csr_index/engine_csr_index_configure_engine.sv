@@ -51,7 +51,6 @@ CSRIndexConfiguration configure_engine_reg  ;
 EnginePacket          fifo_response_engine_in_dout_int      ;
 EnginePacket          fifo_response_engine_in_dout_reg      ;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
-logic                 fifo_response_engine_in_push_filter   ;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
