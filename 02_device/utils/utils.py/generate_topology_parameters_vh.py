@@ -2103,21 +2103,21 @@ generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
 LEGAL_VALUES_SIZE = [32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304]
 
 def adjust_to_nearest_legal_cache_size(value):
-    nearest_legal = 32768
+    nearest_legal = value
     if value < 32768:
         nearest_legal = 32768
     elif value not in LEGAL_VALUES_SIZE:
         # Find the nearest legal value
         nearest_legal = min(LEGAL_VALUES_SIZE, key=lambda x: abs(x - value))
-        
-   
+
+    
         # If the value is already legal, return it unchanged
     return nearest_legal
 
 LEGAL_VALUES_NUM_WAYS = [2, 4]
 
 def adjust_to_nearest_legal_cache_num_ways(value):
-    nearest_legal = 2
+    nearest_legal = value
     if value < 2:
         nearest_legal = 2
     elif value not in LEGAL_VALUES_NUM_WAYS:
