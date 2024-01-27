@@ -795,7 +795,7 @@ module engine_csr_index_generator #(parameter
     assign request_out_int.payload                = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH                  ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2              ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
         .PROG_THRESH     (5                             )
@@ -970,10 +970,10 @@ module engine_csr_index_generator #(parameter
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH              ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (5                         )
+        .PROG_THRESH     (               5          )
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -1005,7 +1005,7 @@ module engine_csr_index_generator #(parameter
     assign request_commit_out_int.payload           = fifo_request_commit_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH              ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
         .PROG_THRESH     (5                         )
