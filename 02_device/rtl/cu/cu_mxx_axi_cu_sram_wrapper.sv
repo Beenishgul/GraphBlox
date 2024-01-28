@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_cu_sram_mid32x64_fe32x64_wrapper #(
+module m00_axi_cu_sram_mid32x32_fe32x32_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -358,11 +358,11 @@ always_comb begin
   sram_request_mem_int.data      = fifo_request_dout.data;
 end
 
-endmodule : m00_axi_cu_sram_mid32x64_fe32x64_wrapper
+endmodule : m00_axi_cu_sram_mid32x32_fe32x32_wrapper
   
 
 
-module m01_axi_cu_sram_mid32x64_fe32x64_wrapper #(
+module m01_axi_cu_sram_mid32x32_fe32x32_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -703,5 +703,5 @@ always_comb begin
   sram_request_mem_int.data      = fifo_request_dout.data;
 end
 
-endmodule : m01_axi_cu_sram_mid32x64_fe32x64_wrapper
+endmodule : m01_axi_cu_sram_mid32x32_fe32x32_wrapper
   

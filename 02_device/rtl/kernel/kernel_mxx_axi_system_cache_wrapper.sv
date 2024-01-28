@@ -17,7 +17,7 @@
 
 
 
-module kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper (
+module kernel_m00_axi_system_cache_be512x32_mid32x32_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -42,8 +42,8 @@ logic areset_control     ;
 
 logic cache_setup_signal_int;
 
-logic m_axi_read_out_araddr_63 ;
-logic m_axi_write_out_awaddr_63;
+logic m_axi_read_out_araddr_32 ;
+logic m_axi_write_out_awaddr_32;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
@@ -103,12 +103,12 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-assign m_axi_read.out.araddr[63]  = 1'b0;
-assign m_axi_write.out.awaddr[63] = 1'b0;
+// assign m_axi_read.out.araddr[32-1]  = 1'b0;
+// assign m_axi_write.out.awaddr[32-1] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x64 (
+m00_axi_system_cache_be512x32_mid32x32 inst_m00_axi_system_cache_be512x32_mid32x32 (
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
@@ -157,7 +157,8 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .M0_AXI_RID        (m_axi_read.in.rid           ), // Input Read channel ID
   .M0_AXI_RRESP      (m_axi_read.in.rresp         ), // Input Read channel response
   .M0_AXI_ARVALID    (m_axi_read.out.arvalid      ), // Output Read Address read channel valid
-  .M0_AXI_ARADDR     ({m_axi_read_out_araddr_63, m_axi_read.out.araddr[62:0]} ), // Output Read Address read channel address
+   //.M0_AXI_ARADDR     ({m_axi_read_out_araddr_32, m_axi_read.out.araddr[32-2:0]} ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     (m_axi_read.out.araddr       ), // Output Read Address read channel address
   .M0_AXI_ARLEN      (m_axi_read.out.arlen        ), // Output Read Address channel burst length
   .M0_AXI_RREADY     (m_axi_read.out.rready       ), // Output Read Read channel ready
   .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
@@ -174,7 +175,8 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
   .M0_AXI_BVALID     (m_axi_write.in.bvalid       ), // Input Write response channel valid
   .M0_AXI_AWVALID    (m_axi_write.out.awvalid     ), // Output Write Address write channel valid
   .M0_AXI_AWID       (m_axi_write.out.awid        ), // Output Write Address write channel ID
-  .M0_AXI_AWADDR     ({m_axi_write_out_awaddr_63, m_axi_write.out.awaddr[62:0]}), // Output Write Address write channel address
+   //.M0_AXI_AWADDR     ({m_axi_write_out_awaddr_32, m_axi_write.out.awaddr[32-2:0]}), // Output Write Address write channel address
+  .M0_AXI_AWADDR     (m_axi_write.out.awaddr      ), // Output Write Address write channel address
   .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
   .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
   .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
@@ -196,12 +198,12 @@ m00_axi_system_cache_be512x64_mid32x64 inst_m00_axi_system_cache_be512x64_mid32x
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m00_axi_system_cache_be512x64_mid32x64_wrapper
+endmodule : kernel_m00_axi_system_cache_be512x32_mid32x32_wrapper
 
 
 
 
-module kernel_m01_axi_system_cache_be32x64_mid32x64_wrapper (
+module kernel_m01_axi_system_cache_be32x32_mid32x32_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -226,8 +228,8 @@ logic areset_control     ;
 
 logic cache_setup_signal_int;
 
-logic m_axi_read_out_araddr_63 ;
-logic m_axi_write_out_awaddr_63;
+logic m_axi_read_out_araddr_32 ;
+logic m_axi_write_out_awaddr_32;
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
@@ -287,12 +289,12 @@ assign s_axi_write.in = s_axi_write_in;
 // --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-assign m_axi_read.out.araddr[63]  = 1'b0;
-assign m_axi_write.out.awaddr[63] = 1'b0;
+// assign m_axi_read.out.araddr[32-1]  = 1'b0;
+// assign m_axi_write.out.awaddr[32-1] = 1'b0;
 assign m_axi_write.out.awregion   = 0;
 assign m_axi_read.out.arregion    = 0;
 
-m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64 (
+m01_axi_system_cache_be32x32_mid32x32 inst_m01_axi_system_cache_be32x32_mid32x32 (
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
@@ -341,7 +343,8 @@ m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64
   .M0_AXI_RID        (m_axi_read.in.rid           ), // Input Read channel ID
   .M0_AXI_RRESP      (m_axi_read.in.rresp         ), // Input Read channel response
   .M0_AXI_ARVALID    (m_axi_read.out.arvalid      ), // Output Read Address read channel valid
-  .M0_AXI_ARADDR     ({m_axi_read_out_araddr_63, m_axi_read.out.araddr[62:0]} ), // Output Read Address read channel address
+   //.M0_AXI_ARADDR     ({m_axi_read_out_araddr_32, m_axi_read.out.araddr[32-2:0]} ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     (m_axi_read.out.araddr       ), // Output Read Address read channel address
   .M0_AXI_ARLEN      (m_axi_read.out.arlen        ), // Output Read Address channel burst length
   .M0_AXI_RREADY     (m_axi_read.out.rready       ), // Output Read Read channel ready
   .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
@@ -358,7 +361,8 @@ m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64
   .M0_AXI_BVALID     (m_axi_write.in.bvalid       ), // Input Write response channel valid
   .M0_AXI_AWVALID    (m_axi_write.out.awvalid     ), // Output Write Address write channel valid
   .M0_AXI_AWID       (m_axi_write.out.awid        ), // Output Write Address write channel ID
-  .M0_AXI_AWADDR     ({m_axi_write_out_awaddr_63, m_axi_write.out.awaddr[62:0]}), // Output Write Address write channel address
+   //.M0_AXI_AWADDR     ({m_axi_write_out_awaddr_32, m_axi_write.out.awaddr[32-2:0]}), // Output Write Address write channel address
+  .M0_AXI_AWADDR     (m_axi_write.out.awaddr      ), // Output Write Address write channel address
   .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
   .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
   .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
@@ -380,5 +384,5 @@ m01_axi_system_cache_be32x64_mid32x64 inst_m01_axi_system_cache_be32x64_mid32x64
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m01_axi_system_cache_be32x64_mid32x64_wrapper
+endmodule : kernel_m01_axi_system_cache_be32x32_mid32x32_wrapper
 
