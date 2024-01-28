@@ -179,6 +179,8 @@ set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs impl_1]
 set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]
+set_property AUTO_RQS 1 [get_runs impl_1]
+set_property AUTO_RQS.SUGGESTION_RUN impl_1 [get_runs synth_1]
 
 set argv [list ${PARAMS_TCL_DIR}]
 set argc 1
@@ -212,7 +214,7 @@ puts "[color 3 "                Step 2: Inference clock, reset, AXI interfaces a
 puts "[color 4 "                        Inference clock and reset signals"]" 
 set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
 set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
-set_property value        64           $bifparam
+set_property value        32           $bifparam
 set_property value_source constant     $bifparam
 set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
 set_property value        32           $bifparam

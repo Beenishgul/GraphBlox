@@ -320,6 +320,7 @@ module __KERNEL___testbench ();
         function bit [31:0] get_random_4bytes();
             bit [31:0] rptr;
             ptr_random_failed : assert(std::randomize(rptr));
+            rptr[31:0] &= ~(32'h00000fff);
             return(rptr);
         endfunction
 
@@ -597,15 +598,15 @@ module __KERNEL___testbench ();
         task automatic set_memory_pointers();
             ///////////////////////////////////////////////////////////////////////////
             //Randomly generate memory pointers.
-            buffer_0_ptr[62:0] = get_random_ptr();
-            buffer_1_ptr[62:0] = get_random_ptr();
-            buffer_2_ptr[62:0] = get_random_ptr();
-            buffer_3_ptr[62:0] = get_random_ptr();
-            buffer_4_ptr[62:0] = get_random_ptr();
-            buffer_5_ptr[62:0] = get_random_ptr();
-            buffer_6_ptr[62:0] = get_random_ptr();
-            buffer_7_ptr[62:0] = get_random_ptr();
-            buffer_8_ptr[62:0] = get_random_ptr();
+            buffer_0_ptr[63:0] = get_random_4bytes();
+            buffer_1_ptr[63:0] = get_random_4bytes();
+            buffer_2_ptr[63:0] = get_random_4bytes();
+            buffer_3_ptr[63:0] = get_random_4bytes();
+            buffer_4_ptr[63:0] = get_random_4bytes();
+            buffer_5_ptr[63:0] = get_random_4bytes();
+            buffer_6_ptr[63:0] = get_random_4bytes();
+            buffer_7_ptr[63:0] = get_random_4bytes();
+            buffer_8_ptr[63:0] = get_random_4bytes();
             buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////

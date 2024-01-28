@@ -104,8 +104,8 @@ config+="temp_dir=${KERNEL_NAME}.build\n"
 config+="report_dir=${KERNEL_NAME}.build/reports\n"
 config+="log_dir=${KERNEL_NAME}.build/logs\n"
 config+="save-temps=1\n"
-# config+="target=hw\n"
-config+="debug=1\n"
+config+="target=hw\n"
+# config+="debug=0\n"
 config+="link=1\n"
 
 # config+="\n"
@@ -134,18 +134,18 @@ do
     
     if [[ "$PART" == "xcu55c-fsvh2892-2L-e" ]]
     then
-        # config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i)%3))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * (32/${XILINX_NUM_KERNELS}))) $((((i)*(32/${XILINX_NUM_KERNELS}))-1)) $i)
     elif [[ "$PART" == "xcu280-fsvh2892-2L-e" ]]
     then
-        # config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 3))\n"
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i)%3))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "HBM" $(((i - 1) * (32/${XILINX_NUM_KERNELS})))  $((((i)*(32/${XILINX_NUM_KERNELS}))-1)) $i)
     elif [[ "$PART" == "xcu250-figd2104-2L-e" ]]
     then
-        # config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     else
-        # config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
+        config+="slr=${KERNEL_NAME}_$i:SLR$(((i - 1 )% 4))\n"
         config+=$(generate_connectivity_sp ${KERNEL_NAME} "0" ${NUM_KERNELS_BUFFERS} "DDR" "$((i - 1))" "$((i - 1))" $i)
     fi
 done
@@ -163,6 +163,7 @@ then
 
     config+="\n[vivado]\n"
     config+="prop=run.synth_1.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\n"
+    # config+="prop=run.synth_1.AUTO_RQS.SUGGESTION_RUN=impl_1\n"
     config+="prop=run.impl_1.{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
     config+="prop=run.impl_1.{STEPS.PHYS_OPT_DESIGN.IS_ENABLED}={true}\n"
     config+="prop=run.impl_1.{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}={-retiming}\n"
@@ -174,6 +175,7 @@ then
     config+="prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=Explore\n"
     config+="prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true\n"
     config+="prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n"
+    # config+="prop=run.impl_1.AUTO_RQS=true\n"
     config+="impl.jobs=${XILINX_JOBS_STRATEGY}\n"
     config+="synth.jobs=${XILINX_JOBS_STRATEGY}\n"
     config+="param=general.maxThreads=${XILINX_MAX_THREADS}\n"
