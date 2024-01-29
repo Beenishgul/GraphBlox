@@ -17,7 +17,7 @@
 
 
 
-module m00_axi_cu_cache_mid32x32_fe32x32_wrapper #(
+module m00_axi_cu_cache_mid32x33_fe32x33_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -411,11 +411,11 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : m00_axi_cu_cache_mid32x32_fe32x32_wrapper
+endmodule : m00_axi_cu_cache_mid32x33_fe32x33_wrapper
   
 
 
-module m01_axi_cu_cache_mid32x32_fe32x32_wrapper #(
+module m01_axi_cu_cache_mid32x33_fe32x33_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
   parameter PROG_THRESH      = 32
 ) (
@@ -809,5 +809,5 @@ counter #(.C_WIDTH(CACHE_WTBUF_DEPTH_W)) inst_write_command_counter (
   .is_zero     (write_command_counter_is_zero                                                                )
 );
 
-endmodule : m01_axi_cu_cache_mid32x32_fe32x32_wrapper
+endmodule : m01_axi_cu_cache_mid32x33_fe32x33_wrapper
   
