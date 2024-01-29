@@ -46,6 +46,7 @@ module lane_template #(
 
 genvar i;
 genvar j;
+genvar k;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -562,6 +563,18 @@ generate
             .fifo_setup_signal                       (engines_fifo_setup_signal[j]                                                             ),
             .done_out                                (engines_done_out[j]                                                                      )
         );
+
+        for(k=ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]+1; k < (1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY); k = k+1 ) begin
+            assign engines_response_merge_lane_in[j][k] = 0;
+            assign engines_fifo_response_merge_lane_in_signals_in[j][k]  = 1'b0;
+            assign engines_fifo_response_merge_lane_in_signals_out[j][k] = 2'b10;
+        end
+
+        for(k=ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]+1; k < (1+ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY); k = k+1 ) begin
+            assign engines_request_cast_lane_out[j][k] = 0;
+            assign engines_fifo_request_cast_lane_out_signals_in[j][k]  = 1'b0;
+            assign engines_fifo_request_cast_lane_out_signals_out[j][k] = 2'b10;
+        end
     end
 endgenerate
 

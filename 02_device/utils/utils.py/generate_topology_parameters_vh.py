@@ -4245,8 +4245,8 @@ logic areset_control     ;
 
 logic cache_setup_signal_int;
 
-logic m_axi_read_out_araddr_{2} ;
-logic m_axi_write_out_awaddr_{2};
+// logic m_axi_read_out_araddr_{2} ;
+// logic m_axi_write_out_awaddr_{2};
 // --------------------------------------------------------------------------------------
 //   Cache AXI signals
 // --------------------------------------------------------------------------------------
@@ -5104,8 +5104,8 @@ M{0:02d}_AXI4_FE_REQ_T  axi_req_o;
 M{0:02d}_AXI4_FE_RESP_T axi_rsp_i;
 
 // --------------------------------------------------------------------------------------
-logic                   m_axi_read_out_araddr_{2} ;
-logic                   m_axi_write_out_awaddr_{2};
+// logic                   m_axi_read_out_araddr_{2} ;
+// logic                   m_axi_write_out_awaddr_{2};
 type_m{0:02d}_axi4_mid_cache m_axi_read_out_arcache   ;
 type_m{0:02d}_axi4_mid_cache m_axi_read_out_awcache   ;
 logic                   cache_setup_signal_int   ;

@@ -15,15 +15,17 @@
 `include "global_package.vh"
 
 module arbiter_1_to_N_response_memory #(
-  parameter ID_LEVEL             = 1                              ,
-  parameter ID_BUNDLE            = 0                              ,
-  parameter NUM_MEMORY_RECEIVER  = 2                              ,
-  parameter DEMUX_BUS_WIDTH      = NUM_MEMORY_RECEIVER            ,
-  parameter DEMUX_SEL_WIDTH      = NUM_MEMORY_RECEIVER            ,
-  parameter NUM_ARBITER_RECEIVER = 2**$clog2(NUM_MEMORY_RECEIVER) ,
-  parameter FIFO_ARBITER_DEPTH   = 8                              ,
-  parameter FIFO_WRITE_DEPTH     = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH          = (FIFO_WRITE_DEPTH/2) + 3
+  parameter ID_LEVEL              = 1                              ,
+  parameter ID_BUNDLE             = 0                              ,
+  parameter NUM_MEMORY_RECEIVER   = 2                              ,
+  parameter DEMUX_BUS_WIDTH       = NUM_MEMORY_RECEIVER            ,
+  parameter DEMUX_SEL_WIDTH       = NUM_MEMORY_RECEIVER            ,
+  parameter NUM_ARBITER_RECEIVER  = 2**$clog2(NUM_MEMORY_RECEIVER) ,
+  parameter FIFO_ARBITER_DEPTH    = 8                              ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3       ,
+  parameter FIFO_ENABLE           = 0                              ,
+  parameter PIPELINE_STAGES_DEPTH = 1
 ) (
   input  logic                  ap_clk                                            ,
   input  logic                  areset                                            ,
@@ -41,6 +43,7 @@ logic areset_control;
 logic areset_fifo   ;
 
 MemoryPacketResponse            response_in_reg;
+MemoryPacketResponse            response_in_int;
 logic [NUM_MEMORY_RECEIVER-1:0] id_mask        ;
 
 // --------------------------------------------------------------------------------------
@@ -311,50 +314,82 @@ always_ff @(posedge ap_clk) begin
 end
 
 
+
+
+generate
+  if (FIFO_ENABLE == 1) begin : gen_fifo
 // --------------------------------------------------------------------------------------
 // FIFO memory response out fifo MemoryPacketResponse
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
-assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
+// --------------------------------------------------------------------------------------
+    assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
+    assign response_in_int = 0;
 
-// Push
-generate
-  case (ID_LEVEL)
-    5       : begin
-      assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
-    end
-    default : begin
-      assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_source);
-    end
-  endcase
-endgenerate
+    case (ID_LEVEL)
+      5       : begin
+        assign fifo_response_signals_in_int.wr_en = response_in_reg.valid;
+      end
+      default : begin
+        assign fifo_response_signals_in_int.wr_en = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_source);
+      end
+    endcase
 
-assign fifo_response_din = response_in_reg.payload;
+    assign fifo_response_din = response_in_reg.payload;
 
 // Pop
-assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_int_rd_en;
-assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & fifo_response_signals_in_int_rd_en;
-assign fifo_response_dout_int.payload     = fifo_response_dout;
+    assign fifo_response_signals_in_int.rd_en = ~fifo_response_signals_out_int.empty & fifo_response_signals_in_int_rd_en;
+    assign fifo_response_dout_int.valid       = fifo_response_signals_out_int.valid & fifo_response_signals_in_int_rd_en;
+    assign fifo_response_dout_int.payload     = fifo_response_dout;
 
-xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
-  .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
-  .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
-  .PROG_THRESH     (PROG_THRESH                       ),
-  .READ_MODE       ("fwft"                            )
-) inst_fifo_MemoryPacketResponse (
-  .clk        (ap_clk                                   ),
-  .srst       (areset_fifo                              ),
-  .din        (fifo_response_din                        ),
-  .wr_en      (fifo_response_signals_in_int.wr_en       ),
-  .rd_en      (fifo_response_signals_in_int.rd_en       ),
-  .dout       (fifo_response_dout                       ),
-  .full       (fifo_response_signals_out_int.full       ),
-  .empty      (fifo_response_signals_out_int.empty      ),
-  .valid      (fifo_response_signals_out_int.valid      ),
-  .prog_full  (fifo_response_signals_out_int.prog_full  ),
-  .wr_rst_busy(fifo_response_signals_out_int.wr_rst_busy),
-  .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
-);
+    xpm_fifo_sync_wrapper #(
+      .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                  ),
+      .WRITE_DATA_WIDTH($bits(MemoryPacketResponsePayload)),
+      .READ_DATA_WIDTH ($bits(MemoryPacketResponsePayload)),
+      .PROG_THRESH     (PROG_THRESH                       ),
+      .READ_MODE       ("fwft"                            )
+    ) inst_fifo_MemoryPacketResponse (
+      .clk        (ap_clk                                   ),
+      .srst       (areset_fifo                              ),
+      .din        (fifo_response_din                        ),
+      .wr_en      (fifo_response_signals_in_int.wr_en       ),
+      .rd_en      (fifo_response_signals_in_int.rd_en       ),
+      .dout       (fifo_response_dout                       ),
+      .full       (fifo_response_signals_out_int.full       ),
+      .empty      (fifo_response_signals_out_int.empty      ),
+      .valid      (fifo_response_signals_out_int.valid      ),
+      .prog_full  (fifo_response_signals_out_int.prog_full  ),
+      .wr_rst_busy(fifo_response_signals_out_int.wr_rst_busy),
+      .rd_rst_busy(fifo_response_signals_out_int.rd_rst_busy)
+    );
+  end else begin
+// --------------------------------------------------------------------------------------
+    assign fifo_response_signals_out_int  = 6'b010000;
+    assign fifo_response_dout             = 0;
+    assign fifo_response_din              = 0;
+    assign fifo_response_signals_in_int   = 0;
+    assign fifo_response_setup_signal_int = 1'b0;
+
+    case (ID_LEVEL)
+      5       : begin
+        assign response_in_int.valid = response_in_reg.valid;
+      end
+      default : begin
+        assign response_in_int.valid = response_in_reg.valid & (|response_in_reg.payload.meta.route.packet_source);
+      end
+    endcase
+
+    assign response_in_int.payload = response_in_reg.payload;
+
+    hyper_pipeline_noreset #(
+      .STAGES(PIPELINE_STAGES_DEPTH      ),
+      .WIDTH ($bits(MemoryPacketResponse))
+    ) inst_hyper_pipeline (
+      .ap_clk(ap_clk                ),
+      .din   (response_in_int       ),
+      .dout  (fifo_response_dout_int)
+    );
+  end
+endgenerate
 
 endmodule : arbiter_1_to_N_response_memory
