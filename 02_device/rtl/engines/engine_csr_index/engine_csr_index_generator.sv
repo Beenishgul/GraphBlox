@@ -1000,7 +1000,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_commit_din                  = request_pending_out_int.payload;
 
     // Pop
-    assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & fifo_request_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
+    assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
     assign request_commit_out_int.valid             = fifo_request_commit_signals_out_int.valid;
     assign request_commit_out_int.payload           = fifo_request_commit_dout;
 
@@ -1061,8 +1061,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg          <= 2'b10;
                 fifo_response_engine_in_signals_out_reg           <= 2'b10;
-                fifo_response_memory_in_signals_out_reg.empty     <= 1'b0;
-                fifo_response_memory_in_signals_out_reg.prog_full <= ~fifo_request_engine_out_signals_in_reg.rd_en;
+                fifo_response_memory_in_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
                 request_engine_out_reg.valid                      <= fifo_response_comb.valid;
                 request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid & burst_flag_reg;
             end

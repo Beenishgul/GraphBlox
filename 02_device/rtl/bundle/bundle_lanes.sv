@@ -47,6 +47,7 @@ module bundle_lanes #(
 
 genvar i;
 genvar j;
+genvar k;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
@@ -643,6 +644,18 @@ generate
             .fifo_setup_signal                       (lanes_fifo_setup_signal[j]                                                                ),
             .done_out                                (lanes_done_out[j]                                                                         )
         );
+
+        for(k=LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]+1; k < (1+LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY); k = k+1 ) begin
+            assign lanes_response_merge_engine_in[j][k] = 0;
+            assign lanes_fifo_response_merge_lane_in_signals_in[j][k]  = 1'b0;
+            assign lanes_fifo_response_merge_lane_in_signals_out[j][k] = 2'b10;
+        end
+
+        for(k=LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]+1; k < (1+LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY); k = k+1 ) begin
+            assign lanes_request_cast_lane_out[j][k] = 0;
+            assign lanes_fifo_request_cast_lane_out_signals_in[j][k]  = 1'b0;
+            assign lanes_fifo_request_cast_lane_out_signals_out[j][k] = 2'b10;
+        end
     end
 endgenerate
 
