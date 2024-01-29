@@ -315,6 +315,20 @@ module __KERNEL___testbench ();
             join
 
         endtask
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate a random 32bit number
+function bit [$bits(size)-1:0] get_random_nbytes(int size);
+    bit [$bits(size)-1:0] rptr;
+    bit [$bits(size)-1:0] page_mask ;
+    
+    assert(std::randomize(rptr));
+    // Create a mask to set lower 12 bits to zero for page alignment
+    page_mask = ~((1 << 12) - 1);
+    rptr &= page_mask;
+    
+    return rptr;
+endfunction
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
         function bit [31:0] get_random_4bytes();
@@ -598,15 +612,15 @@ module __KERNEL___testbench ();
         task automatic set_memory_pointers();
             ///////////////////////////////////////////////////////////////////////////
             //Randomly generate memory pointers.
-            buffer_0_ptr[63:0] = get_random_4bytes();
-            buffer_1_ptr[63:0] = get_random_4bytes();
-            buffer_2_ptr[63:0] = get_random_4bytes();
-            buffer_3_ptr[63:0] = get_random_4bytes();
-            buffer_4_ptr[63:0] = get_random_4bytes();
-            buffer_5_ptr[63:0] = get_random_4bytes();
-            buffer_6_ptr[63:0] = get_random_4bytes();
-            buffer_7_ptr[63:0] = get_random_4bytes();
-            buffer_8_ptr[63:0] = get_random_4bytes();
+            buffer_0_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_1_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_2_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_3_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_4_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_5_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_6_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_7_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_8_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
             buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////

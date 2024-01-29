@@ -19,7 +19,7 @@ parameter S_AXI_FE_DATA_WIDTH      = 32;
 
   
 
-parameter M00_AXI4_FE_ADDR_W   = 32                 ;
+parameter M00_AXI4_FE_ADDR_W   = 33                 ;
 parameter M00_AXI4_FE_DATA_W   = 32                 ;
 parameter M00_AXI4_FE_STRB_W   = M00_AXI4_FE_DATA_W / 8;
 parameter M00_AXI4_FE_BURST_W  = 2                   ;
@@ -269,7 +269,7 @@ typedef m00_axi_lite_resp_t S00_AXI4_LITE_FE_RESP_T;
 
   
 
-parameter M01_AXI4_FE_ADDR_W   = 32                 ;
+parameter M01_AXI4_FE_ADDR_W   = 33                 ;
 parameter M01_AXI4_FE_DATA_W   = 32                 ;
 parameter M01_AXI4_FE_STRB_W   = M01_AXI4_FE_DATA_W / 8;
 parameter M01_AXI4_FE_BURST_W  = 2                   ;
