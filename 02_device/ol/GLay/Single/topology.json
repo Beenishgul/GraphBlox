@@ -423,13 +423,13 @@
     },
     "fifo_memory": {
         "ENGINE_ALU_OPS": 0,
-        "ENGINE_CSR_INDEX": 8,
+        "ENGINE_CSR_INDEX": 16,
         "ENGINE_FILTER_COND": 0,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
         "ENGINE_SET_OPS": 0,
         "ENGINE_PIPELINE": 0,
-        "ENGINE_READ_WRITE": 8
+        "ENGINE_READ_WRITE": 16
     },
     "fifo_engine": {
         "ENGINE_ALU_OPS": 8,
