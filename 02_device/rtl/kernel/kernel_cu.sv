@@ -98,11 +98,12 @@ logic                  cu_setup_done_assert  ;
 // --------------------------------------------------------------------------------------
 // CU Stream -> AXI-Multi CH
 // --------------------------------------------------------------------------------------
-logic                  areset_cu_channel                  [NUM_CHANNELS-1:0];
-KernelDescriptor       cu_channel_descriptor              [NUM_CHANNELS-1:0];
-MemoryPacketRequest    cu_channel_request_in              [NUM_CHANNELS-1:0];
-FIFOStateSignalsOutput cu_channel_fifo_request_signals_out[NUM_CHANNELS-1:0];
-FIFOStateSignalsInput  cu_channel_fifo_request_signals_in [NUM_CHANNELS-1:0];
+logic                  areset_cu_channel                           [NUM_CHANNELS-1:0];
+KernelDescriptor       cu_channel_descriptor                       [NUM_CHANNELS-1:0];
+MemoryPacketRequest    cu_channel_request_in                       [NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput cu_channel_fifo_request_signals_out         [NUM_CHANNELS-1:0];
+FIFOStateSignalsInput  cu_channel_fifo_request_signals_in          [NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput cu_channel_fifo_request_backtrack_signals_in[NUM_CHANNELS-1:0];
 
 MemoryPacketResponse     cu_channel_response_out             [NUM_CHANNELS-1:0];
 FIFOStateSignalsOutput   cu_channel_fifo_response_signals_out[NUM_CHANNELS-1:0];
@@ -278,6 +279,8 @@ always_ff @(posedge ap_clk) begin
     cu_channel_request_in[i] <= ch_arbiter_1_to_N_chs_cache_request_out[i];
     ch_arbiter_1_to_N_chs_cache_fifo_request_signals_in[i].rd_en = ~cu_channel_fifo_request_signals_out[i].prog_full ;
     cu_channel_fifo_request_signals_in[i].rd_en <= 1'b1;
+
+    cu_channel_fifo_request_backtrack_signals_in[i]  = cu_channel_fifo_request_signals_out[i];
   end
 end
 
@@ -373,17 +376,18 @@ cu_setup #(
 cu_bundles #(
   `include"set_cu_parameters.vh"
   ) inst_cu_bundles (
-  .ap_clk                             (ap_clk                              ),
-  .areset                             (areset_bundles                      ),
-  .descriptor_in                      (cu_bundles_descriptor               ),
-  .response_memory_in                 (cu_bundles_response_in              ),
-  .fifo_response_memory_in_signals_in (cu_bundles_fifo_response_signals_in ),
-  .fifo_response_memory_in_signals_out(cu_bundles_fifo_response_signals_out),
-  .request_memory_out                 (cu_bundles_request_out              ),
-  .fifo_request_memory_out_signals_in (cu_bundles_fifo_request_signals_in  ),
-  .fifo_request_memory_out_signals_out(cu_bundles_fifo_request_signals_out ),
-  .fifo_setup_signal                  (cu_bundles_fifo_setup_signal        ),
-  .done_out                           (cu_bundles_done_out                 )
+  .ap_clk                                      (ap_clk                                      ),
+  .areset                                      (areset_bundles                              ),
+  .descriptor_in                               (cu_bundles_descriptor                       ),
+  .response_memory_in                          (cu_bundles_response_in                      ),
+  .fifo_response_memory_in_signals_in          (cu_bundles_fifo_response_signals_in         ),
+  .fifo_response_memory_in_signals_out         (cu_bundles_fifo_response_signals_out        ),
+  .request_memory_out                          (cu_bundles_request_out                      ),
+  .fifo_request_memory_out_signals_in          (cu_bundles_fifo_request_signals_in          ),
+  .fifo_request_memory_out_signals_out         (cu_bundles_fifo_request_signals_out         ),
+  .fifo_request_memory_out_backtrack_signals_in(cu_channel_fifo_request_backtrack_signals_in),
+  .fifo_setup_signal                           (cu_bundles_fifo_setup_signal                ),
+  .done_out                                    (cu_bundles_done_out                         )
 );
 
 // --------------------------------------------------------------------------------------

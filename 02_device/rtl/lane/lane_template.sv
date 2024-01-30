@@ -37,6 +37,7 @@ module lane_template #(
     output MemoryPacketRequest    request_memory_out                                               ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
+    input  FIFOStateSignalsOutput fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]   ,
     output ControlPacket          request_control_out                                              ,
     input  FIFOStateSignalsInput  fifo_request_control_out_signals_in                              ,
     output FIFOStateSignalsOutput fifo_request_control_out_signals_out                             ,
@@ -100,7 +101,8 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput engine_fifo_response_lanes_backtrack_signals_in_reg[NUM_ENGINES-1:0][NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsOutput engine_fifo_response_lanes_backtrack_signals_in_reg [NUM_ENGINES-1:0][NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsOutput engines_fifo_request_memory_out_backtrack_signals_in[NUM_ENGINES-1:0][       NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Engines - Arbiter Signals: Memory Request Generator
@@ -537,31 +539,32 @@ generate
     for (j=0; j<NUM_ENGINES; j++) begin : generate_engine_template
         engine_template #(
             `include"set_engine_parameters.vh"
-        ) inst_engine_template (
-            .ap_clk                                  (ap_clk                                                                                   ),
-            .areset                                  (areset_engine[j]                                                                         ),
-            .descriptor_in                           (engines_descriptor_in[j]                                                                 ),
-            .response_engine_in                      (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
-            .fifo_response_engine_in_signals_in      (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
-            .fifo_response_engine_in_signals_out     (engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
-            .fifo_response_lanes_backtrack_signals_in(engine_fifo_response_lanes_backtrack_signals_in_reg[j][NUM_BACKTRACK_LANES-1:0]          ),
-            .response_memory_in                      (engines_response_memory_in[j]                                                            ),
-            .fifo_response_memory_in_signals_in      (engines_fifo_response_memory_in_signals_in[j]                                            ),
-            .fifo_response_memory_in_signals_out     (engines_fifo_response_memory_in_signals_out[j]                                           ),
-            .response_control_in                     (engines_response_control_in[j]                                                           ),
-            .fifo_response_control_in_signals_in     (engines_fifo_response_control_in_signals_in[j]                                           ),
-            .fifo_response_control_in_signals_out    (engines_fifo_response_control_in_signals_out[j]                                          ),
-            .request_engine_out                      (engines_request_cast_lane_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]                   ),
-            .fifo_request_engine_out_signals_in      (engines_fifo_request_cast_lane_out_signals_in[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]   ),
-            .fifo_request_engine_out_signals_out     (engines_fifo_request_cast_lane_out_signals_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]  ),
-            .request_memory_out                      (engines_request_memory_out[j]                                                            ),
-            .fifo_request_memory_out_signals_in      (engines_fifo_request_memory_out_signals_in[j]                                            ),
-            .fifo_request_memory_out_signals_out     (engines_fifo_request_memory_out_signals_out[j]                                           ),
-            .request_control_out                     (engines_request_control_out[j]                                                           ),
-            .fifo_request_control_out_signals_in     (engines_fifo_request_control_out_signals_in[j]                                           ),
-            .fifo_request_control_out_signals_out    (engines_fifo_request_control_out_signals_out[j]                                          ),
-            .fifo_setup_signal                       (engines_fifo_setup_signal[j]                                                             ),
-            .done_out                                (engines_done_out[j]                                                                      )
+            ) inst_engine_template (
+            .ap_clk                                      (ap_clk                                                                                   ),
+            .areset                                      (areset_engine[j]                                                                         ),
+            .descriptor_in                               (engines_descriptor_in[j]                                                                 ),
+            .response_engine_in                          (engines_response_merge_lane_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]                 ),
+            .fifo_response_engine_in_signals_in          (engines_fifo_response_merge_lane_in_signals_in[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0] ),
+            .fifo_response_engine_in_signals_out         (engines_fifo_response_merge_lane_in_signals_out[j][ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]:0]),
+            .fifo_response_lanes_backtrack_signals_in    (engine_fifo_response_lanes_backtrack_signals_in_reg[j][NUM_BACKTRACK_LANES-1:0]          ),
+            .response_memory_in                          (engines_response_memory_in[j]                                                            ),
+            .fifo_response_memory_in_signals_in          (engines_fifo_response_memory_in_signals_in[j]                                            ),
+            .fifo_response_memory_in_signals_out         (engines_fifo_response_memory_in_signals_out[j]                                           ),
+            .response_control_in                         (engines_response_control_in[j]                                                           ),
+            .fifo_response_control_in_signals_in         (engines_fifo_response_control_in_signals_in[j]                                           ),
+            .fifo_response_control_in_signals_out        (engines_fifo_response_control_in_signals_out[j]                                          ),
+            .request_engine_out                          (engines_request_cast_lane_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]                   ),
+            .fifo_request_engine_out_signals_in          (engines_fifo_request_cast_lane_out_signals_in[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]   ),
+            .fifo_request_engine_out_signals_out         (engines_fifo_request_cast_lane_out_signals_out[j][ENGINES_CONFIG_CAST_WIDTH_ARRAY[j]:0]  ),
+            .request_memory_out                          (engines_request_memory_out[j]                                                            ),
+            .fifo_request_memory_out_signals_in          (engines_fifo_request_memory_out_signals_in[j]                                            ),
+            .fifo_request_memory_out_signals_out         (engines_fifo_request_memory_out_signals_out[j]                                           ),
+            .fifo_request_memory_out_backtrack_signals_in(engines_fifo_request_memory_out_backtrack_signals_in[j]                                  ),
+            .request_control_out                         (engines_request_control_out[j]                                                           ),
+            .fifo_request_control_out_signals_in         (engines_fifo_request_control_out_signals_in[j]                                           ),
+            .fifo_request_control_out_signals_out        (engines_fifo_request_control_out_signals_out[j]                                          ),
+            .fifo_setup_signal                           (engines_fifo_setup_signal[j]                                                             ),
+            .done_out                                    (engines_done_out[j]                                                                      )
         );
 
         for(k=ENGINES_CONFIG_MERGE_WIDTH_ARRAY[j]+1; k < (1+ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY); k = k+1 ) begin
