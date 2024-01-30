@@ -40,29 +40,30 @@ module engine_read_write_generator #(parameter
     PIPELINE_STAGES     = 2                    ,
     COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
     NUM_BACKTRACK_LANES = 4                    ,
+    ENGINE_CAST_WIDTH   = 1                    ,
     NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                  ap_clk                                                           ,
-    input  logic                  areset                                                           ,
-    input  KernelDescriptor       descriptor_in                                                    ,
-    input  ReadWriteConfiguration configure_memory_in                                              ,
-    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                              ,
-    input  EnginePacket           response_engine_in                                               ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacketResponse   response_memory_in                                               ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    output EnginePacket           request_engine_out                                               ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacketRequest    request_memory_out                                               ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
-    output logic                  fifo_setup_signal                                                ,
-    output logic                  configure_memory_setup                                           ,
+    input  logic                  ap_clk                                                                             ,
+    input  logic                  areset                                                                             ,
+    input  KernelDescriptor       descriptor_in                                                                      ,
+    input  ReadWriteConfiguration configure_memory_in                                                                ,
+    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                                                ,
+    input  EnginePacket           response_engine_in                                                                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                                                ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
+    input  MemoryPacketResponse   response_memory_in                                                                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                                                ,
+    output EnginePacket           request_engine_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                                                ,
+    output MemoryPacketRequest    request_memory_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                                                ,
+    output logic                  fifo_setup_signal                                                                  ,
+    output logic                  configure_memory_setup                                                             ,
     output logic                  done_out
 );
 
@@ -118,12 +119,12 @@ module engine_read_write_generator #(parameter
     EnginePacket     request_engine_out_reg                ;
     EnginePacketFull request_memory_out_reg                ;
 
-    FIFOStateSignalsInput  fifo_configure_memory_in_signals_in_reg;
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg ;
-    FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg ;
-    FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg ;
-    FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg ;
- 
+    FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
+    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
+    FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
+
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
@@ -171,11 +172,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                  areset_backtrack                                                           ;
-    logic                  backtrack_configure_route_valid                                            ;
-    PacketRouteAddress     backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                  areset_backtrack                                                                             ;
+    logic                  backtrack_configure_route_valid                                                              ;
+    PacketRouteAddress     backtrack_configure_route_in                                                                 ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
@@ -609,6 +610,7 @@ module engine_read_write_generator #(parameter
         .ID_ENGINE          (ID_ENGINE          ),
         .ID_MODULE          (2                  ),
         .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+        .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
         .NUM_BUNDLES        (NUM_BUNDLES        )
     ) inst_backtrack_fifo_lanes_response_signal (
         .ap_clk                                  (ap_clk                                            ),

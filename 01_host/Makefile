@@ -51,28 +51,9 @@ FULL_SRC_FPGA_UTILS_CPP ?= $(ROOT_DIR)/$(APP_DIR)/$(HOST_DIR)/$(SRC_DIR)/$(UTIL_
 #     CLI COMMANDS                           
 # =========================================================
 
-RM      := -@rm -f
-RMDIR   := -@rm -rf
-ECHO    := -@echo
-CP      := -@cp -rf
-MKDIR   := -@mkdir -p
-
-# TEST PASS OR FAIL
-PASS = \033[92mPASS\033[0m
-FAIL = \033[91mFAIL\033[0m
-
-# =========================================================
-# Color coded messages                      
-# =========================================================
-YELLOW  ?=\033[0;33m
-GREEN   ?=\033[0;32m
-BLUE    ?=\033[0;34m
-RED     ?=\033[0;31m
-NC      ?=\033[0m
-
 COMPILED_FILE = $(@F)
-SUCCESS = [${GREEN}success!${NC}]
-FAIL    = [${RED}failure!${NC}]
+SUCCESS       = [${GREEN}success!${NC}]
+FAIL          = [${RED}failure!${NC}]
 SUCCESS_MSG   = echo  "$(SUCCESS) $(COMPILED_FILE)"
 FAIL_MSG      = echo  "$(FAIL) $(COMPILED_FILE)"
 EXIT_STATUS   = &&  $(SUCCESS_MSG) || { $(FAIL_MSG) ; exit 1; }
@@ -81,10 +62,10 @@ EXIT_STATUS   = &&  $(SUCCESS_MSG) || { $(FAIL_MSG) ; exit 1; }
 # COMPILERS                         
 # =========================================================
 
-CXX     := g++
-VPP     := v++
-GCC     := gcc
-CC      := gcc
+CXX     ?= g++
+VPP     ?= v++
+GCC     ?= gcc
+CC      ?= gcc
 
 # =========================================================
 # COMPILER GRAPH FLAGS                         
@@ -189,18 +170,18 @@ $(APP_TEST)-$(INTEGRATION)-$(APP_LANG) : $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRAT
 	$(ECHO) "=========================================================\n"
 .PHONY: directories-obj
 directories-obj :
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
-	$(MKDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(UTIL_DIR_FPGA_CPP)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(PREPRO_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(STRUCT_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_C)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(TEST_DIR_CPP)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(ALGO_DIR)/$(INTEGRATION)
+	$(MKDIR_P) $(ACTIVE_APP_DIR)/$(RES_DIR)/$(INTEGRATION)/$(INTEGRATION)
 
 .PHONY: clean-all
 clean-all:

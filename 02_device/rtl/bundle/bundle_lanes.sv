@@ -461,7 +461,7 @@ generate
 // --------------------------------------------------------------------------------------
     end else begin
         for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_memory_request_in
-            assign lanes_fifo_request_memory_out_signals_in[i].rd_en  = 1'b0;
+            assign lanes_fifo_request_memory_out_signals_in[i].rd_en  = 1'b1;
             assign lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[i] = 1'b0;
         end
         assign lane_arbiter_N_to_1_memory_fifo_request_signals_out = 2'b10;
@@ -495,7 +495,7 @@ generate
 // --------------------------------------------------------------------------------------
     end else begin
         for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_N_to_1_control_request_in
-            assign lanes_fifo_request_control_out_signals_in[i].rd_en    = 1'b0;
+            assign lanes_fifo_request_control_out_signals_in[i].rd_en    = 1'b1;
             assign lane_arbiter_N_to_1_control_lane_arbiter_grant_out[i] = 1'b0;
             assign lane_arbiter_N_to_1_control_request_in[i]             = 0;
         end
@@ -601,7 +601,7 @@ generate
     end else begin
         for (i=0; i<NUM_LANES; i++) begin : generate_lane_arbiter_1_to_N_control_response
             assign lanes_response_control_in[i] = 0;
-            assign lanes_fifo_response_control_in_signals_in[i].rd_en  = 1'b0;
+            assign lanes_fifo_response_control_in_signals_in[i].rd_en  = 1'b1;
             assign lane_arbiter_1_to_N_control_response_out[i] = 0;
             assign lane_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = 1'b0;
         end

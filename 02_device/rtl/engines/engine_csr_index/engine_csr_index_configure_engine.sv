@@ -28,8 +28,6 @@ module engine_csr_index_configure_engine #(parameter
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
     input  EnginePacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
     output CSRIndexConfiguration  configure_engine_out               ,
     input  FIFOStateSignalsInput  fifo_configure_engine_signals_in   ,
     output FIFOStateSignalsOutput fifo_configure_engine_signals_out  ,
@@ -48,9 +46,8 @@ CSRIndexConfiguration configure_engine_reg  ;
 // --------------------------------------------------------------------------------------
 // Response FIFO
 // --------------------------------------------------------------------------------------
-EnginePacket          fifo_response_engine_in_dout_int      ;
-EnginePacket          fifo_response_engine_in_dout_reg      ;
-FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
+EnginePacket fifo_response_engine_in_dout_int;
+EnginePacket fifo_response_engine_in_dout_reg;
 
 // --------------------------------------------------------------------------------------
 // Configure FIFO
@@ -76,13 +73,11 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if(areset_csr_index_generator) begin
-        response_engine_in_reg.valid           <= 1'b0;
-        fifo_response_engine_in_signals_in_reg <= 0;
-        fifo_configure_engine_signals_in_reg   <= 0;
+        response_engine_in_reg.valid         <= 1'b0;
+        fifo_configure_engine_signals_in_reg <= 0;
     end else begin
-        response_engine_in_reg.valid                 <= response_engine_in.valid ;
-        fifo_response_engine_in_signals_in_reg.rd_en <= fifo_response_engine_in_signals_in.rd_en;
-        fifo_configure_engine_signals_in_reg.rd_en   <= fifo_configure_engine_signals_in.rd_en;
+        response_engine_in_reg.valid               <= response_engine_in.valid ;
+        fifo_configure_engine_signals_in_reg.rd_en <= fifo_configure_engine_signals_in.rd_en;
     end
 end
 
@@ -104,9 +99,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_configure_engine_signals_out_int);
-    fifo_configure_engine_signals_out   <= map_internal_fifo_signals_to_output(fifo_configure_engine_signals_out_int);
-    configure_engine_out.payload        <= fifo_configure_engine_dout_int.payload;
+    fifo_configure_engine_signals_out <= map_internal_fifo_signals_to_output(fifo_configure_engine_signals_out_int);
+    configure_engine_out.payload      <= fifo_configure_engine_dout_int.payload;
 end
 
 // --------------------------------------------------------------------------------------

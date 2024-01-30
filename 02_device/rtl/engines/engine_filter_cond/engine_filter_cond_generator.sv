@@ -31,23 +31,23 @@ module engine_filter_cond_generator #(parameter
     NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                   ap_clk                                                           ,
-    input  logic                   areset                                                           ,
-    input  KernelDescriptor        descriptor_in                                                    ,
-    input  FilterCondConfiguration configure_memory_in                                              ,
-    input  FIFOStateSignalsInput   fifo_configure_memory_in_signals_in                              ,
-    input  EnginePacket            response_engine_in                                               ,
-    input  FIFOStateSignalsInput   fifo_response_engine_in_signals_in                               ,
-    output FIFOStateSignalsOutput  fifo_response_engine_in_signals_out                              ,
-    input  FIFOStateSignalsOutput  fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    output EnginePacket            request_engine_out                                               ,
-    input  FIFOStateSignalsInput   fifo_request_engine_out_signals_in                               ,
-    output FIFOStateSignalsOutput  fifo_request_engine_out_signals_out                              ,
-    output ControlPacket           request_control_out                                              ,
-    input  FIFOStateSignalsInput   fifo_request_control_out_signals_in                              ,
-    output FIFOStateSignalsOutput  fifo_request_control_out_signals_out                             ,
-    output logic                   fifo_setup_signal                                                ,
-    output logic                   configure_memory_setup                                           ,
+    input  logic                   ap_clk                                                                             ,
+    input  logic                   areset                                                                             ,
+    input  KernelDescriptor        descriptor_in                                                                      ,
+    input  FilterCondConfiguration configure_memory_in                                                                ,
+    input  FIFOStateSignalsInput   fifo_configure_memory_in_signals_in                                                ,
+    input  EnginePacket            response_engine_in                                                                 ,
+    input  FIFOStateSignalsInput   fifo_response_engine_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput  fifo_response_engine_in_signals_out                                                ,
+    input  FIFOStateSignalsOutput  fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
+    output EnginePacket            request_engine_out                                                                 ,
+    input  FIFOStateSignalsInput   fifo_request_engine_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput  fifo_request_engine_out_signals_out                                                ,
+    output ControlPacket           request_control_out                                                                ,
+    input  FIFOStateSignalsInput   fifo_request_control_out_signals_in                                                ,
+    output FIFOStateSignalsOutput  fifo_request_control_out_signals_out                                               ,
+    output logic                   fifo_setup_signal                                                                  ,
+    output logic                   configure_memory_setup                                                             ,
     output logic                   done_out
 );
 
@@ -126,11 +126,11 @@ ControlPacketPayload          fifo_request_control_out_dout            ;
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-logic                  areset_backtrack                                                           ;
-logic                  backtrack_configure_route_valid                                            ;
-PacketRouteAddress     backtrack_configure_route_in                                               ;
-FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+logic                  areset_backtrack                                                                             ;
+logic                  backtrack_configure_route_valid                                                              ;
+PacketRouteAddress     backtrack_configure_route_in                                                                 ;
+FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
+FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
 // --------------------------------------------------------------------------------------
 localparam             PULSE_HOLD              = 2;
 logic [PULSE_HOLD-1:0] filter_cond_done_hold      ;
@@ -416,7 +416,7 @@ type_sequence_state sequence_state_control_int;
 // --------------------------------------------------------------------------------------
 always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
-always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg; 
+always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg;
 always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 always_comb break_running_flow_int = (break_running_flow_reg|break_start_flow_int);
 always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
@@ -520,6 +520,7 @@ backtrack_fifo_lanes_response_signal #(
     .ID_ENGINE          (ID_ENGINE          ),
     .ID_MODULE          (2                  ),
     .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+    .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
     .NUM_BUNDLES        (NUM_BUNDLES        )
 ) inst_backtrack_fifo_lanes_response_signal (
     .ap_clk                                  (ap_clk                                            ),
