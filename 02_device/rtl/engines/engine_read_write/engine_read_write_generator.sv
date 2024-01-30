@@ -40,6 +40,7 @@ module engine_read_write_generator #(parameter
     PIPELINE_STAGES     = 2                    ,
     COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
     NUM_BACKTRACK_LANES = 4                    ,
+    NUM_CHANNELS        = 2                    ,
     ENGINE_CAST_WIDTH   = 1                    ,
     NUM_BUNDLES         = 4
 ) (
@@ -62,6 +63,7 @@ module engine_read_write_generator #(parameter
     output MemoryPacketRequest    request_memory_out                                                                 ,
     input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                                 ,
     output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                                                ,
+    input  FIFOStateSignalsOutput fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                     ,
     output logic                  fifo_setup_signal                                                                  ,
     output logic                  configure_memory_setup                                                             ,
     output logic                  done_out
