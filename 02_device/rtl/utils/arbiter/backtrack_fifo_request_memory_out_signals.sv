@@ -41,24 +41,14 @@ logic [NUM_CHANNELS-1:0] signals_out_reg_rd_en;
 // --------------------------------------------------------------------------------------
 always_comb begin
     signals_out_reg_rd_en = 0;
-    if(configure_address_valid & (|configure_address_in.id_channel)) begin
+    if(configure_address_valid) begin
         for (int i = 0; i < NUM_CHANNELS; i = i + 1) begin
             signals_out_reg_rd_en[i] = configure_address_in.id_channel[i] ? ~fifo_request_memory_out_backtrack_signals_in[i].prog_full : 1'b1;
         end
     end
-
-    if(configure_address_valid & (|configure_address_in.id_channel)) begin
-        signals_out_reg_rd_en[NUM_CHANNELS-2:0] = {(NUM_CHANNELS-1){1'b1}};
-        signals_out_reg_rd_en[NUM_CHANNELS-1]   = configure_address_in.id_channel[NUM_CHANNELS-1] ? ~fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1].prog_full : 1'b1;
-    end
-
-    if(configure_address_valid & ~(|configure_address_in.id_channel)) begin
-        signals_out_reg_rd_en[NUM_CHANNELS-1:0] = {NUM_CHANNELS{1'b1}};
-    end
-
 end
 
-assign fifo_response_engine_in_signals_out.rd_en = &signals_out_reg_rd_en;
+assign fifo_request_memory_out_signals_out.rd_en = &signals_out_reg_rd_en;
 
 // --------------------------------------------------------------------------------------
 // Drive output

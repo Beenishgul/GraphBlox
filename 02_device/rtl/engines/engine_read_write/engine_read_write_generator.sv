@@ -181,6 +181,14 @@ module engine_read_write_generator #(parameter
     FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
 
 // --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Engine i <- Channel i-1
+// --------------------------------------------------------------------------------------
+    logic                    backtrack_configure_address_valid                                       ;
+    PacketRequestDataAddress backtrack_configure_address_in                                          ;
+    FIFOStateSignalsOutput   backtrack_fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0];
+    FIFOStateSignalsInput    backtrack_fifo_request_memory_out_signals_out                           ;
+
+// --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     EnginePacketRouteAttributes engine_read_write_route;
@@ -563,7 +571,7 @@ module engine_read_write_generator #(parameter
     assign fifo_request_send_din                  = generator_engine_request_engine_reg_S3.payload;
 
     // Pop
-    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en;
     assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid;
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
@@ -621,6 +629,29 @@ module engine_read_write_generator #(parameter
         .configure_route_in                      (backtrack_configure_route_in                      ),
         .fifo_response_lanes_backtrack_signals_in(backtrack_fifo_response_lanes_backtrack_signals_in),
         .fifo_response_engine_in_signals_out     (backtrack_fifo_response_engine_in_signals_out     )
+    );
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Engine i <- Channel i-1
+// --------------------------------------------------------------------------------------
+    assign backtrack_configure_address_valid                      = configure_engine_int.valid;
+    assign backtrack_configure_address_in                         = configure_engine_int.payload.meta.address;
+    assign backtrack_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
+
+    backtrack_fifo_request_memory_out_signals #(
+        .ID_CU       (ID_CU       ),
+        .ID_BUNDLE   (ID_BUNDLE   ),
+        .ID_LANE     (ID_LANE     ),
+        .ID_ENGINE   (ID_ENGINE   ),
+        .ID_MODULE   (ID_MODULE   ),
+        .NUM_CHANNELS(NUM_CHANNELS)
+    ) inst_backtrack_fifo_request_memory_out_signals (
+        .ap_clk                                      (ap_clk                                                ),
+        .areset                                      (areset_backtrack                                      ),
+        .configure_address_valid                     (backtrack_configure_address_valid                     ),
+        .configure_address_in                        (backtrack_configure_address_in                        ),
+        .fifo_request_memory_out_backtrack_signals_in(backtrack_fifo_request_memory_out_backtrack_signals_in),
+        .fifo_request_memory_out_signals_out         (backtrack_fifo_request_memory_out_signals_out         )
     );
 
 // --------------------------------------------------------------------------------------
