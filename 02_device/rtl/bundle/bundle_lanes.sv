@@ -419,8 +419,7 @@ generate
     end
 endgenerate
 
-// assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = fifo_request_lanes_out_signals_in_reg.rd_en;
-assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = 1'b1;
+assign lane_arbiter_N_to_1_lane_fifo_request_signals_in.rd_en = fifo_request_lanes_out_signals_in_reg.rd_en;
 // --------------------------------------------------------------------------------------
 arbiter_N_to_1_request_engine #(
     .NUM_ENGINE_REQUESTOR(NUM_LANES                                   ),
