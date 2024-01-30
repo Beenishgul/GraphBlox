@@ -19,7 +19,9 @@ module arbiter_N_to_1_request_engine #(
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_ENGINE_REQUESTOR),
   parameter FIFO_ARBITER_DEPTH    = 8                              ,
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3       ,
+  parameter FIFO_ENABLE           = 0                              ,
+  parameter PIPELINE_STAGES_DEPTH = 1
 ) (
   input  logic                            ap_clk                               ,
   input  logic                            areset                               ,
@@ -218,39 +220,60 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
+generate
+  if (FIFO_ENABLE == 1) begin : gen_fifo
+// --------------------------------------------------------------------------------------
 // FIFO memory Ready
 // --------------------------------------------------------------------------------------
 // FIFO is reseting
-assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
+    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
-assign fifo_request_din                  = fifo_request_din_reg.payload;
+    assign fifo_request_signals_in_int.wr_en = fifo_request_din_reg.valid;
+    assign fifo_request_din                  = fifo_request_din_reg.payload;
 
 // Pop
-assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-assign request_out_int.valid             = fifo_request_signals_out_int.valid;
-assign request_out_int.payload           = fifo_request_dout;
+    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
+    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
+    assign request_out_int.payload           = fifo_request_dout;
 
-xpm_fifo_sync_wrapper #(
-  .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-  .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-  .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-  .PROG_THRESH     (PROG_THRESH               )
-) inst_fifo_EnginePacket (
-  .clk        (ap_clk                                  ),
-  .srst       (areset_fifo                             ),
-  .din        (fifo_request_din                        ),
-  .wr_en      (fifo_request_signals_in_int.wr_en       ),
-  .rd_en      (fifo_request_signals_in_int.rd_en       ),
-  .dout       (fifo_request_dout                       ),
-  .full       (fifo_request_signals_out_int.full       ),
-  .empty      (fifo_request_signals_out_int.empty      ),
-  .valid      (fifo_request_signals_out_int.valid      ),
-  .prog_full  (fifo_request_signals_out_int.prog_full  ),
-  .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
-  .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
-);
+    xpm_fifo_sync_wrapper #(
+      .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+      .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+      .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+      .PROG_THRESH     (PROG_THRESH               )
+    ) inst_fifo_EnginePacket (
+      .clk        (ap_clk                                  ),
+      .srst       (areset_fifo                             ),
+      .din        (fifo_request_din                        ),
+      .wr_en      (fifo_request_signals_in_int.wr_en       ),
+      .rd_en      (fifo_request_signals_in_int.rd_en       ),
+      .dout       (fifo_request_dout                       ),
+      .full       (fifo_request_signals_out_int.full       ),
+      .empty      (fifo_request_signals_out_int.empty      ),
+      .valid      (fifo_request_signals_out_int.valid      ),
+      .prog_full  (fifo_request_signals_out_int.prog_full  ),
+      .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
+      .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
+    );
+  end else begin
+// --------------------------------------------------------------------------------------
+    assign fifo_request_signals_out_int  = 6'b010000;
+    assign fifo_request_dout             = 0;
+    assign fifo_request_din              = 0;
+    assign fifo_request_signals_in_int   = 0;
+    assign fifo_request_setup_signal_int = 1'b0;
+
+    hyper_pipeline_noreset #(
+      .STAGES(PIPELINE_STAGES_DEPTH),
+      .WIDTH ($bits(EnginePacket)  )
+    ) inst_hyper_pipeline (
+      .ap_clk(ap_clk              ),
+      .din   (fifo_request_din_reg),
+      .dout  (request_out_int     )
+    );
+  end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_942x16_EnginePacket

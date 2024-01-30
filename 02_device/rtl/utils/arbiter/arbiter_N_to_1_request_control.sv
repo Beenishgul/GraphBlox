@@ -19,7 +19,9 @@ module arbiter_N_to_1_request_control #(
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_CONTROL_REQUESTOR),
   parameter FIFO_ARBITER_DEPTH    = 8                               ,
   parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9) ,
-  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3        ,
+  parameter FIFO_ENABLE           = 0                               ,
+  parameter PIPELINE_STAGES_DEPTH = 1
 ) (
   input  logic                             ap_clk                                ,
   input  logic                             areset                                ,
@@ -218,6 +220,9 @@ generate
 endgenerate
 
 // --------------------------------------------------------------------------------------
+generate
+  if (FIFO_ENABLE == 1) begin : gen_fifo
+// --------------------------------------------------------------------------------------
 // FIFO memory Ready
 // --------------------------------------------------------------------------------------
 // FIFO is reseting
@@ -251,6 +256,24 @@ xpm_fifo_sync_wrapper #(
   .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
   .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
 );
+  end else begin
+// --------------------------------------------------------------------------------------
+    assign fifo_request_signals_out_int  = 6'b010000;
+    assign fifo_request_dout             = 0;
+    assign fifo_request_din              = 0;
+    assign fifo_request_signals_in_int   = 0;
+    assign fifo_request_setup_signal_int = 1'b0;
+
+    hyper_pipeline_noreset #(
+      .STAGES(PIPELINE_STAGES_DEPTH),
+      .WIDTH ($bits(ControlPacket)  )
+    ) inst_hyper_pipeline (
+      .ap_clk(ap_clk              ),
+      .din   (fifo_request_din_reg),
+      .dout  (request_out_int     )
+    );
+  end
+endgenerate
 
 // --------------------------------------------------------------------------------------
 // Bus arbiter for requests fifo_942x16_ControlPacket
