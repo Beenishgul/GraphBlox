@@ -346,7 +346,7 @@ generate
       .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
       .PROG_THRESH     (PROG_THRESH               ),
       .READ_MODE       ("fwft"                    )
-    ) inst_fifo_MemoryPacketResponse (
+    ) inst_fifo_EnginePacketResponse (
       .clk        (ap_clk                                   ),
       .srst       (areset_fifo                              ),
       .din        (fifo_response_din                        ),
