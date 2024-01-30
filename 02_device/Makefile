@@ -11,12 +11,12 @@ APP_TEST            ?= test_glayGraph_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
 # APP_LANG            ?= c
 INTEGRATION         ?= openmp
-# INTEGRATION         ?= ggdl
+# INTEGRATION         ?= glay
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
 HOST_NAME           ?= $(shell /usr/bin/hostnamectl --transient 2>/dev/null)
-
+DSA                 ?= $(call device2sandsa, $(DEVICE))
 ifeq ($(shell cd .. ; git log -1 --pretty=format:"%h" 2>/dev/null),)
 	GIT_VER ?= 1
 else
@@ -175,10 +175,10 @@ CAPABILITY                ?= Full
 # =========================================================
 # COMPILER FLAGS                         
 # =========================================================
-CXX     := g++
-VPP     := v++
-GCC     := gcc
-CC      := gcc
+CXX     ?= g++
+VPP     ?= v++
+GCC     ?= gcc
+CC      ?= gcc
 
 # =========================================================
 # Starting point of GLay generate IPs and compile Host

@@ -40,35 +40,33 @@ module engine_csr_index_generator #(parameter
     PIPELINE_STAGES     = 2                    ,
     COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
     NUM_BACKTRACK_LANES = 4                    ,
+    ENGINE_CAST_WIDTH   = 1                    ,
     NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                  ap_clk                                                           ,
-    input  logic                  areset                                                           ,
-    input  KernelDescriptor       descriptor_in                                                    ,
-    input  CSRIndexConfiguration  configure_engine_in                                              ,
-    input  FIFOStateSignalsInput  fifo_configure_engine_in_signals_in                              ,
-    input  CSRIndexConfiguration  configure_memory_in                                              ,
-    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                              ,
-    input  EnginePacket           response_engine_in                                               ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                              ,
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0],
-    input  MemoryPacketResponse   response_memory_in                                               ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                              ,
-    input  ControlPacket          response_control_in                                              ,
-    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                              ,
-    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                             ,
-    output EnginePacket           request_engine_out                                               ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                              ,
-    output MemoryPacketRequest    request_memory_out                                               ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                               ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                              ,
-    output logic                  fifo_setup_signal                                                ,
-    output logic                  configure_memory_setup                                           ,
-    output logic                  configure_engine_setup                                           ,
+    input  logic                  ap_clk                                                                             ,
+    input  logic                  areset                                                                             ,
+    input  KernelDescriptor       descriptor_in                                                                      ,
+    input  CSRIndexConfiguration  configure_engine_in                                                                ,
+    input  FIFOStateSignalsInput  fifo_configure_engine_in_signals_in                                                ,
+    input  CSRIndexConfiguration  configure_memory_in                                                                ,
+    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                                                ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
+    input  MemoryPacketResponse   response_memory_in                                                                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                                                ,
+    input  ControlPacket          response_control_in                                                                ,
+    input  FIFOStateSignalsInput  fifo_response_control_in_signals_in                                                ,
+    output FIFOStateSignalsOutput fifo_response_control_in_signals_out                                               ,
+    output EnginePacket           request_engine_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                                                ,
+    output MemoryPacketRequest    request_memory_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                                                ,
+    output logic                  fifo_setup_signal                                                                  ,
+    output logic                  configure_memory_setup                                                             ,
+    output logic                  configure_engine_setup                                                             ,
     output logic                  done_out
 );
 
@@ -132,7 +130,6 @@ module engine_csr_index_generator #(parameter
     EnginePacketFullPayload fifo_request_send_dout  ;
 
     ControlPacket        response_control_in_reg   ;
-    EnginePacket         response_engine_in_reg    ;
     MemoryPacketResponse response_memory_in_reg    ;
     MemoryPacketResponse response_memory_in_reg_S2 ;
     logic                configure_engine_setup_reg;
@@ -148,10 +145,8 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsInput  fifo_request_engine_out_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_request_memory_out_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_control_in_signals_in_reg ;
-    FIFOStateSignalsInput  fifo_response_engine_in_signals_in_reg  ;
     FIFOStateSignalsInput  fifo_response_memory_in_signals_in_reg  ;
     FIFOStateSignalsOutput fifo_response_control_in_signals_out_reg;
-    FIFOStateSignalsOutput fifo_response_engine_in_signals_out_reg ;
     FIFOStateSignalsOutput fifo_response_memory_in_signals_out_reg ;
     FIFOStateSignalsOutput fifo_request_engine_out_signals_out_reg ;
     FIFOStateSignalsOutput fifo_request_memory_out_signals_out_reg ;
@@ -195,11 +190,11 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                  areset_backtrack                                                           ;
-    logic                  backtrack_configure_route_valid                                            ;
-    PacketRouteAddress     backtrack_configure_route_in                                               ;
-    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES-1:0];
-    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                              ;
+    logic                  areset_backtrack                                                                             ;
+    logic                  backtrack_configure_route_valid                                                              ;
+    PacketRouteAddress     backtrack_configure_route_in                                                                 ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
 // --------------------------------------------------------------------------------------
 // Handle bursty transaction (READ ONLY)
 // --------------------------------------------------------------------------------------
@@ -278,10 +273,8 @@ module engine_csr_index_generator #(parameter
             fifo_request_engine_out_signals_in_reg  <= 0;
             fifo_request_memory_out_signals_in_reg  <= 0;
             fifo_response_control_in_signals_in_reg <= 0;
-            fifo_response_engine_in_signals_in_reg  <= 0;
             fifo_response_memory_in_signals_in_reg  <= 0;
             response_control_in_reg.valid           <= 1'b0;
-            response_engine_in_reg.valid            <= 1'b0;
             response_memory_in_reg.valid            <= 1'b0;
         end
         else begin
@@ -290,17 +283,14 @@ module engine_csr_index_generator #(parameter
             fifo_request_engine_out_signals_in_reg  <= fifo_request_engine_out_signals_in;
             fifo_request_memory_out_signals_in_reg  <= fifo_request_memory_out_signals_in;
             fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
-            fifo_response_engine_in_signals_in_reg  <= fifo_response_engine_in_signals_in;
             fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
             response_control_in_reg.valid           <= response_control_in.valid;
-            response_engine_in_reg.valid            <= response_engine_in.valid;
             response_memory_in_reg.valid            <= response_memory_in.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
         response_control_in_reg.payload <= response_control_in.payload;
-        response_engine_in_reg.payload  <= response_engine_in.payload;
         response_memory_in_reg.payload  <= response_memory_in.payload;
     end
 
@@ -339,7 +329,6 @@ module engine_csr_index_generator #(parameter
             done_out                             <= 1'b0;
             fifo_empty_reg                       <= 1'b1;
             fifo_response_control_in_signals_out <= 2'b10;
-            fifo_response_engine_in_signals_out  <= 2'b10;
             fifo_response_memory_in_signals_out  <= 2'b10;
             fifo_setup_signal                    <= 1'b1;
             request_engine_out.valid             <= 1'b0;
@@ -351,7 +340,6 @@ module engine_csr_index_generator #(parameter
             done_out                             <= done_out_reg & fifo_empty_reg & response_memory_counter_is_zero;
             fifo_empty_reg                       <= fifo_empty_int;
             fifo_response_control_in_signals_out <= fifo_response_control_in_signals_out_reg;
-            fifo_response_engine_in_signals_out  <= fifo_response_engine_in_signals_out_reg;
             fifo_response_memory_in_signals_out  <= fifo_response_memory_in_signals_out_reg;
             fifo_request_engine_out_signals_out  <= fifo_request_engine_out_signals_out_reg;
             fifo_request_memory_out_signals_out  <= fifo_request_memory_out_signals_out_reg;
@@ -943,6 +931,7 @@ module engine_csr_index_generator #(parameter
         .ID_ENGINE          (ID_ENGINE          ),
         .ID_MODULE          (2                  ),
         .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+        .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
         .NUM_BUNDLES        (NUM_BUNDLES        )
     ) inst_backtrack_fifo_lanes_response_signal (
         .ap_clk                                  (ap_clk                                            ),
@@ -973,7 +962,7 @@ module engine_csr_index_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (               5          )
+        .PROG_THRESH     (5                         )
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -1040,7 +1029,6 @@ module engine_csr_index_generator #(parameter
             fifo_request_memory_out_signals_out_reg  <= 2'b10;
             fifo_request_signals_in_reg              <= 1'b0;
             fifo_response_control_in_signals_out_reg <= 2'b10;
-            fifo_response_engine_in_signals_out_reg  <= 2'b10;
             fifo_response_memory_in_signals_out_reg  <= 2'b10;
             request_engine_out_reg.valid             <= 1'b0;
             request_memory_out_reg.valid             <= 1'b0;
@@ -1051,19 +1039,17 @@ module engine_csr_index_generator #(parameter
                 fifo_request_memory_out_signals_out_reg  <= 2'b10;
                 fifo_request_signals_in_reg              <= fifo_request_engine_out_signals_in_reg;
                 fifo_response_control_in_signals_out_reg <= 2'b10;
-                fifo_response_engine_in_signals_out_reg  <= 2'b10;
                 fifo_response_memory_in_signals_out_reg  <= 2'b10;
                 request_engine_out_reg.valid             <= fifo_request_dout_reg_S2.valid;
                 request_memory_out_reg.valid             <= 1'b0;
             end else if(configure_engine_int.payload.param.mode_buffer) begin // response from memory -> request engine
-                fifo_request_engine_out_signals_out_reg           <= map_internal_dual_fifo_signals_to_output_internal(fifo_request_pending_signals_out_int, fifo_request_commit_signals_out_int);
-                fifo_request_memory_out_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_send_signals_out_int);
-                fifo_request_signals_in_reg                       <= fifo_request_memory_out_signals_in_reg;
-                fifo_response_control_in_signals_out_reg          <= 2'b10;
-                fifo_response_engine_in_signals_out_reg           <= 2'b10;
-                fifo_response_memory_in_signals_out_reg           <= map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
-                request_engine_out_reg.valid                      <= fifo_response_comb.valid;
-                request_memory_out_reg.valid                      <= fifo_request_dout_reg_S2.valid & burst_flag_reg;
+                fifo_request_engine_out_signals_out_reg  <= map_internal_dual_fifo_signals_to_output_internal(fifo_request_pending_signals_out_int, fifo_request_commit_signals_out_int);
+                fifo_request_memory_out_signals_out_reg  <= map_internal_fifo_signals_to_output(fifo_request_send_signals_out_int);
+                fifo_request_signals_in_reg              <= fifo_request_memory_out_signals_in_reg;
+                fifo_response_control_in_signals_out_reg <= 2'b10;
+                fifo_response_memory_in_signals_out_reg  <= map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
+                request_engine_out_reg.valid             <= fifo_response_comb.valid;
+                request_memory_out_reg.valid             <= fifo_request_dout_reg_S2.valid & burst_flag_reg;
             end
         end
     end

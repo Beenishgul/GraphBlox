@@ -414,7 +414,7 @@ generate
         );
     end else begin
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_memory_request_in
-            assign engines_fifo_request_memory_out_signals_in[i].rd_en      = 1'b0;
+            assign engines_fifo_request_memory_out_signals_in[i].rd_en      = 1'b1;
             assign engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[i] = 1'b0;
             assign engine_arbiter_N_to_1_memory_request_in[i]               = 0;
         end
@@ -449,7 +449,7 @@ generate
         );
     end else begin
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_N_to_1_control_request_in
-            assign engines_fifo_request_control_out_signals_in[i].rd_en      = 1'b0;
+            assign engines_fifo_request_control_out_signals_in[i].rd_en      = 1'b1;
             assign engine_arbiter_N_to_1_control_engine_arbiter_grant_out[i] = 1'b0;
             assign engine_arbiter_N_to_1_control_request_in[i]               = 0;
         end
@@ -520,7 +520,7 @@ generate
     end else begin
         for (i=0; i<NUM_ENGINES; i++) begin : generate_engine_arbiter_1_to_N_control_response
             assign engines_response_control_in[i] = 0;
-            assign engines_fifo_response_control_in_signals_in[i].rd_en  = 1'b0;
+            assign engines_fifo_response_control_in_signals_in[i].rd_en  = 1'b1;
             assign engine_arbiter_1_to_N_control_fifo_response_signals_in[i].rd_en = 1'b0;
             assign engine_arbiter_1_to_N_control_response_out[i] = 0;
         end

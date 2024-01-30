@@ -313,9 +313,7 @@ always_ff @(posedge ap_clk) begin
   fifo_response_dout_reg.payload <= fifo_response_dout_int.payload;
 end
 
-
-
-
+// --------------------------------------------------------------------------------------
 generate
   if (FIFO_ENABLE == 1) begin : gen_fifo
 // --------------------------------------------------------------------------------------

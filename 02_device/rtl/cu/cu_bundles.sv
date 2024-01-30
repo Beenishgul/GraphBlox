@@ -392,7 +392,7 @@ generate
 // --------------------------------------------------------------------------------------
     end else begin
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_memory_N_to_1_request_in
-            assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = 1'b0;
+            assign bundle_fifo_request_memory_out_signals_in[i].rd_en  = 1'b1;
         end
         assign bundle_arbiter_memory_N_to_1_fifo_request_signals_out = 2'b10;
         assign bundle_arbiter_memory_N_to_1_arbiter_grant_out        = 0;
@@ -427,7 +427,7 @@ generate
 // --------------------------------------------------------------------------------------
     end else begin
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_N_to_1_request_in
-            assign bundle_fifo_request_control_out_signals_in[i].rd_en  = 1'b0;
+            assign bundle_fifo_request_control_out_signals_in[i].rd_en  = 1'b1;
             assign bundle_arbiter_control_N_to_1_arbiter_grant_out[i]   = 1'b0;
             assign bundle_arbiter_control_N_to_1_request_in[i]          = 0;
         end
@@ -500,7 +500,7 @@ generate
     end else begin
         for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_arbiter_control_1_to_N_response
             assign bundle_response_control_in[i] = 0;
-            assign bundle_fifo_response_control_in_signals_in[i].rd_en  = 1'b0;
+            assign bundle_fifo_response_control_in_signals_in[i].rd_en  = 1'b1;
             assign bundle_arbiter_control_1_to_N_response_out[i] = 0;
         end
         assign bundle_arbiter_control_1_to_N_fifo_response_signals_out = 2'b10;

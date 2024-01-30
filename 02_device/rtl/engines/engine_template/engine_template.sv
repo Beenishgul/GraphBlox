@@ -106,24 +106,24 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // Generate FIFO backtrack signals - Signals: Lanes Response Generator
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput  template_fifo_request_control_out_signals_in                                 ;
-FIFOStateSignalsInput  template_fifo_request_engine_out_signals_in                                  ;
-FIFOStateSignalsInput  template_fifo_request_memory_out_signals_in                                  ;
-FIFOStateSignalsInput  template_fifo_response_control_in_signals_in                                 ;
-FIFOStateSignalsInput  template_fifo_response_engine_in_signals_in      [(1+ENGINE_MERGE_WIDTH)-1:0];
-FIFOStateSignalsInput  template_fifo_response_memory_in_signals_in                                  ;
-FIFOStateSignalsOutput template_fifo_request_control_out_signals_out                                ;
-FIFOStateSignalsOutput template_fifo_request_engine_out_signals_out                                 ;
-FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out                                 ;
-FIFOStateSignalsOutput template_fifo_response_control_in_signals_out                                ;
-FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out     [(1+ENGINE_MERGE_WIDTH)-1:0];
-FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out                                 ;
-FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in[   NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsInput  template_fifo_request_control_out_signals_in                                                ;
+FIFOStateSignalsInput  template_fifo_request_engine_out_signals_in                                                 ;
+FIFOStateSignalsInput  template_fifo_request_memory_out_signals_in                                                 ;
+FIFOStateSignalsInput  template_fifo_response_control_in_signals_in                                                ;
+FIFOStateSignalsInput  template_fifo_response_engine_in_signals_in      [               (1+ENGINE_MERGE_WIDTH)-1:0];
+FIFOStateSignalsInput  template_fifo_response_memory_in_signals_in                                                 ;
+FIFOStateSignalsOutput template_fifo_request_control_out_signals_out                                               ;
+FIFOStateSignalsOutput template_fifo_request_engine_out_signals_out                                                ;
+FIFOStateSignalsOutput template_fifo_request_memory_out_signals_out                                                ;
+FIFOStateSignalsOutput template_fifo_response_control_in_signals_out                                               ;
+FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out     [               (1+ENGINE_MERGE_WIDTH)-1:0];
+FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out                                                ;
+FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
 
 KernelDescriptor template_descriptor_in    ;
 logic            areset_template           ;
@@ -200,6 +200,12 @@ generate
     for (i=0; i<NUM_BACKTRACK_LANES; i++) begin  : generate_response_lanes_backtrack_signals
         always_ff @(posedge ap_clk) begin
             fifo_response_lanes_backtrack_signals_in_reg[i] <= fifo_response_lanes_backtrack_signals_in[i];
+        end
+    end
+    for (i=NUM_BACKTRACK_LANES; i<NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH; i++) begin  : generate_response_cast_backtrack_signals
+        always_ff @(posedge ap_clk) begin
+            fifo_response_lanes_backtrack_signals_in_reg[i].prog_full <= ~fifo_request_engine_out_signals_in[(i-NUM_BACKTRACK_LANES)+1].rd_en;
+            fifo_response_lanes_backtrack_signals_in_reg[i].empty     <= 1'b0;
         end
     end
 endgenerate
