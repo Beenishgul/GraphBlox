@@ -709,15 +709,8 @@ endfunction
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
-
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
-
-            auxiliary_1  = new [graph.mem_auxiliary_1];
-            auxiliary_2  = new [graph.mem_auxiliary_2];
-
-             m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
-             m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
+            
+            `include "module_slv_m_axi_vip_dump.vh"
 
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
                 graph.auxiliary_1[i] = auxiliary_1[i];
@@ -851,20 +844,15 @@ endfunction
         function automatic bit check_BFS_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
-            bit error_found = 0;
+            bit error_found;
             integer error_counter;
             integer frontier_counter;
+
+            `include "module_slv_m_axi_vip_dump.vh"
+
+            error_found = 0;
             error_counter = 0;
             frontier_counter = 0;
-
-            auxiliary_1  = new [graph.mem_auxiliary_1];
-            auxiliary_2  = new [graph.mem_auxiliary_2];
-
-            m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
-            m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
-
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 if(auxiliary_2[i])
@@ -881,21 +869,17 @@ endfunction
         function automatic bit check_PR_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
             // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
-            bit error_found = 0;
+            bit error_found;
             integer error_counter;
             integer mismatch_counter;
+
+            `include "module_slv_m_axi_vip_dump.vh"
+
+            error_found = 0;
             error_counter = 0;
             mismatch_counter = 0;
-            
-            auxiliary_1  = new [graph.mem_auxiliary_1];
-            auxiliary_2  = new [graph.mem_auxiliary_2];
-
-            m00_axi_buffer_dump_memory(m00_axi, buffer_7_ptr, auxiliary_1, 0, graph.mem_auxiliary_1);
-            m00_axi_buffer_dump_memory(m00_axi, buffer_8_ptr, auxiliary_2, 0, graph.mem_auxiliary_2);
-
+                        
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 if(auxiliary_2[i] != graph.out_degree[i-graph.num_auxiliary_2]) begin
@@ -915,20 +899,15 @@ endfunction
         function automatic bit check_MEMCPY_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
-            // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
-            bit error_found = 0;
+            bit error_found;
             integer error_counter;
             integer mismatch_counter;
+            
+            `include "module_slv_m_axi_vip_dump.vh"
+
+            error_found = 0;
             error_counter = 0;
             mismatch_counter = 0;
-
-            edges_array_src  = new [graph.mem_edges_array_src];
-            edges_array_dest  = new [graph.mem_edges_array_dest];
-
-            m00_axi_buffer_dump_memory(m00_axi, buffer_4_ptr, edges_array_src, 0, graph.mem_edges_array_src);
-            m01_axi_buffer_dump_memory(m01_axi, buffer_5_ptr, edges_array_dest, 0, graph.mem_edges_array_dest);
 
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = 0; i < graph.mem_edges_array_src; i++) begin
