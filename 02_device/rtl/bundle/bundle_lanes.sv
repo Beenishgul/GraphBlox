@@ -103,7 +103,7 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out_int    [NUM_LANES-1:0]                         ;
 FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg     [NUM_LANES-1:0][NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsOutput lanes_fifo_request_memory_out_backtrack_signals_in[NUM_LANES-1:0][      NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput lanes_fifo_request_memory_out_backtrack_signals_in_reg[NUM_LANES-1:0][      NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
@@ -402,7 +402,9 @@ generate
 
         always_ff @(posedge ap_clk) begin
             fifo_response_lanes_backtrack_signals_in_reg[i] <= fifo_response_lanes_backtrack_signals_in;
+            lanes_fifo_request_memory_out_backtrack_signals_in_reg[i] <= fifo_request_memory_out_backtrack_signals_in;
         end
+
     end
 endgenerate
 
@@ -639,7 +641,7 @@ generate
             .request_memory_out                          (lanes_request_memory_out[j]                                                               ),
             .fifo_request_memory_out_signals_in          (lanes_fifo_request_memory_out_signals_in[j]                                               ),
             .fifo_request_memory_out_signals_out         (lanes_fifo_request_memory_out_signals_out[j]                                              ),
-            .fifo_request_memory_out_backtrack_signals_in(lanes_fifo_request_memory_out_backtrack_signals_in[j]                                     ),
+            .fifo_request_memory_out_backtrack_signals_in(lanes_fifo_request_memory_out_backtrack_signals_in_reg[j]                                 ),
             .request_control_out                         (lanes_request_control_out[j]                                                              ),
             .fifo_request_control_out_signals_in         (lanes_fifo_request_control_out_signals_in[j]                                              ),
             .fifo_request_control_out_signals_out        (lanes_fifo_request_control_out_signals_out[j]                                             ),

@@ -73,9 +73,9 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_out   [NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
-FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_in    [NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
-FIFOStateSignalsOutput bundle_fifo_request_memory_out_backtrack_signals_in[NUM_BUNDLES-1:0][ NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_out       [NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput bundle_fifo_response_lanes_backtrack_signals_in        [NUM_BUNDLES-1:0][NUM_LANES_MAX-1:0];
+FIFOStateSignalsOutput bundle_fifo_request_memory_out_backtrack_signals_in_reg[NUM_BUNDLES-1:0][ NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Bundles
@@ -368,6 +368,14 @@ generate
     end
 endgenerate
 
+generate
+    for (i=0; i<NUM_BUNDLES; i++) begin : generate_bundle_backtrack_request_memory_out_signals
+        always_ff @(posedge ap_clk) begin
+            bundle_fifo_request_memory_out_backtrack_signals_in_reg[i] <= fifo_request_memory_out_backtrack_signals_in;
+        end
+    end
+endgenerate
+
 // --------------------------------------------------------------------------------------
 // Generate Bundles - Memory Arbitration OUTPUT
 // --------------------------------------------------------------------------------------
@@ -517,7 +525,7 @@ generate
     for (j=0; j<NUM_BUNDLES; j++) begin : generate_bundle_lanes
         bundle_lanes #(
             `include"set_bundle_parameters.vh"
-            ) inst_bundle_lanes (
+        ) inst_bundle_lanes (
             .ap_clk                                      (ap_clk                                                                                      ),
             .areset                                      (areset_bundle[j]                                                                            ),
             .descriptor_in                               (bundle_descriptor_in[j]                                                                     ),
@@ -538,7 +546,7 @@ generate
             .request_memory_out                          (bundle_request_memory_out[j]                                                                ),
             .fifo_request_memory_out_signals_in          (bundle_fifo_request_memory_out_signals_in[j]                                                ),
             .fifo_request_memory_out_signals_out         (bundle_fifo_request_memory_out_signals_out[j]                                               ),
-            .fifo_request_memory_out_backtrack_signals_in(bundle_fifo_request_memory_out_backtrack_signals_in[j]                                      ),
+            .fifo_request_memory_out_backtrack_signals_in(bundle_fifo_request_memory_out_backtrack_signals_in_reg[j]                                  ),
             .request_control_out                         (bundle_request_control_out[j]                                                               ),
             .fifo_request_control_out_signals_in         (bundle_fifo_request_control_out_signals_in[j]                                               ),
             .fifo_request_control_out_signals_out        (bundle_fifo_request_control_out_signals_out[j]                                              ),

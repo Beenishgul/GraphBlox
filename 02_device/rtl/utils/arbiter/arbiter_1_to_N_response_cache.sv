@@ -17,8 +17,9 @@
 module arbiter_1_to_N_response_cache #(
   parameter NUM_MEMORY_RECEIVER = 2                              ,
   parameter FIFO_ARBITER_DEPTH  = 16                             ,
-  parameter FIFO_WRITE_DEPTH    = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH         = (FIFO_WRITE_DEPTH/2) + 3       ,
+  // parameter FIFO_WRITE_DEPTH    = 2**$clog2(FIFO_ARBITER_DEPTH)  ,
+  parameter FIFO_WRITE_DEPTH    = NUM_MEMORY_RECEIVER*32         ,
+  parameter PROG_THRESH         = (FIFO_WRITE_DEPTH/2)           ,
   parameter FIFO_ENABLE           = 0                            ,
   parameter PIPELINE_STAGES_DEPTH = 1
 ) (
@@ -28,7 +29,7 @@ module arbiter_1_to_N_response_cache #(
   input  FIFOStateSignalsInput  fifo_response_signals_in              ,
   output FIFOStateSignalsOutput fifo_response_signals_out             ,
   output MemoryPacketResponse   response_out [NUM_MEMORY_RECEIVER-1:0],
-  output logic                  fifo_setup_signal                     
+  output logic                  fifo_setup_signal
 );
 
 // --------------------------------------------------------------------------------------

@@ -403,7 +403,7 @@
     },
     "fifo_control_response": {
         "ENGINE_ALU_OPS": 0,
-        "ENGINE_CSR_INDEX": 8,
+        "ENGINE_CSR_INDEX": 16,
         "ENGINE_FILTER_COND": 0,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
@@ -414,7 +414,7 @@
     "fifo_control_request": {
         "ENGINE_ALU_OPS": 0,
         "ENGINE_CSR_INDEX": 0,
-        "ENGINE_FILTER_COND": 8,
+        "ENGINE_FILTER_COND": 16,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
         "ENGINE_SET_OPS": 0,
@@ -423,23 +423,23 @@
     },
     "fifo_memory": {
         "ENGINE_ALU_OPS": 0,
-        "ENGINE_CSR_INDEX": 16,
+        "ENGINE_CSR_INDEX": 32,
         "ENGINE_FILTER_COND": 0,
         "ENGINE_FORWARD_DATA": 0,
         "ENGINE_MERGE_DATA": 0,
         "ENGINE_SET_OPS": 0,
         "ENGINE_PIPELINE": 0,
-        "ENGINE_READ_WRITE": 16
+        "ENGINE_READ_WRITE": 32
     },
     "fifo_engine": {
-        "ENGINE_ALU_OPS": 8,
-        "ENGINE_CSR_INDEX": 8,
-        "ENGINE_FILTER_COND": 8,
-        "ENGINE_FORWARD_DATA": 8,
-        "ENGINE_MERGE_DATA": 8,
-        "ENGINE_SET_OPS": 8,
-        "ENGINE_PIPELINE": 8,
-        "ENGINE_READ_WRITE": 8
+        "ENGINE_ALU_OPS": 16,
+        "ENGINE_CSR_INDEX": 16,
+        "ENGINE_FILTER_COND": 16,
+        "ENGINE_FORWARD_DATA": 16,
+        "ENGINE_MERGE_DATA": 16,
+        "ENGINE_SET_OPS": 16,
+        "ENGINE_PIPELINE": 16,
+        "ENGINE_READ_WRITE": 16
     },
     "cycles": {
         "ENGINE_ALU_OPS": 6,
