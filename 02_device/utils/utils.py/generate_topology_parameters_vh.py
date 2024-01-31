@@ -100,6 +100,7 @@ output_file_path_global = os.path.join(output_folder_path_global,"config_paramet
 output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
 output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
 output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
+output_file_slv_m_axi_vip_dump = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_dump.vh")
 output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
 output_file_slv_m_axi_vip_import = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_import.vh")
 output_file_testbench_parameters = os.path.join(output_folder_path_parameters,"testbench_parameters.vh")
@@ -834,6 +835,7 @@ check_and_clean_file(output_file_lane_arbitration)
 check_and_clean_file(output_file_slv_m_axi_vip_inst)
 check_and_clean_file(output_file_slv_m_axi_vip_import)
 check_and_clean_file(output_file_slv_m_axi_vip_func)
+check_and_clean_file(output_file_slv_m_axi_vip_dump)
 check_and_clean_file(output_file_filelist_xsim_ip_vhdl_f)
 check_and_clean_file(output_file_filelist_xsim_ip_sv_f)
 check_and_clean_file(output_file_filelist_xsim_ip_v_f)
@@ -1772,11 +1774,13 @@ generate
         .m_axi_write_out(m{0:02d}_axi4_write.out       )
       );
 
-    end else if(CHANNEL_CONFIG_L2_CACHE[{5}] == 2) begin end
+    end else if(CHANNEL_CONFIG_L2_CACHE[{5}] == 2) begin 
 
     // Merge the This channel with the adjacent axi_system_cache_be
-
-    else begin
+        assign kernel_cache_setup_signal[{5}] = 0;
+        assign kernel_m{0:02d}_axi_lite_in      = 0;
+    
+   end else begin
         assign kernel_cache_setup_signal[{5}] = 0;
         assign kernel_m{0:02d}_axi4_read_in   = 0;
         assign kernel_m{0:02d}_axi4_read_out  = 0;
@@ -1792,36 +1796,38 @@ generate
 endgenerate
     """
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"// Channel {index}")
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(parameters_template.format(channel))
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(f"// --------------------------------------------------------------------------------------")
+            output_lines.append(f"// Channel {index}")
+            output_lines.append(f"// --------------------------------------------------------------------------------------")
+            output_lines.append(parameters_template.format(channel))
 
     CACHE_MERGE_COUNT = 0;
     CACHE_PORT_COUNT  = 0;
     CACHE_PORT_INDEX  = 0;
     CHANNEL_PORT_INDEX  = 0;
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(f"// Channel {index}")
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
-        output_lines.append(assign_template_must.format(channel,index))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(assign_template_optional.format(channel,index))
-        else:
-            output_lines.append(assign_template_optional_default.format(channel,index))
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(f"// --------------------------------------------------------------------------------------")
+            output_lines.append(f"// Channel {index}")
+            output_lines.append(f"// --------------------------------------------------------------------------------------")
+            output_lines.append(assign_template_must.format(channel,index))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(assign_template_optional.format(channel,index))
+            else:
+                output_lines.append(assign_template_optional_default.format(channel,index))
 
-        output_lines.append(module_template_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
-       
-        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
-            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                output_lines.append(module_template_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
-                CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
-        else:
-            output_lines.append(module_template_ports.format(0,channel))
-        
-        output_lines.append(module_template_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
+            output_lines.append(module_template_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
+           
+            if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+                CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+                for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                    output_lines.append(module_template_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                    CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+            else:
+                output_lines.append(module_template_ports.format(0,channel))
+            
+            output_lines.append(module_template_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
 
 
     # Writing to the VHDL file
@@ -1877,10 +1883,11 @@ output logic [ M{0:02d}_AXI4_BE_PROT_W-1:0] m{0:02d}_axi_arprot ,
 output logic [  M{0:02d}_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template_must.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(ports_template_optional.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(ports_template_must.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(ports_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -1930,10 +1937,11 @@ with open(output_file_top_wires, 'w') as file:
   wire [                           4-1:0] m{0:02d}_axi_arqos        ; // Address read channel quality of service
     """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(wires_template_must.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(wires_template_optional.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(wires_template_must.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(wires_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2012,12 +2020,13 @@ output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Ad
   // 
     """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template_must.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(ports_template_optional.format(channel))
-        else:
-            output_lines.append(ports_template_optional_comment.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(ports_template_must.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(ports_template_optional.format(channel))
+            else:
+                output_lines.append(ports_template_optional_comment.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2067,10 +2076,11 @@ with open(output_file_top_portmap, 'w') as file:
 .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
     """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(connection_template_must.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(connection_template_optional.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(connection_template_must.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(connection_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2119,10 +2129,11 @@ with open(output_file_afu_portmap, 'w') as file:
 .m{0:02d}_axi_arqos  (m{0:02d}_axi_arqos  ),
     """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(connection_template_must.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(connection_template_optional.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(connection_template_must.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(connection_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2176,16 +2187,22 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         .aclk         (ap_clk         ),
         .aresetn      (ap_rst_n       )
     );
-
+    """
+    module_template_instance = """   
         slv_m{0:02d}_axi_vip_slv_mem_t m{0:02d}_axi    ;
         slv_m{0:02d}_axi_vip_slv_t     m{0:02d}_axi_slv;
         """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(module_template_must_pre.format(channel))
-        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-            output_lines.append(module_template_optional.format(channel))
-        output_lines.append(module_template_must_post.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(module_template_instance.format(channel))
+
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(module_template_must_pre.format(channel))
+            if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+                output_lines.append(module_template_optional.format(channel))
+            output_lines.append(module_template_must_post.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2197,8 +2214,9 @@ with open(output_file_slv_m_axi_vip_import, 'w') as file:
     import slv_m{0:02d}_axi_vip_pkg::*;
         """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(module_template.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(module_template.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2930,52 +2948,126 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
             """
 
     backdoor_buffer_fill_memories_mid = """
-            m{0:02d}_axi_buffer_fill_memory(m{0:02d}_axi, {1}_ptr, graph.{2}, 0, graph.mem_{2});
+            m{0:02d}_axi_buffer_fill_memory(m{3:02d}_axi, {1}_ptr, graph.{2}, 0, graph.mem_{2});
             """
 
     backdoor_buffer_fill_memories_end = """
         endtask
             """
 
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(fill_memory_template.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(fill_memory_template.format(channel))
 
     output_lines.append(start_vips_pre)
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(start_vips_mid.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(start_vips_mid.format(channel))
     output_lines.append(start_vips_end)
 
     output_lines.append(slv_no_backpressure_wready_pre)
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(slv_no_backpressure_wready_mid.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(slv_no_backpressure_wready_mid.format(channel))
     output_lines.append(slv_no_backpressure_wready_end)
 
     output_lines.append(slv_random_backpressure_wready_pre)
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(slv_random_backpressure_wready_mid.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(slv_random_backpressure_wready_mid.format(channel))
     output_lines.append(slv_random_backpressure_wready_end)
 
     output_lines.append(slv_no_delay_rvalid_pre)
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(slv_no_delay_rvalid_mid.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(slv_no_delay_rvalid_mid.format(channel))
     output_lines.append(slv_no_delay_rvalid_end)
 
     output_lines.append(slv_random_delay_rvalid_pre)
-    for channel in DISTINCT_CHANNELS:
-        output_lines.append(slv_random_delay_rvalid_mid.format(channel))
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+            output_lines.append(slv_random_delay_rvalid_mid.format(channel))
     output_lines.append(slv_random_delay_rvalid_end)
 
-    output_lines.append(backdoor_fill_memories_pre)
-    for index, (buffer_name, properties) in enumerate(channels.items()):
-        output_lines.append(backdoor_fill_memories_mid.format(int(properties[0]), buffer_name, index))
-    output_lines.append(backdoor_fill_memories_end)
+    # output_lines.append(backdoor_fill_memories_pre)
+    # for index, (buffer_name, properties) in enumerate(channels.items()):
+    #     output_lines.append(backdoor_fill_memories_mid.format(int(properties[0]), buffer_name, index))
+    # output_lines.append(backdoor_fill_memories_end)
 
+    CHANNEL_PORT_INDEX  = 0;
     output_lines.append(backdoor_buffer_fill_memories_pre)
     for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
         if index == 9:
             continue  # Skip the iteration if the index is 9
-        output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2))
+        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
+            output_lines.append(backdoor_buffer_fill_memories_mid.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
+        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
+            output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            CHANNEL_PORT_INDEX = int(properties[0])
+        else:
+            output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+
     output_lines.append(backdoor_buffer_fill_memories_end)
+    
+    file.write('\n'.join(output_lines))
+
+
+
+with open(output_file_slv_m_axi_vip_dump, "w") as file:
+    output_lines = []
+    
+    backdoor_buffer_dump_memories_pre = """
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor dumpe the memory with the content.
+            """
+
+    backdoor_buffer_dump_memories_declare = """           bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0] {2}[];"""
+
+    backdoor_buffer_dump_memories_assign = """           {2}  = new [graph.mem_{2}];"""
+
+    backdoor_buffer_dump_memories_call = """           m{0:02d}_axi_buffer_dump_memory(m{3:02d}_axi, {1}_ptr, {2}, 0, graph.mem_{2});"""
+
+    backdoor_buffer_dump_memories_end = """
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            """
+
+    CHANNEL_PORT_INDEX  = 0;
+    output_lines.append(backdoor_buffer_dump_memories_pre)
+    
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+        if index == 9:
+            continue  # Skip the iteration if the index is 9
+        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
+            output_lines.append(backdoor_buffer_dump_memories_declare.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
+        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
+            output_lines.append(backdoor_buffer_dump_memories_declare.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            CHANNEL_PORT_INDEX = int(properties[0])
+        else:
+            output_lines.append(backdoor_buffer_dump_memories_declare.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+        if index == 9:
+            continue  # Skip the iteration if the index is 9
+        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
+            output_lines.append(backdoor_buffer_dump_memories_assign.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
+        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
+            output_lines.append(backdoor_buffer_dump_memories_assign.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            CHANNEL_PORT_INDEX = int(properties[0])
+        else:
+            output_lines.append(backdoor_buffer_dump_memories_assign.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+        if index == 9:
+            continue  # Skip the iteration if the index is 9
+        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
+            output_lines.append(backdoor_buffer_dump_memories_call.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
+        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
+            output_lines.append(backdoor_buffer_dump_memories_call.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            CHANNEL_PORT_INDEX = int(properties[0])
+        else:
+            output_lines.append(backdoor_buffer_dump_memories_call.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+
+    output_lines.append(backdoor_buffer_dump_memories_end)
     
     file.write('\n'.join(output_lines))
 
@@ -2989,7 +3081,7 @@ with open(output_file_set_top_parameters, "w") as file:
         .C_M{0:02d}_AXI_DATA_WIDTH      (C_M{0:02d}_AXI_DATA_WIDTH      ),
         """
 
-    for channel in DISTINCT_CHANNELS:
+    for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(ports_template.format(channel))
 
     file.write('\n'.join(output_lines))
