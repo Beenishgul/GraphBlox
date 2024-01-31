@@ -158,7 +158,6 @@ logic generator_engine_done_out              ;
 FIFOStateSignalsInput  arbiter_1_to_N_memory_fifo_response_signals_in [NUM_MODULES-1:0];
 FIFOStateSignalsOutput arbiter_1_to_N_memory_fifo_response_signals_out                 ;
 logic                  arbiter_1_to_N_memory_fifo_setup_signal                         ;
-logic                  areset_arbiter_1_to_N_engine                                    ;
 logic                  areset_arbiter_1_to_N_memory                                    ;
 MemoryPacketResponse   arbiter_1_to_N_memory_response_in                               ;
 MemoryPacketResponse   arbiter_1_to_N_memory_response_out             [NUM_MODULES-1:0];
@@ -177,7 +176,6 @@ FIFOStateSignalsOutput generator_fifo_request_memory_out_backtrack_signals_in[  
 // Register reset signal
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    areset_arbiter_1_to_N_engine <= areset;
     areset_arbiter_1_to_N_memory <= areset;
     areset_configure_engine      <= areset;
     areset_configure_memory      <= areset;
