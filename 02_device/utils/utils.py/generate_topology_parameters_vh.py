@@ -1627,23 +1627,24 @@ with open(output_file_cu_arbitration, "w") as file:
 with open(output_file_afu_topology, 'w') as file:
     output_lines = []
 
-    parameters_template = """
+    parameters_template_optional = """
 M{0:02d}_AXI4_BE_MasterReadInterface  m{0:02d}_axi4_read ;
 M{0:02d}_AXI4_BE_MasterWriteInterface m{0:02d}_axi4_write;
-
-M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput  kernel_s{0:02d}_axi_read_out ;
-M{0:02d}_AXI4_MID_SlaveReadInterfaceInput   kernel_s{0:02d}_axi_read_in  ;
-M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput kernel_s{0:02d}_axi_write_out;
-M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  kernel_s{0:02d}_axi_write_in ;
 
 M{0:02d}_AXI4_BE_MasterReadInterfaceInput   kernel_m{0:02d}_axi4_read_in  ;
 M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  kernel_m{0:02d}_axi4_read_out ;
 M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  kernel_m{0:02d}_axi4_write_in ;
 M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput kernel_m{0:02d}_axi4_write_out;
+"""
+
+    parameters_template_must = """
+M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput  kernel_s{0:02d}_axi_read_out ;
+M{0:02d}_AXI4_MID_SlaveReadInterfaceInput   kernel_s{0:02d}_axi_read_in  ;
+M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput kernel_s{0:02d}_axi_write_out;
+M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  kernel_s{0:02d}_axi_write_in ;
 
 M{0:02d}_AXI4_LITE_MID_RESP_T               kernel_m{0:02d}_axi_lite_in ;
 M{0:02d}_AXI4_LITE_MID_REQ_T                kernel_m{0:02d}_axi_lite_out;
-
 """
 
     assign_template_must = """
@@ -1796,11 +1797,12 @@ generate
 endgenerate
     """
     for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {index}")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
-            output_lines.append(f"// --------------------------------------------------------------------------------------")
-            output_lines.append(f"// Channel {index}")
-            output_lines.append(f"// --------------------------------------------------------------------------------------")
-            output_lines.append(parameters_template.format(channel))
+            output_lines.append(parameters_template_optional.format(channel))
+        output_lines.append(parameters_template_must.format(channel))
 
     CACHE_MERGE_COUNT = 0;
     CACHE_PORT_COUNT  = 0;
