@@ -2238,20 +2238,46 @@ def generate_output_file_buffer_channels_tcl(output_file_name):
     with open(output_file_name, "w") as file:
         current_address = 0x010  # Starting base address
 
-        for buffer_name, properties in channels.items():
-            axi_interface = f"m0{properties[0]}_axi"
-            size = int(properties[1])  # Size as specified in JSON
-            size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+        CHANNEL_PORT_INDEX  = 0;
+        for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+            if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
+                axi_interface = f"m{CHANNEL_PORT_INDEX:02d}_axi" 
+                size = int(properties[1])  # Size as specified in JSON
+                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
 
-            # Writing the TCL commands
-            file.write(f'''puts_reg_info "{buffer_name}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
-  set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
-  set_property address_offset 0x{current_address:03X} $reg
-  set_property size           [expr {{{size}}}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
-  set_property value {axi_interface} $regparam \n\n''')
+                # Writing the TCL commands
+                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+      set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
+      set_property address_offset 0x{current_address:03X} $reg
+      set_property size           [expr {{{size}}}]   $reg
+      set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
+      set_property value {axi_interface} $regparam \n\n''')
+            elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
+                axi_interface = f"m{int(properties[0]):02d}_axi" 
+                size = int(properties[1])  # Size as specified in JSON
+                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
 
-            current_address += size_in_hex  # Increment the address based on the size
+                # Writing the TCL commands
+                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+      set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
+      set_property address_offset 0x{current_address:03X} $reg
+      set_property size           [expr {{{size}}}]   $reg
+      set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
+      set_property value {axi_interface} $regparam \n\n''')
+                CHANNEL_PORT_INDEX = int(properties[0])
+            else:
+                axi_interface = f"m{int(properties[0]):02d}_axi" 
+                size = int(properties[1])  # Size as specified in JSON
+                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+
+                # Writing the TCL commands
+                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+      set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
+      set_property address_offset 0x{current_address:03X} $reg
+      set_property size           [expr {{{size}}}]   $reg
+      set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
+      set_property value {axi_interface} $regparam \n\n''')
+
 
 generate_output_file_buffer_channels_tcl(output_file_buffer_channels_tcl)
 
