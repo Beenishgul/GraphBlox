@@ -79,13 +79,13 @@ module engine_read_write_generator #(parameter
 
     KernelDescriptor descriptor_in_reg;
 
-    ReadWriteConfiguration configure_memory_reg;
-    EnginePacketFull       request_send_out_int;
+    logic                  configure_memory_setup_reg;
+    ReadWriteConfiguration configure_memory_reg      ;
+    ReadWriteConfiguration configure_engine_int      ;
 
     logic fifo_empty_int     ;
     logic fifo_empty_reg     ;
     logic cmd_stream_mode_pop;
-
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -101,31 +101,21 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    EnginePacketFullPayload       fifo_request_send_din             ;
-    EnginePacketFullPayload       fifo_request_send_dout            ;
-    EnginePacket                  fifo_response_comb                ;
-    FIFOStateSignalsInputInternal fifo_request_send_signals_in_int  ;
-    FIFOStateSignalsOutInternal   fifo_request_send_signals_out_int ;
-    logic                         fifo_request_send_setup_signal_int;
-
-    EnginePacket         response_engine_in_reg    ;
-    MemoryPacketResponse response_memory_in_reg    ;
-    MemoryPacketResponse response_memory_in_reg_S2 ;
-    logic                configure_memory_setup_reg;
-
-    ReadWriteConfiguration configure_engine_int;
-
-    EnginePacketFull generator_engine_request_engine_reg   ;
-    EnginePacketFull generator_engine_request_engine_reg_S2;
-    EnginePacketFull generator_engine_request_engine_reg_S3;
-    EnginePacket     request_engine_out_reg                ;
-    EnginePacketFull request_memory_out_reg                ;
+    EnginePacket         response_engine_in_reg                ;
+    EnginePacket         request_engine_out_reg                ;
+    EnginePacket         fifo_response_comb                    ;
+    EnginePacketFull     generator_engine_request_engine_reg   ;
+    EnginePacketFull     generator_engine_request_engine_reg_S2;
+    EnginePacketFull     generator_engine_request_engine_reg_S3;
+    EnginePacketFull     request_memory_out_reg                ;
+    MemoryPacketResponse response_memory_in_reg                ;
+    MemoryPacketResponse response_memory_in_reg_S2             ;
 
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
-    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
-    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
     FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
     FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
@@ -144,24 +134,34 @@ module engine_read_write_generator #(parameter
     logic                         fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
+// FIFO Engine INPUT Response EnginePacket
+// --------------------------------------------------------------------------------------
+    EnginePacketFull              request_send_out_int              ;
+    EnginePacketFullPayload       fifo_request_send_din             ;
+    EnginePacketFullPayload       fifo_request_send_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_send_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_send_signals_out_int ;
+    logic                         fifo_request_send_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
 // FIFO pending cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
-    FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
-    FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
-    logic                         fifo_request_pending_setup_signal_int;
     EnginePacket                  request_pending_out_int              ;
     EnginePacketPayload           fifo_request_pending_din             ;
     EnginePacketPayload           fifo_request_pending_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
+    logic                         fifo_request_pending_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // FIFO commit cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
-    FIFOStateSignalsInputInternal fifo_request_commit_signals_in_int  ;
-    FIFOStateSignalsOutInternal   fifo_request_commit_signals_out_int ;
-    logic                         fifo_request_commit_setup_signal_int;
     EnginePacket                  request_commit_out_int              ;
     EnginePacketPayload           fifo_request_commit_din             ;
     EnginePacketPayload           fifo_request_commit_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_commit_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_commit_signals_out_int ;
+    logic                         fifo_request_commit_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter

@@ -409,6 +409,10 @@ always_ff @(posedge ap_clk) begin
     for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
         if(configure_engine_param_int.merge_mask[j]) begin
             generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[0];
+
+            if(response_engine_in_int[0].valid & (response_engine_in_int[0].payload.data.field[3] != response_engine_in_int[j].payload.data.field[3]))
+                $display("%0d == %0d",response_engine_in_int[0].payload.data.field[3],response_engine_in_int[j].payload.data.field[3] );
+            
         end else begin
             generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
         end
@@ -417,6 +421,7 @@ always_ff @(posedge ap_clk) begin
     for (int j=(1+ENGINE_MERGE_WIDTH); j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
         generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
     end
+
 end
 
 // --------------------------------------------------------------------------------------

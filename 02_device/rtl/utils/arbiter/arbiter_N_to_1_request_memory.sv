@@ -18,9 +18,9 @@ module arbiter_N_to_1_request_memory #(
   parameter NUM_MEMORY_REQUESTOR  = 2                              ,
   parameter NUM_ARBITER_REQUESTOR = 2**$clog2(NUM_MEMORY_REQUESTOR),
   parameter FIFO_ARBITER_DEPTH    = 8                              ,
-  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH+9),
-  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2) + 3       ,
-  parameter FIFO_ENABLE           = 0                              ,
+  parameter FIFO_WRITE_DEPTH      = 2**$clog2(FIFO_ARBITER_DEPTH)  ,
+  parameter PROG_THRESH           = (FIFO_WRITE_DEPTH/2)           ,
+  parameter FIFO_ENABLE           = 1                              ,
   parameter PIPELINE_STAGES_DEPTH = 1
 ) (
   input  logic                            ap_clk                               ,
