@@ -41,7 +41,6 @@ logic areset_control;
 logic areset_fifo   ;
 
 MemoryPacketRequest              request_in_reg;
-logic [NUM_MEMORY_REQUESTOR-1:0] id_mask       ;
 
 // --------------------------------------------------------------------------------------
 // Response FIFO
@@ -61,9 +60,6 @@ logic                            fifo_request_signals_in_int_rd_en   ;
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
-
-assign id_mask = ~0;
-
 always_ff @(posedge ap_clk) begin
   areset_control <= areset;
   areset_fifo    <= areset;
