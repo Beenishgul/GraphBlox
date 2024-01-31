@@ -490,6 +490,8 @@ def l2_merge_caches(sequence):
     current_cache = []
     
     for num in sequence:
+        if num == 0:
+            continue
         if num == 1:
             if current_cache:
                 caches.append(len(current_cache))
@@ -1728,7 +1730,7 @@ assign m{0:02d}_axi4_write.in.bid    = 0; // Write response channel ID
 assign m{0:02d}_axi4_write.in.bresp  = 0; // Write channel response
     """
 
-    module_template = """
+    module_template_pre = """
 // --------------------------------------------------------------------------------------
 // System Cache CH {5}-> AXI
 // --------------------------------------------------------------------------------------
@@ -1739,10 +1741,14 @@ generate
       kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper inst_kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),
         .areset            (areset_cache[{5}]               ),
-        .s_axi_read_out    (kernel_s{0:02d}_axi_read_out    ),
-        .s_axi_read_in     (kernel_s{0:02d}_axi_read_in     ),
-        .s_axi_write_out   (kernel_s{0:02d}_axi_write_out   ),
-        .s_axi_write_in    (kernel_s{0:02d}_axi_write_in    ),
+            """
+
+    module_template_ports = """        .s{0}_axi_read_out    (kernel_s{1:02d}_axi_read_out    ),
+        .s{0}_axi_read_in     (kernel_s{1:02d}_axi_read_in     ),
+        .s{0}_axi_write_out   (kernel_s{1:02d}_axi_write_out   ),
+        .s{0}_axi_write_in    (kernel_s{1:02d}_axi_write_in    ),                   """
+
+    module_template_post = """
         .m_axi_read_in     (kernel_m{0:02d}_axi4_read_in    ),
         .m_axi_read_out    (kernel_m{0:02d}_axi4_read_out   ),
         .m_axi_write_in    (kernel_m{0:02d}_axi4_write_in   ),
@@ -1785,19 +1791,37 @@ generate
 // --------------------------------------------------------------------------------------
 endgenerate
     """
-
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(f"// Channel {index}")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(parameters_template.format(channel))
+
+    CACHE_MERGE_COUNT = 0;
+    CACHE_PORT_COUNT  = 0;
+    CACHE_PORT_INDEX  = 0;
+    CHANNEL_PORT_INDEX  = 0;
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(f"// Channel {index}")
+        output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(assign_template_must.format(channel,index))
         if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
             output_lines.append(assign_template_optional.format(channel,index))
         else:
             output_lines.append(assign_template_optional_default.format(channel,index))
 
-        output_lines.append(module_template.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
+        output_lines.append(module_template_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
+       
+        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                output_lines.append(module_template_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+        else:
+            output_lines.append(module_template_ports.format(0,channel))
+        
+        output_lines.append(module_template_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
 
 
     # Writing to the VHDL file
@@ -2253,7 +2277,7 @@ def adjust_to_nearest_legal_cache_num_ways(value):
 with open(output_file_generate_m_axi_vip_tcl, "w") as file:
     output_lines = []
 
-    fill_m_axi_vip_tcl_template="""
+    fill_m_axi_vip_tcl_template_vars="""
 # ----------------------------------------------------------------------------
 set BE_ADDR_WIDTH_M{0:02d}         {2}
 set BE_CACHE_DATA_WIDTH_M{0:02d}   {1}
@@ -2268,6 +2292,9 @@ set FE_CACHE_DATA_WIDTH_M{0:02d}  {10}
 set CU_CACHE_NUM_WAYS_M{0:02d}    {11} 
 set CU_CACHE_SIZE_B_M{0:02d}      {12} 
 set LINE_CU_CACHE_DATA_WIDTH_M{0:02d} {3} 
+"""
+
+    fill_m_axi_vip_tcl_template="""
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
@@ -2342,17 +2369,18 @@ set_property -dict [list                                                  \\
                     CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
                     CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
 
+    fill_m_axi_vip_tcl_template_cache_ports="""                    CONFIG.C_S{0}_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{1:02d}}}\\
+                    CONFIG.C_S{0}_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{1:02d}}}      \\
+                    CONFIG.C_S{0}_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
+                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
+                    CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
+                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
+                    CONFIG.C_S{0}_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
+                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
+                    CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
+                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\"""
+
     fill_m_axi_vip_tcl_template_cache_post="""                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
-                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}\\
-                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}      \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
                     CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
@@ -2574,6 +2602,12 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
   
  """
     CACHE_MERGE_COUNT = 0;
+    CACHE_PORT_COUNT  = 0;
+    CACHE_PORT_INDEX  = 0;
+    CHANNEL_PORT_INDEX  = 0;
+    for index, channel in enumerate(DISTINCT_CHANNELS):
+        output_lines.append(fill_m_axi_vip_tcl_template_vars.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]))
+      
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]))
         
@@ -2585,6 +2619,15 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
      
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        
+        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT-1]
+            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                output_lines.append(fill_m_axi_vip_tcl_template_cache_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+        else:
+            output_lines.append(fill_m_axi_vip_tcl_template_cache_ports.format(0,channel))
+
         output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         
         output_lines.append(fill_m_axi_vip_tcl_template_cu_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), CACHE_CONFIG_L1_RAM[index]))
@@ -4327,7 +4370,7 @@ with open(output_file_mxx_axi_lite_register_slice_mid_wrapper, "w") as file:
 
 fill_kernel_mxx_axi_system_cache_wrapper_module = []
 
-fill_kernel_mxx_axi_system_cache_wrapper_pre="""
+fill_kernel_mxx_axi_system_cache_wrapper_header="""
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -4345,16 +4388,21 @@ fill_kernel_mxx_axi_system_cache_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_kernel_mxx_axi_system_cache_wrapper="""
+fill_kernel_mxx_axi_system_cache_wrapper_pre="""
 
 module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
-  output M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput  s_axi_read_out    ,
-  input  M{0:02d}_AXI4_MID_SlaveReadInterfaceInput   s_axi_read_in     ,
-  output M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput s_axi_write_out   ,
-  input  M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  s_axi_write_in    ,
+  """
+fill_kernel_mxx_axi_system_cache_wrapper_ports="""
+  output M{1:02d}_AXI4_MID_SlaveReadInterfaceOutput  s{0}_axi_read_out    ,
+  input  M{1:02d}_AXI4_MID_SlaveReadInterfaceInput   s{0}_axi_read_in     ,
+  output M{1:02d}_AXI4_MID_SlaveWriteInterfaceOutput s{0}_axi_write_out   ,
+  input  M{1:02d}_AXI4_MID_SlaveWriteInterfaceInput  s{0}_axi_write_in    ,
+  """
+
+fill_kernel_mxx_axi_system_cache_wrapper_mid="""
   input  M{0:02d}_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
   output M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
@@ -4374,13 +4422,6 @@ logic cache_setup_signal_int;
 
 // logic m_axi_read_out_araddr_{2} ;
 // logic m_axi_write_out_awaddr_{2};
-// --------------------------------------------------------------------------------------
-//   Cache AXI signals
-// --------------------------------------------------------------------------------------
-M{0:02d}_AXI4_BE_MasterReadInterface  m_axi_read ;
-M{0:02d}_AXI4_BE_MasterWriteInterface m_axi_write;
-M{0:02d}_AXI4_MID_SlaveReadInterface  s_axi_read ;
-M{0:02d}_AXI4_MID_SlaveWriteInterface s_axi_write;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -4403,122 +4444,97 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// AXI4 MASTER
-// --------------------------------------------------------------------------------------
-// DRIVE AXI4 MASTER SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-assign m_axi_write.in = m_axi_write_in;
-assign m_axi_read.in  = m_axi_read_in;
-
-// --------------------------------------------------------------------------------------
-// DRIVE AXI4 MASTER SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-assign m_axi_read_out  = m_axi_read.out;
-assign m_axi_write_out = m_axi_write.out;
-
-// --------------------------------------------------------------------------------------
-// AXI4 SLAVE
-// --------------------------------------------------------------------------------------
-// DRIVE AXI4 SLAVE SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-assign s_axi_write_out = s_axi_write.out;
-assign s_axi_read_out  = s_axi_read.out;
-
-// --------------------------------------------------------------------------------------
-// DRIVE AXI4 SLAVE SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-assign s_axi_read.in  = s_axi_read_in;
-assign s_axi_write.in = s_axi_write_in;
-
-// --------------------------------------------------------------------------------------
 // System cache
 // --------------------------------------------------------------------------------------
-// assign m_axi_read.out.araddr[{2}-1]  = 1'b0;
-// assign m_axi_write.out.awaddr[{2}-1] = 1'b0;
-assign m_axi_write.out.awregion   = 0;
-assign m_axi_read.out.arregion    = 0;
+// assign m_axi_read_out.araddr[{2}-1]  = 1'b0;
+// assign m_axi_write_out.awaddr[{2}-1] = 1'b0;
+assign m_axi_write_out.awregion   = 0;
+assign m_axi_read_out.arregion    = 0;
 
 m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} (
+  """
+fill_kernel_mxx_axi_system_cache_wrapper_portmaps="""
+  .S{0}_AXI_GEN_ARUSER (0                           ),
+  .S{0}_AXI_GEN_AWUSER (0                           ),
+  .S{0}_AXI_GEN_RVALID (s{0}_axi_read_out.rvalid       ), // Output Read channel valid
+  .S{0}_AXI_GEN_ARREADY(s{0}_axi_read_out.arready      ), // Output Read Address read channel ready
+  .S{0}_AXI_GEN_RLAST  (s{0}_axi_read_out.rlast        ), // Output Read channel last word
+  .S{0}_AXI_GEN_RDATA  (s{0}_axi_read_out.rdata        ), // Output Read channel data
+  .S{0}_AXI_GEN_RID    (s{0}_axi_read_out.rid          ), // Output Read channel ID
+  .S{0}_AXI_GEN_RRESP  (s{0}_axi_read_out.rresp        ), // Output Read channel response
+  .S{0}_AXI_GEN_ARVALID(s{0}_axi_read_in.arvalid       ), // Input Read Address read channel valid
+  .S{0}_AXI_GEN_ARADDR (s{0}_axi_read_in.araddr        ), // Input Read Address read channel address
+  .S{0}_AXI_GEN_ARLEN  (s{0}_axi_read_in.arlen         ), // Input Read Address channel burst length
+  .S{0}_AXI_GEN_RREADY (s{0}_axi_read_in.rready        ), // Input Read Read channel ready
+  .S{0}_AXI_GEN_ARID   (s{0}_axi_read_in.arid          ), // Input Read Address read channel ID
+  .S{0}_AXI_GEN_ARSIZE (s{0}_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S{0}_AXI_GEN_ARBURST(s{0}_axi_read_in.arburst       ), // Input Read Address read channel burst type
+  .S{0}_AXI_GEN_ARLOCK (s{0}_axi_read_in.arlock        ), // Input Read Address read channel lock type
+  .S{0}_AXI_GEN_ARCACHE(s{0}_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S{0}_AXI_GEN_ARPROT (s{0}_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S{0}_AXI_GEN_ARQOS  (s{0}_axi_read_in.arqos         ), // Input Read Address channel quality of service
+  .S{0}_AXI_GEN_AWREADY(s{0}_axi_write_out.awready     ), // Output Write Address write channel ready
+  .S{0}_AXI_GEN_WREADY (s{0}_axi_write_out.wready      ), // Output Write channel ready
+  .S{0}_AXI_GEN_BID    (s{0}_axi_write_out.bid         ), // Output Write response channel ID
+  .S{0}_AXI_GEN_BRESP  (s{0}_axi_write_out.bresp       ), // Output Write channel response
+  .S{0}_AXI_GEN_BVALID (s{0}_axi_write_out.bvalid      ), // Output Write response channel valid
+  .S{0}_AXI_GEN_AWVALID(s{0}_axi_write_in.awvalid      ), // Input Write Address write channel valid
+  .S{0}_AXI_GEN_AWID   (s{0}_axi_write_in.awid         ), // Input Write Address write channel ID
+  .S{0}_AXI_GEN_AWADDR (s{0}_axi_write_in.awaddr       ), // Input Write Address write channel address
+  .S{0}_AXI_GEN_AWLEN  (s{0}_axi_write_in.awlen        ), // Input Write Address write channel burst length
+  .S{0}_AXI_GEN_AWSIZE (s{0}_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S{0}_AXI_GEN_AWBURST(s{0}_axi_write_in.awburst      ), // Input Write Address write channel burst type
+  .S{0}_AXI_GEN_AWLOCK (s{0}_axi_write_in.awlock       ), // Input Write Address write channel lock type
+  .S{0}_AXI_GEN_AWCACHE(s{0}_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S{0}_AXI_GEN_AWPROT (s{0}_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S{0}_AXI_GEN_AWQOS  (s{0}_axi_write_in.awqos        ), // Input Write Address write channel quality of service
+  .S{0}_AXI_GEN_WDATA  (s{0}_axi_write_in.wdata        ), // Input Write channel data
+  .S{0}_AXI_GEN_WSTRB  (s{0}_axi_write_in.wstrb        ), // Input Write channel write strobe
+  .S{0}_AXI_GEN_WLAST  (s{0}_axi_write_in.wlast        ), // Input Write channel last word flag
+  .S{0}_AXI_GEN_WVALID (s{0}_axi_write_in.wvalid       ), // Input Write channel valid
+  .S{0}_AXI_GEN_BREADY (s{0}_axi_write_in.bready       ), // Input Write response channel ready
+  """
 
-  .S0_AXI_GEN_ARUSER (0                           ),
-  .S0_AXI_GEN_AWUSER (0                           ),
-  .S0_AXI_GEN_RVALID (s_axi_read.out.rvalid       ), // Output Read channel valid
-  .S0_AXI_GEN_ARREADY(s_axi_read.out.arready      ), // Output Read Address read channel ready
-  .S0_AXI_GEN_RLAST  (s_axi_read.out.rlast        ), // Output Read channel last word
-  .S0_AXI_GEN_RDATA  (s_axi_read.out.rdata        ), // Output Read channel data
-  .S0_AXI_GEN_RID    (s_axi_read.out.rid          ), // Output Read channel ID
-  .S0_AXI_GEN_RRESP  (s_axi_read.out.rresp        ), // Output Read channel response
-  .S0_AXI_GEN_ARVALID(s_axi_read.in.arvalid       ), // Input Read Address read channel valid
-  .S0_AXI_GEN_ARADDR (s_axi_read.in.araddr        ), // Input Read Address read channel address
-  .S0_AXI_GEN_ARLEN  (s_axi_read.in.arlen         ), // Input Read Address channel burst length
-  .S0_AXI_GEN_RREADY (s_axi_read.in.rready        ), // Input Read Read channel ready
-  .S0_AXI_GEN_ARID   (s_axi_read.in.arid          ), // Input Read Address read channel ID
-  .S0_AXI_GEN_ARSIZE (s_axi_read.in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_ARBURST(s_axi_read.in.arburst       ), // Input Read Address read channel burst type
-  .S0_AXI_GEN_ARLOCK (s_axi_read.in.arlock        ), // Input Read Address read channel lock type
-  .S0_AXI_GEN_ARCACHE(s_axi_read.in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_ARPROT (s_axi_read.in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_ARQOS  (s_axi_read.in.arqos         ), // Input Read Address channel quality of service
-  .S0_AXI_GEN_AWREADY(s_axi_write.out.awready     ), // Output Write Address write channel ready
-  .S0_AXI_GEN_WREADY (s_axi_write.out.wready      ), // Output Write channel ready
-  .S0_AXI_GEN_BID    (s_axi_write.out.bid         ), // Output Write response channel ID
-  .S0_AXI_GEN_BRESP  (s_axi_write.out.bresp       ), // Output Write channel response
-  .S0_AXI_GEN_BVALID (s_axi_write.out.bvalid      ), // Output Write response channel valid
-  .S0_AXI_GEN_AWVALID(s_axi_write.in.awvalid      ), // Input Write Address write channel valid
-  .S0_AXI_GEN_AWID   (s_axi_write.in.awid         ), // Input Write Address write channel ID
-  .S0_AXI_GEN_AWADDR (s_axi_write.in.awaddr       ), // Input Write Address write channel address
-  .S0_AXI_GEN_AWLEN  (s_axi_write.in.awlen        ), // Input Write Address write channel burst length
-  .S0_AXI_GEN_AWSIZE (s_axi_write.in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_AWBURST(s_axi_write.in.awburst      ), // Input Write Address write channel burst type
-  .S0_AXI_GEN_AWLOCK (s_axi_write.in.awlock       ), // Input Write Address write channel lock type
-  .S0_AXI_GEN_AWCACHE(s_axi_write.in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_AWPROT (s_axi_write.in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_AWQOS  (s_axi_write.in.awqos        ), // Input Write Address write channel quality of service
-  .S0_AXI_GEN_WDATA  (s_axi_write.in.wdata        ), // Input Write channel data
-  .S0_AXI_GEN_WSTRB  (s_axi_write.in.wstrb        ), // Input Write channel write strobe
-  .S0_AXI_GEN_WLAST  (s_axi_write.in.wlast        ), // Input Write channel last word flag
-  .S0_AXI_GEN_WVALID (s_axi_write.in.wvalid       ), // Input Write channel valid
-  .S0_AXI_GEN_BREADY (s_axi_write.in.bready       ), // Input Write response channel ready
-
-  .M0_AXI_RVALID     (m_axi_read.in.rvalid        ), // Input Read channel valid
-  .M0_AXI_ARREADY    (m_axi_read.in.arready       ), // Input Read Address read channel ready
-  .M0_AXI_RLAST      (m_axi_read.in.rlast         ), // Input Read channel last word
-  .M0_AXI_RDATA      (m_axi_read.in.rdata         ), // Input Read channel data
-  .M0_AXI_RID        (m_axi_read.in.rid           ), // Input Read channel ID
-  .M0_AXI_RRESP      (m_axi_read.in.rresp         ), // Input Read channel response
-  .M0_AXI_ARVALID    (m_axi_read.out.arvalid      ), // Output Read Address read channel valid
-   //.M0_AXI_ARADDR     ({{m_axi_read_out_araddr_{2}, m_axi_read.out.araddr[{2}-2:0]}} ), // Output Read Address read channel address
-  .M0_AXI_ARADDR     (m_axi_read.out.araddr       ), // Output Read Address read channel address
-  .M0_AXI_ARLEN      (m_axi_read.out.arlen        ), // Output Read Address channel burst length
-  .M0_AXI_RREADY     (m_axi_read.out.rready       ), // Output Read Read channel ready
-  .M0_AXI_ARID       (m_axi_read.out.arid         ), // Output Read Address read channel ID
-  .M0_AXI_ARSIZE     (m_axi_read.out.arsize       ), // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
-  .M0_AXI_ARBURST    (m_axi_read.out.arburst      ), // Output Read Address read channel burst type
-  .M0_AXI_ARLOCK     (m_axi_read.out.arlock       ), // Output Read Address read channel lock type
-  .M0_AXI_ARCACHE    (m_axi_read.out.arcache      ), // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .M0_AXI_ARPROT     (m_axi_read.out.arprot       ), // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .M0_AXI_ARQOS      (m_axi_read.out.arqos        ), // Output Read Address channel quality of service
-  .M0_AXI_AWREADY    (m_axi_write.in.awready      ), // Input Write Address write channel ready
-  .M0_AXI_WREADY     (m_axi_write.in.wready       ), // Input Write channel ready
-  .M0_AXI_BID        (m_axi_write.in.bid          ), // Input Write response channel ID
-  .M0_AXI_BRESP      (m_axi_write.in.bresp        ), // Input Write channel response
-  .M0_AXI_BVALID     (m_axi_write.in.bvalid       ), // Input Write response channel valid
-  .M0_AXI_AWVALID    (m_axi_write.out.awvalid     ), // Output Write Address write channel valid
-  .M0_AXI_AWID       (m_axi_write.out.awid        ), // Output Write Address write channel ID
-   //.M0_AXI_AWADDR     ({{m_axi_write_out_awaddr_{2}, m_axi_write.out.awaddr[{2}-2:0]}}), // Output Write Address write channel address
-  .M0_AXI_AWADDR     (m_axi_write.out.awaddr      ), // Output Write Address write channel address
-  .M0_AXI_AWLEN      (m_axi_write.out.awlen       ), // Output Write Address write channel burst length
-  .M0_AXI_AWSIZE     (m_axi_write.out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
-  .M0_AXI_AWBURST    (m_axi_write.out.awburst     ), // Output Write Address write channel burst type
-  .M0_AXI_AWLOCK     (m_axi_write.out.awlock      ), // Output Write Address write channel lock type
-  .M0_AXI_AWCACHE    (m_axi_write.out.awcache     ), // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .M0_AXI_AWPROT     (m_axi_write.out.awprot      ), // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .M0_AXI_AWQOS      (m_axi_write.out.awqos       ), // Output Write Address write channel quality of service
-  .M0_AXI_WDATA      (m_axi_write.out.wdata       ), // Output Write channel data
-  .M0_AXI_WSTRB      (m_axi_write.out.wstrb       ), // Output Write channel write strobe
-  .M0_AXI_WLAST      (m_axi_write.out.wlast       ), // Output Write channel last word flag
-  .M0_AXI_WVALID     (m_axi_write.out.wvalid      ), // Output Write channel valid
-  .M0_AXI_BREADY     (m_axi_write.out.bready      ),  // Output Write response channel ready
+fill_kernel_mxx_axi_system_cache_wrapper_post="""
+  .M0_AXI_RVALID     (m_axi_read_in.rvalid        ), // Input Read channel valid
+  .M0_AXI_ARREADY    (m_axi_read_in.arready       ), // Input Read Address read channel ready
+  .M0_AXI_RLAST      (m_axi_read_in.rlast         ), // Input Read channel last word
+  .M0_AXI_RDATA      (m_axi_read_in.rdata         ), // Input Read channel data
+  .M0_AXI_RID        (m_axi_read_in.rid           ), // Input Read channel ID
+  .M0_AXI_RRESP      (m_axi_read_in.rresp         ), // Input Read channel response
+  .M0_AXI_ARVALID    (m_axi_read_out.arvalid      ), // Output Read Address read channel valid
+   //.M0_AXI_ARADDR     ({{m_axi_read_out_araddr_{2}, m_axi_read_out.araddr[{2}-2:0]}} ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     (m_axi_read_out.araddr       ), // Output Read Address read channel address
+  .M0_AXI_ARLEN      (m_axi_read_out.arlen        ), // Output Read Address channel burst length
+  .M0_AXI_RREADY     (m_axi_read_out.rready       ), // Output Read Read channel ready
+  .M0_AXI_ARID       (m_axi_read_out.arid         ), // Output Read Address read channel ID
+  .M0_AXI_ARSIZE     (m_axi_read_out.arsize       ), // Output Read Address read channel burst size. This signal indicates the size of each transfer in the burst
+  .M0_AXI_ARBURST    (m_axi_read_out.arburst      ), // Output Read Address read channel burst type
+  .M0_AXI_ARLOCK     (m_axi_read_out.arlock       ), // Output Read Address read channel lock type
+  .M0_AXI_ARCACHE    (m_axi_read_out.arcache      ), // Output Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .M0_AXI_ARPROT     (m_axi_read_out.arprot       ), // Output Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .M0_AXI_ARQOS      (m_axi_read_out.arqos        ), // Output Read Address channel quality of service
+  .M0_AXI_AWREADY    (m_axi_write_in.awready      ), // Input Write Address write channel ready
+  .M0_AXI_WREADY     (m_axi_write_in.wready       ), // Input Write channel ready
+  .M0_AXI_BID        (m_axi_write_in.bid          ), // Input Write response channel ID
+  .M0_AXI_BRESP      (m_axi_write_in.bresp        ), // Input Write channel response
+  .M0_AXI_BVALID     (m_axi_write_in.bvalid       ), // Input Write response channel valid
+  .M0_AXI_AWVALID    (m_axi_write_out.awvalid     ), // Output Write Address write channel valid
+  .M0_AXI_AWID       (m_axi_write_out.awid        ), // Output Write Address write channel ID
+   //.M0_AXI_AWADDR     ({{m_axi_write_out_awaddr_{2}, m_axi_write_out.awaddr[{2}-2:0]}}), // Output Write Address write channel address
+  .M0_AXI_AWADDR     (m_axi_write_out.awaddr      ), // Output Write Address write channel address
+  .M0_AXI_AWLEN      (m_axi_write_out.awlen       ), // Output Write Address write channel burst length
+  .M0_AXI_AWSIZE     (m_axi_write_out.awsize      ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
+  .M0_AXI_AWBURST    (m_axi_write_out.awburst     ), // Output Write Address write channel burst type
+  .M0_AXI_AWLOCK     (m_axi_write_out.awlock      ), // Output Write Address write channel lock type
+  .M0_AXI_AWCACHE    (m_axi_write_out.awcache     ), // Output Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .M0_AXI_AWPROT     (m_axi_write_out.awprot      ), // Output Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .M0_AXI_AWQOS      (m_axi_write_out.awqos       ), // Output Write Address write channel quality of service
+  .M0_AXI_WDATA      (m_axi_write_out.wdata       ), // Output Write channel data
+  .M0_AXI_WSTRB      (m_axi_write_out.wstrb       ), // Output Write channel write strobe
+  .M0_AXI_WLAST      (m_axi_write_out.wlast       ), // Output Write channel last word flag
+  .M0_AXI_WVALID     (m_axi_write_out.wvalid      ), // Output Write channel valid
+  .M0_AXI_BREADY     (m_axi_write_out.bready      ),  // Output Write response channel ready
     """
 
 fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
@@ -4568,9 +4584,35 @@ output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_pat
 check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
 
 with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
-    fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+    fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_header.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+    
+    CACHE_MERGE_COUNT = 0;
+    CACHE_PORT_COUNT  = 0;
+    CACHE_PORT_INDEX  = 0;
+    CHANNEL_PORT_INDEX  = 0;
+    
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+        
+        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+        else:
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ports.format(0,channel))
+
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_mid.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+       
+        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(CACHE_PORT_INDEX))
+        else:
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0))
+
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+      
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ctrl.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
             fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post_if.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
