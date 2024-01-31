@@ -270,7 +270,7 @@ typedef m00_axi_lite_resp_t S00_AXI4_LITE_BE_RESP_T;
   
 
 parameter M01_AXI4_BE_ADDR_W   = 33                 ;
-parameter M01_AXI4_BE_DATA_W   = 32                 ;
+parameter M01_AXI4_BE_DATA_W   = 512                 ;
 parameter M01_AXI4_BE_STRB_W   = M01_AXI4_BE_DATA_W / 8;
 parameter M01_AXI4_BE_BURST_W  = 2                   ;
 parameter M01_AXI4_BE_CACHE_W  = 4                   ;
