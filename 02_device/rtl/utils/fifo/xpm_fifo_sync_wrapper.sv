@@ -11,6 +11,7 @@
 // Revise : 2023-06-17 16:37:19
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
+`include "global_package.vh"
 
 module xpm_fifo_sync_wrapper #(
   parameter FIFO_WRITE_DEPTH = 16   ,
@@ -79,6 +80,30 @@ module xpm_fifo_sync_wrapper #(
     .dbiterr      (           )
   );
 // End of xpm_fifo_sync instance declaration
+
+// localparam FALL_THROUGH = (READ_MODE == "fwft") ? 1'b1 : 1'b0; 
+
+// assign prog_full = ()
+
+//   fifo_v3 #(
+//       .FALL_THROUGH(FALL_THROUGH),
+//       .DATA_WIDTH(WRITE_DATA_WIDTH),
+//       .DEPTH(DEPTH),
+//       .dtype(dtype),
+//       .ADDR_DEPTH(ADDR_DEPTH)
+//     ) inst_fifo_v3 (
+//       .clk_i      (clk_i),
+//       .rst_ni     (rst_ni),
+//       .flush_i    (flush_i),
+//       .testmode_i (testmode_i),
+//       .full_o     (full_o),
+//       .empty_o    (empty_o),
+//       .usage_o    (usage_o),
+//       .data_i     (data_i),
+//       .push_i     (push_i),
+//       .data_o     (data_o),
+//       .pop_i      (pop_i)
+//     );
 
 
 endmodule : xpm_fifo_sync_wrapper

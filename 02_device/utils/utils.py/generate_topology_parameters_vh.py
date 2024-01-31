@@ -485,33 +485,51 @@ def check_and_clean_file(file_path):
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
 
+def l2_merge_caches(sequence):
+    caches = []
+    current_cache = []
+    
+    for num in sequence:
+        if num == 1:
+            if current_cache:
+                caches.append(len(current_cache))
+                current_cache = []
+        current_cache.append(num)
+    
+    if current_cache:
+        caches.append(len(current_cache))
+    
+    return caches
+
 def generate_channels_properties_parameters(ch_properties):
 
     # Grouping values for each channel
-    channel_config_l1 = []
-    channel_config_l2 = []
+    channel_config_l1_type = []
+    channel_config_l2_type = []
     channel_config_data_width_be = []
     channel_config_address_width_be = []
     channel_config_data_width_mid = []
     channel_config_address_width_mid = []
+    channel_config_axi_port_full_be = []
     channel_config_data_width_fe = []
     channel_config_address_width_fe = []
     for channel, values in ch_properties.items():
-        channel_config_data_width_fe.append(int(values[7]))
-        channel_config_address_width_fe.append(int(values[6]))
-        channel_config_l1.append(int(values[5]))
-        channel_config_data_width_mid.append(int(values[4]))
-        channel_config_address_width_mid.append(int(values[3]))
-        channel_config_l2.append(int(values[2]))
+        channel_config_data_width_fe.append(int(values[8]))
+        channel_config_address_width_fe.append(int(values[7]))
+        channel_config_l1_type.append(int(values[6]))
+        channel_config_data_width_mid.append(int(values[5]))
+        channel_config_address_width_mid.append(int(values[4]))
+        channel_config_l2_type.append(int(values[3]))
+        channel_config_axi_port_full_be.append(int(values[2]))
         channel_config_data_width_be.append(int(values[1]))
         channel_config_address_width_be.append(int(values[0]))
   
 
 
-    NUM_CHANNELS_MAX = len(channel_config_l1)
+    NUM_CHANNELS_MAX = len(channel_config_l1_type)
 
 
-    return NUM_CHANNELS_MAX, channel_config_l1, channel_config_l2, channel_config_address_width_be, channel_config_data_width_be, channel_config_address_width_mid, channel_config_data_width_mid, channel_config_address_width_fe, channel_config_data_width_fe
+    return NUM_CHANNELS_MAX, channel_config_l1_type, channel_config_l2_type, channel_config_address_width_be, channel_config_data_width_be, channel_config_axi_port_full_be, channel_config_address_width_mid, channel_config_data_width_mid, channel_config_address_width_fe, channel_config_data_width_fe
 
 def generate_caches_properties_parameters(cache_properties):
 
@@ -538,17 +556,22 @@ def generate_caches_properties_parameters(cache_properties):
     return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l1_ram, cache_config_l2_ram, cache_config_l2_ctrl
 
 
-CHANNEL_CONFIG_L1 = []
-CHANNEL_CONFIG_L2 = []
+CHANNEL_CONFIG_L1_TYPE = []
+CHANNEL_CONFIG_L2_TYPE = []
+CHANNEL_CONFIG_L2_MERGE = []
 CHANNEL_CONFIG_ADDRESS_WIDTH_BE=[]
 CHANNEL_CONFIG_DATA_WIDTH_BE=[]
+CHANNEL_CONFIG_AXI_PORT_FULL_BE=[]
 CHANNEL_CONFIG_ADDRESS_WIDTH_MID=[]
 CHANNEL_CONFIG_DATA_WIDTH_MID=[]
 CHANNEL_CONFIG_ADDRESS_WIDTH_FE=[]
 CHANNEL_CONFIG_DATA_WIDTH_FE=[]
+
 NUM_CHANNELS_MAX  = 1
 
-NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1,CHANNEL_CONFIG_L2, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
+NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1_TYPE,CHANNEL_CONFIG_L2_TYPE, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_AXI_PORT_FULL_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
+CHANNEL_CONFIG_L2_MERGE = l2_merge_caches(CHANNEL_CONFIG_L2_TYPE)
+CHANNEL_CONFIG_L2_COUNT = len(CHANNEL_CONFIG_L2_MERGE)
 
 CACHE_CONFIG_L1_RAM = []
 CACHE_CONFIG_L1_PREFETCH = []
@@ -582,8 +605,8 @@ def find_max_value(list1, list2, list1_c, list2_c, max_size):
     # Return the maximum value
     return max(combined_list)
 
-CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS, CHANNEL_CONFIG_L1, CHANNEL_CONFIG_L2, NUM_CHANNELS_TOP)
-CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE, CHANNEL_CONFIG_L1, CHANNEL_CONFIG_L2, NUM_CHANNELS_TOP)
+CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS, CHANNEL_CONFIG_L1_TYPE, CHANNEL_CONFIG_L2_TYPE, NUM_CHANNELS_TOP)
+CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE, CHANNEL_CONFIG_L1_TYPE, CHANNEL_CONFIG_L2_TYPE, NUM_CHANNELS_TOP)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
@@ -902,8 +925,8 @@ with open(output_file_path_topology, "w") as file:
     file.write("// TOPOLOGY CONFIGURATIONS CHANNEL\n")
     file.write("// --------------------------------------------------------------------------------------\n")
     file.write(f"parameter NUM_CHANNELS_MAX = {NUM_CHANNELS_MAX},\n")
-    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L1) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L2) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L1_TYPE) + ",\n")
+    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L2_TYPE) + ",\n")
     file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_BE[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_BE) + ",\n")
     file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_BE[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_BE) + ",\n")
     file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_MID[NUM_CHANNELS_MAX]         =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_MID) + ",\n")
@@ -1619,24 +1642,53 @@ M{0:02d}_AXI4_LITE_MID_REQ_T                kernel_m{0:02d}_axi_lite_out;
 
 """
 
-    assign_template = """
+    assign_template_must = """
 // --------------------------------------------------------------------------------------
-// Channel {1} READ AXI4 SIGNALS INPUT
+// Channel {1} READ AXI4 SIGNALS INPUT - MUST
 // --------------------------------------------------------------------------------------
 assign m{0:02d}_axi4_read.in.rvalid  = m{0:02d}_axi_rvalid ; // Read channel valid
 assign m{0:02d}_axi4_read.in.arready = m{0:02d}_axi_arready; // Address read channel ready
 assign m{0:02d}_axi4_read.in.rlast   = m{0:02d}_axi_rlast  ; // Read channel last word
 assign m{0:02d}_axi4_read.in.rdata   = swap_endianness_cacheline_m{0:02d}_axi_be(m{0:02d}_axi_rdata, endian_read_reg)  ; // Read channel data
-assign m{0:02d}_axi4_read.in.rid     = m{0:02d}_axi_rid    ; // Read channel ID
-assign m{0:02d}_axi4_read.in.rresp   = m{0:02d}_axi_rresp  ; // Read channel response
 
 // --------------------------------------------------------------------------------------
-// Channel {1} READ AXI4 SIGNALS OUTPUT
+// Channel {1} READ AXI4 SIGNALS OUTPUT - MUST
 // --------------------------------------------------------------------------------------
 assign m{0:02d}_axi_arvalid = m{0:02d}_axi4_read.out.arvalid; // Address read channel valid
 assign m{0:02d}_axi_araddr  = m{0:02d}_axi4_read.out.araddr ; // Address read channel address
 assign m{0:02d}_axi_arlen   = m{0:02d}_axi4_read.out.arlen  ; // Address write channel burst length
 assign m{0:02d}_axi_rready  = m{0:02d}_axi4_read.out.rready ; // Read channel ready
+
+// --------------------------------------------------------------------------------------
+// Channel {1} WRITE AXI4 SIGNALS INPUT - MUST
+// --------------------------------------------------------------------------------------
+assign m{0:02d}_axi4_write.in.awready = m{0:02d}_axi_awready; // Address write channel ready
+assign m{0:02d}_axi4_write.in.wready  = m{0:02d}_axi_wready ; // Write channel ready
+assign m{0:02d}_axi4_write.in.bvalid  = m{0:02d}_axi_bvalid ; // Write response channel valid
+
+// --------------------------------------------------------------------------------------
+// Channel {1} WRITE AXI4 SIGNALS OUTPUT - MUST
+// --------------------------------------------------------------------------------------
+assign m{0:02d}_axi_awvalid = m{0:02d}_axi4_write.out.awvalid; // Address write channel valid
+assign m{0:02d}_axi_awaddr  = m{0:02d}_axi4_write.out.awaddr ; // Address write channel address
+assign m{0:02d}_axi_awlen   = m{0:02d}_axi4_write.out.awlen  ; // Address write channel burst length
+assign m{0:02d}_axi_wdata   = swap_endianness_cacheline_m{0:02d}_axi_be(m{0:02d}_axi4_write.out.wdata, endian_write_reg); // Write channel data
+assign m{0:02d}_axi_wstrb   = m{0:02d}_axi4_write.out.wstrb  ; // Write channel write strobe
+assign m{0:02d}_axi_wlast   = m{0:02d}_axi4_write.out.wlast  ; // Write channel last word flag
+assign m{0:02d}_axi_wvalid  = m{0:02d}_axi4_write.out.wvalid ; // Write channel valid
+assign m{0:02d}_axi_bready  = m{0:02d}_axi4_write.out.bready ; // Write response channel ready
+    """
+
+    assign_template_optional = """
+// --------------------------------------------------------------------------------------
+// Channel {1} READ AXI4 SIGNALS INPUT - OPTIONAL
+// --------------------------------------------------------------------------------------
+assign m{0:02d}_axi4_read.in.rid     = m{0:02d}_axi_rid    ; // Read channel ID
+assign m{0:02d}_axi4_read.in.rresp   = m{0:02d}_axi_rresp  ; // Read channel response
+
+// --------------------------------------------------------------------------------------
+// Channel {1} READ AXI4 SIGNALS OUTPUT - OPTIONAL
+// --------------------------------------------------------------------------------------
 assign m{0:02d}_axi_arid    = m{0:02d}_axi4_read.out.arid   ; // Address read channel ID
 assign m{0:02d}_axi_arsize  = m{0:02d}_axi4_read.out.arsize ; // Address read channel burst size
 assign m{0:02d}_axi_arburst = m{0:02d}_axi4_read.out.arburst; // Address read channel burst type
@@ -1646,32 +1698,34 @@ assign m{0:02d}_axi_arprot  = m{0:02d}_axi4_read.out.arprot ; // Address write c
 assign m{0:02d}_axi_arqos   = m{0:02d}_axi4_read.out.arqos  ; // Address write channel quality of service
 
 // --------------------------------------------------------------------------------------
-// Channel {1} WRITE AXI4 SIGNALS INPUT
+// Channel {1} WRITE AXI4 SIGNALS INPUT - OPTIONAL
 // --------------------------------------------------------------------------------------
-assign m{0:02d}_axi4_write.in.awready = m{0:02d}_axi_awready; // Address write channel ready
-assign m{0:02d}_axi4_write.in.wready  = m{0:02d}_axi_wready ; // Write channel ready
 assign m{0:02d}_axi4_write.in.bid     = m{0:02d}_axi_bid    ; // Write response channel ID
 assign m{0:02d}_axi4_write.in.bresp   = m{0:02d}_axi_bresp  ; // Write channel response
-assign m{0:02d}_axi4_write.in.bvalid  = m{0:02d}_axi_bvalid ; // Write response channel valid
 
 // --------------------------------------------------------------------------------------
-// Channel {1} WRITE AXI4 SIGNALS OUTPUT
+// Channel {1} WRITE AXI4 SIGNALS OUTPUT - OPTIONAL
 // --------------------------------------------------------------------------------------
-assign m{0:02d}_axi_awvalid = m{0:02d}_axi4_write.out.awvalid; // Address write channel valid
 assign m{0:02d}_axi_awid    = m{0:02d}_axi4_write.out.awid   ; // Address write channel ID
-assign m{0:02d}_axi_awaddr  = m{0:02d}_axi4_write.out.awaddr ; // Address write channel address
-assign m{0:02d}_axi_awlen   = m{0:02d}_axi4_write.out.awlen  ; // Address write channel burst length
 assign m{0:02d}_axi_awsize  = m{0:02d}_axi4_write.out.awsize ; // Address write channel burst size
 assign m{0:02d}_axi_awburst = m{0:02d}_axi4_write.out.awburst; // Address write channel burst type
 assign m{0:02d}_axi_awlock  = m{0:02d}_axi4_write.out.awlock ; // Address write channel lock type
 assign m{0:02d}_axi_awcache = m{0:02d}_axi4_write.out.awcache; // Address write channel memory type
 assign m{0:02d}_axi_awprot  = m{0:02d}_axi4_write.out.awprot ; // Address write channel protection type
 assign m{0:02d}_axi_awqos   = m{0:02d}_axi4_write.out.awqos  ; // Address write channel quality of service
-assign m{0:02d}_axi_wdata   = swap_endianness_cacheline_m{0:02d}_axi_be(m{0:02d}_axi4_write.out.wdata, endian_write_reg); // Write channel data
-assign m{0:02d}_axi_wstrb   = m{0:02d}_axi4_write.out.wstrb  ; // Write channel write strobe
-assign m{0:02d}_axi_wlast   = m{0:02d}_axi4_write.out.wlast  ; // Write channel last word flag
-assign m{0:02d}_axi_wvalid  = m{0:02d}_axi4_write.out.wvalid ; // Write channel valid
-assign m{0:02d}_axi_bready  = m{0:02d}_axi4_write.out.bready ; // Write response channel ready
+    """
+
+    assign_template_optional_default = """
+// --------------------------------------------------------------------------------------
+// Channel {1} READ AXI4 SIGNALS INPUT - OPTIONAL
+// --------------------------------------------------------------------------------------
+assign m{0:02d}_axi4_read.in.rid     = 0; // Read channel ID
+assign m{0:02d}_axi4_read.in.rresp   = 0; // Read channel response
+// --------------------------------------------------------------------------------------
+// Channel {1} WRITE AXI4 SIGNALS INPUT - OPTIONAL
+// --------------------------------------------------------------------------------------
+assign m{0:02d}_axi4_write.in.bid    = 0; // Write response channel ID
+assign m{0:02d}_axi4_write.in.bresp  = 0; // Write channel response
     """
 
     module_template = """
@@ -1712,7 +1766,11 @@ generate
         .m_axi_write_out(m{0:02d}_axi4_write.out       )
       );
 
-    end else begin
+    end else if(CHANNEL_CONFIG_L2_CACHE[{5}] == 2) begin end
+
+    // Merge the This channel with the adjacent axi_system_cache_be
+
+    else begin
         assign kernel_cache_setup_signal[{5}] = 0;
         assign kernel_m{0:02d}_axi4_read_in   = 0;
         assign kernel_m{0:02d}_axi4_read_out  = 0;
@@ -1733,7 +1791,12 @@ endgenerate
         output_lines.append(f"// Channel {index}")
         output_lines.append(f"// --------------------------------------------------------------------------------------")
         output_lines.append(parameters_template.format(channel))
-        output_lines.append(assign_template.format(channel,index))
+        output_lines.append(assign_template_must.format(channel,index))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(assign_template_optional.format(channel,index))
+        else:
+            output_lines.append(assign_template_optional_default.format(channel,index))
+
         output_lines.append(module_template.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
 
 
@@ -1746,7 +1809,7 @@ endgenerate
 with open(output_file_afu_ports, 'w') as file:
     output_lines = []
 
-    ports_template = """
+    ports_template_must = """
 output logic                         m{0:02d}_axi_awvalid,
 input  logic                         m{0:02d}_axi_awready,
 output logic [ M{0:02d}_AXI4_BE_ADDR_W-1:0] m{0:02d}_axi_awaddr ,
@@ -1766,6 +1829,8 @@ input  logic                         m{0:02d}_axi_rvalid ,
 output logic                         m{0:02d}_axi_rready ,
 input  logic [ M{0:02d}_AXI4_BE_DATA_W-1:0] m{0:02d}_axi_rdata  ,
 input  logic                         m{0:02d}_axi_rlast  ,
+      """
+    ports_template_optional = """
 // Control Signals
 // AXI4 master interface m{0:02d}_axi missing ports
 input  logic [   M{0:02d}_AXI4_BE_ID_W-1:0] m{0:02d}_axi_bid    ,
@@ -1789,14 +1854,16 @@ output logic [  M{0:02d}_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template.format(channel))
+        output_lines.append(ports_template_must.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(ports_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
 with open(output_file_top_wires, 'w') as file:
     output_lines = []
 
-    wires_template = """
+    wires_template_must = """
   wire                                    m{0:02d}_axi_awready      ; // Address write channel ready
   wire                                    m{0:02d}_axi_wready       ; // Write channel ready
   wire                                    m{0:02d}_axi_awvalid      ; // Address write channel valid
@@ -1816,6 +1883,8 @@ with open(output_file_top_wires, 'w') as file:
   wire                                    m{0:02d}_axi_rready       ; // Read channel ready
   wire [                           8-1:0] m{0:02d}_axi_arlen        ; // Address write channel burst length
   wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_araddr  ; // Address read channel address
+      """
+    wires_template_optional = """
 // AXI4 master interface m{0:02d}_axi missing ports
   wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_bid     ; // Write response channel ID
   wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_rid     ; // Read channel ID
@@ -1838,14 +1907,16 @@ with open(output_file_top_wires, 'w') as file:
     """
 
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(wires_template.format(channel))
+        output_lines.append(wires_template_must.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(wires_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
 with open(output_file_top_ports, 'w') as file:
     output_lines = []
 
-    ports_template = """
+    ports_template_must = """
 input  wire                                    m{0:02d}_axi_awready      , // Address write channel ready
 input  wire                                    m{0:02d}_axi_wready       , // Write channel ready
 output wire                                    m{0:02d}_axi_awvalid      , // Address write channel valid
@@ -1865,6 +1936,8 @@ output wire                                    m{0:02d}_axi_arvalid      , // Ad
 output wire                                    m{0:02d}_axi_rready       , // Read channel ready
 output wire [                           8-1:0] m{0:02d}_axi_arlen        , // Address write channel burst length
 output wire [        C_M{0:02d}_AXI_ADDR_WIDTH-1:0] m{0:02d}_axi_araddr       , // Address read channel address
+    """
+    ports_template_optional = """
 // AXI4 master interface m{0:02d}_axi missing ports
 input  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_bid          , // Write response channel ID
 input  wire [          C_M{0:02d}_AXI_ID_WIDTH-1:0] m{0:02d}_axi_rid          , // Read channel ID
@@ -1886,8 +1959,41 @@ output wire [                           3-1:0] m{0:02d}_axi_arprot       , // Ad
 output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Address read channel quality of service
     """
 
+    ports_template_optional_comment = """
+  //  Note: A minimum subset of AXI4 memory mapped signals are declared.  AXI
+  // signals omitted from these interfaces are automatically inferred with the
+  // optimal values for Xilinx accleration platforms.  This allows Xilinx AXI4 Interconnects
+  // within the system to be optimized by removing logic for AXI4 protocol
+  // features that are not necessary. When adapting AXI4 masters within the RTL
+  // kernel that have signals not declared below, it is suitable to add the
+  // signals to the declarations below to connect them to the AXI4 Master.
+  // 
+  // List of ommited signals - effect
+  // -------------------------------
+  // ID - Transaction ID are used for multithreading and out of order
+  // transactions.  This increases complexity. This saves logic and increases Fmax
+  // in the system when ommited.
+  // SIZE - Default value is log2(data width in bytes). Needed for subsize bursts.
+  // This saves logic and increases Fmax in the system when ommited.
+  // BURST - Default value (0b01) is incremental.  Wrap and fixed bursts are not
+  // recommended. This saves logic and increases Fmax in the system when ommited.
+  // LOCK - Not supported in AXI4
+  // CACHE - Default value (0b0011) allows modifiable transactions. No benefit to
+  // changing this.
+  // PROT - Has no effect in current acceleration platforms.
+  // QOS - Has no effect in current acceleration platforms.
+  // REGION - Has no effect in current acceleration platforms.
+  // USER - Has no effect in current acceleration platforms.
+  // RESP - Not useful in most acceleration platforms.
+  // 
+    """
+
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(ports_template.format(channel))
+        output_lines.append(ports_template_must.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(ports_template_optional.format(channel))
+        else:
+            output_lines.append(ports_template_optional_comment.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -1895,7 +2001,7 @@ output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Ad
 with open(output_file_top_portmap, 'w') as file:
     output_lines = []
 
-    connection_template = """
+    connection_template_must = """
 .m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
 .m{0:02d}_axi_awready(m{0:02d}_axi_awready),
 .m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
@@ -1915,6 +2021,8 @@ with open(output_file_top_portmap, 'w') as file:
 .m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
 .m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
 .m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
+    """
+    connection_template_optional = """
 .m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
 .m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
 .m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
@@ -1936,14 +2044,16 @@ with open(output_file_top_portmap, 'w') as file:
     """
 
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(connection_template.format(channel))
+        output_lines.append(connection_template_must.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(connection_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
 with open(output_file_afu_portmap, 'w') as file:
     output_lines = []
 
-    connection_template = """
+    connection_template_must = """
 .m{0:02d}_axi_awvalid(m{0:02d}_axi_awvalid),
 .m{0:02d}_axi_awready(m{0:02d}_axi_awready),
 .m{0:02d}_axi_awaddr (m{0:02d}_axi_awaddr ),
@@ -1963,6 +2073,8 @@ with open(output_file_afu_portmap, 'w') as file:
 .m{0:02d}_axi_rready (m{0:02d}_axi_rready ),
 .m{0:02d}_axi_rdata  (m{0:02d}_axi_rdata  ),
 .m{0:02d}_axi_rlast  (m{0:02d}_axi_rlast  ),
+    """
+    connection_template_optional = """
 .m{0:02d}_axi_bid    (m{0:02d}_axi_bid    ),
 .m{0:02d}_axi_rid    (m{0:02d}_axi_rid    ),
 .m{0:02d}_axi_rresp  (m{0:02d}_axi_rresp  ),
@@ -1984,18 +2096,18 @@ with open(output_file_afu_portmap, 'w') as file:
     """
 
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(connection_template.format(channel))
+        output_lines.append(connection_template_must.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(connection_template_optional.format(channel))
 
     file.write('\n'.join(output_lines))
 
 with open(output_file_slv_m_axi_vip_inst, 'w') as file:
     output_lines = []
 
-    module_template = """
+    module_template_must_pre = """
     // Slave MM VIP instantiation
     slv_m{0:02d}_axi_vip inst_slv_m{0:02d}_axi_vip (
-        .aclk         (ap_clk         ),
-        .aresetn      (ap_rst_n       ),
         .s_axi_awvalid(m{0:02d}_axi_awvalid),
         .s_axi_awready(m{0:02d}_axi_awready),
         .s_axi_awaddr (m{0:02d}_axi_awaddr ),
@@ -2015,7 +2127,8 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         .s_axi_rready (m{0:02d}_axi_rready ),
         .s_axi_rdata  (m{0:02d}_axi_rdata  ),
         .s_axi_rlast  (m{0:02d}_axi_rlast  ),
-        
+    """
+    module_template_optional = """   
         .s_axi_bid    (m{0:02d}_axi_bid    ),
         .s_axi_rid    (m{0:02d}_axi_rid    ),
         .s_axi_rresp  (m{0:02d}_axi_rresp  ),
@@ -2033,7 +2146,11 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         .s_axi_arlock (m{0:02d}_axi_arlock ),
         .s_axi_arcache(m{0:02d}_axi_arcache),
         .s_axi_arprot (m{0:02d}_axi_arprot ),
-        .s_axi_arqos  (m{0:02d}_axi_arqos  )
+        .s_axi_arqos  (m{0:02d}_axi_arqos  ),
+    """
+    module_template_must_post = """
+        .aclk         (ap_clk         ),
+        .aresetn      (ap_rst_n       )
     );
 
         slv_m{0:02d}_axi_vip_slv_mem_t m{0:02d}_axi    ;
@@ -2041,7 +2158,10 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         """
 
     for channel in DISTINCT_CHANNELS:
-        output_lines.append(module_template.format(channel))
+        output_lines.append(module_template_must_pre.format(channel))
+        if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
+            output_lines.append(module_template_optional.format(channel))
+        output_lines.append(module_template_must_post.format(channel))
 
     file.write('\n'.join(output_lines))
 
@@ -2165,16 +2285,16 @@ set_property -dict [list \\
                     CONFIG.PROTOCOL {{AXI4}}                            \\
                     CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}       \\
                     CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}} \\
-                    CONFIG.SUPPORTS_NARROW {{0}}                        \\
-                    CONFIG.HAS_LOCK {{1}}                               \\
-                    CONFIG.HAS_CACHE {{1}}                              \\
-                    CONFIG.HAS_REGION {{0}}                             \\
-                    CONFIG.HAS_BURST {{1}}                              \\
-                    CONFIG.HAS_QOS {{1}}                                \\
-                    CONFIG.HAS_PROT {{1}}                               \\
                     CONFIG.HAS_WSTRB {{1}}                              \\
-                    CONFIG.HAS_SIZE {{1}}                               \\
-                    CONFIG.ID_WIDTH   {{1}}                             \\
+                    CONFIG.SUPPORTS_NARROW {{0}}                        \\
+                    CONFIG.HAS_REGION {{0}}                             \\
+                    CONFIG.HAS_LOCK {{{13}}}                               \\
+                    CONFIG.HAS_CACHE {{{13}}}                              \\
+                    CONFIG.HAS_BURST {{{13}}}                              \\
+                    CONFIG.HAS_QOS {{{13}}}                                \\
+                    CONFIG.HAS_PROT {{{13}}}                               \\
+                    CONFIG.HAS_SIZE {{{13}}}                               \\
+                    CONFIG.ID_WIDTH   {{{13}}}                             \\
                     ] [get_ips ${{module_name}}]
 
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
@@ -2212,7 +2332,7 @@ set_property -dict [list                                                  \\
                     CONFIG.C_CACHE_SIZE  ${{SYSTEM_CACHE_SIZE_B_M{0:02d}}}           \\
                     CONFIG.C_M0_AXI_ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}           \\
                     CONFIG.C_M0_AXI_DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}     \\
-                    CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
+                    CONFIG.C_NUM_GENERIC_PORTS {{{9}}}                      \\
                     CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
                     CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
                     CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
@@ -2453,11 +2573,16 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
   
  """
-
+    CACHE_MERGE_COUNT = 0;
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index])))
+        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]))
         
-        output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
+            output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]))
+            CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
+        else:
+            output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], 1))
+     
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
@@ -5489,7 +5614,7 @@ check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
 with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
     fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if(CHANNEL_CONFIG_L1[index] == 1):
+        if(CHANNEL_CONFIG_L1_TYPE[index] == 1):
             fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_v2.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
         else:
             fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
