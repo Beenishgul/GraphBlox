@@ -2259,27 +2259,14 @@ def generate_ipx_associate_commands_tcl(output_file_name):
 
     # Open output file for appending
     with open(output_file_name, "a") as file:
-        CHANNEL_PORT_INDEX  = 0;
-        for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
-            if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-                file.write(f'ipx::associate_bus_interfaces -busif "m{CHANNEL_PORT_INDEX:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{CHANNEL_PORT_INDEX:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[CHANNEL_PORT_INDEX]} $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{CHANNEL_PORT_INDEX:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[CHANNEL_PORT_INDEX]} $bifparam\n')
-            elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-                file.write(f'ipx::associate_bus_interfaces -busif "m{int(properties[0]):02d}_axi" -clock "ap_clk" $core >> $log_file\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{int(properties[0]):02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[int(properties[0])]} $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{int(properties[0]):02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[int(properties[0])]} $bifparam\n')
-                CHANNEL_PORT_INDEX = int(properties[0])
-            else:
-                file.write(f'ipx::associate_bus_interfaces -busif "m{int(properties[0]):02d}_axi" -clock "ap_clk" $core >> $log_file\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{int(properties[0]):02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[int(properties[0])]} $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{int(properties[0]):02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[int(properties[0])]} $bifparam\n')
+        for index, channel_num in enumerate(DISTINCT_CHANNELS):
+            if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+                file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
+                file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+                file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[index]} $bifparam\n')
+                file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+                file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]} $bifparam\n')
+          
 
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
