@@ -4775,7 +4775,7 @@ generate
     if(CHANNEL_CONFIG_L1_CACHE[{1}] == 1) begin
 // --------------------------------------------------------------------------------------
 // CU Cache -> AXI Kernel Cache
-      m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1 (
+      m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1_m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_ch{1} (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
         .descriptor_in            (cu_channel_descriptor[{1}]               ),
@@ -4796,7 +4796,7 @@ generate
       );
     end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 2) begin
 // CU SRAM -> AXI Kernel Cache
-      m{0:02d}_axi_cu_sram_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_sram_l1 (
+      m{0:02d}_axi_cu_sram_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_sram_l1_m{0:02d}_axi_cu_sram_mid{2}x{3}_fe{4}x{5}_ch{1} (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
         .descriptor_in            (cu_channel_descriptor[{1}]               ),
@@ -4817,7 +4817,7 @@ generate
       );
     end else if(CHANNEL_CONFIG_L1_CACHE[{1}] == 3) begin
 // CU BUFFER -> AXI Kernel Cache
-      m{0:02d}_axi_cu_stream_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_stream_l1 (
+      m{0:02d}_axi_cu_stream_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_stream_l1_m{0:02d}_axi_cu_stream_mid{2}x{3}_fe{4}x{5}_ch{1} (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
         .descriptor_in            (cu_channel_descriptor[{1}]               ),
@@ -4838,7 +4838,7 @@ generate
       );
     end else begin
 // CU CACHE -> AXI Kernel Cache
-      m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1 (
+      m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_wrapper inst_cu_cache_l1_m{0:02d}_axi_cu_cache_mid{2}x{3}_fe{4}x{5}_ch{1} (
         .ap_clk                   (ap_clk                                 ),
         .areset                   (areset_cu_channel[{1}]                   ),
         .descriptor_in            (cu_channel_descriptor[{1}]               ),
@@ -4862,7 +4862,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH {1} (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-    m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper inst_m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper_ch (
+    m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper inst_m{0:02d}_axi_register_slice_mid_{2}x{3}_wrapper_ch{1} (
       .ap_clk         (ap_clk                 ),
       .areset         (areset_axi_slice[{1}]    ),
       .s_axi_read_out (cu_m{0:02d}_axi_read_in  ),
@@ -4880,7 +4880,7 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Generate CU CACHE CH {1} Lite (M->S) Register Slice
 // --------------------------------------------------------------------------------------
-    m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper inst_m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper
+    m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper inst_m{0:02d}_axi_lite_register_slice_mid_64x17_wrapper_ch{1}
         (
             .ap_clk         (ap_clk),
             .areset         (areset_axi_lite_slice[{1}]),

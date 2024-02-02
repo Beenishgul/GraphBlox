@@ -44,8 +44,8 @@ module fifo_v3 #(
     // this integer will be truncated by the synthesis tool
     logic [ADDR_DEPTH:0] status_cnt_n, status_cnt_q;
     // actual memory
-    (* ram_style = "distributed" *) dtype [FifoDepth-1:0]mem_n ;
-    (* ram_style = "distributed" *) dtype [FifoDepth-1:0]mem_q ;
+    (* ram_style = "block" *) dtype [FifoDepth-1:0]mem_n ;
+    (* ram_style = "block" *) dtype [FifoDepth-1:0]mem_q ;
 
     assign usage_o = status_cnt_q[ADDR_DEPTH-1:0];
 
