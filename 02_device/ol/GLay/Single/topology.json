@@ -380,7 +380,7 @@
         "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram"
     },
     "cache_properties": {
-        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
+        "channel_0": ["32768",   "4", "Automatic",      "0", "512",  "1", "8", "BRAM"],
         "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1", "BRAM"],
@@ -391,12 +391,39 @@
         "channel_8": ["2097152", "4", "LUTRAM",    "0", "1024", "1", "1", "BRAM"],
         "channel_9": ["4194304", "4", "Automatic", "0", "1024", "1", "1", "BRAM"]
     },
+    "cu_properties_comments": {
+        "architecture": {
+            "GLay": "Graph Processing",
+            "NearAutomata": "Automata Processing",
+            "Sieve": "PIM Emulation Sieve",
+            "Suite": "Random Tests"
+        },
+        "ctrl_mode": {
+            "USER_MANAGED": "XRT not enabled use IP",
+            "AP_CTRL_HS": "Single job at a time AP_CTRL_HS",
+            "AP_CTRL_CHAIN": "Chain jobs once a CU is done AP_CTRL_CHAIN"
+        },
+        "slr_layout": {
+            "0": "serial_percent",
+            "1": "interleaved_percent",
+            "2": "slr_mapping"
+        },
+        "synth_strategy": {
+            "0": "fast",
+            "1": "aggressive",
+            "2": "sweep_all"
+        }
+    },
     "cu_properties": {
-        "frequency"   : "200000000",
-        "num_kernels" : "1",
+        "frequency": "300000000",
+        "num_kernels": "16",
         "architecture": "GLay",
-        "ctrl_mode"   : "USER_MANAGED",
-        "capability"  : "Single"  
+        "ctrl_mode": "USER_MANAGED",
+        "capability": "Single",
+        "slr_percent": [25, 35, 40, 0],
+        "slr_mapping": [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
+        "slr_layout": "2",
+        "synth_strategy": "1"
     },
     "fifo_comments": {
         "comments":"fifo size for each port type if size zero engine doesn't have this port"
