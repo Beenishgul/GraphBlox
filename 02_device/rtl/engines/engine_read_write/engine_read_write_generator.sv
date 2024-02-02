@@ -205,7 +205,7 @@ module engine_read_write_generator #(parameter
     assign engine_read_write_route.sequence_id               = 0;
     assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
-    localparam             PULSE_HOLD           = 5;
+    localparam             PULSE_HOLD           = 6;
     logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
     logic                  cmd_in_flight_assert    ;
 
@@ -715,8 +715,8 @@ module engine_read_write_generator #(parameter
     assign fifo_request_commit_setup_signal_int = fifo_request_commit_signals_out_int.wr_rst_busy | fifo_request_commit_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_reg.valid;
-    assign fifo_request_commit_din                  = request_pending_out_reg.payload;
+    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_int.valid;
+    assign fifo_request_commit_din                  = request_pending_out_int.payload;
 
     // Pop
     assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
@@ -727,7 +727,7 @@ module engine_read_write_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 4          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (BURST_LENGTH * 2 + 1      )
+        .PROG_THRESH     (BURST_LENGTH * 2          )
     ) inst_fifo_EnginePacketRequestCommit (
         .clk        (ap_clk                                         ),
         .srst       (areset_fifo                                    ),
