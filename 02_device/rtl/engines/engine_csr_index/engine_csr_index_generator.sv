@@ -159,6 +159,7 @@ module engine_csr_index_generator #(parameter
     FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
     logic                         fifo_request_pending_setup_signal_int;
     EnginePacket                  request_pending_out_int              ;
+    EnginePacket                  request_pending_out_reg              ;
     EnginePacketPayload           fifo_request_pending_din             ;
     EnginePacketPayload           fifo_request_pending_dout            ;
 
@@ -1009,6 +1010,9 @@ module engine_csr_index_generator #(parameter
         .rd_rst_busy(fifo_request_pending_signals_out_int.rd_rst_busy)
     );
 
+    always_ff @(posedge ap_clk) begin
+        request_pending_out_reg <= request_pending_out_int;
+    end
 // --------------------------------------------------------------------------------------
 // FIFO commit cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
@@ -1016,8 +1020,8 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_commit_setup_signal_int = fifo_request_commit_signals_out_int.wr_rst_busy | fifo_request_commit_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_int.valid;
-    assign fifo_request_commit_din                  = request_pending_out_int.payload;
+    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_reg.valid;
+    assign fifo_request_commit_din                  = request_pending_out_reg.payload;
 
     // Pop
     assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en;
@@ -1028,7 +1032,7 @@ module engine_csr_index_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (5                         )
+        .PROG_THRESH     (6                         )
     ) inst_fifo_EnginePacketRequestCommit (
         .clk        (ap_clk                                         ),
         .srst       (areset_fifo                                    ),
