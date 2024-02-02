@@ -255,6 +255,30 @@ synth.jobs={XILINX_JOBS_STRATEGY}
 param=general.maxThreads={XILINX_MAX_THREADS}
 """
 
+XILINX_IMPL_STRATEGY_3 = f"""
+[advanced]
+param=compiler.skipTimingCheckAndFrequencyScaling=0
+param=compiler.multiStrategiesWaitOnAllRuns=1
+
+[vivado]
+prop=run.synth_1.{{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}}={{-directive sdx_optimization_effort_high}}
+prop=run.impl_1.{{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED}}={{true}}
+prop=run.impl_1.{{STEPS.PHYS_OPT_DESIGN.IS_ENABLED}}={{true}}
+prop=run.impl_1.{{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}}={{-retiming}}
+prop=run.impl_1.STEPS.OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=ExploreWithRemap
+prop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=SSI_SpreadSLLs
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=Explore
+prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=AlternateCLBRouting
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore
+impl.jobs={XILINX_JOBS_STRATEGY}
+synth.jobs={XILINX_JOBS_STRATEGY}
+param=general.maxThreads={XILINX_MAX_THREADS}
+"""
+
+
 # Build the final configuration string
 config = f"\nplatform={PLATFORM}\n"
 config += f"messageDb={KERNEL_NAME}.mdb\n"
@@ -278,6 +302,8 @@ elif XILINX_IMPL_STRATEGY == '1':
     config += XILINX_IMPL_STRATEGY_1
 elif XILINX_IMPL_STRATEGY == '2':
     config += XILINX_IMPL_STRATEGY_2
+elif XILINX_IMPL_STRATEGY == '3':
+    config += XILINX_IMPL_STRATEGY_3
 else:
     print("ERROR: Invalid XILINX_IMPL_STRATEGY")
     sys.exit(1)
