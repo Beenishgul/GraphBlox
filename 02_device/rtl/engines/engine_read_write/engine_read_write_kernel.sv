@@ -70,23 +70,24 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-assign org_data_int = org_value_reg;
-
-always_comb begin
+always_ff @(posedge ap_clk) begin
   // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
-  address_int = 0;
   if (config_params_valid_in & data_valid_reg) begin
-    address_int.shift.amount    = config_params_in.granularity;
-    address_int.shift.direction = config_params_in.direction;
-    address_int.id_channel      = config_params_in.id_channel;
-    address_int.id_buffer       = config_params_in.id_buffer;
-    address_int.burst_length    = 1;
-    if(address_int.shift.direction) begin
-      address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) << address_int.shift.amount;
+    address_int.shift.amount    <= config_params_in.granularity;
+    address_int.shift.direction <= config_params_in.direction;
+    address_int.id_channel      <= config_params_in.id_channel;
+    address_int.id_buffer       <= config_params_in.id_buffer;
+    address_int.burst_length    <= 1;
+    if(config_params_in.direction) begin
+      address_int.offset <= (config_params_in.index_start + ops_value_reg.field[1]) << config_params_in.granularity;
     end else begin
-      address_int.offset = (config_params_in.index_start + ops_value_reg.field[1]) >> address_int.shift.amount;
+      address_int.offset <= (config_params_in.index_start + ops_value_reg.field[1]) >> config_params_in.granularity;
     end
+  end else begin
+    address_int <= 0;
   end
+
+  org_data_int <= org_value_reg;
 end
 
 // Output assignment logic

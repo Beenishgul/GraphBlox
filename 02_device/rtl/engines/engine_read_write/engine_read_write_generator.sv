@@ -107,6 +107,7 @@ module engine_read_write_generator #(parameter
     EnginePacketFull     generator_engine_request_engine_reg   ;
     EnginePacketFull     generator_engine_request_engine_reg_S2;
     EnginePacketFull     generator_engine_request_engine_reg_S3;
+    EnginePacketFull     generator_engine_request_engine_reg_S4;
     EnginePacketFull     request_memory_out_reg                ;
     MemoryPacketResponse response_memory_in_reg                ;
     MemoryPacketResponse response_memory_in_reg_S2             ;
@@ -147,6 +148,7 @@ module engine_read_write_generator #(parameter
 // FIFO pending cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
     EnginePacket                  request_pending_out_int              ;
+    EnginePacket                  request_pending_out_reg              ;
     EnginePacketPayload           fifo_request_pending_din             ;
     EnginePacketPayload           fifo_request_pending_dout            ;
     FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
@@ -203,7 +205,7 @@ module engine_read_write_generator #(parameter
     assign engine_read_write_route.sequence_id               = 0;
     assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
-    localparam             PULSE_HOLD           = 4;
+    localparam             PULSE_HOLD           = 5;
     logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
     logic                  cmd_in_flight_assert    ;
 
@@ -537,14 +539,26 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         generator_engine_request_engine_reg_S3.valid                                 <= generator_engine_request_engine_reg_S2.valid;
-        generator_engine_request_engine_reg_S3.payload.data                          <= result_int;
-        generator_engine_request_engine_reg_S3.payload.meta.address                  <= address_int;
+        generator_engine_request_engine_reg_S3.payload.data                          <= 0;
+        generator_engine_request_engine_reg_S3.payload.meta.address                  <= 0;
         generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S2.payload.meta.route.packet_destination;
         generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_source;
         generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_state;
         generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S2.payload.meta.route.sequence_id;
         generator_engine_request_engine_reg_S3.payload.meta.route.hops               <= generator_engine_request_engine_reg_S2.payload.meta.route.hops;
         generator_engine_request_engine_reg_S3.payload.meta.subclass                 <= generator_engine_request_engine_reg_S2.payload.meta.subclass;
+    end
+
+    always_ff @(posedge ap_clk) begin
+        generator_engine_request_engine_reg_S4.valid                                 <= generator_engine_request_engine_reg_S3.valid;
+        generator_engine_request_engine_reg_S4.payload.data                          <= result_int;
+        generator_engine_request_engine_reg_S4.payload.meta.address                  <= address_int;
+        generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
+        generator_engine_request_engine_reg_S4.payload.meta.route.sequence_state     <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state;
+        generator_engine_request_engine_reg_S4.payload.meta.route.sequence_id        <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_id;
+        generator_engine_request_engine_reg_S4.payload.meta.route.hops               <= generator_engine_request_engine_reg_S3.payload.meta.route.hops;
+        generator_engine_request_engine_reg_S4.payload.meta.subclass                 <= generator_engine_request_engine_reg_S3.payload.meta.subclass;
     end
 
 // --------------------------------------------------------------------------------------
@@ -567,8 +581,8 @@ module engine_read_write_generator #(parameter
     assign fifo_request_send_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_reg_S3.valid;
-    assign fifo_request_send_din                  = generator_engine_request_engine_reg_S3.payload;
+    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_reg_S4.valid;
+    assign fifo_request_send_din                  = generator_engine_request_engine_reg_S4.payload;
 
     // Pop
     assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en;
@@ -579,7 +593,7 @@ module engine_read_write_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2              ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
-        .PROG_THRESH     (5                             )
+        .PROG_THRESH     (6                             )
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
@@ -674,7 +688,7 @@ module engine_read_write_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (5                         )
+        .PROG_THRESH     (6                         )
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -690,6 +704,10 @@ module engine_read_write_generator #(parameter
         .rd_rst_busy(fifo_request_pending_signals_out_int.rd_rst_busy)
     );
 
+    always_ff @(posedge ap_clk) begin
+        request_pending_out_reg <= request_pending_out_int;
+    end
+
 // --------------------------------------------------------------------------------------
 // FIFO commit cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
@@ -697,8 +715,8 @@ module engine_read_write_generator #(parameter
     assign fifo_request_commit_setup_signal_int = fifo_request_commit_signals_out_int.wr_rst_busy | fifo_request_commit_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_int.valid;
-    assign fifo_request_commit_din                  = request_pending_out_int.payload;
+    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_reg.valid;
+    assign fifo_request_commit_din                  = request_pending_out_reg.payload;
 
     // Pop
     assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
@@ -709,7 +727,7 @@ module engine_read_write_generator #(parameter
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 4          ),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (BURST_LENGTH * 2          )
+        .PROG_THRESH     (BURST_LENGTH * 2 + 1      )
     ) inst_fifo_EnginePacketRequestCommit (
         .clk        (ap_clk                                         ),
         .srst       (areset_fifo                                    ),
