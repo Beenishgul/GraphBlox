@@ -411,16 +411,17 @@
         "synth_strategy": {
             "0": "fast",
             "1": "aggressive",
-            "2": "sweep_all"
+            "2": "sweep_all",
+            "3": "spread_logic"
         }
     },
     "cu_properties": {
         "frequency": "300000000",
         "num_kernels": "16",
         "slr_percent": [30, 35, 35, 0],
-        "slr_mapping": [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
-        "slr_layout": "2",
-        "synth_strategy": "1"
+        "slr_mapping": [1, 2, 1, 2, 1, 2, 0, 2, 0, 2, 0, 1, 2, 1, 2, 1],
+        "slr_layout": "1",
+        "synth_strategy": "3"
     },
     "fifo_comments": {
         "comments":"fifo size for each port type if size zero engine doesn't have this port"
