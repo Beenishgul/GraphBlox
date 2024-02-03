@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import json
@@ -20,11 +22,11 @@ MSG: Usage:
   DESIGN_FREQ_HZ: 300000000
 """)
 
-if len(sys.argv) < 14:
+if len(sys.argv) < 15:
     print_usage()
     sys.exit(1)
 
-APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS_STRATEGY, PART, PLATFORM, TARGET, XILINX_NUM_KERNELS, XILINX_MAX_THREADS, DESIGN_FREQ_HZ, FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY = sys.argv[1:15]
+APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS_STRATEGY, PART, PLATFORM, TARGET, XILINX_NUM_KERNELS, XILINX_MAX_THREADS, DESIGN_FREQ_HZ, FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, OVERRIDE_TOPOLOGY_JSON = sys.argv[1:16]
 
 
 # Construct the full path for the file
@@ -35,8 +37,13 @@ with open(config_file_path, "r") as file:
     config_data = json.load(file)
 
 # Convert integer arguments to integers
-XILINX_IMPL_STRATEGY = config_data["cu_properties"]["synth_strategy"]
-XILINX_NUM_KERNELS   = int(config_data["cu_properties"]["num_kernels"])
+OVERRIDE_TOPOLOGY_JSON
+
+if not int(OVERRIDE_TOPOLOGY_JSON):
+    XILINX_IMPL_STRATEGY = config_data["cu_properties"]["synth_strategy"]
+    XILINX_NUM_KERNELS   = config_data["cu_properties"]["num_kernels"]
+    DESIGN_FREQ_HZ       = config_data["cu_properties"]["frequency"]
+
 XILINX_MAX_THREADS   = int(XILINX_MAX_THREADS)
 XILINX_JOBS_STRATEGY = int(XILINX_JOBS_STRATEGY)
 NUM_SLR = {"xcu55c-fsvh2892-2L-e": 3, "xcu280-fsvh2892-2L-e": 3, "xcu250-figd2104-2L-e": 4}.get(PART, 4)
@@ -64,9 +71,7 @@ def slr_placement(part, i):
     
     return f"slr={KERNEL_NAME}_{i}:{slr}\n" + generate_connectivity_sp(KERNEL_NAME, 0, 9, mem_type, start, end, i)
 
-def distribute_kernels(config_data, num_slrs):
-    frequency   = int(config_data["cu_properties"]["frequency"])
-    num_kernels = int(config_data["cu_properties"]["num_kernels"])
+def distribute_kernels(config_data, num_slrs, frequency, num_kernels):
     slr_percent = config_data["cu_properties"]["slr_percent"]
     slr_layout  = int(config_data["cu_properties"]["slr_layout"])  # Assuming it's either 0 or 1
     slr_mapping = config_data["cu_properties"]["slr_mapping"]      # Assuming it's either 0 or 1 or 2
@@ -134,7 +139,7 @@ def distribute_kernels(config_data, num_slrs):
 
     return slr_allocation
 
-def generate_kernel_and_memory_config(kernel_name, config_data, part, num_buffers_per_kernel=10):
+def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernels, num_buffers_per_kernel=10):
     # Define part information including SLR count and memory type
     # Extract SLR and memory configuration based on part information
     part_info = {
@@ -143,8 +148,6 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_buffer
         "xcu250-figd2104-2L-e": ("ddr", 4),
     }
     memory_type, num_slrs = part_info.get(part, ("ddr", 4))
-    kernel_name = "glay_kernel"
-    num_kernels = int(config_data["cu_properties"]["num_kernels"])
     slr_layout = config_data["cu_properties"]["slr_layout"]
     slr_mapping = config_data["cu_properties"]["slr_mapping"] if slr_layout == "2" else []
     slr_percent = config_data["cu_properties"]["slr_percent"]
@@ -292,7 +295,7 @@ config += "link=1\n\n"
 config+="[clock]\n"
 config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
 
-config +=  generate_kernel_and_memory_config(KERNEL_NAME, config_data, PART)
+config +=  generate_kernel_and_memory_config(KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS))
 
 config+="\n"
 # Select the appropriate configuration based on XILINX_IMPL_STRATEGY
