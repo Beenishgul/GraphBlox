@@ -48,96 +48,57 @@ XILINX_MAX_THREADS   = int(XILINX_MAX_THREADS)
 XILINX_JOBS_STRATEGY = int(XILINX_JOBS_STRATEGY)
 NUM_SLR = {"xcu55c-fsvh2892-2L-e": 3, "xcu280-fsvh2892-2L-e": 3, "xcu250-figd2104-2L-e": 4}.get(PART, 4)
 
-def generate_connectivity_sp(kernel_name, start_kernel_buffers, num_kernel_buffers, mem_type, start, end, i):
-    config = ""
-    for j in range(start_kernel_buffers, num_kernel_buffers):
-        range_str = f"[{start}:{end}]" if start != end else f"[{start}]"
-        config += f"sp={kernel_name}_{i}.buffer_{j}:{mem_type}{range_str}\n"
-    return config
-
-def slr_placement(part, i):
-    if "xcu55c-fsvh2892-2L-e" in part or "xcu280-fsvh2892-2L-e" in part:
-        slr = f"SLR{(i + 1) % 3}"
-        mem_type = "HBM"
-        start, end = (i - 1) * (32 // XILINX_NUM_KERNELS), i * (32 // XILINX_NUM_KERNELS) - 1
-    elif "xcu250-figd2104-2L-e" in part:
-        slr = f"SLR{(i + 1) % 3}"
-        mem_type = "HBM"
-        start, end = (i - 1) * (32 // XILINX_NUM_KERNELS), i * (32 // XILINX_NUM_KERNELS) - 1
-    else:
-        slr = f"SLR{(i - 1) % 4}"
-        mem_type = "DDR"
-        start, end = i - 1, i - 1
+def get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properties):
+    """
+    Correctly calculates and returns the start and end channels for a given kernel based on cu_properties,
+    considering the SLR index and the selected channel layout strategy, ensuring integer channel ranges.
     
-    return f"slr={KERNEL_NAME}_{i}:{slr}\n" + generate_connectivity_sp(KERNEL_NAME, 0, 9, mem_type, start, end, i)
-
-def distribute_kernels(config_data, num_slrs, frequency, num_kernels):
-    slr_percent = config_data["cu_properties"]["slr_percent"]
-    slr_layout  = int(config_data["cu_properties"]["slr_layout"])  # Assuming it's either 0 or 1
-    slr_mapping = config_data["cu_properties"]["slr_mapping"]      # Assuming it's either 0 or 1 or 2
-    cu_properties_comments = config_data["cu_properties_comments"]
-
-    slr_allocation = {}
-    kernels_allocated = 0
-
-    if num_kernels == 0:
-        return slr_allocation  # No kernels to allocate, return an empty allocation
-  
-    # Check if the layout value exists in the cu_properties_comments dictionary
-    if str(slr_layout) not in cu_properties_comments["slr_layout"]:
-        error_message = f"ERROR: Invalid SLR layout value: {slr_layout}. Possible values are: {', '.join(cu_properties_comments['slr_layout'].keys())}"
-        return error_message  # Return an error message
+    Parameters:
+    - kernel_idx: Index of the kernel (1-based).
+    - slr_idx: Index of the SLR (0-based) the kernel is in.
+    - cu_properties: Dictionary containing configuration properties.
     
-    # Handle Sequential Allocation
-    if slr_layout == 0:
-        for slr_index in range(num_slrs):
-            if kernels_allocated < num_kernels:
-                kernels_in_slr = round(num_kernels * (slr_percent[slr_index] / 100))
-                # Ensure we do not allocate more kernels than available
-                kernels_in_slr = min(kernels_in_slr, num_kernels - kernels_allocated)
-                
-                if kernels_in_slr > 0:
-                    slr_name = f"SLR{slr_index}"
-                    slr_allocation[slr_name] = {
-                        "frequency": frequency,
-                        "num_kernels": kernels_in_slr,
-                        "architecture": config_data["cu_properties"]["architecture"],
-                        "ctrl_mode": config_data["cu_properties"]["ctrl_mode"],
-                        "capability": config_data["cu_properties"]["capability"]
-                    }
-                    kernels_allocated += kernels_in_slr
+    Returns:
+    - Tuple of (channel_start, channel_end) indicating the integer range of channels allocated to the kernel.
+    """
+    total_memory_channels = int(cu_properties["num_channels"])
+    num_kernels = int(cu_properties["num_kernels"])
+    slr_percent = cu_properties.get("slr_percent", [100])
+    # Determine channel distribution strategy
+    channel_layout = cu_properties.get("channel_layout", "0")
 
-    # Handle Interleaved Allocation
-    elif slr_layout == 1:
-        for kernel_index in range(num_kernels):
-            slr_index = kernel_index % num_slrs
-            slr_name = f"SLR{slr_index}"
-            if slr_name not in slr_allocation:
-                slr_allocation[slr_name] = {
-                    "frequency": frequency,
-                    "num_kernels": 0,
-                    "architecture": config_data["cu_properties"]["architecture"],
-                    "ctrl_mode": config_data["cu_properties"]["ctrl_mode"],
-                    "capability": config_data["cu_properties"]["capability"]
-                }
-            slr_allocation[slr_name]["num_kernels"] += 1
+    # Initialize channel range
+    channel_start = 0
+    channel_end = 0
 
-    # Handle Custom Allocation based on slr_mapping
-    elif slr_layout == 2:
-        for kernel_index in range(num_kernels):
-            slr_index = slr_mapping[kernel_index % len(slr_mapping)]  # Ensure index is within bounds
-            slr_name = f"SLR{slr_index}"
-            if slr_name not in slr_allocation:
-                slr_allocation[slr_name] = {
-                    "frequency": frequency,
-                    "num_kernels": 0,
-                    "architecture": config_data["cu_properties"]["architecture"],
-                    "ctrl_mode": config_data["cu_properties"]["ctrl_mode"],
-                    "capability": config_data["cu_properties"]["capability"]
-                }
-            slr_allocation[slr_name]["num_kernels"] += 1
+    if channel_layout == "0":
+        # Calculate total channels for this SLR based on percentage
+        channels_for_slr = round(total_memory_channels * (slr_percent[slr_idx] / 100))
+        
+        # Calculate start channel index based on SLR
+        previous_channels = sum(round(total_memory_channels * (p / 100)) for p in slr_percent[:slr_idx])
+        
+        # Find kernels in this SLR
+        kernels_in_slr = cu_properties["slr_mapping"].count(slr_idx)
+        if kernels_in_slr > 0:
+            channels_per_kernel = channels_for_slr // kernels_in_slr
 
-    return slr_allocation
+            # Calculate start and end for this kernel within SLR
+            kernel_order = cu_properties["slr_mapping"][:kernel_idx].count(slr_idx)
+            channel_start = previous_channels + (kernel_order - 1) * channels_per_kernel
+            channel_end = channel_start + channels_per_kernel - 1
+
+    elif channel_layout == "1":
+        # Direct channel mapping logic here
+        if kernel_idx <= len(cu_properties["channel_mapping"]):
+            channel_range = cu_properties["channel_mapping"][kernel_idx - 1].split(':')
+            channel_start, channel_end = map(int, channel_range)
+
+    # Adjust channel_end to not exceed total channels and ensure it's integer
+    channel_end = min(channel_end, total_memory_channels - 1)
+
+    return channel_start, channel_end
+
 
 def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernels, num_buffers_per_kernel=10):
     # Define part information including SLR count and memory type
@@ -148,10 +109,11 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernel
         "xcu250-figd2104-2L-e": ("ddr", 4),
     }
     memory_type, num_slrs = part_info.get(part, ("ddr", 4))
-    slr_layout = config_data["cu_properties"]["slr_layout"]
-    slr_mapping = config_data["cu_properties"]["slr_mapping"] if slr_layout == "2" else []
-    slr_percent = config_data["cu_properties"]["slr_percent"]
-    total_memory_channels = 32 if memory_type == "hbm" else 4
+    cu_properties = config_data["cu_properties"]
+    slr_layout    = config_data["cu_properties"]["slr_layout"]
+    slr_mapping   = config_data["cu_properties"]["slr_mapping"] if slr_layout == "2" else []
+    slr_percent   = config_data["cu_properties"]["slr_percent"]
+    total_memory_channels = int(config_data["cu_properties"].get("num_channels", 32 if memory_type == "hbm" else 4))
 
     # Calculate kernels per SLR based on percentages for interleaved distribution
     kernels_per_slr = [round(num_kernels * (percent / 100.0)) for percent in slr_percent[:num_slrs]]
@@ -206,8 +168,10 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernel
         else:
             slr_idx = kernel_assignments[kernel_idx - 1]
 
-        channel_start = (kernel_idx - 1) * (total_memory_channels // num_kernels) if memory_type == "hbm" else slr_idx
-        channel_end = kernel_idx * (total_memory_channels // num_kernels) - 1 if memory_type == "hbm" else channel_start
+        # channel_start = (kernel_idx - 1) * (total_memory_channels // num_kernels) if memory_type == "hbm" else slr_idx
+        # channel_end = kernel_idx * (total_memory_channels // num_kernels) - 1 if memory_type == "hbm" else channel_start
+
+        channel_start, channel_end =  get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properties)
 
         connectivity_configs.append(f"slr={kernel_name}_{kernel_idx}:SLR{slr_idx}")
         for buffer_idx in range(num_buffers_per_kernel):
