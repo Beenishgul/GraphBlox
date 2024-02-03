@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Assuming you want to add a new table of data and display each figure side by side for each algorithm
 # We will add a third table with dummy data and then plot the figures side by side.
 
