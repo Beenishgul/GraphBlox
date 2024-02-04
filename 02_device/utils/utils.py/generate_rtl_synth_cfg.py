@@ -33,25 +33,25 @@ APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
-UTILS_QOR="util.tcl"
+UTILS_TCL="utils.tcl"
 
-output_file_project_generate_qor_pre_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_synth.tcl")
-output_file_project_generate_qor_post_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_synth.tcl")
+output_file_project_generate_qor_pre_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_synth.tcl")
+output_file_project_generate_qor_post_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_synth.tcl")
 
-output_file_project_read_qor_pre_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_opt.tcl")
-output_file_project_generate_qor_post_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_opt.tcl")
+output_file_project_read_qor_pre_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_opt.tcl")
+output_file_project_generate_qor_post_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_opt.tcl")
 
-output_file_project_read_qor_pre_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_place.tcl")
-output_file_project_generate_qor_post_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_place.tcl")
+output_file_project_read_qor_pre_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_place.tcl")
+output_file_project_generate_qor_post_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_place.tcl")
 
-output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_phys_opt.tcl")
-output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_phys_opt.tcl")
+output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_phys_opt.tcl")
+output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_phys_opt.tcl")
 
-output_file_project_read_qor_pre_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_route.tcl")
-output_file_project_generate_qor_post_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_route.tcl")
+output_file_project_read_qor_pre_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_route.tcl")
+output_file_project_generate_qor_post_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_route.tcl")
 
-output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_post_route_phys_opt.tcl")
-output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.tcl")
+output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_post_route_phys_opt.tcl")
+output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_post_route_phys_opt.tcl")
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
