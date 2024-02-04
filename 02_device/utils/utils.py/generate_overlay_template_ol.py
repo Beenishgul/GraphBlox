@@ -157,23 +157,26 @@ def get_engine_id(engine_name):
     
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
-    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_ol, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
-    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-    process_file_ol(template_file_path_ol, engine_template_filename_ol)
-    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
     append_to_file(output_file_path_vh, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
-    process_file_vh(template_file_path_ol, engine_template_filename_ol, engine_name)
+    # process_file_vh(template_file_path_ol, engine_template_filename_ol, engine_name)
+    process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_template_filename_json, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
 
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
     append_to_file(output_file_path_cpp, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
-    process_file_cpp(template_file_path_ol, engine_template_filename_ol, engine_name)
+    # process_file_cpp(template_file_path_ol, engine_template_filename_ol, engine_name)
+    process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_template_filename_json, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
+
+    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
+    append_to_file(output_file_path_ol, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
+    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
+    process_file_ol(template_file_path_ol, engine_template_filename_ol)
+    append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
 
     process_file_json(template_file_path_json, engine_template_filename_json, engine_name)
 
@@ -468,7 +471,13 @@ def process_file_json(template_file_path, engine_template_filename, engine_name)
         # Load the JSON data from the file
         json_engine_template = json.load(file)
         # Combine the data
-        combined_engine_template_json[engine_id]=json_engine_template # Use extend for lists, update for dicts
+        # combined_engine_template_json[engine_id]=json_engine_template # Use extend for lists, update for dicts
+
+     # This replaces the entire top-level key with the new engine_id
+    new_engine_template = {engine_id: json_engine_template[next(iter(json_engine_template))]}
+
+    # Update the combined JSON structure
+    combined_engine_template_json.update(new_engine_template)
 
     engine_index_json += 1
 
@@ -490,6 +499,153 @@ def get_channels_index(channels, input_value):
     # Return None if no match is found
     return None
 
+def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_template_filename_json, engine_template_filename_ol, engine_name):
+    # Define the size of a cache line in bytes and the size of each entry
+    CACHE_LINE_SIZE = 64
+    ENTRY_SIZE = 4  # Assuming 4 bytes per entry
+    entries_per_cache_line = CACHE_LINE_SIZE // ENTRY_SIZE
+    global entries_vh
+    global entry_index_vh
+    global engine_index_vh
+    global output_file_path_vh
+    global buffers
+    global channels
+    
+    engine_type    = engine_name.split("(")[0]
+    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    buffer_start_ops = print_operations_vh(buffer_start)
+    buffer_end_ops = print_operations_vh(buffer_end)
+    buffer_key   = get_key_from_value(buffers, buffer_name)
+    local_count = 0
+    filename_ol = os.path.join(template_file_path_ol, engine_template_filename_ol)
+    filename_json = os.path.join(template_file_path_json, engine_template_filename_json)
+
+    # print(f"echo {filename_ol}")
+    # print(f"echo {filename_json}")
+
+    check_and_clean_file(filename_ol)
+    
+    process_entries_json_v2(filename_ol, filename_json, channels, buffers)
+
+    # Read the file and process entries and comments
+    with open(filename_ol, 'r') as file:
+
+        for line in file:
+            line = line.strip()  # Strip the leading and trailing whitespaces
+
+            # Check if the line is a hex entry with optional comment
+            hex_match = re.search(r'(0x[0-9A-Fa-f]+)(.*)', line)
+            if hex_match:
+                hex_value = hex_match.group(1)
+                comment = hex_match.group(2).strip()  # Remove leading/trailing whitespace from comment
+                cache_line, offset = calculate_cache_info(entry_index_vh, entries_per_cache_line)
+                # append_to_file(output_file_path_vh, f"{hex_value:<10} // entry {entry_index:<4} cacheline {cache_line:<4} offset {offset:<4} -- count {local_count:<4} -- {comment}")
+                
+                if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
+                    if local_count == 1:
+                        append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_start_ops};")
+                    elif local_count == 2:
+                        append_to_file(output_file_path_vh, f"   // --  2  - Index_End")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops};")
+                    elif local_count == 7:
+                        append_to_file(output_file_path_vh, f"   // --  7  - Array_size")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
+                    if local_count   == 1:
+                        append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 8:
+                        append_to_file(output_file_path_vh, f"   // --  2  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 15:
+                        append_to_file(output_file_path_vh, f"   // --  3  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 22:
+                        append_to_file(output_file_path_vh, f"   // --  4  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+
+                entry_index_vh += 1
+                local_count += 1
+            # elif line.startswith('//'):  # This is a comment line
+            #     print(line)  # Print the comment line as is
+
+    engine_index_vh += 1
+
+def process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_template_filename_json, engine_template_filename_ol, engine_name):
+    # Define the size of a cache line in bytes and the size of each entry
+    CACHE_LINE_SIZE = 64
+    ENTRY_SIZE = 4  # Assuming 4 bytes per entry
+    entries_per_cache_line = CACHE_LINE_SIZE // ENTRY_SIZE
+    global entries_cpp
+    global entry_index_cpp
+    global engine_index_cpp
+    global output_file_path_cpp
+    global buffers
+    global channels
+
+    engine_type    = engine_name.split("(")[0]
+    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    buffer_start_ops = print_operations_cpp(buffer_start)
+    buffer_end_ops = print_operations_cpp(buffer_end)
+    buffer_key   = get_key_from_value(buffers, buffer_name)
+    buffer_index   = get_index_from_value(buffers, buffer_name)
+    local_count = 0
+    filename_ol = os.path.join(template_file_path_ol, engine_template_filename_ol)
+    filename_json = os.path.join(template_file_path_json, engine_template_filename_json)
+
+    # print(f"echo {filename_ol}")
+    # print(f"echo {filename_json}")
+
+    check_and_clean_file(filename_ol)
+    
+    process_entries_json_v2(filename_ol, filename_json, channels, buffers)
+
+    # Read the file and process entries and comments
+    with open(filename_ol, 'r') as file:
+        for line in file:
+            line = line.strip()  # Strip the leading and trailing whitespaces
+
+            # Check if the line is a hex entry with optional comment
+            hex_match = re.search(r'(0x[0-9A-Fa-f]+)(.*)', line)
+            if hex_match:
+                hex_value = hex_match.group(1)
+                comment = hex_match.group(2).strip()  # Remove leading/trailing whitespace from comment
+                cache_line, offset = calculate_cache_info(entry_index_vh, entries_per_cache_line)
+                # append_to_file(output_file_path_vh, f"{hex_value:<10} // entry {entry_index:<4} cacheline {cache_line:<4} offset {offset:<4} -- count {local_count:<4} -- {comment}")
+                
+                if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
+                    if local_count == 1:
+                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 2:
+                        append_to_file(output_file_path_cpp, f"   // --  2  - Index_End")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops};")
+                    elif local_count == 7:
+                        append_to_file(output_file_path_cpp, f"   // --  7  - Array_size")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
+                    if local_count   == 1:
+                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 8:
+                        append_to_file(output_file_path_cpp, f"   // --  2  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 15:
+                        append_to_file(output_file_path_cpp, f"   // --  3  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 22:
+                        append_to_file(output_file_path_cpp, f"   // --  4  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+
+                entry_index_cpp += 1
+                local_count += 1
+            # elif line.startswith('//'):  # This is a comment line
+            #     print(line)  # Print the comment line as is
+
+    engine_index_cpp += 1
+
+
 
 # Function to parse and construct the entries with compact comments
 def process_entries_json_v2(output_program_path_ol, source_program_path_json, channels, buffers):
@@ -499,6 +655,8 @@ def process_entries_json_v2(output_program_path_ol, source_program_path_json, ch
     entries_per_cache_line = CACHE_LINE_SIZE // ENTRY_SIZE
     total_number_entries = 0
 
+    # print(f"echo {source_program_path_json}")
+
     with open(source_program_path_json, 'r') as file:
         # Load the JSON data from the file
         parsed_data = json.load(file)
@@ -507,6 +665,11 @@ def process_entries_json_v2(output_program_path_ol, source_program_path_json, ch
 
         entries = engine_data["entries"]
         # Print engine name and number of entries
+        if "entries" in engine_data:
+            entries = engine_data["entries"]
+        else:
+            print(f"echo Warning: 'entries' key not found in engine_data. Skipping.")
+            continue  # Skip t
             
         append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
         append_to_file(output_program_path_ol, f"// Engine: {engine_name}, Number of entries: {len(entries)}")
@@ -579,7 +742,6 @@ def process_entries_json_v2(output_program_path_ol, source_program_path_json, ch
             comment = f" // {key:10} cacheline[{cache_line:3}][{offset:2}] <{bits_prev:2}b>: " + " || ".join(comment_details)
             append_to_file(output_program_path_ol, f"{entry_hex}{comment}")
     append_to_file(output_program_path_ol, f"// --------------------------------------------------------------------------------------")
-    append_to_file(output_program_path_ol, f"// -->  Load.{topology}  <-- ")
     append_to_file(output_program_path_ol, f"// Number of entries {total_number_entries}")
 
 
@@ -688,7 +850,7 @@ with open(output_file_path_json, 'w') as f:
     json.dump(combined_engine_template_json, f, indent=4)
 
 # process_entries_json(output_program_path_ol, source_program_path_json)
-process_entries_json_v2(output_program_path_ol, source_program_path_json,channels, buffers)
+process_entries_json_v2(output_program_path_ol, source_program_path_json, channels, buffers)
 
 print(f"export NUM_ENTRIES={entry_index_vh}")
 

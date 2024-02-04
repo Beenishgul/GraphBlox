@@ -1,21 +1,23 @@
 {
-    "type_set_operation": {
-        "SET_NOP"       : 1,
-        "SET_INTERSECT" : 2,
-        "SET_UNION"     : 4,
-        "SET_COMPLIMENT": 8
-    },
-    "entries": {
-        "entry_0": {
-            "set_mask": {
-                "bits": "4",
-                "value": "0x0"
-            }
+    "ENGINE_SET_OPS": {
+        "type_set_operation": {
+            "SET_NOP"       : 1,
+            "SET_INTERSECT" : 2,
+            "SET_UNION"     : 4,
+            "SET_COMPLIMENT": 8
         },
-        "entry_1": {
-            "set_operation": {
-                "bits": "4",
-                "value": "0x0"
+        "entries": {
+            "entry_0": {
+                "set_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_1": {
+                "set_operation": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
             }
         }
     }

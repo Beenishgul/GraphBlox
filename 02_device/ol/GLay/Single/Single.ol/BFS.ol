@@ -152,5 +152,4 @@
 0x00030101 // entry_7    cacheline[  7][ 6] <32b>: else_id_cu[0:7]=0x01 || else_id_bundle[8:15]=0x01 || else_id_lane[16:23]=0x03 || else_id_buffer[24:31]=0x00
 0x00000000 // entry_8    cacheline[  7][ 7] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
-// -->  Load.Single.BFS  <-- 
 // Number of entries 120
