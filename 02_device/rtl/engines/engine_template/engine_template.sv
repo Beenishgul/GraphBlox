@@ -915,7 +915,7 @@ generate
 
 // --------------------------------------------------------------------------------------
         end
-        8       : begin
+        8      : begin
 // --------------------------------------------------------------------------------------
 // ENGINE ALU
 // --------------------------------------------------------------------------------------
@@ -935,7 +935,7 @@ generate
             assign template_fifo_response_lanes_backtrack_signals_in     = fifo_response_lanes_backtrack_signals_in_reg;
             assign template_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in_reg;
 
-            engine_dimm_sieve #(
+            engine_parallel_read_write #(
                 .ID_CU              (ID_CU              ),
                 .ID_BUNDLE          (ID_BUNDLE          ),
                 .ID_LANE            (ID_LANE            ),
@@ -951,7 +951,7 @@ generate
                 .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
                 .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
                 .ENGINES_CONFIG     (ENGINES_CONFIG     )
-            ) inst_engine_dimm_sieve (
+            ) inst_engine_parallel_read_write (
                 .ap_clk                                      (ap_clk                                               ),
                 .areset                                      (areset_template                                      ),
                 .descriptor_in                               (template_descriptor_in                               ),

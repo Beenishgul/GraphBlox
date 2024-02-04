@@ -5,7 +5,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_read_write_kernel.sv
+// File   : engine_parallel_read_write_kernel.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-09-07 23:47:05
 // Editor : sublime text4, tab size (4)
@@ -13,16 +13,16 @@
 
 `include "global_package.vh"
 
-module engine_read_write_kernel (
-  input  logic                            ap_clk                ,
-  input  logic                            areset                ,
-  input  logic                            clear_in              ,
-  input  logic                            config_params_valid_in,
-  input  ReadWriteConfigurationParameters config_params_in      ,
-  input  logic                            data_valid_in         ,
-  input  EnginePacketData                 data_in               ,
-  output PacketRequestDataAddress         address_out           ,
-  output EnginePacketData                 result_out
+module engine_parallel_read_write_kernel (
+  input  logic                                        ap_clk                ,
+  input  logic                                        areset                ,
+  input  logic                                        clear_in              ,
+  input  logic                                        config_params_valid_in,
+  input  ParallelReadWriteConfigurationParameterField config_params_in      ,
+  input  logic                                        data_valid_in         ,
+  input  EnginePacketData                             data_in               ,
+  output PacketRequestDataAddress                     address_out           ,
+  output EnginePacketData                             result_out
 );
 
 // Define internal signals
@@ -103,4 +103,4 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-endmodule : engine_read_write_kernel
+endmodule : engine_parallel_read_write_kernel

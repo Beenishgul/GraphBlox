@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_read_write_generator.sv
+// File   : engine_parallel_read_write_generator.sv
 // Create : 2023-01-23 16:17:05
 // Revise : 2023-09-07 23:47:05
 // Editor : sublime text4, tab size (4)
@@ -28,7 +28,7 @@
 
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
-module engine_read_write_generator #(parameter
+module engine_parallel_read_write_generator #(parameter
     ID_CU               = 0                    ,
     ID_BUNDLE           = 0                    ,
     ID_LANE             = 0                    ,
@@ -45,28 +45,28 @@ module engine_read_write_generator #(parameter
     NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                  ap_clk                                                                             ,
-    input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
-    input  ReadWriteConfiguration configure_memory_in                                                                ,
-    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                                                ,
-    input  EnginePacket           response_engine_in                                                                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                                                 ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                                                ,
-    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
-    input  MemoryPacketResponse   response_memory_in                                                                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                                                 ,
-    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                                                ,
-    output EnginePacket           request_engine_out                                                                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                                                 ,
-    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                                                ,
-    output MemoryPacketRequest    request_memory_out                                                                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                                 ,
-    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                                                ,
-    input  FIFOStateSignalsOutput fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                     ,
-    output logic                  fifo_setup_signal                                                                  ,
-    output logic                  configure_memory_setup                                                             ,
-    output logic                  done_out
+    input  logic                          ap_clk                                                                             ,
+    input  logic                          areset                                                                             ,
+    input  KernelDescriptor               descriptor_in                                                                      ,
+    input  ParallelReadWriteConfiguration configure_memory_in                                                                ,
+    input  FIFOStateSignalsInput          fifo_configure_memory_in_signals_in                                                ,
+    input  EnginePacket                   response_engine_in                                                                 ,
+    input  FIFOStateSignalsInput          fifo_response_engine_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput         fifo_response_engine_in_signals_out                                                ,
+    input  FIFOStateSignalsOutput         fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
+    input  MemoryPacketResponse           response_memory_in                                                                 ,
+    input  FIFOStateSignalsInput          fifo_response_memory_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput         fifo_response_memory_in_signals_out                                                ,
+    output EnginePacket                   request_engine_out                                                                 ,
+    input  FIFOStateSignalsInput          fifo_request_engine_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput         fifo_request_engine_out_signals_out                                                ,
+    output MemoryPacketRequest            request_memory_out                                                                 ,
+    input  FIFOStateSignalsInput          fifo_request_memory_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput         fifo_request_memory_out_signals_out                                                ,
+    input  FIFOStateSignalsOutput         fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                     ,
+    output logic                          fifo_setup_signal                                                                  ,
+    output logic                          configure_memory_setup                                                             ,
+    output logic                          done_out
 );
 
 // --------------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ module engine_read_write_generator #(parameter
 
     KernelDescriptor descriptor_in_reg;
 
-    logic                  configure_memory_setup_reg;
-    ReadWriteConfiguration configure_memory_reg      ;
-    ReadWriteConfiguration configure_engine_int      ;
+    logic                          configure_memory_setup_reg;
+    ParallelReadWriteConfiguration configure_memory_reg      ;
+    ParallelReadWriteConfiguration configure_engine_int      ;
 
     logic fifo_empty_int     ;
     logic fifo_empty_reg     ;
@@ -90,8 +90,8 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
 // --------------------------------------------------------------------------------------
-    engine_read_write_generator_state current_state;
-    engine_read_write_generator_state next_state   ;
+    engine_parallel_read_write_generator_state current_state;
+    engine_parallel_read_write_generator_state next_state   ;
 
     logic done_out_reg;
 
@@ -193,17 +193,17 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    EnginePacketRouteAttributes engine_read_write_route;
+    EnginePacketRouteAttributes engine_parallel_read_write_route;
 // --------------------------------------------------------------------------------------
-    assign engine_read_write_route.packet_destination        = 0;
-    assign engine_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
-    assign engine_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
-    assign engine_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
-    assign engine_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
-    assign engine_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
-    assign engine_read_write_route.sequence_state            = SEQUENCE_INVALID;
-    assign engine_read_write_route.sequence_id               = 0;
-    assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
+    assign engine_parallel_read_write_route.packet_destination        = 0;
+    assign engine_parallel_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
+    assign engine_parallel_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
+    assign engine_parallel_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
+    assign engine_parallel_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
+    assign engine_parallel_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
+    assign engine_parallel_read_write_route.sequence_state            = SEQUENCE_INVALID;
+    assign engine_parallel_read_write_route.sequence_id               = 0;
+    assign engine_parallel_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
     localparam             PULSE_HOLD           = 6;
     logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
@@ -315,7 +315,7 @@ module engine_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_read_write_route.sequence_source);
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_parallel_read_write_route.sequence_source);
     end
 
 // --------------------------------------------------------------------------------------
@@ -363,7 +363,7 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_generator)
-            current_state <= ENGINE_READ_WRITE_GEN_RESET;
+            current_state <= ENGINE_PARALLEL_READ_WRITE_GEN_RESET;
         else begin
             current_state <= next_state;
         end
@@ -372,63 +372,63 @@ module engine_read_write_generator #(parameter
     always_comb begin
         next_state = current_state;
         case (current_state)
-            ENGINE_READ_WRITE_GEN_RESET : begin
-                next_state = ENGINE_READ_WRITE_GEN_IDLE;
+            ENGINE_PARALLEL_READ_WRITE_GEN_RESET : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_IDLE;
             end
-            ENGINE_READ_WRITE_GEN_IDLE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_IDLE : begin
                 if(descriptor_in_reg.valid)
-                    next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
                 else
-                    next_state = ENGINE_READ_WRITE_GEN_IDLE;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_IDLE;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
                 if(fifo_configure_memory_in_signals_in_reg.rd_en)
-                    next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_TRANS;
                 else
-                    next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
-                next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY;
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY : begin
                 if(configure_memory_reg.valid) // (0) direct mode (get count from memory)
-                    next_state = ENGINE_READ_WRITE_GEN_START_TRANS;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_START_TRANS;
                 else
-                    next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY;
             end
-            ENGINE_READ_WRITE_GEN_START_TRANS : begin
-                next_state = ENGINE_READ_WRITE_GEN_START;
+            ENGINE_PARALLEL_READ_WRITE_GEN_START_TRANS : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_START;
             end
-            ENGINE_READ_WRITE_GEN_START : begin
-                next_state = ENGINE_READ_WRITE_GEN_BUSY;
+            ENGINE_PARALLEL_READ_WRITE_GEN_START : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_BUSY;
             end
-            ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
-                next_state = ENGINE_READ_WRITE_GEN_BUSY;
+            ENGINE_PARALLEL_READ_WRITE_GEN_BUSY_TRANS : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_BUSY;
             end
-            ENGINE_READ_WRITE_GEN_BUSY : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_BUSY : begin
                 if (enter_gen_pause_int)
-                    next_state = ENGINE_READ_WRITE_GEN_PAUSE_TRANS;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE_TRANS;
                 else
-                    next_state = ENGINE_READ_WRITE_GEN_BUSY;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_BUSY;
             end
-            ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
-                next_state = ENGINE_READ_WRITE_GEN_PAUSE;
+            ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE_TRANS : begin
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE;
             end
-            ENGINE_READ_WRITE_GEN_PAUSE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE : begin
                 if (exit_gen_pause_int)
-                    next_state = ENGINE_READ_WRITE_GEN_BUSY_TRANS;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_BUSY_TRANS;
                 else
-                    next_state = ENGINE_READ_WRITE_GEN_PAUSE;
+                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE;
             end
             default : begin
-                next_state = ENGINE_READ_WRITE_GEN_RESET;
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_RESET;
             end
         endcase
     end // always_comb
 
     always_ff @(posedge ap_clk) begin
         case (current_state)
-            ENGINE_READ_WRITE_GEN_RESET : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_RESET : begin
                 done_out_reg                       <= 1'b1;
                 configure_memory_setup_reg         <= 1'b0;
                 configure_engine_int.valid         <= 1'b0;
@@ -436,57 +436,57 @@ module engine_read_write_generator #(parameter
                 response_memory_counter_load_value <= 0;
                 cmd_stream_mode_pop                <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_IDLE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_IDLE : begin
                 done_out_reg                       <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
                 cmd_stream_mode_pop                <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
                 done_out_reg                       <= 1'b0;
                 configure_memory_setup_reg         <= 1'b0;
                 counter_load                       <= 1'b0;
                 response_memory_counter_load_value <= 0;
                 cmd_stream_mode_pop                <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
             end
-            ENGINE_READ_WRITE_GEN_SETUP_MEMORY : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg <= 1'b0;
                 configure_engine_int.valid <= 1'b0;
                 if(configure_memory_reg.valid)
                     configure_engine_int <= configure_memory_reg;
             end
-            ENGINE_READ_WRITE_GEN_START_TRANS : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_START_TRANS : begin
                 done_out_reg               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
                 counter_load               <= 1'b1;
                 cmd_stream_mode_pop        <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_START : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_START : begin
                 done_out_reg               <= 1'b0;
                 configure_engine_int.valid <= 1'b1;
                 counter_load               <= 1'b0;
                 cmd_stream_mode_pop        <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE_TRANS : begin
                 done_out_reg        <= 1'b0;
                 counter_load        <= 1'b0;
                 cmd_stream_mode_pop <= 1'b1;
             end
-            ENGINE_READ_WRITE_GEN_BUSY : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_BUSY : begin
                 done_out_reg        <= 1'b1;
                 counter_load        <= 1'b0;
                 cmd_stream_mode_pop <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_BUSY_TRANS : begin
                 done_out_reg        <= 1'b0;
                 counter_load        <= 1'b0;
                 cmd_stream_mode_pop <= 1'b0;
             end
-            ENGINE_READ_WRITE_GEN_PAUSE : begin
+            ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE : begin
                 done_out_reg        <= 1'b0;
                 counter_load        <= 1'b0;
                 cmd_stream_mode_pop <= 1'b1;
@@ -562,16 +562,16 @@ module engine_read_write_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-    engine_read_write_kernel inst_engine_read_write_kernel (
-        .ap_clk                (ap_clk                             ),
-        .areset                (areset_kernel                      ),
-        .clear_in              (~(configure_engine_int.valid)      ),
-        .config_params_valid_in(configure_engine_int.valid         ),
-        .config_params_in      (configure_engine_int.payload.param ),
-        .data_valid_in         (response_engine_in_int.valid       ),
-        .data_in               (response_engine_in_int.payload.data),
-        .address_out           (address_int                        ),
-        .result_out            (result_int                         )
+    engine_parallel_read_write_kernel inst_engine_parallel_read_write_kernel (
+        .ap_clk                (ap_clk                                           ),
+        .areset                (areset_kernel                                    ),
+        .clear_in              (~(configure_engine_int.valid)                    ),
+        .config_params_valid_in(configure_engine_int.valid                       ),
+        .config_params_in      (configure_engine_int.payload.param.param_field[0]),
+        .data_valid_in         (response_engine_in_int.valid                     ),
+        .data_in               (response_engine_in_int.payload.data              ),
+        .address_out           (address_int                                      ),
+        .result_out            (result_int                                       )
     );
 
 // --------------------------------------------------------------------------------------
@@ -624,7 +624,7 @@ module engine_read_write_generator #(parameter
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_route_valid                    = configure_engine_int.valid;
-    assign backtrack_configure_route_in                       = configure_engine_int.payload.meta.route.packet_destination;
+    assign backtrack_configure_route_in                       = configure_engine_int.payload.param.param_field[0].meta.route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
@@ -649,7 +649,7 @@ module engine_read_write_generator #(parameter
 // Backtrack FIFO module - Engine i <- Channel i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_address_valid                      = configure_engine_int.valid;
-    assign backtrack_configure_address_in                         = configure_engine_int.payload.meta.address;
+    assign backtrack_configure_address_in                         = configure_engine_int.payload.param.param_field[0].meta.address;
     assign backtrack_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
 
     backtrack_fifo_request_memory_out_signals #(
@@ -769,4 +769,4 @@ module engine_read_write_generator #(parameter
         request_engine_out_reg.payload <= fifo_response_comb.payload;
     end
 
-endmodule : engine_read_write_generator
+endmodule : engine_parallel_read_write_generator

@@ -158,19 +158,19 @@ def get_engine_id(engine_name):
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_ol, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
+    append_to_file(output_file_path_ol, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     process_file_ol(template_file_path_ol, engine_template_filename_ol)
     append_to_file(output_file_path_ol, "// --------------------------------------------------------------------------------------")
     
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_vh, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
+    append_to_file(output_file_path_vh, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
     process_file_vh(template_file_path_ol, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_vh, "// --------------------------------------------------------------------------------------")
 
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
-    append_to_file(output_file_path_cpp, f"// Name {base_name:<20}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
+    append_to_file(output_file_path_cpp, f"// Name {base_name:<30}ID {engine_index:<4} mapping {base_mapping:<4} cycles {base_cycles:<4} {buffer_key}-{buffer_name} {buffer_start_ops}-{buffer_end_ops}")
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
     process_file_cpp(template_file_path_ol, engine_template_filename_ol, engine_name)
     append_to_file(output_file_path_cpp, "// --------------------------------------------------------------------------------------")
@@ -365,6 +365,19 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                     elif local_count == 7:
                         append_to_file(output_file_path_vh, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
+                    if local_count   == 1:
+                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 8:
+                        append_to_file(output_file_path_cpp, f"   // --  2  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 15:
+                        append_to_file(output_file_path_cpp, f"   // --  3  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                    elif local_count == 22:
+                        append_to_file(output_file_path_cpp, f"   // --  4  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
 
                 entry_index_vh += 1
                 local_count += 1
@@ -417,6 +430,19 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                     elif local_count == 7:
                         append_to_file(output_file_path_cpp, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
+                    if local_count   == 1:
+                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 8:
+                        append_to_file(output_file_path_cpp, f"   // --  2  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 15:
+                        append_to_file(output_file_path_cpp, f"   // --  3  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                    elif local_count == 22:
+                        append_to_file(output_file_path_cpp, f"   // --  4  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
 
                 entry_index_cpp += 1
                 local_count += 1
