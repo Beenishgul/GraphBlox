@@ -43,6 +43,8 @@ engine_set_ops="engine_set_ops"
 engine_pipeline="engine_pipeline"
 engine_read_write="engine_read_write"
 engine_template="engine_template"
+engine_parallel_read_write="engine_parallel_read_write"
+
 engines="engines"
 
 kernel="kernel"
@@ -168,6 +170,7 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${eng
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_set_ops}      ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_pipeline}     ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write}   ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_parallel_read_write}   ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_template}     ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/ ${CFG_FILE_NAME_SV} "sv"

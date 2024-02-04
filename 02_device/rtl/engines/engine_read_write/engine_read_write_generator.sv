@@ -517,12 +517,12 @@ module engine_read_write_generator #(parameter
         generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
         generator_engine_request_engine_reg.payload.data                          <= 0;
         generator_engine_request_engine_reg.payload.meta.address                  <= 0;
-        generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;
+        generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_engine_int.payload.meta.route.packet_destination;
         generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
         generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
         generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
         generator_engine_request_engine_reg.payload.meta.route.hops               <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.subclass                 <= configure_memory_reg.payload.meta.subclass;
+        generator_engine_request_engine_reg.payload.meta.subclass                 <= configure_engine_int.payload.meta.subclass;
     end
 
     always_ff @(posedge ap_clk) begin

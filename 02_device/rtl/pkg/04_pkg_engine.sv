@@ -393,7 +393,7 @@ typedef enum logic[10:0] {
     ENGINE_PARALLEL_READ_WRITE_GEN_BUSY               = 1 << 8,
     ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE_TRANS        = 1 << 9,
     ENGINE_PARALLEL_READ_WRITE_GEN_PAUSE              = 1 << 10
-} parallel_engine_read_write_generator_state;
+} engine_parallel_read_write_generator_state;
 
 typedef struct packed{
     PacketRouteAddress packet_destination;
