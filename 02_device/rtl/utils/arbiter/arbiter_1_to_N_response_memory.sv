@@ -40,7 +40,6 @@ module arbiter_1_to_N_response_memory #(
 // Cache response variables
 // --------------------------------------------------------------------------------------
 logic areset_control;
-logic areset_fifo   ;
 
 MemoryPacketResponse            response_in_reg;
 MemoryPacketResponse            response_in_int;
@@ -69,7 +68,6 @@ assign id_mask = ~0;
 
 always_ff @(posedge ap_clk) begin
   areset_control <= areset;
-  areset_fifo    <= areset;
 end
 
 // --------------------------------------------------------------------------------------
@@ -321,6 +319,12 @@ generate
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
 // --------------------------------------------------------------------------------------
+    logic areset_fifo;
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+      areset_fifo    <= areset;
+    end
+    
     assign fifo_response_setup_signal_int = fifo_response_signals_out_int.wr_rst_busy  | fifo_response_signals_out_int.rd_rst_busy;
     assign response_in_int = 0;
 
