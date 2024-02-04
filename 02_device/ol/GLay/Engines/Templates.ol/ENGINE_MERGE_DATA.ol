@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA   ID 4    mapping 4    cycles 2    None-None ( 0 )-( 0 )
+// Engine: ENGINE_MERGE_DATA_5, Number of entries: 2
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 25   cacheline 1    offset 9    -- // entry_0    cacheline[  0][ 0] < 4b>: merge_mask[0:3]=0x0
-0x00000000 // entry 26   cacheline 1    offset 10   -- // entry_1    cacheline[  0][ 1] < 4b>: merge_type[0:3]=0x0
+0x00000007 // entry_0    cacheline[  3][11] < 4b>: merge_mask[0:3]=0x7
+0x00000000 // entry_1    cacheline[  3][12] < 4b>: merge_type[0:3]=0x0
 // --------------------------------------------------------------------------------------
