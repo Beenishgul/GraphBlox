@@ -15,17 +15,19 @@
 `include "global_package.vh"
 
 module engine_csr_index_configure_memory #(parameter
-    ID_CU            = 0                                ,
-    ID_BUNDLE        = 0                                ,
-    ID_LANE          = 0                                ,
-    ID_ENGINE        = 0                                ,
-    ID_RELATIVE      = 0                                ,
-    ID_MODULE        = 0                                ,
-    FIFO_WRITE_DEPTH = 16                               ,
-    PROG_THRESH      = 8                                ,
-    ENGINE_SEQ_WIDTH = 16                               ,
-    ENGINE_SEQ_MIN   = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
-    ENGINE_SEQ_MAX   = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
+    ID_CU                 = 0                                ,
+    ID_BUNDLE             = 0                                ,
+    ID_LANE               = 0                                ,
+    ID_ENGINE             = 0                                ,
+    ID_RELATIVE           = 0                                ,
+    ID_MODULE             = 0                                ,
+    FIFO_ENABLE           = 0                                ,
+    PIPELINE_STAGES_DEPTH = 1                                ,
+    FIFO_WRITE_DEPTH      = 16                               ,
+    PROG_THRESH           = 8                                ,
+    ENGINE_SEQ_WIDTH      = 16                               ,
+    ENGINE_SEQ_MIN        = ID_RELATIVE * ENGINE_SEQ_WIDTH   ,
+    ENGINE_SEQ_MAX        = ENGINE_SEQ_WIDTH + ENGINE_SEQ_MIN
 ) (
     input  logic                  ap_clk                             ,
     input  logic                  areset                             ,
@@ -250,38 +252,82 @@ assign fifo_response_memory_in_dout_int.valid   = response_memory_in_reg.valid &
 assign fifo_response_memory_in_dout_int.payload = response_memory_in_reg.payload;
 
 // --------------------------------------------------------------------------------------
+generate
+    if (FIFO_ENABLE == 1) begin : gen_fifo
+// --------------------------------------------------------------------------------------
 // FIFO memory configure_memory out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // FIFO is resetting
-assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy  | fifo_configure_memory_signals_out_int.rd_rst_busy;
+        assign fifo_configure_memory_setup_signal_int = fifo_configure_memory_signals_out_int.wr_rst_busy | fifo_configure_memory_signals_out_int.rd_rst_busy;
 
 // Push
-assign fifo_configure_memory_signals_in_int.wr_en = configure_memory_reg.valid;
-assign fifo_configure_memory_din                  = configure_memory_reg.payload;
+        assign fifo_configure_memory_signals_in_int.wr_en = configure_memory_reg.valid;
+        assign fifo_configure_memory_din                  = configure_memory_reg.payload;
 
 // Pop
-assign fifo_configure_memory_signals_in_int.rd_en = ~fifo_configure_memory_signals_out_int.empty & fifo_configure_memory_signals_in_reg.rd_en;
-assign fifo_configure_memory_dout_int.valid       = fifo_configure_memory_signals_out_int.valid;
-assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
+        assign fifo_configure_memory_signals_in_int.rd_en = ~fifo_configure_memory_signals_out_int.empty & fifo_configure_memory_signals_in_reg.rd_en;
+        assign fifo_configure_memory_dout_int.valid       = fifo_configure_memory_signals_out_int.valid;
+        assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
-xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(16                                 ),
-    .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
-    .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-    .PROG_THRESH     (8                                  )
-) inst_fifo_EnginePacketResponseConigurationInput (
-    .clk        (ap_clk                                           ),
-    .srst       (areset_fifo                                      ),
-    .din        (fifo_configure_memory_din                        ),
-    .wr_en      (fifo_configure_memory_signals_in_int.wr_en       ),
-    .rd_en      (fifo_configure_memory_signals_in_int.rd_en       ),
-    .dout       (fifo_configure_memory_dout                       ),
-    .full       (fifo_configure_memory_signals_out_int.full       ),
-    .empty      (fifo_configure_memory_signals_out_int.empty      ),
-    .valid      (fifo_configure_memory_signals_out_int.valid      ),
-    .prog_full  (fifo_configure_memory_signals_out_int.prog_full  ),
-    .wr_rst_busy(fifo_configure_memory_signals_out_int.wr_rst_busy),
-    .rd_rst_busy(fifo_configure_memory_signals_out_int.rd_rst_busy)
-);
+        xpm_fifo_sync_wrapper #(
+            .FIFO_WRITE_DEPTH(16                                 ),
+            .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
+            .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
+            .PROG_THRESH     (8                                  )
+        ) inst_fifo_EnginePacketResponseConigurationInput (
+            .clk        (ap_clk                                           ),
+            .srst       (areset_fifo                                      ),
+            .din        (fifo_configure_memory_din                        ),
+            .wr_en      (fifo_configure_memory_signals_in_int.wr_en       ),
+            .rd_en      (fifo_configure_memory_signals_in_int.rd_en       ),
+            .dout       (fifo_configure_memory_dout                       ),
+            .full       (fifo_configure_memory_signals_out_int.full       ),
+            .empty      (fifo_configure_memory_signals_out_int.empty      ),
+            .valid      (fifo_configure_memory_signals_out_int.valid      ),
+            .prog_full  (fifo_configure_memory_signals_out_int.prog_full  ),
+            .wr_rst_busy(fifo_configure_memory_signals_out_int.wr_rst_busy),
+            .rd_rst_busy(fifo_configure_memory_signals_out_int.rd_rst_busy)
+        );
+    end else begin
+// --------------------------------------------------------------------------------------
+        CSRIndexConfiguration fifo_request_din_reg;
+// --------------------------------------------------------------------------------------
+        assign fifo_configure_memory_dout                 = 0;
+        assign fifo_configure_memory_signals_in_int.rd_en = ~fifo_configure_memory_signals_out_int.empty & fifo_configure_memory_signals_in_reg.rd_en;
+        assign fifo_configure_memory_setup_signal_int     = 1'b0;
+
+        always_ff @(posedge ap_clk) begin
+            if(areset_fifo) begin
+                fifo_configure_memory_signals_out_int      <= 6'b010000;
+                fifo_configure_memory_signals_in_int.wr_en <= 1'b0;
+                fifo_request_din_reg.valid                 <= 1'b0;
+            end else begin
+                if(configure_memory_reg.valid)begin
+                    fifo_configure_memory_din                   <= configure_memory_reg.payload;
+                    fifo_configure_memory_signals_in_int.wr_en  <= 1'b1;
+                    fifo_configure_memory_signals_out_int.empty <= 1'b0;
+                end
+
+                if(fifo_configure_memory_signals_in_int.rd_en & fifo_configure_memory_signals_in_int.wr_en) begin
+                    fifo_request_din_reg.valid                  <= 1'b1;
+                    fifo_request_din_reg.payload                <= fifo_configure_memory_din;
+                    fifo_configure_memory_signals_in_int.wr_en  <= 1'b0;
+                    fifo_configure_memory_signals_out_int.empty <= 1'b1;
+                end else begin
+                    fifo_request_din_reg.valid <= 1'b0;
+                end
+            end
+        end
+
+        hyper_pipeline_noreset #(
+            .STAGES(PIPELINE_STAGES_DEPTH        ),
+            .WIDTH ($bits(CSRIndexConfiguration))
+        ) inst_hyper_pipeline (
+            .ap_clk(ap_clk                        ),
+            .din   (fifo_request_din_reg          ),
+            .dout  (fifo_configure_memory_dout_int)
+        );
+    end
+endgenerate
 
 endmodule : engine_csr_index_configure_memory
