@@ -1,115 +1,125 @@
 #include "glayenv.hpp"
 void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
+   // --  1  - Index_Start
+    graph.overlay_program[1] = ( graph.num_vertices );
+   // --  2  - Index_Start
+    graph.overlay_program[8] = ( graph.num_vertices );
+   // --  3  - Index_Start
+    graph.overlay_program[15] = ( graph.num_vertices );
+   // --  4  - Index_Start
+    graph.overlay_program[22] = ( graph.num_vertices );
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 1    mapping 1    cycles 11   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// Name ENGINE_PARALLEL_READ_WRITE    ID 1    mapping 8    cycles 29   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[1] = ( graph->num_vertices );
-   // --  2  - Index_End
-    overlay_program[2] = ( graph->num_vertices * 2 );
-   // --  7  - Array_size
-    overlay_program[7] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+   // --  2  - Index_Start
+    overlay_program[8] = ( graph->num_vertices );
+   // --  3  - Index_Start
+    overlay_program[15] = ( graph->num_vertices );
+   // --  4  - Index_Start
+    overlay_program[22] = ( graph->num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 2    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
-// --------------------------------------------------------------------------------------
-   // --  1  - Index_Start
-    overlay_program[12] = ( 0 );
-   // --  2  - Index_End
-    overlay_program[13] = ( graph->num_vertices );
-   // --  7  - Array_size
-    overlay_program[18] = ( graph->num_vertices )-( 0 );
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 3    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE             ID 2    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[23] = ( 0 );
+    overlay_program[30] = ( 0 );
    // --  2  - Index_End
-    overlay_program[24] = ( graph->num_vertices );
+    overlay_program[31] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[29] = ( graph->num_vertices )-( 0 );
+    overlay_program[36] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 4    mapping 6    cycles 0    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 5    mapping 1    cycles 11   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_CSR_INDEX              ID 3    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[31] = ( 0 );
+    overlay_program[41] = ( 0 );
    // --  2  - Index_End
-    overlay_program[32] = ( graph->num_vertices );
+    overlay_program[42] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[37] = ( graph->num_vertices )-( 0 );
+    overlay_program[47] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA   ID 6    mapping 4    cycles 2    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 7    mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// Name ENGINE_FORWARD_DATA           ID 4    mapping 6    cycles 0    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 8    mapping 1    cycles 11   buffer_2-out_degree ( 0 )-( graph->num_vertices )
+// Name ENGINE_READ_WRITE             ID 5    mapping 1    cycles 11   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[53] = ( 0 );
+    overlay_program[49] = ( 0 );
    // --  2  - Index_End
-    overlay_program[54] = ( graph->num_vertices );
+    overlay_program[50] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[59] = ( graph->num_vertices )-( 0 );
+    overlay_program[55] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 9    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
+// Name ENGINE_MERGE_DATA             ID 6    mapping 4    cycles 2    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FILTER_COND            ID 7    mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_READ_WRITE             ID 8    mapping 1    cycles 11   buffer_2-out_degree ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[64] = ( 0 );
+    overlay_program[71] = ( 0 );
    // --  2  - Index_End
-    overlay_program[65] = ( graph->num_vertices );
+    overlay_program[72] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[70] = ( graph->num_vertices )-( 0 );
+    overlay_program[77] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 10   mapping 6    cycles 0    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_CSR_INDEX    ID 11   mapping 2    cycles 8    buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
+// Name ENGINE_READ_WRITE             ID 9    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
-    overlay_program[75] = ( 0 );
+    overlay_program[82] = ( 0 );
    // --  2  - Index_End
-    overlay_program[76] = ( graph->num_edges );
-   // --  7  - Array_size
-    overlay_program[81] = ( graph->num_edges )-( 0 );
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 12   mapping 6    cycles 0    None-None ( 0 )-( 0 )
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Name ENGINE_READ_WRITE   ID 13   mapping 1    cycles 11   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
-// --------------------------------------------------------------------------------------
-   // --  1  - Index_Start
     overlay_program[83] = ( graph->num_vertices );
-   // --  2  - Index_End
-    overlay_program[84] = ( graph->num_vertices * 2 );
    // --  7  - Array_size
-    overlay_program[89] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+    overlay_program[88] = ( graph->num_vertices )-( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FILTER_COND  ID 14   mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// Name ENGINE_FORWARD_DATA           ID 10   mapping 6    cycles 0    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_FORWARD_DATA ID 15   mapping 6    cycles 0    None-None ( 0 )-( 0 )
+// Name ENGINE_CSR_INDEX              ID 11   mapping 2    cycles 8    buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
+// --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    overlay_program[93] = ( 0 );
+   // --  2  - Index_End
+    overlay_program[94] = ( graph->num_edges );
+   // --  7  - Array_size
+    overlay_program[99] = ( graph->num_edges )-( 0 );
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA           ID 12   mapping 6    cycles 0    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_READ_WRITE             ID 13   mapping 1    cycles 11   buffer_7-auxiliary_1 ( graph->num_vertices )-( graph->num_vertices * 2 )
+// --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    overlay_program[101] = ( graph->num_vertices );
+   // --  2  - Index_End
+    overlay_program[102] = ( graph->num_vertices * 2 );
+   // --  7  - Array_size
+    overlay_program[107] = ( graph->num_vertices * 2 )-( graph->num_vertices );
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FILTER_COND            ID 14   mapping 3    cycles 9    None-None ( 0 )-( 0 )
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// Name ENGINE_FORWARD_DATA           ID 15   mapping 6    cycles 0    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 }
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.BFS  <-- 
-// Number of entries 102
+// Number of entries 120

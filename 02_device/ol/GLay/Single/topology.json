@@ -69,6 +69,55 @@
     "Single.BFS": {
         "0": [
             [
+                "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
+            ],
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"
+            ],
+            [
+                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "1": [
+            [
+                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
+                "ENGINE_MERGE_DATA(W:2)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
+            ],
+            [
+                "ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "2": [
+            [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "3": [
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ]
+    },
+    "Single.BFSV1": {
+        "0": [
+            [
                 "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
             ],
             [
@@ -422,7 +471,7 @@
     "cu_properties": {
         "synth_strategy" : "1",
         "frequency"      : "300000000",
-        "num_kernels"    : "15",
+        "num_kernels"    : "16",
         "slr_percent"    : [30, 35, 35, 0],
         "slr_mapping"    : [1, 2, 1, 2, 1, 2, 0, 2, 0, 2, 0, 1, 2, 1, 2, 1],
         "slr_layout"     : "2",
@@ -435,76 +484,83 @@
         "comments":"fifo size for each port type if size zero engine doesn't have this port"
     },
     "fifo_control_response": {
-        "ENGINE_ALU_OPS"     : 0,
-        "ENGINE_CSR_INDEX"   : 16,
-        "ENGINE_FILTER_COND" : 0,
-        "ENGINE_FORWARD_DATA": 0,
-        "ENGINE_MERGE_DATA"  : 0,
-        "ENGINE_SET_OPS"     : 0,
-        "ENGINE_PIPELINE"    : 0,
-        "ENGINE_READ_WRITE"  : 0
+        "ENGINE_ALU_OPS"            : 0,
+        "ENGINE_CSR_INDEX"          : 16,
+        "ENGINE_FILTER_COND"        : 0,
+        "ENGINE_FORWARD_DATA"       : 0,
+        "ENGINE_MERGE_DATA"         : 0,
+        "ENGINE_SET_OPS"            : 0,
+        "ENGINE_PIPELINE"           : 0,
+        "ENGINE_READ_WRITE"         : 0,
+        "ENGINE_PARALLEL_READ_WRITE": 0
     },
     "fifo_control_request": {
-        "ENGINE_ALU_OPS"     : 0,
-        "ENGINE_CSR_INDEX"   : 0,
-        "ENGINE_FILTER_COND" : 16,
-        "ENGINE_FORWARD_DATA": 0,
-        "ENGINE_MERGE_DATA"  : 0,
-        "ENGINE_SET_OPS"     : 0,
-        "ENGINE_PIPELINE"    : 0,
-        "ENGINE_READ_WRITE"  : 0
+        "ENGINE_ALU_OPS"            : 0,
+        "ENGINE_CSR_INDEX"          : 0,
+        "ENGINE_FILTER_COND"        : 16,
+        "ENGINE_FORWARD_DATA"       : 0,
+        "ENGINE_MERGE_DATA"         : 0,
+        "ENGINE_SET_OPS"            : 0,
+        "ENGINE_PIPELINE"           : 0,
+        "ENGINE_READ_WRITE"         : 0,
+        "ENGINE_PARALLEL_READ_WRITE": 0
     },
     "fifo_memory": {
-        "ENGINE_ALU_OPS"     : 0,
-        "ENGINE_CSR_INDEX"   : 32,
-        "ENGINE_FILTER_COND" : 0,
-        "ENGINE_FORWARD_DATA": 0,
-        "ENGINE_MERGE_DATA"  : 0,
-        "ENGINE_SET_OPS"     : 0,
-        "ENGINE_PIPELINE"    : 0,
-        "ENGINE_READ_WRITE"  : 32
+        "ENGINE_ALU_OPS"            : 0,
+        "ENGINE_CSR_INDEX"          : 32,
+        "ENGINE_FILTER_COND"        : 0,
+        "ENGINE_FORWARD_DATA"       : 0,
+        "ENGINE_MERGE_DATA"         : 0,
+        "ENGINE_SET_OPS"            : 0,
+        "ENGINE_PIPELINE"           : 0,
+        "ENGINE_READ_WRITE"         : 32,
+        "ENGINE_PARALLEL_READ_WRITE": 32
     },
     "fifo_engine": {
-        "ENGINE_ALU_OPS"     : 16,
-        "ENGINE_CSR_INDEX"   : 16,
-        "ENGINE_FILTER_COND" : 16,
-        "ENGINE_FORWARD_DATA": 16,
-        "ENGINE_MERGE_DATA"  : 16,
-        "ENGINE_SET_OPS"     : 16,
-        "ENGINE_PIPELINE"    : 16,
-        "ENGINE_READ_WRITE"  : 16
+        "ENGINE_ALU_OPS"            : 16,
+        "ENGINE_CSR_INDEX"          : 16,
+        "ENGINE_FILTER_COND"        : 16,
+        "ENGINE_FORWARD_DATA"       : 16,
+        "ENGINE_MERGE_DATA"         : 16,
+        "ENGINE_SET_OPS"            : 16,
+        "ENGINE_PIPELINE"           : 16,
+        "ENGINE_READ_WRITE"         : 16,
+        "ENGINE_PARALLEL_READ_WRITE": 16
     },
     "cycles": {
-        "ENGINE_ALU_OPS"     : 6,
-        "ENGINE_CSR_INDEX"   : 8,
-        "ENGINE_FILTER_COND" : 9,
-        "ENGINE_FORWARD_DATA": 0,
-        "ENGINE_MERGE_DATA"  : 2,
-        "ENGINE_SET_OPS"     : 2,
-        "ENGINE_PIPELINE"    : 0,
-        "ENGINE_READ_WRITE"  : 11
+        "ENGINE_ALU_OPS"            : 6,
+        "ENGINE_CSR_INDEX"          : 8,
+        "ENGINE_FILTER_COND"        : 9,
+        "ENGINE_FORWARD_DATA"       : 0,
+        "ENGINE_MERGE_DATA"         : 2,
+        "ENGINE_SET_OPS"            : 2,
+        "ENGINE_PIPELINE"           : 0,
+        "ENGINE_READ_WRITE"         : 11,
+        "ENGINE_PARALLEL_READ_WRITE": 29
     },
     "luts": {
-        "ENGINE_ALU_OPS"     : 2805,
-        "ENGINE_CSR_INDEX"   : 1932,
-        "ENGINE_FILTER_COND" : 2070,
-        "ENGINE_FORWARD_DATA": 339,
-        "ENGINE_MERGE_DATA"  : 669,
-        "ENGINE_SET_OPS"     : 669,
-        "ENGINE_PIPELINE"    : 1081,
-        "ENGINE_READ_WRITE"  : 1419
+        "ENGINE_ALU_OPS"            : 2805,
+        "ENGINE_CSR_INDEX"          : 1932,
+        "ENGINE_FILTER_COND"        : 2070,
+        "ENGINE_FORWARD_DATA"       : 339,
+        "ENGINE_MERGE_DATA"         : 669,
+        "ENGINE_SET_OPS"            : 669,
+        "ENGINE_PIPELINE"           : 1081,
+        "ENGINE_READ_WRITE"         : 1419,
+        "ENGINE_PARALLEL_READ_WRITE": 1419
     },
     "mapping_comments": {
         "comments":"The engine mapping encoded in engine_template.sv file"
     },
     "mapping": {
-        "ENGINE_ALU_OPS"     : 5,
-        "ENGINE_CSR_INDEX"   : 2,
-        "ENGINE_FILTER_COND" : 3,
-        "ENGINE_FORWARD_DATA": 6,
-        "ENGINE_MERGE_DATA"  : 4,
-        "ENGINE_SET_OPS"     : 7,
-        "ENGINE_PIPELINE"    : 0,
-        "ENGINE_READ_WRITE"  : 1
+        "ENGINE_ALU_OPS"            : 5,
+        "ENGINE_CSR_INDEX"          : 2,
+        "ENGINE_FILTER_COND"        : 3,
+        "ENGINE_FORWARD_DATA"       : 6,
+        "ENGINE_MERGE_DATA"         : 4,
+        "ENGINE_SET_OPS"            : 7,
+        "ENGINE_PIPELINE"           : 0,
+        "ENGINE_READ_WRITE"         : 1,
+        "ENGINE_PARALLEL_READ_WRITE": 8
     }
 }

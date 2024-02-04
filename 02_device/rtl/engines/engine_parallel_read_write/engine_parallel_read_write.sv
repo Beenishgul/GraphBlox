@@ -6,7 +6,7 @@
 // Copyright (c) 2021-2023 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi atmughrabi@gmail.com/atmughra@virginia.edu
-// File   : engine_read_write.sv
+// File   : engine_parallel_read_write.sv
 // Create : 2023-07-17 14:42:46
 // Revise : 2023-08-28 15:49:58
 // Editor : sublime text4, tab size (4)
@@ -14,7 +14,7 @@
 
 `include "global_package.vh"
 
-module engine_read_write #(parameter
+module engine_parallel_read_write #(parameter
     ID_CU               = 0                             ,
     ID_BUNDLE           = 0                             ,
     ID_LANE             = 0                             ,
@@ -109,34 +109,34 @@ FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 logic configure_fifo_setup_signal;
 
-FIFOStateSignalsInput  configure_memory_fifo_configure_memory_signals_in   ;
-FIFOStateSignalsInput  configure_memory_fifo_response_memory_in_signals_in ;
-FIFOStateSignalsOutput configure_memory_fifo_configure_memory_signals_out  ;
-FIFOStateSignalsOutput configure_memory_fifo_response_memory_in_signals_out;
-logic                  configure_memory_fifo_setup_signal                  ;
-MemoryPacketResponse   configure_memory_response_memory_in                 ;
-ReadWriteConfiguration configure_memory_out                                ;
+FIFOStateSignalsInput          configure_memory_fifo_configure_memory_signals_in   ;
+FIFOStateSignalsInput          configure_memory_fifo_response_memory_in_signals_in ;
+FIFOStateSignalsOutput         configure_memory_fifo_configure_memory_signals_out  ;
+FIFOStateSignalsOutput         configure_memory_fifo_response_memory_in_signals_out;
+logic                          configure_memory_fifo_setup_signal                  ;
+MemoryPacketResponse           configure_memory_response_memory_in                 ;
+ParallelReadWriteConfiguration configure_memory_out                                ;
 
 // --------------------------------------------------------------------------------------
 // Generation module - Memory/Engine Config -> Gen
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsInput  generator_engine_fifo_configure_memory_in_signals_in;
-FIFOStateSignalsInput  generator_engine_fifo_request_engine_out_signals_in ;
-FIFOStateSignalsInput  generator_engine_fifo_request_memory_out_signals_in ;
-FIFOStateSignalsInput  generator_engine_fifo_response_engine_in_signals_in ;
-FIFOStateSignalsInput  generator_engine_fifo_response_memory_in_signals_in ;
-FIFOStateSignalsOutput generator_engine_fifo_response_memory_in_signals_out;
-FIFOStateSignalsOutput generator_engine_fifo_request_engine_out_signals_out;
-FIFOStateSignalsOutput generator_engine_fifo_request_memory_out_signals_out;
-FIFOStateSignalsOutput generator_engine_fifo_response_engine_in_signals_out;
-logic                  generator_engine_configure_memory_setup             ;
-logic                  generator_engine_done_out                           ;
-logic                  generator_engine_fifo_setup_signal                  ;
-EnginePacket           generator_engine_request_engine_out                 ;
-MemoryPacketRequest    generator_engine_request_memory_out                 ;
-EnginePacket           generator_engine_response_engine_in                 ;
-MemoryPacketResponse   generator_engine_response_memory_in                 ;
-ReadWriteConfiguration generator_engine_configure_memory_in                ;
+FIFOStateSignalsInput          generator_engine_fifo_configure_memory_in_signals_in;
+FIFOStateSignalsInput          generator_engine_fifo_request_engine_out_signals_in ;
+FIFOStateSignalsInput          generator_engine_fifo_request_memory_out_signals_in ;
+FIFOStateSignalsInput          generator_engine_fifo_response_engine_in_signals_in ;
+FIFOStateSignalsInput          generator_engine_fifo_response_memory_in_signals_in ;
+FIFOStateSignalsOutput         generator_engine_fifo_response_memory_in_signals_out;
+FIFOStateSignalsOutput         generator_engine_fifo_request_engine_out_signals_out;
+FIFOStateSignalsOutput         generator_engine_fifo_request_memory_out_signals_out;
+FIFOStateSignalsOutput         generator_engine_fifo_response_engine_in_signals_out;
+logic                          generator_engine_configure_memory_setup             ;
+logic                          generator_engine_done_out                           ;
+logic                          generator_engine_fifo_setup_signal                  ;
+EnginePacket                   generator_engine_request_engine_out                 ;
+MemoryPacketRequest            generator_engine_request_memory_out                 ;
+EnginePacket                   generator_engine_response_engine_in                 ;
+MemoryPacketResponse           generator_engine_response_memory_in                 ;
+ParallelReadWriteConfiguration generator_engine_configure_memory_in                ;
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Memory Response/Engine Generator
@@ -309,7 +309,7 @@ assign configure_memory_fifo_response_memory_in_signals_in.rd_en = modules_fifo_
 
 assign modules_fifo_response_memory_in_signals_out[0] = configure_memory_fifo_response_memory_in_signals_out;
 
-engine_read_write_configure_memory #(
+engine_parallel_read_write_configure_memory #(
     .ID_CU           (ID_CU           ),
     .ID_BUNDLE       (ID_BUNDLE       ),
     .ID_LANE         (ID_LANE         ),
@@ -320,7 +320,7 @@ engine_read_write_configure_memory #(
     .ENGINE_SEQ_WIDTH(ENGINE_SEQ_WIDTH),
     .ENGINE_SEQ_MIN  (ENGINE_SEQ_MIN  ),
     .ID_MODULE       (0               )
-) inst_engine_read_write_configure_memory (
+) inst_engine_parallel_read_write_configure_memory (
     .ap_clk                             (ap_clk                                              ),
     .areset                             (areset_configure_memory                             ),
     .response_memory_in                 (configure_memory_response_memory_in                 ),
@@ -355,7 +355,7 @@ assign generator_engine_fifo_request_memory_out_signals_in.rd_en = fifo_request_
 assign generator_fifo_response_lanes_backtrack_signals_in     = fifo_response_lanes_backtrack_signals_in;
 assign generator_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
 
-engine_read_write_generator #(
+engine_parallel_read_write_generator #(
     .ID_CU              (ID_CU              ),
     .ID_BUNDLE          (ID_BUNDLE          ),
     .ID_LANE            (ID_LANE            ),
@@ -369,7 +369,7 @@ engine_read_write_generator #(
     .NUM_CHANNELS       (NUM_CHANNELS       ),
     .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
     .NUM_BUNDLES        (NUM_BUNDLES        )
-) inst_engine_read_write_generator (
+) inst_engine_parallel_read_write_generator (
     .ap_clk                                      (ap_clk                                                ),
     .areset                                      (areset_generator                                      ),
     .descriptor_in                               (descriptor_in_reg                                     ),
@@ -394,4 +394,4 @@ engine_read_write_generator #(
     .done_out                                    (generator_engine_done_out                             )
 );
 
-endmodule : engine_read_write
+endmodule : engine_parallel_read_write
