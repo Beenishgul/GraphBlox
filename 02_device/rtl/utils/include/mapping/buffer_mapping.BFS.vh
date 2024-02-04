@@ -1,6 +1,14 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_PARALLEL_READ_WRITE    ID 1    mapping 8    cycles 29   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------
+   // --  1  - Index_Start
+    graph.overlay_program[1] = ( graph.num_vertices );
+   // --  2  - Index_Start
+    graph.overlay_program[8] = ( graph.num_vertices );
+   // --  3  - Index_Start
+    graph.overlay_program[15] = ( graph.num_vertices );
+   // --  4  - Index_Start
+    graph.overlay_program[22] = ( graph.num_vertices );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE             ID 2    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
