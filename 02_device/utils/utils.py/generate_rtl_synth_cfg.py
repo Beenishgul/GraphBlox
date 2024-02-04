@@ -33,6 +33,26 @@ APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS
 config_filename = f"topology.json"
 config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
 
+UTILS_QOR="util.tcl"
+
+output_file_project_generate_qor_pre_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_synth.tcl")
+output_file_project_generate_qor_post_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_synth.tcl")
+
+output_file_project_read_qor_pre_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_opt.tcl")
+output_file_project_generate_qor_post_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_opt.tcl")
+
+output_file_project_read_qor_pre_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_place.tcl")
+output_file_project_generate_qor_post_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_place.tcl")
+
+output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_phys_opt.tcl")
+output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_phys_opt.tcl")
+
+output_file_project_read_qor_pre_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_route.tcl")
+output_file_project_generate_qor_post_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_route.tcl")
+
+output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_read_qor_pre_post_route_phys_opt.tcl")
+output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.tcl")
+
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
 
@@ -245,6 +265,45 @@ synth.jobs={XILINX_JOBS_STRATEGY}
 param=general.maxThreads={XILINX_MAX_THREADS}
 """
 
+XILINX_IMPL_STRATEGY_4 = f"""
+[advanced]
+param=compiler.skipTimingCheckAndFrequencyScaling=0
+param=compiler.multiStrategiesWaitOnAllRuns=1
+
+[vivado]
+prop=run.synth_1.{{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}}={{-directive sdx_optimization_effort_high}}
+prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.PRE={output_file_project_generate_qor_pre_synth_tcl}
+prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.POST={output_file_project_generate_qor_post_synth_tcl}
+
+prop=run.impl_1.STEPS.OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore
+prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_opt_tcl}
+prop=run.impl_1.STEPS.OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_opt_tcl}
+
+prop=run.impl_1.{{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}}={{-retiming}}
+prop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=ExtraTimingOpt
+prop=run.impl_1.STEPS.PLACE_DESIGN.TCL.PRE={output_file_project_read_qor_pre_place_tcl}
+prop=run.impl_1.STEPS.PLACE_DESIGN.TCL.POST={output_file_project_generate_qor_post_place_tcl}
+
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=Explore
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_phys_opt_tcl}
+prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_phys_opt_tcl}
+
+prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=Explore
+prop=run.impl_1.STEPS.ROUTE_DESIGN.TCL.PRE={output_file_project_read_qor_pre_route_tcl}
+prop=run.impl_1.STEPS.ROUTE_DESIGN.TCL.POST={output_file_project_generate_qor_post_route_tcl}
+
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_post_route_phys_opt_tcl}
+prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_post_route_phys_opt_tcl}
+
+impl.jobs={XILINX_JOBS_STRATEGY}
+synth.jobs={XILINX_JOBS_STRATEGY}
+param=general.maxThreads={XILINX_MAX_THREADS}
+"""
+
 
 # Build the final configuration string
 config = f"\nplatform={PLATFORM}\n"
@@ -271,6 +330,9 @@ elif XILINX_IMPL_STRATEGY == '2':
     config += XILINX_IMPL_STRATEGY_2
 elif XILINX_IMPL_STRATEGY == '3':
     config += XILINX_IMPL_STRATEGY_3
+elif XILINX_IMPL_STRATEGY == '4':
+    config += XILINX_IMPL_STRATEGY_4
+
 else:
     print("ERROR: Invalid XILINX_IMPL_STRATEGY")
     sys.exit(1)

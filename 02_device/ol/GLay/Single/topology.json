@@ -469,7 +469,7 @@
         }
     },
     "cu_properties": {
-        "synth_strategy" : "1",
+        "synth_strategy" : "4",
         "frequency"      : "300000000",
         "num_kernels"    : "16",
         "slr_percent"    : [30, 35, 35, 0],

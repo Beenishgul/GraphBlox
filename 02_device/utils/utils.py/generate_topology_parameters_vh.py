@@ -38,6 +38,8 @@ output_folder_path_kernel      = os.path.join(FULL_SRC_IP_DIR_RTL, "kernel")
 output_folder_path_cu          = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
 output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
 output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
+FULL_SRC_IP_DIR_UTILS_QOR      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
+
 
 if not os.path.exists(output_folder_path_topology):
     os.makedirs(output_folder_path_topology)
@@ -69,6 +71,9 @@ if not os.path.exists(FULL_SRC_IP_DIR_UTILS):
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
 
+if not os.path.exists(FULL_SRC_IP_DIR_UTILS_QOR):
+    os.makedirs(FULL_SRC_IP_DIR_UTILS_QOR)
+
 if not os.path.exists(output_folder_path_testbench):
     os.makedirs(output_folder_path_testbench)
 
@@ -85,17 +90,178 @@ output_file_pkg_mxx_axi4_fe  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_
 output_file_pkg_mxx_axi4_mid = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_mid.sv")
 output_file_pkg_mxx_axi4_be  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_be.sv")
 
+
+output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
+output_file_generate_m_axi_vip_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_vip.tcl")
+output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
+
+
+# STEPS.SYNTH_DESIGN.TCL.PRE
+# STEPS.SYNTH_DESIGN.TCL.POST
+
+# STEPS.OPT_DESIGN.TCL.PRE
+# STEPS.OPT_DESIGN.TCL.POST
+
+# STEPS.PLACE_DESIGN.TCL.PRE
+# STEPS.PLACE_DESIGN.TCL.POST
+
+# STEPS.PHYS_OPT_DESIGN.TCL.PRE
+# STEPS.PHYS_OPT_DESIGN.TCL.POST
+
+# STEPS.ROUTE_DESIGN.TCL.PRE
+# STEPS.ROUTE_DESIGN.TCL.POST
+
+# STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE
+# STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST
+
+output_file_project_generate_qor_pre_synth_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_synth.tcl")
+output_file_project_generate_qor_post_synth_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_synth.tcl")
+
+output_file_project_read_qor_pre_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_opt.tcl")
+output_file_project_generate_qor_post_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_opt.tcl")
+
+output_file_project_read_qor_pre_place_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_place.tcl")
+output_file_project_generate_qor_post_place_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_place.tcl")
+
+output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_phys_opt.tcl")
+output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_phys_opt.tcl")
+
+output_file_project_read_qor_pre_route_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_route.tcl")
+output_file_project_generate_qor_post_route_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_route.tcl")
+
+output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_post_route_phys_opt.tcl")
+output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_post_route_phys_opt.tcl")
+
+output_file_project_generate_qor_post_synth_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.ass.rpt")
+output_file_project_generate_qor_post_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.ass.rpt")
+output_file_project_generate_qor_post_place_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.ass.rpt")
+output_file_project_generate_qor_post_phys_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.ass.rpt")
+output_file_project_generate_qor_post_route_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.ass.rpt")
+output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.ass.rpt")
+
+output_file_project_generate_qor_post_synth_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.sugg.rpt")
+output_file_project_generate_qor_post_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.sugg.rpt")
+output_file_project_generate_qor_post_place_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.sugg.rpt")
+output_file_project_generate_qor_post_phys_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.sugg.rpt")
+output_file_project_generate_qor_post_route_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.sugg.rpt")
+output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.sugg.rpt")
+
+output_file_project_generate_qor_post_synth_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.rqs")
+output_file_project_generate_qor_post_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.rqs")
+output_file_project_generate_qor_post_place_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.rqs")
+output_file_project_generate_qor_post_phys_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.rqs")
+output_file_project_generate_qor_post_route_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.rqs")
+output_file_project_generate_qor_post_post_route_phys_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.rqs")
+
+with open(output_file_project_generate_qor_post_synth_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_synth_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_synth_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
+    """)
+
+with open(output_file_project_generate_qor_post_opt_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_opt_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_opt_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
+    """)
+
+with open(output_file_project_generate_qor_post_place_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_place_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_place_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_place_rqs}
+    """)
+
+with open(output_file_project_generate_qor_post_phys_opt_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_phys_opt_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
+    """)
+
+with open(output_file_project_generate_qor_post_route_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_route_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_route_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
+    """)
+
+with open(output_file_project_generate_qor_post_post_route_phys_opt_tcl, "w") as file:
+
+    file.write(f"""
+report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt}
+write_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs} 
+    """)
+
+
+with open(output_file_project_generate_qor_pre_synth_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_post_route_phys_opt_rqs}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs}
+       }}
+        """)
+
+with open(output_file_project_read_qor_pre_opt_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_synth_rqs}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
+       }}
+        """)
+
+with open(output_file_project_read_qor_pre_place_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_opt_rqs}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
+       }}
+        """)
+
+with open(output_file_project_read_qor_pre_phys_opt_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_place_tcl}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_place_tcl}
+       }}
+        """)
+
+with open(output_file_project_read_qor_pre_route_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_phys_opt_rqs}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
+       }}
+        """)
+
+with open(output_file_project_read_qor_pre_post_route_phys_opt_tcl, "w") as file:
+
+    file.write(f"""
+     if {{ [file exists ${{{output_file_project_generate_qor_post_route_rqs}}}] == 1}} {{       
+        read_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
+       }}
+        """)
+
+
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
 output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
 output_file_afu_topology = os.path.join(output_folder_path_topology,"afu_topology.vh")
-output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
-output_file_generate_m_axi_vip_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_vip.tcl")
+
 output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
 output_file_bundle_topology = os.path.join(output_folder_path_topology , "bundle_topology.vh")
 output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
-output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
+
 output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
 output_file_lane_topology = os.path.join(output_folder_path_topology,"lane_topology.vh")
+
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
 output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
@@ -1332,8 +1498,12 @@ with open(output_file_lane_arbitration, "w") as file:
                     MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_ENGINE]
   
                     if MAP_ENGINE:
-                        file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}] = engines_request_memory_out[{ID_ENGINE}];\n")
-                        file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}];\n")
+                        file.write(f"               always_ff @(posedge ap_clk) begin\n")
+                        file.write(f"                   engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}] <= engines_request_memory_out[{ID_ENGINE}];\n")
+                        file.write(f"                   engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  <= ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}];\n")
+                        file.write(f"               end\n")                     
+                        # file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}] = engines_request_memory_out[{ID_ENGINE}];\n")
+                        # file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}];\n")
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
@@ -1375,8 +1545,12 @@ with open(output_file_lane_arbitration, "w") as file:
                     MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_ENGINE]
 
                     if MAP_ENGINE:
-                        file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}] = engines_request_control_out[{ID_ENGINE}];\n")
-                        file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}];\n")
+                        file.write(f"               always_ff @(posedge ap_clk) begin\n")
+                        file.write(f"                   engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}] <= engines_request_control_out[{ID_ENGINE}];\n")
+                        file.write(f"                   engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  <= ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}];\n")
+                        file.write(f"               end\n")   
+                        # file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}] = engines_request_control_out[{ID_ENGINE}];\n")
+                        # file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}];\n")
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
@@ -1453,8 +1627,12 @@ with open(output_file_bundle_arbitration, "w") as file:
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] = lanes_request_memory_out[{ID_LANE}];\n")
-                    file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    file.write(f"               always_ff @(posedge ap_clk) begin\n")
+                    file.write(f"                   lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] <= lanes_request_memory_out[{ID_LANE}];\n")
+                    file.write(f"                   lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    file.write(f"               end\n")   
+                    # file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] = lanes_request_memory_out[{ID_LANE}];\n")
+                    # file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
                     REAL_ID_LANE += 1
                 else:
                     file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
@@ -1487,8 +1665,12 @@ with open(output_file_bundle_arbitration, "w") as file:
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}] = lanes_request_control_out[{ID_LANE}];\n")
-                    file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    file.write(f"               always_ff @(posedge ap_clk) begin\n")
+                    file.write(f"                   lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}] <= lanes_request_control_out[{ID_LANE}];\n")
+                    file.write(f"                   lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    file.write(f"               end\n")   
+                    # file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}] = lanes_request_control_out[{ID_LANE}];\n")
+                    # file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
                     REAL_ID_LANE += 1
                 else:
                     file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
