@@ -205,49 +205,67 @@ write_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt
 with open(output_file_project_generate_qor_pre_synth_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_post_route_phys_opt_rqs}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_post_route_phys_opt_rqs}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_post_route_phys_opt_rqs}"
+        }}
         """)
 
 with open(output_file_project_read_qor_pre_opt_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_synth_rqs}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_synth_rqs}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_synth_rqs}"
+        }}
         """)
 
 with open(output_file_project_read_qor_pre_place_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_opt_rqs}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_opt_rqs}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_opt_rqs}"
+        }}
         """)
 
 with open(output_file_project_read_qor_pre_phys_opt_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_place_tcl}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_place_tcl}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_place_tcl}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_place_tcl}"
+        }}
         """)
 
 with open(output_file_project_read_qor_pre_route_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_phys_opt_rqs}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_phys_opt_rqs}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_phys_opt_rqs}"
+        }}
         """)
 
 with open(output_file_project_read_qor_pre_post_route_phys_opt_tcl, "w") as file:
 
     file.write(f"""
-     if {{ [file exists ${{{output_file_project_generate_qor_post_route_rqs}}}] == 1}} {{       
+     if {{ [file exists {output_file_project_generate_qor_post_route_rqs}] == 1}} {{       
         read_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
-       }}
+       }} else {{
+        # If the file does not exist, print a message
+        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_route_rqs}"
+        }}
         """)
 
 
