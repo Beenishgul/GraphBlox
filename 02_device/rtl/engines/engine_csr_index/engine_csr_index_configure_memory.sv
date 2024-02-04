@@ -265,10 +265,10 @@ assign fifo_configure_memory_dout_int.valid       = fifo_configure_memory_signal
 assign fifo_configure_memory_dout_int.payload     = fifo_configure_memory_dout;
 
 xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH                   ),
+    .FIFO_WRITE_DEPTH(16                                 ),
     .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-    .PROG_THRESH     (PROG_THRESH                        )
+    .PROG_THRESH     (8                                  )
 ) inst_fifo_EnginePacketResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
