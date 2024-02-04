@@ -1,14 +1,6 @@
 #include "glayenv.hpp"
 void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
 {
-   // --  1  - Index_Start
-    graph.overlay_program[1] = ( graph.num_vertices );
-   // --  2  - Index_Start
-    graph.overlay_program[8] = ( graph.num_vertices );
-   // --  3  - Index_Start
-    graph.overlay_program[15] = ( graph.num_vertices );
-   // --  4  - Index_Start
-    graph.overlay_program[22] = ( graph.num_vertices );
 // --------------------------------------------------------------------------------------
 // Name ENGINE_PARALLEL_READ_WRITE    ID 1    mapping 8    cycles 29   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )
 // --------------------------------------------------------------------------------------

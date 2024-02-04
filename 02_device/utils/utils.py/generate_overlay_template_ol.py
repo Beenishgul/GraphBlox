@@ -367,17 +367,17 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
-                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
                     elif local_count == 8:
-                        append_to_file(output_file_path_cpp, f"   // --  2  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"   // --  2  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
                     elif local_count == 15:
-                        append_to_file(output_file_path_cpp, f"   // --  3  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"   // --  3  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
                     elif local_count == 22:
-                        append_to_file(output_file_path_cpp, f"   // --  4  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"   // --  4  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
 
                 entry_index_vh += 1
                 local_count += 1
