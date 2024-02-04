@@ -313,13 +313,16 @@ generate
 
                 if(fifo_configure_memory_signals_in_int.rd_en & fifo_configure_memory_signals_in_int.wr_en) begin
                     fifo_request_din_reg.valid                  <= 1'b1;
-                    fifo_request_din_reg.payload                <= fifo_configure_memory_din;
                     fifo_configure_memory_signals_in_int.wr_en  <= 1'b0;
                     fifo_configure_memory_signals_out_int.empty <= 1'b1;
                 end else begin
                     fifo_request_din_reg.valid <= 1'b0;
                 end
             end
+        end
+
+        always_ff @(posedge ap_clk) begin
+            fifo_request_din_reg.payload <= fifo_configure_memory_din;
         end
 
         hyper_pipeline_noreset #(

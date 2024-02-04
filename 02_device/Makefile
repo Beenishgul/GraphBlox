@@ -367,8 +367,9 @@ open-vivado-project: session-info | $(KERNEL_PROJECT_PKG_XPR)
 # =========================================================
 # XOCCFLAGS   =   
 XOCCLFLAGS  =   --optimize 3 
-VPPCONFLAGS =   --config $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
-		
+VPPCONFLAGS =   -R2 --config $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg 
+# VPPCONFLAGS +=   --interactive impl_1
+		 
 # You could uncomment following line and modify the options for hardware debug/profiling
 # DEBUG_OPT   = --debug.chipscope $(KERNEL_NAME)_1 --debug.protocol all --profile_kernel data:all:all:all:all
 
