@@ -118,222 +118,64 @@ output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project
 # STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE
 # STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST
 
-output_file_project_generate_qor_pre_synth_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_synth.tcl")
-output_file_project_generate_qor_post_synth_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_synth.tcl")
+# Define a function to write report generation TCL code
+def write_report_generation_tcl(output_file, stage, report_types, dcp, ass_rpt, time_rpt, util_rpt, sugg_rpt, rqs):
+    report_code = f"""
+report_qor_assessment  -exclude_methodology_checks -name {ass_rpt} -max_paths 200 -full_assessment_details -file {ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 200 -file {sugg_rpt}
+write_qor_suggestions {rqs}
+write_checkpoint {dcp} -force
 
-output_file_project_read_qor_pre_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_opt.tcl")
-output_file_project_generate_qor_post_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_opt.tcl")
+report_utilization -file {util_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {util_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {time_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {time_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {time_rpt}.timing_summary_report.rpt 
+"""
+    with open(output_file, "w") as file:
+        file.write(report_code)
 
-output_file_project_read_qor_pre_place_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_place.tcl")
-output_file_project_generate_qor_post_place_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_place.tcl")
+# Define a function to write QoR suggestion reading TCL code
+def write_qor_suggestion_reading_tcl(output_file, read_rqs):
+    read_code = f"""
+if {{ [file exists {read_rqs}] == 1}} {{       
+    read_qor_suggestions {read_rqs}
+}} else {{
+    # If the file does not exist, print a message
+    puts "INFO: The specified file does not exist or cannot be found : {read_rqs}"
+}}
+"""
+    with open(output_file, "w") as file:
+        file.write(read_code)
 
-output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_phys_opt.tcl")
-output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_phys_opt.tcl")
+# Base directories
+utils_tcl_dir = FULL_SRC_IP_DIR_UTILS_TCL
+qor_dir = FULL_SRC_IP_DIR_UTILS_QOR
+dcp_dir = FULL_SRC_IP_DIR_UTILS_DCP
 
-output_file_project_read_qor_pre_route_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_route.tcl")
-output_file_project_generate_qor_post_route_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_route.tcl")
+# Stages for which to generate reports
+stages = ["synth", "opt", "place", "phys_opt", "route", "post_route_phys_opt"]
 
-output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_read_qor_pre_post_route_phys_opt.tcl")
-output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_qor_post_post_route_phys_opt.tcl")
+# Generate TCL files for each stage
+for stage in stages:
+    output_file_project_generate = os.path.join(utils_tcl_dir, f"project_generate_qor_post_{stage}.tcl")
+    output_file_project_read = os.path.join(utils_tcl_dir, f"project_read_qor_pre_{stage}.tcl")
 
-output_file_project_generate_qor_post_synth_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.ass.rpt")
-output_file_project_generate_qor_post_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.ass.rpt")
-output_file_project_generate_qor_post_place_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.ass.rpt")
-output_file_project_generate_qor_post_phys_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.ass.rpt")
-output_file_project_generate_qor_post_route_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.ass.rpt")
-output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.ass.rpt")
+    rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.rqs")
+    dcp = os.path.join(dcp_dir, f"project_generate_qor_post_{stage}.dcp")
+    ass_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.ass.rpt")
+    sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.sugg.rpt")
+    time_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.time.rpt")
+    util_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.util.rpt")
 
-output_file_project_generate_qor_post_synth_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.sugg.rpt")
-output_file_project_generate_qor_post_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.sugg.rpt")
-output_file_project_generate_qor_post_place_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.sugg.rpt")
-output_file_project_generate_qor_post_phys_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.sugg.rpt")
-output_file_project_generate_qor_post_route_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.sugg.rpt")
-output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.sugg.rpt")
+    # Generate report TCL
+    write_report_generation_tcl(output_file_project_generate, stage, "all", dcp, ass_rpt,time_rpt, util_rpt, sugg_rpt, rqs)
 
-output_file_project_generate_qor_post_synth_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_synth.rqs")
-output_file_project_generate_qor_post_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_opt.rqs")
-output_file_project_generate_qor_post_place_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_place.rqs")
-output_file_project_generate_qor_post_phys_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_phys_opt.rqs")
-output_file_project_generate_qor_post_route_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.rqs")
-output_file_project_generate_qor_post_post_route_phys_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.rqs")
+    # Generate QoR suggestion reading TCL (for the next stage, hence the check for index)
+    if stages.index(stage) > 0:  # Skip for the first stage as it has no previous stage to read from
+        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[stages.index(stage)-1]}.rqs")
+        write_qor_suggestion_reading_tcl(output_file_project_read, prev_stage_rqs)
 
-output_file_project_generate_qor_post_synth_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_synth.dcp")
-output_file_project_generate_qor_post_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_opt.dcp")
-output_file_project_generate_qor_post_place_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_place.dcp")
-output_file_project_generate_qor_post_phys_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_phys_opt.dcp")
-output_file_project_generate_qor_post_route_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_route.dcp")
-output_file_project_generate_qor_post_post_route_phys_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_post_route_phys_opt.dcp")
-
-
-report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_summary_report.rpt 
-
-
-with open(output_file_project_generate_qor_post_synth_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_synth_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_synth_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_synth_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
-write_checkpoint {output_file_project_generate_qor_post_synth_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-with open(output_file_project_generate_qor_post_opt_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_opt_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_opt_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
-write_checkpoint {output_file_project_generate_qor_post_opt_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_opt_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-with open(output_file_project_generate_qor_post_place_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_place_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_place_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_place_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_place_rqs}
-write_checkpoint {output_file_project_generate_qor_post_place_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_place_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_place_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-with open(output_file_project_generate_qor_post_phys_opt_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_phys_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_phys_opt_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
-write_checkpoint {output_file_project_generate_qor_post_phys_opt_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-with open(output_file_project_generate_qor_post_route_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_route_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_route_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_route_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
-write_checkpoint {output_file_project_generate_qor_post_route_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_route_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_route_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-with open(output_file_project_generate_qor_post_post_route_phys_opt_tcl, "w") as file:
-
-    file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt}
-write_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs} 
-write_checkpoint {output_file_project_generate_qor_post_post_route_phys_opt_dcp} -force
-
-report_utilization -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_summary_report.rpt 
-
-    """)
-
-
-with open(output_file_project_generate_qor_pre_synth_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_post_route_phys_opt_rqs}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_post_route_phys_opt_rqs}"
-        }}
-        """)
-
-with open(output_file_project_read_qor_pre_opt_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_synth_rqs}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_synth_rqs}"
-        }}
-        """)
-
-with open(output_file_project_read_qor_pre_place_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_opt_rqs}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_opt_rqs}"
-        }}
-        """)
-
-with open(output_file_project_read_qor_pre_phys_opt_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_place_tcl}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_place_tcl}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_place_tcl}"
-        }}
-        """)
-
-with open(output_file_project_read_qor_pre_route_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_phys_opt_rqs}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_phys_opt_rqs}"
-        }}
-        """)
-
-with open(output_file_project_read_qor_pre_post_route_phys_opt_tcl, "w") as file:
-
-    file.write(f"""
-     if {{ [file exists {output_file_project_generate_qor_post_route_rqs}] == 1}} {{       
-        read_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
-       }} else {{
-        # If the file does not exist, print a message
-        puts "INFO: The specified file does not exist or cannot be found : {output_file_project_generate_qor_post_route_rqs}"
-        }}
-        """)
 
 
 output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
