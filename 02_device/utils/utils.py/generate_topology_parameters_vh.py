@@ -164,58 +164,108 @@ output_file_project_generate_qor_post_phys_opt_dcp = os.path.join(FULL_SRC_IP_DI
 output_file_project_generate_qor_post_route_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_route.dcp")
 output_file_project_generate_qor_post_post_route_phys_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_post_route_phys_opt.dcp")
 
+
+report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_summary_report.rpt 
+
+
 with open(output_file_project_generate_qor_post_synth_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_synth_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_synth_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_synth_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_synth_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
-write_checkpoint {output_file_project_generate_qor_post_synth_dcp}
+write_checkpoint {output_file_project_generate_qor_post_synth_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_synth_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_synth_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 with open(output_file_project_generate_qor_post_opt_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_opt_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
-write_checkpoint {output_file_project_generate_qor_post_opt_dcp}
+write_checkpoint {output_file_project_generate_qor_post_opt_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_opt_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_opt_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 with open(output_file_project_generate_qor_post_place_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_place_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_place_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_place_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_place_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_place_rqs}
-write_checkpoint {output_file_project_generate_qor_post_place_dcp}
+write_checkpoint {output_file_project_generate_qor_post_place_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_place_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_place_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_place_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 with open(output_file_project_generate_qor_post_phys_opt_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_phys_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_phys_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
-write_checkpoint {output_file_project_generate_qor_post_phys_opt_dcp}
+write_checkpoint {output_file_project_generate_qor_post_phys_opt_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 with open(output_file_project_generate_qor_post_route_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_route_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_route_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_route_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_route_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
-write_checkpoint {output_file_project_generate_qor_post_route_dcp}
+write_checkpoint {output_file_project_generate_qor_post_route_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_route_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_route_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_route_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 with open(output_file_project_generate_qor_post_post_route_phys_opt_tcl, "w") as file:
 
     file.write(f"""
-report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}
+report_qor_assessment  -exclude_methodology_checks -name output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs} 
-write_checkpoint {output_file_project_generate_qor_post_post_route_phys_opt_dcp}
+write_checkpoint {output_file_project_generate_qor_post_post_route_phys_opt_dcp} -force
+
+report_utilization -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.utilization_hierarchical.rpt -hierarchical
+report_utilization -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.utilization_report.rpt
+check_timing -verbose -name timing_violations_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_violations_report.rpt
+report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}.timing_summary_report.rpt 
+
     """)
 
 
