@@ -366,8 +366,8 @@ open-vivado-project: session-info | $(KERNEL_PROJECT_PKG_XPR)
 # VPP Flow: XCLBIN V++ Flags
 # =========================================================
 # XOCCFLAGS   =   
-XOCCLFLAGS  =   --optimize 3 
-VPPCONFLAGS =   -R2 --config $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg 
+# XOCCLFLAGS  =   --optimize 3 -R2 
+VPPCONFLAGS =   --config $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg 
 # VPPCONFLAGS +=   --interactive synth
 		 
 # You could uncomment following line and modify the options for hardware debug/profiling

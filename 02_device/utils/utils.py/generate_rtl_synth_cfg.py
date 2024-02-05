@@ -272,8 +272,8 @@ param=compiler.multiStrategiesWaitOnAllRuns=1
 
 [vivado]
 prop=run.synth_1.{{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}}={{-directive sdx_optimization_effort_high}}
-prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.PRE={{{output_file_project_generate_qor_pre_synth_tcl}}}
-prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.POST={{{output_file_project_generate_qor_post_synth_tcl}}}
+prop=run.synth_1.{{STEPS.SYNTH_DESIGN.TCL.PRE}}={{{output_file_project_generate_qor_pre_synth_tcl}}}
+prop=run.synth_1.{{STEPS.SYNTH_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_synth_tcl}}}
 
 prop=run.impl_1.{{STEPS.OPT_DESIGN.IS_ENABLED}}={{true}}
 prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore
