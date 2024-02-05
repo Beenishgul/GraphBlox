@@ -418,18 +418,20 @@ typedef struct packed{
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask   ;
+    logic [       NUM_BUNDLES_WIDTH_BITS-1:0]                                    ops_bundle ; 
+    logic [         NUM_LANES_WIDTH_BITS-1:0]                                    ops_lane   ; 
     ParallelReadWriteConfigurationMeta                                           meta       ;
 } ParallelReadWriteConfigurationParameterField;
 
 typedef struct packed{
-    logic                                        increment                                       ;
-    logic                                        decrement                                       ;
-    logic                                        mode_sequence                                   ;
-    logic                                        mode_buffer                                     ;
-    logic                                        mode_counter                                    ;
-    logic                                        mode_merge                                      ;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    lane_mask                                       ;
-    ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field ;
+    logic                                                                            increment    ;
+    logic                                                                            decrement    ;
+    logic                                                                            mode_sequence;
+    logic                                                                            mode_buffer  ;
+    logic                                                                            mode_counter ;
+    logic                                                                            mode_merge   ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] lane_mask    ;
+    ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field  ;
 } ParallelReadWriteConfigurationParameters;
 
 typedef struct packed{
