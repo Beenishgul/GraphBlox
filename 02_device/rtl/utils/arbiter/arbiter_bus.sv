@@ -55,14 +55,17 @@ module arbiter_bus_N_in_1_out #(
     input  logic [ARBITER_WIDTH-1:0] arbiter_bus_valid                 ,
     input  logic [    BUS_WIDTH-1:0] arbiter_bus_in [ARBITER_WIDTH-1:0],
     output logic [ARBITER_WIDTH-1:0] arbiter_grant                     ,
+    output logic                     arbiter_bus_out_valid             ,
     output logic [    BUS_WIDTH-1:0] arbiter_bus_out
 );
 
-logic                       areset_arbiter                          ;
-logic   [ARBITER_WIDTH-1:0] arbiter_grant_reg                       ;
-logic   [ARBITER_WIDTH-1:0] arbiter_bus_valid_reg                   ;
-logic   [    BUS_WIDTH-1:0] arbiter_bus_reg      [ARBITER_WIDTH-1:0];
-integer                     i                                       ;
+integer i;
+// --------------------------------------------------------------------------------------
+logic                     areset_arbiter                          ;
+logic [ARBITER_WIDTH-1:0] arbiter_grant_reg                       ;
+logic [ARBITER_WIDTH-1:0] arbiter_bus_valid_reg                   ;
+logic [    BUS_WIDTH-1:0] arbiter_bus_reg      [ARBITER_WIDTH-1:0];
+logic [    BUS_WIDTH-1:0] arbiter_bus_out_int                     ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -92,19 +95,23 @@ end
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_arbiter) begin
-        arbiter_bus_out <= 0;
-        arbiter_grant   <= 0;
+        arbiter_grant         <= 0;
+        arbiter_bus_out_valid <= 1'b0;
     end else begin
-        for ( i = 0; i < ARBITER_WIDTH; i++) begin
-            if (arbiter_bus_valid_reg[i]) begin
-                arbiter_bus_out <= arbiter_bus_reg[i];
-            end
-            arbiter_grant <= arbiter_grant_reg;
-        end
-        if (~(|arbiter_bus_valid_reg)) begin
-            arbiter_bus_out <= 0;
-        end
+        arbiter_grant         <= arbiter_grant_reg;
+        arbiter_bus_out_valid <= |arbiter_bus_valid_reg;
     end
+end
+
+always_comb begin
+    arbiter_bus_out_int = 0;
+    for ( i = 0; i < ARBITER_WIDTH; i++) begin
+        if(arbiter_bus_valid_reg[i]) arbiter_bus_out_int =  arbiter_bus_reg[i];
+    end
+end
+
+always_ff @(posedge ap_clk) begin
+    arbiter_bus_out <= arbiter_bus_out_int;
 end
 
 generate

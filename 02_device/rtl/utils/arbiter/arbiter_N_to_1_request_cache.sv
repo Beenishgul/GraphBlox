@@ -57,8 +57,9 @@ logic                         fifo_request_setup_signal_int;
 // --------------------------------------------------------------------------------------
 //   Transaction Counter Signals
 // --------------------------------------------------------------------------------------
-MemoryPacketRequest arbiter_bus_out                           ;
-MemoryPacketRequest arbiter_bus_in [NUM_ARBITER_REQUESTOR-1:0];
+logic               arbiter_bus_out_valid                           ;
+MemoryPacketRequest arbiter_bus_out                                 ;
+MemoryPacketRequest arbiter_bus_in       [NUM_ARBITER_REQUESTOR-1:0];
 
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_grant    ;
 logic [NUM_ARBITER_REQUESTOR-1:0] arbiter_request  ;
@@ -150,7 +151,7 @@ always_ff @(posedge ap_clk) begin
     fifo_request_din_reg.valid <= 1'b0;
   end
   else begin
-    fifo_request_din_reg.valid <= arbiter_bus_out.valid;
+    fifo_request_din_reg.valid <= arbiter_bus_out.valid & arbiter_bus_out_valid;
   end
 end
 
@@ -273,13 +274,14 @@ arbiter_bus_N_in_1_out #(
   .WIDTH    (NUM_MEMORY_REQUESTOR      ),
   .BUS_WIDTH($bits(MemoryPacketRequest))
 ) inst_arbiter_bus_N_in_1_out (
-  .ap_clk           (ap_clk           ),
-  .areset           (areset_arbiter   ),
-  .arbiter_req      (arbiter_request  ),
-  .arbiter_bus_valid(arbiter_bus_valid),
-  .arbiter_bus_in   (arbiter_bus_in   ),
-  .arbiter_grant    (arbiter_grant    ),
-  .arbiter_bus_out  (arbiter_bus_out  )
+  .ap_clk               (ap_clk               ),
+  .areset               (areset_arbiter       ),
+  .arbiter_req          (arbiter_request      ),
+  .arbiter_bus_valid    (arbiter_bus_valid    ),
+  .arbiter_bus_in       (arbiter_bus_in       ),
+  .arbiter_grant        (arbiter_grant        ),
+  .arbiter_bus_out_valid(arbiter_bus_out_valid),
+  .arbiter_bus_out      (arbiter_bus_out      )
 );
 
 endmodule : arbiter_N_to_1_request_cache
