@@ -272,32 +272,32 @@ param=compiler.multiStrategiesWaitOnAllRuns=1
 
 [vivado]
 prop=run.synth_1.{{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}}={{-directive sdx_optimization_effort_high}}
-prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.PRE={output_file_project_generate_qor_pre_synth_tcl}
-prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.POST={output_file_project_generate_qor_post_synth_tcl}
+prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.PRE={{{output_file_project_generate_qor_pre_synth_tcl}}}
+prop=run.synth_1.STEPS.SYNTH_DESIGN.TCL.POST={{{output_file_project_generate_qor_post_synth_tcl}}}
 
-prop=run.impl_1.STEPS.OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.{{STEPS.OPT_DESIGN.IS_ENABLED}}={{true}}
 prop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=Explore
-prop=run.impl_1.STEPS.OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_opt_tcl}
-prop=run.impl_1.STEPS.OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_opt_tcl}
+prop=run.impl_1.{{STEPS.OPT_DESIGN.TCL.PRE}}={{{output_file_project_read_qor_pre_opt_tcl}}}
+prop=run.impl_1.{{STEPS.OPT_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_opt_tcl}}}
 
 prop=run.impl_1.{{STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS}}={{-retiming}}
 prop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=ExtraTimingOpt
-prop=run.impl_1.STEPS.PLACE_DESIGN.TCL.PRE={output_file_project_read_qor_pre_place_tcl}
-prop=run.impl_1.STEPS.PLACE_DESIGN.TCL.POST={output_file_project_generate_qor_post_place_tcl}
+prop=run.impl_1.{{STEPS.PLACE_DESIGN.TCL.PRE}}={{{output_file_project_read_qor_pre_place_tcl}}}
+prop=run.impl_1.{{STEPS.PLACE_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_place_tcl}}}
 
-prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.{{STEPS.PHYS_OPT_DESIGN.IS_ENABLED}}={{true}}
 prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=Explore
-prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_phys_opt_tcl}
-prop=run.impl_1.STEPS.PHYS_OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_phys_opt_tcl}
+prop=run.impl_1.{{STEPS.PHYS_OPT_DESIGN.TCL.PRE}}={{{output_file_project_read_qor_pre_phys_opt_tcl}}}
+prop=run.impl_1.{{STEPS.PHYS_OPT_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_phys_opt_tcl}}}
 
 prop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=Explore
-prop=run.impl_1.STEPS.ROUTE_DESIGN.TCL.PRE={output_file_project_read_qor_pre_route_tcl}
-prop=run.impl_1.STEPS.ROUTE_DESIGN.TCL.POST={output_file_project_generate_qor_post_route_tcl}
+prop=run.impl_1.{{STEPS.ROUTE_DESIGN.TCL.PRE}}={{{output_file_project_read_qor_pre_route_tcl}}}
+prop=run.impl_1.{{STEPS.ROUTE_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_route_tcl}}}
 
-prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED=true
+prop=run.impl_1.{{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED}}={{true}}
 prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore
-prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE={output_file_project_read_qor_pre_post_route_phys_opt_tcl}
-prop=run.impl_1.STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST={output_file_project_generate_qor_post_post_route_phys_opt_tcl}
+prop=run.impl_1.{{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE}}={{{output_file_project_read_qor_pre_post_route_phys_opt_tcl}}}
+prop=run.impl_1.{{STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_post_route_phys_opt_tcl}}}
 
 impl.jobs={XILINX_JOBS_STRATEGY}
 synth.jobs={XILINX_JOBS_STRATEGY}

@@ -39,6 +39,7 @@ output_folder_path_cu          = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
 output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
 output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
 FULL_SRC_IP_DIR_UTILS_QOR      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
+FULL_SRC_IP_DIR_UTILS_DCP      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.dcp")
 
 
 if not os.path.exists(output_folder_path_topology):
@@ -73,6 +74,9 @@ if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
 
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_QOR):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_QOR)
+
+if not os.path.exists(FULL_SRC_IP_DIR_UTILS_DCP):
+    os.makedirs(FULL_SRC_IP_DIR_UTILS_DCP)
 
 if not os.path.exists(output_folder_path_testbench):
     os.makedirs(output_folder_path_testbench)
@@ -153,12 +157,20 @@ output_file_project_generate_qor_post_phys_opt_rqs = os.path.join(FULL_SRC_IP_DI
 output_file_project_generate_qor_post_route_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_route.rqs")
 output_file_project_generate_qor_post_post_route_phys_opt_rqs = os.path.join(FULL_SRC_IP_DIR_UTILS_QOR,"project_generate_qor_post_post_route_phys_opt.rqs")
 
+output_file_project_generate_qor_post_synth_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_synth.dcp")
+output_file_project_generate_qor_post_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_opt.dcp")
+output_file_project_generate_qor_post_place_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_place.dcp")
+output_file_project_generate_qor_post_phys_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_phys_opt.dcp")
+output_file_project_generate_qor_post_route_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_route.dcp")
+output_file_project_generate_qor_post_post_route_phys_opt_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS_DCP,"project_generate_qor_post_post_route_phys_opt.dcp")
+
 with open(output_file_project_generate_qor_post_synth_tcl, "w") as file:
 
     file.write(f"""
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_synth_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_synth_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_synth_rqs}
+write_checkpoint {output_file_project_generate_qor_post_synth_dcp}
     """)
 
 with open(output_file_project_generate_qor_post_opt_tcl, "w") as file:
@@ -167,6 +179,7 @@ with open(output_file_project_generate_qor_post_opt_tcl, "w") as file:
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_opt_rqs}
+write_checkpoint {output_file_project_generate_qor_post_opt_dcp}
     """)
 
 with open(output_file_project_generate_qor_post_place_tcl, "w") as file:
@@ -175,6 +188,7 @@ with open(output_file_project_generate_qor_post_place_tcl, "w") as file:
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_place_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_place_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_place_rqs}
+write_checkpoint {output_file_project_generate_qor_post_place_dcp}
     """)
 
 with open(output_file_project_generate_qor_post_phys_opt_tcl, "w") as file:
@@ -183,6 +197,7 @@ with open(output_file_project_generate_qor_post_phys_opt_tcl, "w") as file:
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_phys_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_phys_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_phys_opt_rqs}
+write_checkpoint {output_file_project_generate_qor_post_phys_opt_dcp}
     """)
 
 with open(output_file_project_generate_qor_post_route_tcl, "w") as file:
@@ -191,6 +206,7 @@ with open(output_file_project_generate_qor_post_route_tcl, "w") as file:
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_route_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_route_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_route_rqs}
+write_checkpoint {output_file_project_generate_qor_post_route_dcp}
     """)
 
 with open(output_file_project_generate_qor_post_post_route_phys_opt_tcl, "w") as file:
@@ -199,6 +215,7 @@ with open(output_file_project_generate_qor_post_post_route_phys_opt_tcl, "w") as
 report_qor_assessment  -exclude_methodology_checks -name qor_assessments -max_paths 200 -full_assessment_details -file {output_file_project_generate_qor_post_post_route_phys_opt_ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 200 -file {output_file_project_generate_qor_post_post_route_phys_opt_sugg_rpt}
 write_qor_suggestions {output_file_project_generate_qor_post_post_route_phys_opt_rqs} 
+write_checkpoint {output_file_project_generate_qor_post_post_route_phys_opt_dcp}
     """)
 
 
