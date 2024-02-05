@@ -38,6 +38,7 @@ output_folder_path_kernel      = os.path.join(FULL_SRC_IP_DIR_RTL, "kernel")
 output_folder_path_cu          = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
 output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
 output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
+FULL_SRC_IP_DIR_UTILS_RPT      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.rpt")
 FULL_SRC_IP_DIR_UTILS_QOR      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
 FULL_SRC_IP_DIR_UTILS_DCP      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.dcp")
 
@@ -71,6 +72,9 @@ if not os.path.exists(FULL_SRC_IP_DIR_UTILS):
 
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
+
+if not os.path.exists(FULL_SRC_IP_DIR_UTILS_RPT):
+    os.makedirs(FULL_SRC_IP_DIR_UTILS_RPT)
 
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_QOR):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_QOR)
@@ -152,12 +156,13 @@ if {{ [file exists {read_rqs}] == 1}} {{
 utils_tcl_dir = FULL_SRC_IP_DIR_UTILS_TCL
 qor_dir = FULL_SRC_IP_DIR_UTILS_QOR
 dcp_dir = FULL_SRC_IP_DIR_UTILS_DCP
+rpt_dir = FULL_SRC_IP_DIR_UTILS_RPT
 
 # Stages for which to generate reports
 stages = ["synth", "opt", "place", "phys_opt", "route", "post_route_phys_opt"]
 
 # Generate TCL files for each stage
-for stage in stages:
+for i, stage in enumerate(stages):
     output_file_project_generate = os.path.join(utils_tcl_dir, f"project_generate_qor_post_{stage}.tcl")
     output_file_project_read = os.path.join(utils_tcl_dir, f"project_read_qor_pre_{stage}.tcl")
 
@@ -165,16 +170,20 @@ for stage in stages:
     dcp = os.path.join(dcp_dir, f"project_generate_qor_post_{stage}.dcp")
     ass_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.ass.rpt")
     sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.sugg.rpt")
-    time_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.time.rpt")
-    util_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.util.rpt")
+    time_rpt = os.path.join(rpt_dir, f"project_generate_qor_post_{stage}.time.rpt")
+    util_rpt = os.path.join(rpt_dir, f"project_generate_qor_post_{stage}.util.rpt")
 
     # Generate report TCL
     write_report_generation_tcl(output_file_project_generate, stage, "all", dcp, ass_rpt,time_rpt, util_rpt, sugg_rpt, rqs)
 
-    # Generate QoR suggestion reading TCL (for the next stage, hence the check for index)
-    if stages.index(stage) > 0:  # Skip for the first stage as it has no previous stage to read from
-        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[stages.index(stage)-1]}.rqs")
-        write_qor_suggestion_reading_tcl(output_file_project_read, prev_stage_rqs)
+   # Generate QoR suggestion reading TCL
+    if i == 0:
+        # First stage reads from the last stage
+        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[-1]}.rqs")
+    else:
+        # Subsequent stages read from the previous stage
+        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[i-1]}.rqs")
+    write_qor_suggestion_reading_tcl(output_file_project_read, prev_stage_rqs)
 
 
 
