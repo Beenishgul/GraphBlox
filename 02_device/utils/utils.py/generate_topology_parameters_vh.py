@@ -219,12 +219,55 @@ channels = config_data["channels"]
 ch_properties = config_data["ch_properties"]
 cu_properties = config_data["cu_properties"]
 cache_properties = config_data["cache_properties"]
-mapping = config_data["mapping"]
-luts    = config_data["luts"]
-fifo_control_response = config_data["fifo_control_response"]
-fifo_control_request  = config_data["fifo_control_request"]
-fifo_memory   = config_data["fifo_memory"]
-fifo_engine   = config_data["fifo_engine"]
+engine_properties = config_data["engine_properties"]
+# mapping = config_data["mapping"]
+# luts    = config_data["luts"]
+# fifo_control_response = config_data["fifo_control_response"]
+# fifo_control_request  = config_data["fifo_control_request"]
+# fifo_memory   = config_data["fifo_memory"]
+# fifo_engine   = config_data["fifo_engine"]
+
+def recreate_data_structures_from_columns(engine_properties, categories_order):
+    """
+    Recreates the data structures for specified categories from the columnar 'engine_properties' data.
+
+    Args:
+    - engine_properties: A dictionary with engine properties as keys and lists as values,
+      where each list's elements represent data for the categories in 'categories_order'.
+    - categories_order: A list of category names in the order they appear in 'engine_properties' lists.
+
+    Returns:
+    - A dictionary of dictionaries, where each key is a category name from 'categories_order'
+      and its value is a dictionary that mimics the structure of that category's original data.
+    """
+    # Initialize a dictionary to hold the recreated data for each category
+    recreated_data = {category: {} for category in categories_order}
+
+    # Iterate over each engine property and its columnar data
+    for property_name, values in engine_properties.items():
+        # For each category, extract the appropriate data and add it to the recreated data structure
+        for i, category in enumerate(categories_order):
+            if i < len(values):  # Ensure we do not go out of bounds
+                recreated_data[category][property_name] = values[i]
+
+    return recreated_data
+
+# Define the order of categories as they appear in the engine_properties lists
+categories_order = [
+    "mapping", "cycles", "luts",
+    "fifo_engine", "fifo_memory",
+    "fifo_control_request", "fifo_control_response"
+]
+# Recreate the data structures for all categories
+engine_properties_structures = recreate_data_structures_from_columns(engine_properties, categories_order)
+
+# Now, extract each category into its own variable
+mapping = engine_properties_structures["mapping"]
+luts = engine_properties_structures["luts"]
+fifo_control_response = engine_properties_structures["fifo_control_response"]
+fifo_control_request = engine_properties_structures["fifo_control_request"]
+fifo_memory = engine_properties_structures["fifo_memory"]
+fifo_engine = engine_properties_structures["fifo_engine"]
 
 
 DISTINCT_CHANNELS = set(int(properties[0]) for properties in channels.values())
@@ -460,7 +503,7 @@ CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY = generate_config_cast_width_array()
 
 # Generate CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH
 CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = generate_cu_bundles_config_array_engine_seq_width(
-    config_data['cycles'], CU_BUNDLES_CONFIG_ARRAY, mapping
+    engine_properties_structures["cycles"], CU_BUNDLES_CONFIG_ARRAY, mapping
 )
 
 # Generate CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN
