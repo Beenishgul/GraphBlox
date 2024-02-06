@@ -125,16 +125,16 @@ output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project
 # Define a function to write report generation TCL code
 def write_report_generation_tcl(output_file, stage, report_types, dcp, ass_rpt, time_rpt, util_rpt, sugg_rpt, rqs):
     report_code = f"""
-report_qor_assessment  -exclude_methodology_checks -name {ass_rpt} -max_paths 200 -full_assessment_details -file {ass_rpt}
-report_qor_suggestions -report_all_suggestions -max_paths 200 -file {sugg_rpt}
-write_qor_suggestions {rqs}
+report_qor_assessment  -exclude_methodology_checks -name {ass_rpt} -max_paths 100 -full_assessment_details -file {ass_rpt}
+report_qor_suggestions -report_all_suggestions -max_paths 100 -file {sugg_rpt} 
+write_qor_suggestions {rqs} -force
 write_checkpoint {dcp} -force
 
-report_utilization -file {util_rpt}.utilization_hierarchical.rpt -hierarchical
-report_utilization -file {util_rpt}.utilization_report.rpt
-check_timing -verbose -name timing_violations_report -file {time_rpt}.timing_violations_report.rpt
-report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {time_rpt}.timing_report.rpt
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {time_rpt}.timing_summary_report.rpt 
+# report_utilization -file utilization_hierarchical_{util_rpt} -hierarchical
+report_utilization -file utilization_{util_rpt}
+# check_timing  -verbose -name timing_violations_report -file timing_violations_report_{time_rpt}
+# report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file timing_report_{time_rpt}
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file timing_summary_report_{time_rpt}
 """
     with open(output_file, "w") as file:
         file.write(report_code)
@@ -166,12 +166,12 @@ for i, stage in enumerate(stages):
     output_file_project_generate = os.path.join(utils_tcl_dir, f"project_generate_qor_post_{stage}.tcl")
     output_file_project_read = os.path.join(utils_tcl_dir, f"project_read_qor_pre_{stage}.tcl")
 
-    rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.rqs")
-    dcp = os.path.join(dcp_dir, f"project_generate_qor_post_{stage}.dcp")
-    ass_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.ass.rpt")
-    sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_post_{stage}.sugg.rpt")
-    time_rpt = os.path.join(rpt_dir, f"project_generate_qor_post_{stage}.time.rpt")
-    util_rpt = os.path.join(rpt_dir, f"project_generate_qor_post_{stage}.util.rpt")
+    rqs = os.path.join(qor_dir, f"project_generate_qor_read_post_{stage}.rqs")
+    dcp = os.path.join(dcp_dir, f"project_generate_checkpoint_post_{stage}.dcp")
+    ass_rpt = os.path.join(qor_dir, f"project_generate_qor_assessment_post_{stage}.rpt")
+    sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_suggesstion_post_{stage}.rpt")
+    time_rpt = os.path.join(rpt_dir, f"project_generate_time_{stage}.rpt")
+    util_rpt = os.path.join(rpt_dir, f"project_generate_utilization_post_{stage}.rpt")
 
     # Generate report TCL
     write_report_generation_tcl(output_file_project_generate, stage, "all", dcp, ass_rpt,time_rpt, util_rpt, sugg_rpt, rqs)
