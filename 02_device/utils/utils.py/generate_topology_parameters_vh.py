@@ -130,11 +130,11 @@ report_qor_suggestions -report_all_suggestions -max_paths 100 -file {sugg_rpt}
 write_qor_suggestions {rqs} -force
 write_checkpoint {dcp} -force
 
-# report_utilization -file utilization_hierarchical_{util_rpt} -hierarchical
-report_utilization -file utilization_{util_rpt}
-# check_timing  -verbose -name timing_violations_report -file timing_violations_report_{time_rpt}
-# report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file timing_report_{time_rpt}
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file timing_summary_report_{time_rpt}
+report_utilization -file {util_rpt}_utilization_hierarchical.rpt -hierarchical
+report_utilization -file {util_rpt}_utilization.rpt
+# check_timing  -verbose -name timing_violations_report -file {time_rpt}_timing_violations_report.rpt
+# report_timing -delay_type min_max -max_paths 20 -sort_by group -input_pins -routable_nets -name timing_report -file {time_rpt}_timing_report.rpt
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 20 -input_pins -routable_nets -name timing_summary_report -file {time_rpt}_timing_summary_report.rpt
 """
     with open(output_file, "w") as file:
         file.write(report_code)
@@ -170,8 +170,8 @@ for i, stage in enumerate(stages):
     dcp = os.path.join(dcp_dir, f"project_generate_checkpoint_post_{stage}.dcp")
     ass_rpt = os.path.join(qor_dir, f"project_generate_qor_assessment_post_{stage}.rpt")
     sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_suggesstion_post_{stage}.rpt")
-    time_rpt = os.path.join(rpt_dir, f"project_generate_time_{stage}.rpt")
-    util_rpt = os.path.join(rpt_dir, f"project_generate_utilization_post_{stage}.rpt")
+    time_rpt = os.path.join(rpt_dir, f"project_generate_time_{stage}")
+    util_rpt = os.path.join(rpt_dir, f"project_generate_utilization_post_{stage}")
 
     # Generate report TCL
     write_report_generation_tcl(output_file_project_generate, stage, "all", dcp, ass_rpt,time_rpt, util_rpt, sugg_rpt, rqs)
