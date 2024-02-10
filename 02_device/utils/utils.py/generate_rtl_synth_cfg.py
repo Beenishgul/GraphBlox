@@ -378,8 +378,8 @@ config += "save-temps=1\n"
 # config += "debug=1\n"
 config += "link=1\n\n"
 
-config+="[clock]\n"
-config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
+# config+="[clock]\n"
+# config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
 
 config +=  generate_kernel_and_memory_config(KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS))
 
