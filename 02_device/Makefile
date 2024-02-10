@@ -38,6 +38,9 @@ UTILS_PERL         ?= utils.pl
 UTILS_TCL          ?= utils.tcl
 UTILS_SHELL        ?= utils.sh
 UTILS_XDC          ?= utils.xdc
+UTILS_QOR          ?= utils.qor
+UTILS_RPT          ?= utils.rpt
+UTILS_XCLBIN       ?= utils.xclbin
 IP_DIR_RTL         ?= rtl
 IP_DIR_HLS         ?= hls
 REPORTS_DIR        ?= rpt
@@ -614,6 +617,14 @@ open-vitis-project: session-info | $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR)
 PHONY: clean-vitis-project
 clean-vitis-projectt: session-info
 	$(RMDIR) $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR)/
+
+PHONY: gen-xclbin-zip
+gen-xclbin-zip:
+	@zip -j $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_ACTIVE).zip \
+			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin.info \
+			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin \
+			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).ltx \
+			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_RPT)/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
 
 # =========================================================
 # VPP Flow: Report Utilization Metrics
