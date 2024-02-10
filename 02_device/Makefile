@@ -618,13 +618,17 @@ PHONY: clean-vitis-project
 clean-vitis-projectt: session-info
 	$(RMDIR) $(APP_DIR_ACTIVE)/$(VITIS_BUILD_DIR)/
 
-PHONY: gen-xclbin-zip
-gen-xclbin-zip:
+PHONY:$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_ACTIVE).zip
+$(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_ACTIVE).zip:
 	@zip -j $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_ACTIVE).zip \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin.info \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).ltx \
 			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_RPT)/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
+
+PHONY: gen-xclbin-zip
+gen-xclbin-zip: $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_ACTIVE).zip 
+	
 
 # =========================================================
 # VPP Flow: Report Utilization Metrics
