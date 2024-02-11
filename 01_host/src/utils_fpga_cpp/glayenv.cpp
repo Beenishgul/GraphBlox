@@ -409,11 +409,6 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::initializeGLAYOverlayConfiguration(si
         mapGLAYOverlayProgramBuffersTC(overlay_program_entries, algorithm, graph, overlayPath);
     }
     break;
-    case 10: // Triangle Counting
-    {
-        mapGLAYOverlayProgramBuffersMEMCPY(overlay_program_entries, algorithm, graph, overlayPath);
-    }
-    break;
     default:// BFS
     {
         mapGLAYOverlayProgramBuffersBFS(overlay_program_entries, algorithm, graph, overlayPath);
