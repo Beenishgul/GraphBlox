@@ -190,7 +190,8 @@ def get_engine_id(engine_name):
     global output_file_path_vh
     global buffers
     base_name    = engine_name.split("(")[0]
-    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    detail_pattern = extract_buffer_details(engine_name) 
+    buffer_name, buffer_start, buffer_end  = detail_pattern[0]
     buffer_key   = get_key_from_value(buffers, buffer_name)
     base_mapping = mapping.get(base_name, 0)
     base_cycles  = cycles.get(base_name, 0)
@@ -256,28 +257,32 @@ def extract_buffer(token):
     return ""  # Returns an empty string if "(B:" is not found
 
 def extract_buffer_details(token):
-    """Extracts buffer details from a token. Handles (B:buffer_name,start,end) formats including mathematical operations."""
-    if "(B:" in token:
-        start = token.find("(B:") + 3
-        end = token.find(")", start)
-        details = token[start:end].split(',')
+    """Extracts details of multiple buffers from a token, handling formats including mathematical operations.
+    Ensures at least four tuples are returned."""
+    buffer_pattern = r'\(B:([^\)]+)\)'
+    detail_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%|\(|\))'
+    matches = re.findall(buffer_pattern, token)
+    
+    buffer_details_list = []
 
-        buffer_name = details[0]  # Buffer name is always present
-        start_value_ops = ['0']  # Default value
-        end_value_ops = ['0']   # Default value
+    for match in matches:
+        details = match.split(',')
+        buffer_name = details[0]
+        start_value_ops = ['0']
+        end_value_ops = ['0']
 
-        # Improved pattern to match identifiers, numbers, and operators
-        pattern = r'([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%|\(|\))'
-
-        # Update start and end values if present, including parsing for operations
         if len(details) > 1:
-            start_value_ops = re.findall(pattern, details[1])
+            start_value_ops = re.findall(detail_pattern, details[1])
         if len(details) > 2:
-            end_value_ops = re.findall(pattern, details[2])
+            end_value_ops = re.findall(detail_pattern, details[2])
 
-        return buffer_name, start_value_ops, end_value_ops
+        buffer_details_list.append((buffer_name, start_value_ops, end_value_ops))
 
-    return "None", ['0'], ['0']
+    # Ensure there are at least four tuples in the list
+    while len(buffer_details_list) < 4:
+        buffer_details_list.append(("None", ['0'], ['0']))
+
+    return buffer_details_list
 
 # Modified pad_data to accept a default pad value
 def pad_data(data, max_length, default_val=0):
@@ -380,7 +385,8 @@ def process_file_vh(template_file_path, engine_template_filename, engine_name):
     global buffers
 
     engine_type    = engine_name.split("(")[0]
-    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    detail_pattern = extract_buffer_details(engine_name) 
+    buffer_name, buffer_start, buffer_end  = detail_pattern[0]
     buffer_start_ops = print_operations_vh(buffer_start)
     buffer_end_ops = print_operations_vh(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
@@ -445,7 +451,8 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
     global buffers
 
     engine_type    = engine_name.split("(")[0]
-    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    detail_pattern = extract_buffer_details(engine_name) 
+    buffer_name, buffer_start, buffer_end  = detail_pattern[0]
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
@@ -556,7 +563,8 @@ def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_te
     global channels
     
     engine_type    = engine_name.split("(")[0]
-    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    detail_pattern = extract_buffer_details(engine_name) 
+    buffer_name, buffer_start, buffer_end  = detail_pattern[0]
     buffer_start_ops = print_operations_vh(buffer_start)
     buffer_end_ops = print_operations_vh(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
@@ -565,7 +573,7 @@ def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_te
     filename_json = os.path.join(template_file_path_json, engine_template_filename_json)
 
     # print(f"echo {filename_ol}")
-    # print(f"echo {filename_json}")
+    # print(f"echo {engine_name}")
 
     check_and_clean_file(filename_ol)
     
@@ -597,17 +605,25 @@ def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_te
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[0]
+                        local_buffer_start_ops = print_operations_vh(local_buffer_start)
                         append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};")
                     elif local_count == 8:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[1]
+                        local_buffer_start_ops = print_operations_vh(local_buffer_start)
                         append_to_file(output_file_path_vh, f"   // --  2  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};")
                     elif local_count == 15:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[2]
+                        local_buffer_start_ops = print_operations_vh(local_buffer_start)
                         append_to_file(output_file_path_vh, f"   // --  3  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};")
                     elif local_count == 22:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[3]
+                        local_buffer_start_ops = print_operations_vh(local_buffer_start)
                         append_to_file(output_file_path_vh, f"   // --  4  - Index_Start")
-                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};")
 
                 entry_index_vh += 1
                 local_count += 1
@@ -629,7 +645,8 @@ def process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_t
     global channels
 
     engine_type    = engine_name.split("(")[0]
-    buffer_name, buffer_start, buffer_end  = extract_buffer_details(engine_name) 
+    detail_pattern = extract_buffer_details(engine_name) 
+    buffer_name, buffer_start, buffer_end  = detail_pattern[0]
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
     buffer_key   = get_key_from_value(buffers, buffer_name)
@@ -670,17 +687,25 @@ def process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_t
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[0]
+                        local_buffer_start_ops = print_operations_cpp(local_buffer_start)
                         append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};")
                     elif local_count == 8:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[1]
+                        local_buffer_start_ops = print_operations_cpp(local_buffer_start)
                         append_to_file(output_file_path_cpp, f"   // --  2  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};")
                     elif local_count == 15:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[2]
+                        local_buffer_start_ops = print_operations_cpp(local_buffer_start)
                         append_to_file(output_file_path_cpp, f"   // --  3  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};")
                     elif local_count == 22:
+                        local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[3]
+                        local_buffer_start_ops = print_operations_cpp(local_buffer_start)
                         append_to_file(output_file_path_cpp, f"   // --  4  - Index_Start")
-                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};")
 
                 entry_index_cpp += 1
                 local_count += 1

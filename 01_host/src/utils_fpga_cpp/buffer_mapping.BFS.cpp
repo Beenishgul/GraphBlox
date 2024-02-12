@@ -7,11 +7,11 @@ void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(size_
    // --  1  - Index_Start
     overlay_program[1] = ( graph->num_vertices );
    // --  2  - Index_Start
-    overlay_program[8] = ( graph->num_vertices );
+    overlay_program[8] = ( 0 );
    // --  3  - Index_Start
-    overlay_program[15] = ( graph->num_vertices );
+    overlay_program[15] = ( 0 );
    // --  4  - Index_Start
-    overlay_program[22] = ( graph->num_vertices );
+    overlay_program[22] = ( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE             ID 1    mapping 1    cycles 11   buffer_7-auxiliary_1 ( 0 )-( graph->num_vertices )
