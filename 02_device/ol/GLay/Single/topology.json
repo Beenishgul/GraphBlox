@@ -72,9 +72,6 @@
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
                 "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
             ],
             [
@@ -83,15 +80,8 @@
         ],
         "1": [
             [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:2)",
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:auxiliary_1,0,num_vertices)",
                 "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -429,7 +419,7 @@
         "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram"
     },
     "cache_properties": {
-        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
+        "channel_0": ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
         "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1", "BRAM"],
