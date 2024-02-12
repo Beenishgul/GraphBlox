@@ -10,31 +10,11 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_merge": {
-                    "bits": "1",
-                    "value": "0"
+                "lane_mask": {
+                    "bits": "4",
+                    "value": "0x0"
                 }, 
-                "lane_mask" : {
+                "merge_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
