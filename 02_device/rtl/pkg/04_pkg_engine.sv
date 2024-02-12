@@ -424,13 +424,8 @@ typedef struct packed{
 } ParallelReadWriteConfigurationParameterField;
 
 typedef struct packed{
-    logic                                                                            increment    ;
-    logic                                                                            decrement    ;
-    logic                                                                            mode_sequence;
-    logic                                                                            mode_buffer  ;
-    logic                                                                            mode_counter ;
-    logic                                                                            mode_merge   ;
     logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] lane_mask    ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask   ;
     ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field  ;
 } ParallelReadWriteConfigurationParameters;
 

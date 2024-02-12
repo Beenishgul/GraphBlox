@@ -16,7 +16,6 @@
 module engine_parallel_read_write_kernel (
   input  logic                                        ap_clk                ,
   input  logic                                        areset                ,
-  input  logic                                        clear_in              ,
   input  logic                                        config_params_valid_in,
   input  ParallelReadWriteConfigurationParameterField config_params_in      ,
   input  logic                                        data_valid_in         ,
@@ -36,36 +35,35 @@ logic                    data_valid_reg;
 always_ff @(posedge ap_clk) begin
   if (areset) begin
     data_valid_reg <= 1'b0;
-    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-      ops_value_reg.field[i] <= 0;
-      org_value_reg.field[i] <= 0;
-    end
   end else begin
     data_valid_reg <= data_valid_in;
-    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-      if(config_params_in.const_mask[i] & config_params_valid_in) begin
-        ops_value_reg.field[i] <= config_params_in.const_value;
-      end else if (config_params_valid_in) begin
-        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-          if(config_params_in.ops_mask[i][j]) begin
-            ops_value_reg.field[i] <= data_in.field[j];
-          end
-        end
-      end else begin
-        ops_value_reg.field[i] <= 0;
-      end
-    end
+  end
+end
 
-    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-      if (config_params_valid_in) begin
-        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-          if(config_params_in.ops_mask[i][j]) begin
-            org_value_reg.field[i] <= data_in.field[j];
-          end
+always_ff @(posedge ap_clk) begin
+  for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+    if(config_params_in.const_mask[i] & config_params_valid_in) begin
+      ops_value_reg.field[i] <= config_params_in.const_value;
+    end else if (config_params_valid_in) begin
+      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+        if(config_params_in.ops_mask[i][j]) begin
+          ops_value_reg.field[i] <= data_in.field[j];
         end
-      end else begin
-        org_value_reg.field[i] <= 0;
       end
+    end else begin
+      ops_value_reg.field[i] <= 0;
+    end
+  end
+
+  for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+    if (config_params_valid_in) begin
+      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+        if(config_params_in.ops_mask[i][j]) begin
+          org_value_reg.field[i] <= data_in.field[j];
+        end
+      end
+    end else begin
+      org_value_reg.field[i] <= 0;
     end
   end
 end
@@ -86,21 +84,15 @@ always_ff @(posedge ap_clk) begin
   end else begin
     address_int <= 0;
   end
-
   org_data_int <= org_value_reg;
 end
 
 // Output assignment logic
 always_ff @(posedge ap_clk) begin
-  if (areset || clear_in) begin
-    result_out  <= 0;
-    address_out <= 0;
-  end else begin
     for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       result_out.field[i] <= org_data_int.field[i];
     end
     address_out <= address_int;
-  end
 end
 
 endmodule : engine_parallel_read_write_kernel

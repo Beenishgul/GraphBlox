@@ -181,13 +181,8 @@ always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
-                configure_memory_reg.payload.param.increment     <= fifo_response_memory_in_dout_reg.payload.data.field[0];
-                configure_memory_reg.payload.param.decrement     <= fifo_response_memory_in_dout_reg.payload.data.field[1];
-                configure_memory_reg.payload.param.mode_sequence <= fifo_response_memory_in_dout_reg.payload.data.field[2];
-                configure_memory_reg.payload.param.mode_buffer   <= fifo_response_memory_in_dout_reg.payload.data.field[3];
-                configure_memory_reg.payload.param.mode_counter  <= fifo_response_memory_in_dout_reg.payload.data.field[4];
-                configure_memory_reg.payload.param.mode_merge    <= fifo_response_memory_in_dout_reg.payload.data.field[5];
-                configure_memory_reg.payload.param.lane_mask     <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS+5:6];
+                configure_memory_reg.payload.param.lane_mask  <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+                configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS)-1:ENGINE_PACKET_DATA_NUM_FIELDS];
             end
 
             (1 << (1+(7*0))) : begin
