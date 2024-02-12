@@ -529,9 +529,9 @@ module engine_parallel_read_write_generator #(parameter
                 .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
                 .WIDTH ($bits(EnginePacket)          )
             ) inst_hyper_pipeline_response_engine_in_int (
-                .ap_clk(ap_clk                                                                  ),
-                .din   (response_engine_in_int & configure_engine_int.payload.param.lane_mask[i]),
-                .dout  (response_engine_reg_int[i]                                              )
+                .ap_clk(ap_clk                    ),
+                .din   (response_engine_in_int    ),
+                .dout  (response_engine_reg_int[i])
             );
 
             assign configure_engine_int_valid[i] = configure_engine_int.valid;
@@ -548,7 +548,7 @@ module engine_parallel_read_write_generator #(parameter
             );
 // --------------------------------------------------------------------------------------
             always_comb begin
-                generator_engine_request_engine_start_Stage[i].valid                                 = response_engine_reg_int[i].valid;
+                generator_engine_request_engine_start_Stage[i].valid                                 = response_engine_reg_int[i].valid & configure_engine_int.payload.param.lane_mask[i];
                 generator_engine_request_engine_start_Stage[i].payload.data                          = result_int[i];
                 generator_engine_request_engine_start_Stage[i].payload.meta.address                  = address_int[i];
                 generator_engine_request_engine_start_Stage[i].payload.meta.route.packet_destination = configure_engine_int.payload.param.param_field[i].meta.route.packet_destination;
