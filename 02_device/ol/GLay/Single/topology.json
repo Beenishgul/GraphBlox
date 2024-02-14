@@ -69,6 +69,17 @@
     "Single.BFS": {
         "0": [
             [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
+                "ENGINE_AUTOMATA_NFA"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ]
+    },
+    "Single.BFSV3": {
+        "0": [
+            [
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
@@ -482,6 +493,7 @@
         "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
         "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
         "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
-        "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0]
+        "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0],
+        "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
     }
 }
