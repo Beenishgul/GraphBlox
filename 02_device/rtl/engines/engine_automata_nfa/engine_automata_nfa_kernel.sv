@@ -263,6 +263,25 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
+logic [7:0] symbols      ;
+logic [7:0] symbols_match;
+
+assign symbols = ops_value_reg.field[0][7:0];
+
+Top_ModuleC0lw inst_Top_ModuleC0lw_1 (
+  .clk     (ap_clk  ),
+  .reset   (areset  ),
+  .run     (1'b1    ),
+  .symbols (symbols ),
+  .ltl4c0lw(symbols_match[0]),
+  .ltl6c0lw(symbols_match[1]),
+  .ltl2c0lw(symbols_match[2]),
+  .ltl3c0lw(symbols_match[3]),
+  .ltl1c0lw(symbols_match[4]),
+  .ltl0c0lw(symbols_match[5]),
+  .ltl5c0lw(symbols_match[6])
+);
+
 // Output assignment logic
 always_ff @(posedge ap_clk) begin
   if (areset) begin
