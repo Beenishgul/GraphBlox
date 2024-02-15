@@ -17,8 +17,7 @@ module engine_alu_ops_kernel (
   input  logic                         ap_clk             ,
   input  logic                         areset             ,
   input  logic                         clear              ,
-  input  logic                         config_params_valid,
-  input  ALUOpsConfigurationParameters config_params_in      ,
+  input  ALUOpsConfigurationParameters config_params_in   ,
   input  logic                         data_valid         ,
   input  EnginePacketData              data_in            ,
   output EnginePacketData              result_out
@@ -41,26 +40,30 @@ end
 
 always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    if(config_params_in.const_mask[i] ) begin
+    if(config_params_in.const_mask[i]) begin
       ops_value_reg.field[i] <= config_params_in.const_value;
     end else  begin
-      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        if(config_params_in.ops_mask[i][j]) begin
-          ops_value_reg.field[i] <= data_in.field[j];
-        end else begin
-          ops_value_reg.field[i] <= 0;
+      if(|config_params_in.ops_mask[i])begin
+        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+          if(config_params_in.ops_mask[i][j]) begin
+            ops_value_reg.field[i] <= data_in.field[j];
+          end
         end
+      end else begin
+        ops_value_reg.field[i] <= 0;
       end
     end
   end
 
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-      if(config_params_in.ops_mask[i][j]) begin
-        org_value_reg.field[i] <= data_in.field[j];
-      end else begin
-        org_value_reg.field[i] <= data_in.field[i];
+    if(|config_params_in.ops_mask[i])begin
+      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+        if(config_params_in.ops_mask[i][j]) begin
+          org_value_reg.field[i] <= data_in.field[j];
+        end
       end
+    end else begin
+      org_value_reg.field[i] <= data_in.field[i];
     end
   end
 end
@@ -104,9 +107,11 @@ always_ff @(posedge ap_clk) begin
       end
 // --------------------------------------------------------------------------------------
       ALU_ACC : begin
-        for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-          if (config_params_in.alu_mask[i] & data_valid_reg) begin
-            result_reg <= result_reg + ops_value_reg.field[i];
+        if(data_valid_reg) begin
+          for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+            if (config_params_in.alu_mask[i]) begin
+              result_reg <= result_reg + ops_value_reg.field[i];
+            end
           end
         end
       end
