@@ -1,52 +1,34 @@
-# @Author: Abdullah
-# @Date:   2023-04-06 18:46:46
-# @Last Modified by:   Abdullah
-# @Last Modified time: 2023-11-24 16:50:10
 #!/bin/bash
 
+# Function to print usage
+print_usage() {
+    cat <<EOF
+Usage: generate_package_filelist_f.sh <params_sh_dir>
+  <params_sh_dir>: Path to the parameters file.
 
-print_usage () {
-    echo "Usage: "
-    echo "  generate_package_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE VIVADO_VIP_DIR"
-    echo ""
-    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
-    echo "  UTILS_DIR_ACTIVE: utils"
-    echo "  KERNEL_NAME: kernel"
-    echo "  IP_DIR_RTL_ACTIVE: IP"
-    echo "  VIVADO_VIP_DIR: vivado_generated_vip"
-    echo ""
+Example:
+  ./generate_package_filelist_f.sh /path/to/params.sh
+EOF
 }
-if [ "$1" = "" ]
-then
-    print_usage
-fi
 
-# APP_DIR_ACTIVE=$1
-# UTILS_DIR_ACTIVE=$2
-# KERNEL_NAME=$3
-# IP_DIR_RTL_ACTIVE=$4
-# VIVADO_VIP_DIR=$5
+# Exit if no arguments
+if [[ $# -eq 0 ]]; then
+    print_usage
+    exit 1
+fi
 
 PARAMS_SH_DIR=$1
 
-source ${PARAMS_SH_DIR}
+# Source the parameters file
+if [ -f "${PARAMS_SH_DIR}" ]; then
+    source "${PARAMS_SH_DIR}"
+else
+    echo "Parameters file does not exist: ${PARAMS_SH_DIR}"
+    exit 1
+fi
 
 pkgs="pkg"
-
-engine_alu_ops="engine_alu_ops"
-engine_csr_index="engine_csr_index"
-engine_cu_setup="engine_cu_setup"
-engine_filter_cond="engine_filter_cond"
-engine_forward_data="engine_forward_data"
-engine_merge_data="engine_merge_data"
-engine_set_ops="engine_set_ops"
-engine_pipeline="engine_pipeline"
-engine_read_write="engine_read_write"
-engine_stride_index="engine_m_axi"
-engine_stride_index="engine_stride_index"
-engine_template="engine_template"
 engines="engines"
-
 kernel="kernel"
 top="top"
 
@@ -70,82 +52,84 @@ utils_slice="slice"
 iob_include="iob_include"
 portmaps="portmaps"
 
+# Initialize file names
 CFG_FILE_NAME="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.src.f"
 CFG_FILE_NAME_VH="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f"
 
-rm_package_filelist_f () {
-
+# Function to remove empty file lists
+rm_package_filelist_f() {
     local filename=$1
-
-    if [[ -z $(grep '[^[:space:]]' $filename ) ]] ; then
-        rm ${filename}
+    if [[ ! -s $filename ]]; then
+        rm -f -- "${filename}"
     fi
 }
 
-generate_package_filelist_f () {
+# Function to generate file lists based on extension
+generate_package_filelist_f() {
+    local ip_directory=$1 cfg_filelist_name=$2 verilog_type=$3
 
-    local ip_directory=$1
-    local cfg_filelist_name=$2
-    local verilog_type=$3
+    if [[ ! -d $ip_directory ]]; then
+        echo "Directory does not exist: $ip_directory"
+        return
+    fi
 
-    for filepath in "$( find ${ip_directory} -type f -iname "*.${verilog_type}" | sort -n )" ; do
-        newtext="${filepath}"
-        echo "$newtext" >> ${cfg_filelist_name}
+    find "$ip_directory" -type f -iname "*.${verilog_type}" -print0 | sort -z | while IFS= read -r -d $'\0' filepath; do
+        echo "$filepath" >> "$cfg_filelist_name"
     done
-
 }
 
-newtext=""
-echo "$newtext" > ${CFG_FILE_NAME}
-echo "$newtext" > ${CFG_FILE_NAME_VH}
+# Clear file lists
+: > "$CFG_FILE_NAME"
+: > "$CFG_FILE_NAME_VH"
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/ ${CFG_FILE_NAME} "sv"
+# Configuration for directories and extensions
+declare -A config=(
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${pkgs}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/"]="vh"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/"]="v"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/${memory_sram_include}/"]="svh"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/"]="vh"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${cu}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${lane}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${control}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/"]="sv"
+    ["${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${top}/"]="v"
+)
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
+# Generate file lists based on configuration
+for path in "${!config[@]}"; do
+    extension="${config[$path]}"
+    cfg_file="${CFG_FILE_NAME}"
+    [[ "$extension" == "vh" || "$extension" == "svh" ]] && cfg_file="${CFG_FILE_NAME_VH}"
+    generate_package_filelist_f "$path" "$cfg_file" "$extension"
+done
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME} "v"
+# Engine directories to process
+declare -a engine_dirs=(
+    "engine_alu_ops"
+    "engine_csr_index"
+    "engine_cu_setup"
+    "engine_filter_cond"
+    "engine_forward_data"
+    "engine_merge_data"
+    "engine_set_ops"
+    "engine_pipeline"
+    "engine_read_write"
+    "engine_m_axi"
+    "engine_template"
+    "engine_automata_nfa"
+)
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/${memory_sram_include}/ ${CFG_FILE_NAME_VH} "svh"
+# Process each engine directory
+for engine_dir in "${engine_dirs[@]}"; do
+    path="${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_dir}"
+    generate_package_filelist_f "$path" "$CFG_FILE_NAME" "sv"
+    generate_package_filelist_f "$path" "$CFG_FILE_NAME" "vh"
+    generate_package_filelist_f "$path" "$CFG_FILE_NAME" "v"
+done
 
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_arbiter}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_counter}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_slice}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${cu}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${lane}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${control}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_ops}      ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index}    ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_cu_setup}     ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_filter_cond}  ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_forward_data} ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_m_axi}        ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_merge_data}   ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_set_ops}      ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_pipeline}     ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write}   ${CFG_FILE_NAME} "sv"
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_template}     ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/ ${CFG_FILE_NAME} "sv"
-
-generate_package_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${top}/ ${CFG_FILE_NAME} "v"
-
-newtext=""
-echo $newtext >> ${CFG_FILE_NAME}
-echo $newtext >> ${CFG_FILE_NAME_VH}
-
-rm_package_filelist_f ${CFG_FILE_NAME}
-rm_package_filelist_f ${CFG_FILE_NAME_VH}
+# Remove package file list if empty
+rm_package_filelist_f "$CFG_FILE_NAME"
+rm_package_filelist_f "$CFG_FILE_NAME_VH"
