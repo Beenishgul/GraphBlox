@@ -66,7 +66,7 @@
             ]
         ]
     },
-    "Single.BFS": {
+    "Single.AUTOMATA": {
         "0": [
             [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
@@ -77,7 +77,7 @@
             ]
         ]
     },
-    "Single.BFSV3": {
+    "Single.BFSV2": {
         "0": [
             [
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
@@ -116,7 +116,7 @@
             ]
         ]
     },
-    "Single.BFSV2": {
+    "Single.BFS": {
         "0": [
             [
                 "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
@@ -482,7 +482,19 @@
         "channel_layout" : "1"
     },
     "engine_properties_comments": {
-        "comments":"mapping, cycles, luts, fifo_engine, fifo_memory, fifo_control_request, fifo_control_response"
+        "comments":"mapping, cycles, luts, fifo_engine, fifo_memory, fifo_control_request, fifo_control_response", 
+        "engine_properties_available": {
+            "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
+            "ENGINE_READ_WRITE"         : [1, 11, 1419, 16, 32, 0,  0],
+            "ENGINE_CSR_INDEX"          : [2, 8,  1932, 16, 32, 0, 16],
+            "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
+            "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
+            "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
+            "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
+            "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
+            "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0],
+            "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
+        }
     },
     "engine_properties": {
         "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
@@ -491,9 +503,6 @@
         "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
         "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
-        "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
-        "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
-        "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0],
-        "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
+        "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0]
     }
 }
