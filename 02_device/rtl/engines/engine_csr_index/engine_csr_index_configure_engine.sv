@@ -144,7 +144,7 @@ end
 // engine response out fifo EnginePacket
 // --------------------------------------------------------------------------------------
 // Push
-assign fifo_response_engine_in_dout_int.valid   = response_engine_in_reg.valid;
+assign fifo_response_engine_in_dout_int.valid   = response_engine_in_reg.valid & (response_engine_in_reg.payload.meta.route.packet_destination.id_module == (1 << ID_MODULE));
 assign fifo_response_engine_in_dout_int.payload = response_engine_in_reg.payload;
 
 // --------------------------------------------------------------------------------------

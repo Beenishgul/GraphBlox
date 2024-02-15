@@ -264,7 +264,7 @@ always_ff @(posedge ap_clk) begin
 end
 
 logic [7:0] symbols      ;
-logic [7:0] symbols_match;
+logic [6:0] symbols_match;
 
 assign symbols = ops_value_reg.field[0][7:0];
 
