@@ -34,7 +34,6 @@ module engine_pipeline #(parameter
     // System Signals
     input  logic                  ap_clk                                                                             ,
     input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
     input  EnginePacket           response_engine_in                                                                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                                                 ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                                                ,
@@ -67,8 +66,6 @@ assign request_control_out                  = 0;
 // --------------------------------------------------------------------------------------
 logic areset_template_engine;
 logic areset_fifo           ;
-
-KernelDescriptor descriptor_in_reg;
 
 EnginePacket         response_engine_in_reg;
 MemoryPacketResponse response_memory_in_reg;
@@ -125,7 +122,6 @@ logic                         fifo_request_memory_out_setup_signal_int;
 // Generate Bundles
 // --------------------------------------------------------------------------------------
 logic                  areset_template                             ;
-KernelDescriptor       template_descriptor_in                      ;
 EnginePacket           template_response_engine_in                 ;
 FIFOStateSignalsOutput template_fifo_response_engine_in_signals_out;
 MemoryPacketResponse   template_response_memory_in                 ;
@@ -141,22 +137,6 @@ logic                  template_done_out                           ;
 always_ff @(posedge ap_clk) begin
     areset_template_engine <= areset;
     areset_fifo            <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_template_engine) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -365,7 +345,6 @@ assign template_response_engine_in = response_engine_in_int;
 assign template_response_memory_in = response_memory_in_int;
 
 assign areset_template        = areset_template_engine;
-assign template_descriptor_in = descriptor_in_reg;
 
 hyper_pipeline #(
     .STAGES(PIPELINE_STAGES    ),

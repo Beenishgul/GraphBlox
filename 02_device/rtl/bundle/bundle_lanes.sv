@@ -20,7 +20,6 @@ module bundle_lanes #(
     // System Signals
     input  logic                  ap_clk                                                            ,
     input  logic                  areset                                                            ,
-    input  KernelDescriptor       descriptor_in                                                     ,
     input  EnginePacket           response_lanes_in                                                 ,
     input  FIFOStateSignalsInput  fifo_response_lanes_in_signals_in                                 ,
     output FIFOStateSignalsOutput fifo_response_lanes_in_signals_out                                ,
@@ -53,8 +52,6 @@ genvar k;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_lanes;
-
-KernelDescriptor descriptor_in_reg;
 
 ControlPacket        request_control_out_int;
 EnginePacket         request_engine_out_int ;
@@ -185,7 +182,6 @@ FIFOStateSignalsOutput lanes_fifo_request_memory_out_signals_out [NUM_LANES-1:0]
 FIFOStateSignalsOutput lanes_fifo_response_control_in_signals_out[NUM_LANES-1:0];
 FIFOStateSignalsOutput lanes_fifo_response_lane_in_signals_out   [NUM_LANES-1:0];
 FIFOStateSignalsOutput lanes_fifo_response_memory_in_signals_out [NUM_LANES-1:0];
-KernelDescriptor       lanes_descriptor_in                       [NUM_LANES-1:0];
 logic                  areset_lane                               [NUM_LANES-1:0];
 logic                  lanes_done_out                            [NUM_LANES-1:0];
 logic                  lanes_fifo_setup_signal                   [NUM_LANES-1:0];
@@ -220,22 +216,6 @@ always_ff @(posedge ap_clk) begin
     areset_lane_arbiter_N_to_1_lanes   <= areset;
     areset_lane_arbiter_N_to_1_memory  <= areset;
     areset_lanes                       <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_lanes) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -348,25 +328,6 @@ assign request_control_out_int = lane_arbiter_N_to_1_control_request_out;
 always_ff @(posedge ap_clk) begin
     for (int i=0; i<NUM_LANES; i++) begin
         areset_lane[i] <= areset;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    if (areset_lanes) begin
-        for (int i=0; i<NUM_LANES; i++) begin
-            lanes_descriptor_in[i].valid <= 0;
-        end
-    end
-    else begin
-        for (int i=0; i<NUM_LANES; i++) begin
-            lanes_descriptor_in[i].valid <= descriptor_in_reg.valid;
-        end
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    for (int i=0; i<NUM_LANES; i++) begin
-        lanes_descriptor_in[i].payload <= descriptor_in_reg.payload;
     end
 end
 
@@ -624,7 +585,6 @@ generate
             ) inst_lane_template (
             .ap_clk                                      (ap_clk                                                                                    ),
             .areset                                      (areset_lane[j]                                                                            ),
-            .descriptor_in                               (lanes_descriptor_in[j]                                                                    ),
             .response_lane_in                            (lanes_response_merge_engine_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]               ),
             .fifo_response_lane_in_signals_in            (lanes_fifo_response_merge_lane_in_signals_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0] ),
             .fifo_response_lane_in_signals_out           (lanes_fifo_response_merge_lane_in_signals_out[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]),

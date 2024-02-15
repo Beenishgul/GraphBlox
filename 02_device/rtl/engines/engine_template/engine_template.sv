@@ -20,7 +20,6 @@ module engine_template #(
     // System Signals
     input  logic                  ap_clk                                                           ,
     input  logic                  areset                                                           ,
-    input  KernelDescriptor       descriptor_in                                                    ,
     input  EnginePacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                   ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]   ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0]  ,
@@ -51,8 +50,6 @@ genvar i;
 // --------------------------------------------------------------------------------------
 logic areset_template_engine;
 logic areset_engine         ;
-
-KernelDescriptor descriptor_in_reg;
 
 ControlPacket        request_control_out_int;
 EnginePacket         request_engine_out_int ;
@@ -128,7 +125,6 @@ FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out             
 FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in    [NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
 FIFOStateSignalsOutput template_fifo_request_memory_out_backtrack_signals_in[                         NUM_CHANNELS-1:0];
 
-KernelDescriptor template_descriptor_in    ;
 logic            areset_template           ;
 logic            template_done_out         ;
 logic            template_fifo_setup_signal;
@@ -147,22 +143,6 @@ always_ff @(posedge ap_clk) begin
     areset_template_engine            <= areset;
     areset_engine                     <= areset;
     areset_engine_cast_arbiter_1_to_N <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_template_engine) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------

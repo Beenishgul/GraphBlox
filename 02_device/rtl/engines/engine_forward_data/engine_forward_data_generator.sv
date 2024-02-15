@@ -33,7 +33,6 @@ module engine_forward_data_generator #(parameter
     // System Signals
     input  logic                  ap_clk                                                                             ,
     input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
     input  EnginePacket           response_engine_in                                                                 ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                                                 ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                                                ,

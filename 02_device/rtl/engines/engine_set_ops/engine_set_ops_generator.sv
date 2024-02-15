@@ -33,7 +33,6 @@ module engine_set_ops_generator #(parameter
     // System Signals
     input  logic                  ap_clk                                                                             ,
     input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
     input  SetOpsConfiguration    configure_memory_in                                                                ,
     input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                                                ,
     input  EnginePacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                                     ,
@@ -54,8 +53,6 @@ genvar i;
 // --------------------------------------------------------------------------------------
 logic areset_generator;
 logic areset_fifo     ;
-
-KernelDescriptor descriptor_in_reg;
 
 SetOpsConfiguration configure_memory_reg;
 
@@ -124,22 +121,6 @@ always_ff @(posedge ap_clk) begin
     areset_generator <= areset;
     areset_fifo      <= areset;
     areset_backtrack <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -299,10 +280,7 @@ always_comb begin
             next_state = ENGINE_SET_OPS_GEN_IDLE;
         end
         ENGINE_SET_OPS_GEN_IDLE : begin
-            if(descriptor_in_reg.valid)
-                next_state = ENGINE_SET_OPS_GEN_SETUP_MEMORY_IDLE;
-            else
-                next_state = ENGINE_SET_OPS_GEN_IDLE;
+            next_state = ENGINE_SET_OPS_GEN_SETUP_MEMORY_IDLE;
         end
         ENGINE_SET_OPS_GEN_SETUP_MEMORY_IDLE : begin
             if(fifo_configure_memory_in_signals_in_reg.rd_en)

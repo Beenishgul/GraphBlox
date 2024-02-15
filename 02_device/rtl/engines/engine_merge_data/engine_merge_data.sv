@@ -37,7 +37,6 @@ module engine_merge_data #(parameter
     // System Signals
     input  logic                  ap_clk                                                                             ,
     input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
     input  EnginePacket           response_engine_in[(1+ENGINE_MERGE_WIDTH)-1:0]                                     ,
     input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in[(1+ENGINE_MERGE_WIDTH)-1:0]                     ,
     output FIFOStateSignalsOutput fifo_response_engine_in_signals_out[(1+ENGINE_MERGE_WIDTH)-1:0]                    ,
@@ -75,8 +74,6 @@ genvar i;
 logic areset_merge_data_engine;
 logic areset_configure_memory ;
 logic areset_generator        ;
-
-KernelDescriptor descriptor_in_reg;
 
 EnginePacket         response_engine_in_reg[(1+ENGINE_MERGE_WIDTH)-1:0];
 MemoryPacketResponse response_memory_in_reg                            ;
@@ -144,22 +141,6 @@ always_ff @(posedge ap_clk) begin
     areset_merge_data_engine <= areset;
     areset_configure_memory  <= areset;
     areset_generator         <= areset;
-end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_merge_data_engine) begin
-        descriptor_in_reg.valid <= 1'b0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
 end
 
 // --------------------------------------------------------------------------------------
@@ -325,7 +306,6 @@ engine_merge_data_generator #(
 ) inst_engine_merge_data_generator (
     .ap_clk                                  (ap_clk                                              ),
     .areset                                  (areset_generator                                    ),
-    .descriptor_in                           (descriptor_in_reg                                   ),
     .configure_memory_in                     (generator_engine_configure_memory_in                ),
     .fifo_configure_memory_in_signals_in     (generator_engine_fifo_configure_memory_in_signals_in),
     .response_engine_in                      (generator_engine_response_engine_in                 ),

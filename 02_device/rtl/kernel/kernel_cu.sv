@@ -79,7 +79,6 @@ logic                  cu_setup_done_out                 ;
 // --------------------------------------------------------------------------------------
 // Signals for CU
 // --------------------------------------------------------------------------------------
-KernelDescriptor       cu_bundles_descriptor               ;
 MemoryPacketResponse   cu_bundles_response_in              ;
 FIFOStateSignalsOutput cu_bundles_fifo_response_signals_out;
 FIFOStateSignalsInput  cu_bundles_fifo_response_signals_in ;
@@ -182,7 +181,6 @@ always_ff @(posedge ap_clk) begin
   if (areset_control) begin
     descriptor_in_reg.valid     <= 1'b0;
     cu_setup_descriptor.valid   <= 1'b0;
-    cu_bundles_descriptor.valid <= 1'b0;
     for (int i = 0; i < NUM_CHANNELS; i++) begin
       cu_channel_descriptor[i].valid  <= 1'b0;
     end
@@ -190,7 +188,6 @@ always_ff @(posedge ap_clk) begin
   else begin
     descriptor_in_reg.valid     <= descriptor_in.valid;
     cu_setup_descriptor.valid   <= descriptor_in_reg.valid;
-    cu_bundles_descriptor.valid <= descriptor_in_reg.valid;
     for (int i = 0; i < NUM_CHANNELS; i++) begin
       cu_channel_descriptor[i].valid  <= descriptor_in_reg.valid;
     end
@@ -200,7 +197,6 @@ end
 always_ff @(posedge ap_clk) begin
   descriptor_in_reg.payload     <= descriptor_in.payload;
   cu_setup_descriptor.payload   <= descriptor_in_reg.payload;
-  cu_bundles_descriptor.payload <= descriptor_in_reg.payload;
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     cu_channel_descriptor[i].payload  <= descriptor_in_reg.payload;
   end
@@ -378,7 +374,6 @@ cu_bundles #(
   ) inst_cu_bundles (
   .ap_clk                                      (ap_clk                                      ),
   .areset                                      (areset_bundles                              ),
-  .descriptor_in                               (cu_bundles_descriptor                       ),
   .response_memory_in                          (cu_bundles_response_in                      ),
   .fifo_response_memory_in_signals_in          (cu_bundles_fifo_response_signals_in         ),
   .fifo_response_memory_in_signals_out         (cu_bundles_fifo_response_signals_out        ),

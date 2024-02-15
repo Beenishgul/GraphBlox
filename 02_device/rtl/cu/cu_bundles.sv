@@ -20,7 +20,6 @@ module cu_bundles #(
     // System Signals
     input  logic                  ap_clk                                                        ,
     input  logic                  areset                                                        ,
-    input  KernelDescriptor       descriptor_in                                                 ,
     input  MemoryPacketResponse   response_memory_in                                            ,
     input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                            ,
     output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                           ,
@@ -38,8 +37,6 @@ genvar j;
 // Wires and Variables
 // --------------------------------------------------------------------------------------
 logic areset_cu_bundles;
-
-KernelDescriptor descriptor_in_reg;
 
 ControlPacket        request_control_out_int;
 MemoryPacketRequest  request_memory_out_int ;
@@ -92,7 +89,6 @@ FIFOStateSignalsOutput bundle_fifo_request_memory_out_signals_out [NUM_BUNDLES-1
 FIFOStateSignalsOutput bundle_fifo_response_control_in_signals_out[NUM_BUNDLES-1:0];
 FIFOStateSignalsOutput bundle_fifo_response_lanes_in_signals_out  [NUM_BUNDLES-1:0];
 FIFOStateSignalsOutput bundle_fifo_response_memory_in_signals_out [NUM_BUNDLES-1:0];
-KernelDescriptor       bundle_descriptor_in                       [NUM_BUNDLES-1:0];
 logic                  areset_bundle                              [NUM_BUNDLES-1:0];
 logic                  bundle_done_out                            [NUM_BUNDLES-1:0];
 logic                  bundle_fifo_setup_signal                   [NUM_BUNDLES-1:0];
@@ -187,22 +183,6 @@ assign fifo_response_control_in_signals_in.rd_en = 1'b1;
 assign response_control_in                       = request_control_out;
 
 // --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_cu_bundles) begin
-        descriptor_in_reg.valid <= 0;
-    end
-    else begin
-        descriptor_in_reg.valid <= descriptor_in.valid;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    descriptor_in_reg.payload <= descriptor_in.payload;
-end
-
-// --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -290,25 +270,6 @@ assign request_control_out_int = bundle_arbiter_control_N_to_1_request_out;
 always_ff @(posedge ap_clk) begin
     for (int i=0; i<NUM_BUNDLES; i++) begin
         areset_bundle[i] <= areset;
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    if (areset_cu_bundles) begin
-        for (int i=0; i<NUM_BUNDLES; i++) begin
-            bundle_descriptor_in[i].valid <= 0;
-        end
-    end
-    else begin
-        for (int i=0; i<NUM_BUNDLES; i++) begin
-            bundle_descriptor_in[i].valid <= descriptor_in_reg.valid;
-        end
-    end
-end
-
-always_ff @(posedge ap_clk) begin
-    for (int i=0; i<NUM_BUNDLES; i++) begin
-        bundle_descriptor_in[i].payload <= descriptor_in_reg.payload;
     end
 end
 
@@ -528,7 +489,6 @@ generate
         ) inst_bundle_lanes (
             .ap_clk                                      (ap_clk                                                                                      ),
             .areset                                      (areset_bundle[j]                                                                            ),
-            .descriptor_in                               (bundle_descriptor_in[j]                                                                     ),
             .response_lanes_in                           (bundle_response_lanes_in[j]                                                                 ),
             .fifo_response_lanes_in_signals_in           (bundle_fifo_response_lanes_in_signals_in[j]                                                 ),
             .fifo_response_lanes_in_signals_out          (bundle_fifo_response_lanes_in_signals_out[j]                                                ),
