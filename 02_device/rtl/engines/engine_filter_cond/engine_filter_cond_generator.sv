@@ -350,7 +350,7 @@ always_ff @(posedge ap_clk) begin
         ENGINE_FILTER_COND_GEN_SETUP_MEMORY : begin
             configure_memory_setup_reg <= 1'b0;
             if(configure_memory_reg.valid)
-                configure_engine_int.valid <= configure_memory_reg.valid;
+                configure_engine_int.valid <= 1'b1;
         end
         ENGINE_FILTER_COND_GEN_START_TRANS : begin
             done_out_reg               <= 1'b0;
@@ -408,7 +408,7 @@ always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK :
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-
+// --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
     .WIDTH ($bits(EnginePacket)          )
