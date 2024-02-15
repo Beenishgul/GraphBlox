@@ -449,6 +449,8 @@ LUT_Match_ltl1c0lw_6 #(8) lut_match_ltl1c0lw_6(
 
 assign ltl1c0lw_w_match_6 = ltl1c0lw_lut_match_6 ;
 
+wire ltl1c0lw_w_out_7;
+
 STE #(.fan_in(4)) ltl1c0lw_ste_6 (
                 .clk(clk),
                 .run(run),
@@ -459,7 +461,7 @@ STE #(.fan_in(4)) ltl1c0lw_ste_6 (
                 .active_state(ltl1c0lw_w_out_6));
 
 
-wire ltl1c0lw_w_out_7;
+
 wire ltl1c0lw_lut_match_7;
 wire ltl1c0lw_w_match_7;
 

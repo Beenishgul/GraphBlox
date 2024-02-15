@@ -334,7 +334,8 @@ engine_csr_index_configure_engine #(
     .ID_LANE         (ID_LANE         ),
     .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH),
     .PROG_THRESH     (PROG_THRESH     ),
-    .ID_ENGINE       (ID_ENGINE       )
+    .ID_ENGINE       (ID_ENGINE       ),
+    .ID_MODULE       (0               )
 ) inst_engine_csr_index_configure_engine (
     .ap_clk                           (ap_clk                                            ),
     .areset                           (areset_configure_engine                           ),
