@@ -2,36 +2,75 @@
 
 import sys
 import os
+import glob
 import json
 
 def print_usage():
-    print("""
-MSG: Usage:
-  generate_build_cfg.py APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS_STRATEGY, PART, PLATFORM, TARGET, XILINX_NUM_KERNELS, XILINX_MAX_THREADS, DESIGN_FREQ_HZ
+    usage_text = """
+Usage: generate_rtl_synth_cfg.py <params_sh_dir>
+  <params_sh_dir>: Path to the parameters file.
 
-  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/
-  UTILS_DIR_ACTIVE: utils
-  KERNEL_NAME: kernel
-  XILINX_IMPL_STRATEGY: 0-2
-  XILINX_JOBS_STRATEGY: 2
-  PART: xcu280-fsvh2892-2L-e
-  PLATFORM: xilinx_u250_gen3x16_xdma_4_1_202210_1
-  TARGET: hw
-  XILINX_NUM_KERNELS: 2
-  XILINX_MAX_THREADS: 8
-  DESIGN_FREQ_HZ: 300000000
-""")
+Example:
+  python generate_rtl_synth_cfg.py /path/to/params.sh
+"""
+    print(usage_text)
 
-if len(sys.argv) < 15:
+def load_params_from_bash(params_file_path):
+    params = {}
+    with open(params_file_path, 'r') as file:
+        for line in file:
+            line = line.strip()
+            # Ignore comments and empty lines
+            if line.startswith('#') or not line:
+                continue
+            # Split on the first '=' to separate key and value
+            key_value = line.split('=', 1)
+            if len(key_value) == 2:
+                key, value = key_value
+                key = key.strip()
+                value = value.strip()
+                # Try to convert numerical values
+                if value.isdigit():
+                    value = int(value)
+                elif value.replace('.', '', 1).isdigit():
+                    value = float(value)
+                # Handle strings, assuming they do not contain spaces
+                else:
+                    # Remove possible Bash export command
+                    key = key.replace('export ', '')
+                    # Assuming the values are not enclosed in quotes in the Bash script
+                    # If they are, you might need to strip them: value = value.strip('\'"')
+                params[key] = value
+    return params
+
+
+if len(sys.argv) < 2:
     print_usage()
     sys.exit(1)
 
-APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, KERNEL_NAME, XILINX_IMPL_STRATEGY, XILINX_JOBS_STRATEGY, PART, PLATFORM, TARGET, XILINX_NUM_KERNELS, XILINX_MAX_THREADS, DESIGN_FREQ_HZ, FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, OVERRIDE_TOPOLOGY_JSON = sys.argv[1:16]
+params_sh_dir = sys.argv[1]
+# Assuming params_sh_dir is a Python file with variables defined
+params = load_params_from_bash(params_sh_dir)
 
+APP_DIR_ACTIVE =  params['APP_DIR_ACTIVE']
+UTILS_DIR_ACTIVE =  params['UTILS_DIR_ACTIVE']
+KERNEL_NAME =  params['KERNEL_NAME']
+XILINX_IMPL_STRATEGY =  params['XILINX_IMPL_STRATEGY']
+XILINX_JOBS_STRATEGY =  params['XILINX_JOBS_STRATEGY']
+PART =  params['PART']
+PLATFORM =  params['PLATFORM']
+TARGET =  params['TARGET']
+XILINX_NUM_KERNELS =  params['XILINX_NUM_KERNELS']
+XILINX_MAX_THREADS =  params['XILINX_MAX_THREADS']
+DESIGN_FREQ_HZ =  params['DESIGN_FREQ_HZ']
+FULL_SRC_IP_DIR_OVERLAY =  params['FULL_SRC_IP_DIR_OVERLAY']
+ARCHITECTURE =  params['ARCHITECTURE']
+CAPABILITY =  params['CAPABILITY']
+OVERRIDE_TOPOLOGY_JSON =  params['OVERRIDE_TOPOLOGY_JSON']
 
-# Construct the full path for the file
-config_filename = f"topology.json"
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
+# Construct the full path for the file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json
+config_filename = f"{KERNEL_NAME}_{TARGET}.topology.json"
+config_file_path = os.path.join(APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, config_filename)
 
 UTILS_TCL="utils.tcl"
 

@@ -38,9 +38,9 @@ output_folder_path_kernel      = os.path.join(FULL_SRC_IP_DIR_RTL, "kernel")
 output_folder_path_cu          = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
 output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
 output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
-FULL_SRC_IP_DIR_UTILS_RPT      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.rpt")
-FULL_SRC_IP_DIR_UTILS_QOR      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
-FULL_SRC_IP_DIR_UTILS_DCP      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.dcp")
+full_src_ip_dir_utils_rpt      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.rpt")
+full_src_ip_dir_utils_qor      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
+full_src_ip_dir_utils_dcp      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.dcp")
 
 
 if not os.path.exists(output_folder_path_topology):
@@ -73,14 +73,14 @@ if not os.path.exists(FULL_SRC_IP_DIR_UTILS):
 if not os.path.exists(FULL_SRC_IP_DIR_UTILS_TCL):
     os.makedirs(FULL_SRC_IP_DIR_UTILS_TCL)
 
-if not os.path.exists(FULL_SRC_IP_DIR_UTILS_RPT):
-    os.makedirs(FULL_SRC_IP_DIR_UTILS_RPT)
+if not os.path.exists(full_src_ip_dir_utils_rpt):
+    os.makedirs(full_src_ip_dir_utils_rpt)
 
-if not os.path.exists(FULL_SRC_IP_DIR_UTILS_QOR):
-    os.makedirs(FULL_SRC_IP_DIR_UTILS_QOR)
+if not os.path.exists(full_src_ip_dir_utils_qor):
+    os.makedirs(full_src_ip_dir_utils_qor)
 
-if not os.path.exists(FULL_SRC_IP_DIR_UTILS_DCP):
-    os.makedirs(FULL_SRC_IP_DIR_UTILS_DCP)
+if not os.path.exists(full_src_ip_dir_utils_dcp):
+    os.makedirs(full_src_ip_dir_utils_dcp)
 
 if not os.path.exists(output_folder_path_testbench):
     os.makedirs(output_folder_path_testbench)
@@ -154,9 +154,9 @@ if {{ [file exists {read_rqs}] == 1}} {{
 
 # Base directories
 utils_tcl_dir = FULL_SRC_IP_DIR_UTILS_TCL
-qor_dir = FULL_SRC_IP_DIR_UTILS_QOR
-dcp_dir = FULL_SRC_IP_DIR_UTILS_DCP
-rpt_dir = FULL_SRC_IP_DIR_UTILS_RPT
+qor_dir = full_src_ip_dir_utils_qor
+dcp_dir = full_src_ip_dir_utils_dcp
+rpt_dir = full_src_ip_dir_utils_rpt
 
 # Stages for which to generate reports
 stages = ["synth", "opt", "place", "phys_opt", "route", "post_route_phys_opt"]
@@ -197,6 +197,8 @@ output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbit
 
 output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
 output_file_lane_topology = os.path.join(output_folder_path_topology,"lane_topology.vh")
+
+output_file_engine_template_topology = os.path.join(output_folder_path_topology,"engine_template_topology.vh")
 
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
@@ -968,6 +970,7 @@ check_and_clean_file(output_file_testbench_parameters)
 check_and_clean_file(output_file_path_topology)
 check_and_clean_file(output_file_bundle_topology)
 check_and_clean_file(output_file_lane_topology)
+check_and_clean_file(output_file_engine_template_topology)
 check_and_clean_file(output_file_afu_topology)
 check_and_clean_file(output_file_afu_ports)
 check_and_clean_file(output_file_top_ports)
@@ -3300,9 +3303,6 @@ with open(output_file_testbench_parameters, "w") as file:
         output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
 
     file.write('\n'.join(output_lines))
-
-
-
 
 
 check_and_clean_file(output_file_pkg_mxx_axi4_fe)
@@ -6815,3 +6815,165 @@ with open(output_file_cu_mxx_axi_cu_sram_wrapper, "w") as file:
         fill_cu_mxx_axi_cu_sram_wrapper_module.append(fill_cu_mxx_axi_cu_sram_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
     
     file.write('\n'.join(fill_cu_mxx_axi_cu_sram_wrapper_module))
+
+
+
+
+fill_engine_template_topology = []
+
+    # Header for the VHDL instantiation section
+fill_engine_template_topology.append("""// --------------------------------------------------------------------------------------
+// Generate Engine - instant
+// --------------------------------------------------------------------------------------
+generate
+    case (ENGINES_CONFIG)""")
+
+    # Template for each engine instantiation
+engine_template_mid = """
+        {index}       : begin
+// --------------------------------------------------------------------------------------
+// {engine_name}
+// --------------------------------------------------------------------------------------
+            assign areset_template = areset_engine;
+
+            assign template_descriptor_in                             = descriptor_in_reg;
+            assign template_fifo_response_control_in_signals_in.rd_en = 1'b1;
+            assign template_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
+            assign template_fifo_response_memory_in_signals_in.rd_en  = 1'b1;
+            assign template_response_control_in                       = response_control_in_int;
+            assign template_response_engine_in[0]                     = response_engine_in_int;
+            assign template_response_memory_in                        = response_memory_in_int;
+
+            assign template_fifo_request_engine_out_signals_in.rd_en     = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
+            assign template_fifo_request_memory_out_signals_in.rd_en     = fifo_request_memory_out_signals_in_reg.rd_en;
+            assign template_fifo_request_control_out_signals_in.rd_en    = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in     = fifo_response_lanes_backtrack_signals_in_reg;
+            assign template_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in_reg;
+            
+            {engine_name} #(
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .NUM_CHANNELS       (NUM_CHANNELS       ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
+            ) inst_{engine_name} (
+                .ap_clk                                      (ap_clk                                               ),
+                .areset                                      (areset_template                                      ),
+                .descriptor_in                               (template_descriptor_in                               ),
+                .response_engine_in                          (template_response_engine_in[0]                       ),
+                .fifo_response_engine_in_signals_in          (template_fifo_response_engine_in_signals_in[0]       ),
+                .fifo_response_engine_in_signals_out         (template_fifo_response_engine_in_signals_out[0]      ),
+                .fifo_response_lanes_backtrack_signals_in    (template_fifo_response_lanes_backtrack_signals_in    ),
+                .response_memory_in                          (template_response_memory_in                          ),
+                .fifo_response_memory_in_signals_in          (template_fifo_response_memory_in_signals_in          ),
+                .fifo_response_memory_in_signals_out         (template_fifo_response_memory_in_signals_out         ),
+                .response_control_in                         (template_response_control_in                         ),
+                .fifo_response_control_in_signals_in         (template_fifo_response_control_in_signals_in         ),
+                .fifo_response_control_in_signals_out        (template_fifo_response_control_in_signals_out        ),
+                .request_engine_out                          (template_request_engine_out                          ),
+                .fifo_request_engine_out_signals_in          (template_fifo_request_engine_out_signals_in          ),
+                .fifo_request_engine_out_signals_out         (template_fifo_request_engine_out_signals_out         ),
+                .request_memory_out                          (template_request_memory_out                          ),
+                .fifo_request_memory_out_signals_in          (template_fifo_request_memory_out_signals_in          ),
+                .fifo_request_memory_out_signals_out         (template_fifo_request_memory_out_signals_out         ),
+                .fifo_request_memory_out_backtrack_signals_in(template_fifo_request_memory_out_backtrack_signals_in),
+                .request_control_out                         (template_request_control_out                         ),
+                .fifo_request_control_out_signals_in         (template_fifo_request_control_out_signals_in         ),
+                .fifo_request_control_out_signals_out        (template_fifo_request_control_out_signals_out        ),
+                .fifo_setup_signal                           (template_fifo_setup_signal                           ),
+                .done_out                                    (template_done_out                                    )
+            );
+// --------------------------------------------------------------------------------------
+        end"""
+
+engine_template_post = """
+        default       : begin
+// --------------------------------------------------------------------------------------
+// ENGINE_PIPELINE
+// --------------------------------------------------------------------------------------
+            assign areset_template = areset_engine;
+
+            assign template_descriptor_in                             = descriptor_in_reg;
+            assign template_fifo_response_control_in_signals_in.rd_en = 1'b1;
+            assign template_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
+            assign template_fifo_response_memory_in_signals_in.rd_en  = 1'b1;
+            assign template_response_control_in                       = response_control_in_int;
+            assign template_response_engine_in[0]                     = response_engine_in_int;
+            assign template_response_memory_in                        = response_memory_in_int;
+
+            assign template_fifo_request_engine_out_signals_in.rd_en     = fifo_request_engine_out_signals_in_reg.rd_en & ~engine_cast_arbiter_1_to_N_fifo_response_signals_out.prog_full;
+            assign template_fifo_request_memory_out_signals_in.rd_en     = fifo_request_memory_out_signals_in_reg.rd_en;
+            assign template_fifo_request_control_out_signals_in.rd_en    = fifo_request_control_out_signals_in_reg.rd_en;
+            assign template_fifo_response_lanes_backtrack_signals_in     = fifo_response_lanes_backtrack_signals_in_reg;
+            assign template_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in_reg;
+            
+            engine_pipeline #(
+                .ID_CU              (ID_CU              ),
+                .ID_BUNDLE          (ID_BUNDLE          ),
+                .ID_LANE            (ID_LANE            ),
+                .ID_ENGINE          (ID_ENGINE          ),
+                .ID_RELATIVE        (ID_RELATIVE        ),
+                .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+                .ENGINE_MERGE_WIDTH (ENGINE_MERGE_WIDTH ),
+                .NUM_CHANNELS       (NUM_CHANNELS       ),
+                .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH   ),
+                .PROG_THRESH        (PROG_THRESH        ),
+                .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+                .NUM_BUNDLES        (NUM_BUNDLES        ),
+                .ENGINE_SEQ_WIDTH   (ENGINE_SEQ_WIDTH   ),
+                .ENGINE_SEQ_MIN     (ENGINE_SEQ_MIN     ),
+                .ENGINES_CONFIG     (ENGINES_CONFIG     )
+            ) inst_engine_pipeline (
+                .ap_clk                                      (ap_clk                                               ),
+                .areset                                      (areset_template                                      ),
+                .descriptor_in                               (template_descriptor_in                               ),
+                .response_engine_in                          (template_response_engine_in[0]                       ),
+                .fifo_response_engine_in_signals_in          (template_fifo_response_engine_in_signals_in[0]       ),
+                .fifo_response_engine_in_signals_out         (template_fifo_response_engine_in_signals_out[0]      ),
+                .fifo_response_lanes_backtrack_signals_in    (template_fifo_response_lanes_backtrack_signals_in    ),
+                .response_memory_in                          (template_response_memory_in                          ),
+                .fifo_response_memory_in_signals_in          (template_fifo_response_memory_in_signals_in          ),
+                .fifo_response_memory_in_signals_out         (template_fifo_response_memory_in_signals_out         ),
+                .response_control_in                         (template_response_control_in                         ),
+                .fifo_response_control_in_signals_in         (template_fifo_response_control_in_signals_in         ),
+                .fifo_response_control_in_signals_out        (template_fifo_response_control_in_signals_out        ),
+                .request_engine_out                          (template_request_engine_out                          ),
+                .fifo_request_engine_out_signals_in          (template_fifo_request_engine_out_signals_in          ),
+                .fifo_request_engine_out_signals_out         (template_fifo_request_engine_out_signals_out         ),
+                .request_memory_out                          (template_request_memory_out                          ),
+                .fifo_request_memory_out_signals_in          (template_fifo_request_memory_out_signals_in          ),
+                .fifo_request_memory_out_signals_out         (template_fifo_request_memory_out_signals_out         ),
+                .fifo_request_memory_out_backtrack_signals_in(template_fifo_request_memory_out_backtrack_signals_in),
+                .request_control_out                         (template_request_control_out                         ),
+                .fifo_request_control_out_signals_in         (template_fifo_request_control_out_signals_in         ),
+                .fifo_request_control_out_signals_out        (template_fifo_request_control_out_signals_out        ),
+                .fifo_setup_signal                           (template_fifo_setup_signal                           ),
+                .done_out                                    (template_done_out                                    )
+            );
+// --------------------------------------------------------------------------------------
+        end"""
+
+# Generate the instantiation code for each engine and append it to the list
+for engine_name, properties in engine_properties.items():
+    index = properties[0]  # Assuming the first element is the index for the switch case
+    instantiation_code = engine_template_mid.format(index=index, engine_name=engine_name.lower())
+    fill_engine_template_topology.append(instantiation_code)
+
+# Closing the generate-case structure
+instantiation_code = engine_template_post.format(index=index, engine_name=engine_name.lower())
+fill_engine_template_topology.append(instantiation_code)
+fill_engine_template_topology.append("    endcase\nendgenerate")
+
+# Write the accumulated VHDL code to the specified output file
+with open(output_file_engine_template_topology, 'w') as vh_file:
+    vh_file.write('\n'.join(fill_engine_template_topology))

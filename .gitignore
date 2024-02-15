@@ -50,6 +50,7 @@
 02_device/rtl/utils/include/topology/cu_arbitration.vh
 02_device/rtl/utils/include/topology/lane_arbitration.vh
 02_device/rtl/utils/include/topology/lane_topology.vh
+02_device/rtl/utils/include/topology/engine_template_topology.vh
 # !02_device/rtl/cu/cu_m00_axi_cu_*.sv
 # 02_device/rtl/cu/cu_m*_axi_cu_*.sv
 # !02_device/rtl/cu/cu_mxx_axi_cu_*.sv

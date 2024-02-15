@@ -248,6 +248,7 @@ $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE): sub-session-info
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)     ;\
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)   ;\
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_XDC)/$(ALVEO)   ;\
+	cp -f $(FULL_SRC_IP_DIR_OVERLAY)/$(ARCHITECTURE)/$(CAPABILITY)/topology.json $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/$$file; done    ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PERL)/$$file; done    ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_TCL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_TCL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)/$$file; done       ;\
@@ -263,13 +264,14 @@ $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini: sub-session-info
 
 .PHONY: $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg: sub-session-info
-	$(BASH) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_rtl_${TARGET}_cfg.sh $(PARAMS_SH_DIR)
+	$(CP) $(FULL_SRC_IP_DIR_OVERLAY)/$(ARCHITECTURE)/$(CAPABILITY)/topology.json $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json ;\
+	python3 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/generate_rtl_synth_cfg.py $(PARAMS_SH_DIR)
 
 .PHONY: gen-filelists
 gen-filelists: sub-session-info
-	$(BASH) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_package_filelist_f.sh $(PARAMS_SH_DIR) ;\
+	$(PYTHON) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/generate_package_filelist_f.py $(PARAMS_SH_DIR) ;\
 	bash $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_xdc_filelist_f.sh $(PARAMS_SH_DIR) ;\
-	bash $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_xsim_filelist_f.sh $(PARAMS_SH_DIR)
+	python3 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/generate_xsim_filelist_f.py $(PARAMS_SH_DIR)
 
 .PHONY: $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR)
 $(APP_DIR_ACTIVE)/$(VIVADO_VIP_DIR): sub-session-info
@@ -462,8 +464,7 @@ clean-import-hw: session-info
 $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR): sub-session-info
 	$(MKDIR_P) $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR) ;\
 	touch $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).log ;\
-	touch $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err ;\
-	cp $(FULL_SRC_IP_DIR_OVERLAY)/$(ARCHITECTURE)/$(CAPABILITY)/topology.json $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).topology.json
+	touch $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).err 
 
 .PHONY: $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin: sub-session-info | $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR) 
@@ -626,7 +627,7 @@ $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_A
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin.info \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).ltx \
-			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).topology.json \
+			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json \
 			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_RPT)/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
 
 PHONY: gen-xclbin-zip
