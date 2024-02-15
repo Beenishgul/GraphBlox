@@ -22,10 +22,10 @@ module engine_read_write_kernel (
 );
 
 // Define internal signals
-EnginePacketData         ops_value_reg ;
-PacketRequestDataAddress address_int   ;
-EnginePacketData         org_value_reg ;
-EnginePacketData         org_data_int  ;
+EnginePacketData         ops_value_reg;
+PacketRequestDataAddress address_int  ;
+EnginePacketData         org_value_reg;
+EnginePacketData         org_data_int ;
 
 always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
@@ -35,6 +35,8 @@ always_ff @(posedge ap_clk) begin
       for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
         if(config_params_in.ops_mask[i][j]) begin
           ops_value_reg.field[i] <= data_in.field[j];
+        end else begin
+          ops_value_reg.field[i] <= 0;
         end
       end
     end
@@ -44,6 +46,8 @@ always_ff @(posedge ap_clk) begin
     for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
       if(config_params_in.ops_mask[i][j]) begin
         org_value_reg.field[i] <= data_in.field[j];
+      end else begin
+        org_value_reg.field[i] <= data_in.field[i];
       end
     end
   end

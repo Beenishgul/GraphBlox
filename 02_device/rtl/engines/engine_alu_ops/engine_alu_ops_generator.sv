@@ -407,13 +407,13 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
 );
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_engine_start_Stage.valid                                 <= alu_op_done_int;
-    generator_engine_request_engine_start_Stage.payload.data                          <= result_int ;
-    generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination <= configure_engine_int.payload.meta.route.packet_destination;
-    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    <= response_engine_reg_int.route.sequence_source;
-    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     <= response_engine_reg_int.route.sequence_state;
-    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        <= response_engine_reg_int.route.sequence_id;
-    generator_engine_request_engine_start_Stage.payload.meta.route.hops               <= response_engine_reg_int.route.hops;
+    generator_engine_request_engine_start_Stage.valid                                 = alu_op_done_int;
+    generator_engine_request_engine_start_Stage.payload.data                          = result_int ;
+    generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = configure_engine_int.payload.meta.route.packet_destination;
+    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
+    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = response_engine_reg_int.route.sequence_state;
+    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
+    generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
 end
 // --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
