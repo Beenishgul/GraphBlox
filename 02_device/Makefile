@@ -77,6 +77,10 @@ XCLBIN_PATH         ?= $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TA
 FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
+
+ACTIVE_PARAMS_DIR      ?= $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PARAMS)
+ACTIVE_PARAMS_SH_DIR   ?= $(ACTIVR_PARAMS_DIR)/$(UTILS_PARAMS)/$(PARAMS_SH)
+ACTIVE_PARAMS_TCL_DIR  ?= $(ACTIVR_PARAMS_DIR)/$(UTILS_PARAMS)/$(PARAMS_TCL)
 # =========================================================
 # GLay HOST Argument list               
 # =========================================================
@@ -248,6 +252,9 @@ $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE): sub-session-info
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_TCL)     ;\
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)   ;\
 	mkdir -p $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_XDC)/$(ALVEO)   ;\
+	mkdir -p $(ACTIVE_PARAMS_DIR)   ;\
+	cp -f $(PARAMS_SH_DIR) $(ACTIVE_PARAMS_DIR)/ ;\
+	cp -f $(PARAMS_TCL_DIR) $(ACTIVE_PARAMS_DIR)/ ;\
 	cp -f $(FULL_SRC_IP_DIR_OVERLAY)/$(ARCHITECTURE)/$(CAPABILITY)/topology.json $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PYTHON)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/$$file; done    ;\
 	for file in $$(ls $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)) ; do cp -- $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_PERL)/$$file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PERL)/$$file; done    ;\

@@ -427,7 +427,7 @@ module engine_read_write_generator #(parameter
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg <= 1'b0;
                 if(configure_memory_reg.valid)
-                    configure_engine_int.valid <= configure_memory_reg.valid;
+                    configure_engine_int.valid <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
                 done_out_reg               <= 1'b0;

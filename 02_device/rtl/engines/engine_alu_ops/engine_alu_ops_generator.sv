@@ -326,9 +326,8 @@ always_ff @(posedge ap_clk) begin
         end
         ENGINE_ALU_OPS_GEN_SETUP_MEMORY : begin
             configure_memory_setup_reg <= 1'b0;
-            configure_engine_int.valid <= 1'b0;
             if(configure_memory_reg.valid)
-                configure_engine_int <= configure_memory_reg;
+                configure_engine_int.valid <= 1'b1;
         end
         ENGINE_ALU_OPS_GEN_START_TRANS : begin
             done_out_reg               <= 1'b0;
@@ -353,6 +352,11 @@ always_ff @(posedge ap_clk) begin
     endcase
 end// always_ff @(posedge ap_clk)
 
+always_ff @(posedge ap_clk) begin
+    if(configure_memory_reg.valid)
+        configure_engine_int.payload <= configure_memory_reg.payload;
+end
+
 // --------------------------------------------------------------------------------------
 // Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
@@ -363,10 +367,14 @@ logic            alu_accum_done_int  ;
 // --------------------------------------------------------------------------------------
 always_comb alu_accum_done_int = (configure_engine_int.payload.param.alu_operation == ALU_ACC) ? ((generator_engine_request_engine_reg_S3.valid & (generator_engine_request_engine_reg_S3.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 // --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+    localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
+    localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     generator_engine_request_engine_reg.valid                                 <= response_engine_in_int.valid;
     generator_engine_request_engine_reg.payload.data                          <= response_engine_in_int.payload.data  ;
-    generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_memory_reg.payload.meta.route.packet_destination;
+    generator_engine_request_engine_reg.payload.meta.route.packet_destination <= configure_engine_int.payload.meta.route.packet_destination;
     generator_engine_request_engine_reg.payload.meta.route.sequence_source    <= response_engine_in_int.payload.meta.route.sequence_source;
     generator_engine_request_engine_reg.payload.meta.route.sequence_state     <= response_engine_in_int.payload.meta.route.sequence_state;
     generator_engine_request_engine_reg.payload.meta.route.sequence_id        <= response_engine_in_int.payload.meta.route.sequence_id;
@@ -394,8 +402,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-    engine_alu_ops_clear                                                         <= alu_accum_done_int & result_flag;
-    generator_engine_request_engine_reg_S4.valid                                 <= alu_accum_done_int & result_flag;
+    engine_alu_ops_clear                                                         <= alu_accum_done_int;
+    generator_engine_request_engine_reg_S4.valid                                 <= alu_accum_done_int;
     generator_engine_request_engine_reg_S4.payload.data                          <= result_int ;
     generator_engine_request_engine_reg_S4.payload.meta.route.packet_destination <= generator_engine_request_engine_reg_S3.payload.meta.route.packet_destination;
     generator_engine_request_engine_reg_S4.payload.meta.route.sequence_source    <= generator_engine_request_engine_reg_S3.payload.meta.route.sequence_source;
@@ -412,7 +420,6 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
     .config_params      (configure_engine_int.payload.param                  ),
     .data_valid         (response_engine_in_int.valid                        ),
     .data               (response_engine_in_int.payload.data                 ),
-    .result_flag        (result_flag                                         ),
     .result             (result_int                                          )
 );
 

@@ -21,7 +21,6 @@ module engine_alu_ops_kernel (
   input  ALUOpsConfigurationParameters config_params      ,
   input  logic                         data_valid         ,
   input  EnginePacketData              data               ,
-  output logic                         result_flag        ,
   output EnginePacketData              result
 );
 
@@ -138,7 +137,6 @@ end
 always_ff @(posedge ap_clk) begin
   if (areset) begin
     result      <= 0;
-    result_flag <= 0;
   end else begin
     for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS/2; i++) begin
       result.field[i] <= result_reg.field[i];
@@ -146,7 +144,6 @@ always_ff @(posedge ap_clk) begin
     for (int i = ENGINE_PACKET_DATA_NUM_FIELDS/2; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
       result.field[i] <= org_value_reg.field[i];
     end
-    result_flag <= result_flag_reg;
   end
 end
 
