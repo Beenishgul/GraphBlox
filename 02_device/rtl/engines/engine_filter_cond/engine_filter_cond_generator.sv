@@ -385,7 +385,6 @@ end
 // --------------------------------------------------------------------------------------
 EnginePacketData result_int ;
 logic            result_bool;
-logic            result_flag;
 // --------------------------------------------------------------------------------------
 logic filter_flow_int       ;
 logic break_start_flow_int  ;
@@ -398,9 +397,9 @@ PacketRouteAddress  packet_destination_int    ;
 type_sequence_state sequence_state_engine_int ;
 type_sequence_state sequence_state_control_int;
 // --------------------------------------------------------------------------------------
-always_comb filter_flow_int      = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
-always_comb conditional_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.filter_pass);
-always_comb break_start_flow_int = result_flag & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg;
+always_comb filter_flow_int      = (result_bool^ configure_engine_int.payload.param.filter_pass);
+always_comb conditional_flow_int = (result_bool^ configure_engine_int.payload.param.filter_pass);
+always_comb break_start_flow_int = (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg;
 always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((response_engine_reg_int.valid & (response_engine_reg_int.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 always_comb break_running_flow_int = (break_running_flow_reg|break_start_flow_int);
 always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : response_engine_reg_int.payload.meta.route.packet_destination;
@@ -409,7 +408,7 @@ always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK :
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-// --------------------------------------------------------------------------------------
+
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
     .WIDTH ($bits(EnginePacket)          )
@@ -420,16 +419,11 @@ hyper_pipeline_noreset #(
 );
 // --------------------------------------------------------------------------------------
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
-    .ap_clk             (ap_clk                             ),
-    .areset             (areset_kernel                      ),
-    .clear              (~(configure_engine_int.valid)      ),
-    .config_params_valid(configure_engine_int.valid         ),
-    .config_params      (configure_engine_int.payload.param ),
-    .data_valid         (response_engine_in_int.valid       ),
-    .data               (response_engine_in_int.payload.data),
-    .result_flag        (result_flag                        ),
-    .result             (result_int                         ),
-    .result_bool        (result_bool                        )
+    .ap_clk          (ap_clk                             ),
+    .config_params_in(configure_engine_int.payload.param ),
+    .data_in         (response_engine_in_int.payload.data),
+    .result_out      (result_int                         ),
+    .result_bool     (result_bool                        )
 );
 // --------------------------------------------------------------------------------------
 always_comb begin
