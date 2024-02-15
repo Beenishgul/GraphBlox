@@ -362,7 +362,6 @@ end
 // Generation Logic - ALU OPS data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
 EnginePacketData result_int          ;
-logic            result_flag         ;
 logic            engine_alu_ops_clear;
 logic            alu_op_done_int     ;
 logic            alu_op_clear_int    ;
@@ -372,7 +371,7 @@ always_comb alu_op_clear_int = (configure_engine_int.payload.param.alu_operation
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-
+// --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
     .WIDTH ($bits(EnginePacketMeta)      )
@@ -399,7 +398,6 @@ engine_alu_ops_kernel inst_engine_alu_ops_kernel (
     .ap_clk             (ap_clk                             ),
     .areset             (areset_kernel                      ),
     .clear              (engine_alu_ops_clear               ),
-    .config_params_valid(configure_engine_int.valid         ),
     .config_params_in   (configure_engine_int.payload.param ),
     .data_valid         (response_engine_in_int.valid       ),
     .data_in            (response_engine_in_int.payload.data),

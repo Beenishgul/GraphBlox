@@ -409,7 +409,7 @@ always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK :
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-
+// --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
     .WIDTH ($bits(EnginePacketMeta)      )
