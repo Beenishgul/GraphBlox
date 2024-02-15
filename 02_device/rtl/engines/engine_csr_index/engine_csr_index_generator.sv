@@ -47,7 +47,6 @@ module engine_csr_index_generator #(parameter
     // System Signals
     input  logic                  ap_clk                                                                             ,
     input  logic                  areset                                                                             ,
-    input  KernelDescriptor       descriptor_in                                                                      ,
     input  CSRIndexConfiguration  configure_engine_in                                                                ,
     input  FIFOStateSignalsInput  fifo_configure_engine_in_signals_in                                                ,
     input  CSRIndexConfiguration  configure_memory_in                                                                ,
@@ -79,8 +78,6 @@ module engine_csr_index_generator #(parameter
     logic areset_generator;
     logic areset_counter  ;
     logic areset_fifo     ;
-
-    KernelDescriptor descriptor_in_reg;
 
     CSRIndexConfiguration configure_engine_reg;
     CSRIndexConfiguration configure_memory_reg;
@@ -259,22 +256,6 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
-            descriptor_in_reg.valid <= 1'b0;
-        end
-        else begin
-            descriptor_in_reg.valid <= descriptor_in.valid;
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        descriptor_in_reg.payload <= descriptor_in.payload;
-    end
-
-// --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -399,10 +380,7 @@ module engine_csr_index_generator #(parameter
                 next_state = ENGINE_CSR_INDEX_GEN_IDLE;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
-                if(descriptor_in_reg.valid)
-                    next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
-                else
-                    next_state = ENGINE_CSR_INDEX_GEN_IDLE;
+                next_state = ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
                 if(fifo_configure_memory_in_signals_in.rd_en)

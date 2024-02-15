@@ -6836,7 +6836,6 @@ engine_template_mid = """
 // --------------------------------------------------------------------------------------
             assign areset_template = areset_engine;
 
-            assign template_descriptor_in                             = descriptor_in_reg;
             assign template_fifo_response_control_in_signals_in.rd_en = 1'b1;
             assign template_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
             assign template_fifo_response_memory_in_signals_in.rd_en  = 1'b1;
@@ -6869,7 +6868,6 @@ engine_template_mid = """
             ) inst_{engine_name} (
                 .ap_clk                                      (ap_clk                                               ),
                 .areset                                      (areset_template                                      ),
-                .descriptor_in                               (template_descriptor_in                               ),
                 .response_engine_in                          (template_response_engine_in[0]                       ),
                 .fifo_response_engine_in_signals_in          (template_fifo_response_engine_in_signals_in[0]       ),
                 .fifo_response_engine_in_signals_out         (template_fifo_response_engine_in_signals_out[0]      ),
@@ -6904,7 +6902,6 @@ engine_template_merge = """
 // --------------------------------------------------------------------------------------
             assign areset_template = areset_engine;
 
-            assign template_descriptor_in                             = descriptor_in_reg;
             assign template_fifo_response_control_in_signals_in.rd_en = 1'b1;
             assign template_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
             assign template_fifo_response_memory_in_signals_in.rd_en  = 1'b1;
@@ -6937,7 +6934,6 @@ engine_template_merge = """
             ) inst_{engine_name} (
                 .ap_clk                                      (ap_clk                                               ),
                 .areset                                      (areset_template                                      ),
-                .descriptor_in                               (template_descriptor_in                               ),
                 .response_engine_in                          (template_response_engine_in                          ),
                 .fifo_response_engine_in_signals_in          (template_fifo_response_engine_in_signals_in          ),
                 .fifo_response_engine_in_signals_out         (template_fifo_response_engine_in_signals_out         ),
@@ -6971,7 +6967,6 @@ engine_template_post = """
 // --------------------------------------------------------------------------------------
             assign areset_template = areset_engine;
 
-            assign template_descriptor_in                             = descriptor_in_reg;
             assign template_fifo_response_control_in_signals_in.rd_en = 1'b1;
             assign template_fifo_response_engine_in_signals_in[0].rd_en = 1'b1;
             assign template_fifo_response_memory_in_signals_in.rd_en  = 1'b1;
@@ -7004,7 +6999,6 @@ engine_template_post = """
             ) inst_engine_pipeline (
                 .ap_clk                                      (ap_clk                                               ),
                 .areset                                      (areset_template                                      ),
-                .descriptor_in                               (template_descriptor_in                               ),
                 .response_engine_in                          (template_response_engine_in[0]                       ),
                 .fifo_response_engine_in_signals_in          (template_fifo_response_engine_in_signals_in[0]       ),
                 .fifo_response_engine_in_signals_out         (template_fifo_response_engine_in_signals_out[0]      ),

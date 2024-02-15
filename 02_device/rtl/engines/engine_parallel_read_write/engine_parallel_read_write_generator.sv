@@ -47,7 +47,6 @@ module engine_parallel_read_write_generator #(parameter
     // System Signals
     input  logic                          ap_clk                                                                             ,
     input  logic                          areset                                                                             ,
-    input  KernelDescriptor               descriptor_in                                                                      ,
     input  ParallelReadWriteConfiguration configure_memory_in                                                                ,
     input  FIFOStateSignalsInput          fifo_configure_memory_in_signals_in                                                ,
     input  EnginePacket                   response_engine_in                                                                 ,
@@ -77,8 +76,6 @@ module engine_parallel_read_write_generator #(parameter
     logic areset_counter  ;
     logic areset_fifo     ;
     logic areset_kernel   ;
-
-    KernelDescriptor descriptor_in_reg;
 
     logic                                     configure_memory_setup_reg;
     ParallelReadWriteConfiguration            configure_memory_reg      ;
@@ -226,22 +223,6 @@ module engine_parallel_read_write_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
-            descriptor_in_reg.valid <= 1'b0;
-        end
-        else begin
-            descriptor_in_reg.valid <= descriptor_in.valid;
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        descriptor_in_reg.payload <= descriptor_in.payload;
-    end
-
-// --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -381,10 +362,7 @@ module engine_parallel_read_write_generator #(parameter
                 next_state = ENGINE_PARALLEL_READ_WRITE_GEN_IDLE;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_IDLE : begin
-                if(descriptor_in_reg.valid)
-                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
-                else
-                    next_state = ENGINE_PARALLEL_READ_WRITE_GEN_IDLE;
+                next_state = ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
                 if(fifo_configure_memory_in_signals_in_reg.rd_en)
