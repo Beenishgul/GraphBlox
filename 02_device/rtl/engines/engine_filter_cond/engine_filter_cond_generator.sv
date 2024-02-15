@@ -78,7 +78,8 @@ logic done_out_reg;
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
 EnginePacket          response_engine_in_int                ;
-EnginePacket          response_engine_reg_int               ;
+EnginePacketMeta      response_engine_reg_int               ;
+logic                 response_engine_reg_int_valid         ;
 EnginePacket          response_engine_in_reg                ;
 FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg;
 
@@ -400,22 +401,31 @@ type_sequence_state sequence_state_control_int;
 always_comb filter_flow_int      = (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb break_start_flow_int = (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg;
-always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((response_engine_reg_int.valid & (response_engine_reg_int.payload.meta.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
+always_comb break_done_flow_int  = (break_running_flow_reg|break_start_flow_int) ? ((response_engine_reg_int_valid & (response_engine_reg_int.route.sequence_state == SEQUENCE_DONE)) ? 1'b1 : 1'b0) : 1'b0;
 always_comb break_running_flow_int = (break_running_flow_reg|break_start_flow_int);
-always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : response_engine_reg_int.payload.meta.route.packet_destination;
-always_comb sequence_state_engine_int  = break_start_flow_int ? SEQUENCE_DONE  : response_engine_reg_int.payload.meta.route.sequence_state;
+always_comb packet_destination_int     = configure_engine_int.payload.param.conditional_flag ? (conditional_flow_int ? configure_memory_reg.payload.param.filter_route._if : configure_memory_reg.payload.param.filter_route._else ) : response_engine_reg_int.route.packet_destination;
+always_comb sequence_state_engine_int  = break_start_flow_int ? SEQUENCE_DONE  : response_engine_reg_int.route.sequence_state;
 always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK : SEQUENCE_DONE;
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
+
+hyper_pipeline_noreset #(
+    .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
+    .WIDTH ($bits(EnginePacketMeta)      )
+) inst_hyper_pipeline_response_engine_in_int (
+    .ap_clk(ap_clk                             ),
+    .din   (response_engine_in_int.payload.meta),
+    .dout  (response_engine_reg_int            )
+);
 // --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
-    .WIDTH ($bits(EnginePacket)          )
-) inst_hyper_pipeline_response_engine_in_int (
-    .ap_clk(ap_clk                 ),
-    .din   (response_engine_in_int ),
-    .dout  (response_engine_reg_int)
+    .WIDTH (1                            )
+) inst_hyper_pipeline_response_engine_in_int_valid (
+    .ap_clk(ap_clk                       ),
+    .din   (response_engine_in_int.valid ),
+    .dout  (response_engine_reg_int_valid)
 );
 // --------------------------------------------------------------------------------------
 engine_filter_cond_kernel inst_engine_filter_cond_kernel (
@@ -427,20 +437,20 @@ engine_filter_cond_kernel inst_engine_filter_cond_kernel (
 );
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int.valid & filter_flow_int & ~break_running_flow_reg;
+    generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int_valid & filter_flow_int & ~break_running_flow_reg;
     generator_engine_request_engine_start_Stage.payload.data                          = result_int;
     generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = packet_destination_int;
-    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.payload.meta.route.sequence_source;
+    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
     generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = sequence_state_engine_int;
-    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.payload.meta.route.sequence_id;
-    generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.payload.meta.route.hops;
+    generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
+    generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
 end
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_control_start_Stage.valid                                 = (response_engine_reg_int.valid & filter_flow_int & ~break_running_flow_reg & ~break_done_flow_int) & configure_engine_int.payload.param.break_flag;
-    generator_engine_request_control_start_Stage.payload.meta.route.packet_destination = response_engine_reg_int.payload.meta.route.sequence_source;
+    generator_engine_request_control_start_Stage.valid                                 = (response_engine_reg_int_valid & filter_flow_int & ~break_running_flow_reg & ~break_done_flow_int) & configure_engine_int.payload.param.break_flag;
+    generator_engine_request_control_start_Stage.payload.meta.route.packet_destination = response_engine_reg_int.route.sequence_source;
     generator_engine_request_control_start_Stage.payload.meta.route.sequence_state     = SEQUENCE_BREAK;
-    generator_engine_request_control_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.payload.meta.route.sequence_id;
+    generator_engine_request_control_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
 end
 // --------------------------------------------------------------------------------------
 hyper_pipeline_noreset #(
