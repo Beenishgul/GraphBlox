@@ -122,7 +122,8 @@ module engine_read_write_generator #(parameter
 // FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
     EnginePacket                  response_engine_in_int                  ;
-    EnginePacket                  response_engine_reg_int                 ;
+    EnginePacketMeta              response_engine_reg_int                 ;
+    logic                         response_engine_reg_int_valid           ;
     EnginePacketPayload           fifo_response_engine_in_din             ;
     EnginePacketPayload           fifo_response_engine_in_dout            ;
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
@@ -493,11 +494,20 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
         .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
-        .WIDTH ($bits(EnginePacket)          )
+        .WIDTH ($bits(EnginePacketMeta)      )
     ) inst_hyper_pipeline_response_engine_in_int (
-        .ap_clk(ap_clk                 ),
-        .din   (response_engine_in_int ),
-        .dout  (response_engine_reg_int)
+        .ap_clk(ap_clk                             ),
+        .din   (response_engine_in_int.payload.meta),
+        .dout  (response_engine_reg_int            )
+    );
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
+        .WIDTH (1                            )
+    ) inst_hyper_pipeline_response_engine_in_int_valid (
+        .ap_clk(ap_clk                       ),
+        .din   (response_engine_in_int.valid ),
+        .dout  (response_engine_reg_int_valid)
     );
 // --------------------------------------------------------------------------------------
     engine_read_write_kernel inst_engine_read_write_kernel (
@@ -509,14 +519,14 @@ module engine_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     always_comb begin
-        generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int.valid;
+        generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int_valid;
         generator_engine_request_engine_start_Stage.payload.data                          = result_int;
         generator_engine_request_engine_start_Stage.payload.meta.address                  = address_int;
         generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = configure_engine_int.payload.meta.route.packet_destination;
-        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.payload.meta.route.sequence_source;
-        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = response_engine_reg_int.payload.meta.route.sequence_state;
-        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.payload.meta.route.sequence_id;
-        generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.payload.meta.route.hops;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = response_engine_reg_int.route.sequence_state;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
+        generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
         generator_engine_request_engine_start_Stage.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
     end
 // --------------------------------------------------------------------------------------
