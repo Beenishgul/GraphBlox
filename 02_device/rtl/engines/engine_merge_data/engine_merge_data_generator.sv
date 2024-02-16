@@ -330,11 +330,9 @@ end// always_comb
 always_ff @(posedge ap_clk) begin
     case (current_state)
         ENGINE_MERGE_DATA_GEN_RESET : begin
-            done_out_reg                          <= 1'b1;
-            configure_memory_setup_reg            <= 1'b0;
-            configure_engine_param_valid          <= 1'b0;
-            configure_engine_param_int.merge_mask <= ~0;
-            configure_engine_param_int.merge_type <= 0;
+            done_out_reg                 <= 1'b1;
+            configure_memory_setup_reg   <= 1'b0;
+            configure_engine_param_valid <= 1'b0;
         end
         ENGINE_MERGE_DATA_GEN_IDLE : begin
             done_out_reg               <= 1'b0;
@@ -348,10 +346,9 @@ always_ff @(posedge ap_clk) begin
             configure_memory_setup_reg <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_SETUP_MEMORY : begin
-            configure_memory_setup_reg   <= 1'b0;
-            configure_engine_param_valid <= 1'b0;
+            configure_memory_setup_reg <= 1'b0;
             if(configure_memory_reg.valid)
-                configure_engine_param_int <= configure_memory_reg.payload.param;
+                configure_engine_param_valid <= 1'b1;
         end
         ENGINE_MERGE_DATA_GEN_START_TRANS : begin
             done_out_reg                 <= 1'b0;
@@ -375,6 +372,11 @@ always_ff @(posedge ap_clk) begin
         end
     endcase
 end// always_ff @(posedge ap_clk)
+
+always_ff @(posedge ap_clk) begin
+    if(configure_memory_reg.valid)
+        configure_engine_param_int <= configure_memory_reg.payload.param;
+end
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge data [0-4] -> Gen

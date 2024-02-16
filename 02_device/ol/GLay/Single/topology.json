@@ -430,7 +430,7 @@
         "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram"
     },
     "cache_properties": {
-        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
+        "channel_0": ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
         "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1", "BRAM"],
@@ -472,9 +472,9 @@
     "cu_properties": {
         "synth_strategy" : "1",
         "frequency"      : "300000000",
-        "num_kernels"    : "12",
+        "num_kernels"    : "16",
         "slr_percent"    : [33, 33, 33, 0],
-        "slr_mapping"    : [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 2],
+        "slr_mapping"    : [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
         "slr_layout"     : "2",
         "num_channels"   : "32",
         "channel_percent": [33, 33, 33, 0],
@@ -486,11 +486,11 @@
         "engine_properties_available": {
             "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
             "ENGINE_READ_WRITE"         : [1, 11, 1419, 16, 32, 0,  0],
-            "ENGINE_CSR_INDEX"          : [2, 8,  1932, 16, 32, 0, 16],
-            "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
+            "ENGINE_CSR_INDEX"          : [2, 8,  2062, 16, 32, 0, 16],
+            "ENGINE_FILTER_COND"        : [3, 9,  1929, 16, 0,  16, 0],
             "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
             "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
-            "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
+            "ENGINE_FORWARD_DATA"       : [6, 0,  289,  16, 0,  0,  0],
             "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
             "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0],
             "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
