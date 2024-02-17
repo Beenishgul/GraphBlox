@@ -66,7 +66,6 @@ logic                 fifo_response_memory_in_push_filter   ;
 // Configure FIFO
 // --------------------------------------------------------------------------------------
 ReadWriteConfigurationPayload fifo_configure_memory_din             ;
-ReadWriteConfiguration        fifo_configure_memory_din_reg         ;
 ReadWriteConfiguration        fifo_configure_memory_dout_int        ;
 ReadWriteConfigurationPayload fifo_configure_memory_dout            ;
 FIFOStateSignalsInput         fifo_configure_memory_signals_in_reg  ;
@@ -180,51 +179,35 @@ always_ff @(posedge ap_clk) begin
     if(fifo_response_memory_in_dout_reg.valid) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
-                configure_memory_reg.payload.param.increment     <= fifo_response_memory_in_dout_reg.payload.data.field[0];
-                configure_memory_reg.payload.param.decrement     <= fifo_response_memory_in_dout_reg.payload.data.field[1];
-                configure_memory_reg.payload.param.mode_sequence <= fifo_response_memory_in_dout_reg.payload.data.field[2];
-                configure_memory_reg.payload.param.mode_buffer   <= fifo_response_memory_in_dout_reg.payload.data.field[3];
-                configure_memory_reg.payload.param.mode_counter  <= fifo_response_memory_in_dout_reg.payload.data.field[4];
-            end
-            (1 << 1) : begin
                 configure_memory_reg.payload.param.index_start <= fifo_response_memory_in_dout_reg.payload.data.field;
             end
-            (1 << 2) : begin
-                configure_memory_reg.payload.param.index_end <= fifo_response_memory_in_dout_reg.payload.data.field;
-            end
-            (1 << 3) : begin
-                configure_memory_reg.payload.param.stride <= fifo_response_memory_in_dout_reg.payload.data.field;
-            end
-            (1 << 4) : begin
+            (1 << 1) : begin
                 configure_memory_reg.payload.param.granularity            <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
                 configure_memory_reg.payload.param.direction              <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
                 configure_memory_reg.payload.meta.address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
                 configure_memory_reg.payload.meta.address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
             end
-            (1 << 5) : begin
+            (1 << 2) : begin
                 configure_memory_reg.payload.meta.subclass.cmd                       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
                 configure_memory_reg.payload.meta.route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS)];
                 configure_memory_reg.payload.meta.route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
                 configure_memory_reg.payload.meta.address.id_channel                 <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
                 configure_memory_reg.payload.param.id_channel                        <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
             end
-            (1 << 6) : begin
+            (1 << 3) : begin
                 configure_memory_reg.payload.meta.route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];
                 configure_memory_reg.payload.meta.route.packet_destination.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_BUNDLES_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:CU_KERNEL_COUNT_MAX_WIDTH_BITS];
                 configure_memory_reg.payload.meta.route.packet_destination.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
                 configure_memory_reg.payload.meta.address.id_buffer                  <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
                 configure_memory_reg.payload.param.id_buffer                         <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
             end
-            (1 << 7) : begin
-                configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_reg.payload.data.field;
-            end
-            (1 << 8) : begin
+            (1 << 4) : begin
                 configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
             end
-            (1 << 9) : begin
+            (1 << 5) : begin
                 configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
             end
-            (1 << 10) : begin
+            (1 << 6) : begin
                 configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS*ENGINE_PACKET_DATA_NUM_FIELDS)-1:0];
             end
             // (1 << 11) : begin

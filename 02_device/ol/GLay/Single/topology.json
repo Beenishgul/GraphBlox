@@ -430,7 +430,7 @@
         "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram"
     },
     "cache_properties": {
-        "channel_0": ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
+        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
         "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1", "BRAM"],
@@ -485,7 +485,7 @@
         "comments":"mapping, cycles, luts, fifo_engine, fifo_memory, fifo_control_request, fifo_control_response", 
         "engine_properties_available": {
             "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
-            "ENGINE_READ_WRITE"         : [1, 11, 1419, 16, 32, 0,  0],
+            "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
             "ENGINE_CSR_INDEX"          : [2, 8,  2062, 16, 32, 0, 16],
             "ENGINE_FILTER_COND"        : [3, 9,  1929, 16, 0,  16, 0],
             "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
@@ -498,7 +498,7 @@
     },
     "engine_properties": {
         "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
-        "ENGINE_READ_WRITE"         : [1, 11, 1419, 16, 32, 0,  0],
+        "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
         "ENGINE_CSR_INDEX"          : [2, 8,  1932, 16, 32, 0, 16],
         "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
         "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],

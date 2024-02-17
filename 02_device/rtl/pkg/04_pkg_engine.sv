@@ -317,17 +317,9 @@ typedef enum logic[10:0] {
 } engine_read_write_generator_state;
 
 typedef struct packed{
-    logic                                                                        increment    ;
-    logic                                                                        decrement    ;
-    logic                                                                        mode_sequence;
-    logic                                                                        mode_buffer  ;
-    logic                                                                        mode_counter ;
     logic [      NUM_CHANNELS_WIDTH_BITS-1:0]                                    id_channel   ;
     logic [   CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                    id_buffer    ;
-    logic [           M00_AXI4_FE_DATA_W-1:0]                                    array_size   ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    index_start  ;
-    logic [           M00_AXI4_FE_DATA_W-1:0]                                    index_end    ;
-    logic [           M00_AXI4_FE_DATA_W-1:0]                                    stride       ;
     logic [   $clog2(M00_AXI4_FE_ADDR_W)-1:0]                                    granularity  ;
     logic                                                                        direction    ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;

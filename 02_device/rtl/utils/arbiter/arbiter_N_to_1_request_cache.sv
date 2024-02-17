@@ -162,27 +162,28 @@ end
 // --------------------------------------------------------------------------------------
 // FIFO INPUT Engine Response MemoryPacketRequest
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-  if (areset_arbiter) begin
-    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
-      request_arbiter_in_reg[i].valid <= 1'b0;
-    end
-  end
-  else begin
-    for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
-      request_arbiter_in_reg[i].valid <= request_in[i].valid;
-    end
-  end
-end
-
-always_ff @(posedge ap_clk) begin
-  for (int i=0; i< NUM_MEMORY_REQUESTOR; i++) begin
-    request_arbiter_in_reg[i].payload <= request_in[i].payload;
-  end
-end
-
 generate
   for (i=0; i<(NUM_MEMORY_REQUESTOR); i++) begin : generate_fifo_request_arbiter_in_din
+    // FIFO is pipeline din
+    hyper_pipeline #(
+      .STAGES(2),
+      .WIDTH (1)
+    ) inst_hyper_pipeline_request_in_valid (
+      .ap_clk(ap_clk                         ),
+      .areset(areset_arbiter                 ),
+      .din   (request_in[i].valid            ),
+      .dout  (request_arbiter_in_reg[i].valid)
+    );
+
+    hyper_pipeline_noreset #(
+      .STAGES(2                                ),
+      .WIDTH ($bits(MemoryPacketRequestPayload))
+    ) inst_hyper_pipeline_noreset_request_in_payload (
+      .ap_clk(ap_clk                           ),
+      .din   (request_in[i].payload            ),
+      .dout  (request_arbiter_in_reg[i].payload)
+    );
+
     // FIFO is resetting
     assign fifo_request_arbiter_in_setup_signal_int[i] = fifo_request_arbiter_in_signals_out_int[i].wr_rst_busy | fifo_request_arbiter_in_signals_out_int[i].rd_rst_busy;
 
@@ -196,10 +197,10 @@ generate
     assign request_arbiter_in_int[i].payload               = fifo_request_arbiter_in_dout[i];
 
     xpm_fifo_sync_wrapper #(
-      .FIFO_WRITE_DEPTH(32                               ),
+      .FIFO_WRITE_DEPTH(16                               ),
       .WRITE_DATA_WIDTH($bits(MemoryPacketRequestPayload)),
       .READ_DATA_WIDTH ($bits(MemoryPacketRequestPayload)),
-      .PROG_THRESH     (24                               )
+      .PROG_THRESH     (12                               )
     ) inst_fifo_MemoryPacketRequestArbiter (
       .clk        (ap_clk                                                ),
       .srst       (areset_fifo                                           ),
