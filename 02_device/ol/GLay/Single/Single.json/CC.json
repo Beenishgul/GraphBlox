@@ -374,46 +374,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -423,7 +389,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -441,7 +407,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -459,25 +425,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -512,46 +472,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -561,7 +487,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -579,7 +505,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -597,25 +523,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -634,46 +554,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -683,7 +569,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -701,7 +587,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -719,25 +605,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -756,46 +636,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -805,7 +651,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -823,7 +669,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -841,25 +687,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -1010,46 +850,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -1059,7 +865,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -1077,7 +883,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -1095,25 +901,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -1132,46 +932,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -1181,7 +947,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -1199,7 +965,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -1217,25 +983,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
@@ -1361,46 +1121,12 @@
         },
         "entries": {
             "entry_0": {
-                "increment": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "decrement": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_sequence": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_buffer": {
-                    "bits": "1",
-                    "value": "0"
-                },
-                "mode_break": {
-                    "bits": "1",
-                    "value": "0"
-                }
-            },
-            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_2": {
-                "index_end": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_3": {
-                "stride": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_4": {
+            "entry_1": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "0"
@@ -1410,7 +1136,7 @@
                     "value": "0"
                 }
             },
-            "entry_5": {
+            "entry_2": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_INVALID"
@@ -1428,7 +1154,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_6": {
+            "entry_3": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -1446,25 +1172,19 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
-                "array_size": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_8": {
+            "entry_4": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
                 }
             },
-            "entry_9": {
+            "entry_5": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_10": {
+            "entry_6": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x00"
