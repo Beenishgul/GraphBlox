@@ -474,7 +474,7 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                 cache_line, offset = calculate_cache_info(entry_index_vh, entries_per_cache_line)
                 # append_to_file(output_file_path_vh, f"{hex_value:<10} // entry {entry_index:<4} cacheline {cache_line:<4} offset {offset:<4} -- count {local_count:<4} -- {comment}")
                 
-                if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
+                if engine_type in ["ENGINE_CSR_INDEX"]:
                     if local_count == 1:
                         append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
@@ -484,6 +484,10 @@ def process_file_cpp(template_file_path, engine_template_filename, engine_name):
                     elif local_count == 7:
                         append_to_file(output_file_path_cpp, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_READ_WRITE"]:
+                    if local_count == 0:
+                        append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
                         append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
@@ -593,7 +597,7 @@ def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_te
                 cache_line, offset = calculate_cache_info(entry_index_vh, entries_per_cache_line)
                 # append_to_file(output_file_path_vh, f"{hex_value:<10} // entry {entry_index:<4} cacheline {cache_line:<4} offset {offset:<4} -- count {local_count:<4} -- {comment}")
                 
-                if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
+                if engine_type in ["ENGINE_CSR_INDEX"]:
                     if local_count == 1:
                         append_to_file(output_file_path_vh, f"   // --  1  - Index_Start")
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_start_ops};")
@@ -603,6 +607,10 @@ def process_file_vh_v2(template_file_path_json, template_file_path_ol, engine_te
                     elif local_count == 7:
                         append_to_file(output_file_path_vh, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_READ_WRITE"]:
+                    if local_count == 0:
+                        append_to_file(output_file_path_vh, f"   // --  0  - Index_Start")
+                        append_to_file(output_file_path_vh, f"    graph.overlay_program[{entry_index_vh}]  = {buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
                         local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[0]
@@ -675,7 +683,7 @@ def process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_t
                 cache_line, offset = calculate_cache_info(entry_index_vh, entries_per_cache_line)
                 # append_to_file(output_file_path_vh, f"{hex_value:<10} // entry {entry_index:<4} cacheline {cache_line:<4} offset {offset:<4} -- count {local_count:<4} -- {comment}")
                 
-                if engine_type in ["ENGINE_CSR_INDEX", "ENGINE_READ_WRITE"]:
+                if engine_type in ["ENGINE_CSR_INDEX"]:
                     if local_count == 1:
                         append_to_file(output_file_path_cpp, f"   // --  1  - Index_Start")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
@@ -685,6 +693,10 @@ def process_file_cpp_v2(template_file_path_json, template_file_path_ol, engine_t
                     elif local_count == 7:
                         append_to_file(output_file_path_cpp, f"   // --  7  - Array_size")
                         append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};")
+                elif engine_type in ["ENGINE_READ_WRITE"]:
+                    if local_count == 0:
+                        append_to_file(output_file_path_cpp, f"   // --  0  - Index_Start")
+                        append_to_file(output_file_path_cpp, f"    overlay_program[{entry_index_cpp}] = {buffer_start_ops};")
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count   == 1:
                         local_buffer_name, local_buffer_start, local_buffer_end  = detail_pattern[0]
