@@ -77,7 +77,7 @@
             ]
         ]
     },
-    "Single.BFSV2": {
+    "Single.BFS": {
         "0": [
             [
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
@@ -116,7 +116,7 @@
             ]
         ]
     },
-    "Single.BFS": {
+    "Single.BFSV1": {
         "0": [
             [
                 "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
@@ -430,7 +430,7 @@
         "comments":"l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram"
     },
     "cache_properties": {
-        "channel_0": ["32768",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
+        "channel_0": ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"],
         "channel_1": ["32768",   "2", "BRAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_2": ["32768",   "1", "URAM",      "0", "512",  "1", "1", "BRAM"],
         "channel_3": ["65536",   "1", "BRAM",      "0", "512",  "1", "1", "BRAM"],
@@ -503,6 +503,7 @@
         "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
         "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
-        "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0]
+        "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
+        "ENGINE_PARALLEL_READ_WRITE": [7, 29, 1419, 16, 32, 0,  0]
     }
 }

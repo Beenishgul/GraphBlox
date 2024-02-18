@@ -29,58 +29,55 @@
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
 module engine_parallel_read_write_generator #(parameter
-    ID_CU               = 0                    ,
-    ID_BUNDLE           = 0                    ,
-    ID_LANE             = 0                    ,
-    ID_ENGINE           = 0                    ,
-    ID_MODULE           = 1                    ,
-    ENGINES_CONFIG      = 0                    ,
-    FIFO_WRITE_DEPTH    = 16                   ,
-    PROG_THRESH         = 8                    ,
-    PIPELINE_STAGES     = 2                    ,
-    COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
-    NUM_BACKTRACK_LANES = 4                    ,
-    NUM_CHANNELS        = 2                    ,
-    ENGINE_CAST_WIDTH   = 1                    ,
-    NUM_BUNDLES         = 4
+    ID_CU                      = 0                    ,
+    ID_BUNDLE                  = 0                    ,
+    ID_LANE                    = 0                    ,
+    ID_ENGINE                  = 0                    ,
+    ID_MODULE                  = 1                    ,
+    ENGINES_CONFIG             = 0                    ,
+    FIFO_WRITE_DEPTH           = 16                   ,
+    PROG_THRESH                = 8                    ,
+    PIPELINE_STAGES            = 2                    ,
+    COUNTER_WIDTH              = CACHE_FRONTEND_DATA_W,
+    NUM_BACKTRACK_LANES        = 4                    ,
+    NUM_CHANNELS               = 2                    ,
+    ENGINE_PARALLEL_CAST_WIDTH = 1                    ,
+    NUM_BUNDLES                = 4
 ) (
     // System Signals
-    input  logic                          ap_clk                                                                             ,
-    input  logic                          areset                                                                             ,
-    input  ParallelReadWriteConfiguration configure_memory_in                                                                ,
-    input  FIFOStateSignalsInput          fifo_configure_memory_in_signals_in                                                ,
-    input  EnginePacket                   response_engine_in                                                                 ,
-    input  FIFOStateSignalsInput          fifo_response_engine_in_signals_in                                                 ,
-    output FIFOStateSignalsOutput         fifo_response_engine_in_signals_out                                                ,
-    input  FIFOStateSignalsOutput         fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
-    input  MemoryPacketResponse           response_memory_in                                                                 ,
-    input  FIFOStateSignalsInput          fifo_response_memory_in_signals_in                                                 ,
-    output FIFOStateSignalsOutput         fifo_response_memory_in_signals_out                                                ,
-    output EnginePacket                   request_engine_out                                                                 ,
-    input  FIFOStateSignalsInput          fifo_request_engine_out_signals_in                                                 ,
-    output FIFOStateSignalsOutput         fifo_request_engine_out_signals_out                                                ,
-    output MemoryPacketRequest            request_memory_out                                                                 ,
-    input  FIFOStateSignalsInput          fifo_request_memory_out_signals_in                                                 ,
-    output FIFOStateSignalsOutput         fifo_request_memory_out_signals_out                                                ,
-    input  FIFOStateSignalsOutput         fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                     ,
-    output logic                          fifo_setup_signal                                                                  ,
-    output logic                          configure_memory_setup                                                             ,
+    input  logic                          ap_clk                                                                                      ,
+    input  logic                          areset                                                                                      ,
+    input  ParallelReadWriteConfiguration configure_memory_in                                                                         ,
+    input  FIFOStateSignalsInput          fifo_configure_memory_in_signals_in                                                         ,
+    input  EnginePacket                   response_engine_in                                                                          ,
+    input  FIFOStateSignalsInput          fifo_response_engine_in_signals_in                                                          ,
+    output FIFOStateSignalsOutput         fifo_response_engine_in_signals_out                                                         ,
+    input  FIFOStateSignalsOutput         fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_PARALLEL_CAST_WIDTH-1:0],
+    input  MemoryPacketResponse           response_memory_in                                                                          ,
+    input  FIFOStateSignalsInput          fifo_response_memory_in_signals_in                                                          ,
+    output FIFOStateSignalsOutput         fifo_response_memory_in_signals_out                                                         ,
+    output EnginePacket                   request_engine_out                                                                          ,
+    input  FIFOStateSignalsInput          fifo_request_engine_out_signals_in                                                          ,
+    output FIFOStateSignalsOutput         fifo_request_engine_out_signals_out                                                         ,
+    output MemoryPacketRequest            request_memory_out                                                                          ,
+    input  FIFOStateSignalsInput          fifo_request_memory_out_signals_in                                                          ,
+    output FIFOStateSignalsOutput         fifo_request_memory_out_signals_out                                                         ,
+    input  FIFOStateSignalsOutput         fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                              ,
+    output logic                          fifo_setup_signal                                                                           ,
+    output logic                          configure_memory_setup                                                                      ,
     output logic                          done_out
 );
 
-    genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_generator;
     logic areset_counter  ;
     logic areset_fifo     ;
-    logic areset_kernel   ;
 
-    logic                                     configure_memory_setup_reg;
-    ParallelReadWriteConfiguration            configure_memory_reg      ;
-    ParallelReadWriteConfiguration            configure_engine_int      ;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] configure_engine_int_valid;
+    logic                          configure_memory_setup_reg;
+    ParallelReadWriteConfiguration configure_memory_reg      ;
+    ParallelReadWriteConfiguration configure_engine_int      ;
 
     logic fifo_empty_int     ;
     logic fifo_empty_reg     ;
@@ -100,18 +97,14 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    EnginePacket response_engine_in_reg;
-    EnginePacket request_engine_out_reg;
-    EnginePacket fifo_response_comb    ;
-
-    EnginePacketFull [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_request_engine_start_Stage      ;
-    EnginePacketFull [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_request_engine_final_Stage      ;
-    EnginePacketFull                                     generator_engine_request_engine_push_Stage       ;
-    logic            [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_request_engine_final_Stage_valid;
-
-    EnginePacketFull     request_memory_out_reg   ;
-    MemoryPacketResponse response_memory_in_reg   ;
-    MemoryPacketResponse response_memory_in_reg_S2;
+    EnginePacket         response_engine_in_reg                     ;
+    EnginePacket         request_engine_out_reg                     ;
+    EnginePacket         fifo_response_comb                         ;
+    EnginePacketFull     generator_engine_request_engine_start_Stage;
+    EnginePacketFull     generator_engine_request_engine_final_Stage;
+    EnginePacketFull     request_memory_out_reg                     ;
+    MemoryPacketResponse response_memory_in_reg                     ;
+    MemoryPacketResponse response_memory_in_reg_S2                  ;
 
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
     FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
@@ -128,13 +121,14 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
-    EnginePacket                                     response_engine_in_int                  ;
-    EnginePacket [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] response_engine_reg_int                 ;
-    EnginePacketPayload                              fifo_response_engine_in_din             ;
-    EnginePacketPayload                              fifo_response_engine_in_dout            ;
-    FIFOStateSignalsInputInternal                    fifo_response_engine_in_signals_in_int  ;
-    FIFOStateSignalsOutInternal                      fifo_response_engine_in_signals_out_int ;
-    logic                                            fifo_response_engine_in_setup_signal_int;
+    EnginePacket                  response_engine_in_int                  ;
+    EnginePacketMeta              response_engine_reg_int                 ;
+    logic                         response_engine_reg_int_valid           ;
+    EnginePacketPayload           fifo_response_engine_in_din             ;
+    EnginePacketPayload           fifo_response_engine_in_dout            ;
+    FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
+    logic                         fifo_response_engine_in_setup_signal_int;
 
 // --------------------------------------------------------------------------------------
 // FIFO Engine INPUT Response EnginePacket
@@ -170,19 +164,18 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
-    logic                     counter_load                      ;
-    logic                     response_memory_counter_is_zero   ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_load_value;
+    logic                     counter_load                   ;
+    logic                     response_memory_counter_is_zero;
+    logic [COUNTER_WIDTH-1:0] response_memory_counter_       ;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    logic                  areset_backtrack                                                                             ;
-    logic                  backtrack_configure_route_valid                                                              ;
-    PacketRouteAddress     backtrack_configure_route_in                                                                 ;
-    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
-    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
+    logic                  areset_backtrack                                                                                      ;
+    logic                  backtrack_configure_route_valid                                                                       ;
+    PacketRouteAddress     backtrack_configure_route_in                                                                          ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_PARALLEL_CAST_WIDTH-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                         ;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Engine i <- Channel i-1
@@ -195,17 +188,17 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
-    EnginePacketRouteAttributes engine_parallel_read_write_route;
+    EnginePacketRouteAttributes engine_read_write_route;
 // --------------------------------------------------------------------------------------
-    assign engine_parallel_read_write_route.packet_destination        = 0;
-    assign engine_parallel_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
-    assign engine_parallel_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
-    assign engine_parallel_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
-    assign engine_parallel_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
-    assign engine_parallel_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
-    assign engine_parallel_read_write_route.sequence_state            = SEQUENCE_INVALID;
-    assign engine_parallel_read_write_route.sequence_id               = 0;
-    assign engine_parallel_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
+    assign engine_read_write_route.packet_destination        = 0;
+    assign engine_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
+    assign engine_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
+    assign engine_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
+    assign engine_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
+    assign engine_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
+    assign engine_read_write_route.sequence_state            = SEQUENCE_INVALID;
+    assign engine_read_write_route.sequence_id               = 0;
+    assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
     localparam             PULSE_HOLD           = 6;
     logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
@@ -218,7 +211,6 @@ module engine_parallel_read_write_generator #(parameter
         areset_generator <= areset;
         areset_counter   <= areset;
         areset_fifo      <= areset;
-        areset_kernel    <= areset;
         areset_backtrack <= areset;
     end
 
@@ -301,7 +293,7 @@ module engine_parallel_read_write_generator #(parameter
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_parallel_read_write_route.sequence_source);
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_read_write_route.sequence_source);
     end
 
 // --------------------------------------------------------------------------------------
@@ -412,35 +404,31 @@ module engine_parallel_read_write_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_PARALLEL_READ_WRITE_GEN_RESET : begin
-                done_out_reg                       <= 1'b1;
-                configure_memory_setup_reg         <= 1'b0;
-                configure_engine_int.valid         <= 1'b0;
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
-                cmd_stream_mode_pop                <= 1'b0;
+                done_out_reg               <= 1'b1;
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_int.valid <= 1'b0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_IDLE : begin
-                done_out_reg                       <= 1'b0;
-                configure_memory_setup_reg         <= 1'b0;
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
-                cmd_stream_mode_pop                <= 1'b0;
+                done_out_reg               <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
-                done_out_reg                       <= 1'b0;
-                configure_memory_setup_reg         <= 1'b0;
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
-                cmd_stream_mode_pop                <= 1'b0;
+                done_out_reg               <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_SETUP_MEMORY : begin
                 configure_memory_setup_reg <= 1'b0;
-                configure_engine_int.valid <= 1'b0;
                 if(configure_memory_reg.valid)
-                    configure_engine_int <= configure_memory_reg;
+                    configure_engine_int.valid <= 1'b1;
             end
             ENGINE_PARALLEL_READ_WRITE_GEN_START_TRANS : begin
                 done_out_reg               <= 1'b0;
@@ -477,6 +465,11 @@ module engine_parallel_read_write_generator #(parameter
         endcase
     end // always_ff @(posedge ap_clk)
 
+    always_ff @(posedge ap_clk) begin
+        if(configure_memory_reg.valid)
+            configure_engine_int.payload <= configure_memory_reg.payload;
+    end
+
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
@@ -487,7 +480,7 @@ module engine_parallel_read_write_generator #(parameter
         .load        (counter_load                      ),
         .incr        (request_memory_out_reg.valid      ),
         .decr        (request_engine_out_reg.valid      ),
-        .load_value  (response_memory_counter_load_value),
+        .load_value  ({{(COUNTER_WIDTH){1'b0}}}         ),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
         .count       (response_memory_counter_          ),
         .is_zero     (response_memory_counter_is_zero   )
@@ -496,66 +489,55 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
-    localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-// --------------------------------------------------------------------------------------
-    generate
-// --------------------------------------------------------------------------------------
-        for (i=0; i<(ENGINE_PACKET_DATA_NUM_FIELDS); i++) begin : generate_fifo_response_engine_in_din
-// --------------------------------------------------------------------------------------
-            hyper_pipeline_noreset #(
-                .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
-                .WIDTH ($bits(EnginePacket)          )
-            ) inst_hyper_pipeline_response_engine_in_int (
-                .ap_clk(ap_clk                    ),
-                .din   (response_engine_in_int    ),
-                .dout  (response_engine_reg_int[i])
-            );
+    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 3;
+    localparam RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES = 1;
 
-            assign configure_engine_int_valid[i] = configure_engine_int.valid;
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
+        .WIDTH ($bits(EnginePacketMeta)               )
+    ) inst_hyper_pipeline_response_engine_in_int (
+        .ap_clk(ap_clk                             ),
+        .din   (response_engine_in_int.payload.meta),
+        .dout  (response_engine_reg_int            )
+    );
 // --------------------------------------------------------------------------------------
-            engine_parallel_read_write_kernel inst_engine_parallel_read_write_kernel (
-                .ap_clk                (ap_clk                                           ),
-                .areset                (areset_kernel                                    ),
-                .config_params_valid_in(configure_engine_int_valid[i]                    ),
-                .config_params_in      (configure_engine_int.payload.param.param_field[i]),
-                .data_valid_in         (response_engine_in_int.valid                     ),
-                .data_in               (response_engine_in_int.payload.data              ),
-                .address_out           (address_int[i]                                   ),
-                .result_out            (result_int[i]                                    )
-            );
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
+        .WIDTH (1                                     )
+    ) inst_hyper_pipeline_response_engine_in_int_valid (
+        .ap_clk(ap_clk                       ),
+        .din   (response_engine_in_int.valid ),
+        .dout  (response_engine_reg_int_valid)
+    );
 // --------------------------------------------------------------------------------------
-            always_comb begin
-                generator_engine_request_engine_start_Stage[i].valid                                 = response_engine_reg_int[i].valid & configure_engine_int.payload.param.lane_mask[i];
-                generator_engine_request_engine_start_Stage[i].payload.data                          = result_int[i];
-                generator_engine_request_engine_start_Stage[i].payload.meta.address                  = address_int[i];
-                generator_engine_request_engine_start_Stage[i].payload.meta.route.packet_destination = configure_engine_int.payload.param.param_field[i].meta.route.packet_destination;
-                generator_engine_request_engine_start_Stage[i].payload.meta.route.sequence_source    = response_engine_reg_int[i].payload.meta.route.sequence_source;
-                generator_engine_request_engine_start_Stage[i].payload.meta.route.sequence_state     = response_engine_reg_int[i].payload.meta.route.sequence_state;
-                generator_engine_request_engine_start_Stage[i].payload.meta.route.sequence_id        = response_engine_reg_int[i].payload.meta.route.sequence_id;
-                generator_engine_request_engine_start_Stage[i].payload.meta.route.hops               = response_engine_reg_int[i].payload.meta.route.hops;
-                generator_engine_request_engine_start_Stage[i].payload.meta.subclass                 = configure_engine_int.payload.param.param_field[i].meta.subclass;
-            end
+    engine_parallel_read_write_kernel inst_engine_parallel_read_write_kernel (
+        .ap_clk          (ap_clk                                           ),
+        .config_params_in(configure_engine_int.payload.param.param_field[0]),
+        .data_in         (response_engine_in_int.payload.data              ),
+        .address_out     (address_int[0]                                   ),
+        .result_out      (result_int[0]                                    )
+    );
 // --------------------------------------------------------------------------------------
-            hyper_pipeline_noreset #(
-                .STAGES(RESPONSE_ENGINE_GEN_INT_STAGES+i),
-                .WIDTH ($bits(EnginePacketFull)         )
-            ) inst_hyper_pipeline_generator_engine_request (
-                .ap_clk(ap_clk                                         ),
-                .din   (generator_engine_request_engine_start_Stage [i]),
-                .dout  (generator_engine_request_engine_final_Stage[i] )
-            );
-// --------------------------------------------------------------------------------------
-            assign generator_engine_request_engine_final_Stage_valid[i] = generator_engine_request_engine_final_Stage[i].valid;
-        end
-    endgenerate
-
     always_comb begin
-        generator_engine_request_engine_push_Stage = 0;
-        for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            if(generator_engine_request_engine_final_Stage_valid[i]) generator_engine_request_engine_push_Stage = generator_engine_request_engine_final_Stage[i];
-        end
+        generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int_valid;
+        generator_engine_request_engine_start_Stage.payload.data                          = result_int[0];
+        generator_engine_request_engine_start_Stage.payload.meta.address                  = address_int[0];
+        generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = configure_engine_int.payload.param.meta[0].route.packet_destination;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = response_engine_reg_int.route.sequence_state;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
+        generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
+        generator_engine_request_engine_start_Stage.payload.meta.subclass                 = configure_engine_int.payload.param.meta[0].subclass;
     end
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES),
+        .WIDTH ($bits(EnginePacketFull)                )
+    ) inst_hyper_pipeline_generator_engine_request (
+        .ap_clk(ap_clk                                     ),
+        .din   (generator_engine_request_engine_start_Stage),
+        .dout  (generator_engine_request_engine_final_Stage)
+    );
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_814x16_EnginePacket
@@ -564,8 +546,8 @@ module engine_parallel_read_write_generator #(parameter
     assign fifo_request_send_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_push_Stage.valid;
-    assign fifo_request_send_din                  = generator_engine_request_engine_push_Stage.payload;
+    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_final_Stage.valid;
+    assign fifo_request_send_din                  = generator_engine_request_engine_final_Stage.payload;
 
     // Pop
     assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en;
@@ -592,7 +574,6 @@ module engine_parallel_read_write_generator #(parameter
         .rd_rst_busy(fifo_request_send_signals_out_int.rd_rst_busy)
     );
 
-
 // --------------------------------------------------------------------------------------
     assign cmd_in_flight_assert = |cmd_in_flight_hold;
 // --------------------------------------------------------------------------------------
@@ -607,18 +588,18 @@ module engine_parallel_read_write_generator #(parameter
 // Backtrack FIFO module - Bundle i <- Bundle i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_route_valid                    = configure_engine_int.valid;
-    assign backtrack_configure_route_in                       = configure_engine_int.payload.param.param_field[0].meta.route.packet_destination;
+    assign backtrack_configure_route_in                       = configure_engine_int.payload.param.meta[0].route.packet_destination;
     assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
 
     backtrack_fifo_lanes_response_signal #(
-        .ID_CU              (ID_CU              ),
-        .ID_BUNDLE          (ID_BUNDLE          ),
-        .ID_LANE            (ID_LANE            ),
-        .ID_ENGINE          (ID_ENGINE          ),
-        .ID_MODULE          (2                  ),
-        .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
-        .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
-        .NUM_BUNDLES        (NUM_BUNDLES        )
+        .ID_CU                     (ID_CU                     ),
+        .ID_BUNDLE                 (ID_BUNDLE                 ),
+        .ID_LANE                   (ID_LANE                   ),
+        .ID_ENGINE                 (ID_ENGINE                 ),
+        .ID_MODULE                 (2                         ),
+        .NUM_BACKTRACK_LANES       (NUM_BACKTRACK_LANES       ),
+        .ENGINE_PARALLEL_CAST_WIDTH(ENGINE_PARALLEL_CAST_WIDTH),
+        .NUM_BUNDLES               (NUM_BUNDLES               )
     ) inst_backtrack_fifo_lanes_response_signal (
         .ap_clk                                  (ap_clk                                            ),
         .areset                                  (areset_backtrack                                  ),
@@ -632,7 +613,7 @@ module engine_parallel_read_write_generator #(parameter
 // Backtrack FIFO module - Engine i <- Channel i-1
 // --------------------------------------------------------------------------------------
     assign backtrack_configure_address_valid                      = configure_engine_int.valid;
-    assign backtrack_configure_address_in                         = configure_engine_int.payload.param.param_field[0].meta.address;
+    assign backtrack_configure_address_in                         = configure_engine_int.payload.param.meta[0].address;
     assign backtrack_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
 
     backtrack_fifo_request_memory_out_signals #(
