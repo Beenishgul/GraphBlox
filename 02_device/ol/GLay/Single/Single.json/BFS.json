@@ -1,5 +1,5 @@
 {
-    "ENGINE_READ_WRITE_0": {
+    "ENGINE_PARALLEL_READ_WRITE_0": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
@@ -10,12 +10,22 @@
         },
         "entries": {
             "entry_0": {
+                "lane_mask": {
+                    "bits": "4",
+                    "value": "0x3"
+                }, 
+                "merge_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_1": {
+            "entry_2": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "2"
@@ -25,7 +35,7 @@
                     "value": "1"
                 }
             },
-            "entry_2": {
+            "entry_3": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_WRITE"
@@ -43,7 +53,7 @@
                     "value": "buffer_8"
                 }
             },
-            "entry_3": {
+            "entry_4": {
                 "id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -61,43 +71,39 @@
                     "value": "buffer_8"
                 }
             },
-            "entry_4": {
+            "entry_5": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x04"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x01"
                 }
             },
-            "entry_5": {
+            "entry_6": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_6": {
+            "entry_7": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x2148"
                 }
-            }
-        }
-    },
-    "ENGINE_READ_WRITE_1": {
-        "type_memory_cmd": {
-            "CMD_MEM_INVALID"    :   1,
-            "CMD_MEM_READ"       :   2,
-            "CMD_MEM_WRITE"      :   4,
-            "CMD_STREAM_READ"    :   8,
-            "CMD_STREAM_WRITE"   :   16,
-            "CMD_CACHE_FLUSH"    :   32
-        },
-        "entries": {
-            "entry_0": {
+            },
+            "entry_8": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_1": {
+            "entry_9": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "2"
@@ -107,7 +113,7 @@
                     "value": "1"
                 }
             },
-            "entry_2": {
+            "entry_10": {
                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_WRITE"
@@ -125,8 +131,8 @@
                     "value": "buffer_7"
                 }
             },
-            "entry_3": {
-                "id_cu": {
+            "entry_11": {
+               "id_cu": {
                     "bits": "8",
                     "value": "0x00"
                 },
@@ -143,27 +149,191 @@
                     "value": "buffer_7"
                 }
             },
-            "entry_4": {
+            "entry_12": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x1"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x04"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x01"
                 }
             },
-            "entry_5": {
+            "entry_13": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000001"
                 }
             },
-            "entry_6": {
+            "entry_14": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x2841"
                 }
+            },
+            "entry_15": {
+                "index_start": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_16": {
+                "shift.amount": {
+                    "bits": "31",
+                    "value": "0"
+                },
+                "shift.direction": {
+                    "bits": "1",
+                    "value": "0"
+                }
+            },
+            "entry_17": {
+                "cmd": {
+                    "bits": "6",
+                    "value": "CMD_MEM_INVALID"
+                },
+                "id_module": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_engine": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                 "id_channel": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_18": {
+               "id_cu": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_buffer": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_19": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_20": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_21": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x00"
+                }
+            },
+            "entry_22": {
+                "index_start": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_23": {
+                "shift.amount": {
+                    "bits": "31",
+                    "value": "0"
+                },
+                "shift.direction": {
+                    "bits": "1",
+                    "value": "0"
+                }
+            },
+            "entry_24": {
+                "cmd": {
+                    "bits": "6",
+                    "value": "CMD_MEM_INVALID"
+                },
+                "id_module": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_engine": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                 "id_channel": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_25": {
+               "id_cu": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_buffer": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_26": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_27": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_28": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x00"
+                }
             }
         }
     },
-    "ENGINE_CSR_INDEX_2": {
+    "ENGINE_CSR_INDEX_1": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
@@ -267,7 +437,10 @@
             }
         }
     },
-    "ENGINE_READ_WRITE_4": {
+    "ENGINE_FORWARD_DATA_2": {
+        "entries": {}
+    },
+    "ENGINE_PARALLEL_READ_WRITE_3": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
@@ -278,12 +451,22 @@
         },
         "entries": {
             "entry_0": {
+                "lane_mask": {
+                    "bits": "4",
+                    "value": "0x7"
+                }, 
+                "merge_mask": {
+                    "bits": "4",
+                    "value": "0x7"
+                }
+            },
+            "entry_1": {
                 "index_start": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_1": {
+            "entry_2": {
                 "shift.amount": {
                     "bits": "31",
                     "value": "2"
@@ -293,8 +476,8 @@
                     "value": "1"
                 }
             },
-            "entry_2": {
-                "cmd": {
+            "entry_3": {
+                 "cmd": {
                     "bits": "6",
                     "value": "CMD_MEM_READ"
                 },
@@ -311,8 +494,8 @@
                     "value": "buffer_3"
                 }
             },
-            "entry_3": {
-                "id_cu": {
+            "entry_4": {
+            "id_cu": {
                     "bits": "8",
                     "value": "0x01"
                 },
@@ -329,43 +512,269 @@
                     "value": "buffer_3"
                 }
             },
-            "entry_4": {
+            "entry_5": {
                 "const_mask": {
                     "bits": "4",
                     "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x04"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x01"
                 }
             },
-            "entry_5": {
+            "entry_6": {
                 "const_value": {
                     "bits": "32",
                     "value": "0x00000000"
                 }
             },
-            "entry_6": {
+            "entry_7": {
+                  "ops_mask": {
+                    "bits": "16",
+                    "value": "0x8412"
+                }
+            },
+            "entry_8": {
+                "index_start": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_9": {
+                "shift.amount": {
+                    "bits": "31",
+                    "value": "2"
+                },
+                "shift.direction": {
+                    "bits": "1",
+                    "value": "1"
+                }
+            },
+            "entry_10": {
+             "cmd": {
+                    "bits": "6",
+                    "value": "CMD_MEM_READ"
+                },
+                "id_module": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_engine": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                 "id_channel": {
+                    "bits": "8",
+                    "value": "buffer_2"
+                }
+            },
+            "entry_11": {
+               "id_cu": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_buffer": {
+                    "bits": "8",
+                    "value": "buffer_2"
+                }
+            },
+            "entry_12": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x04"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x01"
+                }
+            },
+            "entry_13": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_14": {
                 "ops_mask": {
                     "bits": "16",
                     "value": "0x8412"
                 }
-            }
-        }
-    },
-    "ENGINE_MERGE_DATA_5": {
-        "entries": {
-            "entry_0": {
-                "merge_mask": {
-                    "bits": "4",
-                    "value": "0x7"
+            },
+            "entry_15": {
+                "index_start": {
+                    "bits": "32",
+                    "value": "0x00000000"
                 }
             },
-            "entry_1": {
-                "merge_type": {
+            "entry_16": {
+                "shift.amount": {
+                    "bits": "31",
+                    "value": "0"
+                },
+                "shift.direction": {
+                    "bits": "1",
+                    "value": "0"
+                }
+            },
+            "entry_17": {
+                "cmd": {
+                    "bits": "6",
+                    "value": "CMD_MEM_READ"
+                },
+                "id_module": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_engine": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                 "id_channel": {
+                    "bits": "8",
+                    "value": "buffer_7"
+                }
+            },
+            "entry_18": {
+                "id_cu": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_buffer": {
+                    "bits": "8",
+                    "value": "buffer_7"
+                }
+            },
+            "entry_19": {
+                "const_mask": {
                     "bits": "4",
                     "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_20": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_21": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x8412"
+                }
+            },
+            "entry_22": {
+                "index_start": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_23": {
+                "shift.amount": {
+                    "bits": "31",
+                    "value": "0"
+                },
+                "shift.direction": {
+                    "bits": "1",
+                    "value": "0"
+                }
+            },
+            "entry_24": {
+                "cmd": {
+                    "bits": "6",
+                    "value": "CMD_MEM_INVALID"
+                },
+                "id_module": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_engine": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                 "id_channel": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_25": {
+               "id_cu": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "id_buffer": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_26": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
+                "op_bundle": {
+                    "bits": "8",
+                    "value": "0x00"
+                },
+                "op_lane": {
+                    "bits": "8",
+                    "value": "0x00"
+                }
+            },
+            "entry_27": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_28": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x00"
                 }
             }
         }
     },
-    "ENGINE_FILTER_COND_6": {
+    "ENGINE_FILTER_COND_4": {
         "type_filter_operation": {
             "FILTER_NOP": 1,
             "FILTER_GT": 2,
@@ -494,171 +903,10 @@
             }
         }
     },
-    "ENGINE_READ_WRITE_7": {
-        "type_memory_cmd": {
-            "CMD_MEM_INVALID"    :   1,
-            "CMD_MEM_READ"       :   2,
-            "CMD_MEM_WRITE"      :   4,
-            "CMD_STREAM_READ"    :   8,
-            "CMD_STREAM_WRITE"   :   16,
-            "CMD_CACHE_FLUSH"    :   32
-        },
-        "entries": {
-            "entry_0": {
-                "index_start": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_1": {
-                "shift.amount": {
-                    "bits": "31",
-                    "value": "2"
-                },
-                "shift.direction": {
-                    "bits": "1",
-                    "value": "1"
-                }
-            },
-            "entry_2": {
-                "cmd": {
-                    "bits": "6",
-                    "value": "CMD_MEM_READ"
-                },
-                "id_module": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_engine": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                 "id_channel": {
-                    "bits": "8",
-                    "value": "buffer_2"
-                }
-            },
-            "entry_3": {
-                "id_cu": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_bundle": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_lane": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_buffer": {
-                    "bits": "8",
-                    "value": "buffer_2"
-                }
-            },
-            "entry_4": {
-                "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
-                }
-            },
-            "entry_5": {
-                "const_value": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_6": {
-                "ops_mask": {
-                    "bits": "16",
-                    "value": "0x8412"
-                }
-            }
-        }
+    "ENGINE_FORWARD_DATA_5": {
+        "entries": {}
     },
-    "ENGINE_READ_WRITE_8": {
-        "type_memory_cmd": {
-            "CMD_MEM_INVALID"    :   1,
-            "CMD_MEM_READ"       :   2,
-            "CMD_MEM_WRITE"      :   4,
-            "CMD_STREAM_READ"    :   8,
-            "CMD_STREAM_WRITE"   :   16,
-            "CMD_CACHE_FLUSH"    :   32
-        },
-        "entries": {
-            "entry_0": {
-                "index_start": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_1": {
-                "shift.amount": {
-                    "bits": "31",
-                    "value": "2"
-                },
-                "shift.direction": {
-                    "bits": "1",
-                    "value": "1"
-                }
-            },
-            "entry_2": {
-                "cmd": {
-                    "bits": "6",
-                    "value": "CMD_MEM_READ"
-                },
-                "id_module": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_engine": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                 "id_channel": {
-                    "bits": "8",
-                    "value": "buffer_7"
-                }
-            },
-            "entry_3": {
-                "id_cu": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_bundle": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_lane": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_buffer": {
-                    "bits": "8",
-                    "value": "buffer_7"
-                }
-            },
-            "entry_4": {
-                "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
-                }
-            },
-            "entry_5": {
-                "const_value": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_6": {
-                "ops_mask": {
-                    "bits": "16",
-                    "value": "0x8412"
-                }
-            }
-        }
-    },
-    "ENGINE_CSR_INDEX_10": {
+    "ENGINE_CSR_INDEX_6": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
@@ -762,7 +1010,10 @@
             }
         }
     },
-    "ENGINE_READ_WRITE_12": {
+    "ENGINE_FORWARD_DATA_7": {
+        "entries": {}
+    },
+    "ENGINE_READ_WRITE_8": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID"    :   1,
             "CMD_MEM_READ"       :   2,
@@ -844,7 +1095,7 @@
             }
         }
     },
-    "ENGINE_FILTER_COND_13": {
+    "ENGINE_FILTER_COND_9": {
         "type_filter_operation": {
             "FILTER_NOP": 1,
             "FILTER_GT": 2,
@@ -946,7 +1197,7 @@
                 },
                 "else_id_lane": {
                     "bits": "8",
-                    "value": "0x03"
+                    "value": "0x01"
                 },
                 "else_id_buffer": {
                     "bits": "8",
@@ -972,5 +1223,8 @@
                 }
             }
         }
+    },
+    "ENGINE_FORWARD_DATA_10": {
+        "entries": {}
     }
 }
