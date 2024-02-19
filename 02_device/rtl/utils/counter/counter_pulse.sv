@@ -32,17 +32,21 @@ module counter_pulse #(parameter int MASK_WIDTH = 8 // Default parameter, can be
     always_comb begin
         count = 0;
         for (int i = 0; i < MASK_WIDTH; i++) begin
-            count += mask_in[i];
+            count += mask_in[i] & valid_in;
         end
     end
 
-    always_comb pulse_out = (pulse_counter > 0) ? 1'b1 : 1'b0;
+    always_comb pulse_out = ((pulse_counter > 0) | count) ? 1'b1 : 1'b0;
 
     always_ff @(posedge ap_clk) begin
-        if(valid_in) begin
-            pulse_counter <= count;
-        end else if (pulse_counter > 0) begin
-            pulse_counter <= pulse_counter - 1;
+        if(areset) begin
+            pulse_counter <= 0;
+        end begin
+            if(valid_in) begin
+                pulse_counter <= count;
+            end else if (pulse_counter > 0) begin
+                pulse_counter <= pulse_counter - 1;
+            end
         end
     end
 
