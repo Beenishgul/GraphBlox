@@ -30,7 +30,10 @@ module counter_pulse #(parameter int MASK_WIDTH = 8 // Default parameter, can be
     logic [COUNTER_WIDTH-1:0] pulse_counter; // Counter for the output pulse
 
     always_comb begin
-        foreach (mask_in[i]) count += mask_in[i]; // Accumulate count of '1's
+        count = 0;
+        for (int i = 0; i < MASK_WIDTH; i++) begin
+            count += mask_in[i];
+        end
     end
 
     always_comb pulse_out = (pulse_counter > 0) ? 1'b1 : 1'b0;
