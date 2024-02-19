@@ -69,6 +69,13 @@ module engine_parallel_read_write_generator #(parameter
 );
 
 // --------------------------------------------------------------------------------------
+// Local paramaters
+// --------------------------------------------------------------------------------------
+    localparam BURST_LENGTH                            = 16                                                                                  ;
+    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 3                                                                                   ;
+    localparam RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES = 1                                                                                   ;
+    localparam PULSE_HOLD                              = RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES + RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES + 2;
+// --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
     logic areset_generator;
@@ -200,9 +207,8 @@ module engine_parallel_read_write_generator #(parameter
     assign engine_read_write_route.sequence_id               = 0;
     assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
 // --------------------------------------------------------------------------------------
-    localparam             PULSE_HOLD           = 6;
-    logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
-    logic                  cmd_in_flight_assert    ;
+    logic [PULSE_HOLD-1:0] cmd_in_flight_hold  ;
+    logic                  cmd_in_flight_assert;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -333,8 +339,6 @@ module engine_parallel_read_write_generator #(parameter
 
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
-// --------------------------------------------------------------------------------------
-    localparam BURST_LENGTH = 16;
 // --------------------------------------------------------------------------------------
     assign enter_gen_pause_int = fifo_request_pending_signals_out_int.prog_full | fifo_request_send_signals_out_int.prog_full;
     assign exit_gen_pause_int  = fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert;
@@ -489,9 +493,6 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 3;
-    localparam RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES = 1;
-
     hyper_pipeline_noreset #(
         .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
         .WIDTH ($bits(EnginePacketMeta)               )
@@ -537,6 +538,16 @@ module engine_parallel_read_write_generator #(parameter
         .ap_clk(ap_clk                                     ),
         .din   (generator_engine_request_engine_start_Stage),
         .dout  (generator_engine_request_engine_final_Stage)
+    );
+// --------------------------------------------------------------------------------------
+    logic pulse_out;
+
+    counter_pulse #(.MASK_WIDTH(ENGINE_PACKET_DATA_NUM_FIELDS)) inst_counter_pulse (
+        .ap_clk   (ap_clk                                      ),
+        .areset   (areset_counter                              ),
+        .valid_in (response_engine_in_int.valid                ),
+        .mask_in  (configure_engine_int.payload.param.lane_mask),
+        .pulse_out(pulse_out                                   )
     );
 
 // --------------------------------------------------------------------------------------
