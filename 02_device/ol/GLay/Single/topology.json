@@ -492,7 +492,7 @@
             "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
             "ENGINE_FORWARD_DATA"       : [6, 0,  289,  16, 0,  0,  0],
             "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
-            "ENGINE_PARALLEL_READ_WRITE": [8, 29, 1419, 16, 32, 0,  0],
+            "ENGINE_PARALLEL_READ_WRITE": [8, 29, 2047, 16, 32, 0,  0],
             "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
         }
     },
@@ -504,6 +504,6 @@
         "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
         "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
-        "ENGINE_PARALLEL_READ_WRITE": [7, 29, 1419, 16, 32, 0,  0]
+        "ENGINE_PARALLEL_READ_WRITE": [7, 29, 2047, 16, 32, 0,  0]
     }
 }
