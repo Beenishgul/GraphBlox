@@ -144,7 +144,6 @@ module engine_read_write_generator #(parameter
 // FIFO pending cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------
     EnginePacket                  request_pending_out_int              ;
-    EnginePacket                  request_pending_out_reg              ;
     EnginePacketPayload           fifo_request_pending_din             ;
     EnginePacketPayload           fifo_request_pending_dout            ;
     FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
@@ -667,10 +666,6 @@ module engine_read_write_generator #(parameter
         .wr_rst_busy(fifo_request_pending_signals_out_int.wr_rst_busy),
         .rd_rst_busy(fifo_request_pending_signals_out_int.rd_rst_busy)
     );
-
-    always_ff @(posedge ap_clk) begin
-        request_pending_out_reg <= request_pending_out_int;
-    end
 
 // --------------------------------------------------------------------------------------
 // FIFO commit cache requests out fifo_oending_EnginePacket

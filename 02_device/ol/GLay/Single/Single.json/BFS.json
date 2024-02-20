@@ -495,7 +495,7 @@
                 }
             },
             "entry_4": {
-            "id_cu": {
+                "id_cu": {
                     "bits": "8",
                     "value": "0x01"
                 },
@@ -575,15 +575,15 @@
             "entry_11": {
                "id_cu": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "id_bundle": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x04"
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -653,15 +653,15 @@
             "entry_18": {
                 "id_cu": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "id_bundle": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x04"
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "id_buffer": {
                     "bits": "8",

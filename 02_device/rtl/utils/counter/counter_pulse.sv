@@ -29,38 +29,43 @@ module counter_pulse #(parameter int MASK_WIDTH = 8 // Default parameter, can be
 
     logic [COUNTER_WIDTH-1:0] count               ; // To hold the count of '1's mask_in 'mask_in'
     logic [COUNTER_WIDTH-1:0] pulse_counter_reg   ; // Counter for the output pulse
-    logic [   MASK_WIDTH-1:0] param_select_out_reg;
-    logic [   MASK_WIDTH-1:0] valid_in_reg        ;
+    logic [   MASK_WIDTH-1:0] param_select_out_int;
 
     always_comb begin
-        count = 0;
+        count     = 0;
+        pulse_out = 1'b0;
         for (int i = 0; i < MASK_WIDTH; i++) begin
             count += mask_in[i] & valid_in[i];
         end
+        pulse_out = (pulse_counter_reg > 2) | valid_in;
     end
-
-    always_comb pulse_out = ((pulse_counter_reg > 0)|count) ? 1'b1 : 1'b0;
 
     always_comb begin
         param_select_out    = 0;
-        param_select_out[0] = param_select_out_reg[0] ? 1'b1 : 1'b0;
+        param_select_out[0] = param_select_out_int[0];
         for (int i = 1; i < MASK_WIDTH; i++) begin
-            param_select_out[i] = |param_select_out ? 1'b0 : param_select_out_reg[i];
+            param_select_out[i] = |param_select_out ? 1'b0 : param_select_out_int[i];
+        end
+    end
+
+    always_comb begin
+        if(|valid_in) begin
+            param_select_out_int = mask_in;
+        end else if (pulse_counter_reg > 1) begin
+            param_select_out_int = param_select_out_int & (param_select_out_int - 1);
+        end else begin
+            param_select_out_int = 0;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        if(areset) begin
-            pulse_counter_reg    <= 0;
-            param_select_out_reg <= 0;
-            valid_in_reg         <= 0;
+        if(areset)begin
+            pulse_counter_reg <= 0;
         end begin
             if(|valid_in) begin
-                pulse_counter_reg    <= count;
-                param_select_out_reg <= mask_in;
-            end else if (pulse_counter_reg > 0) begin
-                pulse_counter_reg    <= pulse_counter_reg - 1;
-                param_select_out_reg <= param_select_out_reg & (param_select_out_reg - 1);
+                pulse_counter_reg <= count;
+            end else if (pulse_counter_reg > 1) begin
+                pulse_counter_reg <= pulse_counter_reg - 1;
             end
         end
     end
