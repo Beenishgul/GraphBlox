@@ -119,7 +119,6 @@ always_ff @(posedge ap_clk) begin
     configure_memory_out.payload        <= fifo_configure_memory_dout_int.payload;
 end
 
-
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
 // --------------------------------------------------------------------------------------
@@ -132,6 +131,8 @@ assign configure_memory_meta_int.route.packet_destination.id_lane   = 0;
 assign configure_memory_meta_int.route.packet_destination.id_engine = 0;
 assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 
+assign configure_memory_meta_int.ops_bundle              = 0;
+assign configure_memory_meta_int.ops_lane                = 0;
 assign configure_memory_meta_int.address.id_channel      = 0;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = 0;

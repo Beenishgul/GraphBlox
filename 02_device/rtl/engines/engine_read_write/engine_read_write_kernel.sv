@@ -22,10 +22,11 @@ module engine_read_write_kernel (
 );
 
 // Define internal signals
-EnginePacketData         ops_value_reg;
-PacketRequestDataAddress address_int  ;
-EnginePacketData         org_value_reg;
-EnginePacketData         org_data_int ;
+EnginePacketData                 ops_value_reg    ;
+PacketRequestDataAddress         address_int      ;
+EnginePacketData                 org_value_reg    ;
+EnginePacketData                 org_data_int     ;
+ReadWriteConfigurationParameters config_params_reg;
 
 always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
@@ -58,16 +59,17 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
+  config_params_reg           <= config_params_in;
   // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
-  address_int.shift.amount    <= config_params_in.granularity;
-  address_int.shift.direction <= config_params_in.direction;
-  address_int.id_channel      <= config_params_in.id_channel;
-  address_int.id_buffer       <= config_params_in.id_buffer;
+  address_int.shift.amount    <= config_params_reg.granularity;
+  address_int.shift.direction <= config_params_reg.direction;
+  address_int.id_channel      <= config_params_reg.id_channel;
+  address_int.id_buffer       <= config_params_reg.id_buffer;
   address_int.burst_length    <= 1;
-  if(config_params_in.direction) begin
-    address_int.offset <= (config_params_in.index_start + ops_value_reg.field[1]) << config_params_in.granularity;
+  if(config_params_reg.direction) begin
+    address_int.offset <= (config_params_reg.index_start + ops_value_reg.field[1]) << config_params_reg.granularity;
   end else begin
-    address_int.offset <= (config_params_in.index_start + ops_value_reg.field[1]) >> config_params_in.granularity;
+    address_int.offset <= (config_params_reg.index_start + ops_value_reg.field[1]) >> config_params_reg.granularity;
   end
   org_data_int <= org_value_reg;
 end
