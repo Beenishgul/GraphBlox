@@ -515,9 +515,9 @@ module engine_parallel_read_write_generator #(parameter
         .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
         .WIDTH (1                                     )
     ) inst_hyper_pipeline_response_engine_in_int_valid (
-        .ap_clk(ap_clk                       ),
-        .din   (response_engine_in_int.valid ),
-        .dout  (response_engine_reg_int_valid)
+        .ap_clk(ap_clk                                           ),
+        .din   (|generator_engine_response_engine_in_kernel_valid),
+        .dout  (response_engine_reg_int_valid                    )
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
@@ -530,11 +530,11 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     engine_parallel_read_write_kernel inst_engine_parallel_read_write_kernel (
-        .ap_clk          (ap_clk                                           ),
-        .config_params_in(config_params_in                                 ),
-        .data_in         (response_engine_in_int.payload.data              ),
-        .address_out     (address_int                                      ),
-        .result_out      (result_int                                       )
+        .ap_clk          (ap_clk                             ),
+        .config_params_in(config_params_in                   ),
+        .data_in         (response_engine_in_int.payload.data),
+        .address_out     (address_int                        ),
+        .result_out      (result_int                         )
     );
 // --------------------------------------------------------------------------------------
     always_comb begin
@@ -634,7 +634,7 @@ module engine_parallel_read_write_generator #(parameter
         if (areset_generator) begin
             cmd_in_flight_hold <= 0;
         end else begin
-            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_send_out_int.valid|response_engine_in_int.valid)};
+            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_send_out_int.valid|(|generator_engine_response_engine_in_kernel_valid))};
         end
     end
 
@@ -681,37 +681,32 @@ module engine_parallel_read_write_generator #(parameter
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_reg;
 
     always_ff @(posedge ap_clk) begin
-        request_pending_out_reg.valid                 <= &generator_engine_response_pending_in_merge_valid_int;
-        request_pending_out_reg.payload.meta          <= request_pending_out_int.payload.meta;
-        request_pending_out_reg.payload.data.field[0] <= response_memory_in_reg_S2.payload.data;
+        request_pending_out_reg.valid                           <= &generator_engine_response_pending_in_merge_valid_reg;
+        request_pending_out_reg.payload.meta                    <= request_pending_out_int.payload.meta;
+        request_pending_out_reg.payload.data.field[0]           <= request_pending_out_int.payload.data[0];
+        generator_engine_response_pending_in_merge_valid_reg[0] <= 1'b1;
 
-        for (int j=1; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+        for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
             if(generator_engine_response_pending_in_merge_valid_int[j]) begin
-                request_pending_out_reg.payload.data.field[j] <= response_memory_in_reg_S2.payload.data;
-            end else begin
-                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[j];
+                request_pending_out_reg.payload.data.field[j]           <= request_pending_out_int.payload.data[0];
+                generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
             end
         end
+
+        for (int j=1; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+            if(~configure_engine_int.payload.param.merge_mask[j]) begin
+                request_pending_out_reg.payload.data.field[j]           <= request_pending_out_int.payload.data[j];
+                generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
+            end
+        end
+
+        if(&generator_engine_response_pending_in_merge_valid_reg)
+            generator_engine_response_pending_in_merge_valid_reg <= 0;
     end
 
     always_comb begin
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_pending_in_merge_valid_int[i] = configure_engine_int.payload.param.merge_mask[i] ? (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b1;
-        end
-
-        if (&generator_engine_response_pending_in_merge_valid_int) begin
-            generator_engine_response_pending_in_merge_valid_int = 0;
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        if(areset_generator) begin
-            generator_engine_response_pending_in_merge_valid_reg <= 0;
-        end else begin
-            if(configure_engine_int.valid)
-                generator_engine_response_pending_in_merge_valid_reg <= generator_engine_response_pending_in_merge_valid_reg | generator_engine_response_pending_in_merge_valid_int;
-            else if(&generator_engine_response_pending_in_merge_valid_int)
-                generator_engine_response_pending_in_merge_valid_reg <= 0;
+            generator_engine_response_pending_in_merge_valid_int[i] = configure_engine_int.payload.param.merge_mask[i] ? request_pending_out_int.valid & (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b1;
         end
     end
 
