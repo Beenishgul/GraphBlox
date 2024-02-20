@@ -78,11 +78,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x01"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_6": {
@@ -156,7 +156,7 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 },
                 "op_lane": {
                     "bits": "8",
@@ -519,11 +519,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x01"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_6": {
@@ -597,11 +597,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x01"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_13": {
@@ -623,13 +623,13 @@
                 }
             },
             "entry_16": {
-                "shift.amount": {
+                 "shift.amount": {
                     "bits": "31",
-                    "value": "0"
+                    "value": "2"
                 },
                 "shift.direction": {
                     "bits": "1",
-                    "value": "0"
+                    "value": "1"
                 }
             },
             "entry_17": {
@@ -675,11 +675,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x02"
                 }
             },
             "entry_20": {

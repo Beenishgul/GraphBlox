@@ -16,36 +16,51 @@
 
 module counter_pulse #(parameter int MASK_WIDTH = 8 // Default parameter, can be overridden to any size
 ) (
-    input  logic                  ap_clk   , // Clock input for synchronous logic
-    input  logic                  areset   , // Active-low asynchronous reset
-    input  logic                  valid_in , // Valid signal indicating when the input should be processed
-    input  logic [MASK_WIDTH-1:0] mask_in  , // Input vector of size N
-    output logic                  pulse_out  // Single valid_in bit asserted for 'count' number of cycles
+    input  logic                  ap_clk          , // Clock input for synchronous logic
+    input  logic                  areset          , // Active-low asynchronous reset
+    input  logic [MASK_WIDTH-1:0] valid_in        , // Valid signal indicating when the input should be processed
+    input  logic [MASK_WIDTH-1:0] mask_in         , // Input vector of size N
+    output logic                  pulse_out       , // Single valid_in bit asserted for 'count' number of cycles
+    output logic [MASK_WIDTH-1:0] param_select_out  // Single valid_in bit asserted for 'count' number of cycles
 );
 
 // Derived parameter for counter size
     localparam int COUNTER_WIDTH = $clog2(MASK_WIDTH) + 1;
 
-    logic [COUNTER_WIDTH-1:0] count        ; // To hold the count of '1's mask_in 'mask_in'
-    logic [COUNTER_WIDTH-1:0] pulse_counter; // Counter for the output pulse
+    logic [COUNTER_WIDTH-1:0] count               ; // To hold the count of '1's mask_in 'mask_in'
+    logic [COUNTER_WIDTH-1:0] pulse_counter_reg   ; // Counter for the output pulse
+    logic [   MASK_WIDTH-1:0] param_select_out_reg;
+    logic [   MASK_WIDTH-1:0] valid_in_reg        ;
 
     always_comb begin
         count = 0;
         for (int i = 0; i < MASK_WIDTH; i++) begin
-            count += mask_in[i] & valid_in;
+            count += mask_in[i] & valid_in[i];
         end
     end
 
-    always_comb pulse_out = ((pulse_counter > 0) | count) ? 1'b1 : 1'b0;
+    always_comb pulse_out = ((pulse_counter_reg > 0)|count) ? 1'b1 : 1'b0;
+
+    always_comb begin
+        param_select_out    = 0;
+        param_select_out[0] = param_select_out_reg[0] ? 1'b1 : 1'b0;
+        for (int i = 1; i < MASK_WIDTH; i++) begin
+            param_select_out[i] = |param_select_out ? 1'b0 : param_select_out_reg[i];
+        end
+    end
 
     always_ff @(posedge ap_clk) begin
         if(areset) begin
-            pulse_counter <= 0;
+            pulse_counter_reg    <= 0;
+            param_select_out_reg <= 0;
+            valid_in_reg         <= 0;
         end begin
-            if(valid_in) begin
-                pulse_counter <= count;
-            end else if (pulse_counter > 0) begin
-                pulse_counter <= pulse_counter - 1;
+            if(|valid_in) begin
+                pulse_counter_reg    <= count;
+                param_select_out_reg <= mask_in;
+            end else if (pulse_counter_reg > 0) begin
+                pulse_counter_reg    <= pulse_counter_reg - 1;
+                param_select_out_reg <= param_select_out_reg & (param_select_out_reg - 1);
             end
         end
     end
