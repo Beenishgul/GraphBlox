@@ -14,10 +14,10 @@
 `include "global_package.vh"
 
 module engine_parallel_read_write_kernel (
-  input  logic                                        ap_clk          ,
-  input  ParallelReadWriteConfigurationParameterField config_params_in,
-  input  EnginePacketData                             data_in         ,
-  output PacketRequestDataAddress                     address_out     ,
+  input  logic                                        ap_clk                ,
+  input  ParallelReadWriteConfigurationParameterField config_params_in      ,
+  input  EnginePacketData                             data_in               ,
+  output PacketRequestDataAddress                     address_out           ,
   output EnginePacketData                             result_out
 );
 
