@@ -236,7 +236,10 @@
         ],
         "1": [
             [
-                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:auxiliary_2,num_vertices,num_vertices*2)"
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)"
+            ],
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
