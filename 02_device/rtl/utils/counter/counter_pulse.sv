@@ -135,9 +135,7 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
 
     // --------------------------------------------------------------------------------------
     always_comb begin
-        config_params_out             = 0;
-        config_meta_out               = 0;
-        config_params_kernel_valid    = 0;
+        config_params_kernel_valid    = {MASK_WIDTH{1'b0}};
         config_params_out             = config_params_in.payload.param.param_field[0];
         config_meta_out               = config_params_in.payload.param.meta[0];
         config_params_kernel_valid[0] = param_select_out[0] | config_params_lane_valid[0];
