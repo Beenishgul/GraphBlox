@@ -303,6 +303,7 @@ param=compiler.skipTimingCheckAndFrequencyScaling=0
 param=compiler.multiStrategiesWaitOnAllRuns=1
 
 [vivado]
+prop=run.my_rm_synth_1.{{STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY}}={{rebuilt}}
 prop=run.my_rm_synth_1.{{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}}={{-directive sdx_optimization_effort_high}}
 prop=run.my_rm_synth_1.{{STEPS.SYNTH_DESIGN.TCL.PRE}}={{{output_file_project_generate_qor_pre_synth_tcl}}}
 prop=run.my_rm_synth_1.{{STEPS.SYNTH_DESIGN.TCL.POST}}={{{output_file_project_generate_qor_post_synth_tcl}}}

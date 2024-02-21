@@ -72,7 +72,7 @@ module engine_parallel_read_write_generator #(parameter
 // Local paramaters
 // --------------------------------------------------------------------------------------
     localparam BURST_LENGTH                            = 16                                                                                  ;
-    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 3                                                                                   ;
+    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 4                                                                                   ;
     localparam RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES = 1                                                                                   ;
     localparam PULSE_HOLD                              = RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES + RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES + 2;
 // --------------------------------------------------------------------------------------
@@ -131,6 +131,7 @@ module engine_parallel_read_write_generator #(parameter
     EnginePacket                  response_engine_in_int                  ;
     EnginePacketMeta              response_engine_reg_int                 ;
     logic                         response_engine_reg_int_valid           ;
+    EnginePacketData              response_engine_reg_int_data            ;
     EnginePacketPayload           fifo_response_engine_in_din             ;
     EnginePacketPayload           fifo_response_engine_in_dout            ;
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
@@ -509,7 +510,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES-1),
         .WIDTH (1                                     )
     ) inst_hyper_pipeline_response_engine_in_int_valid (
         .ap_clk(ap_clk                                           ),
@@ -518,7 +519,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES   ),
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES-1),
         .WIDTH ($bits(ParallelReadWriteConfigurationMeta))
     ) inst_hyper_pipeline_configure_engine_int_meta (
         .ap_clk(ap_clk                      ),
@@ -526,12 +527,21 @@ module engine_parallel_read_write_generator #(parameter
         .dout  (configure_engine_select_meta)
     );
 // --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(1                      ),
+        .WIDTH ($bits(EnginePacketData))
+    ) inst_hyper_pipeline_configure_engine_int_data (
+        .ap_clk(ap_clk                             ),
+        .din   (response_engine_in_int.payload.data),
+        .dout  (response_engine_reg_int_data       )
+    );
+// --------------------------------------------------------------------------------------
     engine_parallel_read_write_kernel inst_engine_parallel_read_write_kernel (
-        .ap_clk          (ap_clk                             ),
-        .config_params_in(config_params_in                   ),
-        .data_in         (response_engine_in_int.payload.data),
-        .address_out     (address_int                        ),
-        .result_out      (result_int                         )
+        .ap_clk          (ap_clk                      ),
+        .config_params_in(config_params_in            ),
+        .data_in         (response_engine_reg_int_data),
+        .address_out     (address_int                 ),
+        .result_out      (result_int                  )
     );
 // --------------------------------------------------------------------------------------
     always_comb begin
