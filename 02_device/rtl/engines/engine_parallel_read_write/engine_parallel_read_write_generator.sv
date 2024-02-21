@@ -679,55 +679,61 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_int;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_reg;
-
+// --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            request_pending_out_reg.valid <= 1'b0;
+            generator_engine_response_pending_in_merge_valid_reg <= 0;
         end else begin
-            request_pending_out_reg.valid <= &generator_engine_response_pending_in_merge_valid_reg;
+            
 
             for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-                if(generator_engine_response_pending_in_merge_valid_int[j] & ~generator_engine_response_pending_in_merge_valid_reg[j]) begin
+                if(generator_engine_response_pending_in_merge_valid_int[j]) begin
                     generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
                 end
             end
 
-            for (int j=1; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-                if(~configure_engine_int.payload.param.merge_mask[j] & ~generator_engine_response_pending_in_merge_valid_reg[j]) begin
+            for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+                if(~configure_engine_int.payload.param.merge_mask[j]) begin
                     generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
                 end
             end
 
-            if(&generator_engine_response_pending_in_merge_valid_reg)
-                generator_engine_response_pending_in_merge_valid_reg <= 0;
+            if(&generator_engine_response_pending_in_merge_valid_reg) begin
+                for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+                    generator_engine_response_pending_in_merge_valid_reg[j] <= generator_engine_response_pending_in_merge_valid_int[j] ? 1'b1 : 1'b0;
+                end
+            end
         end
     end
 
+    assign request_pending_out_reg.valid = &generator_engine_response_pending_in_merge_valid_reg;
 
     always_ff @(posedge ap_clk) begin
-        request_pending_out_reg.payload.meta <= request_pending_out_int.payload.meta;
+        for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+            if(generator_engine_response_pending_in_merge_valid_int[j]) begin
+                request_pending_out_reg.payload.meta <= request_pending_out_int.payload.meta;
+            end
+        end
 
         for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-            if(generator_engine_response_pending_in_merge_valid_int[j] & ~generator_engine_response_pending_in_merge_valid_reg[j]) begin
-                request_pending_out_reg.payload.data.field[j]           <= request_pending_out_int.payload.data[0];
-                generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
+            if(generator_engine_response_pending_in_merge_valid_int[j]) begin
+                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[0];
             end
         end
 
-        for (int j=1; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-            if(~configure_engine_int.payload.param.merge_mask[j] & ~generator_engine_response_pending_in_merge_valid_reg[j]) begin
-                request_pending_out_reg.payload.data.field[j]           <= request_pending_out_int.payload.data[j];
-                generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
+        for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
+            if(~configure_engine_int.payload.param.merge_mask[j]) begin
+                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[j];
             end
         end
-
-        if(&generator_engine_response_pending_in_merge_valid_reg)
-            generator_engine_response_pending_in_merge_valid_reg <= 0;
     end
 
     always_comb begin
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_pending_in_merge_valid_int[i] = configure_engine_int.payload.param.merge_mask[i] ? request_pending_out_int.valid & (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b1;
+            generator_engine_response_pending_in_merge_valid_int[i] = configure_engine_int.payload.param.merge_mask[i] ? request_pending_out_int.valid &
+                (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
+                    (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
+                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b1;
         end
     end
 
@@ -738,8 +744,8 @@ module engine_parallel_read_write_generator #(parameter
     assign fifo_request_commit_setup_signal_int = fifo_request_commit_signals_out_int.wr_rst_busy | fifo_request_commit_signals_out_int.rd_rst_busy;
 
     // Push
-    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_int.valid;
-    assign fifo_request_commit_din                  = request_pending_out_int.payload;
+    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_reg.valid;
+    assign fifo_request_commit_din                  = request_pending_out_reg.payload;
 
     // Pop
     assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en & fifo_request_engine_out_signals_in_reg.rd_en;

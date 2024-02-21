@@ -192,7 +192,8 @@ typedef struct packed{
 // Response Memory Packet
 // --------------------------------------------------------------------------------------
 typedef struct packed{
-  type_memory_response_offset offset; // SIZE = clog2(4GB) bits
+  logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer; // SIZE = 8 bits  - up to 8 buffers in the descriptor
+  type_memory_response_offset            offset   ; // SIZE = clog2(4GB) bits
 } PacketResponseDataAddress;
 
 typedef struct packed{
@@ -440,6 +441,7 @@ function MemoryPacketResponsePayload map_CacheResponse_to_MemoryResponsePacket (
   MemoryPacketResponsePayload output_packet;
 
   output_packet.meta.route.packet_source  = input_packet_req.meta.route.packet_source ;
+  output_packet.meta.address.id_buffer   = input_packet_req.meta.address.id_buffer;
   if(input_packet_req.meta.address.shift.direction) begin
     output_packet.meta.address.offset       = (input_packet_req.meta.address.offset >> input_packet_req.meta.address.shift.amount);
   end else begin
@@ -458,6 +460,7 @@ function MemoryPacketResponsePayload  map_MemoryRequestPacket_to_MemoryResponseP
 
   output_packet.meta.route.packet_source  = input_packet.meta.route.packet_source ;
   output_packet.meta.address.offset       = input_packet.meta.address.offset;
+  output_packet.meta.address.id_buffer       = input_packet.meta.address.id_buffer;
   // output_packet.meta.address.offset       = input_packet.meta.address.offset >> input_packet.meta.address.shift.amount;
   output_packet.data.field                = input_packet.data.field;
 
