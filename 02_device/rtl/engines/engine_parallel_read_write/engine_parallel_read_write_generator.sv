@@ -72,7 +72,7 @@ module engine_parallel_read_write_generator #(parameter
 // Local paramaters
 // --------------------------------------------------------------------------------------
     localparam BURST_LENGTH                            = 16                                                                                  ;
-    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 4                                                                                   ;
+    localparam RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES  = 3                                                                                   ;
     localparam RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES = 1                                                                                   ;
     localparam PULSE_HOLD                              = RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES + RESPONSE_ENGINE_PARALLEL_GEN_INT_STAGES + 2;
 // --------------------------------------------------------------------------------------
@@ -510,7 +510,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES-1),
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
         .WIDTH (1                                     )
     ) inst_hyper_pipeline_response_engine_in_int_valid (
         .ap_clk(ap_clk                                           ),
@@ -519,7 +519,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES-1),
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
         .WIDTH ($bits(ParallelReadWriteConfigurationMeta))
     ) inst_hyper_pipeline_configure_engine_int_meta (
         .ap_clk(ap_clk                      ),
@@ -528,7 +528,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(1                      ),
+        .STAGES(0                      ),
         .WIDTH ($bits(EnginePacketData))
     ) inst_hyper_pipeline_configure_engine_int_data (
         .ap_clk(ap_clk                             ),

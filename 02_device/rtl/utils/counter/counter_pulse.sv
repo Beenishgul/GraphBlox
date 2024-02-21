@@ -92,6 +92,8 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
     logic [   MASK_WIDTH-1:0]                    config_params_kernel_valid_int;
     logic [   MASK_WIDTH-1:0]                    param_select_out_int          ;
     logic [   MASK_WIDTH-1:0]                    param_select_out              ;
+    logic [   MASK_WIDTH-1:0]                    param_select_flag             ;
+    logic [   MASK_WIDTH-1:0]                    param_valid_flag              ;
     logic [COUNTER_WIDTH-1:0]                    count                         ; // To hold the count of '1's mask_in 'mask_in'
     logic [COUNTER_WIDTH-1:0]                    pulse_counter_reg             ; // Counter for the output pulse
     ParallelReadWriteConfigurationParameterField config_params_int             ;
@@ -136,28 +138,28 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
         end
     end
 
-    // --------------------------------------------------------------------------------------
     always_comb begin
-        config_params_kernel_valid_int    = {MASK_WIDTH{1'b0}};
-        config_params_int                 = config_params_in.payload.param.param_field[0];
-        config_meta_int                   = config_params_in.payload.param.meta[0];
-        config_params_kernel_valid_int[0] = param_select_out[0] | config_params_lane_valid[0];
+        param_select_flag[0] = 1'b1;
+        param_valid_flag[0]  = param_select_out[0] | config_params_lane_valid[0];
         for (int i = 1; i < MASK_WIDTH; i++) begin
-            if((param_select_out[i] | config_params_lane_valid[i]) & ~config_params_kernel_valid_int[i-1]) begin
-                config_params_int                 = config_params_in.payload.param.param_field[i];
-                config_meta_int                   = config_params_in.payload.param.meta[i];
-                config_params_kernel_valid_int[i] = 1'b1;
-            end
-            if(config_params_kernel_valid_int[i-1]) begin
-                config_params_kernel_valid_int[i] = 1'b1;
-            end
+            param_select_flag[i] = ((param_select_out[i] | config_params_lane_valid[i]) & ~config_params_kernel_valid_int[i-1]);
+            param_valid_flag[i]  = (config_params_kernel_valid_int[i-1] | param_select_flag);
         end
     end
 
-    always_ff @(posedge ap_clk ) begin
-        config_meta_out            <= config_meta_int;
-        config_params_kernel_valid <= config_params_kernel_valid_int;
-        config_params_out          <= config_params_int;
+    // --------------------------------------------------------------------------------------
+    always_comb begin
+        for (int i = 0; i < MASK_WIDTH; i++) begin
+            config_params_int                 = param_select_flag[i] ? config_params_in.payload.param.param_field[i] : 0;
+            config_meta_int                   = param_select_flag[i] ? config_params_in.payload.param.meta[i] : 0;
+            config_params_kernel_valid_int[i] = param_valid_flag[i]  ?  1'b1 : 1'b0;
+        end
+    end
+
+    always_comb begin
+        config_meta_out            = config_meta_int;
+        config_params_kernel_valid = config_params_kernel_valid_int;
+        config_params_out          = config_params_int;
     end
 
     // --------------------------------------------------------------------------------------
