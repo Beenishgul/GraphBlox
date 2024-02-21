@@ -416,6 +416,7 @@ typedef struct packed{
 
 typedef struct packed{
     logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] lane_mask  ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] cast_mask ;
     logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask ;
     ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field;
     ParallelReadWriteConfigurationMeta           [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] meta       ;

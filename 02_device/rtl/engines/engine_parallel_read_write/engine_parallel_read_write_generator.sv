@@ -214,7 +214,7 @@ module engine_parallel_read_write_generator #(parameter
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    config_param_select                             ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_kernel_valid;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_lane_valid  ;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_merge_valid ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_cast_valid ;
     ParallelReadWriteConfigurationMeta           configure_engine_int_meta                       ;
     ParallelReadWriteConfigurationMeta           configure_engine_select_meta                    ;
     ParallelReadWriteConfigurationParameterField config_params_in                                ;
@@ -304,7 +304,7 @@ module engine_parallel_read_write_generator #(parameter
         end
     end
 
-    assign fifo_empty_int = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
+    assign fifo_empty_int = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty & ~cmd_in_flight_assert;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
@@ -492,7 +492,7 @@ module engine_parallel_read_write_generator #(parameter
         .areset      (areset_counter                    ),
         .load        (counter_load                      ),
         .incr        (request_memory_out_reg.valid      ),
-        .decr        (request_engine_out_reg.valid      ),
+        .decr        (response_memory_in_reg.valid      ),
         .load_value  ({{(COUNTER_WIDTH){1'b0}}}         ),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
         .count       (response_memory_counter_          ),
@@ -561,8 +561,8 @@ module engine_parallel_read_write_generator #(parameter
     counter_pulse #(.MASK_WIDTH(ENGINE_PACKET_DATA_NUM_FIELDS)) inst_counter_pulse (
         .ap_clk          (ap_clk                                         ),
         .areset          (areset_counter                                 ),
-        .valid_in        (generator_engine_response_engine_in_merge_valid),
-        .mask_in         (configure_engine_int.payload.param.merge_mask  ),
+        .valid_in        (generator_engine_response_engine_in_cast_valid),
+        .mask_in         (configure_engine_int.payload.param.cast_mask  ),
         .pulse_out       (pulse_out                                      ),
         .param_select_out(config_param_select                            )
     );
@@ -584,10 +584,10 @@ module engine_parallel_read_write_generator #(parameter
     end
 // --------------------------------------------------------------------------------------
     always_comb begin
-        generator_engine_response_engine_in_merge_valid = 0;
+        generator_engine_response_engine_in_cast_valid = 0;
         generator_engine_response_engine_in_lane_valid  = 0;
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_engine_in_merge_valid[i] = response_engine_in_int.valid & configure_engine_int.payload.param.merge_mask[i] & (response_engine_in_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (response_engine_in_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane);
+            generator_engine_response_engine_in_cast_valid[i] = response_engine_in_int.valid & configure_engine_int.payload.param.cast_mask[i] & (response_engine_in_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (response_engine_in_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane);
             generator_engine_response_engine_in_lane_valid[i]  = response_engine_in_int.valid & configure_engine_int.payload.param.lane_mask[i] & (response_engine_in_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (response_engine_in_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane);
         end
     end
@@ -608,10 +608,10 @@ module engine_parallel_read_write_generator #(parameter
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2              ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
-        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
-        .PROG_THRESH     (PULSE_HOLD                    )
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                 ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)   ),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)   ),
+        .PROG_THRESH     (ENGINE_PACKET_DATA_NUM_FIELDS * 2)
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
@@ -655,10 +655,10 @@ module engine_parallel_read_write_generator #(parameter
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (PULSE_HOLD                )
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                 ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)       ),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)       ),
+        .PROG_THRESH     (ENGINE_PACKET_DATA_NUM_FIELDS * 2)
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
@@ -684,7 +684,7 @@ module engine_parallel_read_write_generator #(parameter
         if (areset_generator) begin
             generator_engine_response_pending_in_merge_valid_reg <= 0;
         end else begin
-            
+
 
             for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
                 if(generator_engine_response_pending_in_merge_valid_int[j]) begin
@@ -693,14 +693,14 @@ module engine_parallel_read_write_generator #(parameter
             end
 
             for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-                if(~configure_engine_int.payload.param.merge_mask[j]) begin
+                if(request_pending_out_int.valid & ~configure_engine_int.payload.param.merge_mask[j]) begin
                     generator_engine_response_pending_in_merge_valid_reg[j] <= 1'b1;
                 end
             end
 
             if(&generator_engine_response_pending_in_merge_valid_reg) begin
                 for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-                    generator_engine_response_pending_in_merge_valid_reg[j] <= generator_engine_response_pending_in_merge_valid_int[j] ? 1'b1 : 1'b0;
+                    generator_engine_response_pending_in_merge_valid_reg[j] <= generator_engine_response_pending_in_merge_valid_int[j];
                 end
             end
         end
@@ -709,10 +709,8 @@ module engine_parallel_read_write_generator #(parameter
     assign request_pending_out_reg.valid = &generator_engine_response_pending_in_merge_valid_reg;
 
     always_ff @(posedge ap_clk) begin
-        for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-            if(generator_engine_response_pending_in_merge_valid_int[j]) begin
-                request_pending_out_reg.payload.meta <= request_pending_out_int.payload.meta;
-            end
+        if(request_pending_out_int.valid) begin
+            request_pending_out_reg.payload.meta <= request_pending_out_int.payload.meta;
         end
 
         for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
@@ -722,7 +720,7 @@ module engine_parallel_read_write_generator #(parameter
         end
 
         for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
-            if(~configure_engine_int.payload.param.merge_mask[j]) begin
+            if(request_pending_out_int.valid & ~configure_engine_int.payload.param.merge_mask[j]) begin
                 request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[j];
             end
         end
@@ -733,7 +731,7 @@ module engine_parallel_read_write_generator #(parameter
             generator_engine_response_pending_in_merge_valid_int[i] = configure_engine_int.payload.param.merge_mask[i] ? request_pending_out_int.valid &
                 (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
                     (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
-                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b1;
+                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b0;
         end
     end
 

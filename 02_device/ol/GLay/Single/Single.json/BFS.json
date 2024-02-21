@@ -14,6 +14,10 @@
                     "bits": "4",
                     "value": "0x3"
                 }, 
+                "cast_mask": {
+                    "bits": "4",
+                    "value": "0x3"
+                }, 
                 "merge_mask": {
                     "bits": "4",
                     "value": "0x0"
@@ -78,11 +82,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x04"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -156,7 +160,7 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "0x04"
                 },
                 "op_lane": {
                     "bits": "8",
@@ -422,7 +426,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x07"
+                    "value": "0x01"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -452,6 +456,10 @@
         "entries": {
             "entry_0": {
                 "lane_mask": {
+                    "bits": "4",
+                    "value": "0x7"
+                },
+                "cast_mask": {
                     "bits": "4",
                     "value": "0x7"
                 }, 
@@ -1068,7 +1076,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x03"
+                    "value": "0x01"
                 },
                 "id_buffer": {
                     "bits": "8",

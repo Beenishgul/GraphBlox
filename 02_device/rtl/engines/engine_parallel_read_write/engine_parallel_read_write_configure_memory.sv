@@ -183,7 +183,8 @@ always_ff @(posedge ap_clk) begin
         case (configure_memory_valid_reg)
             (1 << 0) : begin
                 configure_memory_reg.payload.param.lane_mask  <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS)-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.cast_mask  <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS)-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.merge_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS)-1:(ENGINE_PACKET_DATA_NUM_FIELDS+ENGINE_PACKET_DATA_NUM_FIELDS)];
             end
 
             (1 << (1+(7*0))) : begin
