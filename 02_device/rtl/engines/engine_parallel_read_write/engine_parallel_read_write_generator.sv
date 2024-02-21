@@ -211,10 +211,7 @@ module engine_parallel_read_write_generator #(parameter
     logic                  cmd_in_flight_assert;
 // --------------------------------------------------------------------------------------
     logic                                        pulse_out                                       ;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    config_param_select                             ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_kernel_valid;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_lane_valid  ;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_cast_valid ;
     ParallelReadWriteConfigurationMeta           configure_engine_int_meta                       ;
     ParallelReadWriteConfigurationMeta           configure_engine_select_meta                    ;
     ParallelReadWriteConfigurationParameterField config_params_in                                ;
@@ -558,39 +555,16 @@ module engine_parallel_read_write_generator #(parameter
         .dout  (generator_engine_request_engine_final_Stage)
     );
 // --------------------------------------------------------------------------------------
-    counter_pulse #(.MASK_WIDTH(ENGINE_PACKET_DATA_NUM_FIELDS)) inst_counter_pulse (
-        .ap_clk          (ap_clk                                         ),
-        .areset          (areset_counter                                 ),
-        .valid_in        (generator_engine_response_engine_in_cast_valid),
-        .mask_in         (configure_engine_int.payload.param.cast_mask  ),
-        .pulse_out       (pulse_out                                      ),
-        .param_select_out(config_param_select                            )
+    config_params_select_pulse #(.MASK_WIDTH(ENGINE_PACKET_DATA_NUM_FIELDS)) inst_config_params_select_pulse (
+        .ap_clk                    (ap_clk                                          ),
+        .areset                    (areset_counter                                  ),
+        .config_params_in          (configure_engine_int                            ),
+        .response_engine_in        (response_engine_in_int                          ),
+        .pulse_out                 (pulse_out                                       ),
+        .config_params_out         (config_params_in                                ),
+        .config_meta_out           (configure_engine_int_meta                       ),
+        .config_params_kernel_valid(generator_engine_response_engine_in_kernel_valid)
     );
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        config_params_in                                    = 0;
-        configure_engine_int_meta                           = 0;
-        generator_engine_response_engine_in_kernel_valid    = 0;
-        config_params_in                                    = configure_engine_int.payload.param.param_field[0];
-        configure_engine_int_meta                           = configure_engine_int.payload.param.meta[0];
-        generator_engine_response_engine_in_kernel_valid[0] = config_param_select[0] | generator_engine_response_engine_in_lane_valid[0];
-        for (int i = 1; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            if((config_param_select[i] | generator_engine_response_engine_in_lane_valid[i]) & ~(|generator_engine_response_engine_in_kernel_valid)) begin
-                config_params_in                                    = configure_engine_int.payload.param.param_field[i];
-                configure_engine_int_meta                           = configure_engine_int.payload.param.meta[i];
-                generator_engine_response_engine_in_kernel_valid[i] = 1'b1;
-            end
-        end
-    end
-// --------------------------------------------------------------------------------------
-    always_comb begin
-        generator_engine_response_engine_in_cast_valid = 0;
-        generator_engine_response_engine_in_lane_valid  = 0;
-        for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_engine_in_cast_valid[i] = response_engine_in_int.valid & configure_engine_int.payload.param.cast_mask[i] & (response_engine_in_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (response_engine_in_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane);
-            generator_engine_response_engine_in_lane_valid[i]  = response_engine_in_int.valid & configure_engine_int.payload.param.lane_mask[i] & (response_engine_in_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) & (response_engine_in_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane);
-        end
-    end
 
 // --------------------------------------------------------------------------------------
 // FIFO cache requests out fifo_814x16_EnginePacket
