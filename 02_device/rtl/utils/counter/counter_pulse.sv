@@ -143,7 +143,7 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
         param_valid_flag[0]  = param_select_out[0] | config_params_lane_valid[0];
         for (int i = 1; i < MASK_WIDTH; i++) begin
             param_select_flag[i] = ((param_select_out[i] | config_params_lane_valid[i]) & ~config_params_kernel_valid_int[i-1]);
-            param_valid_flag[i]  = (config_params_kernel_valid_int[i-1] | param_select_flag);
+            param_valid_flag[i]  = (config_params_kernel_valid_int[i-1] | param_select_flag[i]);
         end
     end
 
