@@ -14,6 +14,10 @@
                     "bits": "4",
                     "value": "0x0"
                 },
+                "cast_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "merge_mask": {
                     "bits": "4",
                     "value": "0x0"
@@ -452,6 +456,10 @@
         "entries": {
             "entry_0": {
                 "lane_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
+                "cast_mask": {
                     "bits": "4",
                     "value": "0x0"
                 },
