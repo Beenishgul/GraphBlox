@@ -163,10 +163,10 @@ assign fifo_configure_engine_dout_int.valid       = fifo_configure_engine_signal
 assign fifo_configure_engine_dout_int.payload     = fifo_configure_engine_dout;
 
 xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH + FIFO_WRITE_DEPTH                  ),
+    .FIFO_WRITE_DEPTH(64                                 ),
     .WRITE_DATA_WIDTH($bits(CSRIndexConfigurationPayload)),
     .READ_DATA_WIDTH ($bits(CSRIndexConfigurationPayload)),
-    .PROG_THRESH     (FIFO_WRITE_DEPTH+ PROG_THRESH                        )
+    .PROG_THRESH     (46                                 )
 ) inst_fifo_EnginePacketResponseConigurationInput (
     .clk        (ap_clk                                           ),
     .srst       (areset_fifo                                      ),
