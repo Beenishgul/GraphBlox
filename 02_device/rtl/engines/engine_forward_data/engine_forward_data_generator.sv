@@ -177,10 +177,10 @@ assign response_engine_in_int.valid                 = fifo_response_engine_in_si
 assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
 xpm_fifo_sync_wrapper #(
-    .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
+    .FIFO_WRITE_DEPTH(64                        ),
     .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
     .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-    .PROG_THRESH     (PROG_THRESH               )
+    .PROG_THRESH     (48                        )
 ) inst_fifo_EnginePacketResponseEngineInput (
     .clk        (ap_clk                                             ),
     .srst       (areset_fifo                                        ),
