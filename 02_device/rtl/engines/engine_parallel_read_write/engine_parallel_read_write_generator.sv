@@ -501,8 +501,8 @@ module engine_parallel_read_write_generator #(parameter
 // Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
-        .WIDTH ($bits(EnginePacketMeta)               )
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES+1),
+        .WIDTH ($bits(EnginePacketMeta)                 )
     ) inst_hyper_pipeline_response_engine_in_int (
         .ap_clk(ap_clk                             ),
         .din   (response_engine_in_int.payload.meta),
@@ -519,7 +519,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES+1 ),
         .WIDTH ($bits(ParallelReadWriteConfigurationMeta))
     ) inst_hyper_pipeline_configure_engine_int_meta (
         .ap_clk(ap_clk                      ),
@@ -528,7 +528,7 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
-        .STAGES(0                      ),
+        .STAGES(1                      ),
         .WIDTH ($bits(EnginePacketData))
     ) inst_hyper_pipeline_configure_engine_int_data (
         .ap_clk(ap_clk                             ),
@@ -592,10 +592,10 @@ module engine_parallel_read_write_generator #(parameter
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                 ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)   ),
-        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)   ),
-        .PROG_THRESH     (ENGINE_PACKET_DATA_NUM_FIELDS * 2)
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                     ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)       ),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)       ),
+        .PROG_THRESH     ((ENGINE_PACKET_DATA_NUM_FIELDS * 2)+1)
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
@@ -639,10 +639,10 @@ module engine_parallel_read_write_generator #(parameter
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                 ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)       ),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)       ),
-        .PROG_THRESH     (ENGINE_PACKET_DATA_NUM_FIELDS * 2)
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                     ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)           ),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)           ),
+        .PROG_THRESH     ((ENGINE_PACKET_DATA_NUM_FIELDS * 2)+1)
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
         .srst       (areset_fifo                                     ),
