@@ -171,7 +171,7 @@ update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Create OOC synthesis: synth_1"]"
 # set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
-set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY rebuilt [get_runs synth_1]
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context -directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 # set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 
