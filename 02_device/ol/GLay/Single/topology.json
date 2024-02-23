@@ -171,9 +171,8 @@
                 "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
             ],
             [
-                "ENGINE_FILTER_COND",
-                "ENGINE_ALU_OPS",
-                "ENGINE_ALU_OPS"
+                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
+                "ENGINE_FILTER_COND"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -189,10 +188,6 @@
             ],
             [
                 "ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
-                "ENGINE_FILTER_COND"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -215,6 +210,7 @@
         "3": [
             [
                 "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
+                "ENGINE_FILTER_COND",
                 "ENGINE_FILTER_COND"
             ],
             [
