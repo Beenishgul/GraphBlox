@@ -916,6 +916,26 @@ endfunction
             return(error_found);
         endfunction
 
+        function automatic bit check_CC_result(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the memory with the content.
+            bit error_found;
+            integer error_counter;
+            integer CC_count;
+
+            `include "module_slv_m_axi_vip_dump.vh"
+
+            error_found = 0;
+            error_counter = 0;
+            CC_count = auxiliary_2[0];
+            $display("MSG: // ------------------------------------------------- \n");
+            $display("MSG: CC_count: %0d \n", CC_count);
+            $display("MSG: // ------------------------------------------------- \n");
+
+            error_counter = 0;
+            return(error_found);
+        endfunction
+
         function automatic bit check_TC_result(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the memory with the content.
@@ -1403,6 +1423,57 @@ endfunction
                 $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
+
+        task automatic multiple_iteration_CC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+            error_found = 0;
+
+            $display("Starting: multiple_iteration CC");
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
+
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
+                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_backpressure_wready();
+                    1 : slv_random_backpressure_wready();
+                endcase
+                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_delay_rvalid();
+                    1 : slv_random_delay_rvalid();
+                endcase
+
+                set_scalar_registers();
+                set_memory_pointers();
+                initalize_GraphCSR (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Wait for interrupt being asserted or poll done register
+                // @(posedge interrupt);
+                // poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                // Service the interrupt
+                // service_interrupts();
+                // wait(interrupt == 0);
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
+            end
+        endtask
+
 
         task automatic multiple_iteration_TC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;

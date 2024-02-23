@@ -165,7 +165,7 @@
             ]
         ]
     },
-    "Single.CC": {
+    "Single.CCv1": {
         "0": [
             [
                 "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
@@ -199,6 +199,49 @@
             ],
             [
                 "ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"
+            ],
+            [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "3": [
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
+                "ENGINE_FILTER_COND",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ]
+    },  
+    "Single.CC": {
+        "0": [
+            [
+                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+            ],
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "1": [
+            [
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:auxiliary_1,0,num_vertices)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "2": [
+            [
+                "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_1,0,num_vertices)(B:auxiliary_2,0,num_vertices)"
             ],
             [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
