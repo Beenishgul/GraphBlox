@@ -1461,7 +1461,7 @@ endfunction
             graph.debug_counter_1 = 1;
 
             for (int trial = 0; trial < num_trials; trial++) begin
-                $display("Starting Trial BFS: %d / SOURCE: %d", trial, graph.bfs_source);
+                $display("Starting     Trial BFS: %d / %d SOURCE: %d", trial, num_trials, trial);
                 graph.bfs_source = trial;
 
                 $display("Starting iteration BFS: %d / Frontier %d", iter, graph.debug_counter_1);
