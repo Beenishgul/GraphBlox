@@ -213,6 +213,8 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_lane_template) begin
         fifo_request_control_out_signals_in_reg <= 0;
@@ -221,9 +223,6 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= 0;
         fifo_response_lane_in_signals_in_reg    <= 0;
         fifo_response_memory_in_signals_in_reg  <= 0;
-        response_control_in_reg.valid           <= 1'b0;
-        response_lane_in_reg.valid              <= 1'b0;
-        response_memory_in_reg.valid            <= 1'b0;
     end
     else begin
         fifo_request_control_out_signals_in_reg <= fifo_request_control_out_signals_in;
@@ -232,9 +231,21 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
         fifo_response_lane_in_signals_in_reg    <= fifo_response_lane_in_signals_in[0];
         fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
-        response_control_in_reg.valid           <= response_control_in.valid ;
-        response_lane_in_reg.valid              <= response_lane_in[0].valid;
-        response_memory_in_reg.valid            <= response_memory_in.valid ;
+    end
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_lane_template) begin
+        response_control_in_reg.valid <= 1'b0;
+        response_lane_in_reg.valid    <= 1'b0;
+        response_memory_in_reg.valid  <= 1'b0;
+    end
+    else begin
+        response_control_in_reg.valid <= response_control_in.valid ;
+        response_lane_in_reg.valid    <= response_lane_in[0].valid;
+        response_memory_in_reg.valid  <= response_memory_in.valid ;
     end
 end
 
@@ -247,27 +258,25 @@ end
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
+// Drive Done State signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_lane_template) begin
-        done_out                  <= 1'b0;
-        fifo_empty_reg            <= 1'b1;
-        fifo_setup_signal         <= 1'b1;
-        request_control_out.valid <= 1'b0;
-        request_lane_out[0].valid <= 1'b0;
-        request_memory_out.valid  <= 1'b0;
+        done_out          <= 1'b0;
+        fifo_empty_reg    <= 1'b1;
+        fifo_setup_signal <= 1'b1;
     end
     else begin
-        done_out                  <= (&engines_done_out_reg) & fifo_empty_reg;
-        fifo_empty_reg            <= fifo_empty_int;
-        fifo_setup_signal         <= engine_arbiter_N_to_1_memory_fifo_setup_signal |  engine_arbiter_N_to_1_control_fifo_setup_signal |  engine_arbiter_1_to_N_memory_fifo_setup_signal | engine_arbiter_1_to_N_control_fifo_setup_signal | (|engines_fifo_setup_signal_reg);
-        request_control_out.valid <= request_control_out_int.valid;
-        request_lane_out[0].valid <= request_lane_out_int.valid ;
-        request_memory_out.valid  <= request_memory_out_int.valid;
+        done_out          <= (&engines_done_out_reg) & fifo_empty_reg;
+        fifo_empty_reg    <= fifo_empty_int;
+        fifo_setup_signal <= engine_arbiter_N_to_1_memory_fifo_setup_signal |  engine_arbiter_N_to_1_control_fifo_setup_signal |  engine_arbiter_1_to_N_memory_fifo_setup_signal | engine_arbiter_1_to_N_control_fifo_setup_signal | (|engines_fifo_setup_signal_reg);
     end
 end
 
 assign fifo_empty_int = engine_arbiter_1_to_N_control_fifo_response_signals_out.empty & engine_arbiter_N_to_1_memory_fifo_request_signals_out.empty & engine_arbiter_N_to_1_control_fifo_request_signals_out.empty & engine_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
-
+// --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out <= engine_arbiter_N_to_1_control_fifo_request_signals_out;
     fifo_request_lane_out_signals_out[0] <= engines_fifo_request_lane_out_signals_out[NUM_ENGINES-1];
@@ -275,9 +284,27 @@ always_ff @(posedge ap_clk) begin
     fifo_response_control_in_signals_out <= engine_arbiter_1_to_N_control_fifo_response_signals_out;
     fifo_response_lane_in_signals_out[0] <= engines_fifo_response_lane_in_signals_out[0];
     fifo_response_memory_in_signals_out  <= engine_arbiter_1_to_N_memory_fifo_response_signals_out;
-    request_control_out.payload          <= request_control_out_int.payload ;
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_lane_template) begin
+        request_control_out.valid <= 1'b0;
+        request_lane_out[0].valid <= 1'b0;
+        request_memory_out.valid  <= 1'b0;
+    end
+    else begin
+        request_control_out.valid <= request_control_out_int.valid;
+        request_lane_out[0].valid <= request_lane_out_int.valid ;
+        request_memory_out.valid  <= request_memory_out_int.valid;
+    end
+end
+
+always_ff @(posedge ap_clk) begin
+    request_control_out.payload <= request_control_out_int.payload ;
     request_lane_out[0].payload          <= request_lane_out_int.payload;
-    request_memory_out.payload           <= request_memory_out_int.payload ;
+    request_memory_out.payload  <= request_memory_out_int.payload ;
 end
 
 // --------------------------------------------------------------------------------------

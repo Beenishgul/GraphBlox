@@ -476,6 +476,7 @@ generate
         end
         assign bundle_arbiter_control_1_to_N_fifo_response_signals_out = 2'b10;
         assign bundle_arbiter_control_1_to_N_fifo_setup_signal         = 1'b0;
+        assign bundle_arbiter_control_1_to_N_response_in = 0;
     end
 endgenerate
 

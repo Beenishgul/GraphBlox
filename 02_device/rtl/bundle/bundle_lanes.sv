@@ -98,9 +98,9 @@ FIFOStateSignalsInput fifo_request_control_out_signals_in_reg;
 // --------------------------------------------------------------------------------------
 // FIFO OUTPUT BackTrack Avoid mem -> engine deadlocks
 // --------------------------------------------------------------------------------------
-FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out_int    [NUM_LANES-1:0]                         ;
-FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg     [NUM_LANES-1:0][NUM_BACKTRACK_LANES-1:0];
-FIFOStateSignalsOutput lanes_fifo_request_memory_out_backtrack_signals_in_reg[NUM_LANES-1:0][      NUM_CHANNELS-1:0];
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_out_int         [NUM_LANES-1:0]                         ;
+FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in_reg          [NUM_LANES-1:0][NUM_BACKTRACK_LANES-1:0];
+FIFOStateSignalsOutput lanes_fifo_request_memory_out_backtrack_signals_in_reg[NUM_LANES-1:0][       NUM_CHANNELS-1:0];
 
 // --------------------------------------------------------------------------------------
 // Generate Lanes - Arbiter Signals: Lanes Request Generator
@@ -221,6 +221,8 @@ end
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_lanes) begin
         fifo_request_control_out_signals_in_reg <= 0;
@@ -229,9 +231,6 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= 0;
         fifo_response_lanes_in_signals_in_reg   <= 0;
         fifo_response_memory_in_signals_in_reg  <= 0;
-        response_control_in_reg.valid           <= 1'b0;
-        response_engine_in_reg.valid            <= 1'b0;
-        response_memory_in_reg.valid            <= 1'b0;
     end
     else begin
         fifo_request_control_out_signals_in_reg <= fifo_request_control_out_signals_in;
@@ -240,9 +239,21 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
         fifo_response_lanes_in_signals_in_reg   <= fifo_response_lanes_in_signals_in;
         fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
-        response_control_in_reg.valid           <= response_control_in.valid ;
-        response_engine_in_reg.valid            <= response_lanes_in.valid;
-        response_memory_in_reg.valid            <= response_memory_in.valid ;
+    end
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_lanes) begin
+        response_control_in_reg.valid <= 1'b0;
+        response_engine_in_reg.valid  <= 1'b0;
+        response_memory_in_reg.valid  <= 1'b0;
+    end
+    else begin
+        response_control_in_reg.valid <= response_control_in.valid ;
+        response_engine_in_reg.valid  <= response_lanes_in.valid;
+        response_memory_in_reg.valid  <= response_memory_in.valid ;
     end
 end
 
@@ -255,27 +266,25 @@ end
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
+// Drive Done State signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_lanes) begin
-        done_out                  <= 1'b0;
-        fifo_empty_reg            <= 1'b1;
-        fifo_setup_signal         <= 1'b1;
-        request_control_out.valid <= 1'b0;
-        request_lanes_out.valid   <= 1'b0;
-        request_memory_out.valid  <= 1'b0;
+        done_out          <= 1'b0;
+        fifo_empty_reg    <= 1'b1;
+        fifo_setup_signal <= 1'b1;
     end
     else begin
-        done_out                  <= (&lanes_done_out_reg) & fifo_empty_reg;
-        fifo_empty_reg            <= fifo_empty_int;
-        fifo_setup_signal         <= lane_arbiter_1_to_N_memory_fifo_setup_signal | lane_arbiter_1_to_N_control_fifo_setup_signal | lane_arbiter_N_to_1_control_fifo_setup_signal | lane_arbiter_N_to_1_memory_fifo_setup_signal | lane_arbiter_N_to_1_lane_fifo_setup_signal | lane_arbiter_1_to_N_lanes_fifo_setup_signal | (|lanes_fifo_setup_signal_reg);
-        request_control_out.valid <= request_control_out_int.valid ;
-        request_lanes_out.valid   <= request_engine_out_int.valid ;
-        request_memory_out.valid  <= request_memory_out_int.valid ;
+        done_out          <= (&lanes_done_out_reg) & fifo_empty_reg;
+        fifo_empty_reg    <= fifo_empty_int;
+        fifo_setup_signal <= lane_arbiter_1_to_N_memory_fifo_setup_signal | lane_arbiter_1_to_N_control_fifo_setup_signal | lane_arbiter_N_to_1_control_fifo_setup_signal | lane_arbiter_N_to_1_memory_fifo_setup_signal | lane_arbiter_N_to_1_lane_fifo_setup_signal | lane_arbiter_1_to_N_lanes_fifo_setup_signal | (|lanes_fifo_setup_signal_reg);
     end
 end
 
 assign fifo_empty_int = lane_arbiter_N_to_1_lane_fifo_request_signals_out.empty & lane_arbiter_1_to_N_lanes_fifo_response_signals_out.empty & lane_arbiter_1_to_N_control_fifo_response_signals_out.empty & lane_arbiter_N_to_1_memory_fifo_request_signals_out.empty & lane_arbiter_N_to_1_control_fifo_request_signals_out.empty & lane_arbiter_1_to_N_memory_fifo_response_signals_out.empty;
-
+// --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out <= lane_arbiter_N_to_1_control_fifo_request_signals_out;
     fifo_request_lanes_out_signals_out   <= lane_arbiter_N_to_1_lane_fifo_request_signals_out;
@@ -283,9 +292,27 @@ always_ff @(posedge ap_clk) begin
     fifo_response_control_in_signals_out <= lane_arbiter_1_to_N_control_fifo_response_signals_out;
     fifo_response_lanes_in_signals_out   <= lane_arbiter_1_to_N_lanes_fifo_response_signals_out;
     fifo_response_memory_in_signals_out  <= lane_arbiter_1_to_N_memory_fifo_response_signals_out;
-    request_control_out.payload          <= request_control_out_int.payload ;
-    request_lanes_out.payload            <= request_engine_out_int.payload;
-    request_memory_out.payload           <= request_memory_out_int.payload ;
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_lanes) begin
+        request_control_out.valid <= 1'b0;
+        request_lanes_out.valid   <= 1'b0;
+        request_memory_out.valid  <= 1'b0;
+    end
+    else begin
+        request_control_out.valid <= request_control_out_int.valid ;
+        request_lanes_out.valid   <= request_engine_out_int.valid ;
+        request_memory_out.valid  <= request_memory_out_int.valid ;
+    end
+end
+
+always_ff @(posedge ap_clk) begin
+    request_control_out.payload <= request_control_out_int.payload ;
+    request_lanes_out.payload   <= request_engine_out_int.payload;
+    request_memory_out.payload  <= request_memory_out_int.payload ;
 end
 
 // --------------------------------------------------------------------------------------
@@ -582,7 +609,7 @@ generate
     for (j=0; j<NUM_LANES; j++) begin : generate_lane_template
         lane_template #(
             `include"set_lane_parameters.vh"
-            ) inst_lane_template (
+        ) inst_lane_template (
             .ap_clk                                      (ap_clk                                                                                    ),
             .areset                                      (areset_lane[j]                                                                            ),
             .response_lane_in                            (lanes_response_merge_engine_in[j][LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]:0]               ),
