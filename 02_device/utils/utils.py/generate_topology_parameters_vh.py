@@ -1296,7 +1296,7 @@ with open(output_file_path_topology, "w") as file:
    
 
 
-# Write to VHDL file
+# Write to SV file
 with open(output_file_bundle_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
@@ -1324,19 +1324,67 @@ with open(output_file_bundle_topology, "w") as file:
         file.write(f"                    begin\n")         
         for lane_merge in range(NUM_LANES):
             lane_merge_l = lane_merge
+            LANE_MERGE_PIPELINE_STAGES = 0
             LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge_l]
-            
 
-            file.write(f"                      assign lanes_fifo_request_cast_lane_out_signals_in[{lane_merge_l}][0]  = lanes_fifo_request_lane_out_signals_in[{lane_merge_l}];\n")
-            file.write(f"                      assign lanes_fifo_request_lane_out_signals_out[{lane_merge_l}]         = lanes_fifo_request_cast_lane_out_signals_out [{lane_merge_l}][0];\n")
-            file.write(f"                      assign lanes_fifo_response_lane_in_signals_out[{lane_merge_l}]         = lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][0];\n")
-            file.write(f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][0] = lanes_fifo_response_lane_in_signals_in[{lane_merge_l}];\n")
-            file.write(f"                      assign lanes_request_lane_out[{lane_merge_l}]                          = lanes_request_cast_lane_out[{lane_merge_l}][0];\n")
-            file.write(f"                      assign lanes_response_merge_engine_in[{lane_merge_l}][0]               = lanes_response_engine_in[{lane_merge_l}];\n\n")
+            file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_request_cast_lane_out_signals_in[{lane_merge_l}][0]) )
+               ) inst_hyper_pipeline_lanes_fifo_request_cast_lane_out_signals_in_{lane_merge_l}_0 (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_fifo_request_lane_out_signals_in[{lane_merge_l}]),
+                   .dout  (lanes_fifo_request_cast_lane_out_signals_in[{lane_merge_l}][0])
+               );
 
+               hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_request_lane_out_signals_out[{lane_merge_l}]) )
+               ) inst_hyper_pipeline_lanes_fifo_request_lane_out_signals_out_{lane_merge_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_fifo_request_cast_lane_out_signals_out[{lane_merge_l}][0]),
+                   .dout  (lanes_fifo_request_lane_out_signals_out[{lane_merge_l}])
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_response_lane_in_signals_out[{lane_merge_l}]) )
+               ) inst_hyper_pipeline_lanes_fifo_response_lane_in_signals_out_{lane_merge_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][0]),
+                   .dout  (lanes_fifo_response_lane_in_signals_out[{lane_merge_l}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][0]) )
+               ) inst_hyper_pipeline_lanes_fifo_response_merge_lane_in_signals_in_{lane_merge_l}_0 (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_fifo_response_lane_in_signals_in[{lane_merge_l}]),
+                   .dout  (lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][0])
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_request_lane_out[{lane_merge_l}]) )
+               ) inst_hyper_pipeline_lanes_request_lane_out_{lane_merge_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_request_cast_lane_out[{lane_merge_l}][0]),
+                   .dout  (lanes_request_lane_out[{lane_merge_l}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_response_merge_engine_in[{lane_merge_l}][0]) )
+               ) inst_hyper_pipeline_lanes_response_merge_engine_in_{lane_merge_l}_0 (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_response_engine_in[{lane_merge_l}]),
+                   .dout  (lanes_response_merge_engine_in[{lane_merge_l}][0])
+               );
+""")
 
             if LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L != 0:
                 merge_count = 0
+                LANE_CAST_PIPELINE_STAGES = 0
                 for lane_cast in range(NUM_LANES):
                     lane_cast_l = lane_cast
                     LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l]
@@ -1354,9 +1402,26 @@ with open(output_file_bundle_topology, "w") as file:
                                 if LANES_CONFIG_MERGE_CONNECT_ARRAY_L == lane_merge_l:
                                     merge_count += 1
                                     cast_count[lane_cast_l] += 1
-                                    file.write(f"                      assign lanes_fifo_request_cast_lane_out_signals_in[{lane_cast_l}][{cast_count[lane_cast_l]}].rd_en             = ~lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][{merge_count}].prog_full;\n")
                                     file.write(f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][{merge_count}].rd_en             = 1'b1;\n")
-                                    file.write(f"                      assign lanes_response_merge_engine_in[{lane_merge_l}][{merge_count}]                                 = lanes_request_cast_lane_out[{lane_cast_l}][{cast_count[lane_cast_l]}];\n\n")
+                                    file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({LANE_CAST_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_request_cast_lane_out_signals_in[{lane_cast_l}][{cast_count[lane_cast_l]}].rd_en) )
+               ) inst_hyper_pipeline_lanes_fifo_request_cast_lane_out_signals_in_{lane_cast_l}_{cast_count[lane_cast_l]}_rd_en (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~lanes_fifo_response_merge_lane_in_signals_out[{lane_merge_l}][{merge_count}].prog_full),
+                   .dout  (lanes_fifo_request_cast_lane_out_signals_in[{lane_cast_l}][{cast_count[lane_cast_l]}].rd_en)
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({LANE_CAST_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_response_merge_engine_in[{lane_merge_l}][{merge_count}]) )
+               ) inst_hyper_pipeline_lanes_response_merge_engine_in_{lane_merge_l}_{merge_count} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_request_cast_lane_out[{lane_cast_l}][{cast_count[lane_cast_l]}]),
+                   .dout  (lanes_response_merge_engine_in[{lane_merge_l}][{merge_count}])
+               );
+
+""")
                                
 
         file.write(f"                    end\n") 
@@ -1365,7 +1430,7 @@ with open(output_file_bundle_topology, "w") as file:
     file.write(f"// total_luts={total_luts}\n\n")   
 
 
-# Write to VHDL file
+# Write to SV file
 with open(output_file_lane_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
@@ -1418,32 +1483,124 @@ with open(output_file_lane_topology, "w") as file:
             # Ensure NUM_ENGINES is an integer or use NUM_ENGINES[0] if it's a list containing the integer value
             for engine_idx in range(NUM_ENGINES):
                 engine_idx_l = engine_idx
+                ENGINE_PIPELINE_STAGES = 0
                 ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L = ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx_l]
                 ENGINES_CONFIG_CAST_WIDTH_ARRAY_L = ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx_l]
 
-                file.write(f"               assign engines_response_merge_lane_in[{engine_idx_l}][0]        = engines_response_lane_in[{engine_idx_l}];\n")
                 file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][0].rd_en = 1'b1;\n")
-                file.write(f"               assign engines_fifo_response_lane_in_signals_out[{engine_idx_l}] = engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][0];\n")
+            
+                file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_response_merge_lane_in[{engine_idx_l}][0]) )
+               ) inst_hyper_pipeline_engines_response_merge_lane_in_{engine_idx_l}_0 (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_response_lane_in[{engine_idx_l}]),
+                   .dout  (engines_response_merge_lane_in[{engine_idx_l}][0])
+               );
 
-                file.write(f"               assign engines_request_lane_out[{engine_idx_l}]                  = engines_request_cast_lane_out[{engine_idx_l}][0];\n")
-                file.write(f"               assign engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][0].rd_en = engines_fifo_request_lane_out_signals_in[{engine_idx_l}].rd_en ;\n")
-                file.write(f"               assign engines_fifo_request_lane_out_signals_out[{engine_idx_l}] = engines_fifo_request_cast_lane_out_signals_out [{engine_idx_l}][0];\n\n")
+               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_response_lane_in_signals_out[{engine_idx_l}]) )
+               ) inst_hyper_pipeline_engines_fifo_response_lane_in_signals_out_{engine_idx_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][0]),
+                   .dout  (engines_fifo_response_lane_in_signals_out[{engine_idx_l}])
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_request_lane_out[{engine_idx_l}]) )
+               ) inst_hyper_pipeline_engines_request_lane_out_{engine_idx_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_request_cast_lane_out[{engine_idx_l}][0]),
+                   .dout  (engines_request_lane_out[{engine_idx_l}] )
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][0].rd_en) )
+               ) inst_hyper_pipeline_engines_fifo_request_cast_lane_out_signals_in_{engine_idx_l}_0_rd_en (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_fifo_request_lane_out_signals_in[{engine_idx_l}].rd_en ),
+                   .dout  (engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][0].rd_en)
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_request_lane_out_signals_out[{engine_idx_l}]) )
+               ) inst_hyper_pipeline_engines_fifo_request_lane_out_signals_out_{engine_idx_l} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_fifo_request_cast_lane_out_signals_out [{engine_idx_l}][0]),
+                   .dout  (engines_fifo_request_lane_out_signals_out[{engine_idx_l}])
+               );
+
+""")
+
     
                 for engine_merge in range(ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L):
                     engine_merge_l = engine_merge
                     merge_count += 1
                    
-                    file.write(f"               assign engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}]          = response_lane_in[{merge_count}];\n")
+                    # file.write(f"               assign engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}]          = response_lane_in[{merge_count}];\n")
                     file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][{engine_merge_l+1}].rd_en = 1'b1;\n")
-                    file.write(f"               assign fifo_response_lane_in_signals_out[{merge_count}] = engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][{engine_merge_l+1}];\n\n")
+                    # file.write(f"               assign fifo_response_lane_in_signals_out[{merge_count}] = engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][{engine_merge_l+1}];\n\n")
+                    file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}]) )
+               ) inst_hyper_pipeline_engines_response_merge_lane_in_{engine_idx_l}_{engine_merge_l+1} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (response_lane_in[{merge_count}]),
+                   .dout  (engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}] )
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(fifo_response_lane_in_signals_out[{merge_count}]) )
+               ) inst_hyper_pipeline_fifo_response_lane_in_signals_out_{merge_count} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_fifo_response_merge_lane_in_signals_out[{engine_idx_l}][{engine_merge_l+1}]),
+                   .dout  (fifo_response_lane_in_signals_out[{merge_count}] )
+               );
+
+""")
 
                 for engine_cast in range(ENGINES_CONFIG_CAST_WIDTH_ARRAY_L):
                     engine_cast_l = engine_cast
                     cast_count += 1
 
-                    file.write(f"               assign request_lane_out[{cast_count}]                  = engines_request_cast_lane_out[{engine_idx_l}][{engine_cast_l+1}];\n")
-                    file.write(f"               assign engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][{engine_cast_l+1}].rd_en = fifo_request_lane_out_signals_in[{cast_count}].rd_en;\n")
-                    file.write(f"               assign fifo_request_lane_out_signals_out[{cast_count}] = engines_fifo_request_cast_lane_out_signals_out[{engine_idx_l}][{engine_cast_l+1}];\n\n")
+                    # file.write(f"               assign request_lane_out[{cast_count}]                  = engines_request_cast_lane_out[{engine_idx_l}][{engine_cast_l+1}];\n")
+                    # file.write(f"               assign engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][{engine_cast_l+1}].rd_en = fifo_request_lane_out_signals_in[{cast_count}].rd_en;\n")
+                    # file.write(f"               assign fifo_request_lane_out_signals_out[{cast_count}] = engines_fifo_request_cast_lane_out_signals_out[{engine_idx_l}][{engine_cast_l+1}];\n\n")
+
+                    file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(request_lane_out[{cast_count}]) )
+               ) inst_hyper_pipeline_request_lane_out_{cast_count} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_request_cast_lane_out[{engine_idx_l}][{engine_cast_l+1}]),
+                   .dout  (request_lane_out[{cast_count}] )
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][{engine_cast_l+1}].rd_en) )
+               ) inst_hyper_pipeline_engines_fifo_request_cast_lane_out_signals_in_{engine_idx_l}_{engine_cast_l+1}_rd_en (
+                   .ap_clk(ap_clk                       ),
+                   .din   (fifo_request_lane_out_signals_in[{cast_count}].rd_en),
+                   .dout  (engines_fifo_request_cast_lane_out_signals_in[{engine_idx_l}][{engine_cast_l+1}].rd_en )
+               );
+
+                hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(fifo_request_lane_out_signals_out[{cast_count}]) )
+               ) inst_hyper_pipeline_fifo_request_lane_out_signals_out_{cast_count} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_fifo_request_cast_lane_out_signals_out[{engine_idx_l}][{engine_cast_l+1}]),
+                   .dout  (fifo_request_lane_out_signals_out[{cast_count}])
+               );
+
+""")
+
 
             file.write(f"          end\n") 
             file.write(f"endgenerate\n")

@@ -185,20 +185,31 @@ assign response_control_in                       = request_control_out;
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_cu_bundles) begin
         fifo_request_control_out_signals_in_reg <= 0;
         fifo_request_memory_out_signals_in_reg  <= 0;
         fifo_response_control_in_signals_in_reg <= 0;
         fifo_response_memory_in_signals_in_reg  <= 0;
-        response_control_in_reg.valid           <= 1'b0;
-        response_memory_in_reg.valid            <= 1'b0;
     end
     else begin
         fifo_request_control_out_signals_in_reg <= fifo_request_control_out_signals_in;
         fifo_request_memory_out_signals_in_reg  <= fifo_request_memory_out_signals_in;
         fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
         fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
+    end
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_cu_bundles) begin
+        response_control_in_reg.valid           <= 1'b0;
+        response_memory_in_reg.valid            <= 1'b0;
+    end
+    else begin
         response_control_in_reg.valid           <= response_control_in.valid;
         response_memory_in_reg.valid            <= response_memory_in.valid;
     end
@@ -212,30 +223,46 @@ end
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
+// Drive Done State signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_cu_bundles) begin
         done_out                  <= 1'b0;
         fifo_empty_reg            <= 1'b1;
         fifo_setup_signal         <= 1'b1;
-        request_control_out.valid <= 1'b0;
-        request_memory_out.valid  <= 1'b0;
     end
     else begin
         done_out                  <= (&bundle_done_out_reg) & fifo_empty_reg;
         fifo_empty_reg            <= fifo_empty_int;
         fifo_setup_signal         <= (|bundle_fifo_setup_signal_reg) | bundle_arbiter_memory_N_to_1_fifo_setup_signal | bundle_arbiter_control_N_to_1_fifo_setup_signal| bundle_arbiter_control_1_to_N_fifo_setup_signal | bundle_arbiter_memory_1_to_N_fifo_setup_signal;
-        request_control_out.valid <= request_control_out_int.valid ;
-        request_memory_out.valid  <= request_memory_out_int.valid ;
     end
 end
 
 assign fifo_empty_int = bundle_arbiter_memory_N_to_1_fifo_request_signals_out.empty & bundle_arbiter_control_N_to_1_fifo_request_signals_out.empty  &  bundle_arbiter_control_1_to_N_fifo_response_signals_out.empty & bundle_arbiter_memory_1_to_N_fifo_response_signals_out.empty;
-
+// --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out <= bundle_arbiter_control_N_to_1_fifo_request_signals_out;
     fifo_request_memory_out_signals_out  <= bundle_arbiter_memory_N_to_1_fifo_request_signals_out;
     fifo_response_control_in_signals_out <= bundle_arbiter_control_1_to_N_fifo_response_signals_out;
     fifo_response_memory_in_signals_out  <= bundle_arbiter_memory_1_to_N_fifo_response_signals_out;
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_cu_bundles) begin
+        request_control_out.valid <= 1'b0;
+        request_memory_out.valid  <= 1'b0;
+    end
+    else begin
+        request_control_out.valid <= request_control_out_int.valid ;
+        request_memory_out.valid  <= request_memory_out_int.valid ;
+    end
+end
+
+always_ff @(posedge ap_clk) begin
     request_control_out.payload          <= request_control_out_int.payload;
     request_memory_out.payload           <= request_memory_out_int.payload;
 end
