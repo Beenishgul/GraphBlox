@@ -125,9 +125,9 @@ FIFOStateSignalsOutput template_fifo_response_memory_in_signals_out             
 FIFOStateSignalsOutput template_fifo_response_lanes_backtrack_signals_in    [NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
 FIFOStateSignalsOutput template_fifo_request_memory_out_backtrack_signals_in[                         NUM_CHANNELS-1:0];
 
-logic            areset_template           ;
-logic            template_done_out         ;
-logic            template_fifo_setup_signal;
+logic areset_template           ;
+logic template_done_out         ;
+logic template_fifo_setup_signal;
 
 ControlPacket        template_request_control_out                            ;
 EnginePacket         template_request_engine_out                             ;
@@ -148,6 +148,8 @@ end
 // --------------------------------------------------------------------------------------
 // Drive input signals
 // --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_template_engine) begin
         fifo_request_control_out_signals_in_reg <= 0;
@@ -156,9 +158,6 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= 0;
         fifo_response_engine_in_signals_in_reg  <= 0;
         fifo_response_memory_in_signals_in_reg  <= 0;
-        response_control_in_reg.valid           <= 1'b0;
-        response_engine_in_reg.valid            <= 1'b0;
-        response_memory_in_reg.valid            <= 1'b0;
     end
     else begin
         fifo_request_control_out_signals_in_reg <= fifo_request_control_out_signals_in;
@@ -167,9 +166,21 @@ always_ff @(posedge ap_clk) begin
         fifo_response_control_in_signals_in_reg <= fifo_response_control_in_signals_in;
         fifo_response_engine_in_signals_in_reg  <= fifo_response_engine_in_signals_in[0];
         fifo_response_memory_in_signals_in_reg  <= fifo_response_memory_in_signals_in;
-        response_control_in_reg.valid           <= response_control_in.valid ;
-        response_engine_in_reg.valid            <= response_engine_in[0].valid;
-        response_memory_in_reg.valid            <= response_memory_in.valid ;
+    end
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_template_engine) begin
+        response_control_in_reg.valid <= 1'b0;
+        response_engine_in_reg.valid  <= 1'b0;
+        response_memory_in_reg.valid  <= 1'b0;
+    end
+    else begin
+        response_control_in_reg.valid <= response_control_in.valid;
+        response_engine_in_reg.valid  <= response_engine_in[0].valid;
+        response_memory_in_reg.valid  <= response_memory_in.valid;
     end
 end
 
@@ -197,27 +208,25 @@ endgenerate
 // --------------------------------------------------------------------------------------
 // Drive output signals
 // --------------------------------------------------------------------------------------
+// Drive Done State signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     if (areset_template_engine) begin
         done_out                  <= 1'b0;
         fifo_empty_reg            <= 1'b1;
         fifo_setup_signal         <= 1'b1;
-        request_control_out.valid <= 1'b0;
-        request_engine_out[0].valid <= 1'b0;
-        request_memory_out.valid  <= 1'b0;
     end
     else begin
         done_out                  <= template_done_out & fifo_empty_reg;
         fifo_empty_reg            <= fifo_empty_int;
         fifo_setup_signal         <= engine_cast_arbiter_1_to_N_fifo_setup_signal | template_fifo_setup_signal;
-        request_control_out.valid <= request_control_out_int.valid;
-        request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.packet_destination);
-        request_memory_out.valid  <= request_memory_out_int.valid;
     end
 end
 
 assign fifo_empty_int = engine_cast_arbiter_1_to_N_fifo_response_signals_out.empty;
-
+// --------------------------------------------------------------------------------------
+// Drive FIFO signals
+// --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
     fifo_request_control_out_signals_out   <= template_fifo_request_control_out_signals_out;
     fifo_request_engine_out_signals_out[0] <= map_internal_dual_fifo_signals_to_output_external(template_fifo_request_engine_out_signals_out, engine_cast_arbiter_1_to_N_fifo_response_signals_out);
@@ -225,11 +234,28 @@ always_ff @(posedge ap_clk) begin
     fifo_response_control_in_signals_out   <= template_fifo_response_control_in_signals_out;
     fifo_response_engine_in_signals_out[0] <= template_fifo_response_engine_in_signals_out[0];
     fifo_response_memory_in_signals_out    <= template_fifo_response_memory_in_signals_out;
-    request_control_out.payload            <= request_control_out_int.payload ;
-    request_engine_out[0].payload          <= request_engine_out_int.payload;
-    request_memory_out.payload             <= request_memory_out_int.payload ;
+end
+// --------------------------------------------------------------------------------------
+// Drive Packets
+// --------------------------------------------------------------------------------------
+always_ff @(posedge ap_clk) begin
+    if (areset_template_engine) begin
+        request_control_out.valid   <= 1'b0;
+        request_engine_out[0].valid <= 1'b0;
+        request_memory_out.valid    <= 1'b0;
+    end
+    else begin
+        request_control_out.valid   <= request_control_out_int.valid;
+        request_engine_out[0].valid <= request_engine_out_int.valid & (|request_engine_out_int.payload.meta.route.packet_destination);
+        request_memory_out.valid    <= request_memory_out_int.valid;
+    end
 end
 
+always_ff @(posedge ap_clk) begin
+    request_control_out.payload   <= request_control_out_int.payload ;
+    request_engine_out[0].payload <= request_engine_out_int.payload;
+    request_memory_out.payload    <= request_memory_out_int.payload ;
+end
 // --------------------------------------------------------------------------------------
 // Drive CAST output signals
 // --------------------------------------------------------------------------------------

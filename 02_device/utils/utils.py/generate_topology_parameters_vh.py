@@ -1454,7 +1454,7 @@ with open(output_file_lane_topology, "w") as file:
 
 with open(output_file_lane_arbitration, "w") as file:
     for ID_BUNDLE in range(NUM_BUNDLES):
-
+        ENGINE_ARBITER_MEMORY_PIPELINE_STAGES=0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
         ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
 
@@ -1480,12 +1480,25 @@ with open(output_file_lane_arbitration, "w") as file:
                     MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_ENGINE]
   
                     if MAP_ENGINE:
-                        file.write(f"               always_ff @(posedge ap_clk) begin\n")
-                        file.write(f"                   engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}] <= engines_request_memory_out[{ID_ENGINE}];\n")
-                        file.write(f"                   engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  <= ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}];\n")
-                        file.write(f"               end\n")                     
-                        # file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}] = engines_request_memory_out[{ID_ENGINE}];\n")
-                        # file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}];\n")
+                        file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}]) )
+               ) inst_hyper_pipeline_engine_arbiter_N_to_1_memory_request_in_{REAL_ID_ENGINE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_request_memory_out[{ID_ENGINE}] ),
+                   .dout  (engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en) )
+               ) inst_hyper_pipeline_engines_fifo_request_memory_out_signals_in_rd_en_{ID_ENGINE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~engine_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{REAL_ID_ENGINE}]),
+                   .dout  (engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en)
+               );
+
+""")
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
@@ -1494,14 +1507,23 @@ with open(output_file_lane_arbitration, "w") as file:
                 for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
                     file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{ID_ENGINE}] = 0;\n")
                     file.write(f"               assign engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n")
-                
-                file.write(f"               assign engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
+
+                file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({ENGINE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_engine_arbiter_N_to_1_memory_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
+                    .dout  (engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en)
+                );
+""")
                 file.write(f"          end\n") 
                 file.write(f"endgenerate\n")
                 file.write(f"\n\n") 
 
     for ID_BUNDLE in range(NUM_BUNDLES):
-
+        ENGINE_ARBITER_CONTROL_PIPELINE_STAGES=0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
         ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
 
@@ -1527,12 +1549,25 @@ with open(output_file_lane_arbitration, "w") as file:
                     MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_ENGINE]
 
                     if MAP_ENGINE:
-                        file.write(f"               always_ff @(posedge ap_clk) begin\n")
-                        file.write(f"                   engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}] <= engines_request_control_out[{ID_ENGINE}];\n")
-                        file.write(f"                   engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  <= ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}];\n")
-                        file.write(f"               end\n")   
-                        # file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}] = engines_request_control_out[{ID_ENGINE}];\n")
-                        # file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = ~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}];\n")
+                        file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}]) )
+               ) inst_hyper_pipeline_engine_arbiter_N_to_1_control_request_in_{REAL_ID_ENGINE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (engines_request_control_out[{ID_ENGINE}] ),
+                   .dout  (engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({ENGINE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en) )
+               ) inst_hyper_pipeline_engines_fifo_request_control_out_signals_in_rd_en_{ID_ENGINE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~engine_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{REAL_ID_ENGINE}]),
+                   .dout  (engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en)
+               );
+
+""")
                         REAL_ID_ENGINE += 1
                     else:
                         file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
@@ -1540,8 +1575,17 @@ with open(output_file_lane_arbitration, "w") as file:
                 for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
                     file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{ID_ENGINE}] = 0;\n")
                     file.write(f"               assign engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n")
-
-                file.write(f"               assign engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
+               
+                file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({ENGINE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_engine_arbiter_N_to_1_control_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
+                    .dout  (engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en)
+                );
+""")
                 file.write(f"          end\n") 
                 file.write(f"endgenerate\n")
                 file.write(f"\n\n") 
@@ -1592,7 +1636,7 @@ with open(output_file_lane_arbitration, "w") as file:
 
 with open(output_file_bundle_arbitration, "w") as file:
     for ID_BUNDLE in range(NUM_BUNDLES):
-
+        LANES_ARBITER_MEMORY_PIPELINE_STAGES=0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
         LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[ID_BUNDLE]
         LANES_CONFIG_LANE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_BUNDLE]
@@ -1609,10 +1653,29 @@ with open(output_file_bundle_arbitration, "w") as file:
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"               always_ff @(posedge ap_clk) begin\n")
-                    file.write(f"                   lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] <= lanes_request_memory_out[{ID_LANE}];\n")
-                    file.write(f"                   lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
-                    file.write(f"               end\n")   
+                    file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({LANES_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}]) )
+               ) inst_hyper_pipeline_lane_arbiter_N_to_1_memory_request_in_{REAL_ID_LANE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_request_memory_out[{ID_LANE}] ),
+                   .dout  (lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({LANES_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en) )
+               ) inst_hyper_pipeline_lanes_fifo_request_memory_out_signals_in_rd_en_{ID_LANE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}]),
+                   .dout  (lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en)
+               );
+
+""")
+                    # file.write(f"               always_ff @(posedge ap_clk) begin\n")
+                    # file.write(f"                   lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] <= lanes_request_memory_out[{ID_LANE}];\n")
+                    # file.write(f"                   lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    # file.write(f"               end\n")   
                     # file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] = lanes_request_memory_out[{ID_LANE}];\n")
                     # file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
                     REAL_ID_LANE += 1
@@ -1623,14 +1686,24 @@ with open(output_file_bundle_arbitration, "w") as file:
             for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
                 file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{ID_LANE}] = 0;\n")
                 file.write(f"               assign lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n")
-                
-            file.write(f"               assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
+
+            file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({LANES_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_lane_arbiter_N_to_1_memory_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
+                    .dout  (lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en)
+                );
+""")   
+            # file.write(f"               assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
             file.write(f"          end\n") 
             file.write(f"endgenerate\n")
             file.write(f"\n\n") 
 
     for ID_BUNDLE in range(NUM_BUNDLES):
-
+        LANES_ARBITER_CONTROL_PIPELINE_STAGES=0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
         LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
         LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
@@ -1647,12 +1720,25 @@ with open(output_file_bundle_arbitration, "w") as file:
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"               always_ff @(posedge ap_clk) begin\n")
-                    file.write(f"                   lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}] <= lanes_request_control_out[{ID_LANE}];\n")
-                    file.write(f"                   lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
-                    file.write(f"               end\n")   
-                    # file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}] = lanes_request_control_out[{ID_LANE}];\n")
-                    # file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
+                    file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({LANES_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}]) )
+               ) inst_hyper_pipeline_lane_arbiter_N_to_1_control_request_in_{REAL_ID_LANE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (lanes_request_control_out[{ID_LANE}] ),
+                   .dout  (lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({LANES_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en) )
+               ) inst_hyper_pipeline_lanes_fifo_request_control_out_signals_in_rd_en_{ID_LANE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~lane_arbiter_N_to_1_control_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{REAL_ID_LANE}]),
+                   .dout  (lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en)
+               );
+
+""")
                     REAL_ID_LANE += 1
                 else:
                     file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
@@ -1661,7 +1747,17 @@ with open(output_file_bundle_arbitration, "w") as file:
                 file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{ID_LANE}] = 0;\n")
                 file.write(f"               assign lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n")
 
-            file.write(f"               assign lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
+            file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({LANES_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_lane_arbiter_N_to_1_control_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
+                    .dout  (lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en)
+                );
+""")
+
             file.write(f"          end\n") 
             file.write(f"endgenerate\n")
             file.write(f"\n\n") 
@@ -1704,6 +1800,7 @@ with open(output_file_bundle_arbitration, "w") as file:
 
 with open(output_file_cu_arbitration, "w") as file:
 
+    BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES=0
     if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY:
 
         file.write("\n")
@@ -1716,8 +1813,26 @@ with open(output_file_cu_arbitration, "w") as file:
             MAP_BUNDLE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP[ID_BUNDLE]
 
             if MAP_BUNDLE:
-                file.write(f"               assign bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}] = bundle_request_memory_out[{ID_BUNDLE}];\n")
-                file.write(f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = ~bundle_arbiter_memory_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_memory_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}];\n")
+                file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
+               ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_request_in_{REAL_ID_BUNDLE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (bundle_request_memory_out[{ID_BUNDLE}] ),
+                   .dout  (bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en) )
+               ) inst_hyper_pipeline_bundle_fifo_request_memory_out_signals_in_rd_en_{ID_BUNDLE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~bundle_arbiter_memory_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_memory_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
+                   .dout  (bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en)
+               );
+
+""")
+
                 REAL_ID_BUNDLE += 1
             else:
                 file.write(f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
@@ -1725,12 +1840,23 @@ with open(output_file_cu_arbitration, "w") as file:
         for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
             file.write(f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n")
             file.write(f"               assign bundle_arbiter_memory_N_to_1_arbiter_grant_out[{ID_BUNDLE}] = 1'b0;\n")
-          
-        file.write(f"               assign bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
+
+        file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
+                    .dout  (bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en)
+                );
+""")
+
         file.write(f"          end\n") 
         file.write(f"endgenerate\n")
         file.write(f"\n\n") 
 
+    BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES=0
     if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST:
 
         file.write("\n")
@@ -1743,8 +1869,27 @@ with open(output_file_cu_arbitration, "w") as file:
             MAP_BUNDLE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP[ID_BUNDLE]
 
             if MAP_BUNDLE:
-                file.write(f"               assign bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}] = bundle_request_control_out[{ID_BUNDLE}];\n")
-                file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = ~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}];\n")
+
+                file.write(f"""               hyper_pipeline_noreset #(
+                   .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
+               ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_request_in_{REAL_ID_BUNDLE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (bundle_request_control_out[{ID_BUNDLE}] ),
+                   .dout  (bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}])
+               );
+
+               hyper_pipeline_noreset #(
+                   .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                   .WIDTH ($bits(bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en) )
+               ) inst_hyper_pipeline_bundle_fifo_request_control_out_signals_in_rd_en_{ID_BUNDLE} (
+                   .ap_clk(ap_clk                       ),
+                   .din   (~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
+                   .dout  (bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en)
+               );
+
+""")
+
                 REAL_ID_BUNDLE += 1
             else:
                 file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
@@ -1753,7 +1898,17 @@ with open(output_file_cu_arbitration, "w") as file:
             file.write(f"               assign bundle_arbiter_control_N_to_1_request_in[{ID_BUNDLE}]  = 0;\n")
             file.write(f"               assign bundle_arbiter_control_N_to_1_arbiter_grant_out[{ID_BUNDLE}]  = 1'b0;\n")
 
-        file.write(f"               assign bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en = fifo_request_control_out_signals_in_reg.rd_en;\n")
+        file.write(f"""               
+                hyper_pipeline_noreset #(
+                    .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
+                    .WIDTH ($bits(bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en))
+                ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_fifo_request_signals_in_rd_en (
+                    .ap_clk(ap_clk                                                    ),
+                    .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
+                    .dout  (bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en)
+                );
+""")
+
         file.write(f"          end\n") 
         file.write(f"endgenerate\n")
         file.write(f"\n\n") 
