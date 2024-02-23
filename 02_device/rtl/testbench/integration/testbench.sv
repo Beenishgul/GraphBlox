@@ -86,6 +86,7 @@ function void display ();
     $display("---------------------------------------------------------------------------");
     $display("MSG: debug_counter_1  : %0d", this.debug_counter_1);
     $display("MSG: debug_counter_2  : %0d", this.debug_counter_2);
+    $display("MSG: bfs_source       : %0d", this.bfs_source);
     $display("---------------------------------------------------------------------------");
 endfunction
 
@@ -874,12 +875,13 @@ endfunction
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 if(auxiliary_2[i])
-                    $display("MSG: %0d \n", i-graph.num_auxiliary_2);
+                    // $display("MSG: %0d \n", i-graph.num_auxiliary_2);
                 frontier_counter += auxiliary_2[i];
             end
             $display("MSG: Frontier_counter: %0d \n", frontier_counter);
             $display("MSG: // ------------------------------------------------- \n");
 
+            graph.debug_counter_1 = frontier_counter;
             error_counter = 0;
             return(error_found);
         endfunction
@@ -1125,7 +1127,7 @@ endfunction
             initialize__ALGORITHM_NAME__auxiliary_struct(graph);
         endfunction : read_files_graphCSR
 
-        function automatic void initalize_GraphCSR (ref GraphCSR graph);
+        function automatic void initalize_GraphCSR (ref GraphCSR graph, input integer unsigned source = _ROOT_);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the files then send to backdoor memory with the content.
             graph.graph_name = "_GRAPH_NAME_";
@@ -1157,7 +1159,7 @@ endfunction
             graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
             graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
-            graph.bfs_source = _ROOT_;
+            graph.bfs_source = source;
 
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
@@ -1202,13 +1204,13 @@ endfunction
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
         // The task will poll the DONE bit and check the results when complete.
-        task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting: multiple_iteration");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1248,17 +1250,17 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_MEMCPY(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_MEMCPY(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting: multiple_iteration MEMCPY");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1298,17 +1300,17 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_AUTOMATA(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_AUTOMATA(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting: multiple_iteration AUTOMATA");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1348,17 +1350,17 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_PR(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_PR(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting: multiple_iteration PR");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1398,17 +1400,17 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_TC(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_TC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
             $display("Starting: multiple_iteration TC");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1448,47 +1450,21 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_BFS(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_BFS(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+            integer unsigned trial = 0;
+            integer unsigned iter  = 0;
             error_found = 0;
+            graph.debug_counter_1 = 1;
 
-            $display("Starting iteration BFS: %d / %d", 0, num_iterations);
-            RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-            case(choose_pressure_type)
-                0 : slv_no_backpressure_wready();
-                1 : slv_random_backpressure_wready();
-            endcase
-            RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-            case(choose_pressure_type)
-                0 : slv_no_delay_rvalid();
-                1 : slv_random_delay_rvalid();
-            endcase
-            initalize_GraphCSR (graph);
-            set_scalar_registers();
-            set_memory_pointers();
-            backdoor_buffer_fill_memories(graph);
-            // Check that __KERNEL__ is IDLE before starting.
-            poll_idle_register();
-            ///////////////////////////////////////////////////////////////////////////
-            //Start transfers
-            blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+            for (int trial = 0; trial < num_trials; trial++) begin
+                $display("Starting Trial BFS: %d / SOURCE: %d", trial, graph.bfs_source);
+                graph.bfs_source = trial;
 
-            ctrl.wait_drivers_idle();
-
-            poll_ready_register();
-
-            poll_done_register();
-
-            ///////////////////////////////////////////////////////////////////////////
-            error_found |= check___KERNEL___result(graph)   ;
-
-            num_iterations--;
-            $display("Starting: multiple_iteration");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration BFS: %d / Frontier %d", iter, graph.debug_counter_1);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1499,8 +1475,7 @@ endfunction
                     0 : slv_no_delay_rvalid();
                     1 : slv_random_delay_rvalid();
                 endcase
-
-                update_BFS_auxiliary_struct(graph);
+                initalize_GraphCSR (graph, trial);
                 set_scalar_registers();
                 set_memory_pointers();
                 backdoor_buffer_fill_memories(graph);
@@ -1519,7 +1494,43 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting: multiple_iteration");
+                while (graph.debug_counter_1) begin
+                    $display("Starting iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
+                    RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_backpressure_wready();
+                        1 : slv_random_backpressure_wready();
+                    endcase
+                    RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_delay_rvalid();
+                        1 : slv_random_delay_rvalid();
+                    endcase
+
+                    update_BFS_auxiliary_struct(graph);
+                    set_scalar_registers();
+                    set_memory_pointers();
+                    backdoor_buffer_fill_memories(graph);
+                    // Check that __KERNEL__ is IDLE before starting.
+                    poll_idle_register();
+                    ///////////////////////////////////////////////////////////////////////////
+                    //Start transfers
+                    blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                    ctrl.wait_drivers_idle();
+
+                    poll_ready_register();
+
+                    poll_done_register();
+
+                    ///////////////////////////////////////////////////////////////////////////
+                    error_found |= check___KERNEL___result(graph)   ;
+                    if(graph.debug_counter_1 == 0)
+                        break;
+                    $display("Finished iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
+                    iter++;
+                end
             end
         endtask
 
