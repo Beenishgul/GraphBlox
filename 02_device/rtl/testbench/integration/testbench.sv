@@ -740,12 +740,12 @@ endfunction
 
         task automatic update_CC_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_count[];
+            integer auxiliary_count[];
             integer n;
 
             `include "module_slv_m_axi_vip_dump.vh"
 
-            auxiliary_count  = new [graph.mem_auxiliary_1];
+            auxiliary_count  = new [graph.num_auxiliary_1];
             graph.debug_counter_2 = 0; 
 
             for (int i = 0; i < graph.num_auxiliary_1; i++) begin
@@ -925,7 +925,7 @@ endfunction
             $display("MSG: // ------------------------------------------------- \n");
             for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
                 if(auxiliary_2[i])
-                    // $display("MSG: %0d \n", i-graph.num_auxiliary_2);
+                    $display("MSG: %0d \n", i-graph.num_auxiliary_2);
                 frontier_counter += auxiliary_2[i];
             end
             $display("MSG: Frontier_counter: %0d \n", frontier_counter);
@@ -1479,24 +1479,31 @@ endfunction
             integer unsigned trial = 0;
             integer unsigned iter  = 0;
             error_found = 0;
-            graph.debug_counter_1 = 1;
-
+        
             for (int trial = 0; trial < num_trials; trial++) begin
-                $display("Starting     Trial CC: %d / %d SOURCE: %d", trial, num_trials, trial);
                 graph.bfs_source = trial;
+                graph.debug_counter_1 = 0;
+                graph.debug_counter_2 = 0;
 
-                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                case(choose_pressure_type)
-                    0 : slv_no_backpressure_wready();
-                    1 : slv_random_backpressure_wready();
-                endcase
-                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                case(choose_pressure_type)
-                    0 : slv_no_delay_rvalid();
-                    1 : slv_random_delay_rvalid();
-                endcase
-                initalize_GraphCSR (graph, trial);
-                $display("Starting iteration CC: %d / Components %d", iter, graph.debug_counter_2);
+                // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_backpressure_wready();
+                //     1 : slv_random_backpressure_wready();
+                // endcase
+                // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_delay_rvalid();
+                //     1 : slv_random_delay_rvalid();
+                // endcase
+                slv_random_backpressure_wready();
+                slv_random_delay_rvalid();
+                if(trial == 0)
+                    initalize_GraphCSR (graph);
+                else
+                    initalize_GraphCSR (graph, trial);
+
+                $display("Starting - CC Trial: %0d / %0d", trial, num_trials);
+                $display("Starting - Iteration: %0d - Components: %0d", iter, graph.debug_counter_2);
                 set_scalar_registers();
                 set_memory_pointers();
                 backdoor_buffer_fill_memories(graph);
@@ -1515,7 +1522,7 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Starting: multiple_iteration");
+                $display("Starting - Multiple Iterations:");
                 while (graph.debug_counter_1) begin
                     RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
                     case(choose_pressure_type)
@@ -1527,9 +1534,8 @@ endfunction
                         0 : slv_no_delay_rvalid();
                         1 : slv_random_delay_rvalid();
                     endcase
-
                     update_CC_auxiliary_struct(graph);
-                    $display("Starting iteration: %d / Components %d", iter+1, graph.debug_counter_2);
+                    $display("Starting - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_2);
                     set_scalar_registers();
                     set_memory_pointers();
                     backdoor_buffer_fill_memories(graph);
@@ -1551,9 +1557,8 @@ endfunction
                         break;
                     iter++;
                 end
-
-                update_CC_auxiliary_struct(graph);
-                $display("Finished iteration: %d / Components %d", iter+1, graph.debug_counter_2);
+                update_BFS_auxiliary_struct(graph);
+                $display("Finished - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_1);
             end
         endtask
 
@@ -1612,24 +1617,30 @@ endfunction
             integer unsigned trial = 0;
             integer unsigned iter  = 0;
             error_found = 0;
-            graph.debug_counter_1 = 1;
-
+        
             for (int trial = 0; trial < num_trials; trial++) begin
-                $display("Starting     Trial BFS: %d / %d SOURCE: %d", trial, num_trials, trial);
                 graph.bfs_source = trial;
+                graph.debug_counter_1 = 1;
 
-                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                case(choose_pressure_type)
-                    0 : slv_no_backpressure_wready();
-                    1 : slv_random_backpressure_wready();
-                endcase
-                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                case(choose_pressure_type)
-                    0 : slv_no_delay_rvalid();
-                    1 : slv_random_delay_rvalid();
-                endcase
-                initalize_GraphCSR (graph, trial);
-                $display("Starting iteration BFS: %d / Frontier %d", iter, graph.debug_counter_1);
+                // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_backpressure_wready();
+                //     1 : slv_random_backpressure_wready();
+                // endcase
+                // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_delay_rvalid();
+                //     1 : slv_random_delay_rvalid();
+                // endcase
+                slv_random_backpressure_wready();
+                slv_random_delay_rvalid();
+                if(trial == 0)
+                    initalize_GraphCSR (graph);
+                else
+                    initalize_GraphCSR (graph, trial);
+
+                $display("Starting - BFS Trial: %0d / %0d - Source: %0d", trial, num_trials, graph.bfs_source);
+                $display("Starting - Iteration: %0d - Frontier: %0d", iter, graph.debug_counter_1);
                 set_scalar_registers();
                 set_memory_pointers();
                 backdoor_buffer_fill_memories(graph);
@@ -1648,7 +1659,7 @@ endfunction
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Starting: multiple_iteration");
+                $display("Starting - Multiple Iterations:");
                 while (graph.debug_counter_1) begin
                     RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
                     case(choose_pressure_type)
@@ -1661,7 +1672,7 @@ endfunction
                         1 : slv_random_delay_rvalid();
                     endcase
                     update_BFS_auxiliary_struct(graph);
-                    $display("Starting iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
+                    $display("Starting - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
                     set_scalar_registers();
                     set_memory_pointers();
                     backdoor_buffer_fill_memories(graph);
@@ -1684,7 +1695,7 @@ endfunction
                     iter++;
                 end
                 update_BFS_auxiliary_struct(graph);
-                $display("Finished iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
+                $display("Finished - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
             end
         endtask
 

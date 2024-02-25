@@ -574,7 +574,7 @@ module engine_read_write_generator #(parameter
     );
 
 // --------------------------------------------------------------------------------------
-    assign cmd_in_flight_assert = |cmd_in_flight_hold;
+    assign cmd_in_flight_assert = (request_send_out_int.valid|response_engine_in_int.valid) | (|cmd_in_flight_hold);
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin

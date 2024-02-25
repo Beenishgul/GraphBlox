@@ -30,7 +30,7 @@ import PKG_MXX_AXI4_FE::*;
 // CSR\_Index\_Generator to acquire the neighbor IDs for further
 // processing, in this scenario reading the data of the vertex neighbors.
 
-typedef enum logic[15:0] {
+typedef enum logic[16:0] {
     ENGINE_CSR_INDEX_GEN_RESET              = 1 << 0,
     ENGINE_CSR_INDEX_GEN_IDLE               = 1 << 1,
     ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
@@ -46,7 +46,8 @@ typedef enum logic[15:0] {
     ENGINE_CSR_INDEX_GEN_PAUSE_TRANS        = 1 << 12,
     ENGINE_CSR_INDEX_GEN_PAUSE              = 1 << 13,
     ENGINE_CSR_INDEX_GEN_DONE_TRANS         = 1 << 14,
-    ENGINE_CSR_INDEX_GEN_DONE               = 1 << 15
+    ENGINE_CSR_INDEX_GEN_DONE_PACKET        = 1 << 15,
+    ENGINE_CSR_INDEX_GEN_DONE               = 1 << 16
 } engine_csr_index_generator_state;
 
 typedef struct packed{
