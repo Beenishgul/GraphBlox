@@ -47,7 +47,7 @@ bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] in_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] out_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_idx[];
-bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
+bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
 bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
 bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
 
@@ -728,6 +728,56 @@ endfunction
             end
         endtask
 
+        function automatic void update_CC_compressNodes(integer num_vertices, ref bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] components[]);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            integer n;  // Use integer for loop index
+            for (n = 0; n < num_vertices; n++) begin
+                while (components[n] != components[components[n]]) begin
+                    components[n] = components[components[n]]; 
+                end
+            end
+        endfunction
+
+        task automatic update_CC_auxiliary_struct(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_count[];
+            integer n;
+
+            `include "module_slv_m_axi_vip_dump.vh"
+
+            auxiliary_count  = new [graph.mem_auxiliary_1];
+            graph.debug_counter_2 = 0; 
+
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                graph.auxiliary_1[i] = auxiliary_1[i];
+                auxiliary_count[i] = 0;
+            end
+
+            update_CC_compressNodes(graph.num_auxiliary_1, graph.auxiliary_1);
+
+            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                graph.auxiliary_1[i] = auxiliary_1[i];
+            end
+
+            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                graph.auxiliary_2[i] = 0;
+            end
+            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                graph.auxiliary_2[i] = 0;
+            end
+
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                n = graph.auxiliary_1[i];
+                auxiliary_count[n] += 1;
+            end
+
+            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                if(auxiliary_count[i] > 0)
+                    graph.debug_counter_2 += 1;
+            end
+
+        endtask
+
         function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor fill the memory with the content.
@@ -921,17 +971,18 @@ endfunction
             // Backdoor read the memory with the content.
             bit error_found;
             integer error_counter;
-            integer CC_count;
+            integer CC_change;
 
             `include "module_slv_m_axi_vip_dump.vh"
 
             error_found = 0;
             error_counter = 0;
-            CC_count = auxiliary_2[0];
+            CC_change = auxiliary_2[1];
             $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: CC_count: %0d \n", CC_count);
+            $display("MSG: CC_change: %0d \n", CC_change);
             $display("MSG: // ------------------------------------------------- \n");
 
+            graph.debug_counter_1 = CC_change;
             error_counter = 0;
             return(error_found);
         endfunction
@@ -1193,7 +1244,7 @@ endfunction
             graph.mem_in_degree       = graph.mem_num_vertices ;
             graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.mem_edges_array_src   = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
             graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
             graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
 
@@ -1425,12 +1476,15 @@ endfunction
         endtask
 
         task automatic multiple_iteration_CC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+            integer unsigned trial = 0;
+            integer unsigned iter  = 0;
             error_found = 0;
+            graph.debug_counter_1 = 1;
 
-            $display("Starting: multiple_iteration CC");
-            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
+            for (int trial = 0; trial < num_trials; trial++) begin
+                $display("Starting     Trial CC: %d / %d SOURCE: %d", trial, num_trials, trial);
+                graph.bfs_source = trial;
 
-                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1441,11 +1495,10 @@ endfunction
                     0 : slv_no_delay_rvalid();
                     1 : slv_random_delay_rvalid();
                 endcase
-
+                initalize_GraphCSR (graph, trial);
+                $display("Starting iteration CC: %d / Components %d", iter, graph.debug_counter_2);
                 set_scalar_registers();
                 set_memory_pointers();
-                initalize_GraphCSR (graph);
-                // backdoor_fill_memories();
                 backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
                 poll_idle_register();
@@ -1458,19 +1511,49 @@ endfunction
                 poll_ready_register();
 
                 poll_done_register();
-                ///////////////////////////////////////////////////////////////////////////
-                //Wait for interrupt being asserted or poll done register
-                // @(posedge interrupt);
-                // poll_done_register();
-                ///////////////////////////////////////////////////////////////////////////
-                // Service the interrupt
-                // service_interrupts();
-                // wait(interrupt == 0);
 
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", trial+1, num_trials);
+                $display("Starting: multiple_iteration");
+                while (graph.debug_counter_1) begin
+                    RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_backpressure_wready();
+                        1 : slv_random_backpressure_wready();
+                    endcase
+                    RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_delay_rvalid();
+                        1 : slv_random_delay_rvalid();
+                    endcase
+
+                    update_CC_auxiliary_struct(graph);
+                    $display("Starting iteration: %d / Components %d", iter+1, graph.debug_counter_2);
+                    set_scalar_registers();
+                    set_memory_pointers();
+                    backdoor_buffer_fill_memories(graph);
+                    // Check that __KERNEL__ is IDLE before starting.
+                    poll_idle_register();
+                    ///////////////////////////////////////////////////////////////////////////
+                    //Start transfers
+                    blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                    ctrl.wait_drivers_idle();
+
+                    poll_ready_register();
+
+                    poll_done_register();
+
+                    ///////////////////////////////////////////////////////////////////////////
+                    error_found |= check___KERNEL___result(graph)   ;
+                    if(graph.debug_counter_1 == 0)
+                        break;
+                    iter++;
+                end
+
+                update_CC_auxiliary_struct(graph);
+                $display("Finished iteration: %d / Components %d", iter+1, graph.debug_counter_2);
             end
         endtask
 
@@ -1535,7 +1618,6 @@ endfunction
                 $display("Starting     Trial BFS: %d / %d SOURCE: %d", trial, num_trials, trial);
                 graph.bfs_source = trial;
 
-                $display("Starting iteration BFS: %d / Frontier %d", iter, graph.debug_counter_1);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1547,6 +1629,7 @@ endfunction
                     1 : slv_random_delay_rvalid();
                 endcase
                 initalize_GraphCSR (graph, trial);
+                $display("Starting iteration BFS: %d / Frontier %d", iter, graph.debug_counter_1);
                 set_scalar_registers();
                 set_memory_pointers();
                 backdoor_buffer_fill_memories(graph);
@@ -1567,7 +1650,6 @@ endfunction
 
                 $display("Starting: multiple_iteration");
                 while (graph.debug_counter_1) begin
-                    $display("Starting iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
                     RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
                     case(choose_pressure_type)
                         0 : slv_no_backpressure_wready();
@@ -1578,8 +1660,8 @@ endfunction
                         0 : slv_no_delay_rvalid();
                         1 : slv_random_delay_rvalid();
                     endcase
-
                     update_BFS_auxiliary_struct(graph);
+                    $display("Starting iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
                     set_scalar_registers();
                     set_memory_pointers();
                     backdoor_buffer_fill_memories(graph);
@@ -1599,9 +1681,10 @@ endfunction
                     error_found |= check___KERNEL___result(graph)   ;
                     if(graph.debug_counter_1 == 0)
                         break;
-                    $display("Finished iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
                     iter++;
                 end
+                update_BFS_auxiliary_struct(graph);
+                $display("Finished iteration: %d / Frontier %d", iter+1, graph.debug_counter_1);
             end
         endtask
 

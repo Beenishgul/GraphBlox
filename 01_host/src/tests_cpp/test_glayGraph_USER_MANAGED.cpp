@@ -303,10 +303,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
         strcpy(arguments->kernel_name, arg);
 
         // Append "_1" to the string if ker_numThreads is greater than one
-        if (arguments->ker_numThreads > 1)
-        {
-            strcat(arguments->kernel_name, "_1");
-        }
+        // if (arguments->ker_numThreads > 1)
+        // {
+        //     strcat(arguments->kernel_name, "_1");
+        // }
         break;
     case 'q':
         arguments->xclbin_path = (char *) malloc((strlen(arg) + 20) * sizeof(char));

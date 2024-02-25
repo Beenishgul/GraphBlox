@@ -17,7 +17,7 @@
 
 
 
-module kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper (
+module kernel_m00_axi_system_cache_be32x33_mid32x33_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -27,12 +27,6 @@ module kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper (
   input  M00_AXI4_MID_SlaveReadInterfaceInput   s0_axi_read_in     ,
   output M00_AXI4_MID_SlaveWriteInterfaceOutput s0_axi_write_out   ,
   input  M00_AXI4_MID_SlaveWriteInterfaceInput  s0_axi_write_in    ,
-  
-
-  output M01_AXI4_MID_SlaveReadInterfaceOutput  s1_axi_read_out    ,
-  input  M01_AXI4_MID_SlaveReadInterfaceInput   s1_axi_read_in     ,
-  output M01_AXI4_MID_SlaveWriteInterfaceOutput s1_axi_write_out   ,
-  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s1_axi_write_in    ,
   
 
   input  M00_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
@@ -83,7 +77,7 @@ end
 assign m_axi_write_out.awregion   = 0;
 assign m_axi_read_out.arregion    = 0;
 
-m00_axi_system_cache_be512x33_mid32x33 inst_m00_axi_system_cache_be512x33_mid32x33 (
+m00_axi_system_cache_be32x33_mid32x33 inst_m00_axi_system_cache_be32x33_mid32x33 (
   
 
   .S0_AXI_GEN_ARUSER (0                           ),
@@ -125,47 +119,6 @@ m00_axi_system_cache_be512x33_mid32x33 inst_m00_axi_system_cache_be512x33_mid32x
   .S0_AXI_GEN_WLAST  (s0_axi_write_in.wlast        ), // Input Write channel last word flag
   .S0_AXI_GEN_WVALID (s0_axi_write_in.wvalid       ), // Input Write channel valid
   .S0_AXI_GEN_BREADY (s0_axi_write_in.bready       ), // Input Write response channel ready
-  
-
-  .S1_AXI_GEN_ARUSER (0                           ),
-  .S1_AXI_GEN_AWUSER (0                           ),
-  .S1_AXI_GEN_RVALID (s1_axi_read_out.rvalid       ), // Output Read channel valid
-  .S1_AXI_GEN_ARREADY(s1_axi_read_out.arready      ), // Output Read Address read channel ready
-  .S1_AXI_GEN_RLAST  (s1_axi_read_out.rlast        ), // Output Read channel last word
-  .S1_AXI_GEN_RDATA  (s1_axi_read_out.rdata        ), // Output Read channel data
-  .S1_AXI_GEN_RID    (s1_axi_read_out.rid          ), // Output Read channel ID
-  .S1_AXI_GEN_RRESP  (s1_axi_read_out.rresp        ), // Output Read channel response
-  .S1_AXI_GEN_ARVALID(s1_axi_read_in.arvalid       ), // Input Read Address read channel valid
-  .S1_AXI_GEN_ARADDR (s1_axi_read_in.araddr        ), // Input Read Address read channel address
-  .S1_AXI_GEN_ARLEN  (s1_axi_read_in.arlen         ), // Input Read Address channel burst length
-  .S1_AXI_GEN_RREADY (s1_axi_read_in.rready        ), // Input Read Read channel ready
-  .S1_AXI_GEN_ARID   (s1_axi_read_in.arid          ), // Input Read Address read channel ID
-  .S1_AXI_GEN_ARSIZE (s1_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S1_AXI_GEN_ARBURST(s1_axi_read_in.arburst       ), // Input Read Address read channel burst type
-  .S1_AXI_GEN_ARLOCK (s1_axi_read_in.arlock        ), // Input Read Address read channel lock type
-  .S1_AXI_GEN_ARCACHE(s1_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S1_AXI_GEN_ARPROT (s1_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S1_AXI_GEN_ARQOS  (s1_axi_read_in.arqos         ), // Input Read Address channel quality of service
-  .S1_AXI_GEN_AWREADY(s1_axi_write_out.awready     ), // Output Write Address write channel ready
-  .S1_AXI_GEN_WREADY (s1_axi_write_out.wready      ), // Output Write channel ready
-  .S1_AXI_GEN_BID    (s1_axi_write_out.bid         ), // Output Write response channel ID
-  .S1_AXI_GEN_BRESP  (s1_axi_write_out.bresp       ), // Output Write channel response
-  .S1_AXI_GEN_BVALID (s1_axi_write_out.bvalid      ), // Output Write response channel valid
-  .S1_AXI_GEN_AWVALID(s1_axi_write_in.awvalid      ), // Input Write Address write channel valid
-  .S1_AXI_GEN_AWID   (s1_axi_write_in.awid         ), // Input Write Address write channel ID
-  .S1_AXI_GEN_AWADDR (s1_axi_write_in.awaddr       ), // Input Write Address write channel address
-  .S1_AXI_GEN_AWLEN  (s1_axi_write_in.awlen        ), // Input Write Address write channel burst length
-  .S1_AXI_GEN_AWSIZE (s1_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S1_AXI_GEN_AWBURST(s1_axi_write_in.awburst      ), // Input Write Address write channel burst type
-  .S1_AXI_GEN_AWLOCK (s1_axi_write_in.awlock       ), // Input Write Address write channel lock type
-  .S1_AXI_GEN_AWCACHE(s1_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S1_AXI_GEN_AWPROT (s1_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S1_AXI_GEN_AWQOS  (s1_axi_write_in.awqos        ), // Input Write Address write channel quality of service
-  .S1_AXI_GEN_WDATA  (s1_axi_write_in.wdata        ), // Input Write channel data
-  .S1_AXI_GEN_WSTRB  (s1_axi_write_in.wstrb        ), // Input Write channel write strobe
-  .S1_AXI_GEN_WLAST  (s1_axi_write_in.wlast        ), // Input Write channel last word flag
-  .S1_AXI_GEN_WVALID (s1_axi_write_in.wvalid       ), // Input Write channel valid
-  .S1_AXI_GEN_BREADY (s1_axi_write_in.bready       ), // Input Write response channel ready
   
 
   .M0_AXI_RVALID     (m_axi_read_in.rvalid        ), // Input Read channel valid
@@ -216,12 +169,12 @@ m00_axi_system_cache_be512x33_mid32x33 inst_m00_axi_system_cache_be512x33_mid32x
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper
+endmodule : kernel_m00_axi_system_cache_be32x33_mid32x33_wrapper
 
 
 
 
-module kernel_m01_axi_system_cache_be512x33_mid32x33_wrapper (
+module kernel_m01_axi_system_cache_be32x33_mid32x33_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
@@ -281,7 +234,7 @@ end
 assign m_axi_write_out.awregion   = 0;
 assign m_axi_read_out.arregion    = 0;
 
-m01_axi_system_cache_be512x33_mid32x33 inst_m01_axi_system_cache_be512x33_mid32x33 (
+m01_axi_system_cache_be32x33_mid32x33 inst_m01_axi_system_cache_be32x33_mid32x33 (
   
 
   .S0_AXI_GEN_ARUSER (0                           ),
@@ -373,5 +326,5 @@ m01_axi_system_cache_be512x33_mid32x33 inst_m01_axi_system_cache_be512x33_mid32x
 
 assign s_axi_lite_out = 0;
 
-endmodule : kernel_m01_axi_system_cache_be512x33_mid32x33_wrapper
+endmodule : kernel_m01_axi_system_cache_be32x33_mid32x33_wrapper
 

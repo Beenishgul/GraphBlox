@@ -398,7 +398,64 @@
             ]
         ]
     },
-    "Single.TC": {
+     "Single.TC": {
+        "0": [
+            [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "1": [
+            [
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)"
+            ],
+            [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "2": [
+             [
+                "ENGINE_FILTER_COND",
+                "ENGINE_ALU_OPS"
+            ],
+            [
+                "ENGINE_READ_WRITE(B:out_degree,0,num_vertices)"
+            ],
+            [
+                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
+                "ENGINE_FILTER_COND"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ],
+        "3": [
+            [
+                "ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"
+            ],
+            [
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)",
+                "ENGINE_MERGE_DATA(W:1)"
+            ],
+            [
+                "ENGINE_READ_WRITE(C:1)(B:edges_idx,0,num_vertices)"
+            ],
+            [
+                "ENGINE_FORWARD_DATA"
+            ]
+        ]
+    },
+    "Single.TCv1": {
         "0": [
             [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
@@ -494,8 +551,8 @@
         "comments":"address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe"
     },
     "ch_properties": {
-        "channel_0": ["33", "512", "0", "1", "33", "32",  "2", "33", "32"],
-        "channel_1": ["33", "512", "0", "2", "33", "32",  "3", "33", "32"],
+        "channel_0": ["33", "32", "0", "0", "33", "32",  "2", "33", "32"],
+        "channel_1": ["33", "32", "0", "0", "33", "32",  "3", "33", "32"],
         "channel_2": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
         "channel_3": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
         "channel_4": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
@@ -551,7 +608,7 @@
     "cu_properties": {
         "synth_strategy" : "1",
         "frequency"      : "300000000",
-        "num_kernels"    : "16",
+        "num_kernels"    : "1",
         "slr_percent"    : [33, 33, 33, 0],
         "slr_mapping"    : [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
         "slr_layout"     : "2",
@@ -571,7 +628,7 @@
             "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
             "ENGINE_FORWARD_DATA"       : [6, 0,  289,  16, 0,  0,  0],
             "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
-            "ENGINE_PARALLEL_READ_WRITE": [8, 29, 2047, 16, 32, 0,  0],
+            "ENGINE_PARALLEL_READ_WRITE": [8, 29, 2255, 16, 32, 0,  0],
             "ENGINE_AUTOMATA_NFA"       : [9, 9,  2070, 16, 0,  16, 0]
         }
     },
@@ -583,6 +640,6 @@
         "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  2805, 16, 0,  0,  0],
         "ENGINE_FORWARD_DATA"       : [6, 0,  339,  16, 0,  0,  0],
-        "ENGINE_PARALLEL_READ_WRITE": [7, 29, 2047, 16, 32, 0,  0]
+        "ENGINE_PARALLEL_READ_WRITE": [7, 29, 2255, 16, 32, 0,  0]
     }
 }
