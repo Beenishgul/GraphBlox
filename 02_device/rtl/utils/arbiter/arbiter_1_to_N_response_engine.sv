@@ -59,12 +59,17 @@ FIFOStateSignalsInputInternal   fifo_response_signals_in_int         ;
 FIFOStateSignalsOutInternal     fifo_response_signals_out_int        ;
 logic                           fifo_response_setup_signal_int       ;
 logic                           fifo_response_signals_in_int_rd_en   ;
-
+// --------------------------------------------------------------------------------------
+// Forward FIFO
+// --------------------------------------------------------------------------------------
+logic                           fifo_forward_signals_in_int_rd_en;
+logic                           fifo_forward_signals_in_reg_rd_en;
+logic [NUM_ENGINE_RECEIVER-1:0] current_module_id_bundle         ;
 // --------------------------------------------------------------------------------------
 //   Register reset signal
 // --------------------------------------------------------------------------------------
-
-assign id_mask = ~0;
+assign current_module_id_bundle = 1 << ID_BUNDLE;
+assign id_mask                  = ~0;
 
 always_ff @(posedge ap_clk) begin
   areset_control <= areset;
@@ -157,24 +162,31 @@ generate
   case (ID_LEVEL)
     0 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
     1 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_bundle[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
     2 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_lane[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = (current_module_id_bundle != fifo_response_dout_int.payload.meta.route.packet_destination.id_bundle[NUM_ENGINE_RECEIVER-1:0]);
     end
     3 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_engine[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
     4 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_module[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
     5 : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == id_mask[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
     default : begin
       assign fifo_response_signals_in_int_rd_en = (fifo_response_signals_in_reg_mask_reg == fifo_response_dout_int.payload.meta.route.packet_destination.id_cu[NUM_ENGINE_RECEIVER-1:0]);
+      assign fifo_forward_signals_in_int_rd_en = 1'b0;
     end
   endcase
 endgenerate
@@ -233,7 +245,15 @@ generate
           end
         end else begin
           for (int i=0; i<NUM_ENGINE_RECEIVER; i++) begin
-            response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_lane[i] & fifo_response_dout_reg.valid;
+            if(fifo_forward_signals_in_reg_rd_en) begin
+              if((i == (NUM_ENGINE_RECEIVER-1))) begin
+                response_out[i].valid <= fifo_response_dout_reg.valid;
+              end else  begin
+                response_out[i].valid <= 1'b0;
+              end
+            end else  begin
+              response_out[i].valid <= fifo_response_dout_reg.payload.meta.route.packet_destination.id_lane[i] & fifo_response_dout_reg.valid;
+            end
           end
         end
       end
@@ -301,9 +321,11 @@ end
 
 always_ff @(posedge ap_clk) begin
   if(areset_control) begin
-    fifo_response_dout_reg.valid <= 1'b0;
+    fifo_response_dout_reg.valid      <= 1'b0;
+    fifo_forward_signals_in_reg_rd_en <= 1'b0;
   end else begin
-    fifo_response_dout_reg.valid <= fifo_response_dout_int.valid ;
+    fifo_response_dout_reg.valid      <= fifo_response_dout_int.valid ;
+    fifo_forward_signals_in_reg_rd_en <= fifo_forward_signals_in_int_rd_en;
   end
 end
 
