@@ -229,6 +229,11 @@ module engine_csr_index_generator #(parameter
     logic                     mod_flag          ;
     logic                     burst_flag_reg    ;
     logic [COUNTER_WIDTH-1:0] counter_temp_value;
+// --------------------------------------------------------------------------------------
+    logic cmd_burst_active        ;
+    logic cmd_done_packet_int     ;
+    logic cmd_done_packet_send_int;
+    logic cmd_done_packet_send_reg;
 
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Bundle i <- Bundle i-1
@@ -360,9 +365,11 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     assign cmd_stream_mode_int    = (configure_memory_reg.payload.meta.subclass.cmd == CMD_STREAM_READ) | (configure_engine_int.payload.meta.subclass.cmd == CMD_STREAM_WRITE);
     assign enter_stream_pause_int = ~(|((counter_count-counter_load_value)%BURST_LENGTH)) & cmd_stream_mode_int;
+    assign cmd_burst_active       = cmd_stream_mode_int & fifo_request_din_reg.valid;
+    assign cmd_done_packet_int    = (counter_count >= configure_engine_int.payload.param.index_end | (fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full));
 // --------------------------------------------------------------------------------------
     assign cmd_done_mode_int                 = done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg & exit_gen_pause_int;
-    assign sequence_done_mode_int            = (counter_count >= configure_engine_int.payload.param.index_end) | (response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty);
+    assign sequence_done_mode_int            = (counter_count >= configure_engine_int.payload.param.index_end) | (~cmd_burst_active & response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty);
     assign response_engine_in_break_flag_int = (response_control_in_reg.payload.meta.route.sequence_state == SEQUENCE_BREAK) & response_control_in_reg.valid & (response_control_in_reg.payload.meta.route.sequence_id == sequence_id_counter);
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
@@ -437,8 +444,16 @@ module engine_csr_index_generator #(parameter
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
+            ENGINE_CSR_INDEX_GEN_DONE_PACKET : begin
+                if(fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full)
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_PACKET;
+                else
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
+            end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if (exit_gen_pause_int)
+                if(response_engine_in_break_flag_int)
+                    next_state = ENGINE_CSR_INDEX_GEN_DONE_PACKET;
+                else if (exit_gen_pause_int)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
@@ -485,6 +500,7 @@ module engine_csr_index_generator #(parameter
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
+                cmd_done_packet_send_int           <= 0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
                 configure_engine_int.payload       <= 0;
@@ -653,6 +669,25 @@ module engine_csr_index_generator #(parameter
                 if(response_engine_in_break_flag_int)
                     response_engine_in_break_flag_reg <= 1'b1;
             end
+            ENGINE_CSR_INDEX_GEN_DONE_PACKET : begin
+                if(cmd_done_packet_int) begin
+                    fifo_request_din_reg.valid <= 1'b0;
+                    counter_enable             <= 1'b0;
+                    cmd_done_packet_send_int   <= 1'b0;
+                end
+                else begin
+                    counter_enable             <= 1'b1;
+                    fifo_request_din_reg.valid <= 1'b1;
+                    cmd_done_packet_send_int   <= 1'b1;
+                end
+                counter_clear                     <= 1'b0;
+                done_int_reg                      <= 1'b0;
+                done_out_reg                      <= 1'b0;
+                cmd_stream_mode_pop               <= 1'b1;
+                counter_load                      <= 1'b0;
+                configure_engine_int.valid        <= 1'b1;
+                response_engine_in_break_flag_reg <= 1'b1;
+            end
             ENGINE_CSR_INDEX_GEN_DONE_TRANS : begin
                 configure_engine_int.valid        <= 1'b1;
                 counter_clear                     <= 1'b1;
@@ -664,6 +699,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid        <= 1'b0;
                 response_engine_in_break_flag_reg <= 1'b0;
                 response_engine_in_done_flag_reg  <= 1'b1;
+                cmd_done_packet_send_int          <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
                 configure_engine_int.valid        <= 1'b0;
@@ -828,15 +864,23 @@ module engine_csr_index_generator #(parameter
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_RUNNING;
         end
     end
-
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(4                              ),
+        .WIDTH ($bits(cmd_done_packet_send_int))
+    ) inst_hyper_pipeline_configure_engine_int_data (
+        .ap_clk(ap_clk                  ),
+        .din   (cmd_done_packet_send_int),
+        .dout  (cmd_done_packet_send_reg)
+    );
 // --------------------------------------------------------------------------------------
     always_comb begin
         burst_length       = 0;
         burst_flag         = 0;
         next_burst_flag    = 0;
         next_burst_length  = 0;
-        counter_temp_value = fifo_request_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1];
-        mod_flag           = (counter_temp_value != 0) ? |((counter_temp_value - counter_load_value) % BURST_LENGTH) : 1'b0;
+        counter_temp_value = fifo_request_dout_reg.valid ? fifo_request_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] : 0;
+        mod_flag           = (|counter_temp_value) ? |((counter_temp_value - counter_load_value) % BURST_LENGTH) : 1'b0;
 
         // Calculate the page start and end addresses for the counter value and burst length.
         page_start         = 0;
@@ -860,14 +904,14 @@ module engine_csr_index_generator #(parameter
                     first_burst_length     = min(burst_length_trunk, PAGE_SIZE_WORDS - (counter_temp_value % PAGE_SIZE_WORDS));
                     remaining_burst_length = burst_length_trunk - first_burst_length;
 
-                    if(page_crossing_flag) begin
+                    if(page_crossing_flag & ~cmd_done_packet_send_reg) begin
                         next_burst_flag   = 1'b1 & (|remaining_burst_length);
                         next_burst_length = remaining_burst_length[$bits(next_burst_length)-1:0];
                         burst_length      = first_burst_length[$bits(burst_length)-1:0];
                     end else begin
                         next_burst_flag   = 1'b0;
                         next_burst_length = 0;
-                        burst_length      = first_burst_length[$bits(burst_length)-1:0];
+                        burst_length      = ~cmd_done_packet_send_reg ? first_burst_length[$bits(burst_length)-1:0] : 1;
                     end
                 end
                 else begin
@@ -895,7 +939,7 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-    assign cmd_in_flight_assert = |cmd_in_flight_hold;
+    assign cmd_in_flight_assert = (request_out_int.valid|fifo_request_din_reg.valid) | (|cmd_in_flight_hold);
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
@@ -991,7 +1035,7 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         request_pending_out_reg <= request_pending_out_int;
     end
-    
+
 // --------------------------------------------------------------------------------------
 // FIFO commit cache requests out fifo_oending_EnginePacket
 // --------------------------------------------------------------------------------------

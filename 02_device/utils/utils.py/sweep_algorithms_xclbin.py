@@ -4,6 +4,8 @@ import shutil
 import subprocess
 import os
 import fnmatch
+import json
+
 
 def read_gitignore_patterns(gitignore_path):
     patterns = []
@@ -22,7 +24,22 @@ def ignore_subdirectories(directory, subdirectories, patterns):
             # print(f"Ignoring {subdir}")  # Debugging output
             ignored.append(subdir)
     return ignored
-    
+
+def generate_topology_file(file_path)
+    # Step 1: Read the JSON file
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    # Step 2: Modify the fields
+    data['engine_properties']['ENGINE_READ_WRITE'][1] = 10  # Update cycles for ENGINE_READ_WRITE
+    data['engine_properties']['ENGINE_CSR_INDEX'][1] = 12   # Update cycles for ENGINE_CSR_INDEX
+
+    # Any other modifications you need to make can be done in a similar manner
+
+    # Step 3: Write the updated JSON data back to the file
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)  # Using indent for pretty printing
+
 # Example Usage
 base_directory   = os.path.abspath('.')  # Current directory
 source_directory = base_directory
@@ -55,21 +72,21 @@ source_directory = base_directory
 
 # Parameters for different algorithm configurations
 algorithms = [
-    # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-    (0, "GLay", "Single", 16, "hw", 32768, 240000000, 1),
-    (1, "GLay", "Single", 16, "hw", 32768, 240000000, 1),
-    (5, "GLay", "Single", 16, "hw", 32768, 240000000, 1),
-    (6, "GLay", "Single", 16, "hw", 32768, 240000000, 1),
-    (8, "GLay", "Single", 16, "hw", 32768, 240000000, 1),
-    (0, "GLay", "Single", 8, "hw", 65536, 240000000, 1),
-    (1, "GLay", "Single", 8, "hw", 65536, 240000000, 1),
-    (5, "GLay", "Single", 8, "hw", 65536, 240000000, 1),
-    (6, "GLay", "Single", 8, "hw", 65536, 240000000, 1),
-    (8, "GLay", "Single", 8, "hw", 65536, 240000000, 1),
-    (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 1),
-    (0, "GLay", "Full", 2, "hw", 262144, 240000000, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 240000000, 2),
-    # (0, "GLay", "Full", 2, "hw", 131072, 240000000, 2),
+    # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, synth_strategy, cache_properties)
+    (0, "GLay", "Single", 16, "hw", 32768, 1),
+    (1, "GLay", "Single", 16, "hw", 32768, 1),
+    (5, "GLay", "Single", 16, "hw", 32768, 1),
+    (6, "GLay", "Single", 16, "hw", 32768, 1),
+    (8, "GLay", "Single", 16, "hw", 32768, 1),
+    (0, "GLay", "Single", 8, "hw", 65536, 1),
+    (1, "GLay", "Single", 8, "hw", 65536, 1),
+    (5, "GLay", "Single", 8, "hw", 65536, 1),
+    (6, "GLay", "Single", 8, "hw", 65536, 1),
+    (8, "GLay", "Single", 8, "hw", 65536, 1),
+    (0, "GLay", "Lite", 4, "hw", 131072, 1),
+    (0, "GLay", "Full", 2, "hw", 262144, 1),
+    # (0, "GLay", "Lite", 4, "hw", 131072, 2),
+    # (0, "GLay", "Full", 2, "hw", 131072, 2),
     # Add more tuples here for other algorithm configurations as needed
 ]
 
