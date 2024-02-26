@@ -75,7 +75,7 @@ def run_make_in_serial(destination_directory, params):
     
     # Run the make commands in its own shell and redirect output to the log file
     with open(log_file, "w") as file:
-        process = subprocess.Popen(["bash", "-c", make_commands], stdout=file, stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
+        process = subprocess.Popen(["bash", "-c", make_commands], preexec_fn=os.setpgrp)
         process.wait()  # Wait for the command to complete
 
 # Example Usage
