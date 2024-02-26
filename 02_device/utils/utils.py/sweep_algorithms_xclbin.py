@@ -5,6 +5,8 @@ import subprocess
 import os
 import fnmatch
 import json
+import shutil
+import glob
 
 def read_gitignore_patterns(gitignore_path):
     patterns = []
@@ -164,6 +166,30 @@ for params, ch_property in zip(algorithms, ch_properties):
     (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
     destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz")
     topology_directory = os.path.join(destination_directory, "02_device", "ol", architecture, capability,"topology.json")
+    xclbin_directory = os.path.join(destination_directory, "02_device", "utils", "utils.xclbin", "file.zip")
+    print(f"Start synthesis with parameters: {params}")
     generate_topology_file(topology_directory, params, ch_property)
     run_make_in_serial(destination_directory, params)
-    print(f"Start synthesis with parameters: {params}")
+
+for params, ch_property in zip(algorithms, ch_properties):
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
+    destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz")
+    xclbin_from_directory = os.path.join(destination_directory, "02_device", "utils", "utils.xclbin")
+    xclbin_to_directory = os.path.join(base_directory, "02_device", "utils", "utils.xclbin")
+
+    # Ensure the target directory exists
+    os.makedirs(os.path.dirname(xclbin_to_directory), exist_ok=True)
+
+    # Find all zip files in the source directory
+    zip_files = glob.glob(os.path.join(xclbin_from_directory, "*.zip"))
+
+    # Copy each found zip file with appended details
+    for zip_file in zip_files:
+        filename = os.path.basename(zip_file)
+        new_filename = f"{os.path.splitext(filename)[0]}_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.zip"
+        new_filepath = os.path.join(xclbin_to_directory, new_filename)
+        try:
+            shutil.copy(zip_file, new_filepath)
+            print(f"Successfully copied and renamed {zip_file} to {new_filepath}")
+        except Exception as e:
+            print(f"Failed to copy and rename {zip_file} to {new_filepath}. Error: {e}")
