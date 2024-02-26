@@ -319,17 +319,17 @@ module __KERNEL___testbench ();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
-function bit [$bits(size)-1:0] get_random_nbytes(int size);
-    bit [$bits(size)-1:0] rptr;
-    bit [$bits(size)-1:0] page_mask ;
-    
-    assert(std::randomize(rptr));
-    // Create a mask to set lower 12 bits to zero for page alignment
-    page_mask = ~((1 << 12) - 1);
-    rptr &= page_mask;
-    
-    return rptr;
-endfunction
+        function bit [$bits(size)-1:0] get_random_nbytes(int size);
+            bit [$bits(size)-1:0] rptr;
+            bit [$bits(size)-1:0] page_mask ;
+
+            assert(std::randomize(rptr));
+            // Create a mask to set lower 12 bits to zero for page alignment
+            page_mask = ~((1 << 12) - 1);
+            rptr &= page_mask;
+
+            return rptr;
+        endfunction
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
         function bit [31:0] get_random_4bytes();
@@ -709,377 +709,377 @@ endfunction
         `include "module_slv_m_axi_vip_func.vh"
 
         task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            
-            `include "module_slv_m_axi_vip_dump.vh"
+        /////////////////////////////////////////////////////////////////////////////////////////////////
 
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = auxiliary_1[i];
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = auxiliary_2[i];
-            end
+        `include "module_slv_m_axi_vip_dump.vh"
 
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = auxiliary_1[i];
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
+        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+            graph.auxiliary_1[i] = auxiliary_1[i];
+        end
+        for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+            graph.auxiliary_1[i] = auxiliary_2[i];
+        end
+
+        for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+            graph.auxiliary_2[i] = auxiliary_1[i];
+        end
+        for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+            graph.auxiliary_2[i] = 0;
+        end
         endtask
 
-        function automatic void update_CC_compressNodes(integer num_vertices, ref bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] components[]);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            integer n;  // Use integer for loop index
-            for (n = 0; n < num_vertices; n++) begin
-                while (components[n] != components[components[n]]) begin
-                    components[n] = components[components[n]]; 
+            function automatic void update_CC_compressNodes(integer num_vertices, ref bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] components[]);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                integer n;  // Use integer for loop index
+                for (n = 0; n < num_vertices; n++) begin
+                    while (components[n] != components[components[n]]) begin
+                        components[n] = components[components[n]];
+                    end
                 end
-            end
-        endfunction
+            endfunction
 
-        task automatic update_CC_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            integer auxiliary_count[];
-            integer n;
+            task automatic update_CC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                integer auxiliary_count[];
+                integer n;
 
-            `include "module_slv_m_axi_vip_dump.vh"
+                `include "module_slv_m_axi_vip_dump.vh"
 
-            auxiliary_count  = new [graph.num_auxiliary_1];
-            graph.debug_counter_2 = 0; 
+                auxiliary_count  = new [graph.num_auxiliary_1];
+                graph.debug_counter_2 = 0;
 
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = auxiliary_1[i];
-                auxiliary_count[i] = 0;
-            end
-
-            update_CC_compressNodes(graph.num_auxiliary_1, graph.auxiliary_1);
-
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = auxiliary_1[i];
-            end
-
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                n = graph.auxiliary_1[i];
-                auxiliary_count[n] += 1;
-            end
-
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                if(auxiliary_count[i] > 0)
-                    graph.debug_counter_2 += 1;
-            end
-
-        endtask
-
-        function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = {M00_AXI4_FE_DATA_W{1'b1}};
-                if(i == graph.bfs_source)begin
-                    graph.auxiliary_1[i] = graph.bfs_source;
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = auxiliary_1[i];
+                    auxiliary_count[i] = 0;
                 end
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-                if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+
+                update_CC_compressNodes(graph.num_auxiliary_1, graph.auxiliary_1);
+
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = auxiliary_1[i];
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    n = graph.auxiliary_1[i];
+                    auxiliary_count[n] += 1;
+                end
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    if(auxiliary_count[i] > 0)
+                        graph.debug_counter_2 += 1;
+                end
+
+            endtask
+
+            function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = {M00_AXI4_FE_DATA_W{1'b1}};
+                    if(i == graph.bfs_source)begin
+                        graph.auxiliary_1[i] = graph.bfs_source;
+                    end
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                    if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+                        graph.auxiliary_1[i] = 1;
+                    end
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = {M00_AXI4_FE_DATA_W{1'b1}};
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_SPMV_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
                     graph.auxiliary_1[i] = 1;
                 end
-            end
-
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = {M00_AXI4_FE_DATA_W{1'b1}};
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_SPMV_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = 1;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_TC_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_MEMCPY_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_AUTOMATA_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_CC_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = i;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                graph.auxiliary_1[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
-                graph.auxiliary_1[i] = 1;
-            end
-    
-            for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                graph.auxiliary_2[i] = 0;
-            end
-        endfunction
-
-        function automatic bit check_BFS_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found;
-            integer error_counter;
-            integer frontier_counter;
-
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            frontier_counter = 0;
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                if(auxiliary_2[i])
-                    $display("MSG: %0d \n", i-graph.num_auxiliary_2);
-                frontier_counter += auxiliary_2[i];
-            end
-            $display("MSG: Frontier_counter: %0d \n", frontier_counter);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            graph.debug_counter_1 = frontier_counter;
-            error_counter = 0;
-            return(error_found);
-        endfunction
-
-        function automatic bit check_PR_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
-            bit error_found;
-            integer error_counter;
-            integer mismatch_counter;
-
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            mismatch_counter = 0;
-                        
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                if(auxiliary_2[i] != graph.out_degree[i-graph.num_auxiliary_2]) begin
-                    $display("MSG: Starting num_auxiliary_2[%0d]: %0d==%0d\n",i-graph.num_auxiliary_2, auxiliary_2[i], graph.out_degree[i-graph.num_auxiliary_2]);
-                    mismatch_counter += 1;
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
                 end
-            end
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
-            $display("MSG: // ------------------------------------------------- \n");
 
-            error_counter = 0;
-
-            return(error_found);
-        endfunction
-
-        function automatic bit check_CC_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found;
-            integer error_counter;
-            integer CC_change;
-
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            CC_change = auxiliary_2[1];
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: CC_change: %0d \n", CC_change);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            graph.debug_counter_1 = CC_change;
-            error_counter = 0;
-            return(error_found);
-        endfunction
-
-        function automatic bit check_TC_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found;
-            integer error_counter;
-            integer triangle_count;
-
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            triangle_count = auxiliary_2[0];
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: Triangle_count: %0d \n", triangle_count);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            error_counter = 0;
-            return(error_found);
-        endfunction
-
-        function automatic bit check_MEMCPY_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found;
-            integer error_counter;
-            integer mismatch_counter;
-            
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            mismatch_counter = 0;
-
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = 0; i < graph.mem_edges_array_src; i++) begin
-                if(edges_array_src[i] != graph.edges_array_dest[i]) begin
-                    $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
-                    mismatch_counter += 1;
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
                 end
-            end
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
-            $display("MSG: // ------------------------------------------------- \n");
-
-            error_counter = 0;
-
-            return(error_found);
-        endfunction
-
-        function automatic bit check_AUTOMATA_result(ref GraphCSR graph);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found;
-            integer error_counter;
-            integer mismatch_counter;
-            
-            `include "module_slv_m_axi_vip_dump.vh"
-
-            error_found = 0;
-            error_counter = 0;
-            mismatch_counter = 0;
-
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = 0; i < graph.mem_edges_array_src; i++) begin
-                if(edges_array_src[i] != graph.edges_array_dest[i]) begin
-                    $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
-                    mismatch_counter += 1;
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
                 end
-            end
-            $display("MSG: // ------------------------------------------------- \n");
-            $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
-            $display("MSG: // ------------------------------------------------- \n");
+            endfunction
 
-            error_counter = 0;
+            function automatic void initialize_TC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
 
-            return(error_found);
-        endfunction
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
 
-        function automatic bit check___KERNEL___result(ref GraphCSR graph);
+            function automatic void initialize_MEMCPY_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_AUTOMATA_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_CC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = i;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 1;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic bit check_BFS_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer frontier_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                frontier_counter = 0;
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    if(auxiliary_2[i])
+                        $display("MSG: %0d \n", i-graph.num_auxiliary_2);
+                    frontier_counter += auxiliary_2[i];
+                end
+                $display("MSG: Frontier_counter: %0d \n", frontier_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                graph.debug_counter_1 = frontier_counter;
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_PR_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    if(auxiliary_2[i] != graph.out_degree[i-graph.num_auxiliary_2]) begin
+                        $display("MSG: Starting num_auxiliary_2[%0d]: %0d==%0d\n",i-graph.num_auxiliary_2, auxiliary_2[i], graph.out_degree[i-graph.num_auxiliary_2]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check_CC_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer CC_change;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                CC_change = auxiliary_2[1];
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: CC_change: %0d \n", CC_change);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                graph.debug_counter_1 = CC_change;
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_TC_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer triangle_count;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                triangle_count = auxiliary_2[0];
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: Triangle_count: %0d \n", triangle_count);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_MEMCPY_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = 0; i < graph.mem_edges_array_src; i++) begin
+                    if(edges_array_src[i] != graph.edges_array_dest[i]) begin
+                        $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check_AUTOMATA_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = 0; i < graph.mem_edges_array_src; i++) begin
+                    if(edges_array_src[i] != graph.edges_array_dest[i]) begin
+                        $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check___KERNEL___result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found = 0;
+
+                error_found |= check__ALGORITHM_NAME__result(graph)   ;
+
+                return(error_found);
+            endfunction
+
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor read the memory with the content.
-            bit error_found = 0;
+            // Global read the files then send to backdoor memory with the content.
+            /////////////////////////////////////////////////////////////////////////////////////////////////
 
-            error_found |= check__ALGORITHM_NAME__result(graph)   ;
-
-            return(error_found);
-        endfunction
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        // Global read the files then send to backdoor memory with the content.
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-        bit choose_pressure_type = 0;
+            bit choose_pressure_type = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
 
@@ -1428,10 +1428,9 @@ endfunction
         task automatic multiple_iteration_PR(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
             error_found = 0;
 
-            $display("Starting: multiple_iteration PR");
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", trial+1, num_trials);
+                $display("Starting - PR Trial: %0d / %0d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1442,7 +1441,9 @@ endfunction
                     0 : slv_no_delay_rvalid();
                     1 : slv_random_delay_rvalid();
                 endcase
-
+                // slv_random_backpressure_wready();
+                // slv_random_delay_rvalid();
+                
                 set_scalar_registers();
                 set_memory_pointers();
                 initalize_GraphCSR (graph);
@@ -1479,7 +1480,7 @@ endfunction
             integer unsigned trial = 0;
             integer unsigned iter  = 0;
             error_found = 0;
-        
+
             for (int trial = 0; trial < num_trials; trial++) begin
                 graph.bfs_source = trial;
                 graph.debug_counter_1 = 0;
@@ -1617,7 +1618,7 @@ endfunction
             integer unsigned trial = 0;
             integer unsigned iter  = 0;
             error_found = 0;
-        
+
             for (int trial = 0; trial < num_trials; trial++) begin
                 graph.bfs_source = trial;
                 graph.debug_counter_1 = 1;
@@ -1671,6 +1672,8 @@ endfunction
                         0 : slv_no_delay_rvalid();
                         1 : slv_random_delay_rvalid();
                     endcase
+                    // slv_random_backpressure_wready();
+                    // slv_random_delay_rvalid();
                     update_BFS_auxiliary_struct(graph);
                     $display("Starting - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
                     set_scalar_registers();

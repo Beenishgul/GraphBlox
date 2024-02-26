@@ -3390,9 +3390,9 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
     slv_random_backpressure_wready_mid = """
             rgen = new("m{0:02d}_axi_random_backpressure_wready");
             rgen.set_ready_policy(XIL_AXI_READY_GEN_RANDOM);
-            rgen.set_low_time_range(0,22);
-            rgen.set_high_time_range(1,22);
-            rgen.set_event_count_range(3,10);
+            rgen.set_low_time_range(0,42);
+            rgen.set_high_time_range(1,42);
+            rgen.set_event_count_range(3,20);
             m{0:02d}_axi.wr_driver.set_wready_gen(rgen);
             """
 
@@ -3427,7 +3427,7 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
 
     slv_random_delay_rvalid_mid = """
             m{0:02d}_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
-            m{0:02d}_axi.mem_model.set_inter_beat_gap_range(0,80);
+            m{0:02d}_axi.mem_model.set_inter_beat_gap_range(0,120);
             """
 
     slv_random_delay_rvalid_end = """
