@@ -2762,6 +2762,15 @@ def generate_ipx_associate_commands_tcl(output_file_name):
                 file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[index]} $bifparam\n')
                 file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
                 file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]} $bifparam\n')
+                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+                file.write(f'set_property value        32           $bifparam\n')
+                file.write(f'set_property value_source constant     $bifparam\n')
+                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+                file.write(f'set_property value        32           $bifparam\n')
+                file.write(f'set_property value_source constant     $bifparam\n')
+                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
+                file.write(f'set_property value        32           $bifparam\n')
+                file.write(f'set_property value_source constant     $bifparam\n')
           
 
 # Generate the ipx::associate_bus_interfaces commands
