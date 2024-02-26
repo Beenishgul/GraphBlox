@@ -24,7 +24,7 @@ def ignore_subdirectories(directory, subdirectories, patterns):
             ignored.append(subdir)
     return ignored
 
-def generate_topology_file(file_path, params):
+def generate_topology_file(file_path, params, ch_property):
     # Step 1: Read the JSON file
     with open(file_path, 'r') as file:
         tolopogy = json.load(file)
@@ -32,6 +32,8 @@ def generate_topology_file(file_path, params):
     (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
 
     tolopogy['cache_properties']['channel_0'] = cache_properties   
+    tolopogy['ch_properties']['channel_0'] = ch_property[0] 
+    tolopogy['ch_properties']['channel_1'] = ch_property[1] 
     tolopogy['cu_properties']['synth_strategy']  = str(synth_strategy) 
     tolopogy['cu_properties']['num_kernels']  = str(num_kernels)    
 
@@ -86,7 +88,8 @@ ignore_patterns  = read_gitignore_patterns(gitignore_path)
 
 # Parameters for different algorithm configurations
 algorithms = [
-    # Format: (algorithm, architecture, capability, Number of Kernels, synth_strategy, cache_properties)
+    # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy)
+    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
     (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
     (1, "GLay", "Single", 1, "hw", ["65536",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
     (1, "GLay", "Single", 1, "hw", ["131072",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
@@ -105,6 +108,28 @@ algorithms = [
     # Add more tuples here for other algorithm configurations as needed
 ]
 
+ch_properties = [
+    # Format: (address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe)
+    (["33", "32", "0", "0", "33", "32",  "2", "33", "32"], ["33", "32", "0", "0", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
+    # (5, "GLay", "Single", 8, "hw", 65536, 1),
+    # (6, "GLay", "Single", 8, "hw", 65536, 1),
+    # (8, "GLay", "Single", 8, "hw", 65536, 1),
+    # (0, "GLay", "Lite", 4, "hw", 131072, 1),
+    # (0, "GLay", "Full", 2, "hw", 262144, 1),
+    # (0, "GLay", "Lite", 4, "hw", 131072, 2),
+    # (0, "GLay", "Full", 2, "hw", 131072, 2),
+    # Add more tuples here for other algorithm configurations as needed
+]
+
+
 # List of destination directories to be ignored during copy
 destination_directories = [
     os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
@@ -117,10 +142,10 @@ for destination_directory in destination_directories:
         copy_directory(source_directory, destination_directory, ignore_patterns)
 
 # Run make in parallel for each algorithm configuration
-for params in algorithms:
+for params, ch_property in zip(algorithms, ch_properties):
     (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
     destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
     topology_directory = os.path.join(destination_directory, "02_device", "ol", architecture, capability,"topology.json")
-    generate_topology_file(topology_directory, params)
+    generate_topology_file(topology_directory, params, ch_property)
     run_make_in_serial(destination_directory, params)
     print(f"Started processing in parallel with parameters: {alg}")
