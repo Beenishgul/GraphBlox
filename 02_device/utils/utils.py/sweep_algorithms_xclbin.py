@@ -6,7 +6,6 @@ import os
 import fnmatch
 import json
 
-
 def read_gitignore_patterns(gitignore_path):
     patterns = []
     with open(gitignore_path, 'r') as file:
@@ -25,20 +24,59 @@ def ignore_subdirectories(directory, subdirectories, patterns):
             ignored.append(subdir)
     return ignored
 
-def generate_topology_file(file_path)
+def generate_topology_file(file_path, params):
     # Step 1: Read the JSON file
     with open(file_path, 'r') as file:
-        data = json.load(file)
+        tolopogy = json.load(file)
 
-    # Step 2: Modify the fields
-    data['engine_properties']['ENGINE_READ_WRITE'][1] = 10  # Update cycles for ENGINE_READ_WRITE
-    data['engine_properties']['ENGINE_CSR_INDEX'][1] = 12   # Update cycles for ENGINE_CSR_INDEX
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+
+    tolopogy['cache_properties']['channel_0'] = cache_properties   
+    tolopogy['cu_properties']['synth_strategy']  = str(synth_strategy) 
+    tolopogy['cu_properties']['num_kernels']  = str(num_kernels)    
 
     # Any other modifications you need to make can be done in a similar manner
 
-    # Step 3: Write the updated JSON data back to the file
+    # Step 3: Write the updated JSON tolopogy back to the file
     with open(file_path, 'w') as file:
-        json.dump(data, file, indent=4)  # Using indent for pretty printing
+        json.dump(tolopogy, file, indent=4)  # Using indent for pretty printing
+
+# def ignore_subdirectories(directory, subdirectories):
+#     return [d for d in subdirectories if os.path.join(directory, d) in destination_directories]
+
+def copy_directory(source, destination, ignore_patterns):
+    try:
+        shutil.copytree(source, destination, ignore=lambda src, names: ignore_subdirectories(src, names, ignore_patterns))
+        print(f"Copied to: {destination}")
+    except FileExistsError:
+        print(f"Directory {destination} already exists.")
+
+def run_make_in_parallel(destination_directory, params):
+    # Construct the make commands
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+
+    make_commands = f"cd {destination_directory} && make ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make build-hw ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make gen-xclbin-zip"
+    
+    # Define the log file path
+    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}.log")
+    
+    # Run the make commands in its own shell and redirect output to the log file
+    with open(log_file, "w") as file:
+        subprocess.Popen(["nohup", "bash", "-c", make_commands], stdout=file, stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
+
+def run_make_in_serial(destination_directory, params):
+
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+    # Construct the make commands
+    make_commands = f"cd {destination_directory} && make ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make build-hw ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make gen-xclbin-zip"
+    
+    # Define the log file path
+    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}.log")
+    
+    # Run the make commands in its own shell and redirect output to the log file
+    with open(log_file, "w") as file:
+        process = subprocess.Popen(["bash", "-c", make_commands], stdout=file, stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
+        process.wait()  # Wait for the command to complete
 
 # Example Usage
 base_directory   = os.path.abspath('.')  # Current directory
@@ -46,45 +84,22 @@ source_directory = base_directory
 gitignore_path   = os.path.join(source_directory, '.gitignore')
 ignore_patterns  = read_gitignore_patterns(gitignore_path)
 
-# def ignore_subdirectories(directory, subdirectories):
-#     return [d for d in subdirectories if os.path.join(directory, d) in destination_directories]
-
-def copy_directory(source, destination):
-    try:
-        shutil.copytree(source, destination, ignore=lambda src, names: ignore_subdirectories(src, names, ignore_patterns))
-        print(f"Copied to: {destination}")
-    except FileExistsError:
-        print(f"Directory {destination} already exists.")
-
-def run_make_in_parallel(directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy):
-    # Construct the make commands
-    make_commands = f"cd {directory} && make ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={cache} DESIGN_FREQ_HZ={freq} && make build-hw ALGORITHMS={alg_index} ARCHITECTURE={arch} CAPABILITY={cap} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={strategy} SYSTEM_CACHE_SIZE_B={cache} DESIGN_FREQ_HZ={freq}"
-    
-    # Define the log file path
-    log_file = os.path.join(directory, f"make_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}.log")
-    
-    # Run the make commands in its own shell and redirect output to the log file
-    with open(log_file, "w") as file:
-        subprocess.Popen(["nohup", "bash", "-c", make_commands], stdout=file, stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
-
-base_directory = os.path.abspath('.')  # Current directory
-source_directory = base_directory
-
 # Parameters for different algorithm configurations
 algorithms = [
-    # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, synth_strategy, cache_properties)
-    (0, "GLay", "Single", 16, "hw", 32768, 1),
-    (1, "GLay", "Single", 16, "hw", 32768, 1),
-    (5, "GLay", "Single", 16, "hw", 32768, 1),
-    (6, "GLay", "Single", 16, "hw", 32768, 1),
-    (8, "GLay", "Single", 16, "hw", 32768, 1),
-    (0, "GLay", "Single", 8, "hw", 65536, 1),
-    (1, "GLay", "Single", 8, "hw", 65536, 1),
-    (5, "GLay", "Single", 8, "hw", 65536, 1),
-    (6, "GLay", "Single", 8, "hw", 65536, 1),
-    (8, "GLay", "Single", 8, "hw", 65536, 1),
-    (0, "GLay", "Lite", 4, "hw", 131072, 1),
-    (0, "GLay", "Full", 2, "hw", 262144, 1),
+    # Format: (algorithm, architecture, capability, Number of Kernels, synth_strategy, cache_properties)
+    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["65536",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["131072",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["262144",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["524288",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["2097152",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    (1, "GLay", "Single", 1, "hw", ["4194304",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    # (5, "GLay", "Single", 8, "hw", 65536, 1),
+    # (6, "GLay", "Single", 8, "hw", 65536, 1),
+    # (8, "GLay", "Single", 8, "hw", 65536, 1),
+    # (0, "GLay", "Lite", 4, "hw", 131072, 1),
+    # (0, "GLay", "Full", 2, "hw", 262144, 1),
     # (0, "GLay", "Lite", 4, "hw", 131072, 2),
     # (0, "GLay", "Full", 2, "hw", 131072, 2),
     # Add more tuples here for other algorithm configurations as needed
@@ -92,18 +107,20 @@ algorithms = [
 
 # List of destination directories to be ignored during copy
 destination_directories = [
-    os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}")
-    for alg_index, arch, cap, num_kernels, target, cache, freq, strategy in algorithms
+    os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
+    for algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy in algorithms
 ]
 
 # Create and copy to each destination directory
-for destination in destination_directories:
-    if not os.path.exists(destination):
-        copy_directory(source_directory, destination)
+for destination_directory in destination_directories:
+    if not os.path.exists(destination_directory):
+        copy_directory(source_directory, destination_directory, ignore_patterns)
 
 # Run make in parallel for each algorithm configuration
-for alg in algorithms:
-    alg_index, arch, cap, num_kernels, target, cache, freq, strategy  = alg
-    destination_directory = os.path.join(base_directory, f"alg_{alg_index}_{arch}_{cap}_{num_kernels}_{target}_{cache}_{freq}Hz_{strategy}")
-    run_make_in_parallel(destination_directory, alg_index, arch, cap, num_kernels, target, cache, freq, strategy )
+for params in algorithms:
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+    destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
+    topology_directory = os.path.join(destination_directory, "02_device", "ol", architecture, capability,"topology.json")
+    generate_topology_file(topology_directory, params)
+    run_make_in_serial(destination_directory, params)
     print(f"Started processing in parallel with parameters: {alg}")
