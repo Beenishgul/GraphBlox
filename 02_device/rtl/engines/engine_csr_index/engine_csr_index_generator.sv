@@ -356,6 +356,7 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     // localparam BURST_LENGTH = M01_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W;
     localparam BURST_LENGTH    = 16                         ;
+    localparam BURST_SCALE     = 2                          ;
     localparam PAGE_SIZE_WORDS = 4096/(M00_AXI4_FE_DATA_W/8); // 4K page size in words
     localparam PAGE_SIZE_LOG2  = $clog2(PAGE_SIZE_WORDS)    ;
     // --------------------------------------------------------------------------------------
@@ -366,7 +367,7 @@ module engine_csr_index_generator #(parameter
     assign cmd_stream_mode_int    = (configure_memory_reg.payload.meta.subclass.cmd == CMD_STREAM_READ) | (configure_engine_int.payload.meta.subclass.cmd == CMD_STREAM_WRITE);
     assign enter_stream_pause_int = ~(|((counter_count-counter_load_value)%BURST_LENGTH)) & cmd_stream_mode_int;
     assign cmd_burst_active       = cmd_stream_mode_int & fifo_request_din_reg.valid;
-    assign cmd_done_packet_int    = (counter_count >= configure_engine_int.payload.param.index_end | (fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full));
+    assign cmd_done_packet_int    = (counter_count >= configure_engine_int.payload.param.index_end | (fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full | fifo_request_commit_signals_out_int.full));
 // --------------------------------------------------------------------------------------
     assign cmd_done_mode_int                 = done_int_reg & response_memory_counter_is_zero & response_engine_in_done_flag_reg & exit_gen_pause_int;
     assign sequence_done_mode_int            = (counter_count >= configure_engine_int.payload.param.index_end) | (~cmd_burst_active & response_engine_in_break_flag_reg & ~fifo_request_signals_out_reg_empty);
@@ -445,7 +446,7 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
             end
             ENGINE_CSR_INDEX_GEN_DONE_PACKET : begin
-                if(fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full)
+                if(fifo_request_pending_signals_out_int.full | fifo_request_send_signals_out_int.full | fifo_request_commit_signals_out_int.full)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_PACKET;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
@@ -806,7 +807,7 @@ module engine_csr_index_generator #(parameter
     assign request_out_int.payload                = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2              ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * BURST_SCALE    ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
         .PROG_THRESH     (5                             )
@@ -1013,7 +1014,7 @@ module engine_csr_index_generator #(parameter
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * BURST_SCALE),
         .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
         .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
         .PROG_THRESH     (5                         )
@@ -1052,10 +1053,10 @@ module engine_csr_index_generator #(parameter
     assign request_commit_out_int.payload           = fifo_request_commit_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
-        .PROG_THRESH     (5                         )
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * BURST_SCALE * 2),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)    ),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)    ),
+        .PROG_THRESH     (BURST_LENGTH                  )
     ) inst_fifo_EnginePacketRequestCommit (
         .clk        (ap_clk                                         ),
         .srst       (areset_fifo                                    ),

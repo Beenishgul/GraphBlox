@@ -116,7 +116,7 @@
             ]
         ]
     },
-    "Single.BFSV1": {
+    "Single.BFSv1": {
         "0": [
             [
                 "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
@@ -551,8 +551,8 @@
         "comments":"address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe"
     },
     "ch_properties": {
-        "channel_0": ["33", "32", "0", "0", "33", "32",  "2", "33", "32"],
-        "channel_1": ["33", "32", "0", "0", "33", "32",  "3", "33", "32"],
+        "channel_0": ["33", "512", "0", "1", "33", "32",  "2", "33", "32"],
+        "channel_1": ["33", "512", "0", "2", "33", "32",  "3", "33", "32"],
         "channel_2": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
         "channel_3": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
         "channel_4": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
