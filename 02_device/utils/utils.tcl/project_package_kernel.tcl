@@ -212,17 +212,17 @@ foreach user_parameter [ipx::get_user_parameters] {
 puts "[color 3 "                Step 2: Inference clock, reset, AXI interfaces and associate them with clock"]" 
 
 # inference clock and reset signals
-puts "[color 4 "                        Inference clock and reset signals"]" 
-set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
-set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
-set_property value        32           $bifparam
-set_property value_source constant     $bifparam
-set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
-set_property value        32           $bifparam
-set_property value_source constant     $bifparam
-set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
-set_property value        32           $bifparam
-set_property value_source constant     $bifparam
+# puts "[color 4 "                        Inference clock and reset signals"]" 
+# set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
+# set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
+# set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
+# set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
 
 # ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
 # ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file

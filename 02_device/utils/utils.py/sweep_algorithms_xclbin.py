@@ -29,13 +29,14 @@ def generate_topology_file(file_path, params, ch_property):
     with open(file_path, 'r') as file:
         tolopogy = json.load(file)
 
-    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
 
     tolopogy['cache_properties']['channel_0'] = cache_properties   
     tolopogy['ch_properties']['channel_0'] = ch_property[0] 
     tolopogy['ch_properties']['channel_1'] = ch_property[1] 
     tolopogy['cu_properties']['synth_strategy']  = str(synth_strategy) 
     tolopogy['cu_properties']['num_kernels']  = str(num_kernels)    
+    tolopogy['cu_properties']['frequency']  = str(frequency) 
 
     # Any other modifications you need to make can be done in a similar manner
 
@@ -53,14 +54,22 @@ def copy_directory(source, destination, ignore_patterns):
     except FileExistsError:
         print(f"Directory {destination} already exists.")
 
+def construct_make_arguments(params):
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
+    # Construct the common part of the make command with parameters
+    common_args = f"ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} DESIGN_FREQ_HZ={frequency}"
+    return common_args
+
 def run_make_in_parallel(destination_directory, params):
     # Construct the make commands
-    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
 
-    make_commands = f"cd {destination_directory} && make ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make build-hw ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make gen-xclbin-zip"
-    
+    common_args = construct_make_arguments(params)
+
+    make_commands = f"cd {destination_directory} && make {common_args} && make build-hw {common_args} && make gen-xclbin-zip {common_args}"
+
     # Define the log file path
-    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}.log")
+    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log")
     
     # Run the make commands in its own shell and redirect output to the log file
     with open(log_file, "w") as file:
@@ -68,17 +77,24 @@ def run_make_in_parallel(destination_directory, params):
 
 def run_make_in_serial(destination_directory, params):
 
-    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
-    # Construct the make commands
-    make_commands = f"cd {destination_directory} && make ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make build-hw ALGORITHMS={algorithm} ARCHITECTURE={architecture} CAPABILITY={capability} XILINX_NUM_KERNELS={num_kernels} TARGET={target} XILINX_IMPL_STRATEGY={synth_strategy} SYSTEM_CACHE_SIZE_B={cache_properties[0]} && make gen-xclbin-zip"
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
+    
+    common_args = construct_make_arguments(params)
+
+    make_commands = f"cd {destination_directory} && make {common_args} && make build-hw {common_args} && make gen-xclbin-zip {common_args}"
     
     # Define the log file path
-    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}.log")
+    log_file = os.path.join(destination_directory, f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log")
     
-    # Run the make commands in its own shell and redirect output to the log file
-    with open(log_file, "w") as file:
+    try:
         process = subprocess.Popen(["bash", "-c", make_commands], preexec_fn=os.setpgrp)
         process.wait()  # Wait for the command to complete
+        if process.returncode != 0:
+            raise Exception(f"ERROR: Command failed with return code {process.returncode}")
+        print(f"MSG: Successfully completed: {make_commands}")
+    except Exception as e:
+        print(e)
+        # Here you can handle the failure, e.g., by logging it, but the script will continue to the next command.
 
 # Example Usage
 base_directory   = os.path.abspath('.')  # Current directory
@@ -88,16 +104,17 @@ ignore_patterns  = read_gitignore_patterns(gitignore_path)
 
 # Parameters for different algorithm configurations
 algorithms = [
-    # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy)
-    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["65536",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["131072",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["262144",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["524288",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["2097152",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
-    (1, "GLay", "Single", 1, "hw", ["4194304",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1),
+    # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy, frequency)
+    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 500000000),
+    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["32768",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["65536",     "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["131072",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["262144",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["524288",    "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["1048576",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["2097152",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
+    (1, "GLay", "Single", 1, "hw", ["4194304",   "4", "URAM",      "0", "512",  "1", "8", "BRAM"], 1, 300000000),
     # (5, "GLay", "Single", 8, "hw", 65536, 1),
     # (6, "GLay", "Single", 8, "hw", 65536, 1),
     # (8, "GLay", "Single", 8, "hw", 65536, 1),
@@ -110,6 +127,7 @@ algorithms = [
 
 ch_properties = [
     # Format: (address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe)
+    (["33", "32", "0", "0", "33", "32",  "2", "33", "32"], ["33", "32", "0", "0", "33", "32",  "3", "33", "32"]),
     (["33", "32", "0", "0", "33", "32",  "2", "33", "32"], ["33", "32", "0", "0", "33", "32",  "3", "33", "32"]),
     (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
     (["33", "512", "0", "1", "33", "32",  "2", "33", "32"], ["33", "512", "0", "2", "33", "32",  "3", "33", "32"]),
@@ -132,8 +150,8 @@ ch_properties = [
 
 # List of destination directories to be ignored during copy
 destination_directories = [
-    os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
-    for algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy in algorithms
+    os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz")
+    for algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy ,frequency in algorithms
 ]
 
 # Create and copy to each destination directory
@@ -143,9 +161,9 @@ for destination_directory in destination_directories:
 
 # Run make in parallel for each algorithm configuration
 for params, ch_property in zip(algorithms, ch_properties):
-    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy) = params
-    destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}")
+    (algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency) = params
+    destination_directory = os.path.join(base_directory, f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz")
     topology_directory = os.path.join(destination_directory, "02_device", "ol", architecture, capability,"topology.json")
     generate_topology_file(topology_directory, params, ch_property)
     run_make_in_serial(destination_directory, params)
-    print(f"Started processing in parallel with parameters: {alg}")
+    print(f"Start synthesis with parameters: {params}")
