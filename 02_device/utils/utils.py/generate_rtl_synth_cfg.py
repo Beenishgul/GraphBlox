@@ -67,6 +67,7 @@ FULL_SRC_IP_DIR_OVERLAY =  params['FULL_SRC_IP_DIR_OVERLAY']
 ARCHITECTURE =  params['ARCHITECTURE']
 CAPABILITY =  params['CAPABILITY']
 OVERRIDE_TOPOLOGY_JSON =  params['OVERRIDE_TOPOLOGY_JSON']
+DESIGN_FREQ_SCALE = "1"
 
 # Construct the full path for the file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json
 config_filename = f"{KERNEL_NAME}_{TARGET}.topology.json"
@@ -102,6 +103,7 @@ if not int(OVERRIDE_TOPOLOGY_JSON):
     XILINX_IMPL_STRATEGY = config_data["cu_properties"]["synth_strategy"]
     XILINX_NUM_KERNELS   = config_data["cu_properties"]["num_kernels"]
     DESIGN_FREQ_HZ       = config_data["cu_properties"]["frequency"]
+    DESIGN_FREQ_SCALE    = config_data["cu_properties"]["frequency_scale"]
 
 XILINX_MAX_THREADS   = int(XILINX_MAX_THREADS)
 XILINX_JOBS_STRATEGY = int(XILINX_JOBS_STRATEGY)
@@ -408,7 +410,6 @@ synth.jobs={XILINX_JOBS_STRATEGY}
 param=general.maxThreads={XILINX_MAX_THREADS}
 """
 
-
 # Build the final configuration string
 config = f"\nplatform={PLATFORM}\n"
 config += f"messageDb={KERNEL_NAME}.mdb\n"
@@ -416,11 +417,21 @@ config += f"temp_dir={KERNEL_NAME}.build\n"
 config += f"report_dir={KERNEL_NAME}.build/reports\n"
 config += f"log_dir={KERNEL_NAME}.build/logs\n"
 config += "save-temps=1\n"
-config += "debug=1\n"
-config += "link=1\n\n"
+config += "link=1\n"
 
-# config+="[clock]\n"
-# config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
+if TARGET == "hw_emu":
+    config += "debug=1\n"
+#     config +=f"""
+# [advanced]
+# param=hw_emu.debugMode=1
+# param=hw_emu.enableProtocolChecker=1
+
+# """  
+config += "\n"
+
+if DESIGN_FREQ_SCALE == "0" or TARGET == "hw_emu":
+    config+="[clock]\n"
+    config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
 
 config +=  generate_kernel_and_memory_config(KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS))
 

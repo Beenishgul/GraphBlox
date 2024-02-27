@@ -38,7 +38,7 @@ struct xrtGLAYHandle *setupGLAYDevice(struct xrtGLAYHandle *glayHandle, int devi
     glayHandle->ctrlMode    = ctrlMode;
     glayHandle->overlayPath = overlayPath;
     glayHandle->endian_read = endian;
-    glayHandle->endian_write= 0;
+    glayHandle->endian_write= endian;
     glayHandle->flush_enable= flush;
     glayHandle->entries     = 0;
 
@@ -110,17 +110,16 @@ void readGLAYDeviceEntriesFromFile(struct xrtGLAYHandle *glayHandle) {
 void printGLAYDevice(struct xrtGLAYHandle *glayHandle)
 {
     printf("\n-----------------------------------------------------\n");
-
-    printf("DEVICE::NAME                    [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::name>().c_str() );
-    printf("DEVICE::BDF                     [%s] \n", glayHandle->deviceHandle.get_info<xrt::info::device::bdf>().c_str() );
+    printf("DEVICE::NAME                    [%s]  \n", glayHandle->deviceHandle.get_info<xrt::info::device::name>().c_str() );
+    printf("DEVICE::BDF                     [%s]  \n", glayHandle->deviceHandle.get_info<xrt::info::device::bdf>().c_str() );
     printf("DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld] \n", glayHandle->deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>() );
     printf("-----------------------------------------------------\n");
-    printf("DEVICE::endian_read [%d] \n", glayHandle->endian_read );
+    printf("DEVICE::endian_read  [%d] \n", glayHandle->endian_read );
     printf("DEVICE::endian_write [%d] \n", glayHandle->endian_write);
     printf("DEVICE::flush_enable [%d] \n", glayHandle->flush_enable);
     printf("-----------------------------------------------------\n");
-    printf(" \nKernel Arguments Offsets: HANDLE[%2u] \n", 0);
-
+    printf(" Kernel Arguments Offsets: HANDLE[%2u] \n", 0);
+    printf("-----------------------------------------------------\n");
     uint32_t i = 0;
     for (auto it : glayHandle->cuHandles[0].get_args())
     {
@@ -148,7 +147,8 @@ GLAYGraphCSRxrtBufferHandlePerKernel::GLAYGraphCSRxrtBufferHandlePerKernel(struc
     xrt_buffer_size[7] = graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t);
     xrt_buffer_size[8] = graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t);
     xrt_buffer_size[9] = 8;
-
+        printf(" xrt_buffer_size setupGLAYGraphCSRUserManaged\n");
+        printf("-----------------------------------------------------\n");
     // ********************************************************************************************
     // ***************                  Allocate Device buffers                      **************
     // ********************************************************************************************
@@ -167,6 +167,8 @@ GLAYGraphCSRxrtBufferHandlePerKernel::GLAYGraphCSRxrtBufferHandlePerKernel(struc
         xrt_buffer[7]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[7], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 1
         xrt_buffer[8]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[8], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 2
         xrt_buffer[9]   =  xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[9], xrt::bo::flags::normal, bankGroupIndex);// auxiliary 3
+        printf(" xrt::bo setupGLAYGraphCSRUserManaged\n");
+        printf("-----------------------------------------------------\n");
     }
     break;
     case 1:
@@ -214,12 +216,14 @@ GLAYGraphCSRxrtBufferHandlePerKernel::GLAYGraphCSRxrtBufferHandlePerKernel(struc
     xrt_buffer_device[7] = xrt_buffer[7].address();
     xrt_buffer_device[8] = xrt_buffer[8].address(); // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
     xrt_buffer_device[9] = (uint64_t)((uint64_t)32768 << 32) | (uint64_t)(overlay_program_entries << 3) | (uint64_t)(glayHandle->flush_enable << 2) | ((uint64_t)glayHandle->endian_write << 1 )| (uint64_t)glayHandle->endian_read; // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode 0-big endian 1-little endian
-
+        printf(" xrt_buffer_device setupGLAYGraphCSRUserManaged\n");
+        printf("-----------------------------------------------------\n");
 // ********************************************************************************************
 // ***************                  Setup Host pointers                          **************
 // ********************************************************************************************
     initializeGLAYOverlayConfiguration(overlay_program_entries, algorithm, graph, glayHandle->overlayPath, cacheSize);
-
+        printf(" initializeGLAYOverlayConfiguration setupGLAYGraphCSRUserManaged\n");
+        printf("-----------------------------------------------------\n");
     struct Vertex *vertices = NULL;
     struct EdgeList *sorted_edges_array = NULL;
 

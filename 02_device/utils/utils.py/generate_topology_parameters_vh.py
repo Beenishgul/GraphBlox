@@ -2748,6 +2748,7 @@ def generate_output_file_buffer_channels_tcl(output_file_name):
       set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
       set_property value {axi_interface} $regparam \n\n''')
 
+            current_address += size_in_hex  # Increment the address based on the size
 
 generate_output_file_buffer_channels_tcl(output_file_buffer_channels_tcl)
 

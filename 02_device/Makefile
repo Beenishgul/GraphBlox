@@ -267,7 +267,7 @@ gen-utils-dir: sub-session-info $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE) $(APP_DIR_
 
 .PHONY: $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini
 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_xrt_ini: sub-session-info
-	$(BASH) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_SHELL)/generate_xrt_ini.sh $(PARAMS_SH_DIR)
+	$(PYTHON) $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PYTHON)/generate_xrt_ini.py $(PARAMS_SH_DIR)
 
 .PHONY: $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg
 $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_rtl_$(TARGET).cfg: sub-session-info
@@ -636,6 +636,7 @@ $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(UTILS_DIR)/$(UTILS_XCLBIN)/$(XILINX_DIR_A
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin \
 			$(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).ltx \
 			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json \
+			$(APP_DIR_ACTIVE)/$(VIVADO_PACKAGE_DIR)/$(KERNEL_NAME).xml \
 			$(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_RPT)/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
 
 PHONY: gen-xclbin-zip
