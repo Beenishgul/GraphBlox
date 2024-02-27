@@ -139,8 +139,24 @@ void xrtGLAYHandle::printGLAYDevice() const
     printf("DEVICE::NAME                    [%s]\n",
            deviceHandle.get_info<xrt::info::device::name>().c_str());
     printf("\n-----------------------------------------------------\n");
+
+    switch (ctrlMode)
+    {
+    case 0: // UserManaged
+        printf("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
+        break;
+    case 1: // CtrlHS
+        printf("KERNEL::CONTROL::MODE           [AP_CTRL_HS]\n");
+        break;
+    case 2: // CtrlChain
+        printf("KERNEL::CONTROL::MODE           [AP_CTRL_CHAIN]\n");
+        break;
+    default:
+        printf("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
+        break;
+    }
+
     printf("KERNEL::CACHE::SIZE             [%d]\n", cacheSize);
-    printf("KERNEL::CONTROL::MODE           [%d]\n", ctrlMode);
     printf("KERNEL::NAME                    [%s]\n", kernelName.c_str());
     printf("KERNEL::THREADS::NUM            [%d]\n", numThreads);
     printf("KERNEL::XCLBIN::PATH            [%s]\n", xclbinPath.c_str());
