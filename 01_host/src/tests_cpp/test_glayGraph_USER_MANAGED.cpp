@@ -33,14 +33,20 @@ extern "C" {
 #include "timer.h"
 #include "mt19937.h"
 #include "graphConfig.h"
-#include "graphRun.h"
-#include "graphStats.h"
 #include "edgeList.h"
 #include "sortRun.h"
-#include "reorder.h"
 
 #include "graphCSRSegments.h"
-#include "edgeList.h"
+
+#include "BFS.h"
+#include "pageRank.h"
+#include "SPMV.h"
+#include "connectedComponents.h"
+#include "triangleCount.h"
+
+#include "graphRun.h"
+#include "graphStats.h"
+#include "reorder.h"
 // #include "glayGDL_emu.h"
 
 void initialize_PR_auxiliary_struct(struct GraphCSR *graph, struct GraphAuxiliary *graphAuxiliary, struct Arguments *arguments);
@@ -376,6 +382,18 @@ main (int argc, char **argv)
     arguments->fnameb_format = 1;
     arguments->convert_format = 1;
     initializeMersenneState (&(arguments->mt19937var), 27491095);
+
+    // GLay Xilinx Parameters
+    arguments->kernel_name = NULL;
+    arguments->device_index = 0;
+    arguments->xclbin_path = NULL;
+    arguments->overlay_path = NULL;
+    arguments->ctrl_mode = 0;
+    arguments->endian_read = 0;
+    arguments->endian_write = 0;
+    arguments->flush_cache = 1;
+    arguments->bankGroupIndex = 0;
+
     omp_set_nested(1);
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
@@ -383,6 +401,8 @@ main (int argc, char **argv)
     if(arguments->dflag)
         arguments->sort = 1;
 
+
+    arguments->ctrl_mode = 0;
     struct GraphAuxiliary *graphAuxiliary = (struct GraphAuxiliary *) my_malloc(sizeof(struct GraphAuxiliary));
     struct GraphCSR *graph = (struct GraphCSR *)generateGraphDataStructure(arguments);
 
@@ -390,8 +410,10 @@ main (int argc, char **argv)
     {
     case 0: // bfs
     {
+        struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
         initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
         multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
+        freeBFSStats(stats);
     }
     break;
     case 1: // pagerank
@@ -404,25 +426,32 @@ main (int argc, char **argv)
     break;
     case 5: //SPMV
     {
-
+        struct SPMVStats *stats = runSPMVAlgorithm(arguments,  graph);
+        freeSPMVStats(stats);
     }
     break;
     case 6: // Connected Components (CC)
     {
+        struct CCStats *stats = runConnectedComponentsAlgorithm(arguments,  graph);
         initialize_CC_auxiliary_struct(graph, graphAuxiliary, arguments);
         multiple_iteration_CC(graph, graphAuxiliary, arguments, timer);
+        freeCCStats(stats);
     }
     break;
     case 8: // Triangle Counting
     {
+        struct TCStats *stats = runTriangleCountAlgorithm(arguments, graph);
         initialize_TC_auxiliary_struct(graph, graphAuxiliary, arguments);
         multiple_iteration_TC(graph, graphAuxiliary, arguments, timer);
+        freeTCStats(stats);
     }
     break;
     default:// BFS
     {
+        struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
         initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
         multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
+        freeBFSStats(stats);
     }
     break;
     }
