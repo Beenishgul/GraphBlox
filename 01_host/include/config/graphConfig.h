@@ -54,7 +54,11 @@ struct Arguments
     int device_index;
     char *xclbin_path;
     char *overlay_path;
-    struct xrtGLAYHandle *glayHandle;
+    int ctrl_mode;
+    int endian_read;
+    int endian_write;
+    int flush_cache;
+    int bankGroupIndex;
 };
 
 

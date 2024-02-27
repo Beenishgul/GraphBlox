@@ -88,7 +88,11 @@ struct Arguments *argumentsNew()
     arguments->device_index = 0;
     arguments->xclbin_path = NULL;
     arguments->overlay_path = NULL;
-    arguments->glayHandle = NULL;
+    arguments->ctrl_mode = 0;
+    arguments->endian_read = 0;
+    arguments->endian_write = 0;
+    arguments->flush_cache = 1;
+    arguments->bankGroupIndex = 0;
 
     return arguments;
 

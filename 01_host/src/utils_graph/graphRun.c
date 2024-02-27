@@ -448,8 +448,6 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
             struct PageRankStats *stats = runPageRankAlgorithm(arguments, graph);
             if(stats)
             {
-                time_total += stats->time_total;
-
                 if(arguments->Sflag) // output page rank error statistics
                 {
                     arguments->pushpull = 0;
