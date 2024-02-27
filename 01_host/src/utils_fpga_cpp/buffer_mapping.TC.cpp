@@ -1,5 +1,5 @@
 #include "glayenv.hpp"
-void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(size_t overlay_program_entries, int algorithm, struct GraphCSR *graph, char *overlayPath)
+void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCSR *graph)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 0    mapping 2    cycles 8    buffer_5-edges_array_dest ( 0 )-( graph->num_edges )

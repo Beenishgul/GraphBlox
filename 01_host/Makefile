@@ -81,7 +81,7 @@ LDFLAGS        = -lm -lJudy
 
 HOST_CXXFLAGS += -std=c++17 -I./ -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
 # The below are linking flags for C++ Compiler
-XRT_LDFLAGS   += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
+XRT_LDFLAGS   += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread -luuid
 CXXFLAGS      += $(HOST_CXXFLAGS)
 
 # Host compiler global settings
