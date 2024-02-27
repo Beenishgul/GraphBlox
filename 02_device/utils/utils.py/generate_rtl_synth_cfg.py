@@ -416,7 +416,7 @@ config += f"temp_dir={KERNEL_NAME}.build\n"
 config += f"report_dir={KERNEL_NAME}.build/reports\n"
 config += f"log_dir={KERNEL_NAME}.build/logs\n"
 config += "save-temps=1\n"
-# config += "debug=1\n"
+config += "debug=1\n"
 config += "link=1\n\n"
 
 # config+="[clock]\n"
