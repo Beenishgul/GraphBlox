@@ -31,14 +31,14 @@ proc color {foreground text} {
 # =========================================================
 # Step 1: Open vivado project and add design sources
 # =========================================================
-# if {${VIVADO_GUI_FLAG} == "YES"} {
+if {${VIVADO_GUI_FLAG} == "YES"} {
   start_gui
-# }
+}
 
 open_project ${KERNEL_PROJECT_PKG_XPR} 
 # =========================================================
 
-# remove_files -fileset sim_1      [get_files] >> $log_file   
+remove_files -fileset sim_1      [get_files] >> $log_file   
 
 puts "[color 4 "                        INFO: Add design sources into sim_1 ${KERNEL_NAME}"]" 
 set_property SOURCE_SET sources_1 [get_filesets sim_1]
