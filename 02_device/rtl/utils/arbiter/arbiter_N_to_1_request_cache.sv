@@ -40,8 +40,8 @@ logic areset_control;
 logic areset_fifo   ;
 logic areset_arbiter;
 
-MemoryPacketRequest request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
-MemoryPacketRequest request_out_int                          ;
+// MemoryPacketRequest request_in_reg [NUM_MEMORY_REQUESTOR-1:0];
+MemoryPacketRequest request_out_int;
 
 // --------------------------------------------------------------------------------------
 //  Cache FIFO signals
@@ -98,24 +98,24 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-always_ff @(posedge ap_clk) begin
-  if (areset_control) begin
-    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-      request_in_reg[i].valid  <= 1'b0;
-    end
-  end
-  else begin
-    for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-      request_in_reg[i].valid  <= request_in[i].valid;
-    end
-  end
-end
+// always_ff @(posedge ap_clk) begin
+//   if (areset_control) begin
+//     for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+//       request_in_reg[i].valid  <= 1'b0;
+//     end
+//   end
+//   else begin
+//     for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+//       request_in_reg[i].valid  <= request_in[i].valid;
+//     end
+//   end
+// end
 
-always_ff @(posedge ap_clk) begin
-  for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
-    request_in_reg[i].payload  <= request_in[i].payload ;
-  end
-end
+// always_ff @(posedge ap_clk) begin
+//   for (int i=0; i<NUM_MEMORY_REQUESTOR; i++) begin
+//     request_in_reg[i].payload  <= request_in[i].payload ;
+//   end
+// end
 
 // --------------------------------------------------------------------------------------
 // Drive output
@@ -170,7 +170,7 @@ generate
       .WIDTH (1)
     ) inst_hyper_pipeline_request_in_valid (
       .ap_clk(ap_clk                         ),
-      .areset(areset_arbiter                 ),
+      .areset(areset_control                 ),
       .din   (request_in[i].valid            ),
       .dout  (request_arbiter_in_reg[i].valid)
     );
@@ -193,7 +193,7 @@ generate
 
     // Pop
     assign fifo_request_arbiter_in_signals_in_int[i].rd_en = ~fifo_request_arbiter_in_signals_out_int[i].empty & arbiter_grant[i];
-    assign request_arbiter_in_int[i].valid                 = fifo_request_arbiter_in_signals_out_int[i].valid;
+    assign request_arbiter_in_int[i].valid                 = fifo_request_arbiter_in_signals_out_int[i].valid & fifo_request_arbiter_in_signals_in_int[i].rd_en;
     assign request_arbiter_in_int[i].payload               = fifo_request_arbiter_in_dout[i];
 
     xpm_fifo_sync_wrapper #(
@@ -232,7 +232,7 @@ assign fifo_request_din                  = fifo_request_din_reg.payload;
 
 // Pop
 assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-assign request_out_int.valid             = fifo_request_signals_out_int.valid;
+assign request_out_int.valid             = fifo_request_signals_out_int.valid & fifo_request_signals_in_int.rd_en;
 assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(

@@ -9,11 +9,12 @@
 #include <cstdlib> 
 #include <bitset>
 
-#include "experimental/xrt_bo.h"
-#include "experimental/xrt_ip.h"
-#include "experimental/xrt_device.h"
-#include "experimental/xrt_kernel.h"
-#include "experimental/xrt_xclbin.h"
+// XRT includes
+#include "xrt/xrt_bo.h"
+#include "xrt/xrt_device.h"
+#include "xrt/xrt_kernel.h"
+#include <experimental/xrt_xclbin.h>
+#include <experimental/xrt_ip.h>
 
 #ifdef __cplusplus
 extern "C" {
