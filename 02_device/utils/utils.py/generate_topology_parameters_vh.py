@@ -3137,6 +3137,42 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
   
  """
+
+    fill_fifo_tcl_template_post="""
+# ----------------------------------------------------------------------------
+# Generate FIFO
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO Width: 107  Depth: 32 Prog : 16 Distributed_RAM"]" 
+
+set module_name fifo_generator_ip_107x32x16_distributed
+create_ip -name fifo_generator          \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 13.*                 \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list \\
+                      CONFIG.Fifo_Implementation {{Common_Clock_Distributed_RAM}} \\
+                      CONFIG.Input_Data_Width {{107}} \\
+                      CONFIG.Input_Depth {{32}} \
+                      CONFIG.Performance_Options {{Standard_FIFO}} \\
+                      CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
+                      CONFIG.Full_Threshold_Assert_Value {{16}} \\
+                      CONFIG.Valid_Flag {{true}} \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    """
+
+
     CACHE_MERGE_COUNT = 0;
     CACHE_PORT_COUNT  = 0;
     CACHE_PORT_INDEX  = 0;
@@ -3173,7 +3209,8 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-      
+    
+    output_lines.append(fill_fifo_tcl_template_post.format(channel))
     file.write('\n'.join(output_lines))
 
 # ----------------------------------------------------------------------------
@@ -3189,12 +3226,18 @@ with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}.vhd
 {5}/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}/sim/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}.vhd
   """
+    fill_fifo_filelist_xsim_ip_vhdl_template="""
+{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_rfs.vhd
+{5}/fifo_generator_ip_107x32x16_distributed/hdl/blk_mem_gen_v8_4_vhsyn_rfs.vhd
+{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_vhsyn_rfs.vhd
+   """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(index==0):
             output_lines.append(fill_filelist_xsim_ip_vhdl_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
 
+    output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
     file.write('\n'.join(output_lines))
 
 
@@ -3234,13 +3277,20 @@ with open(output_file_filelist_xsim_ip_v_f, "w") as file:
 {5}/m{0:02d}_axi_lite_register_slice_mid_64x17/sim/m{0:02d}_axi_lite_register_slice_mid_64x17.v
    """
 
+    fill_fifo_filelist_xsim_ip_v_template="""
+{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_rfs.v
+{5}/fifo_generator_ip_107x32x16_distributed/simulation/fifo_generator_vlog_beh.v
+{5}/fifo_generator_ip_107x32x16_distributed/sim/fifo_generator_ip_107x32x16_distributed.v
+   """
+
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(index==0):
             output_lines.append(fill_file_filelist_xsim_ip_v_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_file_filelist_xsim_ip_v_template_axi_lite.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-
+    
+    output_lines.append(fill_fifo_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
     output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
     
     file.write('\n'.join(output_lines))
