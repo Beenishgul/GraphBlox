@@ -199,6 +199,7 @@ output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_ar
 output_file_lane_topology = os.path.join(output_folder_path_topology,"lane_topology.vh")
 
 output_file_engine_template_topology = os.path.join(output_folder_path_topology,"engine_template_topology.vh")
+output_file_fifo_wrapper_topology    = os.path.join(output_folder_path_topology,"fifo_wrapper_topology.vh")
 
 output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
 output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
@@ -971,6 +972,7 @@ check_and_clean_file(output_file_path_topology)
 check_and_clean_file(output_file_bundle_topology)
 check_and_clean_file(output_file_lane_topology)
 check_and_clean_file(output_file_engine_template_topology)
+check_and_clean_file(output_file_fifo_wrapper_topology)
 check_and_clean_file(output_file_afu_topology)
 check_and_clean_file(output_file_afu_ports)
 check_and_clean_file(output_file_top_ports)
@@ -3138,39 +3140,39 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
   
  """
 
-    fill_fifo_tcl_template_post="""
-# ----------------------------------------------------------------------------
-# Generate FIFO
-# ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO Width: 107  Depth: 32 Prog : 16 Distributed_RAM"]" 
+#     fill_fifo_tcl_template_post="""
+# # ----------------------------------------------------------------------------
+# # Generate FIFO
+# # ----------------------------------------------------------------------------
+# puts "[color 2 "                        Generate FIFO Width: 107  Depth: 32 Prog : 16 Distributed_RAM"]" 
 
-set module_name fifo_generator_ip_107x32x16_distributed
-create_ip -name fifo_generator          \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 13.*                 \\
-          -module_name ${{module_name}}   >> $log_file
+# set module_name fifo_generator_ip_107x32x16_distributed
+# create_ip -name fifo_generator          \\
+#           -vendor xilinx.com            \\
+#           -library ip                   \\
+#           -version 13.*                 \\
+#           -module_name ${{module_name}}   >> $log_file
           
-set_property -dict [list \\
-                      CONFIG.Fifo_Implementation {{Common_Clock_Distributed_RAM}} \\
-                      CONFIG.Input_Data_Width {{107}} \\
-                      CONFIG.Input_Depth {{32}} \
-                      CONFIG.Performance_Options {{Standard_FIFO}} \\
-                      CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
-                      CONFIG.Full_Threshold_Assert_Value {{16}} \\
-                      CONFIG.Valid_Flag {{true}} \\
-                    ] [get_ips ${{module_name}}]
+# set_property -dict [list \\
+#                       CONFIG.Fifo_Implementation {{Common_Clock_Distributed_RAM}} \\
+#                       CONFIG.Input_Data_Width {{107}} \\
+#                       CONFIG.Input_Depth {{32}} \
+#                       CONFIG.Performance_Options {{Standard_FIFO}} \\
+#                       CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
+#                       CONFIG.Full_Threshold_Assert_Value {{16}} \\
+#                       CONFIG.Valid_Flag {{true}} \\
+#                     ] [get_ips ${{module_name}}]
 
-set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
-    """
+# set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+# set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+# set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+# set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+# generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+# generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+# export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+# export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+#     """
 
 
     CACHE_MERGE_COUNT = 0;
@@ -3210,74 +3212,93 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
             output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
     
-    output_lines.append(fill_fifo_tcl_template_post.format(channel))
+    # output_lines.append(fill_fifo_tcl_template_post.format(channel))
     file.write('\n'.join(output_lines))
 
 
 # ----------------------------------------------------------------------------
-# generate axi fifo project files
+# Generate FIFO
 # ----------------------------------------------------------------------------
 
+# Size (bits) ALUOpsConfigurationPayload: 74 
+# Size (bits) CacheRequestPayload: 177 
+# Size (bits) ControlPacketPayload: 26 
+# Size (bits) CSRIndexConfigurationPayload: 353 
+# Size (bits) EnginePacketFullPayload: 233 
+# Size (bits) EnginePacketPayload: 170 
+# Size (bits) FilterCondConfigurationPayload: 96 
+# Size (bits) MemoryPacketRequestPayload: 107 
+# Size (bits) MemoryPacketResponsePayload: 64 
+# Size (bits) MergeDataConfigurationPayload: 8 
+# Size (bits) ParallelReadWriteConfigurationPayload: 744 
+# Size (bits) ReadWriteConfigurationPayload: 176 
+# Size (bits) SetOpsConfigurationPayload: 8 
+
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
+# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY
+# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE
+# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
+# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
+# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY  
+# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE 
+# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE 
+# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST 
+
+# .FIFO_ARBITER_DEPTH   (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+# parameter depth      = 2**$clog2(FIFO_ARBITER_DEPTH)   ,
+# parameter prog_full           = (FIFO_WRITE_DEPTH/2)            ,
+
 # Define the data types and their configurations
-data_types_pr = {
+data_types_pr_engine_packet = {
     "ALUOpsConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "CacheRequestPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "ControlPacketPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 74, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "CSRIndexConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "EnginePacketFullPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "EnginePacketPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 353, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "FilterCondConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "MemoryPacketRequestPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
-    ],
-    "MemoryPacketResponsePayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 96, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "MergeDataConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 8, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "ParallelReadWriteConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 744, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "ReadWriteConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 176, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "SetOpsConfigurationPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+        {"width": 8, "configurations": [{"depth": 16, "prog_full": 8}]}
+    ],
+    "CacheRequestPayload": [
+        {"width": 177, "configurations": [{"depth": 64, "prog_full": 32}]}
+    ],
+    "ControlPacketPayload": [
+        {"width": 26, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 27}]}
+    ],
+    "EnginePacketFullPayload": [
+        {"width": 233, "configurations": [{"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 5}]}
+    ],
+    "EnginePacketPayload": [
+        {"width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]}
+    ],
+    "MemoryPacketRequestPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8},  {"depth": 16, "prog_full": 12},{"depth": 32, "prog_full": 27},{"depth": 32, "prog_full": 16}]}
+    ],
+    "MemoryPacketResponsePayload": [
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 64, "prog_full": 32}]}
     ]
+
 }
 
+# Tracking for generated FIFOs to avoid duplication
+generated_fifos = set()
+generated_reference_fifos = []
 def determine_fifo_type(depth):
-    """
-    Determines the FIFO type based on depth.
-    """
     if depth > 128:
         return "Common_Clock_Builtin_FIFO"
     elif depth > 32:
@@ -3286,21 +3307,37 @@ def determine_fifo_type(depth):
         return "Common_Clock_Shift_Register"
 
 def fill_and_append_fifo_tcl(data_types, template, output_file_generate_tcl):
-    """
-    Fills the TCL template with given configurations and appends to a file.
-    """
     for data_type, configs in data_types.items():
         for config in configs:
             width = config["width"]
             for conf in config["configurations"]:
                 depth = conf["depth"]
-                full_threshold = conf["full_threshold"]
+                prog_full = conf["prog_full"]  # Use 'prog_full' as per the updated data structure
                 fifo_type = determine_fifo_type(depth)
-                module_name = f"fifo_generator_ip_{width}x{depth}x{full_threshold}_{fifo_type.lower().replace('_', '')}"
+                # Generate a unique identifier for each FIFO configuration
+                fifo_id = f"{width}_{depth}_{prog_full}_{fifo_type}"
+
+                # Check if the FIFO has already been generated
+                if fifo_id in generated_fifos:
+                    # print(f"Skipping generation for FIFO with ID: {fifo_id} (Already generated)")
+                    continue
+                
+                module_name = f"fifo_generator_ip_{width}x{depth}x{prog_full}_{fifo_type.lower().replace('_', '')}"
+                # Mark this FIFO configuration as generated
+                generated_fifos.add(fifo_id)
+                # During FIFO generation tracking, add details like this:
+                generated_reference_fifos.append({
+                    "module_name": module_name,
+                    "width": width,
+                    "depth": depth,
+                    "prog_full": prog_full,
+                    "fifo_type": fifo_type
+                })
+
                 filled_template = template.format(
                     width=width,
                     depth=depth,
-                    full_threshold=full_threshold,
+                    full_threshold=prog_full,  # Use 'prog_full' for 'Full_Threshold_Assert_Value'
                     fifo_type=fifo_type,
                     module_name=module_name
                 )
@@ -3308,12 +3345,13 @@ def fill_and_append_fifo_tcl(data_types, template, output_file_generate_tcl):
                 with open(output_file_generate_tcl, "a") as file:
                     file.write(filled_template + "\n\n")
 
+
 # TCL template with placeholders for formatting
 fill_fifo_tcl_template_post = """
 # ----------------------------------------------------------------------------
 # Generate FIFO
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO Width: {width}  Depth: {depth} Prog : {full_threshold} {fifo_type}]"
+puts "[color 2 "                        Generate FIFO Width: {width}  Depth: {depth} Prog : {full_threshold} {fifo_type}"]"
 
 set module_name {module_name}
 create_ip -name fifo_generator          \\
@@ -3344,7 +3382,139 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 """
 
 # Execute the function with the defined data types and the template
-# fill_and_append_fifo_tcl(data_types, fill_fifo_tcl_template_post, output_file_generate_m_axi_vip_tcl)
+fill_and_append_fifo_tcl(data_types_pr_engine_packet, fill_fifo_tcl_template_post, output_file_generate_m_axi_vip_tcl)
+
+# ----------------------------------------------------------------------------
+# generate fill_fifo_wrapper_topology
+# ----------------------------------------------------------------------------
+fill_fifo_wrapper_topology = []
+
+fifo_template_pre = """
+generate
+"""
+fifo_template_mid = """
+  if((READ_MODE == "std") && (READ_DATA_WIDTH == {width}) && (FIFO_WRITE_DEPTH == {depth}) && (READ_DATA_WIDTH == {depth}) && (PROG_THRESH == {full_threshold})) begin
+    {module_name} {module_name}_inst (
+      .clk        (clk        ),
+      .srst       (srst       ),
+      .din        (din        ),
+      .wr_en      (wr_en      ),
+      .rd_en      (rd_en      ),
+      .dout       (dout       ),
+      .full       (full       ),
+      .empty      (empty      ),
+      .valid      (valid      ),
+      .prog_full  (prog_full  ),
+      .wr_rst_busy(wr_rst_busy),
+      .rd_rst_busy(rd_rst_busy)
+    );
+end else
+"""
+fifo_template_default = """
+ begin
+    // xpm_fifo_sync: Synchronous FIFO
+    // Xilinx Parameterized Macro
+    xpm_fifo_sync #(
+      .FIFO_MEMORY_TYPE   ("auto"                        ), //string; "auto", "block", "distributed", or "ultra";
+      .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
+      .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH              ), //positive integer
+      .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH              ), //positive integer
+      .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
+      .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
+      .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
+      .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
+      .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
+      .FIFO_READ_LATENCY  (1                             ), //positive integer;
+      .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
+      .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
+      .PROG_EMPTY_THRESH  (PROG_THRESH                   ), //positive integer
+      .DOUT_RESET_VALUE   ("0"                           ), //string
+      .WAKEUP_TIME        (0                             )  //positive integer; 0 or 2;
+    ) xpm_fifo_sync_inst (
+      .sleep        (1'b0       ),
+      .rst          (srst       ),
+      .wr_clk       (clk        ),
+      .wr_en        (wr_en      ),
+      .din          (din        ),
+      .full         (full       ),
+      .overflow     (           ),
+      .prog_full    (prog_full  ),
+      .wr_data_count(           ),
+      .almost_full  (           ),
+      .wr_ack       (           ),
+      .wr_rst_busy  (wr_rst_busy),
+      .rd_en        (rd_en      ),
+      .dout         (dout       ),
+      .empty        (empty      ),
+      .prog_empty   (           ),
+      .rd_data_count(           ),
+      .almost_empty (           ),
+      .data_valid   (valid      ),
+      .underflow    (           ),
+      .rd_rst_busy  (rd_rst_busy),
+      .injectsbiterr(1'b0       ),
+      .injectdbiterr(1'b0       ),
+      .sbiterr      (           ),
+      .dbiterr      (           )
+    );
+    // End of xpm_fifo_sync instance declaration
+  end
+endgenerate"""
+
+fill_fifo_wrapper_topology.append(fifo_template_pre)
+# Generate the instantiation code for each engine and append it to the list
+for fifo_config in generated_reference_fifos:
+    filled_fifo_wrapper_topology = fifo_template_mid.format(
+        width=fifo_config["width"],
+        depth=fifo_config["depth"],
+        full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
+        module_name=fifo_config["module_name"]
+    )
+    fill_fifo_wrapper_topology.append(filled_fifo_wrapper_topology)
+
+fill_fifo_wrapper_topology.append(fifo_template_default)
+
+# Write the accumulated VHDL code to the specified output file
+with open(output_file_fifo_wrapper_topology, 'w') as vh_file:
+    vh_file.write('\n'.join(fill_fifo_wrapper_topology))
+
+# ----------------------------------------------------------------------------
+# generate fill_fifo_wrapper_topology lib
+# ----------------------------------------------------------------------------
+# {0}/{1}/hdl/fifo_generator_v13_2_vhsyn_rfs.vhd
+# {0}/{1}/hdl/blk_mem_gen_v8_4_vhsyn_rfs.vhd
+fill_fifo_filelist_xsim_ip_vhdl_template="""
+{0}/{1}/hdl/fifo_generator_v13_2_rfs.vhd
+   """
+
+fill_fifo_filelist_xsim_ip_v_pre= """
+{0}/{1}/hdl/fifo_generator_v13_2_rfs.v
+{0}/{1}/simulation/fifo_generator_vlog_beh.v
+"""
+fill_fifo_filelist_xsim_ip_v_template = """
+{0}/{1}/sim/{2}.v
+"""
+# Accumulator for the file paths
+fill_fifo_filelist_xsim_ip_v = []
+fill_fifo_filelist_xsim_ip_vhdl = []
+
+first_fifo_config = generated_reference_fifos[0]
+fill_fifo_filelist_xsim_ip_v.append(fill_fifo_filelist_xsim_ip_v_pre.format(output_folder_path_vip,first_fifo_config["module_name"]))
+fill_fifo_filelist_xsim_ip_vhdl.append(fill_fifo_filelist_xsim_ip_vhdl_template.format(output_folder_path_vip,first_fifo_config["module_name"]))
+for fifo_config in generated_reference_fifos:
+    module_name = fifo_config["module_name"]
+    paths = fill_fifo_filelist_xsim_ip_v_template.format(
+        output_folder_path_vip,
+        module_name,
+        module_name
+    )
+    # Append the generated paths to the accumulator
+    fill_fifo_filelist_xsim_ip_v.append(paths)
+
+# Combine all generated paths into a single string
+fill_fifo_filelist_xsim_ip_v = ''.join(fill_fifo_filelist_xsim_ip_v)
+fill_fifo_filelist_xsim_ip_vhdl = ''.join(fill_fifo_filelist_xsim_ip_vhdl)
+
 
 # ----------------------------------------------------------------------------
 # generate axi vip project files
@@ -3359,11 +3529,6 @@ with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}.vhd
 {5}/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}/sim/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}.vhd
   """
-    fill_fifo_filelist_xsim_ip_vhdl_template="""
-{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_rfs.vhd
-{5}/fifo_generator_ip_107x32x16_distributed/hdl/blk_mem_gen_v8_4_vhsyn_rfs.vhd
-{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_vhsyn_rfs.vhd
-   """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(index==0):
@@ -3371,6 +3536,7 @@ with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
         output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
 
     output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+    output_lines.append(fill_fifo_filelist_xsim_ip_vhdl)
     file.write('\n'.join(output_lines))
 
 
@@ -3409,21 +3575,14 @@ with open(output_file_filelist_xsim_ip_v_f, "w") as file:
     fill_file_filelist_xsim_ip_v_template_axi_lite="""
 {5}/m{0:02d}_axi_lite_register_slice_mid_64x17/sim/m{0:02d}_axi_lite_register_slice_mid_64x17.v
    """
-
-    fill_fifo_filelist_xsim_ip_v_template="""
-{5}/fifo_generator_ip_107x32x16_distributed/hdl/fifo_generator_v13_2_rfs.v
-{5}/fifo_generator_ip_107x32x16_distributed/simulation/fifo_generator_vlog_beh.v
-{5}/fifo_generator_ip_107x32x16_distributed/sim/fifo_generator_ip_107x32x16_distributed.v
-   """
-
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if(index==0):
             output_lines.append(fill_file_filelist_xsim_ip_v_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         if(int(CACHE_CONFIG_L2_CTRL[index])):
             output_lines.append(fill_file_filelist_xsim_ip_v_template_axi_lite.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
         output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-    
-    output_lines.append(fill_fifo_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+   
+    output_lines.append(fill_fifo_filelist_xsim_ip_v)
     output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
     
     file.write('\n'.join(output_lines))
@@ -7541,3 +7700,76 @@ fill_engine_template_topology.append("    endcase\nendgenerate")
 # Write the accumulated VHDL code to the specified output file
 with open(output_file_engine_template_topology, 'w') as vh_file:
     vh_file.write('\n'.join(fill_engine_template_topology))
+
+
+engine_template_pre = """
+generate
+"""
+engine_template_mid = """
+  if((READ_MODE == "std") && (READ_DATA_WIDTH == 107) && (FIFO_WRITE_DEPTH == 32) && (READ_DATA_WIDTH == 32) && (PROG_THRESH == 16) && (FIFO_MEMORY_TYPE == "distributed")) begin
+    fifo_generator_ip_107x32x16_distributed fifo_generator_ip_107x32x16_distributed_inst (
+      .clk        (clk        ),
+      .srst       (srst       ),
+      .din        (din        ),
+      .wr_en      (wr_en      ),
+      .rd_en      (rd_en      ),
+      .dout       (dout       ),
+      .full       (full       ),
+      .empty      (empty      ),
+      .valid      (valid      ),
+      .prog_full  (prog_full  ),
+      .wr_rst_busy(wr_rst_busy),
+      .rd_rst_busy(rd_rst_busy)
+    );
+end else
+"""
+engine_template_default = """
+ begin
+    // xpm_fifo_sync: Synchronous FIFO
+    // Xilinx Parameterized Macro
+    xpm_fifo_sync #(
+      .FIFO_MEMORY_TYPE   ("distributed"                        ), //string; "auto", "block", "distributed", or "ultra";
+      .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
+      .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH              ), //positive integer
+      .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH              ), //positive integer
+      .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
+      .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
+      .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
+      .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
+      .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
+      .FIFO_READ_LATENCY  (1                             ), //positive integer;
+      .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
+      .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
+      .PROG_EMPTY_THRESH  (PROG_THRESH                   ), //positive integer
+      .DOUT_RESET_VALUE   ("0"                           ), //string
+      .WAKEUP_TIME        (0                             )  //positive integer; 0 or 2;
+    ) xpm_fifo_sync_inst (
+      .sleep        (1'b0       ),
+      .rst          (srst       ),
+      .wr_clk       (clk        ),
+      .wr_en        (wr_en      ),
+      .din          (din        ),
+      .full         (full       ),
+      .overflow     (           ),
+      .prog_full    (prog_full  ),
+      .wr_data_count(           ),
+      .almost_full  (           ),
+      .wr_ack       (           ),
+      .wr_rst_busy  (wr_rst_busy),
+      .rd_en        (rd_en      ),
+      .dout         (dout       ),
+      .empty        (empty      ),
+      .prog_empty   (           ),
+      .rd_data_count(           ),
+      .almost_empty (           ),
+      .data_valid   (valid      ),
+      .underflow    (           ),
+      .rd_rst_busy  (rd_rst_busy),
+      .injectsbiterr(1'b0       ),
+      .injectdbiterr(1'b0       ),
+      .sbiterr      (           ),
+      .dbiterr      (           )
+    );
+    // End of xpm_fifo_sync instance declaration
+  end
+endgenerate"""
