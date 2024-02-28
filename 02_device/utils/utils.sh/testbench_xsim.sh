@@ -89,8 +89,8 @@ echo "MSG: xvlog_files_f   file : ${xvlog_files}"
 echo "MSG: xvlog_include_f file : ${xvlog_include}"
 
 xvhdl_opts="--incr --relax -L uvm -L xilinx_vip -L system_cache_v5_0_9 ${xvhdl_files}"
-xvlog_opts="--incr --relax -L uvm -L xilinx_vip --sv ${xvlog_include} ${xvlog_files}"
-xelab_opts="--incr --relax -L uvm -L xilinx_vip -L xpm -L xil_defaultlib -debug typical -L xpm -L system_cache_v5_0_9 -L unisims_ver --mt auto -L axi_infrastructure_v1_1_0 -L axi_vip_v1_1_14 "
+xvlog_opts="--incr --relax -L uvm -L xilinx_vip -L axi_vip_v1_1_15 --sv ${xvlog_include} ${xvlog_files}"
+xelab_opts="--incr --relax -L uvm -L xilinx_vip -L xpm -L xil_defaultlib -debug typical -L fifo_generator_v13_2_9 -L unisims_ver -L unimacro_ver -L secureip -L xpm -L system_cache_v5_0_10 -L unisims_ver --mt auto -L axi_infrastructure_v1_1_0 -L axi_vip_v1_1_15 -L axi_register_slice_v2_1_29"
 xsim_opts="-tclbatch ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/cmd_xsim.tcl --wdb work.${KERNEL_NAME}_testbench.wdb work.${KERNEL_NAME}_testbench#work.glbl"
 # Script info
 echo -e "MSG: ${KERNEL_NAME}_testbench_xsim.sh - (Vivado v2023.1 ML (64-bit)-id)\n"
