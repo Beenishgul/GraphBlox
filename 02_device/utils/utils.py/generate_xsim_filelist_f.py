@@ -108,43 +108,81 @@ def main(params_sh_dir):
     open(cfg_file_name_vh, 'w').close()
     open(cfg_file_name_vhdl, 'w').close()
     
+    # configs = {
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, pkgs) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache, iob_include) + "/": "vh",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram, memory_sram_include) + "/": "svh",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_include) + "/": "vh",
+
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_arbiter) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_slice) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_counter) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_fifo) + "/": "sv",
+
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache) + "/": "v",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram) + "/": "sv",
+
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, bundle) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, cu) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, lane) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, control) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, kernel) + "/": "sv",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, top) + "/": "v",
+    #     os.path.join(app_dir_active, ip_dir_rtl_active, testbench, testbench_module) + "/": "sv",
+    # }
+
+
+    # # Generate file lists based on configuration
+    # for path, extension in configs.items():
+    #     if extension == "sv":
+    #         cfg_file = cfg_file_name_sv
+    #     elif extension == "v":
+    #         cfg_file = cfg_file_name_v
+    #     elif extension == "svh" or extension == "vh":
+    #         cfg_file = cfg_file_name_vh
+    #     elif  extension == "vhdl":  # Assuming svh files go into vhdl list for this example
+    #         cfg_file = cfg_file_name_vhdl
+    #     else:
+    #         continue  # Skip if extension is not recognized
+    #     generate_package_filelist(path, cfg_file, extension)
+    
     configs = {
-        os.path.join(app_dir_active, ip_dir_rtl_active, pkgs) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache, iob_include) + "/": "vh",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram, memory_sram_include) + "/": "svh",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_include) + "/": "vh",
+        os.path.join(app_dir_active, ip_dir_rtl_active, pkgs) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache, iob_include) + "/": ["vh"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram, memory_sram_include) + "/": ["svh"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_include) + "/": ["vh"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_arbiter) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_slice) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_counter) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_fifo) + "/": "sv",
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_arbiter) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_slice) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_counter) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_fifo) + "/": ["v" ,"sv"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache) + "/": "v",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram) + "/": "sv",
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache) + "/": ["v"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram) + "/": ["sv"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, bundle) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, cu) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, lane) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, control) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, kernel) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, top) + "/": "v",
-        os.path.join(app_dir_active, ip_dir_rtl_active, testbench, testbench_module) + "/": "sv",
+        os.path.join(app_dir_active, ip_dir_rtl_active, bundle) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, cu) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, lane) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, control) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, kernel) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, top) + "/": ["v"],
+         os.path.join(app_dir_active, ip_dir_rtl_active, testbench, testbench_module) + "/": ["sv"],
     }
 
-
-    # Generate file lists based on configuration
-    for path, extension in configs.items():
-        if extension == "sv":
-            cfg_file = cfg_file_name_sv
-        elif extension == "v":
-            cfg_file = cfg_file_name_v
-        elif extension == "svh" or extension == "vh":
-            cfg_file = cfg_file_name_vh
-        elif  extension == "vhdl":  # Assuming svh files go into vhdl list for this example
-            cfg_file = cfg_file_name_vhdl
-        else:
-            continue  # Skip if extension is not recognized
-        generate_package_filelist(path, cfg_file, extension)
+    for path, extensions in configs.items():
+        for extension in extensions:
+            # Decide the configuration file based on the extension
+            if extension == "sv":
+                cfg_file = cfg_file_name_sv
+            elif extension == "v":
+                cfg_file = cfg_file_name_v
+            elif extension == "svh" or extension == "vh":
+                cfg_file = cfg_file_name_vh
+            elif  extension == "vhdl":  # Assuming svh files go into vhdl list for this example
+                cfg_file = cfg_file_name_vhdl
+            else:
+                continue  # Skip if extension is not recognized
+            generate_package_filelist(path, cfg_file, extension)
     
     # Engine directories processing (example)
     # engine_dirs = [

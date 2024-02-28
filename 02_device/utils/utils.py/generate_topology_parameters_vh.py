@@ -3213,6 +3213,139 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
     output_lines.append(fill_fifo_tcl_template_post.format(channel))
     file.write('\n'.join(output_lines))
 
+
+# ----------------------------------------------------------------------------
+# generate axi fifo project files
+# ----------------------------------------------------------------------------
+
+# Define the data types and their configurations
+data_types_pr = {
+    "ALUOpsConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "CacheRequestPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "ControlPacketPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "CSRIndexConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "EnginePacketFullPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "EnginePacketPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "FilterCondConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "MemoryPacketRequestPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "MemoryPacketResponsePayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "MergeDataConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "ParallelReadWriteConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "ReadWriteConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ],
+    "SetOpsConfigurationPayload": [
+        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 32}, {"depth": 256, "prog_full": 128}]},
+        {"width": 64, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 128, "prog_full": 64}, {"depth": 512, "prog_full": 256}]}
+    ]
+}
+
+def determine_fifo_type(depth):
+    """
+    Determines the FIFO type based on depth.
+    """
+    if depth > 128:
+        return "Common_Clock_Builtin_FIFO"
+    elif depth > 32:
+        return "Common_Clock_Distributed_RAM"
+    else:
+        return "Common_Clock_Shift_Register"
+
+def fill_and_append_fifo_tcl(data_types, template, output_file_generate_tcl):
+    """
+    Fills the TCL template with given configurations and appends to a file.
+    """
+    for data_type, configs in data_types.items():
+        for config in configs:
+            width = config["width"]
+            for conf in config["configurations"]:
+                depth = conf["depth"]
+                full_threshold = conf["full_threshold"]
+                fifo_type = determine_fifo_type(depth)
+                module_name = f"fifo_generator_ip_{width}x{depth}x{full_threshold}_{fifo_type.lower().replace('_', '')}"
+                filled_template = template.format(
+                    width=width,
+                    depth=depth,
+                    full_threshold=full_threshold,
+                    fifo_type=fifo_type,
+                    module_name=module_name
+                )
+                # Append filled template to a file
+                with open(output_file_generate_tcl, "a") as file:
+                    file.write(filled_template + "\n\n")
+
+# TCL template with placeholders for formatting
+fill_fifo_tcl_template_post = """
+# ----------------------------------------------------------------------------
+# Generate FIFO
+# ----------------------------------------------------------------------------
+puts "[color 2 "                        Generate FIFO Width: {width}  Depth: {depth} Prog : {full_threshold} {fifo_type}]"
+
+set module_name {module_name}
+create_ip -name fifo_generator          \\
+          -vendor xilinx.com            \\
+          -library ip                   \\
+          -version 13.*                 \\
+          -module_name ${{module_name}}   >> $log_file
+          
+set_property -dict [list \\
+                      CONFIG.Fifo_Implementation {{{fifo_type}}} \\
+                      CONFIG.Input_Data_Width {{{width}}} \\
+                      CONFIG.Input_Depth {{{depth}}} \\
+                      CONFIG.Performance_Options {{Standard_FIFO}} \\
+                      CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
+                      CONFIG.Full_Threshold_Assert_Value {{{full_threshold}}} \\
+                      CONFIG.Valid_Flag {{true}} \\
+                    ] [get_ips ${{module_name}}]
+
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+"""
+
+# Execute the function with the defined data types and the template
+# fill_and_append_fifo_tcl(data_types, fill_fifo_tcl_template_post, output_file_generate_m_axi_vip_tcl)
+
 # ----------------------------------------------------------------------------
 # generate axi vip project files
 # ----------------------------------------------------------------------------

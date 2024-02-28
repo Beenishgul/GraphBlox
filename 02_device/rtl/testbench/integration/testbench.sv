@@ -92,6 +92,23 @@ endfunction
 
 endclass
 
+    // Function to print sizes of data types
+    function void printDataTypeSizes();
+        $display("Size (bits) ALUOpsConfigurationPayload: %0d ", $bits(ALUOpsConfigurationPayload));
+        $display("Size (bits) CacheRequestPayload: %0d ", $bits(CacheRequestPayload));
+        $display("Size (bits) ControlPacketPayload: %0d ", $bits(ControlPacketPayload));
+        $display("Size (bits) CSRIndexConfigurationPayload: %0d ", $bits(CSRIndexConfigurationPayload));
+        $display("Size (bits) EnginePacketFullPayload: %0d ", $bits(EnginePacketFullPayload));
+        $display("Size (bits) EnginePacketPayload: %0d ", $bits(EnginePacketPayload));
+        $display("Size (bits) FilterCondConfigurationPayload: %0d ", $bits(FilterCondConfigurationPayload));
+        $display("Size (bits) MemoryPacketRequestPayload: %0d ", $bits(MemoryPacketRequestPayload));
+        $display("Size (bits) MemoryPacketResponsePayload: %0d ", $bits(MemoryPacketResponsePayload));
+        $display("Size (bits) MergeDataConfigurationPayload: %0d ", $bits(MergeDataConfigurationPayload));
+        $display("Size (bits) ParallelReadWriteConfigurationPayload: %0d ", $bits(ParallelReadWriteConfigurationPayload));
+        $display("Size (bits) ReadWriteConfigurationPayload: %0d ", $bits(ReadWriteConfigurationPayload));
+        $display("Size (bits) SetOpsConfigurationPayload: %0d ", $bits(SetOpsConfigurationPayload));
+    endfunction
+
     class __KERNEL__xrtBufferHandlePerKernel;
 
         integer num_buffers;
@@ -1080,7 +1097,7 @@ module __KERNEL___testbench ();
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
             bit choose_pressure_type = 0;
-        bit         axis_choose_pressure_type = 0;
+        bit axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
 
         GraphCSR graph;
@@ -1735,6 +1752,7 @@ module __KERNEL___testbench ();
                 $display( "Test completed successfully");
             end
 
+            printDataTypeSizes();
             #1000  $finish;
 
         end
