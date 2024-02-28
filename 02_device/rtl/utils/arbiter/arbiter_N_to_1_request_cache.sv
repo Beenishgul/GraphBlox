@@ -193,7 +193,7 @@ generate
 
     // Pop
     assign fifo_request_arbiter_in_signals_in_int[i].rd_en = ~fifo_request_arbiter_in_signals_out_int[i].empty & arbiter_grant[i];
-    assign request_arbiter_in_int[i].valid                 = fifo_request_arbiter_in_signals_out_int[i].valid & fifo_request_arbiter_in_signals_in_int[i].rd_en;
+    assign request_arbiter_in_int[i].valid                 = fifo_request_arbiter_in_signals_out_int[i].valid;
     assign request_arbiter_in_int[i].payload               = fifo_request_arbiter_in_dout[i];
 
     xpm_fifo_sync_wrapper #(
@@ -232,7 +232,7 @@ assign fifo_request_din                  = fifo_request_din_reg.payload;
 
 // Pop
 assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-assign request_out_int.valid             = fifo_request_signals_out_int.valid & fifo_request_signals_in_int.rd_en;
+assign request_out_int.valid             = fifo_request_signals_out_int.valid;
 assign request_out_int.payload           = fifo_request_dout;
 
 xpm_fifo_sync_wrapper #(

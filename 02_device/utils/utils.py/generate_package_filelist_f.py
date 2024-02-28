@@ -102,31 +102,32 @@ def main(params_sh_dir):
     open(cfg_file_name_vh, 'w').close()
     
     configs = {
-        os.path.join(app_dir_active, ip_dir_rtl_active, pkgs) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache, iob_include) + "/": "vh",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram, memory_sram_include) + "/": "svh",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_include) + "/": "vh",
+        os.path.join(app_dir_active, ip_dir_rtl_active, pkgs) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache, iob_include) + "/": ["vh"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram, memory_sram_include) + "/": ["svh"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_include) + "/": ["vh"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_arbiter) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_slice) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_counter) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_fifo) + "/": "sv",
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_arbiter) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_slice) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_counter) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, utils, utils_fifo) + "/": ["v" ,"sv"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache) + "/": "v",
-        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram) + "/": "sv",
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_cache) + "/": ["v"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, memory, memory_sram) + "/": ["sv"],
 
-        os.path.join(app_dir_active, ip_dir_rtl_active, bundle) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, cu) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, lane) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, control) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, kernel) + "/": "sv",
-        os.path.join(app_dir_active, ip_dir_rtl_active, top) + "/": "v",
+        os.path.join(app_dir_active, ip_dir_rtl_active, bundle) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, cu) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, lane) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, control) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, kernel) + "/": ["sv"],
+        os.path.join(app_dir_active, ip_dir_rtl_active, top) + "/": ["v"],
     }
 
-    # Generate file lists based on configuration
-    for path, extension in configs.items():
-        cfg_file = cfg_file_name if extension in ["sv", "v"] else cfg_file_name_vh
-        generate_package_filelist(path, cfg_file, extension)
+    for path, extensions in configs.items():
+        for extension in extensions:
+            # Decide the configuration file based on the extension
+            cfg_file = cfg_file_name if extension in ["sv", "v"] else cfg_file_name_vh
+            generate_package_filelist(path, cfg_file, extension)
     
     # Engine directories processing (example)
     # engine_dirs = [
