@@ -3583,6 +3583,7 @@ if XPM_FIFO_ENABLE == "0":
     # Generate the instantiation code for each engine and append it to the list
     for fifo_config in generated_reference_fifos:
         fifo_count += 1;
+        fifo_threshold = fifo_config["depth"]-fifo_config["prog_full"]
         filled_template = fill_fifo_tcl_template_post.format(
             fifo_count = fifo_count,
             total_fifo_count = total_fifo_count,
@@ -3591,7 +3592,7 @@ if XPM_FIFO_ENABLE == "0":
             fifo_mem_type=fifo_config["fifo_mem_type"],
             width=fifo_config["width"],
             depth=fifo_config["depth"],
-            full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
+            full_threshold=fifo_threshold,  # Use 'prog_full' for 'PROG_THRESH'
             module_name=fifo_config["module_name"],
             reg_embed=fifo_config["reg_embed"],
         )
