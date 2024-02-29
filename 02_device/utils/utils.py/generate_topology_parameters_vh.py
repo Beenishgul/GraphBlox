@@ -5,6 +5,7 @@ import sys
 import os
 import ast
 import json
+import math
 from datetime import datetime
 
 # Validate the number of arguments
@@ -229,6 +230,8 @@ engine_properties = config_data["engine_properties"]
 # fifo_control_request  = config_data["fifo_control_request"]
 # fifo_memory   = config_data["fifo_memory"]
 # fifo_engine   = config_data["fifo_engine"]
+
+XPM_FIFO_ENABLE = cu_properties["xpm_fifo"]
 
 def recreate_data_structures_from_columns(engine_properties, categories_order):
     """
@@ -1037,6 +1040,8 @@ with open(output_file_path_global, "w") as file:
     for buffer_name, properties in channels.items():
         uppercase_buffer_name = buffer_name.upper()
         file.write(f"parameter {uppercase_buffer_name}_WIDTH_BITS = {properties[1]};\n")
+
+    file.write(f"parameter XPM_FIFO_ENABLE  = {XPM_FIFO_ENABLE};\n")
     
 # Write to VHDL file
 with open(output_file_path_topology, "w") as file:
@@ -3140,41 +3145,6 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
   
  """
 
-#     fill_fifo_tcl_template_post="""
-# # ----------------------------------------------------------------------------
-# # Generate FIFO
-# # ----------------------------------------------------------------------------
-# puts "[color 2 "                        Generate FIFO Width: 107  Depth: 32 Prog : 16 Distributed_RAM"]" 
-
-# set module_name fifo_generator_ip_107x32x16_distributed
-# create_ip -name fifo_generator          \\
-#           -vendor xilinx.com            \\
-#           -library ip                   \\
-#           -version 13.*                 \\
-#           -module_name ${{module_name}}   >> $log_file
-          
-# set_property -dict [list \\
-#                       CONFIG.Fifo_Implementation {{Common_Clock_Distributed_RAM}} \\
-#                       CONFIG.Input_Data_Width {{107}} \\
-#                       CONFIG.Input_Depth {{32}} \
-#                       CONFIG.Performance_Options {{Standard_FIFO}} \\
-#                       CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
-#                       CONFIG.Full_Threshold_Assert_Value {{16}} \\
-#                       CONFIG.Valid_Flag {{true}} \\
-#                     ] [get_ips ${{module_name}}]
-
-# set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-# set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-# set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-# set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-# generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-# generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-# export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-# export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
-#     """
-
-
     CACHE_MERGE_COUNT = 0;
     CACHE_PORT_COUNT  = 0;
     CACHE_PORT_INDEX  = 0;
@@ -3212,7 +3182,6 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
             output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
         # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
     
-    # output_lines.append(fill_fifo_tcl_template_post.format(channel))
     file.write('\n'.join(output_lines))
 
 
@@ -3234,95 +3203,248 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # Size (bits) ReadWriteConfigurationPayload: 176 
 # Size (bits) SetOpsConfigurationPayload: 8 
 
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
-# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY
-# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE
-# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
-# CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
-# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY  
-# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE 
-# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE 
-# CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST 
+# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY) MemoryPacketRequestPayload width
+# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE) EnginePacketPayload width
+# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE) ControlPacketPayload width
+# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST) ControlPacketPayload width
+# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY) MemoryPacketRequestPayload width
+# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE) EnginePacketPayload width
+# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE) ControlPacketPayload width
+# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST) ControlPacketPayload width
+# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY ) MemoryPacketRequestPayload width
+# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE ) EnginePacketPayload width
+# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE ) ControlPacketPayload width
+# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST ) ControlPacketPayload width
 
-# .FIFO_ARBITER_DEPTH   (LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
-# parameter depth      = 2**$clog2(FIFO_ARBITER_DEPTH)   ,
-# parameter prog_full           = (FIFO_WRITE_DEPTH/2)            ,
+# NUM_CHANNELS_TOP MemoryPacketRequestPayload * 32
+# NUM_MEMORY_REQUESTORS = 2 MemoryPacketResponsePayload * 32
+# NUM_CHANNELS_TOP MemoryPacketResponsePayload * 32
+
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE  = NUM_CHANNELS_TOP * 32
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST   = NUM_CHANNELS_TOP * 32
+# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST  = 2 * 32
 
 # Define the data types and their configurations
 data_types_pr_engine_packet = {
     "ALUOpsConfigurationPayload": [
-        {"width": 74, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 74, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 74, "configurations": []}
     ],
     "CSRIndexConfigurationPayload": [
-        {"width": 353, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 353, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 353, "configurations": []}
     ],
     "FilterCondConfigurationPayload": [
-        {"width": 96, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 96, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 96, "configurations": []}
     ],
     "MergeDataConfigurationPayload": [
-        {"width": 8, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 8, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 8, "configurations": []}
     ],
     "ParallelReadWriteConfigurationPayload": [
-        {"width": 744, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 744, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 744, "configurations": []}
     ],
     "ReadWriteConfigurationPayload": [
-        {"width": 176, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 176, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 176, "configurations": []}
     ],
     "SetOpsConfigurationPayload": [
-        {"width": 8, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {"fifo_type": "std", "width": 8, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "fwft", "width": 8, "configurations": []}
     ],
     "CacheRequestPayload": [
-        {"width": 177, "configurations": [{"depth": 64, "prog_full": 32}]}
+        {"fifo_type": "std", "width": 177, "configurations": [{"depth": 64, "prog_full": 32}]},
+        {"fifo_type": "fwft", "width": 177, "configurations": [{"depth": 64, "prog_full": 32}]}
     ],
     "ControlPacketPayload": [
-        {"width": 26, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 27}]}
+        {"fifo_type": "std", "width": 26, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 27}]},
+        {"fifo_type": "fwft", "width": 26, "configurations": []}
     ],
     "EnginePacketFullPayload": [
-        {"width": 233, "configurations": [{"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 5}]}
+        {"fifo_type": "std", "width": 233, "configurations": [{"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 5}]},
+        {"fifo_type": "fwft", "width": 233, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "EnginePacketPayload": [
-        {"width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]}
+        {"fifo_type": "std", "width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]},
+        {"fifo_type": "fwft", "width": 170, "configurations": [{"depth": 32, "prog_full": 27}, {"depth": 64, "prog_full": 32}]}
     ],
     "MemoryPacketRequestPayload": [
-        {"width": 107, "configurations": [{"depth": 16, "prog_full": 8},  {"depth": 16, "prog_full": 12},{"depth": 32, "prog_full": 27},{"depth": 32, "prog_full": 16}]}
+        {"fifo_type": "std", "width": 107, "configurations": [{"depth": 16, "prog_full": 8},  {"depth": 16, "prog_full": 12},{"depth": 32, "prog_full": 27},{"depth": 32, "prog_full": 16}]},
+        {"fifo_type": "fwft", "width": 107, "configurations": []}
     ],
     "MemoryPacketResponsePayload": [
-        {"width": 64, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 64, "prog_full": 32}]}
+        {"fifo_type": "std", "width": 64, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 64, "prog_full": 32}]},
+        {"fifo_type": "fwft", "width": 64, "configurations": []}
+    ],
+    "MemoryStreamRequestPayload": [
+        {"fifo_type": "std", "width": 32, "configurations": []},
+        {"fifo_type": "fwft", "width": 32, "configurations": []}
     ]
-
 }
+
+def clog2(x):
+    if x > 0:
+        return math.ceil(math.log2(x))
+    else:
+        return 0
+
+def calculate_prog_full(depth):
+    return depth // 2
+
+def flatten_list(nested_list):
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flat_list.extend(flatten_list(item))  # Recursively flatten the item
+        else:
+            flat_list.append(item)
+    return flat_list
+
+def flatten_list(nested_list):
+    if isinstance(nested_list, int):  # Directly handle single integer values
+        yield nested_list
+    elif isinstance(nested_list, list):  # Handle lists and nested lists
+        for item in nested_list:
+            if isinstance(item, list):
+                yield from flatten_list(item)
+            else:
+                yield item
+
+def update_configurations(fifo_depths, data_types, data_type_key, fifo_type):
+    for depth in fifo_depths:
+        new_depth = 16  # Calculate default depth
+        new_prog_full = new_depth // 2  # Calculate new prog_full
+        if depth > 15:  # Skip if depth is zero
+            new_depth = 2 ** clog2(depth)  # Calculate new depth
+            new_prog_full = new_depth // 2  # Calculate new prog_full
+            # Ensure there's an entry for the data_type_key
+        if data_type_key not in data_types:
+            data_types[data_type_key] = []
+        # Append the new configuration
+        # data_types[data_type_key].append({"width": None, "configurations": [{"depth": new_depth, "prog_full": new_prog_full}]})
+        if "std" == fifo_type:
+            data_types[data_type_key][0]["configurations"].append({"depth": new_depth, "prog_full": new_prog_full})
+
+        if "fwft" == fifo_type:
+            data_types[data_type_key][1]["configurations"].append({"depth": new_depth, "prog_full": new_prog_full})
+
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE  = NUM_CHANNELS_TOP * 32
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST   = NUM_CHANNELS_TOP * 32
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST  = 2 * 32
+C_BURST_LEN = 32
+C_MAX_OUTSTANDING = 2
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST  = (2 ** (clog2(C_BURST_LEN*(C_MAX_OUTSTANDING+1))))
+# Flatten each configuration list into a single list
+flattened_cache_memory_response = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE))
+flattened_cache_memory_request  = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST))
+flattened_kernel_memory_request = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST))
+flattened_stream_memory_request = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST))
+
+# Update configurations for each flattened list
+update_configurations(flattened_cache_memory_response, data_types_pr_engine_packet, "MemoryPacketResponsePayload","std")
+update_configurations(flattened_cache_memory_response, data_types_pr_engine_packet, "MemoryPacketResponsePayload","fwft")
+
+update_configurations(flattened_cache_memory_request, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
+update_configurations(flattened_cache_memory_request, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+
+update_configurations(flattened_kernel_memory_request, data_types_pr_engine_packet, "MemoryPacketResponsePayload","std")
+
+update_configurations(flattened_stream_memory_request, data_types_pr_engine_packet, "MemoryStreamRequestPayload","std")
+update_configurations(flattened_stream_memory_request, data_types_pr_engine_packet, "MemoryStreamRequestPayload","fwft")
+# Flatten each configuration list into a single list
+flattened_lane_memory = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY))
+flattened_bundle_memory = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY))
+flattened_cu_memory = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY))
+
+# Update configurations for each flattened list
+update_configurations(flattened_lane_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
+update_configurations(flattened_lane_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+
+update_configurations(flattened_bundle_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
+update_configurations(flattened_bundle_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+
+update_configurations(flattened_cu_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
+update_configurations(flattened_cu_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+# Flatten each configuration list into a single list
+flattened_lane_engine = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE))
+flattened_bundle_engine = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE))
+flattened_cu_engine = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE))
+
+# Update configurations for each flattened list
+update_configurations(flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
+update_configurations(flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+
+update_configurations(flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
+update_configurations(flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+
+update_configurations(flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
+update_configurations(flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+
+# Flatten each configuration list into a single list
+flattened_lane_control_response = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
+flattened_bundle_control_response = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
+flattened_cu_control_response = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
+# Flatten each configuration list into a single list
+flattened_lane_control_request = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
+flattened_bundle_control_request = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
+flattened_cu_control_request = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
+
+# Update configurations for each flattened list
+update_configurations(flattened_lane_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
+update_configurations(flattened_bundle_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
+update_configurations(flattened_cu_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
+
+# Update configurations for each flattened list
+update_configurations(flattened_lane_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
+update_configurations(flattened_bundle_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
+update_configurations(flattened_cu_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
 
 # Tracking for generated FIFOs to avoid duplication
 generated_fifos = set()
 generated_reference_fifos = []
-def determine_fifo_type(depth):
-    if depth > 128:
+def determine_fifo_mem_type(depth, width, fifo_type):
+    if depth > 512:
         return "Common_Clock_Builtin_FIFO"
+    elif depth > 32 and width > 64:
+        return "Common_Clock_Block_RAM"
+    elif depth > 128:
+        return "Common_Clock_Block_RAM"
     elif depth > 32:
         return "Common_Clock_Distributed_RAM"
     else:
-        return "Common_Clock_Shift_Register"
+        if fifo_type == "fwft":
+            return "Common_Clock_Distributed_RAM"
+        else:
+            return "Common_Clock_Shift_Register"
 
-def fill_and_append_fifo_tcl(data_types, template, output_file_generate_tcl):
+def determine_fifo_type(fifo_type):
+    if fifo_type == "fwft":
+        return "First_Word_Fall_Through"
+    else:
+        return "Standard_FIFO"
+
+def fill_and_generate_fifo_tcl(data_types):
     for data_type, configs in data_types.items():
         for config in configs:
             width = config["width"]
+            fifo_type = config["fifo_type"]
+            fifo_perf_opt = determine_fifo_type(fifo_type)
             for conf in config["configurations"]:
                 depth = conf["depth"]
                 prog_full = conf["prog_full"]  # Use 'prog_full' as per the updated data structure
-                fifo_type = determine_fifo_type(depth)
+                fifo_mem_type = determine_fifo_mem_type(depth, width, fifo_type)
+
                 # Generate a unique identifier for each FIFO configuration
-                fifo_id = f"{width}_{depth}_{prog_full}_{fifo_type}"
+                fifo_id = f"{width}_{depth}_{prog_full}_{fifo_mem_type}_{fifo_type}"
 
                 # Check if the FIFO has already been generated
                 if fifo_id in generated_fifos:
                     # print(f"Skipping generation for FIFO with ID: {fifo_id} (Already generated)")
                     continue
                 
-                module_name = f"fifo_generator_ip_{width}x{depth}x{prog_full}_{fifo_type.lower().replace('_', '')}"
+                module_name = f"fifo_generator_ip_{width}x{depth}x{prog_full}_{fifo_mem_type.lower().replace('_', '')}_{fifo_perf_opt.lower().replace('_', '')}"
                 # Mark this FIFO configuration as generated
                 generated_fifos.add(fifo_id)
                 # During FIFO generation tracking, add details like this:
@@ -3331,27 +3453,17 @@ def fill_and_append_fifo_tcl(data_types, template, output_file_generate_tcl):
                     "width": width,
                     "depth": depth,
                     "prog_full": prog_full,
-                    "fifo_type": fifo_type
+                    "fifo_mem_type": fifo_mem_type,
+                    "fifo_type": fifo_type,
+                    "fifo_perf_opt": fifo_perf_opt,
                 })
-
-                filled_template = template.format(
-                    width=width,
-                    depth=depth,
-                    full_threshold=prog_full,  # Use 'prog_full' for 'Full_Threshold_Assert_Value'
-                    fifo_type=fifo_type,
-                    module_name=module_name
-                )
-                # Append filled template to a file
-                with open(output_file_generate_tcl, "a") as file:
-                    file.write(filled_template + "\n\n")
-
 
 # TCL template with placeholders for formatting
 fill_fifo_tcl_template_post = """
 # ----------------------------------------------------------------------------
 # Generate FIFO
 # ----------------------------------------------------------------------------
-puts "[color 2 "                        Generate FIFO Width: {width}  Depth: {depth} Prog : {full_threshold} {fifo_type}"]"
+puts "[color 2 "                        Generate ({fifo_count}/{total_fifo_count}) FIFO {fifo_perf_opt} Width: {width}  Depth: {depth} Prog_full : {full_threshold} {fifo_mem_type}"]"
 
 set module_name {module_name}
 create_ip -name fifo_generator          \\
@@ -3361,10 +3473,10 @@ create_ip -name fifo_generator          \\
           -module_name ${{module_name}}   >> $log_file
           
 set_property -dict [list \\
-                      CONFIG.Fifo_Implementation {{{fifo_type}}} \\
+                      CONFIG.Fifo_Implementation {{{fifo_mem_type}}} \\
                       CONFIG.Input_Data_Width {{{width}}} \\
                       CONFIG.Input_Depth {{{depth}}} \\
-                      CONFIG.Performance_Options {{Standard_FIFO}} \\
+                      CONFIG.Performance_Options {{{fifo_perf_opt}}} \\
                       CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
                       CONFIG.Full_Threshold_Assert_Value {{{full_threshold}}} \\
                       CONFIG.Valid_Flag {{true}} \\
@@ -3382,7 +3494,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 """
 
 # Execute the function with the defined data types and the template
-fill_and_append_fifo_tcl(data_types_pr_engine_packet, fill_fifo_tcl_template_post, output_file_generate_m_axi_vip_tcl)
+fill_and_generate_fifo_tcl(data_types_pr_engine_packet)
 
 # ----------------------------------------------------------------------------
 # generate fill_fifo_wrapper_topology
@@ -3393,8 +3505,8 @@ fifo_template_pre = """
 generate
 """
 fifo_template_mid = """
-  if((READ_MODE == "std") && (READ_DATA_WIDTH == {width}) && (FIFO_WRITE_DEPTH == {depth}) && (READ_DATA_WIDTH == {depth}) && (PROG_THRESH == {full_threshold})) begin
-    {module_name} {module_name}_inst (
+  if((READ_MODE == "{fifo_type}") && (READ_DATA_WIDTH == {width}) && (FIFO_WRITE_DEPTH == {depth}) && (WRITE_DATA_WIDTH == {width}) && (PROG_THRESH == {full_threshold}) && (XPM_ENABLE == 0)) begin
+    {module_name} inst_{fifo_count}_{module_name}(
       .clk        (clk        ),
       .srst       (srst       ),
       .din        (din        ),
@@ -3461,19 +3573,43 @@ fifo_template_default = """
   end
 endgenerate"""
 
-fill_fifo_wrapper_topology.append(fifo_template_pre)
-# Generate the instantiation code for each engine and append it to the list
-for fifo_config in generated_reference_fifos:
-    filled_fifo_wrapper_topology = fifo_template_mid.format(
-        width=fifo_config["width"],
-        depth=fifo_config["depth"],
-        full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
-        module_name=fifo_config["module_name"]
-    )
-    fill_fifo_wrapper_topology.append(filled_fifo_wrapper_topology)
+fifo_count = 0
+fill_fifo_wrapper_topology.append(fifo_template_pre)        
+if XPM_FIFO_ENABLE == 0:
+    fifo_count = 0
+    total_fifo_count = len(generated_reference_fifos)
+    # Generate the instantiation code for each engine and append it to the list
+    for fifo_config in generated_reference_fifos:
+        fifo_count += 1;
+        filled_template = fill_fifo_tcl_template_post.format(
+            fifo_count = fifo_count,
+            total_fifo_count = total_fifo_count,
+            fifo_type=fifo_config["fifo_type"],
+            fifo_perf_opt=fifo_config["fifo_perf_opt"],
+            fifo_mem_type=fifo_config["fifo_mem_type"],
+            width=fifo_config["width"],
+            depth=fifo_config["depth"],
+            full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
+            module_name=fifo_config["module_name"]
+        )
+
+        with open(output_file_generate_m_axi_vip_tcl, "a") as file:
+            file.write(filled_template + "\n\n")
+
+    # Generate the instantiation code for each engine and append it to the list
+    for fifo_config in generated_reference_fifos:
+        fifo_count += 1
+        filled_fifo_wrapper_topology = fifo_template_mid.format(
+            fifo_count = fifo_count,
+            fifo_type=fifo_config["fifo_type"],
+            width=fifo_config["width"],
+            depth=fifo_config["depth"],
+            full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
+            module_name=fifo_config["module_name"]
+        )
+        fill_fifo_wrapper_topology.append(filled_fifo_wrapper_topology)
 
 fill_fifo_wrapper_topology.append(fifo_template_default)
-
 # Write the accumulated VHDL code to the specified output file
 with open(output_file_fifo_wrapper_topology, 'w') as vh_file:
     vh_file.write('\n'.join(fill_fifo_wrapper_topology))
@@ -3498,18 +3634,19 @@ fill_fifo_filelist_xsim_ip_v_template = """
 fill_fifo_filelist_xsim_ip_v = []
 fill_fifo_filelist_xsim_ip_vhdl = []
 
-first_fifo_config = generated_reference_fifos[0]
-fill_fifo_filelist_xsim_ip_v.append(fill_fifo_filelist_xsim_ip_v_pre.format(output_folder_path_vip,first_fifo_config["module_name"]))
-fill_fifo_filelist_xsim_ip_vhdl.append(fill_fifo_filelist_xsim_ip_vhdl_template.format(output_folder_path_vip,first_fifo_config["module_name"]))
-for fifo_config in generated_reference_fifos:
-    module_name = fifo_config["module_name"]
-    paths = fill_fifo_filelist_xsim_ip_v_template.format(
-        output_folder_path_vip,
-        module_name,
-        module_name
-    )
-    # Append the generated paths to the accumulator
-    fill_fifo_filelist_xsim_ip_v.append(paths)
+if XPM_FIFO_ENABLE == 0:
+    first_fifo_config = generated_reference_fifos[0]
+    fill_fifo_filelist_xsim_ip_v.append(fill_fifo_filelist_xsim_ip_v_pre.format(output_folder_path_vip,first_fifo_config["module_name"]))
+    fill_fifo_filelist_xsim_ip_vhdl.append(fill_fifo_filelist_xsim_ip_vhdl_template.format(output_folder_path_vip,first_fifo_config["module_name"]))
+    for fifo_config in generated_reference_fifos:
+        module_name = fifo_config["module_name"]
+        paths = fill_fifo_filelist_xsim_ip_v_template.format(
+            output_folder_path_vip,
+            module_name,
+            module_name
+        )
+        # Append the generated paths to the accumulator
+        fill_fifo_filelist_xsim_ip_v.append(paths)
 
 # Combine all generated paths into a single string
 fill_fifo_filelist_xsim_ip_v = ''.join(fill_fifo_filelist_xsim_ip_v)

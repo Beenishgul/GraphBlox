@@ -276,7 +276,7 @@ generate
         .FIFO_WRITE_DEPTH(LP_FIFO_DEPTH),
         .WRITE_DATA_WIDTH(C_DATA_WIDTH ),
         .READ_DATA_WIDTH (C_DATA_WIDTH ),
-        .PROG_THRESH     (C_BURST_LEN-2),
+        .PROG_THRESH     (LP_FIFO_DEPTH/2),
         .READ_MODE       ("fwft"       )
       ) inst_rd_xpm_fifo_sync (
         .clk        (ap_clk        ),

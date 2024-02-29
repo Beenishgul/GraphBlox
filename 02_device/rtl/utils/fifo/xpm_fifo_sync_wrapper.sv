@@ -14,11 +14,12 @@
 `include "global_package.vh"
 
 module xpm_fifo_sync_wrapper #(
-  parameter FIFO_WRITE_DEPTH = 16   ,
-  parameter WRITE_DATA_WIDTH = 32   ,
-  parameter READ_DATA_WIDTH  = 32   ,
-  parameter PROG_THRESH      = 6    ,
-  parameter READ_MODE        = "std",
+  parameter FIFO_WRITE_DEPTH = 16             ,
+  parameter WRITE_DATA_WIDTH = 32             ,
+  parameter READ_DATA_WIDTH  = 32             ,
+  parameter PROG_THRESH      = 6              ,
+  parameter XPM_ENABLE       = XPM_FIFO_ENABLE,
+  parameter READ_MODE        = "std"          ,
   parameter FIFO_MEMORY_TYPE = "auto"
 ) (
   input  logic                        clk        ,
