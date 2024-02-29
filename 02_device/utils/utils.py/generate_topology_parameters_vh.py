@@ -3405,19 +3405,28 @@ update_configurations(flattened_cu_control_request, data_types_pr_engine_packet,
 generated_fifos = set()
 generated_reference_fifos = []
 def determine_fifo_mem_type(depth, width, fifo_type):
-    if depth > 512:
-        return "Common_Clock_Builtin_FIFO","true"
-    elif depth > 32 and width > 64:
-        return "Common_Clock_Block_RAM","false"
-    elif depth > 128:
-        return "Common_Clock_Block_RAM","false"
-    elif depth > 32:
-        return "Common_Clock_Distributed_RAM","false"
-    else:
+    size = depth * width  # Calculate total FIFO size in bits
+    # Thresholds for decision making (in bits)
+    shift_register_threshold = 32 * 16  # Example threshold for shift registers
+    distributed_ram_threshold = 512 * 32  # Example threshold for distributed RAM
+    block_ram_threshold = 2048 * 32  # Example threshold for starting to consider BRAM over distributed RAM
+    
+    # Decision logic based on size
+    if size <= shift_register_threshold:
         if fifo_type == "fwft":
             return "Common_Clock_Distributed_RAM","false"
         else:
             return "Common_Clock_Shift_Register","false"
+    elif size <= distributed_ram_threshold:
+        return "Common_Clock_Distributed_RAM","false"
+    elif size <= block_ram_threshold:
+        if depth > 512:
+                return "Common_Clock_Builtin_FIFO","true"
+        else:
+                return "Common_Clock_Block_RAM","false"
+    else:
+        return "Built-in FIFO"  # Assume built-in FIFO for very large or specialized needs
+
 
 def determine_fifo_type(fifo_type):
     if fifo_type == "fwft":
