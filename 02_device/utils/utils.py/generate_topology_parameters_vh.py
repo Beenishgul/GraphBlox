@@ -3406,18 +3406,18 @@ generated_fifos = set()
 generated_reference_fifos = []
 def determine_fifo_mem_type(depth, width, fifo_type):
     if depth > 512:
-        return "Common_Clock_Builtin_FIFO"
+        return "Common_Clock_Builtin_FIFO","true"
     elif depth > 32 and width > 64:
-        return "Common_Clock_Block_RAM"
+        return "Common_Clock_Block_RAM","false"
     elif depth > 128:
-        return "Common_Clock_Block_RAM"
+        return "Common_Clock_Block_RAM","false"
     elif depth > 32:
-        return "Common_Clock_Distributed_RAM"
+        return "Common_Clock_Distributed_RAM","false"
     else:
         if fifo_type == "fwft":
-            return "Common_Clock_Distributed_RAM"
+            return "Common_Clock_Distributed_RAM","false"
         else:
-            return "Common_Clock_Shift_Register"
+            return "Common_Clock_Shift_Register","false"
 
 def determine_fifo_type(fifo_type):
     if fifo_type == "fwft":
@@ -3434,7 +3434,7 @@ def fill_and_generate_fifo_tcl(data_types):
             for conf in config["configurations"]:
                 depth = conf["depth"]
                 prog_full = conf["prog_full"]  # Use 'prog_full' as per the updated data structure
-                fifo_mem_type = determine_fifo_mem_type(depth, width, fifo_type)
+                fifo_mem_type, reg_embed = determine_fifo_mem_type(depth, width, fifo_type)
 
                 # Generate a unique identifier for each FIFO configuration
                 fifo_id = f"{width}_{depth}_{prog_full}_{fifo_mem_type}_{fifo_type}"
@@ -3456,6 +3456,7 @@ def fill_and_generate_fifo_tcl(data_types):
                     "fifo_mem_type": fifo_mem_type,
                     "fifo_type": fifo_type,
                     "fifo_perf_opt": fifo_perf_opt,
+                    "reg_embed": reg_embed,
                 })
 
 # TCL template with placeholders for formatting
@@ -3478,6 +3479,7 @@ set_property -dict [list \\
                       CONFIG.Input_Depth {{{depth}}} \\
                       CONFIG.Performance_Options {{{fifo_perf_opt}}} \\
                       CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
+                      CONFIG.Use_Embedded_Registers {{{reg_embed}}} \\
                       CONFIG.Full_Threshold_Assert_Value {{{full_threshold}}} \\
                       CONFIG.Valid_Flag {{true}} \\
                     ] [get_ips ${{module_name}}]
@@ -3575,7 +3577,7 @@ endgenerate"""
 
 fifo_count = 0
 fill_fifo_wrapper_topology.append(fifo_template_pre)        
-if XPM_FIFO_ENABLE == 0:
+if XPM_FIFO_ENABLE == "0":
     fifo_count = 0
     total_fifo_count = len(generated_reference_fifos)
     # Generate the instantiation code for each engine and append it to the list
@@ -3590,7 +3592,8 @@ if XPM_FIFO_ENABLE == 0:
             width=fifo_config["width"],
             depth=fifo_config["depth"],
             full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
-            module_name=fifo_config["module_name"]
+            module_name=fifo_config["module_name"],
+            reg_embed=fifo_config["reg_embed"],
         )
 
         with open(output_file_generate_m_axi_vip_tcl, "a") as file:
@@ -3634,7 +3637,7 @@ fill_fifo_filelist_xsim_ip_v_template = """
 fill_fifo_filelist_xsim_ip_v = []
 fill_fifo_filelist_xsim_ip_vhdl = []
 
-if XPM_FIFO_ENABLE == 0:
+if XPM_FIFO_ENABLE == "0":
     first_fifo_config = generated_reference_fifos[0]
     fill_fifo_filelist_xsim_ip_v.append(fill_fifo_filelist_xsim_ip_v_pre.format(output_folder_path_vip,first_fifo_config["module_name"]))
     fill_fifo_filelist_xsim_ip_vhdl.append(fill_fifo_filelist_xsim_ip_vhdl_template.format(output_folder_path_vip,first_fifo_config["module_name"]))
