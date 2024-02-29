@@ -6,21 +6,25 @@ import glob
 import shutil
 import fnmatch
 
+
 def delete_files(root_dir, gitignore_path):
-    with open(gitignore_path, 'r') as file:
+    with open(gitignore_path, "r") as file:
         exclusion_patterns = set()
-        
+
         for line in file:
             line = line.strip()
-            if line and not line.startswith('#'):
-                if line.startswith('!'):
+            if line and not line.startswith("#"):
+                if line.startswith("!"):
                     # Exclusion pattern, add it to the set
                     exclusion_patterns.add(os.path.join(root_dir, line[1:]))
                 else:
                     pattern = os.path.join(root_dir, line)
                     for file_to_delete in glob.glob(pattern, recursive=True):
                         try:
-                            if os.path.isfile(file_to_delete) and not any(fnmatch.fnmatch(file_to_delete, exclusion_pattern) for exclusion_pattern in exclusion_patterns):
+                            if os.path.isfile(file_to_delete) and not any(
+                                fnmatch.fnmatch(file_to_delete, exclusion_pattern)
+                                for exclusion_pattern in exclusion_patterns
+                            ):
                                 # print(f"Deleting file: {file_to_delete}")
                                 os.remove(file_to_delete)
                             elif os.path.isdir(file_to_delete):
@@ -28,6 +32,7 @@ def delete_files(root_dir, gitignore_path):
                                 shutil.rmtree(file_to_delete)
                         except Exception as e:
                             print(f"Error deleting {file_to_delete}: {str(e)}")
+
 
 def main():
     if len(sys.argv) != 3:
@@ -38,6 +43,7 @@ def main():
     gitignore_path = sys.argv[2]
 
     delete_files(root_dir, gitignore_path)
+
 
 if __name__ == "__main__":
     main()

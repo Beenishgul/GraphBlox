@@ -69,7 +69,7 @@ eval $(python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_ov
 python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${XILINX_VIVADO} ${FULL_SRC_IP_DIR_GEN_VIP} ${KERNEL_NAME} ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_IP_DIR_UTILS} ${FULL_SRC_IP_DIR_UTILS_TCL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} ${PAUSE_FILE_GENERATION} "include"
 # python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
 
-rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
+    rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
 rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv
 
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${pkgs}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}
@@ -107,7 +107,7 @@ if [[ "$TESTBENCH_MODULE" == "integration" ]]
 then
     newtext="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv"
     newtextvh="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/${testbench}/module_slv_m_axi_vip_func.vh"
-    
+
     search="__KERNEL__"
     replace=${KERNEL_NAME}
     if [[ $search != "" && $replace != "" ]]; then
@@ -185,7 +185,7 @@ then
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s/$search/$replace/g" $newtext
     fi
-    
+
     search="_ROOT_"
     replace=${ROOT}
     if [[ $search != "" && $replace != "" ]]; then

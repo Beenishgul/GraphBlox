@@ -5,6 +5,7 @@ import os
 import glob
 import json
 
+
 def print_usage():
     usage_text = """
 Usage: generate_rtl_synth_cfg.py <params_sh_dir>
@@ -15,16 +16,17 @@ Example:
 """
     print(usage_text)
 
+
 def load_params_from_bash(params_file_path):
     params = {}
-    with open(params_file_path, 'r') as file:
+    with open(params_file_path, "r") as file:
         for line in file:
             line = line.strip()
             # Ignore comments and empty lines
-            if line.startswith('#') or not line:
+            if line.startswith("#") or not line:
                 continue
             # Split on the first '=' to separate key and value
-            key_value = line.split('=', 1)
+            key_value = line.split("=", 1)
             if len(key_value) == 2:
                 key, value = key_value
                 key = key.strip()
@@ -32,35 +34,40 @@ def load_params_from_bash(params_file_path):
                 # Try to convert numerical values
                 if value.isdigit():
                     value = int(value)
-                elif value.replace('.', '', 1).isdigit():
+                elif value.replace(".", "", 1).isdigit():
                     value = float(value)
                 # Handle strings, assuming they do not contain spaces
                 else:
                     # Remove possible Bash export command
-                    key = key.replace('export ', '')
+                    key = key.replace("export ", "")
                     # Assuming the values are not enclosed in quotes in the Bash script
                     # If they are, you might need to strip them: value = value.strip('\'"')
                 params[key] = value
     return params
 
+
 def generate_xrt_ini(params):
 
     # Extract parameters from the loaded params
-    VIVADO_GUI_FLAG = params['VIVADO_GUI_FLAG']
-    APP_DIR_ACTIVE = params['APP_DIR_ACTIVE']
-    UTILS_DIR_ACTIVE = params['UTILS_DIR_ACTIVE']
-    KERNEL_NAME = params['KERNEL_NAME']
-    UTILS_TCL = params['UTILS_TCL']
-    XILINX_CTRL_MODE = params.get('XILINX_CTRL_MODE', 'USER_MANAGED')  # Default to USER_MANAGED if not set
+    VIVADO_GUI_FLAG = params["VIVADO_GUI_FLAG"]
+    APP_DIR_ACTIVE = params["APP_DIR_ACTIVE"]
+    UTILS_DIR_ACTIVE = params["UTILS_DIR_ACTIVE"]
+    KERNEL_NAME = params["KERNEL_NAME"]
+    UTILS_TCL = params["UTILS_TCL"]
+    XILINX_CTRL_MODE = params.get(
+        "XILINX_CTRL_MODE", "USER_MANAGED"
+    )  # Default to USER_MANAGED if not set
 
     CFG_FILE_NAME = f"{APP_DIR_ACTIVE}/{UTILS_DIR_ACTIVE}/{KERNEL_NAME}_xrt.ini"
 
     if VIVADO_GUI_FLAG == "NO":
         debug_mode = "batch"
     else:
-        debug_mode="gui"
+        debug_mode = "gui"
 
-    user_pre_sim_script = f"{APP_DIR_ACTIVE}/{UTILS_DIR_ACTIVE}/{UTILS_TCL}/cmd_xsim.tcl"
+    user_pre_sim_script = (
+        f"{APP_DIR_ACTIVE}/{UTILS_DIR_ACTIVE}/{UTILS_TCL}/cmd_xsim.tcl"
+    )
     runtime_log = "console"
 
     profile = "true"
@@ -80,8 +87,9 @@ def generate_xrt_ini(params):
         config += "\n[Runtime]\n"
         config += "exclusive_cu_context=true\n"
 
-    with open(CFG_FILE_NAME, 'w') as cfg_file:
+    with open(CFG_FILE_NAME, "w") as cfg_file:
         cfg_file.write(config)
+
 
 # Script usage and parameters loading logic
 if len(sys.argv) < 2:

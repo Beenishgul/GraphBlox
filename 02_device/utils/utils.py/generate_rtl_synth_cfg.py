@@ -5,6 +5,7 @@ import os
 import glob
 import json
 
+
 def print_usage():
     usage_text = """
 Usage: generate_rtl_synth_cfg.py <params_sh_dir>
@@ -15,16 +16,17 @@ Example:
 """
     print(usage_text)
 
+
 def load_params_from_bash(params_file_path):
     params = {}
-    with open(params_file_path, 'r') as file:
+    with open(params_file_path, "r") as file:
         for line in file:
             line = line.strip()
             # Ignore comments and empty lines
-            if line.startswith('#') or not line:
+            if line.startswith("#") or not line:
                 continue
             # Split on the first '=' to separate key and value
-            key_value = line.split('=', 1)
+            key_value = line.split("=", 1)
             if len(key_value) == 2:
                 key, value = key_value
                 key = key.strip()
@@ -32,12 +34,12 @@ def load_params_from_bash(params_file_path):
                 # Try to convert numerical values
                 if value.isdigit():
                     value = int(value)
-                elif value.replace('.', '', 1).isdigit():
+                elif value.replace(".", "", 1).isdigit():
                     value = float(value)
                 # Handle strings, assuming they do not contain spaces
                 else:
                     # Remove possible Bash export command
-                    key = key.replace('export ', '')
+                    key = key.replace("export ", "")
                     # Assuming the values are not enclosed in quotes in the Bash script
                     # If they are, you might need to strip them: value = value.strip('\'"')
                 params[key] = value
@@ -52,46 +54,79 @@ params_sh_dir = sys.argv[1]
 # Assuming params_sh_dir is a Python file with variables defined
 params = load_params_from_bash(params_sh_dir)
 
-APP_DIR_ACTIVE =  params['APP_DIR_ACTIVE']
-UTILS_DIR_ACTIVE =  params['UTILS_DIR_ACTIVE']
-KERNEL_NAME =  params['KERNEL_NAME']
-XILINX_IMPL_STRATEGY =  params['XILINX_IMPL_STRATEGY']
-XILINX_JOBS_STRATEGY =  params['XILINX_JOBS_STRATEGY']
-PART =  params['PART']
-PLATFORM =  params['PLATFORM']
-TARGET =  params['TARGET']
-XILINX_NUM_KERNELS =  params['XILINX_NUM_KERNELS']
-XILINX_MAX_THREADS =  params['XILINX_MAX_THREADS']
-DESIGN_FREQ_HZ =  params['DESIGN_FREQ_HZ']
-FULL_SRC_IP_DIR_OVERLAY =  params['FULL_SRC_IP_DIR_OVERLAY']
-ARCHITECTURE =  params['ARCHITECTURE']
-CAPABILITY =  params['CAPABILITY']
-OVERRIDE_TOPOLOGY_JSON =  params['OVERRIDE_TOPOLOGY_JSON']
+APP_DIR_ACTIVE = params["APP_DIR_ACTIVE"]
+UTILS_DIR_ACTIVE = params["UTILS_DIR_ACTIVE"]
+KERNEL_NAME = params["KERNEL_NAME"]
+XILINX_IMPL_STRATEGY = params["XILINX_IMPL_STRATEGY"]
+XILINX_JOBS_STRATEGY = params["XILINX_JOBS_STRATEGY"]
+PART = params["PART"]
+PLATFORM = params["PLATFORM"]
+TARGET = params["TARGET"]
+XILINX_NUM_KERNELS = params["XILINX_NUM_KERNELS"]
+XILINX_MAX_THREADS = params["XILINX_MAX_THREADS"]
+DESIGN_FREQ_HZ = params["DESIGN_FREQ_HZ"]
+FULL_SRC_IP_DIR_OVERLAY = params["FULL_SRC_IP_DIR_OVERLAY"]
+ARCHITECTURE = params["ARCHITECTURE"]
+CAPABILITY = params["CAPABILITY"]
+OVERRIDE_TOPOLOGY_JSON = params["OVERRIDE_TOPOLOGY_JSON"]
 DESIGN_FREQ_SCALE = "1"
 
 # Construct the full path for the file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json
 config_filename = f"{KERNEL_NAME}_{TARGET}.topology.json"
 config_file_path = os.path.join(APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, config_filename)
 
-UTILS_TCL="utils.tcl"
+UTILS_TCL = "utils.tcl"
 
-output_file_project_generate_qor_pre_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_synth.tcl")
-output_file_project_generate_qor_post_synth_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_synth.tcl")
+output_file_project_generate_qor_pre_synth_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_read_qor_pre_synth.tcl"
+)
+output_file_project_generate_qor_post_synth_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_generate_qor_post_synth.tcl"
+)
 
-output_file_project_read_qor_pre_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_opt.tcl")
-output_file_project_generate_qor_post_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_opt.tcl")
+output_file_project_read_qor_pre_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_read_qor_pre_opt.tcl"
+)
+output_file_project_generate_qor_post_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_generate_qor_post_opt.tcl"
+)
 
-output_file_project_read_qor_pre_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_place.tcl")
-output_file_project_generate_qor_post_place_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_place.tcl")
+output_file_project_read_qor_pre_place_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_read_qor_pre_place.tcl"
+)
+output_file_project_generate_qor_post_place_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_generate_qor_post_place.tcl"
+)
 
-output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_phys_opt.tcl")
-output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_phys_opt.tcl")
+output_file_project_read_qor_pre_phys_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_read_qor_pre_phys_opt.tcl"
+)
+output_file_project_generate_qor_post_phys_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE,
+    UTILS_DIR_ACTIVE,
+    UTILS_TCL,
+    "project_generate_qor_post_phys_opt.tcl",
+)
 
-output_file_project_read_qor_pre_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_route.tcl")
-output_file_project_generate_qor_post_route_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_route.tcl")
+output_file_project_read_qor_pre_route_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_read_qor_pre_route.tcl"
+)
+output_file_project_generate_qor_post_route_tcl = os.path.join(
+    APP_DIR_ACTIVE, UTILS_DIR_ACTIVE, UTILS_TCL, "project_generate_qor_post_route.tcl"
+)
 
-output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_read_qor_pre_post_route_phys_opt.tcl")
-output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(APP_DIR_ACTIVE,UTILS_DIR_ACTIVE,UTILS_TCL,"project_generate_qor_post_post_route_phys_opt.tcl")
+output_file_project_read_qor_pre_post_route_phys_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE,
+    UTILS_DIR_ACTIVE,
+    UTILS_TCL,
+    "project_read_qor_pre_post_route_phys_opt.tcl",
+)
+output_file_project_generate_qor_post_post_route_phys_opt_tcl = os.path.join(
+    APP_DIR_ACTIVE,
+    UTILS_DIR_ACTIVE,
+    UTILS_TCL,
+    "project_generate_qor_post_post_route_phys_opt.tcl",
+)
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
@@ -101,24 +136,29 @@ OVERRIDE_TOPOLOGY_JSON
 
 if not int(OVERRIDE_TOPOLOGY_JSON):
     XILINX_IMPL_STRATEGY = config_data["cu_properties"]["synth_strategy"]
-    XILINX_NUM_KERNELS   = config_data["cu_properties"]["num_kernels"]
-    DESIGN_FREQ_HZ       = config_data["cu_properties"]["frequency"]
-    DESIGN_FREQ_SCALE    = config_data["cu_properties"]["frequency_scale"]
+    XILINX_NUM_KERNELS = config_data["cu_properties"]["num_kernels"]
+    DESIGN_FREQ_HZ = config_data["cu_properties"]["frequency"]
+    DESIGN_FREQ_SCALE = config_data["cu_properties"]["frequency_scale"]
 
-XILINX_MAX_THREADS   = int(XILINX_MAX_THREADS)
+XILINX_MAX_THREADS = int(XILINX_MAX_THREADS)
 XILINX_JOBS_STRATEGY = int(XILINX_JOBS_STRATEGY)
-NUM_SLR = {"xcu55c-fsvh2892-2L-e": 3, "xcu280-fsvh2892-2L-e": 3, "xcu250-figd2104-2L-e": 4}.get(PART, 4)
+NUM_SLR = {
+    "xcu55c-fsvh2892-2L-e": 3,
+    "xcu280-fsvh2892-2L-e": 3,
+    "xcu250-figd2104-2L-e": 4,
+}.get(PART, 4)
+
 
 def get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properties):
     """
     Correctly calculates and returns the start and end channels for a given kernel based on cu_properties,
     considering the SLR index and the selected channel layout strategy, ensuring integer channel ranges.
-    
+
     Parameters:
     - kernel_idx: Index of the kernel (1-based).
     - slr_idx: Index of the SLR (0-based) the kernel is in.
     - cu_properties: Dictionary containing configuration properties.
-    
+
     Returns:
     - Tuple of (channel_start, channel_end) indicating the integer range of channels allocated to the kernel.
     """
@@ -135,10 +175,12 @@ def get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properti
     if channel_layout == "0":
         # Calculate total channels for this SLR based on percentage
         channels_for_slr = round(total_memory_channels * (slr_percent[slr_idx] / 100))
-        
+
         # Calculate start channel index based on SLR
-        previous_channels = sum(round(total_memory_channels * (p / 100)) for p in slr_percent[:slr_idx])
-        
+        previous_channels = sum(
+            round(total_memory_channels * (p / 100)) for p in slr_percent[:slr_idx]
+        )
+
         # Find kernels in this SLR
         kernels_in_slr = cu_properties["slr_mapping"].count(slr_idx)
         if kernels_in_slr > 0:
@@ -152,7 +194,7 @@ def get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properti
     elif channel_layout == "1":
         # Direct channel mapping logic here
         if kernel_idx <= len(cu_properties["channel_mapping"]):
-            channel_range = cu_properties["channel_mapping"][kernel_idx - 1].split(':')
+            channel_range = cu_properties["channel_mapping"][kernel_idx - 1].split(":")
             channel_start, channel_end = map(int, channel_range)
 
     # Adjust channel_end to not exceed total channels and ensure it's integer
@@ -161,7 +203,9 @@ def get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properti
     return channel_start, channel_end
 
 
-def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernels, num_buffers_per_kernel=10):
+def generate_kernel_and_memory_config(
+    kernel_name, config_data, part, num_kernels, num_buffers_per_kernel=10
+):
     # Define part information including SLR count and memory type
     # Extract SLR and memory configuration based on part information
     part_info = {
@@ -171,13 +215,21 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernel
     }
     memory_type, num_slrs = part_info.get(part, ("ddr", 4))
     cu_properties = config_data["cu_properties"]
-    slr_layout    = config_data["cu_properties"]["slr_layout"]
-    slr_mapping   = config_data["cu_properties"]["slr_mapping"] if slr_layout == "2" else []
-    slr_percent   = config_data["cu_properties"]["slr_percent"]
-    total_memory_channels = int(config_data["cu_properties"].get("num_channels", 32 if memory_type == "hbm" else 4))
+    slr_layout = config_data["cu_properties"]["slr_layout"]
+    slr_mapping = (
+        config_data["cu_properties"]["slr_mapping"] if slr_layout == "2" else []
+    )
+    slr_percent = config_data["cu_properties"]["slr_percent"]
+    total_memory_channels = int(
+        config_data["cu_properties"].get(
+            "num_channels", 32 if memory_type == "hbm" else 4
+        )
+    )
 
     # Calculate kernels per SLR based on percentages for interleaved distribution
-    kernels_per_slr = [round(num_kernels * (percent / 100.0)) for percent in slr_percent[:num_slrs]]
+    kernels_per_slr = [
+        round(num_kernels * (percent / 100.0)) for percent in slr_percent[:num_slrs]
+    ]
     if slr_layout == "1":  # Adjust for interleaving if total does not match num_kernels
         while sum(kernels_per_slr) < num_kernels:
             for i in range(num_slrs):
@@ -187,7 +239,9 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernel
                     break
 
     connectivity_configs = ["[connectivity]"]
-    nk_line = f"nk={kernel_name}:{num_kernels}:" + ",".join([f"{kernel_name}_{i+1}" for i in range(num_kernels)])
+    nk_line = f"nk={kernel_name}:{num_kernels}:" + ",".join(
+        [f"{kernel_name}_{i+1}" for i in range(num_kernels)]
+    )
     connectivity_configs.append(nk_line)
 
     kernel_assignments = []
@@ -232,13 +286,18 @@ def generate_kernel_and_memory_config(kernel_name, config_data, part, num_kernel
         # channel_start = (kernel_idx - 1) * (total_memory_channels // num_kernels) if memory_type == "hbm" else slr_idx
         # channel_end = kernel_idx * (total_memory_channels // num_kernels) - 1 if memory_type == "hbm" else channel_start
 
-        channel_start, channel_end =  get_channel_range_from_properties_corrected(kernel_idx, slr_idx, cu_properties)
+        channel_start, channel_end = get_channel_range_from_properties_corrected(
+            kernel_idx, slr_idx, cu_properties
+        )
 
         connectivity_configs.append(f"slr={kernel_name}_{kernel_idx}:SLR{slr_idx}")
         for buffer_idx in range(num_buffers_per_kernel):
-            connectivity_configs.append(f"sp={kernel_name}_{kernel_idx}.buffer_{buffer_idx}:{memory_type.upper()}[{channel_start}:{channel_end}]")
+            connectivity_configs.append(
+                f"sp={kernel_name}_{kernel_idx}.buffer_{buffer_idx}:{memory_type.upper()}[{channel_start}:{channel_end}]"
+            )
 
     return "\n".join(connectivity_configs)
+
 
 CFG_FILE_NAME = f"{APP_DIR_ACTIVE}/{UTILS_DIR_ACTIVE}/{KERNEL_NAME}_rtl_{TARGET}.cfg"
 
@@ -426,32 +485,35 @@ if TARGET == "hw_emu":
 # param=hw_emu.debugMode=1
 # param=hw_emu.enableProtocolChecker=1
 
-# """  
+# """
 config += "\n"
 
 if DESIGN_FREQ_SCALE == "0" or TARGET == "hw_emu":
-    config+="[clock]\n"
-    config+=f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
+    config += "[clock]\n"
+    config += f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
 
-config +=  generate_kernel_and_memory_config(KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS))
+config += generate_kernel_and_memory_config(
+    KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS)
+)
 
-config+="\n"
+config += "\n"
 # Select the appropriate configuration based on XILINX_IMPL_STRATEGY
-if XILINX_IMPL_STRATEGY == '0':
+if XILINX_IMPL_STRATEGY == "0":
     config += XILINX_IMPL_STRATEGY_0
-elif XILINX_IMPL_STRATEGY == '1':
+elif XILINX_IMPL_STRATEGY == "1":
     config += XILINX_IMPL_STRATEGY_1
-elif XILINX_IMPL_STRATEGY == '2':
+elif XILINX_IMPL_STRATEGY == "2":
     config += XILINX_IMPL_STRATEGY_2
-elif XILINX_IMPL_STRATEGY == '3':
+elif XILINX_IMPL_STRATEGY == "3":
     config += XILINX_IMPL_STRATEGY_3
-elif XILINX_IMPL_STRATEGY == '4':
+elif XILINX_IMPL_STRATEGY == "4":
     config += XILINX_IMPL_STRATEGY_4
-elif XILINX_IMPL_STRATEGY == '5':
+elif XILINX_IMPL_STRATEGY == "5":
     config += XILINX_IMPL_STRATEGY_5
 else:
     print("ERROR: Invalid XILINX_IMPL_STRATEGY")
     sys.exit(1)
+
 
 def check_and_clean_file(file_path):
     # Check if the file exists
@@ -460,6 +522,7 @@ def check_and_clean_file(file_path):
         os.remove(file_path)
         # print(f"MSG: Existing file '{file_path}' found and removed.")
 
+
 output_folder_path_cfg = os.path.join(APP_DIR_ACTIVE, UTILS_DIR_ACTIVE)
 
 if not os.path.exists(output_folder_path_cfg):
@@ -467,5 +530,5 @@ if not os.path.exists(output_folder_path_cfg):
 
 check_and_clean_file(CFG_FILE_NAME)
 
-with open(CFG_FILE_NAME, 'w') as cfg_file:
+with open(CFG_FILE_NAME, "w") as cfg_file:
     cfg_file.write(config)
