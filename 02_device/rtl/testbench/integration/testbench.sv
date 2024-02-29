@@ -1722,7 +1722,7 @@ module __KERNEL___testbench ();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
         initial begin : STIMULUS
-
+            printDataTypeSizes();
             graph = new();
 
             #200000;
@@ -1752,9 +1752,7 @@ module __KERNEL___testbench ();
                 $display( "Test completed successfully");
             end
 
-            printDataTypeSizes();
             #1000  $finish;
-
         end
 
 // Waveform dump

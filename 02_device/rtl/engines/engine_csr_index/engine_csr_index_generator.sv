@@ -232,7 +232,6 @@ module engine_csr_index_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic cmd_burst_active        ;
     logic cmd_done_packet_int     ;
-    logic cmd_done_packet_send_int;
     logic cmd_done_packet_send_reg;
 
 // --------------------------------------------------------------------------------------
@@ -452,9 +451,9 @@ module engine_csr_index_generator #(parameter
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_TRANS;
             end
             ENGINE_CSR_INDEX_GEN_PAUSE : begin
-                if(response_engine_in_break_flag_int)
+                if(response_engine_in_break_flag_reg & exit_gen_pause_int)
                     next_state = ENGINE_CSR_INDEX_GEN_DONE_PACKET;
-                else if (exit_gen_pause_int)
+                else if (~response_engine_in_break_flag_reg & exit_gen_pause_int)
                     next_state = ENGINE_CSR_INDEX_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_CSR_INDEX_GEN_PAUSE;
@@ -501,7 +500,7 @@ module engine_csr_index_generator #(parameter
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
-                cmd_done_packet_send_int           <= 0;
+                cmd_done_packet_send_reg           <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_IDLE : begin
                 configure_engine_int.payload       <= 0;
@@ -523,6 +522,7 @@ module engine_csr_index_generator #(parameter
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
+                cmd_done_packet_send_reg           <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_IDLE : begin
                 configure_memory_setup_reg         <= 1'b0;
@@ -540,6 +540,7 @@ module engine_csr_index_generator #(parameter
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
+                cmd_done_packet_send_reg           <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
@@ -570,6 +571,7 @@ module engine_csr_index_generator #(parameter
                 response_engine_in_break_flag_reg  <= 1'b0;
                 response_engine_in_done_flag_reg   <= 1'b0;
                 response_memory_counter_load_value <= 0;
+                cmd_done_packet_send_reg           <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_TRANS : begin
                 configure_engine_setup_reg <= 1'b1;
@@ -674,12 +676,12 @@ module engine_csr_index_generator #(parameter
                 if(cmd_done_packet_int) begin
                     fifo_request_din_reg.valid <= 1'b0;
                     counter_enable             <= 1'b0;
-                    cmd_done_packet_send_int   <= 1'b0;
+                    cmd_done_packet_send_reg   <= 1'b0;
                 end
                 else begin
                     counter_enable             <= 1'b1;
                     fifo_request_din_reg.valid <= 1'b1;
-                    cmd_done_packet_send_int   <= 1'b1;
+                    cmd_done_packet_send_reg   <= 1'b1;
                 end
                 counter_clear                     <= 1'b0;
                 done_int_reg                      <= 1'b0;
@@ -700,7 +702,6 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid        <= 1'b0;
                 response_engine_in_break_flag_reg <= 1'b0;
                 response_engine_in_done_flag_reg  <= 1'b1;
-                cmd_done_packet_send_int          <= 1'b0;
             end
             ENGINE_CSR_INDEX_GEN_DONE : begin
                 configure_engine_int.valid        <= 1'b0;
@@ -712,6 +713,7 @@ module engine_csr_index_generator #(parameter
                 fifo_request_din_reg.valid        <= 1'b0;
                 response_engine_in_break_flag_reg <= 1'b0;
                 response_engine_in_done_flag_reg  <= 1'b0;
+                cmd_done_packet_send_reg          <= 1'b0;
             end
         endcase
     end // always_ff @(posedge ap_clk)
@@ -866,15 +868,6 @@ module engine_csr_index_generator #(parameter
         end
     end
 // --------------------------------------------------------------------------------------
-    hyper_pipeline_noreset #(
-        .STAGES(4                              ),
-        .WIDTH ($bits(cmd_done_packet_send_int))
-    ) inst_hyper_pipeline_configure_engine_int_data (
-        .ap_clk(ap_clk                  ),
-        .din   (cmd_done_packet_send_int),
-        .dout  (cmd_done_packet_send_reg)
-    );
-// --------------------------------------------------------------------------------------
     always_comb begin
         burst_length       = 0;
         burst_flag         = 0;
@@ -940,13 +933,13 @@ module engine_csr_index_generator #(parameter
     end
 
 // --------------------------------------------------------------------------------------
-    assign cmd_in_flight_assert = (request_out_int.valid|fifo_request_din_reg.valid) | (|cmd_in_flight_hold);
+    assign cmd_in_flight_assert = (request_out_int.valid|fifo_request_din_reg.valid|response_memory_in_reg.valid) | (|cmd_in_flight_hold);
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
             cmd_in_flight_hold <= 0;
         end else begin
-            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_out_int.valid|fifo_request_din_reg.valid)};
+            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_out_int.valid|fifo_request_din_reg.valid|response_memory_in_reg.valid)};
         end
     end
 // --------------------------------------------------------------------------------------

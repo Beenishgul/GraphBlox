@@ -4735,28 +4735,6 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # Size (bits) ParallelReadWriteConfigurationPayload: 744
 # Size (bits) ReadWriteConfigurationPayload: 176
 # Size (bits) SetOpsConfigurationPayload: 8
-
-# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY) MemoryPacketRequestPayload width
-# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE) EnginePacketPayload width
-# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE) ControlPacketPayload width
-# print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST) ControlPacketPayload width
-# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY) MemoryPacketRequestPayload width
-# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE) EnginePacketPayload width
-# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE) ControlPacketPayload width
-# print (CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST) ControlPacketPayload width
-# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY ) MemoryPacketRequestPayload width
-# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE ) EnginePacketPayload width
-# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE ) ControlPacketPayload width
-# print (CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST ) ControlPacketPayload width
-
-# NUM_CHANNELS_TOP MemoryPacketRequestPayload * 32
-# NUM_MEMORY_REQUESTORS = 2 MemoryPacketResponsePayload * 32
-# NUM_CHANNELS_TOP MemoryPacketResponsePayload * 32
-
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE  = NUM_CHANNELS_TOP * 32
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST   = NUM_CHANNELS_TOP * 32
-# CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST  = 2 * 32
-
 # Define the data types and their configurations
 data_types_pr_engine_packet = {
     "ALUOpsConfigurationPayload": [
@@ -4911,6 +4889,177 @@ data_types_pr_engine_packet = {
     ],
 }
 
+# Size (bits) ALUOpsConfigurationPayload: 75
+# Size (bits) CacheRequestPayload: 178
+# Size (bits) ControlPacketPayload: 27
+# Size (bits) CSRIndexConfigurationPayload: 354
+# Size (bits) EnginePacketFullPayload: 235
+# Size (bits) EnginePacketPayload: 172
+# Size (bits) FilterCondConfigurationPayload: 98
+# Size (bits) MemoryPacketRequestPayload: 108
+# Size (bits) MemoryPacketResponsePayload: 65
+# Size (bits) MergeDataConfigurationPayload: 8
+# Size (bits) ParallelReadWriteConfigurationPayload: 748
+# Size (bits) ReadWriteConfigurationPayload: 177
+# Size (bits) SetOpsConfigurationPayload: 8
+# Define the data types and their configurations
+data_types_bfs_engine_packet = {
+    "ALUOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 75,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 75, "configurations": []},
+    ],
+    "CSRIndexConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 354,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 354, "configurations": []},
+    ],
+    "FilterCondConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 98,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 98, "configurations": []},
+    ],
+    "MergeDataConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "ParallelReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 748,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 748, "configurations": []},
+    ],
+    "ReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 177,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 177, "configurations": []},
+    ],
+    "SetOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "CacheRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 178,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 178,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+    ],
+    "ControlPacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 27,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 27, "configurations": []},
+    ],
+    "EnginePacketFullPayload": [
+        {
+            "fifo_type": "std",
+            "width": 235,
+            "configurations": [
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 5},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 235,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+    ],
+    "EnginePacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 172,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 5},
+                {"depth": 64, "prog_full": 16},
+                {"depth": 64, "prog_full": 32},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 172,
+            "configurations": [
+                {"depth": 32, "prog_full": 27},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+    ],
+    "MemoryPacketRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 108,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 16},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 108, "configurations": []},
+    ],
+    "MemoryPacketResponsePayload": [
+        {
+            "fifo_type": "std",
+            "width": 65,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 65, "configurations": []},
+    ],
+    "MemoryStreamRequestPayload": [
+        {"fifo_type": "std", "width": 32, "configurations": []},
+        {"fifo_type": "fwft", "width": 32, "configurations": []},
+    ],
+}
+
+if ALGORITHM_NAME == "BFS":
+    data_types_active_engine_packet = data_types_bfs_engine_packet
+else:
+    data_types_active_engine_packet = data_types_pr_engine_packet
 
 def clog2(x):
     if x > 0:
@@ -4992,46 +5141,46 @@ flattened_stream_memory_request = list(
 # Update configurations for each flattened list
 update_configurations(
     flattened_cache_memory_response,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketResponsePayload",
     "std",
 )
 update_configurations(
     flattened_cache_memory_response,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketResponsePayload",
     "fwft",
 )
 
 update_configurations(
     flattened_cache_memory_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "std",
 )
 update_configurations(
     flattened_cache_memory_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "fwft",
 )
 
 update_configurations(
     flattened_kernel_memory_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketResponsePayload",
     "std",
 )
 
 update_configurations(
     flattened_stream_memory_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryStreamRequestPayload",
     "std",
 )
 update_configurations(
     flattened_stream_memory_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryStreamRequestPayload",
     "fwft",
 )
@@ -5047,39 +5196,39 @@ flattened_cu_memory = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_M
 # Update configurations for each flattened list
 update_configurations(
     flattened_lane_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "std",
 )
 update_configurations(
     flattened_lane_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "fwft",
 )
 
 update_configurations(
     flattened_bundle_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "std",
 )
 update_configurations(
     flattened_bundle_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "fwft",
 )
 
 update_configurations(
     flattened_cu_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "std",
 )
 update_configurations(
     flattened_cu_memory,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "MemoryPacketRequestPayload",
     "fwft",
 )
@@ -5094,24 +5243,24 @@ flattened_cu_engine = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_E
 
 # Update configurations for each flattened list
 update_configurations(
-    flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
+    flattened_lane_engine, data_types_active_engine_packet, "EnginePacketPayload", "std"
 )
 update_configurations(
-    flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
-)
-
-update_configurations(
-    flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
-)
-update_configurations(
-    flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
+    flattened_lane_engine, data_types_active_engine_packet, "EnginePacketPayload", "fwft"
 )
 
 update_configurations(
-    flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
+    flattened_bundle_engine, data_types_active_engine_packet, "EnginePacketPayload", "std"
 )
 update_configurations(
-    flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
+    flattened_bundle_engine, data_types_active_engine_packet, "EnginePacketPayload", "fwft"
+)
+
+update_configurations(
+    flattened_cu_engine, data_types_active_engine_packet, "EnginePacketPayload", "std"
+)
+update_configurations(
+    flattened_cu_engine, data_types_active_engine_packet, "EnginePacketPayload", "fwft"
 )
 
 # Flatten each configuration list into a single list
@@ -5138,19 +5287,19 @@ flattened_cu_control_request = list(
 # Update configurations for each flattened list
 update_configurations(
     flattened_lane_control_response,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "fwft",
 )
 update_configurations(
     flattened_bundle_control_response,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "fwft",
 )
 update_configurations(
     flattened_cu_control_response,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "fwft",
 )
@@ -5158,19 +5307,19 @@ update_configurations(
 # Update configurations for each flattened list
 update_configurations(
     flattened_lane_control_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "std",
 )
 update_configurations(
     flattened_bundle_control_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "std",
 )
 update_configurations(
     flattened_cu_control_request,
-    data_types_pr_engine_packet,
+    data_types_active_engine_packet,
     "ControlPacketPayload",
     "std",
 )
@@ -5293,7 +5442,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 """
 
 # Execute the function with the defined data types and the template
-fill_and_generate_fifo_tcl(data_types_pr_engine_packet)
+fill_and_generate_fifo_tcl(data_types_active_engine_packet)
 
 # ----------------------------------------------------------------------------
 # generate fill_fifo_wrapper_topology
@@ -5322,54 +5471,135 @@ fifo_template_mid = """
 end else
 """
 fifo_template_default_2 = """
- begin
+begin
+    localparam LEGAL_RANGE = FIFO_WRITE_DEPTH - (PROG_THRESH) < 5 ? 5 : (FIFO_WRITE_DEPTH - (PROG_THRESH)) > (FIFO_WRITE_DEPTH - 5) ? (FIFO_WRITE_DEPTH - 5) : FIFO_WRITE_DEPTH - (PROG_THRESH);
+
+    logic [READ_DATA_WIDTH-1:0] dout_int;
+    logic                       valid_int;
+
+    if(READ_MODE == "std") begin
+        always_ff @(posedge clk) begin
+            if(srst) begin
+                valid <= 1'b0;
+            end
+            else begin
+                valid <= valid_int & rd_en;
+            end
+        end
+
+        always_ff @(posedge clk ) begin
+            if(srst) begin
+                dout <= 0;
+            end
+            else begin
+                if(valid_int & rd_en)
+                    dout <= dout_int[READ_DATA_WIDTH-1:0];
+            end
+        end
+
+    end else begin
+        assign valid = valid_int;
+        assign dout  = dout_int[READ_DATA_WIDTH-1:0];
+    end
+
     // xpm_fifo_sync: Synchronous FIFO
     // Xilinx Parameterized Macro
     xpm_fifo_sync #(
-      .FIFO_MEMORY_TYPE   ("auto"                        ), //string; "auto", "block", "distributed", or "ultra";
-      .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
-      .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH              ), //positive integer
-      .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH              ), //positive integer
-      .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
-      .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
-      .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
-      .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
-      .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
-      .FIFO_READ_LATENCY  (1                             ), //positive integer;
-      .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
-      .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
-      .PROG_EMPTY_THRESH  (PROG_THRESH                   ), //positive integer
-      .DOUT_RESET_VALUE   ("0"                           ), //string
-      .WAKEUP_TIME        (0                             )  //positive integer; 0 or 2;
+        .FIFO_MEMORY_TYPE   ("auto"                  ), //string; "auto", "block", "distributed", or "ultra";
+        .ECC_MODE           ("no_ecc"                ), //string; "no_ecc" or "en_ecc";
+        .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH        ), //positive integer
+        .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH        ), //positive integer
+        .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)), //positive integer
+        .PROG_FULL_THRESH   (LEGAL_RANGE             ), //positive integer
+        .FULL_RESET_VALUE   (0                       ), //positive integer; 0 or 1
+        .USE_ADV_FEATURES   ("1002"                  ), //string; "0000" to "1F1F", "1A0A", "1002";
+        .READ_MODE          ("fwft"                  ), //string; "std" or "fwft";
+        .FIFO_READ_LATENCY  (1                       ), //positive integer;
+        .READ_DATA_WIDTH    (READ_DATA_WIDTH         ), //positive integer
+        .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH) ), //positive integer
+        .PROG_EMPTY_THRESH  (PROG_THRESH             ), //positive integer
+        .DOUT_RESET_VALUE   ("0"                     ), //string
+        .WAKEUP_TIME        (0                       )  //positive integer; 0 or 2;
     ) xpm_fifo_sync_inst (
-      .sleep        (1'b0       ),
-      .rst          (srst       ),
-      .wr_clk       (clk        ),
-      .wr_en        (wr_en      ),
-      .din          (din        ),
-      .full         (full       ),
-      .overflow     (           ),
-      .prog_full    (prog_full  ),
-      .wr_data_count(           ),
-      .almost_full  (           ),
-      .wr_ack       (           ),
-      .wr_rst_busy  (wr_rst_busy),
-      .rd_en        (rd_en      ),
-      .dout         (dout       ),
-      .empty        (empty      ),
-      .prog_empty   (           ),
-      .rd_data_count(           ),
-      .almost_empty (           ),
-      .data_valid   (valid      ),
-      .underflow    (           ),
-      .rd_rst_busy  (rd_rst_busy),
-      .injectsbiterr(1'b0       ),
-      .injectdbiterr(1'b0       ),
-      .sbiterr      (           ),
-      .dbiterr      (           )
+        .sleep        (1'b0                     ),
+        .rst          (srst                     ),
+        .wr_clk       (clk                      ),
+        .wr_en        (wr_en                    ),
+        .din          (din[WRITE_DATA_WIDTH-1:0]),
+        .full         (full                     ),
+        .overflow     (                         ),
+        .prog_full    (prog_full                ),
+        .wr_data_count(                         ),
+        .almost_full  (                         ),
+        .wr_ack       (                         ),
+        .wr_rst_busy  (wr_rst_busy              ),
+        .rd_en        (rd_en                    ),
+        .dout         (dout_int                 ),
+        .empty        (empty                    ),
+        .prog_empty   (                         ),
+        .rd_data_count(                         ),
+        .almost_empty (                         ),
+        .data_valid   (valid_int                ),
+        .underflow    (                         ),
+        .rd_rst_busy  (rd_rst_busy              ),
+        .injectsbiterr(1'b0                     ),
+        .injectdbiterr(1'b0                     ),
+        .sbiterr      (                         ),
+        .dbiterr      (                         )
     );
     // End of xpm_fifo_sync instance declaration
-  end
+end
+endgenerate"""
+
+fifo_template_default_3 = """
+begin
+    // xpm_fifo_sync: Synchronous FIFO
+    // Xilinx Parameterized Macro
+    xpm_fifo_sync #(
+        .FIFO_MEMORY_TYPE   ("auto"                          ), //string; "auto", "block", "distributed", or "ultra";
+        .ECC_MODE           ("no_ecc"                        ), //string; "no_ecc" or "en_ecc";
+        .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH                ), //positive integer
+        .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH                ), //positive integer
+        .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)        ), //positive integer
+        .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - (PROG_THRESH)), //positive integer
+        .FULL_RESET_VALUE   (0                               ), //positive integer; 0 or 1
+        .USE_ADV_FEATURES   ("1002"                          ), //string; "0000" to "1F1F", "1A0A", "1002";
+        .READ_MODE          (READ_MODE                       ), //string; "std" or "fwft";
+        .FIFO_READ_LATENCY  (1                               ), //positive integer;
+        .READ_DATA_WIDTH    (READ_DATA_WIDTH                 ), //positive integer
+        .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)         ), //positive integer
+        .PROG_EMPTY_THRESH  (PROG_THRESH                     ), //positive integer
+        .DOUT_RESET_VALUE   ("0"                             ), //string
+        .WAKEUP_TIME        (0                               )  //positive integer; 0 or 2;
+    ) xpm_fifo_sync_inst (
+        .sleep        (1'b0                     ),
+        .rst          (srst                     ),
+        .wr_clk       (clk                      ),
+        .wr_en        (wr_en                    ),
+        .din          (din[WRITE_DATA_WIDTH-1:0]),
+        .full         (full                     ),
+        .overflow     (                         ),
+        .prog_full    (prog_full                ),
+        .wr_data_count(                         ),
+        .almost_full  (                         ),
+        .wr_ack       (                         ),
+        .wr_rst_busy  (wr_rst_busy              ),
+        .rd_en        (rd_en                    ),
+        .dout         (dout[READ_DATA_WIDTH-1:0]),
+        .empty        (empty                    ),
+        .prog_empty   (                         ),
+        .rd_data_count(                         ),
+        .almost_empty (                         ),
+        .data_valid   (valid                    ),
+        .underflow    (                         ),
+        .rd_rst_busy  (rd_rst_busy              ),
+        .injectsbiterr(1'b0                     ),
+        .injectdbiterr(1'b0                     ),
+        .sbiterr      (                         ),
+        .dbiterr      (                         )
+    );
+    // End of xpm_fifo_sync instance declaration
+end
 endgenerate"""
 
 fifo_template_default = """
@@ -5422,8 +5652,10 @@ if XPM_FIFO_ENABLE == "0":
 
 if XPM_FIFO_ENABLE == "0":
     fill_fifo_wrapper_topology.append(fifo_template_default)
-else:
+elif XPM_FIFO_ENABLE == "1":
     fill_fifo_wrapper_topology.append(fifo_template_default_2)
+else:
+    fill_fifo_wrapper_topology.append(fifo_template_default_3)
 
 # Write the accumulated VHDL code to the specified output file
 with open(output_file_fifo_wrapper_topology, "w") as vh_file:
@@ -10088,76 +10320,3 @@ fill_engine_template_topology.append("    endcase\nendgenerate")
 # Write the accumulated VHDL code to the specified output file
 with open(output_file_engine_template_topology, "w") as vh_file:
     vh_file.write("\n".join(fill_engine_template_topology))
-
-
-engine_template_pre = """
-generate
-"""
-engine_template_mid = """
-  if((READ_MODE == "std") && (READ_DATA_WIDTH == 107) && (FIFO_WRITE_DEPTH == 32) && (READ_DATA_WIDTH == 32) && (PROG_THRESH == 16) && (FIFO_MEMORY_TYPE == "distributed")) begin
-    fifo_generator_ip_107x32x16_distributed fifo_generator_ip_107x32x16_distributed_inst (
-      .clk        (clk        ),
-      .srst       (srst       ),
-      .din        (din        ),
-      .wr_en      (wr_en      ),
-      .rd_en      (rd_en      ),
-      .dout       (dout       ),
-      .full       (full       ),
-      .empty      (empty      ),
-      .valid      (valid      ),
-      .prog_full  (prog_full  ),
-      .wr_rst_busy(wr_rst_busy),
-      .rd_rst_busy(rd_rst_busy)
-    );
-end else
-"""
-engine_template_default = """
- begin
-    // xpm_fifo_sync: Synchronous FIFO
-    // Xilinx Parameterized Macro
-    xpm_fifo_sync #(
-      .FIFO_MEMORY_TYPE   ("distributed"                        ), //string; "auto", "block", "distributed", or "ultra";
-      .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
-      .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH              ), //positive integer
-      .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH              ), //positive integer
-      .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
-      .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
-      .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
-      .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
-      .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
-      .FIFO_READ_LATENCY  (1                             ), //positive integer;
-      .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
-      .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
-      .PROG_EMPTY_THRESH  (PROG_THRESH                   ), //positive integer
-      .DOUT_RESET_VALUE   ("0"                           ), //string
-      .WAKEUP_TIME        (0                             )  //positive integer; 0 or 2;
-    ) xpm_fifo_sync_inst (
-      .sleep        (1'b0       ),
-      .rst          (srst       ),
-      .wr_clk       (clk        ),
-      .wr_en        (wr_en      ),
-      .din          (din        ),
-      .full         (full       ),
-      .overflow     (           ),
-      .prog_full    (prog_full  ),
-      .wr_data_count(           ),
-      .almost_full  (           ),
-      .wr_ack       (           ),
-      .wr_rst_busy  (wr_rst_busy),
-      .rd_en        (rd_en      ),
-      .dout         (dout       ),
-      .empty        (empty      ),
-      .prog_empty   (           ),
-      .rd_data_count(           ),
-      .almost_empty (           ),
-      .data_valid   (valid      ),
-      .underflow    (           ),
-      .rd_rst_busy  (rd_rst_busy),
-      .injectsbiterr(1'b0       ),
-      .injectdbiterr(1'b0       ),
-      .sbiterr      (           ),
-      .dbiterr      (           )
-    );
-    // End of xpm_fifo_sync instance declaration
-  end
-endgenerate"""
