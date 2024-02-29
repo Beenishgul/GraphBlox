@@ -611,7 +611,7 @@
         "frequency_scale": "1",
         "ctrl_mode"      : "USER_MANAGED",
         "num_kernels"    : "1",
-        "xpm_fifo"       : "1",
+        "xpm_fifo"       : "0",
         "slr_percent"    : [33, 33, 33, 0],
         "slr_mapping"    : [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
         "slr_layout"     : "2",
