@@ -3231,7 +3231,7 @@ data_types_pr_engine_packet = {
         {"fifo_type": "fwft", "width": 74, "configurations": []}
     ],
     "CSRIndexConfigurationPayload": [
-        {"fifo_type": "std", "width": 353, "configurations": [{"depth": 16, "prog_full": 8}]},
+        {"fifo_type": "std", "width": 353, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 48}]},
         {"fifo_type": "fwft", "width": 353, "configurations": []}
     ],
     "FilterCondConfigurationPayload": [
@@ -3267,7 +3267,7 @@ data_types_pr_engine_packet = {
         {"fifo_type": "fwft", "width": 233, "configurations": [{"depth": 16, "prog_full": 8}]}
     ],
     "EnginePacketPayload": [
-        {"fifo_type": "std", "width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]},
+        {"fifo_type": "std", "width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 16}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]},
         {"fifo_type": "fwft", "width": 170, "configurations": [{"depth": 32, "prog_full": 27}, {"depth": 64, "prog_full": 32}]}
     ],
     "MemoryPacketRequestPayload": [
@@ -3524,7 +3524,7 @@ fifo_template_mid = """
     );
 end else
 """
-fifo_template_default = """
+fifo_template_default_2 = """
  begin
     // xpm_fifo_sync: Synchronous FIFO
     // Xilinx Parameterized Macro
@@ -3575,6 +3575,14 @@ fifo_template_default = """
   end
 endgenerate"""
 
+fifo_template_default = """
+ begin
+    initial begin
+      $display("MSG: %0d %0d %0d %s", READ_DATA_WIDTH, FIFO_WRITE_DEPTH, PROG_THRESH, READ_MODE);
+    end
+  end
+endgenerate"""
+
 fifo_count = 0
 fill_fifo_wrapper_topology.append(fifo_template_pre)        
 if XPM_FIFO_ENABLE == "0":
@@ -3613,7 +3621,11 @@ if XPM_FIFO_ENABLE == "0":
         )
         fill_fifo_wrapper_topology.append(filled_fifo_wrapper_topology)
 
-fill_fifo_wrapper_topology.append(fifo_template_default)
+if XPM_FIFO_ENABLE == "0":
+    fill_fifo_wrapper_topology.append(fifo_template_default)
+else:
+    fill_fifo_wrapper_topology.append(fifo_template_default_2)
+
 # Write the accumulated VHDL code to the specified output file
 with open(output_file_fifo_wrapper_topology, 'w') as vh_file:
     vh_file.write('\n'.join(fill_fifo_wrapper_topology))
